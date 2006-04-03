@@ -1,0 +1,22 @@
+/*
+ * Created on Mar 27, 2005
+ */
+package com.arcaner.warlock.ui.macros.internal.variables;
+
+import com.arcaner.warlock.client.IWarlockClientViewer;
+import com.arcaner.warlock.ui.macros.IMacroVariable;
+
+/**
+ * @author Marshall
+ */
+public class CurrentCommandMacroVariable implements IMacroVariable {
+
+	public String getIdentifier() {
+		return "$currentCommand";
+	}
+	
+	public String getValue(IWarlockClientViewer context) {
+		return context.getCurrentCommand();
+	}
+
+}
