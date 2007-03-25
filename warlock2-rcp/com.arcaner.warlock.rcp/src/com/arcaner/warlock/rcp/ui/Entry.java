@@ -3,7 +3,7 @@ package com.arcaner.warlock.rcp.ui;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Text;
 
-import com.arcaner.warlock.rcp.rcp.client.IWarlockClient;
+import com.arcaner.warlock.client.IWarlockClient;
 import com.arcaner.warlock.rcp.views.GameView;
 
 public class Entry extends Text {

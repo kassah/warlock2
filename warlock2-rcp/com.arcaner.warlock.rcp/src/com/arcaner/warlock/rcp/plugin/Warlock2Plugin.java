@@ -13,7 +13,7 @@ import org.eclipse.core.runtime.Platform;
 import org.eclipse.ui.plugin.AbstractUIPlugin;
 import org.osgi.framework.BundleContext;
 
-import com.arcaner.warlock.rcp.rcp.script.IScriptEngine;
+import com.arcaner.warlock.script.IScriptEngine;
 
 /**
  * The main plugin class to be used in the desktop.
