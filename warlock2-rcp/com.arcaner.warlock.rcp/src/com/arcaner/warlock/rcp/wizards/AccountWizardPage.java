@@ -22,13 +22,13 @@ import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Label;
 import org.eclipse.swt.widgets.Text;
 
+import com.arcaner.warlock.network.SGEConnection;
+import com.arcaner.warlock.network.SGEConnectionListener;
 import com.arcaner.warlock.rcp.application.SavedProfiles;
-import com.arcaner.warlock.rcp.rcp.network.SGEConnection;
-import com.arcaner.warlock.rcp.rcp.network.SGEConnectionListener;
-import com.arcaner.warlock.rcp.rcp.network.SWTSGEConnectionListenerAdapter;
 import com.arcaner.warlock.rcp.ui.ComboField;
 import com.arcaner.warlock.rcp.ui.TextField;
 import com.arcaner.warlock.rcp.ui.WarlockSharedImages;
+import com.arcaner.warlock.rcp.ui.network.SWTSGEConnectionListenerAdapter;
 
 /**
  * @author Marshall

@@ -26,12 +26,12 @@ import org.eclipse.swt.widgets.Label;
 import org.eclipse.swt.widgets.Menu;
 import org.eclipse.ui.part.ViewPart;
 
-import com.arcaner.warlock.rcp.rcp.client.ICompass;
-import com.arcaner.warlock.rcp.rcp.client.IPropertyListener;
-import com.arcaner.warlock.rcp.rcp.client.IWarlockClient;
-import com.arcaner.warlock.rcp.rcp.client.internal.Compass;
-import com.arcaner.warlock.rcp.rcp.client.stormfront.IStormFrontClientListener;
-import com.arcaner.warlock.rcp.rcp.client.stormfront.internal.StormFrontClient;
+import com.arcaner.warlock.client.ICompass;
+import com.arcaner.warlock.client.IPropertyListener;
+import com.arcaner.warlock.client.internal.Compass;
+import com.arcaner.warlock.client.stormfront.IStormFrontClient;
+import com.arcaner.warlock.client.stormfront.IStormFrontClientListener;
+import com.arcaner.warlock.client.stormfront.internal.StormFrontClient;
 import com.arcaner.warlock.rcp.ui.WarlockSharedImages;
 
 /**
@@ -46,7 +46,7 @@ public class CompassView extends ViewPart implements IPropertyListener {
 	
 	private static CompassView instance;	
 	
-	private IWarlockClient client;
+	private IStormFrontClient client;
 	private ICompass compass;
 	private Label compassLabels[];
 	private String onIds[];
@@ -63,10 +63,10 @@ public class CompassView extends ViewPart implements IPropertyListener {
 		return instance;
 	}
 	
-	public CompassView (IWarlockClient client) {
-
-		
+	public void init (IStormFrontClient client) {
 		this.client = client;
+		client.getCompass().addListener(this);
+		
 		instance = this;
 		
 		compassLabels = new Label[ICompass.N_DIRECTIONS];

@@ -23,11 +23,11 @@ import org.eclipse.ui.IWorkbenchPage;
 import org.eclipse.ui.PartInitException;
 import org.eclipse.ui.part.ViewPart;
 
-import com.arcaner.warlock.rcp.rcp.client.IWarlockClient;
-import com.arcaner.warlock.rcp.rcp.client.IWarlockClientViewer;
-import com.arcaner.warlock.rcp.rcp.client.internal.SWTWarlockClientViewer;
-import com.arcaner.warlock.rcp.rcp.client.stormfront.IStormFrontClient;
-import com.arcaner.warlock.rcp.rcp.client.stormfront.IStormFrontClientListener;
+import com.arcaner.warlock.client.IWarlockClient;
+import com.arcaner.warlock.client.IWarlockClientViewer;
+import com.arcaner.warlock.client.stormfront.IStormFrontClient;
+import com.arcaner.warlock.client.stormfront.IStormFrontClientListener;
+import com.arcaner.warlock.rcp.ui.client.SWTWarlockClientViewer;
 import com.arcaner.warlock.rcp.ui.macros.IMacro;
 import com.arcaner.warlock.rcp.ui.macros.MacroFactory;
 

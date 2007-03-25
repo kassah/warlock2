@@ -16,9 +16,9 @@ import org.eclipse.swt.widgets.Text;
 import org.eclipse.swt.widgets.Tree;
 import org.eclipse.ui.part.ViewPart;
 
-import com.arcaner.warlock.rcp.rcp.network.ISGEConnectionListener;
-import com.arcaner.warlock.rcp.rcp.network.SGEConnection;
-import com.arcaner.warlock.rcp.rcp.network.SWTSGEConnectionListenerAdapter;
+import com.arcaner.warlock.network.ISGEConnectionListener;
+import com.arcaner.warlock.network.SGEConnection;
+import com.arcaner.warlock.rcp.ui.network.SWTSGEConnectionListenerAdapter;
 
 /**
  * @author Marshall

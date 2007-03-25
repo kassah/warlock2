@@ -29,10 +29,10 @@ import org.eclipse.swt.layout.FillLayout;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Table;
 
-import com.arcaner.warlock.rcp.rcp.network.SGEConnection;
-import com.arcaner.warlock.rcp.rcp.network.SGEConnectionListener;
-import com.arcaner.warlock.rcp.rcp.network.SWTSGEConnectionListenerAdapter;
+import com.arcaner.warlock.network.SGEConnection;
+import com.arcaner.warlock.network.SGEConnectionListener;
 import com.arcaner.warlock.rcp.ui.WarlockSharedImages;
+import com.arcaner.warlock.rcp.ui.network.SWTSGEConnectionListenerAdapter;
 
 /**
  * @author Marshall

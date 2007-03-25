@@ -12,7 +12,7 @@ import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.jface.operation.IRunnableWithProgress;
 import org.eclipse.jface.wizard.Wizard;
 
-import com.arcaner.warlock.rcp.rcp.network.SGEConnection;
+import com.arcaner.warlock.network.SGEConnection;
 
 /**
  * @author Marshall

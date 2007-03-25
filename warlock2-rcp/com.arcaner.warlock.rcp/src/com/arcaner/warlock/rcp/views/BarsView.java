@@ -16,8 +16,8 @@ import org.eclipse.swt.widgets.Label;
 import org.eclipse.swt.widgets.ProgressBar;
 import org.eclipse.ui.part.ViewPart;
 
-import com.arcaner.warlock.rcp.rcp.client.IWarlockClient;
-import com.arcaner.warlock.rcp.rcp.client.stormfront.IStormFrontClientListener;
+import com.arcaner.warlock.client.IWarlockClient;
+import com.arcaner.warlock.client.stormfront.IStormFrontClientListener;
 
 /**
  * @author Marshall
