@@ -5,8 +5,6 @@ package com.arcaner.warlock.client.internal;
 
 import java.io.IOException;
 
-import org.eclipse.core.runtime.Path;
-
 import com.arcaner.warlock.client.ICommandHistory;
 import com.arcaner.warlock.client.IWarlockClient;
 import com.arcaner.warlock.client.IWarlockClientViewer;
@@ -65,7 +63,7 @@ abstract public class WarlockClient implements IWarlockClient {
 		// Need to parse and handle args at this point.. TODO
 		
 		System.out.println("scriptname=" +scriptName);
-		ScriptRunner.runScript(this, new Path("C:\\Code\\warlock2\\test\\" + scriptName));
+		ScriptRunner.runScript(this, "C:\\Code\\warlock2\\test\\" + scriptName);
 	}
 	
 	public void echo(String text) {

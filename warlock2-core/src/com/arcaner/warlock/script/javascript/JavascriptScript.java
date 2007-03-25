@@ -6,8 +6,6 @@
  */
 package com.arcaner.warlock.script.javascript;
 
-import org.eclipse.core.runtime.IPath;
-
 import com.arcaner.warlock.script.IScript;
 
 /**
@@ -18,14 +16,14 @@ import com.arcaner.warlock.script.IScript;
  */
 public class JavascriptScript implements IScript {
 
-	private IPath path;
+	private String path;
 	
-	public JavascriptScript (IPath path)
+	public JavascriptScript (String path)
 	{
 		this.path = path;
 	}
 	
-	public IPath getPath() {
+	public String getPath() {
 		return path;
 	}
 

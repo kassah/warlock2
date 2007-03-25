@@ -7,8 +7,6 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashMap;
 
-import org.eclipse.swt.widgets.Display;
-
 /**
  * @author Marshall
  */
@@ -233,20 +231,16 @@ public class SGEConnection extends Connection implements IConnectionListener {
 
 	protected void fireEvent (final int event)
 	{
-		Display.getDefault().asyncExec(new Runnable() {
-			public void run () {
-				for (ISGEConnectionListener listener : sgeListeners) {
-					switch (event) {
-					case LOGIN_READY: listener.loginReady(SGEConnection.this); break;
-					case LOGIN_FINISHED: listener.loginFinished(SGEConnection.this, loginStatus); break;
-					case GAMES_READY: listener.gamesReady(SGEConnection.this, games);
-					case CHARACTERS_READY: listener.charactersReady(SGEConnection.this, characters); break;
-					case READY_TO_PLAY: listener.readyToPlay(SGEConnection.this, loginProperties); break;
-					default: break;
-					}
-				}
+		for (ISGEConnectionListener listener : sgeListeners) {
+			switch (event) {
+			case LOGIN_READY: listener.loginReady(SGEConnection.this); break;
+			case LOGIN_FINISHED: listener.loginFinished(SGEConnection.this, loginStatus); break;
+			case GAMES_READY: listener.gamesReady(SGEConnection.this, games);
+			case CHARACTERS_READY: listener.charactersReady(SGEConnection.this, characters); break;
+			case READY_TO_PLAY: listener.readyToPlay(SGEConnection.this, loginProperties); break;
+			default: break;
 			}
-		});
+		}	
 	}
 	
 	public void disconnected(Connection connection) {

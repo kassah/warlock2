@@ -6,8 +6,6 @@
  */
 package com.arcaner.warlock.script;
 
-import org.eclipse.core.runtime.IPath;
-
 import com.arcaner.warlock.client.IWarlockClient;
 
 /**
@@ -25,7 +23,7 @@ public interface IScriptEngine {
 	 * @param client The warlock client associated with this script
 	 * @return The script that is running.
 	 */
-	public IScript startScript(IWarlockClient client, IPath path);
+	public IScript startScript(IWarlockClient client, String path);
 	
 	/**
 	 * @return The file extensions that this scripting engine can handle.

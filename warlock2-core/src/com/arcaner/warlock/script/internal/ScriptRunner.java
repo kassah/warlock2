@@ -9,11 +9,7 @@ package com.arcaner.warlock.script.internal;
 import java.io.File;
 import java.util.Collection;
 
-import org.eclipse.core.runtime.IPath;
-import org.eclipse.core.runtime.Path;
-
 import com.arcaner.warlock.client.IWarlockClient;
-import com.arcaner.warlock.plugin.Warlock2Plugin;
 import com.arcaner.warlock.script.IScriptEngine;
 
 /**
@@ -24,9 +20,9 @@ import com.arcaner.warlock.script.IScriptEngine;
  */
 public class ScriptRunner {
 
-	public static void runScript (IWarlockClient client, IPath scriptPath)
+	public static void runScript (IWarlockClient client, String scriptPath)
 	{
-		Collection<IScriptEngine> engines = Warlock2Plugin.getDefault().getScriptEngines();
+		Collection<IScriptEngine> engines = ScriptEngineRegistry.getScriptEngines();
 		
 		System.out.println("engines = " + engines);
 		for (IScriptEngine engine : engines)
@@ -40,7 +36,7 @@ public class ScriptRunner {
 				if (new File(path+"."+extensions[i]).exists())
 				{
 					System.out.println("Engine (" + engine.getScriptEngineName() + ") starting " + scriptPath);
-					engine.startScript(client, new Path(path+"."+extensions[i]));
+					engine.startScript(client, path+"."+extensions[i]);
 					return;	
 				}
 			}

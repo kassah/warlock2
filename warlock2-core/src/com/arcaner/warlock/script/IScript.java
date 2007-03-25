@@ -6,7 +6,6 @@
  */
 package com.arcaner.warlock.script;
 
-import org.eclipse.core.runtime.IPath;
 
 /**
  * @author Marshall
@@ -16,7 +15,7 @@ import org.eclipse.core.runtime.IPath;
  */
 public interface IScript {
 
-	public IPath getPath ();
+	public String getPath ();
 	
 	public boolean isRunning ();
 	

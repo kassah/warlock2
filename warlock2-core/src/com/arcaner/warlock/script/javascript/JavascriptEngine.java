@@ -8,7 +8,6 @@ package com.arcaner.warlock.script.javascript;
 
 import java.io.FileReader;
 
-import org.eclipse.core.runtime.IPath;
 import org.mozilla.javascript.Context;
 import org.mozilla.javascript.Scriptable;
 
@@ -38,8 +37,8 @@ public class JavascriptEngine implements IScriptEngine {
 		return new String[] { "js" };
 	}
 	
-	public IScript startScript(final IWarlockClient client, IPath path) {
-		final JavascriptScript script = new JavascriptScript (path.makeAbsolute());
+	public IScript startScript(final IWarlockClient client, String path) {
+		final JavascriptScript script = new JavascriptScript (path);
 		new Thread(new Runnable() {
 			public void run () {
 				Context context = Context.enter();
@@ -47,7 +46,7 @@ public class JavascriptEngine implements IScriptEngine {
 					Scriptable scope = context.initStandardObjects();
 					scope.put("client", scope, client);
 					
-					Object result = context.evaluateReader(scope, new FileReader(script.getPath().toFile()), "<cmd>", 1, null);
+					Object result = context.evaluateReader(scope, new FileReader(script.getPath()), "<cmd>", 1, null);
 					System.out.println("script result: " + Context.toString(result));
 				}
 				catch (Exception e) {
