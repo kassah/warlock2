@@ -1,0 +1,16 @@
+<project name="warlock2-core" default="update-core-plugin">
+
+	<target name="build-jar">
+		<jar destfile="warlock2-core.jar">
+			<fileset dir="bin" includes="**/*"/>
+		</jar>
+	</target>
+	
+	<target name="update-core-plugin" depends="build-jar">
+		<move file="warlock2-core.jar" todir="../warlock2-rcp/com.arcaner.warlock.core/lib"/>
+		<copy todir="../warlock2-rcp/com.arcaner.warlock.core/lib">
+			<fileset dir="lib" includes="**/*"/>
+		</copy>
+	</target>
+	
+</project>
