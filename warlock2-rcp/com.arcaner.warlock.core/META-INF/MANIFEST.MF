@@ -7,9 +7,9 @@ Bundle-Activator: com.arcaner.warlock.core.Activator
 Bundle-Vendor: Warlock Team
 Require-Bundle: org.eclipse.core.runtime
 Eclipse-LazyStart: true
-Bundle-ClassPath: warlock2-core.jar,
- lib/js.jar,
- lib/warlock2-core.jar
+Bundle-ClassPath: lib/js.jar,
+ lib/warlock2-core.jar,
+ warlock2-core-rcp.jar
 Export-Package: com.arcaner.warlock.client,
  com.arcaner.warlock.client.internal,
  com.arcaner.warlock.client.stormfront,
