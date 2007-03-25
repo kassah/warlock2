@@ -1,0 +1,74 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?eclipse version="3.0"?>
+<plugin>
+
+     <extension-point id="scriptEngines" name="Warlock Script Engine" schema="schema/scriptEngines.exsd"/>
+   <extension-point id="macroVariables" name="Warlock Macro Variable" schema="schema/macroVariables.exsd"/>
+   <extension-point id="macroCommands" name="Warlock Macro Commands" schema="schema/macroCommands.exsd"/>
+   <extension
+         point="org.eclipse.ui.views">
+      <view
+            allowMultiple="true"
+            icon="icons/character.gif"
+            class="com.arcaner.warlock.rcp.views.GameView"
+            name="Warlock"
+            id="com.arcaner.warlock.views.gameView"/>
+      <view
+            allowMultiple="false"
+            icon="icons/compass_view.gif"
+            class="com.arcaner.warlock.rcp.views.CompassView"
+            name="Compass"
+            id="com.arcaner.warlock.views.compassView"/>
+      <view
+            allowMultiple="false"
+            class="com.arcaner.warlock.rcp.views.BarsView"
+            name="Bars"
+            id="com.arcaner.warlock.views.barsView"/>
+   </extension>
+   <extension
+         id="warlock"
+         point="org.eclipse.core.runtime.applications">
+      <application>
+         <run class="com.arcaner.warlock.rcp.application.WarlockApplication"/>
+      </application>
+   </extension>
+   <extension
+         point="org.eclipse.ui.perspectives">
+      <perspective
+            class="com.arcaner.warlock.rcp.application.WarlockPerspectiveFactory"
+            name="Warlock Perspective"
+            id="com.arcaner.warlock.warlockPerspective"/>
+   </extension>
+   <extension
+         point="org.eclipse.ui.commands">
+      <command
+            name="Connect"
+            id="com.arcaner.warlock.commands.connectCommand"/>
+      <keyConfiguration
+            name="Warlock Key Configuration"
+            parent="org.eclipse.ui.defaultAcceleratorConfiguration"
+            id="com.arcaner.warlock.keyConfiguration"/>
+      <keyBinding
+            contextId="org.eclipse.ui.globalScope"
+            command="com.arcaner.warlock.commands.connectCommand"
+            string="Ctrl+Shift+C"
+            commandId="com.arcaner.warlock.commands.connectCommand"
+            configuration="com.arcaner.warlock.keyConfiguration"/>
+   </extension>
+   <extension
+         point="com.arcaner.warlock.scriptEngines">
+      <scriptEngine classname="com.arcaner.warlock.script.javascript.JavascriptEngine"/>
+   </extension>
+   <extension
+         point="com.arcaner.warlock.macroVariables">
+      <macroVariable classname="com.arcaner.warlock.rcp.ui.macros.internal.variables.CurrentCommandMacroVariable"/>
+      <macroVariable classname="com.arcaner.warlock.rcp.ui.macros.internal.variables.LastCommandMacroVariable"/>
+      <macroVariable classname="com.arcaner.warlock.rcp.ui.macros.internal.variables.NextCommandMacroVariable"/>
+   </extension>
+   <extension
+         point="com.arcaner.warlock.macroCommands">
+      <macroCommand classname="com.arcaner.warlock.rcp.ui.macros.internal.commands.SendMacroCommand"/>
+      <macroCommand classname="com.arcaner.warlock.rcp.ui.macros.internal.commands.ClearMacroCommand"/>
+   </extension>
+
+</plugin>

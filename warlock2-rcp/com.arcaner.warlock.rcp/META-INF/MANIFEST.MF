@@ -1,0 +1,26 @@
+Manifest-Version: 1.0
+Bundle-ManifestVersion: 2
+Bundle-Name: Warlock: Simutronics Game Client
+Bundle-SymbolicName: com.arcaner.warlock; singleton:=true
+Bundle-Version: 2.0.0
+Bundle-ClassPath: warlock2.jar,
+ dom4j-1.5.2.jar,
+ jaxen-1.1-beta-4.jar,
+ js.jar
+Bundle-Activator: com.arcaner.warlock.rcp.plugin.Warlock2Plugin
+Bundle-Vendor: Warlock Team
+Bundle-Localization: plugin
+Require-Bundle: org.eclipse.ui,
+ org.eclipse.core.runtime,
+ org.eclipse.jface.text
+Eclipse-LazyStart: true
+Export-Package: com.arcaner.warlock.rcp.actions,
+ com.arcaner.warlock.rcp.application,
+ com.arcaner.warlock.rcp.plugin,
+ com.arcaner.warlock.rcp.ui,
+ com.arcaner.warlock.rcp.ui.macros,
+ com.arcaner.warlock.rcp.ui.macros.internal,
+ com.arcaner.warlock.rcp.ui.macros.internal.commands,
+ com.arcaner.warlock.rcp.ui.macros.internal.variables,
+ com.arcaner.warlock.rcp.views,
+ com.arcaner.warlock.rcp.wizards
