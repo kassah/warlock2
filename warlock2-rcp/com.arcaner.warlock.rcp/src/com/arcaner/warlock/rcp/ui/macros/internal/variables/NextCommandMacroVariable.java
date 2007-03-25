@@ -3,9 +3,9 @@
  */
 package com.arcaner.warlock.rcp.ui.macros.internal.variables;
 
-import com.arcaner.warlock.rcp.rcp.client.ICommand;
-import com.arcaner.warlock.rcp.rcp.client.IWarlockClient;
-import com.arcaner.warlock.rcp.rcp.client.IWarlockClientViewer;
+import com.arcaner.warlock.client.ICommand;
+import com.arcaner.warlock.client.IWarlockClient;
+import com.arcaner.warlock.client.IWarlockClientViewer;
 import com.arcaner.warlock.rcp.ui.macros.IMacroVariable;
 
 /**

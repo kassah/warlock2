@@ -8,7 +8,7 @@ package com.arcaner.warlock.rcp.ui.macros.internal;
 
 import java.util.Map;
 
-import com.arcaner.warlock.rcp.rcp.client.IWarlockClientViewer;
+import com.arcaner.warlock.client.IWarlockClientViewer;
 import com.arcaner.warlock.rcp.ui.macros.IMacro;
 import com.arcaner.warlock.rcp.ui.macros.IMacroCommand;
 import com.arcaner.warlock.rcp.ui.macros.IMacroVariable;

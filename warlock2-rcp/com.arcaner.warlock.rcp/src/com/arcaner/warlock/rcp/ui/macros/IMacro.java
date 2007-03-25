@@ -6,7 +6,7 @@
  */
 package com.arcaner.warlock.rcp.ui.macros;
 
-import com.arcaner.warlock.rcp.rcp.client.IWarlockClientViewer;
+import com.arcaner.warlock.client.IWarlockClientViewer;
 
 /**
  * @author Marshall
