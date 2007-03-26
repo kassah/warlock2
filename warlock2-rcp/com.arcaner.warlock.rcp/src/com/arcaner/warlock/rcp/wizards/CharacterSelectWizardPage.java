@@ -178,8 +178,10 @@ public class CharacterSelectWizardPage extends WizardPage {
 				String server = (String) loginProperties.get("GAMEHOST");
 				int port = Integer.parseInt ((String) loginProperties.get("GAMEPORT"));
 				String key = (String) loginProperties.get("KEY");
-				StormFrontClient client = new StormFrontClient(GameView.createNext().getViewer());
+				StormFrontClient client = new StormFrontClient();
 				client.addStormFrontClientListener(new SingletonStormFrontClientListenerAdapter(BarsView.getDefault()));
+				GameView.createNext().setStormFrontClient(client);
+				
 				client.connect(server, port, key);
 			} catch (Exception e) {
 				// TODO Auto-generated catch block

@@ -63,10 +63,8 @@ public class CompassView extends ViewPart implements IPropertyListener {
 		return instance;
 	}
 	
-	public void init (IStormFrontClient client) {
-		this.client = client;
-		client.getCompass().addListener(this);
-		
+	public CompassView ()
+	{
 		instance = this;
 		
 		compassLabels = new Label[ICompass.N_DIRECTIONS];
@@ -109,7 +107,11 @@ public class CompassView extends ViewPart implements IPropertyListener {
 		commands[ICompass.SOUTH] = "south";
 		commands[ICompass.SOUTHWEST] = "southwest";
 		commands[ICompass.DOWN] = "down";
-		
+	}
+	
+	public void init (IStormFrontClient client) {
+		this.client = client;
+		client.getCompass().addListener(this);
 	}
 	
 	public void propertyActivated()

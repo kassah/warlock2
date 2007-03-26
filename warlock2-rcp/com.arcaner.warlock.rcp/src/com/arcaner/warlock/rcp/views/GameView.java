@@ -34,7 +34,7 @@ import com.arcaner.warlock.rcp.ui.macros.MacroFactory;
 /**
  * @author marshall
  */
-public class GameView extends ViewPart implements KeyListener {
+public class GameView extends ViewPart implements KeyListener, IWarlockClientViewer {
 
 	public static final String VIEW_ID = "com.arcaner.warlock.views.gameView";
 	
@@ -46,13 +46,13 @@ public class GameView extends ViewPart implements KeyListener {
 	protected Text entry;
 
 	protected IStormFrontClient client;
-	protected ClientViewer viewer;
+	protected SWTWarlockClientViewer viewer;
 	
 	public GameView() {
 		if (firstInstance == null)
 			firstInstance = this;
 		
-		viewer = new ClientViewer();
+		viewer = new SWTWarlockClientViewer(this);
 		openViews.add(this);
 	}
 	
@@ -133,52 +133,52 @@ public class GameView extends ViewPart implements KeyListener {
 		}
 	}
 	
-	public IWarlockClientViewer getViewer() {
-		return viewer;
+	public void append(String toAppend) {
+		text.append(toAppend);
+		int length = text.getContent().getCharCount();		
+		if (text.getCaretOffset() < length) {
+			text.setCaretOffset(length);
+			text.showSelection();
+		}
 	}
 	
-	private class ClientViewer extends SWTWarlockClientViewer
-	{
-		public void handleAppend(String toAppend) {
-			text.append(toAppend);
-			int length = text.getContent().getCharCount();		
-			if (text.getCaretOffset() < length) {
-				text.setCaretOffset(length);
-				text.showSelection();
-			}
-		}
+	public void echo(String text) {
+		// A hacked style range, for now. This was mainly so we could get an idea on how to do it
+		// once we implement highlight prefs, etc.
+		
+		StyleRange range = new StyleRange();
+		range.background = new Color(getSite().getShell().getDisplay(), 0x30, 0x30, 0x30);
+		range.foreground = new Color(getSite().getShell().getDisplay(), 255, 255, 255);
+		range.fontStyle = SWT.BOLD;
+		range.start = GameView.this.text.getCharCount();
+		range.length = text.length();
+		
+		this.text.append(text);
+		this.text.setStyleRange(range);
+	}
 	
-		public void handleEcho(String text) {
-			// A hacked style range, for now. This was mainly so we could get an idea on how to do it
-			// once we implement highlight prefs, etc.
-			
-			StyleRange range = new StyleRange();
-			range.background = new Color(getSite().getShell().getDisplay(), 0x30, 0x30, 0x30);
-			range.foreground = new Color(getSite().getShell().getDisplay(), 255, 255, 255);
-			range.fontStyle = SWT.BOLD;
-			range.start = GameView.this.text.getCharCount();
-			range.length = text.length();
-			
-			GameView.this.text.append(text);
-			GameView.this.text.setStyleRange(range);
-		}
+	public void setViewerTitle(String title) {
+		setPartName(title);
+	}
+	
+	public IWarlockClient getWarlockClient () {
+		return this.client;
+	}
+	
+	public void setStormFrontClient(IStormFrontClient client) {
+		this.client = client;
+		client.addViewer(viewer);
 		
-		public void handleSetViewerTitle(String title) {
-			setPartName(title);
-		}
-		
-		public IWarlockClient getWarlockClient () {
-			return GameView.this.client;
-		}
-		
-		public void setWarlockClient(IWarlockClient client) {
-			GameView.this.client = (IStormFrontClient) client;
-		}
-		
-		public String getCurrentCommand ()
-		{
-			return GameView.this.entry.getText();
-		}
+		CompassView.getDefault().init(client);
+	}
+	
+	public String getCurrentCommand ()
+	{
+		return GameView.this.entry.getText();
+	}
+	
+	public void append(String viewName, String text) {
+		append(text);	
 	}
 	
 	public void keyPressed(KeyEvent e) {
@@ -196,7 +196,7 @@ public class GameView extends ViewPart implements KeyListener {
 		{
 			if (macro.getKeyCode() == e.keyCode)
 			{
-				String result = macro.executeCommand(viewer);
+				String result = macro.executeCommand(this);
 				if (result != null)
 				{
 					entry.setText(result);
@@ -206,5 +206,10 @@ public class GameView extends ViewPart implements KeyListener {
 			}
 		}
 		
+	}
+	
+	public IWarlockClientViewer getViewer ()
+	{
+		return viewer;
 	}
 }
