@@ -4,6 +4,7 @@
 package com.arcaner.warlock.client;
 
 import java.io.IOException;
+import java.util.Collection;
 
 /**
  * @author Marshall
@@ -58,5 +59,17 @@ public interface IWarlockClient {
 	 * @param title
 	 */
 	public void setTitle (String title);
+	
+	/**
+	 * @return the list of viewers for this client.
+	 */
+	public Collection<IWarlockClientViewer> getViewers();
+	
+	/**
+	 * Add a viewer to this client
+	 * @param viewer The viewer to add
+	 */
+	public void addViewer (IWarlockClientViewer viewer);
+	
 	
 }

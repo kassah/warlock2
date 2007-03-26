@@ -11,7 +11,6 @@ import java.util.ArrayList;
 import java.util.Collection;
 
 import com.arcaner.warlock.client.ICompass;
-import com.arcaner.warlock.client.IWarlockClientViewer;
 import com.arcaner.warlock.client.internal.Compass;
 import com.arcaner.warlock.client.internal.WarlockClient;
 import com.arcaner.warlock.client.stormfront.IStormFrontClient;
@@ -34,9 +33,7 @@ public class StormFrontClient extends WarlockClient implements IStormFrontClient
 	protected StringBuffer buffer = new StringBuffer();
 	protected IStormFrontProtocolHandler handler;
 	
-	public StormFrontClient(IWarlockClientViewer viewer) {
-		super(viewer);
-		
+	public StormFrontClient() {
 		compass = new Compass(this);
 		
 		roundtime = health = mana = fatigue = spirit = 0;

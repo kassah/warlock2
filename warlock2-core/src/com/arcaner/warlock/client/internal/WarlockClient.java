@@ -4,6 +4,8 @@
 package com.arcaner.warlock.client.internal;
 
 import java.io.IOException;
+import java.util.ArrayList;
+import java.util.Collection;
 
 import com.arcaner.warlock.client.ICommandHistory;
 import com.arcaner.warlock.client.IWarlockClient;
@@ -17,12 +19,11 @@ import com.arcaner.warlock.script.internal.ScriptRunner;
 abstract public class WarlockClient implements IWarlockClient {
 
 	protected IConnection connection;
-	protected IWarlockClientViewer viewer;
+	protected ArrayList<IWarlockClientViewer> viewers;
 	protected ICommandHistory commandHistory = new CommandHistory();
 	
-	public WarlockClient (IWarlockClientViewer viewer) {
-		this.viewer = viewer;
-		this.viewer.setWarlockClient(this);
+	public WarlockClient () {
+		viewers = new ArrayList<IWarlockClientViewer>();
 	}
 	
 	// IWarlockClient methods
@@ -34,7 +35,7 @@ abstract public class WarlockClient implements IWarlockClient {
 	abstract public void connect(String server, int port, String key) throws IOException;
 	
 	public void output(String viewName, String text) {
-		viewer.append(text);
+		for (IWarlockClientViewer viewer : viewers) viewer.append(viewName, text);
 	}
 	
 	public void send(String command) {
@@ -72,7 +73,7 @@ abstract public class WarlockClient implements IWarlockClient {
 		 *   sending random text needs to go through the append
 		 *   mechanism
 		 */
-		viewer.echo(text);
+		for (IWarlockClientViewer viewer : viewers) viewer.echo(text);
 	}
 	
 	public void clear(String viewName) {
@@ -80,7 +81,15 @@ abstract public class WarlockClient implements IWarlockClient {
 	}
 	
 	public void setTitle(String title) {
-		viewer.setViewerTitle(title);
+		for (IWarlockClientViewer viewer : viewers) viewer.setViewerTitle(title);
+	}
+	
+	public Collection<IWarlockClientViewer> getViewers() {
+		return viewers;
+	}
+	
+	public void addViewer(IWarlockClientViewer viewer) {
+		viewers.add(viewer);
 	}
 	
 }
