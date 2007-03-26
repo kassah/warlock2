@@ -12,6 +12,7 @@ import org.mozilla.javascript.Context;
 import org.mozilla.javascript.Scriptable;
 
 import com.arcaner.warlock.client.IWarlockClient;
+import com.arcaner.warlock.client.stormfront.IStormFrontClient;
 import com.arcaner.warlock.script.IScript;
 import com.arcaner.warlock.script.IScriptEngine;
 
@@ -30,7 +31,7 @@ public class JavascriptEngine implements IScriptEngine {
 	}
 	
 	public String getScriptEngineName() {
-		return "Standard Javascript Engine (c) 2005 Warlock Team";
+		return "Standard Javascript Engine (c) 2007 Warlock Team";
 	}
 	
 	public String[] getSupportedExtensions() {
@@ -45,6 +46,13 @@ public class JavascriptEngine implements IScriptEngine {
 				try {
 					Scriptable scope = context.initStandardObjects();
 					scope.put("client", scope, client);
+					
+					if (client instanceof IStormFrontClient)
+					{
+						IStormFrontClient sfClient = (IStormFrontClient) client;
+						scope.put("compass", scope, sfClient.getCompass());
+						scope.put("commandHistory", scope, sfClient.getCommandHistory());
+					}
 					
 					Object result = context.evaluateReader(scope, new FileReader(script.getPath()), "<cmd>", 1, null);
 					System.out.println("script result: " + Context.toString(result));
