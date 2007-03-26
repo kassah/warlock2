@@ -36,10 +36,9 @@ public class WarlockPerspectiveFactory implements IPerspectiveFactory {
 		myLayout = layout;
 		
 		layout.setEditorAreaVisible(false);
-		
 		layout.addView(GameView.VIEW_ID, IPageLayout.LEFT, 0.15f, layout.getEditorArea());
-		layout.addView(CompassView.VIEW_ID, IPageLayout.RIGHT, 0.95f, GameView.VIEW_ID);
 		layout.addView(BarsView.VIEW_ID, IPageLayout.BOTTOM, 0.85f, GameView.VIEW_ID);
+		layout.addView(CompassView.VIEW_ID, IPageLayout.RIGHT, 0.85f, BarsView.VIEW_ID);
 	}
 
 }

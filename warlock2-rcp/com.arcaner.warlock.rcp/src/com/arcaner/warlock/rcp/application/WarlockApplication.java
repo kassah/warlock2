@@ -31,6 +31,8 @@ public class WarlockApplication extends WorkbenchAdvisor implements IPlatformRun
 		configurer.setShowPerspectiveBar(false);
 		configurer.setShowProgressIndicator(false);
 		configurer.setShowFastViewBars(false);
+		configurer.setShowCoolBar(false);
+		configurer.setShowStatusLine(false);
 	}
 	
 	public void fillActionBars(IWorkbenchWindow window, IActionBarConfigurer configurer, int flags)
