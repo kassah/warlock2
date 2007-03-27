@@ -1,8 +1,0 @@
-<?xml version="1.0" encoding="UTF-8"?>
-<classpath>
-	<classpathentry kind="src" path="src"/>
-	<classpathentry kind="lib" exported="true" path="js.jar"/>
-	<classpathentry kind="con" exported="true" path="org.eclipse.jdt.launching.JRE_CONTAINER"/>
-	<classpathentry kind="con" exported="true" path="org.eclipse.pde.core.requiredPlugins"/>
-	<classpathentry kind="output" path="bin"/>
-</classpath>
