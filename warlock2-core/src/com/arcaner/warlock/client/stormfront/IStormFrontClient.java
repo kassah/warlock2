@@ -6,34 +6,19 @@
  */
 package com.arcaner.warlock.client.stormfront;
 
-import java.util.Collection;
-
 import com.arcaner.warlock.client.ICompass;
+import com.arcaner.warlock.client.IProperty;
 import com.arcaner.warlock.client.IWarlockClient;
 
 /**
  * @author Marshall
- *
- * TODO To change the template for this generated type comment go to
- * Window - Preferences - Java - Code Style - Code Templates
  */
 public interface IStormFrontClient extends IWarlockClient {
-	/**
-	 * Returns a list of this client's listeners
-	 * @return
-	 */
-	public Collection<IStormFrontClientListener> getStormFrontClientListeners ();
 	
 	/**
-	 * Add a warlock client listener to this client.
-	 * @param listener
+	 * @return The roundtime property
 	 */
-	public void addStormFrontClientListener (IStormFrontClientListener listener);
-	
-	/**
-	 * @return The number of seconds left in the roundtime
-	 */
-	public int getRoundtime();
+	public IProperty<Integer> getRoundtime();
 	
 	/**
 	 * Start a new roundtime countdown based on the seconds argument.
@@ -43,52 +28,24 @@ public interface IStormFrontClient extends IWarlockClient {
 	public void startRoundtime(int seconds, String label);
 	
 	/**
-	 * @return The amount of health in the health bar.
+	 * @return The health property
 	 */
-	public int getHealth();
-	
-	/**
-	 * Set the health bar to this amount, with the supplied label
-	 * @param health The amount of health to display in the health bar.
-	 * @param label The label the health bar should display
-	 */
-	public void setHealth (int health, String label);
+	public IProperty<Integer> getHealth();	
 	
 	/**
 	 * @return The amount of mana in the mana bar.
 	 */
-	public int getMana();
-	
-	/**
-	 * Set the mana bar to this amount, with the supplied label
-	 * @param mana The amount of mana to display in the mana bar.
-	 * @param label The label the mana bar should display
-	 */
-	public void setMana (int mana, String label);
+	public IProperty<Integer >getMana();
 	
 	/**
 	 * @return The amount of fatigue in the fatigue bar.
 	 */
-	public int getFatigue();
-	
-	/**
-	 * Set the fatigue bar to this amount, with the supplied label
-	 * @param fatigue The amount of fatigue to display in the fatigue bar.
-	 * @param label The label the fatigue bar should display
-	 */
-	public void setFatigue (int fatigue, String label);
+	public IProperty<Integer> getFatigue();
 	
 	/**
 	 * @return The amount of spirit in the spirit bar.
 	 */
-	public int getSpirit();
-	
-	/**
-	 * Set the spirit bar to this amount, with the supplied label
-	 * @param spirit The amount of spirit to display in the spirit bar.
-	 * @param label The label the spirit bar should display
-	 */
-	public void setSpirit (int spirit, String label);
+	public IProperty<Integer> getSpirit();
 	
 	/**
 	 * @return The client's compass.
@@ -104,4 +61,30 @@ public interface IStormFrontClient extends IWarlockClient {
 	 * @return whether we just showed a prompt or not
 	 */
 	public boolean isPrompting();
+	
+	/**
+	 * Sets the current style of the storm front client
+	 */
+	public void setCurrentStyle (IStormFrontStyle style);
+	
+	/**
+	 * @return The current style of the storm front client
+	 */
+	public IStormFrontStyle getCurrentStyle();
+	
+	/**
+	 * Append text to all of the viewers of this client using the specified style
+	 * @param viewName The view name to append to
+	 * @param text The text to append
+	 * @param style The style to use
+	 */
+	public void append (String viewName, String text, IStormFrontStyle style);
+	
+	/**
+	 * Echo text to all of the viewers of this client using the specified style
+	 * @param viewName The view name to echo to
+	 * @param text The text to echo
+	 * @param style The style to use
+	 */
+	public void echo (String viewName, String text, IStormFrontStyle style);
 }

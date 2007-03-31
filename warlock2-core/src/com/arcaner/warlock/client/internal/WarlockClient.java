@@ -16,7 +16,7 @@ import com.arcaner.warlock.script.internal.ScriptRunner;
 /**
  * @author Marshall
  */
-abstract public class WarlockClient implements IWarlockClient {
+public abstract class WarlockClient implements IWarlockClient {
 
 	protected IConnection connection;
 	protected ArrayList<IWarlockClientViewer> viewers;
@@ -32,9 +32,9 @@ abstract public class WarlockClient implements IWarlockClient {
 		return commandHistory;
 	}
 	
-	abstract public void connect(String server, int port, String key) throws IOException;
+	public abstract void connect(String server, int port, String key) throws IOException;
 	
-	public void output(String viewName, String text) {
+	public void append (String viewName, String text) {
 		for (IWarlockClientViewer viewer : viewers) viewer.append(viewName, text);
 	}
 	
@@ -67,13 +67,13 @@ abstract public class WarlockClient implements IWarlockClient {
 		ScriptRunner.runScript(this, "C:\\Code\\warlock2\\test\\" + scriptName);
 	}
 	
-	public void echo(String text) {
+	public void echo (String viewName, String text) {
 		/*
 		 * TODO this needs to only be used for sending commands
 		 *   sending random text needs to go through the append
 		 *   mechanism
 		 */
-		for (IWarlockClientViewer viewer : viewers) viewer.echo(text);
+		for (IWarlockClientViewer viewer : viewers) viewer.echo(viewName, text);
 	}
 	
 	public void clear(String viewName) {

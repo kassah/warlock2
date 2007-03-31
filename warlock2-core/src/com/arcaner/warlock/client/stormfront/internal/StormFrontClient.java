@@ -7,14 +7,16 @@
 package com.arcaner.warlock.client.stormfront.internal;
 
 import java.io.IOException;
-import java.util.ArrayList;
-import java.util.Collection;
 
 import com.arcaner.warlock.client.ICompass;
+import com.arcaner.warlock.client.IProperty;
+import com.arcaner.warlock.client.IWarlockClientViewer;
+import com.arcaner.warlock.client.internal.ClientProperty;
 import com.arcaner.warlock.client.internal.Compass;
 import com.arcaner.warlock.client.internal.WarlockClient;
 import com.arcaner.warlock.client.stormfront.IStormFrontClient;
-import com.arcaner.warlock.client.stormfront.IStormFrontClientListener;
+import com.arcaner.warlock.client.stormfront.IStormFrontClientViewer;
+import com.arcaner.warlock.client.stormfront.IStormFrontStyle;
 import com.arcaner.warlock.network.StormFrontConnection;
 import com.arcaner.warlock.stormfront.IStormFrontProtocolHandler;
 
@@ -27,22 +29,28 @@ import com.arcaner.warlock.stormfront.IStormFrontProtocolHandler;
 public class StormFrontClient extends WarlockClient implements IStormFrontClient {
 
 	protected ICompass compass;
-	protected int roundtime, health, mana, fatigue, spirit, lastPrompt;
-	protected ArrayList<IStormFrontClientListener> clientListeners;
+	protected int lastPrompt;
+	protected ClientProperty<Integer> roundtime, health, mana, fatigue, spirit;
 	protected boolean isPrompting = false;
 	protected StringBuffer buffer = new StringBuffer();
 	protected IStormFrontProtocolHandler handler;
+	protected boolean isBold;
+	protected IStormFrontStyle currentStyle = StormFrontStyle.EMPTY_STYLE;
 	
 	public StormFrontClient() {
 		compass = new Compass(this);
 		
-		roundtime = health = mana = fatigue = spirit = 0;
-		clientListeners = new ArrayList<IStormFrontClientListener>();
+		roundtime = new ClientProperty<Integer>(this, "roundtime");
+		health = new ClientProperty<Integer>(this, "health");
+		mana = new ClientProperty<Integer>(this, "mana");
+		fatigue = new ClientProperty<Integer>(this, "fatigue");
+		spirit = new ClientProperty<Integer>(this, "spirit");
 	}
 	
-	public void output(String viewName, String text) {
-		
-		if(viewName == null) {
+	public void append (String viewName, String text)
+	{	
+		if(DEFAULT_VIEW.equals(viewName))
+		{
 			boolean flush = false;
 			
 			// if we've already shown the prompt newline, don't do it again
@@ -87,8 +95,11 @@ public class StormFrontClient extends WarlockClient implements IStormFrontClient
 				 */
 				// if there is something in the buffer, output and clear it
 				if(buffer.length() > 0) {
-					super.output(viewName, buffer.toString());
+					String bufferText = buffer.toString();
+					
+					append(viewName, bufferText, currentStyle);
 					buffer.delete(0, buffer.length());
+					bufferText = null;
 				}
 			}
 			
@@ -106,36 +117,18 @@ public class StormFrontClient extends WarlockClient implements IStormFrontClient
 		}
 	}
 	
-	public Collection<IStormFrontClientListener> getStormFrontClientListeners() {
-		return clientListeners;
-	}
-
-	public void addStormFrontClientListener(IStormFrontClientListener listener) {
-		clientListeners.add(listener);
-	}
-	
-	public void removeStormFrontClientListener(IStormFrontClientListener listener) {
-		clientListeners.remove(listener);
-	}
-
-	public int getRoundtime() {
+	public IProperty<Integer> getRoundtime() {
 		return roundtime;
 	}
 
 	private void startRoundtime (int seconds)
 	{
-		roundtime = seconds;
-		for (IStormFrontClientListener listener : clientListeners) {
-			listener.roundtimeStarted(this, seconds);
-		}
+		roundtime.set(seconds);
 	}
 	
 	private void updateRoundtimes (int currentRoundtime)
 	{
-		roundtime = currentRoundtime;
-		for (IStormFrontClientListener listener : clientListeners) {
-			listener.roundtimeChanged(this, currentRoundtime);
-		}
+		roundtime.set(currentRoundtime);
 	}
 	
 	public void startRoundtime (final int seconds, String label) {
@@ -162,48 +155,20 @@ public class StormFrontClient extends WarlockClient implements IStormFrontClient
 		}).start();
 	}
 	
-	public int getHealth() {
+	public IProperty<Integer> getHealth() {
 		return health;
 	}
 
-	public void setHealth(int health, String label) {
-		this.health = health;
-		for (IStormFrontClientListener listener : clientListeners) {
-			listener.healthChanged(this, health, label);
-		}
-	}
-
-	public int getMana() {
+	public IProperty<Integer> getMana() {
 		return mana;
 	}
 
-	public void setMana(int mana, String label) {
-		this.mana = mana;
-		for (IStormFrontClientListener listener : clientListeners) {
-			listener.manaChanged(this, mana, label);
-		}
-	}
-
-	public int getFatigue() {
+	public IProperty<Integer> getFatigue() {
 		return fatigue;
 	}
 
-	public void setFatigue(int fatigue, String label) {
-		this.fatigue = fatigue;
-		for (IStormFrontClientListener listener : clientListeners) {
-			listener.fatigueChanged(this, fatigue, label);
-		}
-	}
-
-	public int getSpirit() {
+	public IProperty<Integer> getSpirit() {
 		return spirit;
-	}
-
-	public void setSpirit(int spirit, String label) {
-		this.spirit = spirit;
-		for (IStormFrontClientListener listener : clientListeners) {
-			listener.spiritChanged(this, spirit, label);
-		}
 	}
 
 	public ICompass getCompass() {
@@ -219,12 +184,56 @@ public class StormFrontClient extends WarlockClient implements IStormFrontClient
 		}
 	}
 	
+	public void append(String viewName, String text, IStormFrontStyle style) {
+		for (IWarlockClientViewer viewer : viewers)
+		{
+			if (viewer instanceof IStormFrontClientViewer)
+			{
+				IStormFrontClientViewer sfViewer = (IStormFrontClientViewer) viewer;
+				sfViewer.append(viewName, text, style);
+			}
+			else {
+				viewer.append(viewName, text);
+			}
+		}
+	}
+	
+	public void echo(String viewName, String text, IStormFrontStyle style) {
+		for (IWarlockClientViewer viewer : viewers)
+		{
+			if (viewer instanceof IStormFrontClientViewer)
+			{
+				IStormFrontClientViewer sfViewer = (IStormFrontClientViewer) viewer;
+				sfViewer.echo(viewName, text, style);
+			}
+			else {
+				viewer.echo(viewName, text);
+			}
+		}
+	}
+	
 	public void setPrompting() {
 		isPrompting = true;
 	}
 	
 	public boolean isPrompting() {
 		return isPrompting;
+	}
+	
+	public void setBold(boolean bold) {
+		isBold = bold;
+	}
+	
+	public boolean isBold() {
+		return isBold;
+	}
+
+	public IStormFrontStyle getCurrentStyle() {
+		return currentStyle;
+	}
+
+	public void setCurrentStyle(IStormFrontStyle currentStyle) {
+		this.currentStyle = currentStyle;
 	}
 	
 }
