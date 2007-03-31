@@ -14,6 +14,7 @@ import org.eclipse.ui.application.IWorkbenchWindowConfigurer;
 import org.eclipse.ui.application.WorkbenchAdvisor;
 
 import com.arcaner.warlock.rcp.actions.WizardAction;
+import com.arcaner.warlock.rcp.ui.WarlockSharedImages;
 import com.arcaner.warlock.rcp.wizards.ConnectWizard;
 
 /**
@@ -44,7 +45,7 @@ public class WarlockApplication extends WorkbenchAdvisor implements IPlatformRun
 		MenuManager connectionMenu = new MenuManager ("&Connection");
 		mainMenu.add(connectionMenu);
 		
-		connectionMenu.add(new WizardAction("Connect...", ConnectWizard.class));
+		connectionMenu.add(new WizardAction("Connect...", ConnectWizard.class, WarlockSharedImages.getImageDescriptor(WarlockSharedImages.IMG_CONNECT)));
 	}
 	
     public Object run(Object args) throws Exception

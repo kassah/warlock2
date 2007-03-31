@@ -4,6 +4,7 @@
 package com.arcaner.warlock.rcp.actions;
 
 import org.eclipse.jface.action.Action;
+import org.eclipse.jface.resource.ImageDescriptor;
 import org.eclipse.jface.wizard.IWizard;
 import org.eclipse.jface.wizard.WizardDialog;
 import org.eclipse.swt.widgets.Display;
@@ -13,13 +14,14 @@ import org.eclipse.swt.widgets.Display;
  */
 public class WizardAction extends Action {
 
-	private Class wizardClass;
+	private Class<? extends IWizard> wizardClass;
 	private boolean wasCanceled;
 	
-	public WizardAction (String name, Class wizardClass)
+	public WizardAction (String name, Class<? extends IWizard> wizardClass, ImageDescriptor descriptor)
 	{
 		setText(name);
 		setToolTipText(name);
+		setImageDescriptor(descriptor);
 		
 		this.wizardClass = wizardClass;
 		wasCanceled = false;
@@ -27,7 +29,7 @@ public class WizardAction extends Action {
 	
 	public void run() {
 		try {
-			WizardDialog dialog = new WizardDialog (Display.getCurrent().getActiveShell(), (IWizard) wizardClass.newInstance());
+			WizardDialog dialog = new WizardDialog (Display.getCurrent().getActiveShell(), wizardClass.newInstance());
 			dialog.create();
 			dialog.getShell().setSize(450, 500);
 			int response = dialog.open();
