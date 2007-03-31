@@ -7,12 +7,9 @@
 package com.arcaner.warlock.rcp.ui.client;
 
 import org.eclipse.swt.widgets.Display;
-import org.eclipse.ui.IPageLayout;
 
 import com.arcaner.warlock.client.IWarlockClient;
 import com.arcaner.warlock.client.IWarlockClientViewer;
-import com.arcaner.warlock.rcp.views.CompassView;
-import com.arcaner.warlock.rcp.views.GameView;
 
 /**
  * @author Marshall
@@ -27,7 +24,7 @@ public class SWTWarlockClientViewer implements IWarlockClientViewer {
 	
 	private static enum EventType
 	{
-		Append, Append2, Echo, SetViewerTitle
+		Append, Echo, SetViewerTitle
 	};
 	
 	public SWTWarlockClientViewer (IWarlockClientViewer viewer)
@@ -50,9 +47,8 @@ public class SWTWarlockClientViewer implements IWarlockClientViewer {
 		public void run () {
 			switch (eventType)
 			{
-				case Append: viewer.append(text); break;
-				case Append2: viewer.append(viewName, text); break;
-				case Echo: viewer.echo(text); break;
+				case Append: viewer.append(viewName, text); break;
+				case Echo: viewer.echo(viewName, text); break;
 				case SetViewerTitle: viewer.setViewerTitle(text); break;
 			}
 			viewName = null;
@@ -61,7 +57,7 @@ public class SWTWarlockClientViewer implements IWarlockClientViewer {
 		}
 	}
 	
-	private void run(Runnable runnable)
+	protected void run(Runnable runnable)
 	{
 		if (asynch)
 		{
@@ -71,14 +67,9 @@ public class SWTWarlockClientViewer implements IWarlockClientViewer {
 		}
 	}
 	
-	public void append(String text) {
+	public void echo(String viewName, String text) {
 		wrapper.text = text;
-		wrapper.eventType = EventType.Append;
-		run(wrapper);
-	}
-	
-	public void echo(String text) {
-		wrapper.text = text;
+		wrapper.viewName = viewName;
 		wrapper.eventType = EventType.Echo;
 		run(wrapper);
 	}
@@ -100,7 +91,9 @@ public class SWTWarlockClientViewer implements IWarlockClientViewer {
 	public void append(String viewName, String text) {
 		wrapper.viewName = viewName;
 		wrapper.text = text;
-		wrapper.eventType = EventType.Append2;
+		wrapper.eventType = EventType.Append;
 		run(wrapper);
 	}
+	
+	
 }
