@@ -16,6 +16,8 @@ import java.util.Collection;
  */
 public interface IWarlockClient {
 	
+	public static final String DEFAULT_VIEW = "defaultView";
+	
 	/**
 	 * Connect and handshake with the Simutronics server
 	 * @param key
@@ -40,13 +42,14 @@ public interface IWarlockClient {
 	 * @param viewName Name of the view to output to
 	 * @param text Text to append to the game window.
 	 */
-	public void output(String viewName, String text);
+	public void append(String viewName, String text);
 	
 	/**
 	 * Echo text to the warlock window.
 	 * @param text The text to echo
+	 * @param viewName The viewName to echo to.
 	 */
-	public void echo (String text);
+	public void echo (String viewName, String text);
 	
 	/**
 	 * Clear the view

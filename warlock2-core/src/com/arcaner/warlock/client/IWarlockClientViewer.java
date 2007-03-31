@@ -13,11 +13,9 @@ package com.arcaner.warlock.client;
  */
 public interface IWarlockClientViewer {
 
-	public void append (String text);
-	
 	public void append (String viewName, String text);
 	
-	public void echo (String text);
+	public void echo (String viewName, String text);
 	
 	public IWarlockClient getWarlockClient ();
 	
