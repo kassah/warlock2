@@ -9,21 +9,21 @@
          point="org.eclipse.ui.views">
       <view
             allowMultiple="true"
-            icon="icons/character.gif"
+            icon="images/character.gif"
             class="com.arcaner.warlock.rcp.views.GameView"
             name="Warlock"
-            id="com.arcaner.warlock.views.gameView"/>
+            id="com.arcaner.warlock.rcp.views.gameView"/>
       <view
             allowMultiple="false"
-            icon="icons/compass_view.gif"
+            icon="images/compass_view.gif"
             class="com.arcaner.warlock.rcp.views.CompassView"
             name="Compass"
-            id="com.arcaner.warlock.views.compassView"/>
+            id="com.arcaner.warlock.rcp.views.compassView"/>
       <view
             allowMultiple="false"
             class="com.arcaner.warlock.rcp.views.BarsView"
             name="Bars"
-            id="com.arcaner.warlock.views.barsView"/>
+            id="com.arcaner.warlock.rcp.views.barsView"/>
    </extension>
    <extension
          id="warlock"
@@ -56,19 +56,40 @@
             configuration="com.arcaner.warlock.keyConfiguration"/>
    </extension>
    <extension
-         point="com.arcaner.warlock.scriptEngines">
+         point="com.arcaner.warlock.rcp.scriptEngines">
       <scriptEngine classname="com.arcaner.warlock.script.javascript.JavascriptEngine"/>
    </extension>
    <extension
-         point="com.arcaner.warlock.macroVariables">
+         point="com.arcaner.warlock.rcp.macroVariables">
       <macroVariable classname="com.arcaner.warlock.rcp.ui.macros.internal.variables.CurrentCommandMacroVariable"/>
       <macroVariable classname="com.arcaner.warlock.rcp.ui.macros.internal.variables.LastCommandMacroVariable"/>
       <macroVariable classname="com.arcaner.warlock.rcp.ui.macros.internal.variables.NextCommandMacroVariable"/>
    </extension>
    <extension
-         point="com.arcaner.warlock.macroCommands">
+         point="com.arcaner.warlock.rcp.macroCommands">
       <macroCommand classname="com.arcaner.warlock.rcp.ui.macros.internal.commands.SendMacroCommand"/>
       <macroCommand classname="com.arcaner.warlock.rcp.ui.macros.internal.commands.ClearMacroCommand"/>
+   </extension>
+   <extension
+         id="product"
+         point="org.eclipse.core.runtime.products">
+      <product
+            application="com.arcaner.warlock.rcp.warlock"
+            description="Warlock: A Simutronics Game Client"
+            name="Warlock 2">
+         <property
+               name="appName"
+               value="Warlock 2">
+         </property>
+         <property
+               name="windowImages"
+               value="images/character.gif">
+         </property>
+         <property
+               name="startupProgressRect"
+               value="0,79,444,19">
+         </property>
+      </product>
    </extension>
 
 </plugin>

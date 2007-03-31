@@ -1,7 +1,7 @@
 Manifest-Version: 1.0
 Bundle-ManifestVersion: 2
 Bundle-Name: Warlock: Simutronics Game Client
-Bundle-SymbolicName: com.arcaner.warlock; singleton:=true
+Bundle-SymbolicName: com.arcaner.warlock.rcp;singleton:=true
 Bundle-Version: 2.0.0
 Bundle-ClassPath: dom4j-1.5.2.jar,
  jaxen-1.1-beta-4.jar,
