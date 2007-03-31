@@ -21,7 +21,7 @@ public class Entry extends Text {
 		String toSend = getText();
 		if (toSend != null && toSend.length() > 0) {
 			client.send (toSend);
-			client.echo (toSend);
+			client.echo (IWarlockClient.DEFAULT_VIEW, toSend);
 		}
 		
 		setText("");
