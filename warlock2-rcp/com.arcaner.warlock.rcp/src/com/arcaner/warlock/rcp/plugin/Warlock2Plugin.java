@@ -34,7 +34,7 @@ public class Warlock2Plugin extends AbstractUIPlugin {
 		engines = new ArrayList<IScriptEngine>();
 		
 		try {
-			resourceBundle = ResourceBundle.getBundle("com.arcaner.warlock.plugin.Warlock2PluginResources");
+			resourceBundle = ResourceBundle.getBundle("com.arcaner.warlock.rcp.plugin.Warlock2PluginResources");
 		} catch (MissingResourceException x) {
 			resourceBundle = null;
 		}
@@ -46,7 +46,7 @@ public class Warlock2Plugin extends AbstractUIPlugin {
 	public void start(BundleContext context) throws Exception {
 		super.start(context);
 		
-		IExtension extensions[] = getExtensions("com.arcaner.warlock.scriptEngines");
+		IExtension extensions[] = getExtensions("com.arcaner.warlock.rcp.scriptEngines");
 		for (int i = 0; i < extensions.length; i++) {
 			IExtension ext = extensions[i];
 			IConfigurationElement[] ce = ext.getConfigurationElements();
