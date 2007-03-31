@@ -20,7 +20,7 @@ import com.arcaner.warlock.network.SGEConnection;
  * TODO To change the template for this generated type comment go to
  * Window - Preferences - Java - Code Style - Code Templates
  */
-public class ConnectWizard extends Wizard {
+public class ConnectWizard extends WizardWithNotification {
 
 	private SGEConnection sgeConnection;
 	private AccountWizardPage page1;

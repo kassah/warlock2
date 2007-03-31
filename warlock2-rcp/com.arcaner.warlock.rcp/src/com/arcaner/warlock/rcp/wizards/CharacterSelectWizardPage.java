@@ -27,7 +27,6 @@ import org.eclipse.swt.layout.FillLayout;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Table;
 
-import com.arcaner.warlock.client.stormfront.SingletonStormFrontClientListenerAdapter;
 import com.arcaner.warlock.client.stormfront.internal.StormFrontClient;
 import com.arcaner.warlock.network.SGEConnection;
 import com.arcaner.warlock.network.SGEConnectionListener;
@@ -179,7 +178,6 @@ public class CharacterSelectWizardPage extends WizardPage {
 				int port = Integer.parseInt ((String) loginProperties.get("GAMEPORT"));
 				String key = (String) loginProperties.get("KEY");
 				StormFrontClient client = new StormFrontClient();
-				client.addStormFrontClientListener(new SingletonStormFrontClientListenerAdapter(BarsView.getDefault()));
 				GameView.createNext().setStormFrontClient(client);
 				
 				client.connect(server, port, key);

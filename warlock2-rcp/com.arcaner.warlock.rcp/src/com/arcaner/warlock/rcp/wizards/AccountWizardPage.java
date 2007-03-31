@@ -6,25 +6,27 @@
  */
 package com.arcaner.warlock.rcp.wizards;
 
-import java.io.IOException;
 import java.lang.reflect.InvocationTargetException;
+import java.util.Collection;
 import java.util.Map;
 
 import org.eclipse.core.runtime.IProgressMonitor;
+import org.eclipse.jface.dialogs.MessageDialog;
 import org.eclipse.jface.operation.IRunnableWithProgress;
-import org.eclipse.jface.wizard.WizardPage;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.SelectionEvent;
 import org.eclipse.swt.events.SelectionListener;
 import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.widgets.Composite;
+import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.Label;
 import org.eclipse.swt.widgets.Text;
 
+import com.arcaner.warlock.configuration.Account;
+import com.arcaner.warlock.configuration.SavedProfiles;
 import com.arcaner.warlock.network.SGEConnection;
 import com.arcaner.warlock.network.SGEConnectionListener;
-import com.arcaner.warlock.rcp.application.SavedProfiles;
 import com.arcaner.warlock.rcp.ui.ComboField;
 import com.arcaner.warlock.rcp.ui.TextField;
 import com.arcaner.warlock.rcp.ui.WarlockSharedImages;
@@ -36,12 +38,13 @@ import com.arcaner.warlock.rcp.ui.network.SWTSGEConnectionListenerAdapter;
  * TODO To change the template for this generated type comment go to
  * Window - Preferences - Java - Code Style - Code Templates
  */
-public class AccountWizardPage extends WizardPage {
+public class AccountWizardPage extends WizardPageWithNotification {
 
 	private SGEConnection connection;
 	private ComboField account;
 	private TextField password;
 	private Listener listener;
+	private Account savedAccount; 
 	
 	public AccountWizardPage (SGEConnection connection)
 	{
@@ -68,37 +71,43 @@ public class AccountWizardPage extends WizardPage {
 		
 		setControl(controls);
 		
-		try {
-			final Map<String, String> accounts = (Map<String, String>)SavedProfiles.getAccounts();
-			for (String accountName : accounts.keySet()) {
-				account.getCombo().add(accountName);
-			}
-			if (accounts.keySet().size() > 0)
-			{
-				account.getCombo().select(0);
-				password.getTextControl().setText(accounts.get(account.getCombo().getItems()[0]));
-				
-				account.getCombo().addSelectionListener(new SelectionListener() {
-					public void widgetDefaultSelected(SelectionEvent e) {
-						widgetSelected(e);
-					}
-					public void widgetSelected(SelectionEvent e) {
-						String accountName = account.getCombo().getText();
-						password.getTextControl().setText((String) accounts.get(accountName));
-					}
-				});
-			}
+		final Collection<Account> accounts = SavedProfiles.getAccounts();
+		for (Account account : accounts) {
+			this.account.getCombo().add(account.getAccountName());
+		}
+		if (accounts.size() > 0)
+		{
+			account.getCombo().select(0);
+			password.getTextControl().setText(SavedProfiles.getAccount(account.getCombo().getText()).getPassword());
 			
-		} catch (IOException e) {
-			e.printStackTrace();
+			account.getCombo().addSelectionListener(new SelectionListener() {
+				public void widgetDefaultSelected(SelectionEvent e) {
+					widgetSelected(e);
+				}
+				public void widgetSelected(SelectionEvent e) {
+					String accountName = account.getCombo().getText();
+					password.getTextControl().setText(SavedProfiles.getAccount(accountName).getPassword());
+				}
+			});
 		}
 	}
-
-	public void setVisible(boolean visible) {
-		super.setVisible(visible);
-		
-		if (!visible)
+	
+	@Override
+	public void pageExited(int button) {
+		if (button == WizardWithNotification.NEXT)
 		{
+			savedAccount = SavedProfiles.getAccount(account.getText());
+			if (savedAccount == null)
+			{
+				boolean save = MessageDialog.openQuestion(Display.getDefault().getActiveShell(),
+					"Save Account?", "Do you want to save this account for use later? Warning: your password will not be well protected");
+				
+				if (save)
+				{
+					savedAccount = SavedProfiles.addAccount(account.getText(), password.getText());
+				}
+			}
+			
 			try {
 				getContainer().run(true, true, new IRunnableWithProgress() {
 					public void run(IProgressMonitor monitor)
@@ -145,5 +154,10 @@ public class AccountWizardPage extends WizardPage {
 	{
 		new Label(parent, SWT.NONE).setText(label);
 		return  new Text(parent, SWT.BORDER);
+	}
+	
+	public Account getSavedAccount ()
+	{
+		return savedAccount;
 	}
 }

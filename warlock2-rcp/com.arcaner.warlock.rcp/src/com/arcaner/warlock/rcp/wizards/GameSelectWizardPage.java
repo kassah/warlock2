@@ -7,6 +7,7 @@
 package com.arcaner.warlock.rcp.wizards;
 
 import java.lang.reflect.InvocationTargetException;
+import java.util.Collection;
 import java.util.Map;
 
 import org.eclipse.core.runtime.IProgressMonitor;
@@ -29,6 +30,9 @@ import org.eclipse.swt.layout.FillLayout;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Table;
 
+import com.arcaner.warlock.configuration.Account;
+import com.arcaner.warlock.configuration.Profile;
+import com.arcaner.warlock.configuration.SavedProfiles;
 import com.arcaner.warlock.network.SGEConnection;
 import com.arcaner.warlock.network.SGEConnectionListener;
 import com.arcaner.warlock.rcp.ui.WarlockSharedImages;
@@ -48,6 +52,10 @@ public class GameSelectWizardPage extends WizardPage {
 	private TableViewer gamesViewer;
 	private String selectedGameCode;
 	private Listener listener;
+	
+	private static String[] gameFilterCodes = new String[] {
+		"CS", "DRDT", "GS4D", "HXD", "MOD"
+	};
 	
 	public GameSelectWizardPage (SGEConnection connection)
 	{
@@ -163,8 +171,19 @@ public class GameSelectWizardPage extends WizardPage {
 		public void gamesReady(SGEConnection connection, Map games) {
 			GameSelectWizardPage.this.gameMap = games;
 			
+			for (String gameCode : gameFilterCodes)
+			{
+				GameSelectWizardPage.this.gameMap.remove(gameCode);
+			}
+			
 			GameSelectWizardPage.this.games.setEnabled(true);
 			gamesViewer.setInput(gameMap);
+			
+			Account savedAccount = ((AccountWizardPage)getPreviousPage()).getSavedAccount();
+			if (savedAccount != null)
+			{
+				Collection<Profile> savedProfiles = SavedProfiles.getProfiles(savedAccount);
+			}
 		}
 
 		public void charactersReady(SGEConnection connection, Map characters) {
