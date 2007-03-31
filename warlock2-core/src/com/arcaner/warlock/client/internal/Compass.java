@@ -12,14 +12,14 @@ import com.arcaner.warlock.client.IWarlockClient;
 /**
  * @author Marshall
  */
-public class Compass extends ClientProperty implements ICompass {
+public class Compass extends ClientProperty<String> implements ICompass {
 	
 	protected boolean[] compass;
 
 	protected static HashMap<String, Integer> directions;
 	
 	public Compass(IWarlockClient client) {
-		super(client);
+		super(client, "compass");
 		
 		compass = new boolean[N_DIRECTIONS];
 		for(int i = 0; i < N_DIRECTIONS; i++) {
@@ -61,8 +61,8 @@ public class Compass extends ClientProperty implements ICompass {
 			compass[i] = false;
 		}
 		
-		for (IPropertyListener listener : listeners) {
-			listener.propertyCleared();
+		for (IPropertyListener<String> listener : listeners) {
+			listener.propertyCleared(this, null);
 		}
 	}
 
@@ -71,11 +71,15 @@ public class Compass extends ClientProperty implements ICompass {
 		int direction = directions.get(data);
 		
 		compass[direction] = true;
+		for (IPropertyListener<String> listener : listeners)
+		{
+			listener.propertyChanged(this, null);
+		}
 	}
 	
 	public void activate() {
-		for(IPropertyListener listener : listeners) {
-			listener.propertyActivated();
+		for(IPropertyListener<String> listener : listeners) {
+			listener.propertyActivated(this);
 		}
 	}
 	

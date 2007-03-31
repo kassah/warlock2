@@ -11,7 +11,7 @@ package com.arcaner.warlock.client;
  *
  * This interface represents the compass data structure
  */
-public interface ICompass extends IProperty {
+public interface ICompass extends IProperty<String> {
 	
 	public static int NORTH = 0;
 	public static int NORTHEAST = 1;
