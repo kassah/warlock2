@@ -16,6 +16,7 @@ import org.xml.sax.SAXException;
 import org.xml.sax.SAXParseException;
 import org.xml.sax.helpers.DefaultHandler;
 
+import com.arcaner.warlock.client.IWarlockClient;
 import com.arcaner.warlock.client.stormfront.IStormFrontClient;
 import com.arcaner.warlock.stormfront.IStormFrontProtocolHandler;
 import com.arcaner.warlock.stormfront.IStormFrontTagHandler;
@@ -43,8 +44,8 @@ public class StormFrontProtocolHandler extends DefaultHandler implements IStormF
 		new PromptTagHandler(this, new RoundtimeTagHandler(this));
 		
 		// compass handlers
-		//new CompDefTagHandler(this);
-		//new DirectionTagHandler(this);
+		new CompDefTagHandler(this);
+		new DirectionTagHandler(this);
 		
 		// stream handlers
 		new PushStreamTagHandler(this);
@@ -57,6 +58,12 @@ public class StormFrontProtocolHandler extends DefaultHandler implements IStormF
 		new RightTagHandler(this);
 		new ComponentTagHandler(this);
 		new StyleTagHandler(this);
+		
+		new PushBoldTagHandler(this);
+		new PopBoldTagHandler(this);
+		new PresetTagHandler(this);
+		
+		new DocumentTagHandler(this);
 	}
 	
 	/*
@@ -85,7 +92,8 @@ public class StormFrontProtocolHandler extends DefaultHandler implements IStormF
 	 */
 	public void popStream()
 	throws EmptyStackException {
-		streamStack.pop();
+		if (streamStack.size() > 0)
+			streamStack.pop();
 	}
 	
 	/* (non-Javadoc)
@@ -117,10 +125,10 @@ public class StormFrontProtocolHandler extends DefaultHandler implements IStormF
 			try {
 				stream = streamStack.peek();
 			} catch(EmptyStackException e) {
-				stream = null;
+				stream = IWarlockClient.DEFAULT_VIEW;
 			}
 			//streamTable.send(stream, str);
-			client.output(stream, str);
+			client.append(stream, str);
 		}
 	}
 	

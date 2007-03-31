@@ -27,10 +27,9 @@ public class CompDefTagHandler extends DefaultTagHandler {
 	}
 
 	public void handleStart(Attributes atts) {
-		if( atts.getValue(0).equals("room exits")) {
+		if (atts.getValue("id").equals("room exits")) {
 			handler.getClient().getCompass().clear();					
 		}
-		
 	}
 }
 

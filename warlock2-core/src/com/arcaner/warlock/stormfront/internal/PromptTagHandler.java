@@ -5,6 +5,7 @@ package com.arcaner.warlock.stormfront.internal;
 
 import org.xml.sax.Attributes;
 
+import com.arcaner.warlock.client.IWarlockClient;
 import com.arcaner.warlock.client.stormfront.IStormFrontClient;
 import com.arcaner.warlock.stormfront.IStormFrontProtocolHandler;
 
@@ -47,7 +48,7 @@ public class PromptTagHandler extends DefaultTagHandler {
 	public boolean handleCharacters(char[] ch, int start, int length) {
 		if(!client.isPrompting()) {
 			String str = String.copyValueOf(ch, start, length);
-			client.output(null, str);
+			client.append(IWarlockClient.DEFAULT_VIEW, str);
 		}
 		return true;
 	}

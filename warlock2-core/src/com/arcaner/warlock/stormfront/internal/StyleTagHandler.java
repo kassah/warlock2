@@ -8,6 +8,8 @@ package com.arcaner.warlock.stormfront.internal;
 
 import org.xml.sax.Attributes;
 
+import com.arcaner.warlock.client.IWarlockClient;
+import com.arcaner.warlock.client.stormfront.internal.StormFrontStyle;
 import com.arcaner.warlock.stormfront.IStormFrontProtocolHandler;
 
 /**
@@ -17,6 +19,9 @@ import com.arcaner.warlock.stormfront.IStormFrontProtocolHandler;
  */
 public class StyleTagHandler extends DefaultTagHandler {
 
+	private String currentStyleId;
+	private StormFrontStyle currentStyle;
+	
 	/**
 	 * @param handler
 	 */
@@ -29,6 +34,21 @@ public class StyleTagHandler extends DefaultTagHandler {
 	}
 
 	public void handleStart(Attributes atts) {
-		// TODO implement
+		String styleId = atts.getValue("id");
+		
+		if (styleId == null || styleId.length() == 0)
+		{
+			StringBuffer buffer = DocumentTagHandler.getBuffer(currentStyleId);
+			handler.getClient().append(IWarlockClient.DEFAULT_VIEW, buffer.toString(), currentStyle);
+			
+			DocumentTagHandler.stopCollecting(currentStyleId);
+		}
+		else
+		{
+			DocumentTagHandler.startCollecting(styleId);
+			currentStyle = StormFrontStyle.createCustomStyle(styleId);
+		}
+
+		currentStyleId = styleId;
 	}
 }

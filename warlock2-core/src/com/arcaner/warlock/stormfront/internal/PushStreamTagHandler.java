@@ -24,7 +24,5 @@ public class PushStreamTagHandler extends DefaultTagHandler {
 	
 	public void handleStart(Attributes atts) {
 		String id = atts.getValue("id");
-		
-		handler.pushStream(id);
 	}
 }
