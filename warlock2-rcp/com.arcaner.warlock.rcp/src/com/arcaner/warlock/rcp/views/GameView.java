@@ -25,18 +25,20 @@ import org.eclipse.ui.part.ViewPart;
 
 import com.arcaner.warlock.client.IWarlockClient;
 import com.arcaner.warlock.client.IWarlockClientViewer;
+import com.arcaner.warlock.client.stormfront.AbstractStormFrontClientViewer;
 import com.arcaner.warlock.client.stormfront.IStormFrontClient;
-import com.arcaner.warlock.client.stormfront.IStormFrontClientListener;
-import com.arcaner.warlock.rcp.ui.client.SWTWarlockClientViewer;
+import com.arcaner.warlock.client.stormfront.IStormFrontStyle;
+import com.arcaner.warlock.rcp.ui.client.SWTStormFrontClientViewer;
 import com.arcaner.warlock.rcp.ui.macros.IMacro;
 import com.arcaner.warlock.rcp.ui.macros.MacroFactory;
+import com.arcaner.warlock.rcp.ui.style.StyleMappings;
 
 /**
  * @author marshall
  */
-public class GameView extends ViewPart implements KeyListener, IWarlockClientViewer {
+public class GameView extends ViewPart implements KeyListener {
 
-	public static final String VIEW_ID = "com.arcaner.warlock.views.gameView";
+	public static final String VIEW_ID = "com.arcaner.warlock.rcp.views.gameView";
 	
 	private static GameView firstInstance;
 	private static boolean firstInstanceIsUsed = false;
@@ -46,13 +48,13 @@ public class GameView extends ViewPart implements KeyListener, IWarlockClientVie
 	protected Text entry;
 
 	protected IStormFrontClient client;
-	protected SWTWarlockClientViewer viewer;
+	protected ViewEvents viewer;
 	
 	public GameView() {
 		if (firstInstance == null)
 			firstInstance = this;
 		
-		viewer = new SWTWarlockClientViewer(this);
+		viewer = new ViewEvents(client);
 		openViews.add(this);
 	}
 	
@@ -77,6 +79,46 @@ public class GameView extends ViewPart implements KeyListener, IWarlockClientVie
 		}	
 		
 		return null;
+	}
+	
+	private class ViewEvents extends AbstractStormFrontClientViewer {
+		
+		private SWTStormFrontClientViewer viewerWrapper;
+		
+		public ViewEvents (IStormFrontClient client)
+		{
+			super(client);
+			
+			viewerWrapper = new SWTStormFrontClientViewer(this);
+		}
+		
+		public void append (String viewName, String toAppend, IStormFrontStyle style) {
+			GameView.this.append(viewName, toAppend, style);
+		}
+		
+		public void echo (String viewName, String text, IStormFrontStyle style) {
+			GameView.this.echo(viewName, text, style);
+		}
+		
+		public void setViewerTitle(String title) {
+			GameView.this.setViewerTitle(title);
+		}
+		
+		public String getCurrentCommand ()
+		{
+			return GameView.this.getCurrentCommand();
+		}
+		
+		public void setClient (IStormFrontClient client)
+		{
+			this.client = client;
+			
+			client.addViewer(viewerWrapper);
+		}
+
+		public SWTStormFrontClientViewer getViewerWrapper() {
+			return viewerWrapper;
+		}
 	}
 	
 	private static String generateUniqueId () {
@@ -110,31 +152,22 @@ public class GameView extends ViewPart implements KeyListener, IWarlockClientVie
 		entry.setLayoutData(new GridData(GridData.FILL, GridData.VERTICAL_ALIGN_END, true, false, 1, 1));
 		//entry.setLayoutData(new RowData(250, 15));
 		entry.addKeyListener(this);
-		
-
-		
-//		new Label(barComposite, SWT.NONE).setText("health");
-//		new Label(barComposite, SWT.NONE).setText("mana");
-//		new Label(barComposite, SWT.NONE).setText("fatigue");
-//		new Label(barComposite, SWT.NONE).setText("spirit");
-		
-
 	}
 	
 	public void setFocus() {
 		entry.setFocus();
-		
-		if (client != null)
-		{
-			for (IStormFrontClientListener listener : client.getStormFrontClientListeners())
-			{
-				listener.setActiveClient(client);
-			}
-		}
 	}
 	
-	public void append(String toAppend) {
+	public void append (String viewName, String toAppend, IStormFrontStyle style)
+	{
+		System.out.println("appending: " + toAppend);
+		
+		StyleRange range = StyleMappings.getStyle(style, text.getCharCount(), toAppend.length());
 		text.append(toAppend);
+		
+		if (range != null)
+			text.setStyleRange(range);
+		
 		int length = text.getContent().getCharCount();		
 		if (text.getCaretOffset() < length) {
 			text.setCaretOffset(length);
@@ -142,7 +175,8 @@ public class GameView extends ViewPart implements KeyListener, IWarlockClientVie
 		}
 	}
 	
-	public void echo(String text) {
+	public void echo (String viewName, String text, IStormFrontStyle style)
+	{
 		// A hacked style range, for now. This was mainly so we could get an idea on how to do it
 		// once we implement highlight prefs, etc.
 		
@@ -161,25 +195,22 @@ public class GameView extends ViewPart implements KeyListener, IWarlockClientVie
 		setPartName(title);
 	}
 	
-	public IWarlockClient getWarlockClient () {
-		return this.client;
-	}
-	
-	public void setStormFrontClient(IStormFrontClient client) {
-		this.client = client;
-		client.addViewer(viewer);
-		
-		CompassView.getDefault().init(client);
-	}
-	
 	public String getCurrentCommand ()
 	{
 		return GameView.this.entry.getText();
 	}
 	
-	public void append(String viewName, String text) {
-		append(text);	
+	public void setStormFrontClient(IStormFrontClient client) {
+		this.client = client;
+		viewer.setClient(client);
+		
+		if (CompassView.getDefault() != null)
+			CompassView.getDefault().init(client);
+		if (BarsView.getDefault() != null)
+			BarsView.getDefault().init(client);
 	}
+	
+
 	
 	public void keyPressed(KeyEvent e) {
 
@@ -196,7 +227,7 @@ public class GameView extends ViewPart implements KeyListener, IWarlockClientVie
 		{
 			if (macro.getKeyCode() == e.keyCode)
 			{
-				String result = macro.executeCommand(this);
+				String result = macro.executeCommand(viewer.getViewerWrapper());
 				if (result != null)
 				{
 					entry.setText(result);

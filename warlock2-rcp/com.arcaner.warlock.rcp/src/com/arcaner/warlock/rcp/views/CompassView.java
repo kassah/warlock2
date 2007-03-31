@@ -13,26 +13,21 @@ import org.eclipse.jface.action.MenuManager;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.MouseEvent;
 import org.eclipse.swt.events.MouseListener;
-import org.eclipse.swt.events.SelectionEvent;
-import org.eclipse.swt.events.SelectionListener;
 import org.eclipse.swt.layout.FormAttachment;
 import org.eclipse.swt.layout.FormData;
 import org.eclipse.swt.layout.FormLayout;
 import org.eclipse.swt.layout.GridLayout;
-import org.eclipse.swt.widgets.Button;
 import org.eclipse.swt.widgets.Composite;
-import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.Label;
 import org.eclipse.swt.widgets.Menu;
 import org.eclipse.ui.part.ViewPart;
 
 import com.arcaner.warlock.client.ICompass;
+import com.arcaner.warlock.client.IProperty;
 import com.arcaner.warlock.client.IPropertyListener;
-import com.arcaner.warlock.client.internal.Compass;
 import com.arcaner.warlock.client.stormfront.IStormFrontClient;
-import com.arcaner.warlock.client.stormfront.IStormFrontClientListener;
-import com.arcaner.warlock.client.stormfront.internal.StormFrontClient;
 import com.arcaner.warlock.rcp.ui.WarlockSharedImages;
+import com.arcaner.warlock.rcp.ui.client.SWTPropertyListener;
 
 /**
  * @author Marshall
@@ -40,23 +35,22 @@ import com.arcaner.warlock.rcp.ui.WarlockSharedImages;
  * TODO To change the template for this generated type comment go to
  * Window - Preferences - Java - Code Style - Code Templates
  */
-public class CompassView extends ViewPart implements IPropertyListener {
+public class CompassView extends ViewPart implements IPropertyListener<String> {
 
-	public static final String VIEW_ID = "com.arcaner.warlock.views.compassView";
+	public static final String VIEW_ID = "com.arcaner.warlock.rcp.views.compassView";
 	
 	private static CompassView instance;	
 	
 	private IStormFrontClient client;
-	private ICompass compass;
 	private Label compassLabels[];
 	private String onIds[];
 	private String offIds[];
 	private static String commands[];
 	
 	private CompassAction runAction, powerWalkAction, peerAction;
-	private WalkingAction walkingAction;
+//	private WalkingAction walkingAction;
 	
-	private Button stopMoving;
+//	private Button stopMoving;
 	
 	public static CompassView getDefault ()
 	{
@@ -110,36 +104,25 @@ public class CompassView extends ViewPart implements IPropertyListener {
 	}
 	
 	public void init (IStormFrontClient client) {
+		client.getCompass().addListener(new SWTPropertyListener<String>(this));
 		this.client = client;
-		client.getCompass().addListener(this);
 	}
 	
-	public void propertyActivated()
+	public void propertyActivated (IProperty<String> property)
 	{
-		Display.getDefault().asyncExec(new Runnable() {
-			public void run () {
-				// TODO this can be made more efficient by remembering the state of the compass
-				try {
-					clearCompass();
-				} catch( Exception e ) {
-					System.out.println("HERE HERE HERE");
-				}
-				
-				boolean[] directions = compass.getDirections();
-				for(int i = 0; i < directions.length; i++) {
-					compassLabels[i].setImage(WarlockSharedImages.getImage(
-							directions[i] ? onIds[i] : offIds[i]));
-				}
-			}
-		});
 	}
 	
-	public void propertyCleared() {
+	public void propertyCleared(IProperty<String> property, String oldValue) {
 		clearCompass();
 	}
 	
-	public void propertyChanged() {
-		// not used
+	public void propertyChanged(IProperty<String> property, String oldValue) {
+		ICompass compass = (ICompass) property;
+		boolean[] directions = compass.getDirections();
+		for(int i = 0; i < directions.length; i++) {
+			compassLabels[i].setImage(WarlockSharedImages.getImage(
+					directions[i] ? onIds[i] : offIds[i]));
+		}
 	}
 	
 	private void clearCompass() {
@@ -209,7 +192,7 @@ public class CompassView extends ViewPart implements IPropertyListener {
 					// THis is only the left-click listener.
 					// RIght clicking will popup a context menu
 					if( e.button == 1 ) {
-						// directionClicked(direction);
+						 directionClicked(direction);
 					}
 				}
 			});
@@ -230,27 +213,24 @@ public class CompassView extends ViewPart implements IPropertyListener {
 		
 		
 		// Just add the run button
-		stopMoving = new Button(main, SWT.NONE);
-		stopMoving.setText("STOP " );
-		
-		FormData stopData = new FormData();
-		stopData.left = new FormAttachment(0,10);
-		stopData.top = new FormAttachment(compassComp, 10);
-		stopMoving.setLayoutData(stopData);
-		stopMoving.addSelectionListener(new SelectionListener() {
-
-			public void widgetSelected(SelectionEvent e) {
-				walkingAction.stop();
-			}
-
-			public void widgetDefaultSelected(SelectionEvent e) {
-				widgetSelected(e);
-			} 
-			
-		});
-		
-		
-		
+//		stopMoving = new Button(main, SWT.NONE);
+//		stopMoving.setText("STOP " );
+//		
+//		FormData stopData = new FormData();
+//		stopData.left = new FormAttachment(0,10);
+//		stopData.top = new FormAttachment(compassComp, 10);
+//		stopMoving.setLayoutData(stopData);
+//		stopMoving.addSelectionListener(new SelectionListener() {
+//
+//			public void widgetSelected(SelectionEvent e) {
+//				walkingAction.stop();
+//			}
+//
+//			public void widgetDefaultSelected(SelectionEvent e) {
+//				widgetSelected(e);
+//			} 
+//			
+//		});
 	}
 	
 	private static class CompassAction extends Action {
@@ -283,200 +263,195 @@ public class CompassView extends ViewPart implements IPropertyListener {
 		}
 	}
 
-	private class WalkingAction implements Runnable {
-		private CompassView view;
-		private String[] commands;
-		private String[] turns;
-		
-		private boolean stopped;
-		private boolean inRT;
-		private boolean atFork;
-		private int lastTurn;
-		private StormFrontClient sfClient;
-		private IStormFrontClientListener rtListener;
-		
-		public WalkingAction(CompassView view, String[] commands, String[] turns) {
-			this.view = view;
-			this.commands = commands;
-			this.turns = turns;
-			this.stopped = false;
-			this.inRT = false;
-			this.atFork = false;
-			/*
-			if( view.getCompass().getWarlockClient() instanceof StormFrontClient ) {
-				this.sfClient = (StormFrontClient)view.getCompass().getWarlockClient();
-				rtListener = new IStormFrontClientListener() {
+//	private class WalkingAction implements Runnable {
+//		private CompassView view;
+//		private String[] commands;
+//		private String[] turns;
+//		
+//		private boolean stopped;
+//		private boolean inRT;
+//		private boolean atFork;
+//		private int lastTurn;
+//		private StormFrontClient sfClient;
+//		private IStormFrontClientListener rtListener;
+//		
+//		public WalkingAction(CompassView view, String[] commands, String[] turns) {
+//			this.view = view;
+//			this.commands = commands;
+//			this.turns = turns;
+//			this.stopped = false;
+//			this.inRT = false;
+//			this.atFork = false;
+//			/*
+//			if( view.getCompass().getWarlockClient() instanceof StormFrontClient ) {
+//				this.sfClient = (StormFrontClient)view.getCompass().getWarlockClient();
+//				rtListener = new IStormFrontClientListener() {
+//
+//					public void addWarlockClient(IWarlockClient client) {
+//					}
+//					public void setActiveClient(IWarlockClient active) {
+//					}
+//					public void healthChanged(IWarlockClient source, int health, String label) {
+//					}
+//					public void manaChanged(IWarlockClient source, int mana, String label) {
+//					}
+//					public void fatigueChanged(IWarlockClient source, int fatigue, String label) {
+//					}
+//					public void spiritChanged(IWarlockClient source, int spirit, String label) {
+//					}
+//					public void roundtimeStarted(IWarlockClient source, int roundtime) {
+//						System.out.println("[listener] starting roundtime");
+//						inRT = true;
+//					}
+//					public void roundtimeChanged(IWarlockClient source, int roundtime) {
+//						if( roundtime == 0 ) inRT = false;
+//					} 
+//				};
+//				sfClient.addStormFrontClientListener(rtListener);
+//			} else {
+//				this.sfClient = null;
+//			}
+//			*/
+//		}
+//		
+//		public void stop() {
+//			this.stopped = true;
+//			sfClient.removeStormFrontClientListener(rtListener);
+//			System.out.println("someone clicked stop");
+//		}
+//		
+//		// TODO FINISH
+//		public void run() {
+//			int turnPointer = 0;
+//			while( turnPointer < turns.length && !stopped) {
+//				atFork = false;
+//				
+//				System.out.println("turn " + turnPointer + " is " + turns[turnPointer]);
+//				sendCommand(turns[turnPointer]);
+//				lastTurn = Compass.getValue(turns[turnPointer]);
+//				turnPointer++;
+//				try {					Thread.sleep(500);				} catch( Exception e ) { }
+//				int x = 0;
+//				while( !atFork && !stopped ) {
+//					handleCurrentRoom();
+//					moveNextRoom();
+//					x++;
+//				}
+//				System.out.println("Hit a fork or stopped: fork: " + atFork + ", stopped: " + stopped);
+//			}
+//		}
+//		
+//		private void executeCommand(String command) {
+//			sendCommand(command);
+//			try {
+//				Thread.sleep(500); // to ensure lag doesnt ruin it
+//			} catch( Exception e ) {
+//				
+//			}
+//			System.out.println("[execute command] finished 500 nap");
+//			if( this.sfClient != null ) {
+//				this.inRT = true;
+//				if( sfClient.getRoundtime() == 0 ) {
+//					this.inRT = false; 
+//					return; 
+//				}
+//				while( inRT && !stopped ) {
+//					try {
+//						Thread.sleep(250);
+//					} catch( Exception e ) {
+//					}					
+//				}
+//			}
+//		}
+//		
+//		
+//		private void handleCurrentRoom() {
+//
+//			// do the actions
+//			int commandPointer = 0;
+//			while( commandPointer < commands.length && !stopped) {
+//				executeCommand(commands[commandPointer]);
+//				commandPointer++;
+//			}			
+//		}
+//		
+//		private void moveNextRoom() {
+//			// go forward a room
+//			
+//			boolean[] dirs = view.getCompass().getDirections();
+//			int justCameFrom = Compass.oppositeDir(lastTurn);
+//			
+//			if( dirs.length == 1 ) { stopped = true; System.out.println("only " + dirs.length + " exits");}// dead end
+//			if( dirs.length > 2 ) atFork = true; // need to fork
+//			if( dirs.length == 2 ) {
+//				System.out.print("Possible exits: ");
+//				for( int i = 0; i < dirs.length; i++ ) {
+//					System.out.print(dirs[i] + ", ");
+//					// TODO: Continue
+//				}
+//				int weGo = -1;
+//				// FIXME STP I just broke this function.
+//				//if( dirs[justCameFrom] ) weGo = dirs[1];
+//				//if( dirs[1] == justCameFrom ) weGo = dirs[0];
+//				String goDir = Compass.nameFromInt(weGo);
+//
+//				System.out.println("last move was (" + lastTurn+", " + 
+//						"), disqualify " + justCameFrom + 
+//						", we go (" + weGo + ", " + goDir + ")");
+//				
+//				if( weGo != -1 ) {
+//					lastTurn = weGo;
+//					sendCommand(goDir);
+//				} else {
+//					// ok either we're going too fast... or we lost our model.
+//					// if we have no commands, we're going to fast. Ignore it.
+//					// if we have commands, we've lost the model. STOP.
+//					if( commands.length > 0 ) {
+//						stopped = true;
+//						System.out.println("[compass debug] We took a wrong turn and thought it worked.");
+//					}
+//				}
+//			}
+//			
+//			try {
+//				Thread.sleep(2000);
+//			} catch( Exception e ) {
+//				
+//			}
+//
+//		}
+//	}
 
-					public void addWarlockClient(IWarlockClient client) {
-					}
-					public void setActiveClient(IWarlockClient active) {
-					}
-					public void healthChanged(IWarlockClient source, int health, String label) {
-					}
-					public void manaChanged(IWarlockClient source, int mana, String label) {
-					}
-					public void fatigueChanged(IWarlockClient source, int fatigue, String label) {
-					}
-					public void spiritChanged(IWarlockClient source, int spirit, String label) {
-					}
-					public void roundtimeStarted(IWarlockClient source, int roundtime) {
-						System.out.println("[listener] starting roundtime");
-						inRT = true;
-					}
-					public void roundtimeChanged(IWarlockClient source, int roundtime) {
-						if( roundtime == 0 ) inRT = false;
-					} 
-				};
-				sfClient.addStormFrontClientListener(rtListener);
-			} else {
-				this.sfClient = null;
-			}
-			*/
-		}
-		
-		public void stop() {
-			this.stopped = true;
-			sfClient.removeStormFrontClientListener(rtListener);
-			System.out.println("someone clicked stop");
-		}
-		
-		// TODO FINISH
-		public void run() {
-			int turnPointer = 0;
-			while( turnPointer < turns.length && !stopped) {
-				atFork = false;
-				
-				System.out.println("turn " + turnPointer + " is " + turns[turnPointer]);
-				sendCommand(turns[turnPointer]);
-				lastTurn = Compass.getValue(turns[turnPointer]);
-				turnPointer++;
-				try {					Thread.sleep(500);				} catch( Exception e ) { }
-				int x = 0;
-				while( !atFork && !stopped ) {
-					handleCurrentRoom();
-					moveNextRoom();
-					x++;
-				}
-				System.out.println("Hit a fork or stopped: fork: " + atFork + ", stopped: " + stopped);
-			}
-		}
-		
-		private void executeCommand(String command) {
-			sendCommand(command);
-			try {
-				Thread.sleep(500); // to ensure lag doesnt ruin it
-			} catch( Exception e ) {
-				
-			}
-			System.out.println("[execute command] finished 500 nap");
-			if( this.sfClient != null ) {
-				this.inRT = true;
-				if( sfClient.getRoundtime() == 0 ) {
-					this.inRT = false; 
-					return; 
-				}
-				while( inRT && !stopped ) {
-					try {
-						Thread.sleep(250);
-					} catch( Exception e ) {
-					}					
-				}
-			}
-		}
-		
-		
-		private void handleCurrentRoom() {
-
-			// do the actions
-			int commandPointer = 0;
-			while( commandPointer < commands.length && !stopped) {
-				executeCommand(commands[commandPointer]);
-				commandPointer++;
-			}			
-		}
-		
-		private void moveNextRoom() {
-			// go forward a room
-			
-			boolean[] dirs = view.getCompass().getDirections();
-			int justCameFrom = Compass.oppositeDir(lastTurn);
-			
-			if( dirs.length == 1 ) { stopped = true; System.out.println("only " + dirs.length + " exits");}// dead end
-			if( dirs.length > 2 ) atFork = true; // need to fork
-			if( dirs.length == 2 ) {
-				System.out.print("Possible exits: ");
-				for( int i = 0; i < dirs.length; i++ ) {
-					System.out.print(dirs[i] + ", ");
-					// TODO: Continue
-				}
-				int weGo = -1;
-				// FIXME STP I just broke this function.
-				//if( dirs[justCameFrom] ) weGo = dirs[1];
-				//if( dirs[1] == justCameFrom ) weGo = dirs[0];
-				String goDir = Compass.nameFromInt(weGo);
-
-				System.out.println("last move was (" + lastTurn+", " + 
-						"), disqualify " + justCameFrom + 
-						", we go (" + weGo + ", " + goDir + ")");
-				
-				if( weGo != -1 ) {
-					lastTurn = weGo;
-					sendCommand(goDir);
-				} else {
-					// ok either we're going too fast... or we lost our model.
-					// if we have no commands, we're going to fast. Ignore it.
-					// if we have commands, we've lost the model. STOP.
-					if( commands.length > 0 ) {
-						stopped = true;
-						System.out.println("[compass debug] We took a wrong turn and thought it worked.");
-					}
-				}
-			}
-			
-			try {
-				Thread.sleep(2000);
-			} catch( Exception e ) {
-				
-			}
-
-		}
-	}
-	
-
-	
-	
 	private void createActions() {
 		this.peerAction = new CompassAction(this,
 				"PEER " + CompassAction.DIR_KEY,
 				"peer " + CompassAction.DIR_KEY);
 		
-		this.runAction = 
-			new CompassAction(this, "run " + CompassAction.DIR_KEY, "") {
-				public void run() {
-					if(walkingAction != null ) {
-						System.out.println("STOPPING");
-						walkingAction.stop();
-					}
-					walkingAction = new WalkingAction(
-							CompassView.this, new String[] {}, new String[] {getDirection()});
-					new Thread( walkingAction ).start();
-				}
-		};
+//		this.runAction = 
+//			new CompassAction(this, "run " + CompassAction.DIR_KEY, "") {
+//				public void run() {
+//					if(walkingAction != null ) {
+//						System.out.println("STOPPING");
+//						walkingAction.stop();
+//					}
+//					walkingAction = new WalkingAction(
+//							CompassView.this, new String[] {}, new String[] {getDirection()});
+//					new Thread( walkingAction ).start();
+//				}
+//		};
 		
-		this.powerWalkAction = 
-			new CompassAction(this, "powerwalk " + CompassAction.DIR_KEY, "") {
-				public void run() {
-					if(walkingAction != null ) {
-						System.out.println("STOPPING");
-						walkingAction.stop();
-					}
-					walkingAction = new WalkingAction(	CompassView.this, 
-							new String[] {"perc"}, new String[] {getDirection()});
-					new Thread( walkingAction ).start();
-				}
-		};
-		
-		
+//		this.powerWalkAction = 
+//			new CompassAction(this, "powerwalk " + CompassAction.DIR_KEY, "") {
+//				public void run() {
+//					if(walkingAction != null ) {
+//						System.out.println("STOPPING");
+//						walkingAction.stop();
+//					}
+//					walkingAction = new WalkingAction(	CompassView.this, 
+//							new String[] {"perc"}, new String[] {getDirection()});
+//					new Thread( walkingAction ).start();
+//				}
+//		};	
 	}
 	
 	
@@ -489,22 +464,13 @@ public class CompassView extends ViewPart implements IPropertyListener {
 		manager.add(runAction);
 	}
 	
-	public void setCompass(ICompass compass) {
-		this.compass = compass;
-		compass.addListener(this);
-		System.out.println("*****\nSETTING COMPASS\n*****");
-	}
 	
 	private void directionClicked (int direction) {
-		compass.getClient().send(commands[direction]);
-	}
-
-	public ICompass getCompass() {
-		return this.compass;
+		client.send(commands[direction]);
 	}
 	
 	public void sendCommand( String text ) {
-		compass.getClient().send(text);
+		client.send(text);
 		System.out.println("[compass command] - " + text);
 	}
 	

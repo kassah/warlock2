@@ -16,8 +16,11 @@ import org.eclipse.swt.widgets.Label;
 import org.eclipse.swt.widgets.ProgressBar;
 import org.eclipse.ui.part.ViewPart;
 
+import com.arcaner.warlock.client.IProperty;
+import com.arcaner.warlock.client.IPropertyListener;
 import com.arcaner.warlock.client.IWarlockClient;
-import com.arcaner.warlock.client.stormfront.IStormFrontClientListener;
+import com.arcaner.warlock.client.stormfront.IStormFrontClient;
+import com.arcaner.warlock.rcp.ui.client.SWTPropertyListener;
 
 /**
  * @author Marshall
@@ -25,18 +28,29 @@ import com.arcaner.warlock.client.stormfront.IStormFrontClientListener;
  * TODO To change the template for this generated type comment go to
  * Window - Preferences - Java - Code Style - Code Templates
  */
-public class BarsView extends ViewPart implements IStormFrontClientListener {
+public class BarsView extends ViewPart implements IPropertyListener<Integer> {
 
-	public static final String VIEW_ID = "com.arcaner.warlock.views.barsView";
+	public static final String VIEW_ID = "com.arcaner.warlock.rcp.views.barsView";
 	
 	protected static BarsView instance;
 	protected ProgressBar roundtime, health, mana, fatigue, spirit;
 	protected Color roundtimeFG, roundtimeBG, healthFG, healthBG, manaFG, manaBG, fatigueFG, fatigueBG, spiritFG, spiritBG;
+	protected SWTPropertyListener<Integer> listenerWrapper;
 	
 	public BarsView() {
 		instance = this;
+		listenerWrapper = new SWTPropertyListener<Integer>(this);
 	}
 
+	public void init (IStormFrontClient client)
+	{		
+		client.getHealth().addListener(listenerWrapper);
+		client.getMana().addListener(listenerWrapper);
+		client.getSpirit().addListener(listenerWrapper);
+		client.getFatigue().addListener(listenerWrapper);
+		client.getRoundtime().addListener(listenerWrapper);
+	}
+	
 	/* (non-Javadoc)
 	 * @see org.eclipse.ui.IWorkbenchPart#createPartControl(org.eclipse.swt.widgets.Composite)
 	 */
@@ -60,28 +74,28 @@ public class BarsView extends ViewPart implements IStormFrontClientListener {
 		health = new ProgressBar(barComposite, SWT.NONE);
 		health.setMinimum(0); health.setMaximum(100); health.setSelection(100); //health.setLabel("health 100%");
 		health.setLayoutData(new GridData(GridData.FILL, GridData.VERTICAL_ALIGN_END, true, false));
-//		health.setBackground(healthBG); health.setForeground(healthFG);
+		health.setBackground(healthBG); health.setForeground(healthFG);
 		
 		new Label(barComposite, SWT.NONE).setText("mana: ");
 		mana = new ProgressBar(barComposite, SWT.NONE);
 		mana.setMinimum(0); mana.setMaximum(100); mana.setSelection(100); //mana.setLabel("mana 100%");
 		mana.setLayoutData(new GridData(GridData.FILL, GridData.VERTICAL_ALIGN_END, true, false));
-//		mana.setBackground(manaBG); mana.setForeground(manaFG);
+		mana.setBackground(manaBG); mana.setForeground(manaFG);
 		
 		new Label(barComposite, SWT.NONE).setText("fatigue: ");
 		fatigue = new ProgressBar(barComposite, SWT.NONE);
 		fatigue.setMinimum(0); fatigue.setMaximum(100); fatigue.setSelection(100); //fatigue.setLabel("fatigue 100%");
 		fatigue.setLayoutData(new GridData(GridData.FILL, GridData.VERTICAL_ALIGN_END, true, false));
-//		fatigue.setBackground(fatigueBG); fatigue.setForeground(fatigueFG);
+		fatigue.setBackground(fatigueBG); fatigue.setForeground(fatigueFG);
 		
 		new Label(barComposite, SWT.NONE).setText("spirit: ");
 		spirit = new ProgressBar(barComposite, SWT.NONE);
 		spirit.setMinimum(0); spirit.setMaximum(100); spirit.setSelection(100); //spirit.setLabel("spirit 100%");
 		spirit.setLayoutData(new GridData(GridData.FILL, GridData.VERTICAL_ALIGN_END, true, false));
-//		spirit.setBackground(spiritBG); spirit.setForeground(fatigueFG);
+		spirit.setBackground(spiritBG); spirit.setForeground(fatigueFG);
 		
 		roundtime.setMinimum(0); roundtime.setMaximum(0); //roundtime.setLabel("roundtime: 0");
-//		roundtime.setBackground(roundtimeBG); roundtime.setForeground(roundtimeFG);
+		roundtime.setBackground(roundtimeBG); roundtime.setForeground(roundtimeFG);
 //		roundtime.setSize(300, 5); //roundtime.setShowText(false);
 	}
 
@@ -107,63 +121,38 @@ public class BarsView extends ViewPart implements IStormFrontClientListener {
 		// TODO Auto-generated method stub
 
 	}
-
-	public void healthChanged(IWarlockClient source, final int health, final String label) {
-		Display.getDefault().asyncExec(new Runnable() {
-			public void run () {
-				BarsView.this.health.setSelection(health);
-			}
-		});
+	
+	public void propertyActivated(IProperty<Integer> property) {	}
+	public void propertyCleared(IProperty<Integer> property, Integer oldValue) {	}
+	public void propertyChanged(IProperty<Integer> property, Integer oldValue) {
+		if (property.getName().equals("health"))
+		{
+			health.setSelection(property.get());
+		}
+		else if (property.getName().equals("mana"))
+		{
+			mana.setSelection(property.get());
+		}
+		else if (property.getName().equals("spirit"))
+		{
+			spirit.setSelection(property.get());
+		}
+		else if (property.getName().equals("fatigue"))
+		{
+			fatigue.setSelection(property.get());
+		}
+		else if (property.getName().equals("roundtime"))
+		{
+			roundtime.setMaximum(property.get() * 1000);
+			roundtime.setMinimum(0);
+			roundtime.setSelection(property.get() * 1000);
+			System.out.println("start roundtime: " + property.get() * 1000);
+		}
 	}
 	
-	public void manaChanged(IWarlockClient source, final int mana, final String label) {
-		Display.getDefault().asyncExec(new Runnable() {
-			public void run () {
-				BarsView.this.mana.setSelection(mana);
-			}
-		});
-	}
-	
-	public void fatigueChanged(IWarlockClient source, final int fatigue, final String label) {
-		Display.getDefault().asyncExec(new Runnable() {
-			public void run () {
-				BarsView.this.fatigue.setSelection(fatigue);
-			}
-		});
-	}
-	
-	public void spiritChanged(IWarlockClient source, final int spirit, final String label) {
-		Display.getDefault().asyncExec(new Runnable() {
-			public void run () {
-				BarsView.this.spirit.setSelection(spirit);
-			}
-		});
-	}
-
-	public void roundtimeStarted(IWarlockClient source, final int roundtime) {
-		Display.getDefault().asyncExec(new Runnable() {
-			public void run () {
-				BarsView.this.roundtime.setMaximum(roundtime * 1000);
-				BarsView.this.roundtime.setMinimum(0);
-				BarsView.this.roundtime.setSelection(roundtime * 1000);
-				System.out.println("start roundtime: " + roundtime * 1000);
-			}
-		});
-	}
 	
 	public void roundtimeChanged(IWarlockClient source, final int roundtime) {
-		Display.getDefault().asyncExec(new Runnable() {
-			public void run () {
-				BarsView.this.roundtime.setSelection(roundtime);
-				System.out.println("set roundtime: " + roundtime);
-			}
-		});
-	}
-	
-	public void addWarlockClient(IWarlockClient client) {
-	}
-
-	public void setActiveClient (IWarlockClient active) {
+		BarsView.this.roundtime.setSelection(roundtime);
 	}
 	
 	public static BarsView getDefault ()
