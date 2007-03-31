@@ -49,6 +49,8 @@ public class WarlockSharedImages {
 	public static final String IMG_COMPASS_OUT_ON = "compass.out.on";
 	public static final String IMG_COMPASS_OUT_OFF = "compass.out.off";
 	
+	public static final String IMG_CONNECT = "connect";
+	
 	private static WarlockSharedImages instance;
 	
 	private HashMap<String, Image> images;
@@ -60,33 +62,34 @@ public class WarlockSharedImages {
 		images = new HashMap<String, Image>();
 		descriptors = new HashMap<String, ImageDescriptor>();
 		
-		addImage(IMG_WIZBAN_WARLOCK, "/icons/warlock-wizard-icon.gif");
-		addImage(IMG_CHARACTER, "/icons/character.gif");
-		addImage(IMG_GAME, "/icons/game.gif");
+		addImage(IMG_WIZBAN_WARLOCK, "/images/warlock-wizard-icon.png");
+		addImage(IMG_CHARACTER, "/images/character.gif");
+		addImage(IMG_GAME, "/images/game.gif");
 		
 		
-		addImage(IMG_COMPASS_NORTH_OFF, "/icons/north.gif");
-		addImage(IMG_COMPASS_NORTH_ON, "/icons/north_on.gif");
-		addImage(IMG_COMPASS_SOUTH_OFF, "/icons/south.gif");
-		addImage(IMG_COMPASS_SOUTH_ON, "/icons/south_on.gif");
-		addImage(IMG_COMPASS_EAST_OFF, "/icons/east.gif");
-		addImage(IMG_COMPASS_EAST_ON, "/icons/east_on.gif");
-		addImage(IMG_COMPASS_WEST_OFF, "/icons/west.gif");
-		addImage(IMG_COMPASS_WEST_ON, "/icons/west_on.gif");
-		addImage(IMG_COMPASS_NORTHEAST_OFF, "/icons/northeast.gif");
-		addImage(IMG_COMPASS_NORTHEAST_ON, "/icons/northeast_on.gif");
-		addImage(IMG_COMPASS_NORTHWEST_OFF, "/icons/northwest.gif");
-		addImage(IMG_COMPASS_NORTHWEST_ON, "/icons/northwest_on.gif");
-		addImage(IMG_COMPASS_SOUTHEAST_OFF, "/icons/southeast.gif");
-		addImage(IMG_COMPASS_SOUTHEAST_ON, "/icons/southeast_on.gif");
-		addImage(IMG_COMPASS_SOUTHWEST_OFF, "/icons/southwest.gif");
-		addImage(IMG_COMPASS_SOUTHWEST_ON, "/icons/southwest_on.gif");
-		addImage(IMG_COMPASS_UP_ON, "/icons/up_on.gif");
-		addImage(IMG_COMPASS_UP_OFF, "/icons/up.gif");
-		addImage(IMG_COMPASS_DOWN_ON, "/icons/down_on.gif");
-		addImage(IMG_COMPASS_DOWN_OFF, "/icons/down.gif");
-		addImage(IMG_COMPASS_OUT_ON, "/icons/out_on.gif");
-		addImage(IMG_COMPASS_OUT_OFF, "/icons/out.gif");
+		addImage(IMG_COMPASS_NORTH_OFF, "/images/north.gif");
+		addImage(IMG_COMPASS_NORTH_ON, "/images/north_on.gif");
+		addImage(IMG_COMPASS_SOUTH_OFF, "/images/south.gif");
+		addImage(IMG_COMPASS_SOUTH_ON, "/images/south_on.gif");
+		addImage(IMG_COMPASS_EAST_OFF, "/images/east.gif");
+		addImage(IMG_COMPASS_EAST_ON, "/images/east_on.gif");
+		addImage(IMG_COMPASS_WEST_OFF, "/images/west.gif");
+		addImage(IMG_COMPASS_WEST_ON, "/images/west_on.gif");
+		addImage(IMG_COMPASS_NORTHEAST_OFF, "/images/northeast.gif");
+		addImage(IMG_COMPASS_NORTHEAST_ON, "/images/northeast_on.gif");
+		addImage(IMG_COMPASS_NORTHWEST_OFF, "/images/northwest.gif");
+		addImage(IMG_COMPASS_NORTHWEST_ON, "/images/northwest_on.gif");
+		addImage(IMG_COMPASS_SOUTHEAST_OFF, "/images/southeast.gif");
+		addImage(IMG_COMPASS_SOUTHEAST_ON, "/images/southeast_on.gif");
+		addImage(IMG_COMPASS_SOUTHWEST_OFF, "/images/southwest.gif");
+		addImage(IMG_COMPASS_SOUTHWEST_ON, "/images/southwest_on.gif");
+		addImage(IMG_COMPASS_UP_ON, "/images/up_on.gif");
+		addImage(IMG_COMPASS_UP_OFF, "/images/up.gif");
+		addImage(IMG_COMPASS_DOWN_ON, "/images/down_on.gif");
+		addImage(IMG_COMPASS_DOWN_OFF, "/images/down.gif");
+		addImage(IMG_COMPASS_OUT_ON, "/images/out_on.gif");
+		addImage(IMG_COMPASS_OUT_OFF, "/images/out.gif");
+		addImage(IMG_CONNECT, "/images/connect.png");
 		
 		for (String key : descriptors.keySet()) {
 			ImageDescriptor descriptor = descriptor(key);
