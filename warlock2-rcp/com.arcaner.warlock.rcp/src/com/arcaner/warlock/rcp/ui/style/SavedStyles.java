@@ -34,8 +34,9 @@ public class SavedStyles {
 			props.load(stream);
 			stream.close();
 			
-			for (String property : props.stringPropertyNames())
+			for (Object obj : props.keySet())
 			{
+				String property = (String) obj;
 				if (property.startsWith(STYLE_PREFIX))
 				{
 					String elements[] = property.split("\\.");
