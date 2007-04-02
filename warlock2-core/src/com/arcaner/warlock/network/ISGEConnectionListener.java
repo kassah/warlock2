@@ -42,5 +42,5 @@ public interface ISGEConnectionListener {
 	 * @param connection
 	 * @param loginProperties
 	 */
-	public void readyToPlay(SGEConnection connection, Map loginProperties);
+	public void readyToPlay(SGEConnection connection, Map<String,String> loginProperties);
 }
