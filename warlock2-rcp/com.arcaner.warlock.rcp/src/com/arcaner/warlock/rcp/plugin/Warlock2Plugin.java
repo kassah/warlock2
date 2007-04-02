@@ -25,6 +25,8 @@ public class Warlock2Plugin extends AbstractUIPlugin {
 	private ResourceBundle resourceBundle;
 	private ArrayList<IScriptEngine> engines;
 	
+	public static final String PLUGIN_ID = "com.arcaner.warlock.rcp";
+	
 	/**
 	 * The constructor.
 	 */

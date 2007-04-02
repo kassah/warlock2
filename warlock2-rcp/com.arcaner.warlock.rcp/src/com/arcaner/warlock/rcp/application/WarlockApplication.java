@@ -3,24 +3,17 @@
  */
 package com.arcaner.warlock.rcp.application;
 
-import org.eclipse.core.runtime.IPlatformRunnable;
-import org.eclipse.jface.action.IMenuManager;
-import org.eclipse.jface.action.MenuManager;
+import org.eclipse.equinox.app.IApplication;
+import org.eclipse.equinox.app.IApplicationContext;
 import org.eclipse.swt.widgets.Display;
-import org.eclipse.ui.IWorkbenchWindow;
 import org.eclipse.ui.PlatformUI;
-import org.eclipse.ui.application.IActionBarConfigurer;
 import org.eclipse.ui.application.IWorkbenchWindowConfigurer;
 import org.eclipse.ui.application.WorkbenchAdvisor;
-
-import com.arcaner.warlock.rcp.actions.WizardAction;
-import com.arcaner.warlock.rcp.ui.WarlockSharedImages;
-import com.arcaner.warlock.rcp.wizards.ConnectWizard;
 
 /**
  * @author Marshall
  */
-public class WarlockApplication extends WorkbenchAdvisor implements IPlatformRunnable {
+public class WarlockApplication extends WorkbenchAdvisor implements IApplication {
 	
 	public String getInitialWindowPerspectiveId ()
 	{
@@ -34,27 +27,19 @@ public class WarlockApplication extends WorkbenchAdvisor implements IPlatformRun
 		configurer.setShowFastViewBars(false);
 		configurer.setShowCoolBar(false);
 		configurer.setShowStatusLine(false);
+		configurer.setShowMenuBar(true);
 	}
 	
-	public void fillActionBars(IWorkbenchWindow window, IActionBarConfigurer configurer, int flags)
-	{
-		if ((flags & FILL_MENU_BAR) == 0)
-			return;
-		
-		IMenuManager mainMenu = configurer.getMenuManager();
-		MenuManager connectionMenu = new MenuManager ("&Connection");
-		mainMenu.add(connectionMenu);
-		
-		connectionMenu.add(new WizardAction("Connect...", ConnectWizard.class, WarlockSharedImages.getImageDescriptor(WarlockSharedImages.IMG_CONNECT)));
-	}
-	
-    public Object run(Object args) throws Exception
-    {
+	public Object start(IApplicationContext context) throws Exception {
 		Display display = PlatformUI.createDisplay();
 		int ret = PlatformUI.createAndRunWorkbench(display, this);
 		if (ret == PlatformUI.RETURN_RESTART)
 			return EXIT_RESTART;
 		
 		return EXIT_OK;
+	}
+	
+	public void stop() {
+		
 	}
 }
