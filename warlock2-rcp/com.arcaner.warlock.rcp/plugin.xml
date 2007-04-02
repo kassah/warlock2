@@ -91,5 +91,41 @@
          </property>
       </product>
    </extension>
+   <extension
+         point="org.eclipse.ui.menus">
+      <menuContribution
+            locationURI="menu:org.eclipse.ui.main.menu">
+         <menu
+               icon="images/connect.png"
+               id="com.arcaner.warlock.rcp.menu.connect"
+               label="Connect"
+               mnemonic="C"
+               tooltip="Connect to a Simutronics game">
+			  <command
+                     commandId="com.arcaner.warlock.rcp.command.newConnection"
+                     icon="images/connect.png"
+                     label="New Connection..."
+                     mnemonic="N"
+                     style="push">
+               </command>
+     <separator
+           name="com.arcaner.warlock.rcp.separator4"
+           visible="true">
+     </separator>
+               <dynamic
+                  class="com.arcaner.warlock.rcp.menu.ProfileConnectContributionItem"
+                  id="com.arcaner.warlock.rcp.dynamicProfiles">
+ 	           </dynamic>
+         </menu>
+     </menuContribution>
+   </extension>
+   <extension
+         point="org.eclipse.ui.commands">
+      <command
+            defaultHandler="com.arcaner.warlock.rcp.menu.NewConnectionHandler"
+            id="com.arcaner.warlock.rcp.command.newConnection"
+            name="New Connection...">
+      </command>
+   </extension>
 
 </plugin>
