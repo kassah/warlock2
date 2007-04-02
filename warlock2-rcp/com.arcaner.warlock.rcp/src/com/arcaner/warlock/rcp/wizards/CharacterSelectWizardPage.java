@@ -6,10 +6,12 @@
  */
 package com.arcaner.warlock.rcp.wizards;
 
+import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
 
 import org.eclipse.core.runtime.IProgressMonitor;
+import org.eclipse.jface.dialogs.MessageDialog;
 import org.eclipse.jface.viewers.DoubleClickEvent;
 import org.eclipse.jface.viewers.IDoubleClickListener;
 import org.eclipse.jface.viewers.ISelection;
@@ -27,13 +29,14 @@ import org.eclipse.swt.layout.FillLayout;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Table;
 
-import com.arcaner.warlock.client.stormfront.internal.StormFrontClient;
+import com.arcaner.warlock.configuration.Account;
+import com.arcaner.warlock.configuration.Profile;
+import com.arcaner.warlock.configuration.SavedProfiles;
 import com.arcaner.warlock.network.SGEConnection;
 import com.arcaner.warlock.network.SGEConnectionListener;
 import com.arcaner.warlock.rcp.ui.WarlockSharedImages;
 import com.arcaner.warlock.rcp.ui.network.SWTSGEConnectionListenerAdapter;
-import com.arcaner.warlock.rcp.views.BarsView;
-import com.arcaner.warlock.rcp.views.GameView;
+import com.arcaner.warlock.rcp.util.LoginUtil;
 
 /**
  * @author Marshall
@@ -44,7 +47,7 @@ import com.arcaner.warlock.rcp.views.GameView;
 public class CharacterSelectWizardPage extends WizardPage {
 
 	private Table characters;
-	private Map characterMap;
+	private Map<String,String> characterMap;
 	private TableViewer characterViewer;
 	private String selectedCharacterCode;
 	private Listener listener;
@@ -55,7 +58,7 @@ public class CharacterSelectWizardPage extends WizardPage {
 		super ("Select a character.", "Please select a character,", WarlockSharedImages.getImageDescriptor(WarlockSharedImages.IMG_WIZBAN_WARLOCK));
 		complete = false;
 		
-		this.characterMap = new HashMap();
+		this.characterMap = new HashMap<String,String>();
 		
 		listener = new Listener();
 		connection.addSGEConnectionListener(new SWTSGEConnectionListenerAdapter(listener));
@@ -97,7 +100,7 @@ public class CharacterSelectWizardPage extends WizardPage {
 	private class CharacterContentProvider implements IStructuredContentProvider {
 		
 		public Object[] getElements(Object inputElement) {
-			Map characterMap = (Map) inputElement;
+			Map<String,String> characterMap = (Map<String,String>) inputElement;
 			return characterMap.keySet().toArray();
 		}
 		
@@ -160,31 +163,55 @@ public class CharacterSelectWizardPage extends WizardPage {
 			this.monitor = monitor;
 		}
 		
-		public void charactersReady(SGEConnection connection, Map characters) {
+		public void charactersReady(SGEConnection connection, Map<String,String> characters) {
 //			CharacterSelectWizardPage.this.characterMap.clear();
 			CharacterSelectWizardPage.this.characterMap = characters;
 			characterViewer.setInput(characters);
 			CharacterSelectWizardPage.this.characters.setEnabled(true);
 		}
 		
-		public void readyToPlay (SGEConnection connection, Map loginProperties)
+		public void readyToPlay (SGEConnection connection, Map<String,String> loginProperties)
 		{
-			try {
-				if (monitor != null) {
-					monitor.worked(1);
-					//monitor.done();
-				}
-				String server = (String) loginProperties.get("GAMEHOST");
-				int port = Integer.parseInt ((String) loginProperties.get("GAMEPORT"));
-				String key = (String) loginProperties.get("KEY");
-				StormFrontClient client = new StormFrontClient();
-				GameView.createNext().setStormFrontClient(client);
-				
-				client.connect(server, port, key);
-			} catch (Exception e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
+			if (monitor != null) {
+				monitor.worked(1);
+				//monitor.done();
 			}
+			
+			GameSelectWizardPage gameSelectPage = (GameSelectWizardPage) getPreviousPage();
+			AccountWizardPage accountPage = (AccountWizardPage) getPreviousPage().getPreviousPage();
+			
+			Account account = accountPage.getSavedAccount();
+			if (account != null)
+			{
+				Collection<Profile> savedProfiles = SavedProfiles.getProfiles(account);
+
+				boolean exists = false;
+				if (savedProfiles != null && savedProfiles.size() > 0)
+				{
+					for (Profile profile : savedProfiles)
+					{
+						if (getSelectedCharacterName().equals(profile.getCharacterName())) {
+							exists = true; break;
+						}
+					}
+				}
+					
+				if (!exists) {
+					boolean response = MessageDialog.openQuestion(getShell(),
+						"Save Profile?",
+						"Would you like to save the character \"" + getSelectedCharacterName() + "\" as a new profile?");
+					
+					if (response)
+					{
+						SavedProfiles.addProfile(account, getSelectedCharacterCode(), getSelectedCharacterName(),
+							gameSelectPage.getSelectedGameCode(), gameSelectPage.getSelectedGameName());
+					}
+				}
+			}
+			
+			LoginUtil.connectAndOpenGameView(loginProperties);
+			
+			
 		}
 	}
 	

@@ -47,7 +47,7 @@ import com.arcaner.warlock.rcp.ui.network.SWTSGEConnectionListenerAdapter;
 public class GameSelectWizardPage extends WizardPage {
 
 	private Table games;
-	private Map gameMap;
+	private Map<String, String> gameMap;
 	private SGEConnection connection;
 	private TableViewer gamesViewer;
 	private String selectedGameCode;
@@ -103,7 +103,7 @@ public class GameSelectWizardPage extends WizardPage {
 	{
 		
 		public Object[] getElements(Object inputElement) {
-			Map gameMap = (Map) inputElement;
+			Map<String,String> gameMap = (Map<String,String>) inputElement;
 			return gameMap.keySet().toArray();
 		}
 		
@@ -193,6 +193,14 @@ public class GameSelectWizardPage extends WizardPage {
 				monitor.done();
 			}
 		}
+	}
+
+	public String getSelectedGameCode() {
+		return selectedGameCode;
+	}
+	
+	public String getSelectedGameName() {
+		return gameMap.get(selectedGameCode);
 	}
 	
 }

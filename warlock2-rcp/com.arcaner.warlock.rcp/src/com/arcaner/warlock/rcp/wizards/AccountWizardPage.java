@@ -100,7 +100,7 @@ public class AccountWizardPage extends WizardPageWithNotification {
 			if (savedAccount == null)
 			{
 				boolean save = MessageDialog.openQuestion(Display.getDefault().getActiveShell(),
-					"Save Account?", "Do you want to save this account for use later? Warning: your password will not be well protected");
+					"Save Account?", "Would you like to save this account information?");
 				
 				if (save)
 				{
