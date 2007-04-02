@@ -93,14 +93,14 @@ public class SWTSGEConnectionListenerAdapter implements ISGEConnectionListener {
 
 	private class ReadyToPlayRunnable implements Runnable {
 		public SGEConnection connection;
-		public Map loginProperties;
+		public Map<String,String> loginProperties;
 		
 		public void run () {
 			listener.readyToPlay(connection, loginProperties);
 		}
 	}
 	
-	public void readyToPlay(SGEConnection connection, Map loginProperties) {
+	public void readyToPlay(SGEConnection connection, Map<String,String> loginProperties) {
 		readyToPlayRunnable.connection = connection;
 		readyToPlayRunnable.loginProperties = loginProperties;
 		Display.getDefault().asyncExec(readyToPlayRunnable);
