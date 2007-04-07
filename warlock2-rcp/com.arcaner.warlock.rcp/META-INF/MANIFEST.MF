@@ -12,8 +12,7 @@ Bundle-Localization: plugin
 Require-Bundle: org.eclipse.ui,
  org.eclipse.core.runtime,
  org.eclipse.jface.text,
- com.arcaner.warlock.core,
- org.eclipse.core.expressions
+ com.arcaner.warlock.core
 Eclipse-LazyStart: true
 Export-Package: com.arcaner.warlock.rcp.actions,
  com.arcaner.warlock.rcp.application,

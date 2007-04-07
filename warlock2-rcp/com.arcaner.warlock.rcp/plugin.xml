@@ -1,10 +1,9 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <?eclipse version="3.0"?>
 <plugin>
-
-     <extension-point id="scriptEngines" name="Warlock Script Engine" schema="schema/scriptEngines.exsd"/>
-   <extension-point id="macroVariables" name="Warlock Macro Variable" schema="schema/macroVariables.exsd"/>
-   <extension-point id="macroCommands" name="Warlock Macro Commands" schema="schema/macroCommands.exsd"/>
+   <extension-point id="scriptEngines" name="scriptEngines" schema="schema/scriptEngines.exsd"/>
+   <extension-point id="macroVariables" name="macroVariables" schema="schema/macroVariables.exsd"/>
+   <extension-point id="macroCommands" name="macroCommands" schema="schema/macroCommands.exsd"/>
    <extension
          point="org.eclipse.ui.views">
       <view
@@ -96,7 +95,6 @@
       <menuContribution
             locationURI="menu:org.eclipse.ui.main.menu">
          <menu
-               icon="images/connect.png"
                id="com.arcaner.warlock.rcp.menu.connect"
                label="Connect"
                mnemonic="C"
@@ -117,6 +115,17 @@
                   id="com.arcaner.warlock.rcp.dynamicProfiles">
  	           </dynamic>
          </menu>
+         <menu
+               label="Preferences"
+               mnemonic="P">
+            <command
+                  commandId="com.arcaner.warlock.rcp.command.preferences"
+                  icon="images/preferences.png"
+                  label="Preferences"
+                  mnemonic="P"
+                  style="push">
+            </command>
+         </menu>
      </menuContribution>
    </extension>
    <extension
@@ -126,6 +135,25 @@
             id="com.arcaner.warlock.rcp.command.newConnection"
             name="New Connection...">
       </command>
+      <command
+            defaultHandler="com.arcaner.warlock.rcp.menu.PreferencesHandler"
+            id="com.arcaner.warlock.rcp.command.preferences"
+            name="Preferences">
+      </command>
+   </extension>
+   <extension
+         point="org.eclipse.ui.preferencePages">
+      <page
+            class="com.arcaner.warlock.rcp.prefs.LookAndFeelPreferencePage"
+            id="com.arcaner.warlock.rcp.prefs.lookAndFeel"
+            name="Look and Feel">
+      </page>
+      <page
+            category="com.arcaner.warlock.rcp.prefs.lookAndFeel"
+            class="com.arcaner.warlock.rcp.prefs.StandardColorsAndFontsPreferencePage"
+            id="com.arcaner.warlock.rcp.prefs.standardColorsAndFonts"
+            name="Standard Colors">
+      </page>
    </extension>
 
 </plugin>
