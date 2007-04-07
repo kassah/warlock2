@@ -51,67 +51,70 @@ public class StormFrontClient extends WarlockClient implements IStormFrontClient
 	{	
 		if(DEFAULT_VIEW.equals(viewName))
 		{
-			boolean flush = false;
+			append(viewName, text, currentStyle);
+			isPrompting = false;
 			
-			// if we've already shown the prompt newline, don't do it again
-			if(isPrompting) {
-				if(text.charAt(0) == '\n') {
-					text = text.substring(1);
-					flush = true;
-				} else if(text.startsWith("\r\n")) {
-					text = text.substring(2);
-					flush = true;
-				}
-			}
-			
-			// search for a newline
-			int end = text.lastIndexOf('\r');
-			if(end < 0) end = text.lastIndexOf('\n');
-			if(end >= 0) {
-				flush = true;
-			} else {
-				// if there was no newline, the end is the start
-				end = 0;
-			}
-			
-			/*
-			 * if there was a newline, output the existing buffer, and then the
-			 * text up to that new line
-			 */
-			if(flush) {
-				// if there is text to output, add it to the buffer
-				if(end > 0) {
-					// when we finish prompting, prepend a newline
-					if(isPrompting) {
-						isPrompting = false;
-						buffer.append("\r\n");
-					}
-					buffer.append(text, 0, end);
-				}
-				
-				/*
-				 * it's possible that our end was the first character, so the
-				 * buffer might still be empty, we need to check it.
-				 */
-				// if there is something in the buffer, output and clear it
-				if(buffer.length() > 0) {
-					String bufferText = buffer.toString();
-					
-					append(viewName, bufferText, currentStyle);
-					buffer.delete(0, buffer.length());
-					bufferText = null;
-				}
-			}
-			
-			// append the rest of the text to the buffer
-			if(text.length() > end) {
-				// when we finish prompting, prepend a newline
-				if(isPrompting) {
-					isPrompting = false;
-					buffer.append("\r\n");
-				}
-				buffer.append(text, end, text.length());
-			}
+//			boolean flush = false;
+//			
+//			// if we've already shown the prompt newline, don't do it again
+//			if(isPrompting) {
+//				if(text.charAt(0) == '\n') {
+//					text = text.substring(1);
+//					flush = true;
+//				} else if(text.startsWith("\r\n")) {
+//					text = text.substring(2);
+//					flush = true;
+//				}
+//			}
+//			
+//			// search for a newline
+//			int end = text.lastIndexOf('\r');
+//			if(end < 0) end = text.lastIndexOf('\n');
+//			if(end >= 0) {
+//				flush = true;
+//			} else {
+//				// if there was no newline, the end is the start
+//				end = 0;
+//			}
+//			
+//			/*
+//			 * if there was a newline, output the existing buffer, and then the
+//			 * text up to that new line
+//			 */
+//			if(flush) {
+//				// if there is text to output, add it to the buffer
+//				if(end > 0) {
+//					// when we finish prompting, prepend a newline
+//					if(isPrompting) {
+//						isPrompting = false;
+//						buffer.append("\r\n");
+//					}
+//					buffer.append(text, 0, end);
+//				}
+//				
+//				/*
+//				 * it's possible that our end was the first character, so the
+//				 * buffer might still be empty, we need to check it.
+//				 */
+//				// if there is something in the buffer, output and clear it
+//				if(buffer.length() > 0) {
+//					String bufferText = buffer.toString();
+//					
+//					append(viewName, bufferText, currentStyle);
+//					buffer.delete(0, buffer.length());
+//					bufferText = null;
+//				}
+//			}
+//			
+//			// append the rest of the text to the buffer
+//			if(text.length() > end) {
+//				// when we finish prompting, prepend a newline
+//				if(isPrompting) {
+//					isPrompting = false;
+//					buffer.append("\r\n");
+//				}
+//				buffer.append(text, end, text.length());
+//			}
 		} else {
 			System.out.println("Got a stream not shown of id: " + viewName);
 		}
