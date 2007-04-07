@@ -43,8 +43,13 @@ public class ProfileConnectAction extends Action implements ISGEConnectionListen
 				connection.addSGEConnectionListener(new SWTSGEConnectionListenerAdapter(ProfileConnectAction.this));
 				monitor.beginTask("Logging into profile \"" + profile.getCharacterName() + "\"...", 5);
 				
-				while (!ProfileConnectAction.this.finished)
-					Display.getDefault().readAndDispatch();
+				while (!ProfileConnectAction.this.finished) {
+					Display.getDefault().syncExec(new Runnable() {
+						public void run () { 
+							Display.getDefault().readAndDispatch();
+						}
+					});
+				}
 				
 				return status;
 			}
