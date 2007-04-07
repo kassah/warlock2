@@ -17,6 +17,6 @@ public class PushBoldTagHandler extends DefaultTagHandler {
 	
 	public void handleEnd() {
 		handler.getClient().setCurrentStyle(StormFrontStyle.BOLD_STYLE);
-		DocumentTagHandler.startCollecting("bold");
+		handler.pushBuffer();
 	}
 }

@@ -18,8 +18,6 @@ import com.arcaner.warlock.stormfront.IStormFrontProtocolHandler;
  * Handles Style nodes. This is a basically a no-op handler so that we can handle styled text for now, and apply style later.
  */
 public class StyleTagHandler extends DefaultTagHandler {
-
-	private String currentStyleId;
 	private StormFrontStyle currentStyle;
 	
 	/**
@@ -38,17 +36,13 @@ public class StyleTagHandler extends DefaultTagHandler {
 		
 		if (styleId == null || styleId.length() == 0)
 		{
-			StringBuffer buffer = DocumentTagHandler.getBuffer(currentStyleId);
+			StringBuffer buffer = handler.popBuffer();
 			handler.getClient().append(IWarlockClient.DEFAULT_VIEW, buffer.toString(), currentStyle);
-			
-			DocumentTagHandler.stopCollecting(currentStyleId);
 		}
 		else
 		{
-			DocumentTagHandler.startCollecting(styleId);
+			handler.pushBuffer();
 			currentStyle = StormFrontStyle.createCustomStyle(styleId);
 		}
-
-		currentStyleId = styleId;
 	}
 }

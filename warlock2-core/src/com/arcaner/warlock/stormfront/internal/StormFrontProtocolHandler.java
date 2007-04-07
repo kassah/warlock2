@@ -33,8 +33,9 @@ public class StormFrontProtocolHandler extends DefaultHandler implements IStormF
 	protected HashMap<String, IStormFrontTagHandler> tagHandlers = new HashMap<String, IStormFrontTagHandler>();
 	protected Stack<String> streamStack = new Stack<String>();
 	protected Stack<String> tagStack = new Stack<String>();
+	protected Stack<StringBuffer> bufferStack = new Stack<StringBuffer>();
 	
-	public StormFrontProtocolHandler(IStormFrontClient client) {
+ 	public StormFrontProtocolHandler(IStormFrontClient client) {
 		
 		this.client = client;
 		
@@ -51,6 +52,7 @@ public class StormFrontProtocolHandler extends DefaultHandler implements IStormF
 		new PushStreamTagHandler(this);
 		new PopStreamTagHandler(this);
 		new ClearStreamTagHandler(this);
+		new StreamTagHandler(this);
 		
 		new InvTagHandler(this);
 		new SpellTagHandler(this);
@@ -63,8 +65,6 @@ public class StormFrontProtocolHandler extends DefaultHandler implements IStormF
 		new PopBoldTagHandler(this);
 		new PresetTagHandler(this);
 		new OutputTagHandler(this);
-		
-		new DocumentTagHandler(this);
 	}
 	
 	/*
@@ -122,14 +122,22 @@ public class StormFrontProtocolHandler extends DefaultHandler implements IStormF
 		// take a default action
 		if(!handled) {
 			String str = String.copyValueOf(ch, start, length);
-			String stream;
-			try {
-				stream = streamStack.peek();
-			} catch(EmptyStackException e) {
-				stream = IWarlockClient.DEFAULT_VIEW;
+			
+			if (bufferStack.size() > 0)
+			{
+				bufferStack.peek().append(str);
 			}
-			//streamTable.send(stream, str);
-			client.append(stream, str);
+			else
+			{
+				String stream;
+				try {
+					stream = streamStack.peek();
+				} catch(EmptyStackException e) {
+					stream = IWarlockClient.DEFAULT_VIEW;
+				}
+				//streamTable.send(stream, str);
+				client.append(stream, str);
+			}
 		}
 	}
 	
@@ -268,5 +276,13 @@ public class StormFrontProtocolHandler extends DefaultHandler implements IStormF
 	public void fatalError(SAXParseException e)
 	throws SAXParseException {
 		System.out.println("FATAL ERROR");
+	}
+	
+	public void pushBuffer() {
+		bufferStack.push(new StringBuffer());
+	}
+	
+	public StringBuffer popBuffer() {
+		return bufferStack.pop();
 	}
 }

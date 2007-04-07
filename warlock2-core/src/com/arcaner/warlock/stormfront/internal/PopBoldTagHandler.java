@@ -22,8 +22,7 @@ public class PopBoldTagHandler extends DefaultTagHandler {
 	
 	@Override
 	public void handleEnd() {
-		StringBuffer boldText = DocumentTagHandler.getBuffer("bold");
-		DocumentTagHandler.stopCollecting("bold");
+		StringBuffer boldText = handler.popBuffer();
 		
 		handler.getClient().append(IWarlockClient.DEFAULT_VIEW, boldText.toString(), StormFrontStyle.BOLD_STYLE);
 		handler.getClient().setCurrentStyle(StormFrontStyle.EMPTY_STYLE);

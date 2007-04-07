@@ -21,4 +21,6 @@ public interface IStormFrontProtocolHandler {
 	public void pushStream(String name);
 	public void popStream();
 	
+	public void pushBuffer();
+	public StringBuffer popBuffer();
 }

@@ -7,8 +7,6 @@ import com.arcaner.warlock.client.stormfront.internal.StormFrontStyle;
 import com.arcaner.warlock.stormfront.IStormFrontProtocolHandler;
 
 public class OutputTagHandler extends DefaultTagHandler {
-
-	private String currentClass;
 	private StormFrontStyle currentStyle;
 	
 	public OutputTagHandler (IStormFrontProtocolHandler handler) {
@@ -20,23 +18,19 @@ public class OutputTagHandler extends DefaultTagHandler {
 	}
 	
 	@Override
-	public void handleStart(Attributes atts) {
-		String clazz = atts.getValue("class");
+	public void handleStart(Attributes attributes) {
+		String clazz = attributes.getValue("class");
 		
 		if (clazz == null || clazz.length() == 0)
 		{
-			StringBuffer buffer = DocumentTagHandler.getBuffer(currentClass);
-			handler.getClient().append(IWarlockClient.DEFAULT_VIEW, buffer.toString(), currentStyle);
-			
-			DocumentTagHandler.stopCollecting(currentClass);	
+			StringBuffer buffer = handler.popBuffer();
+			handler.getClient().append(IWarlockClient.DEFAULT_VIEW, buffer.toString(), currentStyle);	
 		}
 		else
 		{
-			DocumentTagHandler.startCollecting(currentClass);
-			currentStyle = StormFrontStyle.createCustomStyle(currentClass);
+			handler.pushBuffer();
+			currentStyle = StormFrontStyle.createCustomStyle(clazz);
 		}
-		
-		currentClass = clazz;
 	}
 
 }
