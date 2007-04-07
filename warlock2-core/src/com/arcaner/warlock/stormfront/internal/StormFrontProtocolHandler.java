@@ -39,6 +39,10 @@ public class StormFrontProtocolHandler extends DefaultHandler implements IStormF
 		
 		this.client = client;
 		
+		// server settings handlers
+		new SettingsInfoTagHandler(this);
+		new ScriptTagHandler(this);
+		
 		// Register the handlers
 		new AppTagHandler(this);
 		new BarTagHandler(this);

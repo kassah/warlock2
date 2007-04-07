@@ -128,7 +128,7 @@ public class SGEConnection extends Connection implements IConnectionListener {
 		state = SGE_CHARACTERS;
 		
 		try {
-			sendLine("L\t"+characterCode+"\tPLAY");
+			sendLine("L\t"+characterCode+"\tSTORM");
 		} catch (IOException e) {
 			e.printStackTrace();
 		}

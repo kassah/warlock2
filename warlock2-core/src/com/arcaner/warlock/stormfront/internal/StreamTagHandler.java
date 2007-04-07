@@ -17,8 +17,12 @@ public class StreamTagHandler extends DefaultTagHandler {
 
 	 @Override
 	public void handleStart(Attributes attributes) {
-		String streamId = new String(attributes.getValue("id"));
-		
-		handler.pushStream(streamId);
+		 String id = attributes.getValue("id");
+		 if (id != null)
+		 {
+			String streamId = new String();
+			
+			handler.pushStream(streamId);
+		 }
 	}
 }

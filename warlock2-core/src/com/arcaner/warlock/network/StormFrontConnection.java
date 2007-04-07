@@ -59,7 +59,7 @@ public class StormFrontConnection implements IConnection {
 	
 	public void sendLine (String line)
 	throws IOException {
-		send (line + "\n");
+		send ("<c>" + line + "\n");
 	}
 	
 	public IWarlockClient getClient() {
@@ -72,9 +72,10 @@ public class StormFrontConnection implements IConnection {
 				socket = new Socket(host, port);
 				
 				sendLine(key);
-				sendLine("/FE:WARLOCK /XML");
+				sendLine("/FE:WIZARD /VERSION:1.0.1.22 /P:WIN_98 /XML");
 				
 				StormFrontStream inputStream = new StormFrontStream(StormFrontConnection.this, socket.getInputStream());
+
 				SAXParserFactory factory = SAXParserFactory.newInstance();
 				SAXParser saxParser = factory.newSAXParser();
 				saxParser.parse(inputStream, new StormFrontProtocolHandler(client));
