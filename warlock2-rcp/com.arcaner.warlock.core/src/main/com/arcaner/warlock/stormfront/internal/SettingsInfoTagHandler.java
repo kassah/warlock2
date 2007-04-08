@@ -18,7 +18,7 @@ public class SettingsInfoTagHandler extends DefaultTagHandler {
 	
 	@Override
 	public void handleEnd() {
-		String playerId = handler.getClient().getPlayerId();
+		String playerId = handler.getClient().getPlayerId().get();
 		
 		File serverSettings = WarlockConfiguration.getConfigurationFile("serverSettings_" + playerId + ".xml", false);
 		if (!serverSettings.exists())
@@ -26,6 +26,7 @@ public class SettingsInfoTagHandler extends DefaultTagHandler {
 			handler.getClient().send("<sendSettings/>");
 		} else {
 			// no-op
+			handler.getClient().getServerSettings().load(playerId);
 			handler.getClient().send("");
 		}
 	}

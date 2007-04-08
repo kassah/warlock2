@@ -2,7 +2,6 @@ package com.arcaner.warlock.stormfront.internal;
 
 import org.xml.sax.Attributes;
 
-import com.arcaner.warlock.client.stormfront.internal.StormFrontClient;
 import com.arcaner.warlock.stormfront.IStormFrontProtocolHandler;
 
 public class PlayerIDTagHandler extends DefaultTagHandler {
@@ -19,7 +18,7 @@ public class PlayerIDTagHandler extends DefaultTagHandler {
 	
 	@Override
 	public void handleStart(Attributes attributes) {
-		((StormFrontClient)handler.getClient()).setPlayerId(attributes.getValue("id"));
+		handler.getClient().getPlayerId().set(attributes.getValue("id"));
 	}
 
 }

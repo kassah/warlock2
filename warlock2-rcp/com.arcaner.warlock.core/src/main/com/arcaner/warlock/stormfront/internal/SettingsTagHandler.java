@@ -45,7 +45,7 @@ public class SettingsTagHandler extends DefaultTagHandler {
 		buffer.insert(0, "<?xml version=\"1.0\" encoding=\"ISO-8859-1\"?>\n<settings>\n");
 		buffer.append("</settings>");
 		
-		String playerId = handler.getClient().getPlayerId();
+		String playerId = handler.getClient().getPlayerId().get();
 		File serverSettings = WarlockConfiguration.getConfigurationFile("serverSettings_" + playerId + ".xml");
 		
 		try {
@@ -63,5 +63,7 @@ public class SettingsTagHandler extends DefaultTagHandler {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
+		
+		handler.getClient().getServerSettings().load(handler.getClient().getPlayerId().get());
 	}
 }
