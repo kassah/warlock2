@@ -13,8 +13,8 @@ abstract public class DefaultTagHandler implements IStormFrontTagHandler {
 		handler.registerHandler(this);
 	}
 	
-	abstract public String getName();
-
+	public abstract String[] getTagNames();
+	
 	public void handleStart(Attributes atts) {
 		// TODO Auto-generated method stub
 

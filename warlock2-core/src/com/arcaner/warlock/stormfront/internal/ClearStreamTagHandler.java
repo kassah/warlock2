@@ -13,8 +13,8 @@ public class ClearStreamTagHandler extends DefaultTagHandler {
 		super(handler);
 	}
 
-	public String getName() {
-		return "clearStream";
+	public String[] getTagNames() {
+		return new String[] { "clearStream"};
 	}
 	
 	public void handleStart(Attributes atts) {

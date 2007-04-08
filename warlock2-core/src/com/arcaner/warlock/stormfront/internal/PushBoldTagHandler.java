@@ -11,8 +11,8 @@ public class PushBoldTagHandler extends DefaultTagHandler {
 	}
 	
 	@Override
-	public String getName() {
-		return "pushBold";
+	public String[] getTagNames() {
+		return new String[] { "pushBold" };
 	}
 	
 	public void handleEnd() {

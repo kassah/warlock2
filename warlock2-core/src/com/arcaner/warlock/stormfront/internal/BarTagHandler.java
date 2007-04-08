@@ -19,8 +19,8 @@ public class BarTagHandler extends DefaultTagHandler {
 		super(handler);
 	}
 	
-	public String getName() {
-		return "progressBar";
+	public String[] getTagNames() {
+		return new String[] { "progressBar" };
 	}
 
 	public void handleStart(Attributes atts) {

@@ -24,8 +24,8 @@ public class PromptTagHandler extends DefaultTagHandler {
 		client = handler.getClient();
 	}
 	
-	public String getName() {
-		return "prompt";
+	public String[] getTagNames() {
+		return new String[] { "prompt" };
 	}
 	
 	public void handleStart(Attributes atts) {

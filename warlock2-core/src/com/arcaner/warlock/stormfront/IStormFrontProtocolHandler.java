@@ -23,4 +23,7 @@ public interface IStormFrontProtocolHandler {
 	
 	public void pushBuffer();
 	public StringBuffer popBuffer();
+	
+	public void startSavingRawXML(StringBuffer buffer, String endOnTag);
+	public void stopSavingRawXML();
 }

@@ -22,8 +22,8 @@ public class CompDefTagHandler extends DefaultTagHandler {
 		super(handler);
 	}
 	
-	public String getName() {
-		return "compDef";
+	public String[] getTagNames() {
+		return new String[] { "compDef" };
 	}
 
 	public void handleStart(Attributes atts) {

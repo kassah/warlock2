@@ -13,8 +13,8 @@ public class PopStreamTagHandler extends DefaultTagHandler {
 		super(handler);
 	}
 
-	public String getName() {
-		return "popStream";
+	public String[] getTagNames() {
+		return new String[] { "popStream" };
 	}
 	
 	public void handleStart(Attributes atts) {

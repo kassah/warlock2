@@ -8,8 +8,8 @@ public class DirectionTagHandler extends DefaultTagHandler {
 		super(handler);
 	}
 	
-	public String getName() {
-		return "d";
+	public String[] getTagNames() {
+		return new String[] { "d" };
 	}
 
 	@Override

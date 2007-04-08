@@ -27,8 +27,8 @@ public class StyleTagHandler extends DefaultTagHandler {
 		super(handler);
 	}
 	
-	public String getName() {
-		return "style";
+	public String[] getTagNames() {
+		return new String[] { "style" };
 	}
 
 	public void handleStart(Attributes atts) {

@@ -18,8 +18,8 @@ public class PushStreamTagHandler extends DefaultTagHandler {
 		super(handler);
 	}
 
-	public String getName() {
-		return "pushStream";
+	public String[] getTagNames() {
+		return new String[] { "pushStream" };
 	}
 	
 	public void handleStart(Attributes atts) {

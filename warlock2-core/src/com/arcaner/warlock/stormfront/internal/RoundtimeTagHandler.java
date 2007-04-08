@@ -26,8 +26,8 @@ public class RoundtimeTagHandler extends DefaultTagHandler {
 		super(handler);
 	}
 	
-	public String getName() {
-		return "roundTime";
+	public String[] getTagNames() {
+		return new String[] { "roundTime" };
 	}
 	
 	public void handleStart(Attributes atts) {

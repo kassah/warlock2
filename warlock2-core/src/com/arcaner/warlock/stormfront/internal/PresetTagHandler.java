@@ -15,8 +15,8 @@ public class PresetTagHandler extends DefaultTagHandler {
 	}
 	
 	@Override
-	public String getName() {
-		return "preset";
+	public String[] getTagNames() {
+		return new String[] { "preset" };
 	}
 	
 	@Override

@@ -13,8 +13,8 @@ public class OutputTagHandler extends DefaultTagHandler {
 		super (handler);
 	}
 	
-	public String getName() {
-		return "output";
+	public String[] getTagNames() {
+		return new String[] { "output" };
 	}
 	
 	@Override

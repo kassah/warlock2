@@ -8,8 +8,8 @@ public class RightTagHandler extends DefaultTagHandler {
 		super(handler);
 	}
 	
-	public String getName() {
-		return "right";
+	public String[] getTagNames() {
+		return new String[] { "right" };
 	}
 
 	public boolean handleCharacters(char[] ch, int start, int length) {

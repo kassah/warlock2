@@ -1,5 +1,8 @@
 package com.arcaner.warlock.stormfront.internal;
 
+import java.io.File;
+
+import com.arcaner.warlock.configuration.WarlockConfiguration;
 import com.arcaner.warlock.stormfront.IStormFrontProtocolHandler;
 
 public class SettingsInfoTagHandler extends DefaultTagHandler {
@@ -9,13 +12,22 @@ public class SettingsInfoTagHandler extends DefaultTagHandler {
 	}
 	
 	@Override
-	public String getName() {
-		return "settingsInfo";
+	public String[] getTagNames() {
+		return new String[] { "settingsInfo" };
 	}
 	
 	@Override
 	public void handleEnd() {
-		handler.getClient().send("");
+		String playerId = handler.getClient().getPlayerId();
+		
+		File serverSettings = WarlockConfiguration.getConfigurationFile("serverSettings_" + playerId + ".xml", false);
+		if (!serverSettings.exists())
+		{
+			handler.getClient().send("<sendSettings/>");
+		} else {
+			// no-op
+			handler.getClient().send("");
+		}
 	}
 
 }

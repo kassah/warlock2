@@ -8,8 +8,8 @@ public class SpellTagHandler extends DefaultTagHandler {
 		super(handler);
 	}
 	
-	public String getName() {
-		return "spell";
+	public String[] getTagNames() {
+		return new String[] { "spell" };
 	}
 
 	public boolean handleCharacters(char[] ch, int start, int length) {

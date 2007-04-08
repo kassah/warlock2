@@ -10,8 +10,8 @@ public class InvTagHandler extends DefaultTagHandler {
 		super(handler);
 	}
 	
-	public String getName() {
-		return "inv";
+	public String[] getTagNames() {
+		return new String[] { "inv" };
 	}
 
 	public void handleStart(Attributes atts) {

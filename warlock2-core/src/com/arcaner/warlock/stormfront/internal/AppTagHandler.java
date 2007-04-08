@@ -16,8 +16,8 @@ public class AppTagHandler extends DefaultTagHandler {
 		super(handler);
 	}
 	
-	public String getName() {
-		return "app";
+	public String[] getTagNames() {
+		return new String[] { "app" };
 	}
 	
 	public void handleStart(Attributes atts) {

@@ -34,14 +34,19 @@ public class StormFrontProtocolHandler extends DefaultHandler implements IStormF
 	protected Stack<String> streamStack = new Stack<String>();
 	protected Stack<String> tagStack = new Stack<String>();
 	protected Stack<StringBuffer> bufferStack = new Stack<StringBuffer>();
+	protected StringBuffer rawXMLBuffer;
+	protected String rawXMLEndOnTag;
+	protected int currentSpacing = 0;
 	
  	public StormFrontProtocolHandler(IStormFrontClient client) {
 		
 		this.client = client;
 		
 		// server settings handlers
+		new PlayerIDTagHandler(this);
 		new SettingsInfoTagHandler(this);
-		new ScriptTagHandler(this);
+		new SettingsTagHandler(this);
+		new SentSettingsTagHandler(this);
 		
 		// Register the handlers
 		new AppTagHandler(this);
@@ -75,7 +80,10 @@ public class StormFrontProtocolHandler extends DefaultHandler implements IStormF
 	 * This function is to register handlers for xml tags
 	 */
 	public void registerHandler(IStormFrontTagHandler tagHandler) {
-		tagHandlers.put(tagHandler.getName(), tagHandler);
+		for (String tagName : tagHandler.getTagNames())
+		{
+			tagHandlers.put(tagName, tagHandler);
+		}
 	}
 	
 	/*
@@ -108,6 +116,12 @@ public class StormFrontProtocolHandler extends DefaultHandler implements IStormF
 	throws SAXException {
 		/*String str = String.copyValueOf(ch, start, length);
 		System.out.print(str);*/
+		
+		if (rawXMLBuffer != null)
+		{
+			rawXMLBuffer.append(ch, start, length);
+			return;
+		}
 		
 		boolean handled = false;
 		
@@ -162,6 +176,18 @@ public class StormFrontProtocolHandler extends DefaultHandler implements IStormF
 		String name;
 		if("".equals(localName)) name = qName;
 		else name = localName;
+		
+		if (rawXMLBuffer != null)
+		{
+			if (name.equals(rawXMLEndOnTag))
+			{
+				rawXMLBuffer = null;
+			} else {
+				rawXMLBuffer.append("</" + name + ">");
+				currentSpacing -= 1;
+				return;
+			}
+		}
 		
 		//System.out.print("</" + name + ">");
 		
@@ -236,16 +262,25 @@ public class StormFrontProtocolHandler extends DefaultHandler implements IStormF
 		if("".equals(localName)) name = qName;
 		else name = localName;
 		
-		/*System.out.print("<" + name);
-		if (atts != null) {
-            for (int i = 0; i < atts.getLength(); i++) {
-                String aName = atts.getLocalName(i); // Attr name
-                if ("".equals(aName)) aName = atts.getQName(i);
-                System.out.print(" ");
-                System.out.print(aName + "=\"" + atts.getValue(i) + "\"");
-            }
-        }
-        System.out.print(">");*/
+		//System.out.print("<" + name);
+		if (rawXMLBuffer != null)
+		{
+			String startTag = "<" + name;
+			if (atts != null) {
+	            for (int i = 0; i < atts.getLength(); i++) {
+	                String aName = atts.getLocalName(i); // Attr name
+	                if ("".equals(aName)) aName = atts.getQName(i);
+	                startTag += " ";
+	                startTag += aName + "=\"" + atts.getValue(i) + "\"";
+	            }
+	        }
+			startTag += ">";
+			rawXMLBuffer.append(startTag);
+			
+			currentSpacing += 1;
+			return;
+		}
+        //System.out.print(">");
         
 		tagStack.push(name);
 		
@@ -288,5 +323,23 @@ public class StormFrontProtocolHandler extends DefaultHandler implements IStormF
 	
 	public StringBuffer popBuffer() {
 		return bufferStack.pop();
+	}
+	
+	public void startSavingRawXML(StringBuffer buffer, String endOnTag) {
+		rawXMLBuffer = buffer;
+		rawXMLEndOnTag = endOnTag;
+	}
+	
+	public void stopSavingRawXML() {
+		rawXMLBuffer = null;
+		rawXMLEndOnTag = null;
+	}
+	
+	private String repeat (String toRepeat, int times)
+	{
+		String str = "";
+		for (int i = 0; i < times; i++)
+			str += toRepeat;
+		return str;
 	}
 }

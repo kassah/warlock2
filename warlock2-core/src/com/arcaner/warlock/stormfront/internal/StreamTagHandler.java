@@ -11,8 +11,8 @@ public class StreamTagHandler extends DefaultTagHandler {
 	}
 
 	@Override
-	public String getName() {
-		return "stream";
+	public String[] getTagNames() {
+		return new String[] { "stream" };
 	}
 
 	 @Override

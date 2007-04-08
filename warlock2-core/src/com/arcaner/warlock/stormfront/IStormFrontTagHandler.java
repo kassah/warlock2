@@ -17,7 +17,7 @@ import org.xml.sax.Attributes;
  */
 public interface IStormFrontTagHandler {
 	
-	public String getName();
+	public String[] getTagNames();
 	
 	/**
 	 * Handle the start tag 

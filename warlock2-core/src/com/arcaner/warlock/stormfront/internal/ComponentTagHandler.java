@@ -8,8 +8,8 @@ public class ComponentTagHandler extends DefaultTagHandler {
 		super(handler);
 	}
 	
-	public String getName() {
-		return "component";
+	public String[] getTagNames() {
+		return new String[] { "component" };
 	}
 	
 	public boolean handleCharacters(char[] ch, int start, int end) {
