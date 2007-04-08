@@ -11,12 +11,14 @@ import java.io.IOException;
 import com.arcaner.warlock.client.ICompass;
 import com.arcaner.warlock.client.IProperty;
 import com.arcaner.warlock.client.IWarlockClientViewer;
+import com.arcaner.warlock.client.PropertyListener;
 import com.arcaner.warlock.client.internal.ClientProperty;
 import com.arcaner.warlock.client.internal.Compass;
 import com.arcaner.warlock.client.internal.WarlockClient;
 import com.arcaner.warlock.client.stormfront.IStormFrontClient;
 import com.arcaner.warlock.client.stormfront.IStormFrontClientViewer;
 import com.arcaner.warlock.client.stormfront.IStormFrontStyle;
+import com.arcaner.warlock.configuration.ServerSettings;
 import com.arcaner.warlock.network.StormFrontConnection;
 import com.arcaner.warlock.stormfront.IStormFrontProtocolHandler;
 
@@ -35,8 +37,9 @@ public class StormFrontClient extends WarlockClient implements IStormFrontClient
 	protected StringBuffer buffer = new StringBuffer();
 	protected IStormFrontProtocolHandler handler;
 	protected boolean isBold;
-	protected String playerId;
+	protected ClientProperty<String> playerId;
 	protected IStormFrontStyle currentStyle = StormFrontStyle.EMPTY_STYLE;
+	protected ServerSettings serverSettings;
 	
 	public StormFrontClient() {
 		compass = new Compass(this);
@@ -46,6 +49,8 @@ public class StormFrontClient extends WarlockClient implements IStormFrontClient
 		mana = new ClientProperty<Integer>(this, "mana");
 		fatigue = new ClientProperty<Integer>(this, "fatigue");
 		spirit = new ClientProperty<Integer>(this, "spirit");
+		playerId = new ClientProperty<String>(this, "playerId");
+		serverSettings = new ServerSettings(this);
 	}
 	
 	public void append (String viewName, String text)
@@ -240,12 +245,11 @@ public class StormFrontClient extends WarlockClient implements IStormFrontClient
 		this.currentStyle = currentStyle;
 	}
 
-	public String getPlayerId() {
+	public ClientProperty<String> getPlayerId() {
 		return playerId;
 	}
-
-	public void setPlayerId(String playerId) {
-		this.playerId = playerId;
-	}
 	
+	public ServerSettings getServerSettings() {
+		return serverSettings;
+	}
 }

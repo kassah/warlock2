@@ -9,6 +9,7 @@ package com.arcaner.warlock.client.stormfront;
 import com.arcaner.warlock.client.ICompass;
 import com.arcaner.warlock.client.IProperty;
 import com.arcaner.warlock.client.IWarlockClient;
+import com.arcaner.warlock.configuration.ServerSettings;
 
 /**
  * @author Marshall
@@ -16,9 +17,15 @@ import com.arcaner.warlock.client.IWarlockClient;
 public interface IStormFrontClient extends IWarlockClient {
 	
 	/**
+	 * The server settings for this client
+	 * @return
+	 */
+	public ServerSettings getServerSettings();
+	
+	/**
 	 * @return The player ID of the current player
 	 */
-	public String getPlayerId();
+	public IProperty<String> getPlayerId();
 	
 	/**
 	 * @return The roundtime property
