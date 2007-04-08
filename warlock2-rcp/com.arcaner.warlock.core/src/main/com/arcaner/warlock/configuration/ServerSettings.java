@@ -125,7 +125,11 @@ public class ServerSettings {
 			}
 			else if ("skin".equals(color))
 			{
-				if (settingType == ColorType.CommandLine_Background)
+				if (settingType == ColorType.MainWindow_Background)
+					return getSkinBackgroundColor("main");
+				else if (settingType == ColorType.MainWindow_Foreground)
+					return getSkinForegroundColor("main");
+				else if (settingType == ColorType.CommandLine_Background)
 					return getSkinBackgroundColor("cmdline");
 				else if (settingType == ColorType.CommandLine_Foreground)
 					return getSkinForegroundColor("cmdline");
@@ -219,6 +223,10 @@ public class ServerSettings {
 		{
 			return new WarlockColor("#FFFFFF");
 		}
+		else if ("main".equals(presetId))
+		{
+			return new WarlockColor("#D4D4D4");
+		}
 		
 		return WarlockColor.DEFAULT_COLOR;
 	}
@@ -228,6 +236,10 @@ public class ServerSettings {
 		if ("roomName".equals(presetId))
 		{
 			return new WarlockColor("#0000FF");
+		}
+		else if ("main".equals(presetId))
+		{
+			return new WarlockColor("#000000");
 		}
 		
 		return WarlockColor.DEFAULT_COLOR;
