@@ -14,7 +14,7 @@ public class StormFrontStream extends InputStream {
 	private boolean inHeader = true;
 	private boolean started = false;
 	private int notDone = 0;
-	private String headerString = "<document>";
+	private String headerString = "<?xml version=\"1.0\" encoding=\"ISO-8859-1\"?><document>";
 	private String footerString = "</document>"; 
 	private InputStream inputStream;
 	private static Replacer[] invalidPatterns = {
@@ -164,7 +164,7 @@ public class StormFrontStream extends InputStream {
 		if(notDone >= 0) {
 			bytesRead = inputStream.read(b, off, toRead);
 		
-			System.out.println("Original bytesRead: " + bytesRead + ", toRead: " + toRead + ", len: " + len);
+//			System.out.println("Original bytesRead: " + bytesRead + ", toRead: " + toRead + ", len: " + len);
 			
 			// do some debug outputting
 			System.out.write(b, off, bytesRead);
@@ -202,7 +202,7 @@ public class StormFrontStream extends InputStream {
 		// Make sure the last character is a newline.
 		int newlinePos;
 		while((newlinePos = result.toString().lastIndexOf('\n')) < 0 && newlinePos >= toRead) {
-			System.out.println("More input");
+//			System.out.println("More input");
 			byte[] tmp = new byte[2048];
 			int numBytes = inputStream.read(tmp, 0, 2048);
 			result = result + new String(tmp, 0, numBytes);
@@ -247,7 +247,7 @@ public class StormFrontStream extends InputStream {
 			System.arraycopy(bytes, 0, b, off, bytesRead);
 		}
 		
-		System.out.println("Final bytesRead: " + bytesRead);
+//		System.out.println("Final bytesRead: " + bytesRead);
 		return bytesRead;
 	}
 	
