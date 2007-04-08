@@ -256,6 +256,10 @@ public class ServerSettings {
 		{
 			return new WarlockColor("#000000");
 		}
+		else if ("cmdline".equals(presetId))
+		{
+			return new WarlockColor("#000000");
+		}
 		
 		return WarlockColor.DEFAULT_COLOR;
 	}
