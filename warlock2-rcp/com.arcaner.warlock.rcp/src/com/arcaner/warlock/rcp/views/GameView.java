@@ -20,6 +20,7 @@ import org.eclipse.swt.graphics.Font;
 import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.widgets.Composite;
+import org.eclipse.swt.widgets.Display;
 import org.eclipse.ui.IWorkbenchPage;
 import org.eclipse.ui.PartInitException;
 import org.eclipse.ui.part.ViewPart;
@@ -31,6 +32,7 @@ import com.arcaner.warlock.client.stormfront.IStormFrontClient;
 import com.arcaner.warlock.client.stormfront.IStormFrontStyle;
 import com.arcaner.warlock.client.stormfront.WarlockColor;
 import com.arcaner.warlock.configuration.ServerSettings;
+import com.arcaner.warlock.rcp.ui.WarlockProgressBar;
 import com.arcaner.warlock.rcp.ui.client.SWTStormFrontClientViewer;
 import com.arcaner.warlock.rcp.ui.macros.IMacro;
 import com.arcaner.warlock.rcp.ui.macros.MacroFactory;
@@ -52,7 +54,8 @@ public class GameView extends ViewPart implements KeyListener {
 	
 	protected StyledText text;
 	protected StyledText entry;
-
+	protected WarlockProgressBar healthBar, fatigueBar, spiritBar, manaBar, roundtimeBar;
+	
 	protected IStormFrontClient client;
 	protected ViewEvents viewer;
 	private Font normalFont = JFaceResources.getDefaultFont(), monospaceFont = JFaceResources.getDefaultFont();
@@ -178,6 +181,48 @@ public class GameView extends ViewPart implements KeyListener {
 		entry.setLayoutData(new GridData(GridData.FILL, GridData.VERTICAL_ALIGN_END, true, false, 1, 1));
 		//entry.setLayoutData(new RowData(250, 15));
 		entry.addKeyListener(this);
+		
+		Composite bars = new Composite(top, SWT.NONE);
+		GridLayout barLayout = new GridLayout(4, true);
+		bars.setLayout(barLayout);
+		barLayout.horizontalSpacing = 0;
+		barLayout.marginHeight = 0;
+		barLayout.marginWidth = 0;
+		bars.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
+		
+		Display display = getSite().getShell().getDisplay();
+		
+		healthBar = new WarlockProgressBar(bars, SWT.NONE);
+		healthBar.setBackground(new Color(display, 0x80, 0, 0));
+		healthBar.setForeground(new Color(display, 0xff, 0xff, 0xff));
+		healthBar.setMinimum(0); healthBar.setMaximum(100);
+		healthBar.setLabel("health: 100%");
+		healthBar.setSelection(100);
+		healthBar.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
+		
+		manaBar = new WarlockProgressBar(bars, SWT.NONE);
+		manaBar.setBackground(new Color(display, 0, 0, 0xff));
+		manaBar.setForeground(new Color(display, 0xff, 0xff, 0xff));
+		manaBar.setMinimum(0); manaBar.setMaximum(100);
+		manaBar.setLabel("mana: 100%");
+		manaBar.setSelection(100);
+		manaBar.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
+		
+		fatigueBar = new WarlockProgressBar(bars, SWT.NONE);
+		fatigueBar.setBackground(new Color(display, 0xd0, 0x98, 0x2f));
+		fatigueBar.setForeground(new Color(display, 0, 0, 0));
+		fatigueBar.setMinimum(0); fatigueBar.setMaximum(100);
+		fatigueBar.setLabel("fatigue: 100%");
+		fatigueBar.setSelection(100);
+		fatigueBar.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
+		
+		spiritBar = new WarlockProgressBar(bars, SWT.NONE);
+		spiritBar.setBackground(new Color(display, 0xc0, 0xc0, 0xc0));
+		spiritBar.setForeground(new Color(display, 0, 0, 0));
+		spiritBar.setMinimum(0); spiritBar.setMaximum(100);
+		spiritBar.setLabel("spirit: 100%");
+		spiritBar.setSelection(100);
+		spiritBar.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
 	}
 	
 	public void setFocus() {
@@ -230,16 +275,14 @@ public class GameView extends ViewPart implements KeyListener {
 	{
 		WarlockColor bg = settings.getColorSetting(ServerSettings.ColorType.MainWindow_Background);
 		WarlockColor fg = settings.getColorSetting(ServerSettings.ColorType.MainWindow_Foreground);
+		
 		String fontFace = settings.getStringSetting(ServerSettings.StringType.MainWindow_FontFace);
 		int fontSize = settings.getIntSetting(ServerSettings.IntType.MainWindow_FontSize);
 		String monoFontFace = settings.getStringSetting(ServerSettings.StringType.MainWindow_MonoFontFace);
 		int monoFontSize = settings.getIntSetting(ServerSettings.IntType.MainWindow_MonoFontSize);
 		
-		text.setBackground(createColor(bg));
-		text.setForeground(createColor(fg));
-		
-		normalFont = new Font(getSite().getShell().getDisplay(), fontFace, fontSize-2, SWT.NONE);
-		monospaceFont = new Font(getSite().getShell().getDisplay(), monoFontFace, monoFontSize-2, SWT.NONE);
+		normalFont = fontFace == null ? JFaceResources.getDefaultFont() : new Font(getSite().getShell().getDisplay(), fontFace, fontSize-2, SWT.NONE);
+		monospaceFont = monoFontFace == null ? JFaceResources.getDialogFont() : new Font(getSite().getShell().getDisplay(), monoFontFace, monoFontSize-2, SWT.NONE);
 		text.setFont(normalFont);
 		
 		WarlockColor entryBG = settings.getColorSetting(ServerSettings.ColorType.CommandLine_Background);
