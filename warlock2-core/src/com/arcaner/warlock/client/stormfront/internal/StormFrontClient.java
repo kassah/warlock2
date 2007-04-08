@@ -35,6 +35,7 @@ public class StormFrontClient extends WarlockClient implements IStormFrontClient
 	protected StringBuffer buffer = new StringBuffer();
 	protected IStormFrontProtocolHandler handler;
 	protected boolean isBold;
+	protected String playerId;
 	protected IStormFrontStyle currentStyle = StormFrontStyle.EMPTY_STYLE;
 	
 	public StormFrontClient() {
@@ -237,6 +238,14 @@ public class StormFrontClient extends WarlockClient implements IStormFrontClient
 
 	public void setCurrentStyle(IStormFrontStyle currentStyle) {
 		this.currentStyle = currentStyle;
+	}
+
+	public String getPlayerId() {
+		return playerId;
+	}
+
+	public void setPlayerId(String playerId) {
+		this.playerId = playerId;
 	}
 	
 }

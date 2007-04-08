@@ -16,6 +16,11 @@ import com.arcaner.warlock.client.IWarlockClient;
 public interface IStormFrontClient extends IWarlockClient {
 	
 	/**
+	 * @return The player ID of the current player
+	 */
+	public String getPlayerId();
+	
+	/**
 	 * @return The roundtime property
 	 */
 	public IProperty<Integer> getRoundtime();
