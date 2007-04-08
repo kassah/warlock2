@@ -3,6 +3,7 @@ package com.arcaner.warlock.rcp.ui.client;
 import com.arcaner.warlock.client.stormfront.IStormFrontClient;
 import com.arcaner.warlock.client.stormfront.IStormFrontClientViewer;
 import com.arcaner.warlock.client.stormfront.IStormFrontStyle;
+import com.arcaner.warlock.configuration.ServerSettings;
 
 public class SWTStormFrontClientViewer extends SWTWarlockClientViewer implements IStormFrontClientViewer
 {
@@ -21,7 +22,7 @@ public class SWTStormFrontClientViewer extends SWTWarlockClientViewer implements
 	}
 	
 	private static enum EventType {
-		Append, Echo
+		Append, Echo, LoadServerSettings
 	};
 	
 	private class ListenerWrapper implements Runnable
@@ -29,16 +30,19 @@ public class SWTStormFrontClientViewer extends SWTWarlockClientViewer implements
 		private EventType eventType;
 		private String viewName, text;
 		private IStormFrontStyle style;
+		private ServerSettings settings;
 		
 		public void run() {
 			switch (eventType)
 			{
 				case Append: viewer.append(viewName, text, style); break;
 				case Echo: viewer.echo(viewName, text, style); break;
+				case LoadServerSettings: viewer.loadServerSettings(settings); break;
 			}
 			
 			viewName = text = null;
 			style = null;
+			settings = null;
 		}
 	}
 	
@@ -55,6 +59,12 @@ public class SWTStormFrontClientViewer extends SWTWarlockClientViewer implements
 		wrapper.text = text;
 		wrapper.style = style;
 		wrapper.eventType = EventType.Echo;
+		run(wrapper);
+	}
+	
+	public void loadServerSettings(ServerSettings settings) {
+		wrapper.settings = settings;
+		wrapper.eventType = EventType.LoadServerSettings;
 		run(wrapper);
 	}
 
