@@ -17,7 +17,6 @@ import org.eclipse.swt.events.KeyEvent;
 import org.eclipse.swt.events.KeyListener;
 import org.eclipse.swt.graphics.Color;
 import org.eclipse.swt.graphics.Font;
-import org.eclipse.swt.layout.FillLayout;
 import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.widgets.Composite;
@@ -36,6 +35,8 @@ import com.arcaner.warlock.rcp.ui.client.SWTStormFrontClientViewer;
 import com.arcaner.warlock.rcp.ui.macros.IMacro;
 import com.arcaner.warlock.rcp.ui.macros.MacroFactory;
 import com.arcaner.warlock.rcp.ui.style.StyleMappings;
+import com.arcaner.warlock.stormfront.IStream;
+import com.arcaner.warlock.stormfront.internal.Stream;
 
 /**
  * @author marshall
@@ -47,6 +48,7 @@ public class GameView extends ViewPart implements KeyListener {
 	private static GameView firstInstance;
 	private static boolean firstInstanceIsUsed = false;
 	private static ArrayList<GameView> openViews = new ArrayList<GameView>();
+	private static GameView viewInFocus;
 	
 	protected StyledText text;
 	protected StyledText entry;
@@ -61,6 +63,16 @@ public class GameView extends ViewPart implements KeyListener {
 		
 		viewer = new ViewEvents(client);
 		openViews.add(this);
+	}
+	
+	public static Collection<GameView> getOpenViews ()
+	{
+		return openViews;
+	}
+	
+	public static GameView getViewInFocus ()
+	{
+		return viewInFocus;
 	}
 	
 	public static GameView createNext () {
@@ -97,12 +109,12 @@ public class GameView extends ViewPart implements KeyListener {
 			viewerWrapper = new SWTStormFrontClientViewer(this);
 		}
 		
-		public void append (String viewName, String toAppend, IStormFrontStyle style) {
-			GameView.this.append(viewName, toAppend, style);
+		public void append (IStream stream, String toAppend, IStormFrontStyle style) {
+			GameView.this.append(stream, toAppend, style);
 		}
 		
-		public void echo (String viewName, String text, IStormFrontStyle style) {
-			GameView.this.echo(viewName, text, style);
+		public void echo (IStream stream, String text, IStormFrontStyle style) {
+			GameView.this.echo(stream, text, style);
 		}
 		
 		public void setViewerTitle(String title) {
@@ -170,26 +182,30 @@ public class GameView extends ViewPart implements KeyListener {
 	
 	public void setFocus() {
 		entry.setFocus();
+		
+		viewInFocus = this;
 	}
 	
-	public void append (String viewName, String toAppend, IStormFrontStyle style)
+	public void append (IStream stream, String toAppend, IStormFrontStyle style)
 	{
-		System.out.println("appending: " + toAppend);
-		
 		StyleRange range = StyleMappings.getStyle(client.getServerSettings(), style, text.getCharCount(), toAppend.length());
-		text.append(toAppend);
 		
-		if (range != null)
-			text.setStyleRange(range);
-		
-		int length = text.getContent().getCharCount();		
-		if (text.getCaretOffset() < length) {
-			text.setCaretOffset(length);
-			text.showSelection();
+		if (stream.equals(Stream.DEFAULT_STREAM))
+		{
+			text.append(toAppend);
+			
+			if (range != null)
+				text.setStyleRange(range);
+			
+			int length = text.getContent().getCharCount();		
+			if (text.getCaretOffset() < length) {
+				text.setCaretOffset(length);
+				text.showSelection();
+			}
 		}
 	}
 	
-	public void echo (String viewName, String text, IStormFrontStyle style)
+	public void echo (IStream stream, String text, IStormFrontStyle style)
 	{
 		// A hacked style range, for now. This was mainly so we could get an idea on how to do it
 		// once we implement highlight prefs, etc.
@@ -228,8 +244,8 @@ public class GameView extends ViewPart implements KeyListener {
 		
 		WarlockColor entryBG = settings.getColorSetting(ServerSettings.ColorType.CommandLine_Background);
 		WarlockColor entryFG = settings.getColorSetting(ServerSettings.ColorType.CommandLine_Foreground);
-		entry.setForeground(createColor(entryFG));
-		entry.setBackground(createColor(entryBG));
+		entry.setForeground(createColor(entryFG.equals(WarlockColor.DEFAULT_COLOR) ? fg  : entryFG));
+		entry.setBackground(createColor(entryBG.equals(WarlockColor.DEFAULT_COLOR) ? bg : entryBG));
 	}
 	
 	public void setViewerTitle(String title) {
@@ -249,6 +265,9 @@ public class GameView extends ViewPart implements KeyListener {
 			CompassView.getDefault().init(client);
 		if (BarsView.getDefault() != null)
 			BarsView.getDefault().init(client);
+		
+		for (StreamView streamView : StreamView.getOpenViews())
+			streamView.setClient(client);
 	}
 	
 	public void keyPressed(KeyEvent e) {

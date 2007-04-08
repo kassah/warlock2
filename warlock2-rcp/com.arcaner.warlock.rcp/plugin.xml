@@ -23,6 +23,12 @@
             class="com.arcaner.warlock.rcp.views.BarsView"
             name="Bars"
             id="com.arcaner.warlock.rcp.views.barsView"/>
+      <view
+            allowMultiple="true"
+            class="com.arcaner.warlock.rcp.views.StreamView"
+            id="com.arcaner.warlock.rcp.views.StreamView"
+            name="Stream View">
+      </view>
    </extension>
    <extension
          id="warlock"
@@ -118,6 +124,10 @@
          <menu
                label="Preferences"
                mnemonic="P">
+            <dynamic
+                  class="com.arcaner.warlock.rcp.menu.StreamWindowContributionItem"
+                  id="com.arcaner.warlock.rcp.dynamiicViews">
+            </dynamic>
             <command
                   commandId="com.arcaner.warlock.rcp.command.preferences"
                   icon="images/preferences.png"
