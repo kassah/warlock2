@@ -10,7 +10,9 @@ Eclipse-LazyStart: true
 Bundle-ClassPath: lib/js.jar,
  lib/commons-lang-2.3.jar,
  warlock2-core.jar,
- warlock2-core-eclipse.jar
+ warlock2-core-eclipse.jar,
+ lib/dom4j-1.6.1.jar,
+ lib/jaxen-1.1-beta-6.jar
 Export-Package: com.arcaner.warlock.client,
  com.arcaner.warlock.client.internal,
  com.arcaner.warlock.client.stormfront,
