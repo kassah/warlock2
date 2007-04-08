@@ -29,6 +29,7 @@ public class ProfileConnectContributionItem extends CompoundContributionItem {
 		for (Profile profile : profiles)
 		{
 			items[i] = new ActionContributionItem(new ProfileConnectAction(profile));
+			i++;
 		}
 		
 		return items;
