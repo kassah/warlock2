@@ -8,9 +8,9 @@ Bundle-Vendor: Warlock Team
 Require-Bundle: org.eclipse.core.runtime
 Eclipse-LazyStart: true
 Bundle-ClassPath: lib/js.jar,
- lib/warlock2-core.jar,
- warlock2-core-rcp.jar,
- lib/commons-lang-2.3.jar
+ lib/commons-lang-2.3.jar,
+ warlock2-core.jar,
+ warlock2-core-eclipse.jar
 Export-Package: com.arcaner.warlock.client,
  com.arcaner.warlock.client.internal,
  com.arcaner.warlock.client.stormfront,
