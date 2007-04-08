@@ -95,11 +95,18 @@ public class ServerSettings {
 	
 	public String getStringSetting (StringType settingType)
 	{
+		Element fontElement = null;
+		
 		switch (settingType)
 		{
-			case MainWindow_FontFace: return mainWindowFontElement.attributeValue("face");
-			case MainWindow_MonoFontFace: return mainWindowColumnFontElement.attributeValue("face");
-			case CommandLine_FontFace: return commandLineElement.attributeValue("face");
+			case MainWindow_FontFace: fontElement = mainWindowFontElement; break;
+			case MainWindow_MonoFontFace: fontElement = mainWindowColumnFontElement; break;
+			case CommandLine_FontFace: fontElement = commandLineElement; break;
+		}
+		
+		if (fontElement != null)
+		{
+			return fontElement.attributeValue("face");
 		}
 		
 		return null;
@@ -142,11 +149,19 @@ public class ServerSettings {
 	
 	public int getIntSetting (IntType settingType)
 	{
+		Element fontElement = null;
+		
 		switch (settingType)
 		{
-			case MainWindow_FontSize: return Integer.parseInt(mainWindowFontElement.attributeValue("size"));
-			case MainWindow_MonoFontSize: return Integer.parseInt(mainWindowColumnFontElement.attributeValue("size"));
+			case MainWindow_FontSize: fontElement = mainWindowFontElement;
+			case MainWindow_MonoFontSize: fontElement = mainWindowColumnFontElement;
 		}
+		
+		if (fontElement != null)
+		{
+			return Integer.parseInt(fontElement.attributeValue("size"));
+		}
+		
 		return -1;
 	}
 	
