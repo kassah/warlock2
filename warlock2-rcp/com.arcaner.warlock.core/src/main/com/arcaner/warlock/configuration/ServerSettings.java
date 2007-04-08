@@ -216,7 +216,7 @@ public class ServerSettings {
 	// These are hard coded for now, we should either have our own "skin" defined in a configuration somewhere,
 	// or try to pull from stormfront's binary "skn" file somehow?
 	// At any rate -- these look to be the right "default" settings for stormfront..
-	public static WarlockColor getSkinForegroundColor (String presetId)
+	public WarlockColor getSkinForegroundColor (String presetId)
 	{
 		if ("bold".equals(presetId))
 		{
@@ -266,7 +266,7 @@ public class ServerSettings {
 		return WarlockColor.DEFAULT_COLOR;
 	}
 	
-	public static WarlockColor getSkinBackgroundColor (String presetId)
+	public WarlockColor getSkinBackgroundColor (String presetId)
 	{
 		if ("roomName".equals(presetId))
 		{
@@ -275,7 +275,7 @@ public class ServerSettings {
 		else if ("bold".equals(presetId) || "speech".equals(presetId) || "whisper".equals(presetId) || "thought".equals(presetId)
 			|| "watching".equals(presetId) || "link".equals(presetId))
 		{
-			return getSkinBackgroundColor("main");
+			return getColorSetting(ColorType.MainWindow_Background);
 		}
 		else if ("main".equals(presetId))
 		{
