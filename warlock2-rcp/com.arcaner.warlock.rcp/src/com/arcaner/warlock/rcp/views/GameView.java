@@ -7,6 +7,7 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Random;
 
+import org.eclipse.jface.resource.JFaceResources;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.custom.StyleRange;
 import org.eclipse.swt.custom.StyledText;
@@ -15,10 +16,11 @@ import org.eclipse.swt.events.FocusListener;
 import org.eclipse.swt.events.KeyEvent;
 import org.eclipse.swt.events.KeyListener;
 import org.eclipse.swt.graphics.Color;
+import org.eclipse.swt.graphics.Font;
+import org.eclipse.swt.layout.FillLayout;
 import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.widgets.Composite;
-import org.eclipse.swt.widgets.Text;
 import org.eclipse.ui.IWorkbenchPage;
 import org.eclipse.ui.PartInitException;
 import org.eclipse.ui.part.ViewPart;
@@ -28,6 +30,8 @@ import com.arcaner.warlock.client.IWarlockClientViewer;
 import com.arcaner.warlock.client.stormfront.AbstractStormFrontClientViewer;
 import com.arcaner.warlock.client.stormfront.IStormFrontClient;
 import com.arcaner.warlock.client.stormfront.IStormFrontStyle;
+import com.arcaner.warlock.client.stormfront.WarlockColor;
+import com.arcaner.warlock.configuration.ServerSettings;
 import com.arcaner.warlock.rcp.ui.client.SWTStormFrontClientViewer;
 import com.arcaner.warlock.rcp.ui.macros.IMacro;
 import com.arcaner.warlock.rcp.ui.macros.MacroFactory;
@@ -45,10 +49,11 @@ public class GameView extends ViewPart implements KeyListener {
 	private static ArrayList<GameView> openViews = new ArrayList<GameView>();
 	
 	protected StyledText text;
-	protected Text entry;
+	protected StyledText entry;
 
 	protected IStormFrontClient client;
 	protected ViewEvents viewer;
+	private Font normalFont = JFaceResources.getDefaultFont(), monospaceFont = JFaceResources.getDefaultFont();
 	
 	public GameView() {
 		if (firstInstance == null)
@@ -119,6 +124,11 @@ public class GameView extends ViewPart implements KeyListener {
 		public SWTStormFrontClientViewer getViewerWrapper() {
 			return viewerWrapper;
 		}
+		
+		public void loadServerSettings (ServerSettings settings)
+		{
+			GameView.this.loadServerSettings(settings);
+		}
 	}
 	
 	private static String generateUniqueId () {
@@ -129,6 +139,10 @@ public class GameView extends ViewPart implements KeyListener {
 		
 		Composite top = new Composite (parent, SWT.NONE);
 		GridLayout layout = new GridLayout(1, false);
+		layout.marginHeight = 0;
+		layout.marginWidth = 0;
+		layout.horizontalSpacing = 0;
+		layout.verticalSpacing = 0;
 		top.setLayout(layout);
 		
 		text = new StyledText(top, SWT.V_SCROLL);
@@ -148,7 +162,7 @@ public class GameView extends ViewPart implements KeyListener {
 //		Composite entryComposite = new Composite(top, SWT.NONE);
 //		entryComposite.setLayout(new GridLayout(1, false));
 //		
-		entry = new Text(top, SWT.BORDER);
+		entry = new StyledText(top, SWT.BORDER);
 		entry.setLayoutData(new GridData(GridData.FILL, GridData.VERTICAL_ALIGN_END, true, false, 1, 1));
 		//entry.setLayoutData(new RowData(250, 15));
 		entry.addKeyListener(this);
@@ -162,7 +176,7 @@ public class GameView extends ViewPart implements KeyListener {
 	{
 		System.out.println("appending: " + toAppend);
 		
-		StyleRange range = StyleMappings.getStyle(style, text.getCharCount(), toAppend.length());
+		StyleRange range = StyleMappings.getStyle(client.getServerSettings(), style, text.getCharCount(), toAppend.length());
 		text.append(toAppend);
 		
 		if (range != null)
@@ -191,6 +205,33 @@ public class GameView extends ViewPart implements KeyListener {
 		this.text.setStyleRange(range);
 	}
 	
+	private Color createColor (WarlockColor color)
+	{
+		return new Color(getSite().getShell().getDisplay(), color.getRed(), color.getGreen(), color.getBlue());
+	}
+	
+	public void loadServerSettings (final ServerSettings settings)
+	{
+		WarlockColor bg = settings.getColorSetting(ServerSettings.ColorType.MainWindow_Background);
+		WarlockColor fg = settings.getColorSetting(ServerSettings.ColorType.MainWindow_Foreground);
+		String fontFace = settings.getStringSetting(ServerSettings.StringType.MainWindow_FontFace);
+		int fontSize = settings.getIntSetting(ServerSettings.IntType.MainWindow_FontSize);
+		String monoFontFace = settings.getStringSetting(ServerSettings.StringType.MainWindow_MonoFontFace);
+		int monoFontSize = settings.getIntSetting(ServerSettings.IntType.MainWindow_MonoFontSize);
+		
+		text.setBackground(createColor(bg));
+		text.setForeground(createColor(fg));
+		
+		normalFont = new Font(getSite().getShell().getDisplay(), fontFace, fontSize-2, SWT.NONE);
+		monospaceFont = new Font(getSite().getShell().getDisplay(), monoFontFace, monoFontSize-2, SWT.NONE);
+		text.setFont(normalFont);
+		
+		WarlockColor entryBG = settings.getColorSetting(ServerSettings.ColorType.CommandLine_Background);
+		WarlockColor entryFG = settings.getColorSetting(ServerSettings.ColorType.CommandLine_Foreground);
+		entry.setForeground(createColor(entryFG));
+		entry.setBackground(createColor(entryBG));
+	}
+	
 	public void setViewerTitle(String title) {
 		setPartName(title);
 	}
@@ -209,8 +250,6 @@ public class GameView extends ViewPart implements KeyListener {
 		if (BarsView.getDefault() != null)
 			BarsView.getDefault().init(client);
 	}
-	
-
 	
 	public void keyPressed(KeyEvent e) {
 
