@@ -10,6 +10,7 @@ import java.util.EmptyStackException;
 import java.util.HashMap;
 import java.util.Stack;
 
+import org.apache.commons.lang.StringEscapeUtils;
 import org.xml.sax.Attributes;
 import org.xml.sax.Locator;
 import org.xml.sax.SAXException;
@@ -119,7 +120,7 @@ public class StormFrontProtocolHandler extends DefaultHandler implements IStormF
 		
 		if (rawXMLBuffer != null)
 		{
-			rawXMLBuffer.append(ch, start, length);
+			rawXMLBuffer.append(StringEscapeUtils.escapeXml(String.copyValueOf(ch, start, length)));
 			return;
 		}
 		
@@ -183,7 +184,7 @@ public class StormFrontProtocolHandler extends DefaultHandler implements IStormF
 			{
 				rawXMLBuffer = null;
 			} else {
-				rawXMLBuffer.append("</" + name + ">");
+				rawXMLBuffer.append(repeat("\t", currentSpacing) + "</" + name + ">\n");
 				currentSpacing -= 1;
 				return;
 			}
@@ -275,7 +276,7 @@ public class StormFrontProtocolHandler extends DefaultHandler implements IStormF
 	            }
 	        }
 			startTag += ">";
-			rawXMLBuffer.append(startTag);
+			rawXMLBuffer.append(repeat("\t", currentSpacing) + startTag + "\n");
 			
 			currentSpacing += 1;
 			return;
