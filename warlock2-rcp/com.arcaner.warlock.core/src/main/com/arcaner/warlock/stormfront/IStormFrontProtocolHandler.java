@@ -7,6 +7,7 @@
 package com.arcaner.warlock.stormfront;
 
 import com.arcaner.warlock.client.stormfront.IStormFrontClient;
+import com.arcaner.warlock.client.stormfront.IStormFrontStyle;
 
 /**
  * @author sproctor
@@ -20,10 +21,14 @@ public interface IStormFrontProtocolHandler {
 	public IStormFrontClient getClient();
 	public void pushStream(String name);
 	public void popStream();
+	public IStream getCurrentStream();
 	
 	public void pushBuffer();
 	public StringBuffer popBuffer();
 	
 	public void startSavingRawXML(StringBuffer buffer, String endOnTag);
 	public void stopSavingRawXML();
+	
+	public void setCurrentStyle (IStormFrontStyle style);
+	public void clearCurrentStyle ();
 }

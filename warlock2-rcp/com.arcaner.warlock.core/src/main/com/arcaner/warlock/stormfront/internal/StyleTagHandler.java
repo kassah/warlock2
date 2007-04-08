@@ -36,13 +36,15 @@ public class StyleTagHandler extends DefaultTagHandler {
 		
 		if (styleId == null || styleId.length() == 0)
 		{
-			StringBuffer buffer = handler.popBuffer();
-			handler.getClient().append(IWarlockClient.DEFAULT_VIEW, buffer.toString(), currentStyle);
+//			StringBuffer buffer = handler.popBuffer();
+//			handler.getClient().append(IWarlockClient.DEFAULT_VIEW, buffer.toString(), currentStyle);
+			handler.clearCurrentStyle();
 		}
 		else
 		{
-			handler.pushBuffer();
-			currentStyle = StormFrontStyle.createCustomStyle(styleId);
+//			handler.pushBuffer();
+//			currentStyle = StormFrontStyle.createCustomStyle(styleId);
+			handler.setCurrentStyle(StormFrontStyle.createCustomStyle(styleId));
 		}
 	}
 }

@@ -89,6 +89,7 @@ public interface IStormFrontClient extends IWarlockClient {
 	 * @param viewName The view name to append to
 	 * @param text The text to append
 	 * @param style The style to use
+	 * @deprecated The client should be appended to using IStream.send() (Use Stream.DEFAULT_STREAM for the main window)
 	 */
 	public void append (String viewName, String text, IStormFrontStyle style);
 	

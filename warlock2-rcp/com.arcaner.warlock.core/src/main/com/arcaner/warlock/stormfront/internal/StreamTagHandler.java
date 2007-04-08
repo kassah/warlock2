@@ -20,9 +20,14 @@ public class StreamTagHandler extends DefaultTagHandler {
 		 String id = attributes.getValue("id");
 		 if (id != null)
 		 {
-			String streamId = new String();
+			String streamId = new String(id);
 			
 			handler.pushStream(streamId);
 		 }
+	}
+	 
+	 @Override
+	public void handleEnd() {
+		handler.popStream();
 	}
 }

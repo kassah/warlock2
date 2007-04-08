@@ -19,8 +19,11 @@ import org.xml.sax.helpers.DefaultHandler;
 
 import com.arcaner.warlock.client.IWarlockClient;
 import com.arcaner.warlock.client.stormfront.IStormFrontClient;
+import com.arcaner.warlock.client.stormfront.IStormFrontStyle;
+import com.arcaner.warlock.client.stormfront.internal.StormFrontStyle;
 import com.arcaner.warlock.stormfront.IStormFrontProtocolHandler;
 import com.arcaner.warlock.stormfront.IStormFrontTagHandler;
+import com.arcaner.warlock.stormfront.IStream;
 
 /**
  * @author sproctor
@@ -32,12 +35,13 @@ public class StormFrontProtocolHandler extends DefaultHandler implements IStormF
 	
 	protected IStormFrontClient client;
 	protected HashMap<String, IStormFrontTagHandler> tagHandlers = new HashMap<String, IStormFrontTagHandler>();
-	protected Stack<String> streamStack = new Stack<String>();
+	protected Stack<Stream> streamStack = new Stack<Stream>();
 	protected Stack<String> tagStack = new Stack<String>();
 	protected Stack<StringBuffer> bufferStack = new Stack<StringBuffer>();
 	protected StringBuffer rawXMLBuffer;
 	protected String rawXMLEndOnTag;
 	protected int currentSpacing = 0;
+	protected IStormFrontStyle currentStyle = StormFrontStyle.EMPTY_STYLE;
 	
  	public StormFrontProtocolHandler(IStormFrontClient client) {
 		
@@ -98,7 +102,7 @@ public class StormFrontProtocolHandler extends DefaultHandler implements IStormF
 	 *  push a stream onto the stack
 	 */
 	public void pushStream(String name) {
-		streamStack.push(name);
+		streamStack.push(Stream.fromName(name));
 	}
 	
 	/*
@@ -108,6 +112,14 @@ public class StormFrontProtocolHandler extends DefaultHandler implements IStormF
 	throws EmptyStackException {
 		if (streamStack.size() > 0)
 			streamStack.pop();
+	}
+	
+	public IStream getCurrentStream ()
+	{
+		if (streamStack.size() > 0)
+			return streamStack.peek();
+		
+		return Stream.DEFAULT_STREAM;
 	}
 	
 	/* (non-Javadoc)
@@ -148,14 +160,15 @@ public class StormFrontProtocolHandler extends DefaultHandler implements IStormF
 			}
 			else
 			{
-				String stream;
+				Stream stream;
 				try {
 					stream = streamStack.peek();
 				} catch(EmptyStackException e) {
-					stream = IWarlockClient.DEFAULT_VIEW;
+					stream = Stream.DEFAULT_STREAM;
 				}
+
+				stream.send(str, currentStyle);
 				//streamTable.send(stream, str);
-				client.append(stream, str);
 			}
 		}
 	}
@@ -342,5 +355,13 @@ public class StormFrontProtocolHandler extends DefaultHandler implements IStormF
 		for (int i = 0; i < times; i++)
 			str += toRepeat;
 		return str;
+	}
+	
+	public void setCurrentStyle(IStormFrontStyle style) {
+		this.currentStyle = style;
+	}
+	
+	public void clearCurrentStyle() {
+		this.currentStyle = StormFrontStyle.EMPTY_STYLE;
 	}
 }

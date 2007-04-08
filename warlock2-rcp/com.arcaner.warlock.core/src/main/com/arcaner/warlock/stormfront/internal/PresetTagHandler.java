@@ -22,21 +22,12 @@ public class PresetTagHandler extends DefaultTagHandler {
 	@Override
 	public void handleStart(Attributes atts) {
 		this.id = atts.getValue("id");
-	}
-	
-	@Override
-	public boolean handleCharacters(char[] ch, int start, int length) {
-		String str = new String(ch);
-		String toAppend = str.substring(start, start+length);
-		
-		handler.getClient().append(IWarlockClient.DEFAULT_VIEW, toAppend, StormFrontStyle.createCustomStyle(id));
-		return true;
+		handler.setCurrentStyle(StormFrontStyle.createCustomStyle(id));
 	}
 	
 	@Override
 	public void handleEnd() {
-		// TODO Auto-generated method stub
-		super.handleEnd();
+		handler.clearCurrentStyle();
 	}
 
 }

@@ -16,7 +16,7 @@ public class PushBoldTagHandler extends DefaultTagHandler {
 	}
 	
 	public void handleEnd() {
-		handler.getClient().setCurrentStyle(StormFrontStyle.BOLD_STYLE);
-		handler.pushBuffer();
+		handler.setCurrentStyle(StormFrontStyle.BOLD_STYLE);
+//		handler.pushBuffer();
 	}
 }

@@ -11,7 +11,6 @@ import java.io.IOException;
 import com.arcaner.warlock.client.ICompass;
 import com.arcaner.warlock.client.IProperty;
 import com.arcaner.warlock.client.IWarlockClientViewer;
-import com.arcaner.warlock.client.PropertyListener;
 import com.arcaner.warlock.client.internal.ClientProperty;
 import com.arcaner.warlock.client.internal.Compass;
 import com.arcaner.warlock.client.internal.WarlockClient;
@@ -21,6 +20,8 @@ import com.arcaner.warlock.client.stormfront.IStormFrontStyle;
 import com.arcaner.warlock.configuration.ServerSettings;
 import com.arcaner.warlock.network.StormFrontConnection;
 import com.arcaner.warlock.stormfront.IStormFrontProtocolHandler;
+import com.arcaner.warlock.stormfront.IStreamListener;
+import com.arcaner.warlock.stormfront.internal.Stream;
 
 /**
  * @author Marshall
@@ -28,7 +29,7 @@ import com.arcaner.warlock.stormfront.IStormFrontProtocolHandler;
  * TODO To change the template for this generated type comment go to
  * Window - Preferences - Java - Code Style - Code Templates
  */
-public class StormFrontClient extends WarlockClient implements IStormFrontClient {
+public class StormFrontClient extends WarlockClient implements IStormFrontClient, IStreamListener {
 
 	protected ICompass compass;
 	protected int lastPrompt;
@@ -51,6 +52,7 @@ public class StormFrontClient extends WarlockClient implements IStormFrontClient
 		spirit = new ClientProperty<Integer>(this, "spirit");
 		playerId = new ClientProperty<String>(this, "playerId");
 		serverSettings = new ServerSettings(this);
+		Stream.DEFAULT_STREAM.addStreamListener(this);
 	}
 	
 	public void append (String viewName, String text)
@@ -193,18 +195,27 @@ public class StormFrontClient extends WarlockClient implements IStormFrontClient
 		}
 	}
 	
-	public void append(String viewName, String text, IStormFrontStyle style) {
+	public void streamCleared() {
+		// TODO Auto-generated method stub
+		
+	}
+	
+	public void streamReceivedText(String text, IStormFrontStyle style) {
 		for (IWarlockClientViewer viewer : viewers)
 		{
 			if (viewer instanceof IStormFrontClientViewer)
 			{
 				IStormFrontClientViewer sfViewer = (IStormFrontClientViewer) viewer;
-				sfViewer.append(viewName, text, style);
+				sfViewer.append(Stream.DEFAULT_STREAM, text, style);
 			}
 			else {
-				viewer.append(viewName, text);
+				viewer.append(Stream.DEFAULT_STREAM.getName(), text);
 			}
 		}
+	}
+	
+	public void append(String viewName, String text, IStormFrontStyle style) {
+		streamReceivedText(text, style);
 	}
 	
 	public void echo(String viewName, String text, IStormFrontStyle style) {
@@ -213,7 +224,7 @@ public class StormFrontClient extends WarlockClient implements IStormFrontClient
 			if (viewer instanceof IStormFrontClientViewer)
 			{
 				IStormFrontClientViewer sfViewer = (IStormFrontClientViewer) viewer;
-				sfViewer.echo(viewName, text, style);
+				sfViewer.echo(Stream.fromName(viewName), text, style);
 			}
 			else {
 				viewer.echo(viewName, text);

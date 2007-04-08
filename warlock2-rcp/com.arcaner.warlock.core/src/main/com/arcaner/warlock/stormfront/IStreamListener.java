@@ -3,6 +3,8 @@
  */
 package com.arcaner.warlock.stormfront;
 
+import com.arcaner.warlock.client.stormfront.IStormFrontStyle;
+
 /**
  * @author Marshall
  *
@@ -10,7 +12,7 @@ package com.arcaner.warlock.stormfront;
  */
 public interface IStreamListener {
 
-	public void streamReceivedText (String text);
+	public void streamReceivedText (String text, IStormFrontStyle style);
 	
 	public void streamCleared ();
 }
