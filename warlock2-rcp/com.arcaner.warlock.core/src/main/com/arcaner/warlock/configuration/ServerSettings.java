@@ -238,6 +238,26 @@ public class ServerSettings {
 		{
 			return new WarlockColor("#FFFFFF");
 		}
+		else if ("whisper".equals(presetId))
+		{
+			return new WarlockColor("#80FFFF");
+		}
+		else if ("watching".equals(presetId))
+		{
+			return new WarlockColor("#FFFF00");
+		}
+		else if ("link".equals(presetId))
+		{
+			return new WarlockColor("#62B0FF");
+		}
+		else if ("selectedLink".equals(presetId))
+		{
+			return new WarlockColor("#000000");
+		}
+		else if ("command".equals(presetId))
+		{
+			return new WarlockColor("#FFFFFF");
+		}
 		else if ("main".equals(presetId))
 		{
 			return new WarlockColor("#D4D4D4");
@@ -252,6 +272,11 @@ public class ServerSettings {
 		{
 			return new WarlockColor("#0000FF");
 		}
+		else if ("bold".equals(presetId) || "speech".equals(presetId) || "whisper".equals(presetId) || "thought".equals(presetId)
+			|| "watching".equals(presetId) || "link".equals(presetId))
+		{
+			return getSkinBackgroundColor("main");
+		}
 		else if ("main".equals(presetId))
 		{
 			return new WarlockColor("#000000");
@@ -260,7 +285,14 @@ public class ServerSettings {
 		{
 			return new WarlockColor("#000000");
 		}
-		
+		else if ("selectedLink".equals(presetId))
+		{
+			return new WarlockColor("#62B0FF");
+		}
+		else if ("command".equals(presetId))
+		{
+			return new WarlockColor("#404040");
+		}
 		return WarlockColor.DEFAULT_COLOR;
 	}
 }
