@@ -6,6 +6,7 @@
  */
 package com.arcaner.warlock.rcp.application;
 
+import org.eclipse.ui.IFolderLayout;
 import org.eclipse.ui.IPageLayout;
 import org.eclipse.ui.IPerspectiveFactory;
 
@@ -15,16 +16,14 @@ import com.arcaner.warlock.rcp.views.GameView;
 
 /**
  * @author Marshall
- *
- * TODO To change the template for this generated type comment go to
- * Window - Preferences - Java - Code Style - Code Templates
  */
 public class WarlockPerspectiveFactory implements IPerspectiveFactory {
 
 	private static IPageLayout myLayout = null;
 	
 	public static final String WARLOCK_PERSPECTIVE_ID = "com.arcaner.warlock.warlockPerspective";
-
+	public static final String BOTTOM_FOLDER_ID = "com.arcaner.warlock.bottomFolder";
+	
 	public static IPageLayout getLayout() {
 		return myLayout;
 	}
@@ -37,7 +36,11 @@ public class WarlockPerspectiveFactory implements IPerspectiveFactory {
 		
 		layout.setEditorAreaVisible(false);
 		layout.addView(GameView.VIEW_ID, IPageLayout.LEFT, 0.15f, layout.getEditorArea());
-		layout.addView(BarsView.VIEW_ID, IPageLayout.BOTTOM, 0.85f, GameView.VIEW_ID);
+//		IFolderLayout folder = layout.createFolder(BOTTOM_FOLDER_ID, IPageLayout.BOTTOM, 0.90f, GameView.VIEW_ID);
+		layout.addStandaloneView(BarsView.VIEW_ID, false, IPageLayout.BOTTOM, 0.95f, GameView.VIEW_ID);
+		
+//		folder.addView("org.eclipse.pde.runtime.LogView");
+		
 		layout.addView(CompassView.VIEW_ID, IPageLayout.RIGHT, 0.85f, BarsView.VIEW_ID);
 	}
 
