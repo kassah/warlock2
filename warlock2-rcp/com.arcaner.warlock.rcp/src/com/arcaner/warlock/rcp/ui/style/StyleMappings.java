@@ -1,5 +1,6 @@
 package com.arcaner.warlock.rcp.ui.style;
 
+import org.eclipse.jface.resource.JFaceResources;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.custom.StyleRange;
 import org.eclipse.swt.graphics.Color;
@@ -26,12 +27,14 @@ public class StyleMappings {
 				range.fontStyle |= SWT.BOLD;
 			else if (styleType.equals(IStormFrontStyle.StyleType.ITALIC))
 				range.fontStyle |= SWT.ITALIC;
+			else if (styleType.equals(IStormFrontStyle.StyleType.UNDERLINE))
+				range.underline = true;
 			else if (styleType.equals(IStormFrontStyle.StyleType.MONOSPACE))
 			{
 				String monoFontFace = settings.getStringSetting(ServerSettings.StringType.MainWindow_MonoFontFace);
 				int monoFontSize = settings.getIntSetting(ServerSettings.IntType.MainWindow_MonoFontSize);
 				
-				range.font = new Font(display, monoFontFace, monoFontSize-2, SWT.NONE);
+				range.font = monoFontFace == null ? JFaceResources.getDialogFont() : new Font(display, monoFontFace, monoFontSize-2, SWT.NONE);
 			}
 		}
 		
