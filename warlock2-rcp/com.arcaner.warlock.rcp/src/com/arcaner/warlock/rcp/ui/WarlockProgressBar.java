@@ -23,9 +23,10 @@ public class WarlockProgressBar extends Canvas
 {
 	protected Font progressFont;
 	protected String label;
-	protected Color foreground, background;
+	protected Color foreground, background, borderColor;
 	protected int min, max, selection;
 	protected int width, height;
+	protected int borderWidth;
 	protected boolean showText;
 	
 	public WarlockProgressBar (Composite composite, int style)
@@ -39,12 +40,13 @@ public class WarlockProgressBar extends Canvas
 		progressFont = new Font(getShell().getDisplay(), "Arial", 8, SWT.NONE);
 		foreground = new Color(getShell().getDisplay(), 255, 255, 255);
 		background = new Color(getShell().getDisplay(), 0, 0, 0);
+		borderColor = new Color(getShell().getDisplay(), 0, 0, 0);
+		borderWidth = 1;
 		
 		addPaintListener(new PaintListener() {
 			public void paintControl(PaintEvent e) {
 				if (label != null) {
 					Rectangle bounds = getBounds();
-					int borderWidth = getBorderWidth();
 					
 					e.gc.setFont (progressFont);
 					
@@ -69,11 +71,11 @@ public class WarlockProgressBar extends Canvas
 					}
 					
 					e.gc.setBackground(background);
-					e.gc.fillRectangle(borderWidth + 1, borderWidth + 1, barWidth, (bounds.height - (borderWidth*2)) - 1);
+					e.gc.fillRectangle(borderWidth, borderWidth, barWidth, (bounds.height - (borderWidth*2)));
 					
-					e.gc.setForeground(background);
-					e.gc.setLineWidth(1);
-					e.gc.drawRectangle(0, 0, bounds.width-1, bounds.height-1);
+					e.gc.setForeground(borderColor);
+					e.gc.setLineWidth(borderWidth);
+					e.gc.drawRectangle(0, 0, bounds.width, bounds.height);
 					
 					if (showText)
 					{
@@ -146,5 +148,21 @@ public class WarlockProgressBar extends Canvas
 		progressFont.dispose();
 		
 		super.dispose();
+	}
+
+	public Color getBorderColor() {
+		return borderColor;
+	}
+
+	public void setBorderColor(Color borderColor) {
+		this.borderColor = borderColor;
+	}
+
+	public int getBorderWidth() {
+		return borderWidth;
+	}
+
+	public void setBorderWidth(int borderWidth) {
+		this.borderWidth = borderWidth;
 	}
 }

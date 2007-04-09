@@ -20,7 +20,6 @@ import org.eclipse.swt.graphics.Font;
 import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.widgets.Composite;
-import org.eclipse.swt.widgets.Display;
 import org.eclipse.ui.IWorkbenchPage;
 import org.eclipse.ui.PartInitException;
 import org.eclipse.ui.part.ViewPart;
@@ -32,7 +31,7 @@ import com.arcaner.warlock.client.stormfront.IStormFrontClient;
 import com.arcaner.warlock.client.stormfront.IStormFrontStyle;
 import com.arcaner.warlock.client.stormfront.WarlockColor;
 import com.arcaner.warlock.configuration.ServerSettings;
-import com.arcaner.warlock.rcp.ui.WarlockProgressBar;
+import com.arcaner.warlock.rcp.ui.WarlockText;
 import com.arcaner.warlock.rcp.ui.client.SWTStormFrontClientViewer;
 import com.arcaner.warlock.rcp.ui.macros.IMacro;
 import com.arcaner.warlock.rcp.ui.macros.MacroFactory;
@@ -52,9 +51,8 @@ public class GameView extends ViewPart implements KeyListener {
 	private static ArrayList<GameView> openViews = new ArrayList<GameView>();
 	private static GameView viewInFocus;
 	
-	protected StyledText text;
+	protected WarlockText text;
 	protected StyledText entry;
-	protected WarlockProgressBar healthBar, fatigueBar, spiritBar, manaBar, roundtimeBar;
 	
 	protected IStormFrontClient client;
 	protected ViewEvents viewer;
@@ -160,7 +158,7 @@ public class GameView extends ViewPart implements KeyListener {
 		layout.verticalSpacing = 0;
 		top.setLayout(layout);
 		
-		text = new StyledText(top, SWT.V_SCROLL);
+		text = new WarlockText(top, SWT.V_SCROLL);
 		text.setLayoutData(new GridData(GridData.FILL, GridData.FILL, true, true));
 		text.setEditable(false);
 		text.setWordWrap(true);
@@ -174,6 +172,14 @@ public class GameView extends ViewPart implements KeyListener {
 			public void focusLost(FocusEvent e) {}
 		});
 		
+		text.append(
+			"Hello, and welcome to Warlock 2!\n" + 
+			"To get started, you can connect to your play.net account by opening the \"Connect\" menu, and pressing \"New Connection\".\n" +
+			"Good luck, and happy hunting!\n\n" +
+			"Copyright (c) 2001-2007 " + WarlockText.OBJECT_HOLDER);
+		
+		text.addLink("http://warlock.sf.net", "The Warlock Team");
+		
 //		Composite entryComposite = new Composite(top, SWT.NONE);
 //		entryComposite.setLayout(new GridLayout(1, false));
 //		
@@ -182,47 +188,48 @@ public class GameView extends ViewPart implements KeyListener {
 		//entry.setLayoutData(new RowData(250, 15));
 		entry.addKeyListener(this);
 		
-		Composite bars = new Composite(top, SWT.NONE);
-		GridLayout barLayout = new GridLayout(4, true);
-		bars.setLayout(barLayout);
-		barLayout.horizontalSpacing = 0;
-		barLayout.marginHeight = 0;
-		barLayout.marginWidth = 0;
-		bars.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
 		
-		Display display = getSite().getShell().getDisplay();
+//		Composite bars = new Composite(top, SWT.NONE);
+//		GridLayout barLayout = new GridLayout(4, true);
+//		bars.setLayout(barLayout);
+//		barLayout.horizontalSpacing = 0;
+//		barLayout.marginHeight = 0;
+//		barLayout.marginWidth = 0;
+//		bars.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
 		
-		healthBar = new WarlockProgressBar(bars, SWT.NONE);
-		healthBar.setBackground(new Color(display, 0x80, 0, 0));
-		healthBar.setForeground(new Color(display, 0xff, 0xff, 0xff));
-		healthBar.setMinimum(0); healthBar.setMaximum(100);
-		healthBar.setLabel("health: 100%");
-		healthBar.setSelection(100);
-		healthBar.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
-		
-		manaBar = new WarlockProgressBar(bars, SWT.NONE);
-		manaBar.setBackground(new Color(display, 0, 0, 0xff));
-		manaBar.setForeground(new Color(display, 0xff, 0xff, 0xff));
-		manaBar.setMinimum(0); manaBar.setMaximum(100);
-		manaBar.setLabel("mana: 100%");
-		manaBar.setSelection(100);
-		manaBar.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
-		
-		fatigueBar = new WarlockProgressBar(bars, SWT.NONE);
-		fatigueBar.setBackground(new Color(display, 0xd0, 0x98, 0x2f));
-		fatigueBar.setForeground(new Color(display, 0, 0, 0));
-		fatigueBar.setMinimum(0); fatigueBar.setMaximum(100);
-		fatigueBar.setLabel("fatigue: 100%");
-		fatigueBar.setSelection(100);
-		fatigueBar.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
-		
-		spiritBar = new WarlockProgressBar(bars, SWT.NONE);
-		spiritBar.setBackground(new Color(display, 0xc0, 0xc0, 0xc0));
-		spiritBar.setForeground(new Color(display, 0, 0, 0));
-		spiritBar.setMinimum(0); spiritBar.setMaximum(100);
-		spiritBar.setLabel("spirit: 100%");
-		spiritBar.setSelection(100);
-		spiritBar.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
+//		Display display = getSite().getShell().getDisplay();
+//		
+//		healthBar = new WarlockProgressBar(bars, SWT.NONE);
+//		healthBar.setBackground(new Color(display, 0x80, 0, 0));
+//		healthBar.setForeground(new Color(display, 0xff, 0xff, 0xff));
+//		healthBar.setMinimum(0); healthBar.setMaximum(100);
+//		healthBar.setLabel("health: 100%");
+//		healthBar.setSelection(100);
+//		healthBar.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
+//		
+//		manaBar = new WarlockProgressBar(bars, SWT.NONE);
+//		manaBar.setBackground(new Color(display, 0, 0, 0xff));
+//		manaBar.setForeground(new Color(display, 0xff, 0xff, 0xff));
+//		manaBar.setMinimum(0); manaBar.setMaximum(100);
+//		manaBar.setLabel("mana: 100%");
+//		manaBar.setSelection(100);
+//		manaBar.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
+//		
+//		fatigueBar = new WarlockProgressBar(bars, SWT.NONE);
+//		fatigueBar.setBackground(new Color(display, 0xd0, 0x98, 0x2f));
+//		fatigueBar.setForeground(new Color(display, 0, 0, 0));
+//		fatigueBar.setMinimum(0); fatigueBar.setMaximum(100);
+//		fatigueBar.setLabel("fatigue: 100%");
+//		fatigueBar.setSelection(100);
+//		fatigueBar.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
+//		
+//		spiritBar = new WarlockProgressBar(bars, SWT.NONE);
+//		spiritBar.setBackground(new Color(display, 0xc0, 0xc0, 0xc0));
+//		spiritBar.setForeground(new Color(display, 0, 0, 0));
+//		spiritBar.setMinimum(0); spiritBar.setMaximum(100);
+//		spiritBar.setLabel("spirit: 100%");
+//		spiritBar.setSelection(100);
+//		spiritBar.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
 	}
 	
 	public void setFocus() {
@@ -303,6 +310,7 @@ public class GameView extends ViewPart implements KeyListener {
 	public void setStormFrontClient(IStormFrontClient client) {
 		this.client = client;
 		viewer.setClient(client);
+		text.setText("");
 		
 		if (CompassView.getDefault() != null)
 			CompassView.getDefault().init(client);
