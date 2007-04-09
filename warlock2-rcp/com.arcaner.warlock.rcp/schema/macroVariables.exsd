@@ -1,9 +1,9 @@
 <?xml version='1.0' encoding='UTF-8'?>
 <!-- Schema file written by PDE -->
-<schema targetNamespace="com.arcaner.warlock">
+<schema targetNamespace="com.arcaner.warlock.rcp">
 <annotation>
       <appInfo>
-         <meta.schema plugin="com.arcaner.warlock" id="macroVariables" name="Warlock Macro Variable"/>
+         <meta.schema plugin="com.arcaner.warlock.rcp" id="macroVariables" name="Warlock Macro Variable"/>
       </appInfo>
       <documentation>
          [Enter description of this extension point.]

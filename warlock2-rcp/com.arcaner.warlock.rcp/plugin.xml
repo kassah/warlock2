@@ -4,6 +4,7 @@
    <extension-point id="scriptEngines" name="scriptEngines" schema="schema/scriptEngines.exsd"/>
    <extension-point id="macroVariables" name="macroVariables" schema="schema/macroVariables.exsd"/>
    <extension-point id="macroCommands" name="macroCommands" schema="schema/macroCommands.exsd"/>
+   
    <extension
          point="org.eclipse.ui.views">
       <view
