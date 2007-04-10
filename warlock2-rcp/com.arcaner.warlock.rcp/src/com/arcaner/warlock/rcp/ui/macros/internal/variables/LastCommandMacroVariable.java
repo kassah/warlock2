@@ -20,10 +20,18 @@ public class LastCommandMacroVariable implements IMacroVariable {
 	public String getValue(IWarlockClientViewer context) {
 		
 		IWarlockClient client = context.getWarlockClient();
-		ICommand command = client.getCommandHistory().prev();
-		
-		if(command != null) {
-			return command.getCommand();
+		String currentCommand = context.getCurrentCommand();
+		if (currentCommand != null && currentCommand.length() > 0)
+		{
+			client.getCommandHistory().addCommand(currentCommand);
+			ICommand command = client.getCommandHistory().prev();
+			
+			if(command != null) {
+				return command.getCommand();
+			}
+		}
+		else {
+			return client.getCommandHistory().current().getCommand();
 		}
 		
 		return null;

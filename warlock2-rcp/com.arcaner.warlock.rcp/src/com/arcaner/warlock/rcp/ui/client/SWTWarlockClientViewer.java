@@ -24,7 +24,7 @@ public class SWTWarlockClientViewer implements IWarlockClientViewer {
 	
 	private static enum EventType
 	{
-		Append, Echo, SetViewerTitle
+		Append, Echo, SetViewerTitle, SetCurrentCommand
 	};
 	
 	public SWTWarlockClientViewer (IWarlockClientViewer viewer)
@@ -50,6 +50,7 @@ public class SWTWarlockClientViewer implements IWarlockClientViewer {
 				case Append: viewer.append(viewName, text); break;
 				case Echo: viewer.echo(viewName, text); break;
 				case SetViewerTitle: viewer.setViewerTitle(text); break;
+				case SetCurrentCommand: viewer.setCurrentCommand(text); break;
 			}
 			viewName = null;
 			text = null;
@@ -92,6 +93,12 @@ public class SWTWarlockClientViewer implements IWarlockClientViewer {
 		wrapper.viewName = viewName;
 		wrapper.text = text;
 		wrapper.eventType = EventType.Append;
+		run(wrapper);
+	}
+	
+	public void setCurrentCommand(String command) {
+		wrapper.text = command;
+		wrapper.eventType = EventType.SetCurrentCommand;
 		run(wrapper);
 	}
 	

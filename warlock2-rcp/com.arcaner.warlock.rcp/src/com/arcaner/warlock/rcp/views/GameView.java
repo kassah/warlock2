@@ -10,7 +10,6 @@ import java.util.Random;
 import org.eclipse.jface.resource.JFaceResources;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.custom.StyleRange;
-import org.eclipse.swt.custom.StyledText;
 import org.eclipse.swt.events.FocusEvent;
 import org.eclipse.swt.events.FocusListener;
 import org.eclipse.swt.events.KeyEvent;
@@ -20,6 +19,9 @@ import org.eclipse.swt.graphics.Font;
 import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.widgets.Composite;
+import org.eclipse.swt.widgets.Event;
+import org.eclipse.swt.widgets.Listener;
+import org.eclipse.swt.widgets.Text;
 import org.eclipse.ui.IWorkbenchPage;
 import org.eclipse.ui.PartInitException;
 import org.eclipse.ui.part.ViewPart;
@@ -54,7 +56,7 @@ public class GameView extends ViewPart implements KeyListener {
 	private static GameView viewInFocus;
 	
 	protected WarlockText text;
-	protected StyledText entry;
+	protected Text entry;
 	protected WarlockCompass compass;
 	
 	protected IStormFrontClient client;
@@ -145,6 +147,10 @@ public class GameView extends ViewPart implements KeyListener {
 		{
 			GameView.this.loadServerSettings(settings);
 		}
+		
+		public void setCurrentCommand(String command) {
+			entry.setText(command);
+		}
 	}
 	
 	private static String generateUniqueId () {
@@ -186,56 +192,13 @@ public class GameView extends ViewPart implements KeyListener {
 //		Composite entryComposite = new Composite(top, SWT.NONE);
 //		entryComposite.setLayout(new GridLayout(1, false));
 //		
-		entry = new StyledText(top, SWT.BORDER);
+		entry = new Text(top, SWT.BORDER);
 		entry.setLayoutData(new GridData(GridData.FILL, GridData.VERTICAL_ALIGN_END, true, false, 1, 1));
 		//entry.setLayoutData(new RowData(250, 15));
 		entry.addKeyListener(this);
 		
 		compass = new WarlockCompass(text, CompassThemes.getCompassTheme("small"));
 		text.setBackgroundMode(SWT.INHERIT_DEFAULT);
-//		text.addAnchoredControl(compass, new Rectangle(0, 0, 125, 125));
-		
-//		Composite bars = new Composite(top, SWT.NONE);
-//		GridLayout barLayout = new GridLayout(4, true);
-//		bars.setLayout(barLayout);
-//		barLayout.horizontalSpacing = 0;
-//		barLayout.marginHeight = 0;
-//		barLayout.marginWidth = 0;
-//		bars.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
-		
-//		Display display = getSite().getShell().getDisplay();
-//		
-//		healthBar = new WarlockProgressBar(bars, SWT.NONE);
-//		healthBar.setBackground(new Color(display, 0x80, 0, 0));
-//		healthBar.setForeground(new Color(display, 0xff, 0xff, 0xff));
-//		healthBar.setMinimum(0); healthBar.setMaximum(100);
-//		healthBar.setLabel("health: 100%");
-//		healthBar.setSelection(100);
-//		healthBar.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
-//		
-//		manaBar = new WarlockProgressBar(bars, SWT.NONE);
-//		manaBar.setBackground(new Color(display, 0, 0, 0xff));
-//		manaBar.setForeground(new Color(display, 0xff, 0xff, 0xff));
-//		manaBar.setMinimum(0); manaBar.setMaximum(100);
-//		manaBar.setLabel("mana: 100%");
-//		manaBar.setSelection(100);
-//		manaBar.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
-//		
-//		fatigueBar = new WarlockProgressBar(bars, SWT.NONE);
-//		fatigueBar.setBackground(new Color(display, 0xd0, 0x98, 0x2f));
-//		fatigueBar.setForeground(new Color(display, 0, 0, 0));
-//		fatigueBar.setMinimum(0); fatigueBar.setMaximum(100);
-//		fatigueBar.setLabel("fatigue: 100%");
-//		fatigueBar.setSelection(100);
-//		fatigueBar.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
-//		
-//		spiritBar = new WarlockProgressBar(bars, SWT.NONE);
-//		spiritBar.setBackground(new Color(display, 0xc0, 0xc0, 0xc0));
-//		spiritBar.setForeground(new Color(display, 0, 0, 0));
-//		spiritBar.setMinimum(0); spiritBar.setMaximum(100);
-//		spiritBar.setLabel("spirit: 100%");
-//		spiritBar.setSelection(100);
-//		spiritBar.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
 	}
 	
 	public void setFocus() {
@@ -347,7 +310,7 @@ public class GameView extends ViewPart implements KeyListener {
 				{
 					entry.setText(result);
 				}
-				
+//				e.doit = false;
 				break;
 			}
 		}
