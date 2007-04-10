@@ -22,7 +22,7 @@ public class Stream implements IStream {
 	private static Hashtable<String, Stream> streams = new Hashtable<String, Stream>();
 	public static final Stream DEFAULT_STREAM = new Stream(IWarlockClient.DEFAULT_VIEW);
 	
-	protected String streamName;
+	protected String streamName, streamTitle;
 	protected ArrayList<IStreamListener> listeners;
 	
 	private Stream (String streamName) {
@@ -63,5 +63,13 @@ public class Stream implements IStream {
 	public static Collection<Stream> getStreams ()
 	{
 		return streams.values();
+	}
+
+	public String getTitle() {
+		return streamTitle;
+	}
+
+	public void setTitle(String streamTitle) {
+		this.streamTitle = streamTitle;
 	}
 }

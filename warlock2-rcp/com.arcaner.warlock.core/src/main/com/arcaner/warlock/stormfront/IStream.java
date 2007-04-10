@@ -16,6 +16,8 @@ public interface IStream {
 	
 	public String getName();
 	
+	public String getTitle();
+	
 	public void send(String data, IStormFrontStyle style);
 	
 	public void addStreamListener(IStreamListener listener);
