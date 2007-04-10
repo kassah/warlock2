@@ -44,7 +44,11 @@ public class ClientProperty<T> implements IProperty<T> {
 		}
 	}
 	
-	public void activate() { }
+	public void activate() {
+		for (IPropertyListener<T> listener : listeners) {
+			listener.propertyActivated(this);
+		}
+	}
 	
 	public void addListener(IPropertyListener<T> listener) {
 		listeners.add(listener);
