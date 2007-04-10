@@ -21,4 +21,5 @@ public interface IStream {
 	public void send(String data, IStormFrontStyle style);
 	
 	public void addStreamListener(IStreamListener listener);
+	public void removeStreamListener(IStreamListener listener);
 }

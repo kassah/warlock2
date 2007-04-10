@@ -35,6 +35,10 @@ public class Stream implements IStream {
 	public void addStreamListener(IStreamListener listener) {
 		listeners.add(listener);
 	}
+	
+	public void removeStreamListener(IStreamListener listener) {
+		listeners.remove(listener);
+	}
 
 	public void clear() {
 		for(IStreamListener listener : listeners) {
