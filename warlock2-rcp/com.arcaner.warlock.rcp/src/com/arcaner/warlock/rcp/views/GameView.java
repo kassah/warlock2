@@ -31,10 +31,12 @@ import com.arcaner.warlock.client.stormfront.IStormFrontClient;
 import com.arcaner.warlock.client.stormfront.IStormFrontStyle;
 import com.arcaner.warlock.client.stormfront.WarlockColor;
 import com.arcaner.warlock.configuration.ServerSettings;
+import com.arcaner.warlock.rcp.ui.WarlockCompass;
 import com.arcaner.warlock.rcp.ui.WarlockText;
 import com.arcaner.warlock.rcp.ui.client.SWTStormFrontClientViewer;
 import com.arcaner.warlock.rcp.ui.macros.IMacro;
 import com.arcaner.warlock.rcp.ui.macros.MacroFactory;
+import com.arcaner.warlock.rcp.ui.style.CompassThemes;
 import com.arcaner.warlock.rcp.ui.style.StyleMappings;
 import com.arcaner.warlock.stormfront.IStream;
 import com.arcaner.warlock.stormfront.internal.Stream;
@@ -53,6 +55,7 @@ public class GameView extends ViewPart implements KeyListener {
 	
 	protected WarlockText text;
 	protected StyledText entry;
+	protected WarlockCompass compass;
 	
 	protected IStormFrontClient client;
 	protected ViewEvents viewer;
@@ -188,6 +191,9 @@ public class GameView extends ViewPart implements KeyListener {
 		//entry.setLayoutData(new RowData(250, 15));
 		entry.addKeyListener(this);
 		
+		compass = new WarlockCompass(text, CompassThemes.getCompassTheme("small"));
+		text.setBackgroundMode(SWT.INHERIT_DEFAULT);
+//		text.addAnchoredControl(compass, new Rectangle(0, 0, 125, 125));
 		
 //		Composite bars = new Composite(top, SWT.NONE);
 //		GridLayout barLayout = new GridLayout(4, true);
@@ -312,8 +318,8 @@ public class GameView extends ViewPart implements KeyListener {
 		viewer.setClient(client);
 		text.setText("");
 		
-		if (CompassView.getDefault() != null)
-			CompassView.getDefault().init(client);
+		compass.setCompass(client.getCompass());
+		
 		if (BarsView.getDefault() != null)
 			BarsView.getDefault().init(client);
 		
