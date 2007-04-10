@@ -13,12 +13,12 @@
             class="com.arcaner.warlock.rcp.views.GameView"
             name="Warlock"
             id="com.arcaner.warlock.rcp.views.gameView"/>
-      <view
+      <!--view
             allowMultiple="false"
             icon="images/compass_view.gif"
             class="com.arcaner.warlock.rcp.views.CompassView"
             name="Compass"
-            id="com.arcaner.warlock.rcp.views.compassView"/>
+            id="com.arcaner.warlock.rcp.views.compassView"/-->
       <view
             allowMultiple="false"
             class="com.arcaner.warlock.rcp.views.BarsView"

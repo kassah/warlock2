@@ -6,12 +6,10 @@
  */
 package com.arcaner.warlock.rcp.application;
 
-import org.eclipse.ui.IFolderLayout;
 import org.eclipse.ui.IPageLayout;
 import org.eclipse.ui.IPerspectiveFactory;
 
 import com.arcaner.warlock.rcp.views.BarsView;
-import com.arcaner.warlock.rcp.views.CompassView;
 import com.arcaner.warlock.rcp.views.GameView;
 
 /**
@@ -41,7 +39,7 @@ public class WarlockPerspectiveFactory implements IPerspectiveFactory {
 		
 //		folder.addView("org.eclipse.pde.runtime.LogView");
 		
-		layout.addView(CompassView.VIEW_ID, IPageLayout.RIGHT, 0.85f, BarsView.VIEW_ID);
+//		layout.addView(CompassView.VIEW_ID, IPageLayout.RIGHT, 0.85f, BarsView.VIEW_ID);
 	}
 
 }
