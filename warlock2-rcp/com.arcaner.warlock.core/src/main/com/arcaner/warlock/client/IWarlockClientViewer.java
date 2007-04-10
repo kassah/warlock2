@@ -22,4 +22,6 @@ public interface IWarlockClientViewer {
 	public void setViewerTitle (String title);
 	
 	public String getCurrentCommand ();
+	
+	public void setCurrentCommand (String command);
 }
