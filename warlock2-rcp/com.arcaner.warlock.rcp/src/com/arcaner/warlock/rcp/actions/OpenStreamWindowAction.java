@@ -13,7 +13,7 @@ public class OpenStreamWindowAction extends Action {
 	
 	public OpenStreamWindowAction (IStream stream)
 	{
-		super(stream.getName(), Action.AS_CHECK_BOX);
+		super(stream.getTitle() == null ? stream.getName() : stream.getTitle(), Action.AS_CHECK_BOX);
 		
 		this.stream = stream;
 	}
@@ -21,12 +21,17 @@ public class OpenStreamWindowAction extends Action {
 	@Override
 	public void run() {
 		
-		StreamView streamView = StreamView.createNext();
+		StreamView streamView = StreamView.createNext(stream.getName());
 		streamView.setStream(stream);
 		
 		GameView inFocus = GameView.getViewInFocus();
 		if (inFocus != null) {
 			streamView.setClient((IStormFrontClient) inFocus.getClient());
 		}
+	}
+	
+	@Override
+	public String getText() {
+ 		return stream.getTitle() == null ? stream.getName() : stream.getTitle();
 	}
 }

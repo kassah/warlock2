@@ -38,19 +38,15 @@ public class StreamView extends ViewPart implements IStreamListener{
 		openViews.add(this);
 	}
 
-	public static StreamView createNext () {
+	public static StreamView createNext (String streamName) {
 		IWorkbenchPage page = PlatformUI.getWorkbench().getActiveWorkbenchWindow().getActivePage();
 		try {
-			StreamView nextInstance = (StreamView) page.showView(VIEW_ID, generateUniqueId(), IWorkbenchPage.VIEW_ACTIVATE);
+			StreamView nextInstance = (StreamView) page.showView(VIEW_ID, streamName, IWorkbenchPage.VIEW_ACTIVATE);
 			return nextInstance;
 		} catch (PartInitException e) {
 			e.printStackTrace();
 		}	
 		return null;
-	}
-	
-	private static String generateUniqueId () {
-		return new Random().nextInt() + "";
 	}
 	
 	@Override
@@ -84,7 +80,7 @@ public class StreamView extends ViewPart implements IStreamListener{
 	public void setStream(IStream stream) {
 		this.stream = stream;
 		
-		setPartName(stream.getName());
+		setPartName(stream.getTitle());
 		stream.addStreamListener(new SWTStreamListener(this));
 	}
 	
