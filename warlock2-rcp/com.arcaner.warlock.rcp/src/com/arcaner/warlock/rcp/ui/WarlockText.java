@@ -13,6 +13,8 @@ import org.eclipse.swt.custom.StyledText;
 import org.eclipse.swt.events.MouseEvent;
 import org.eclipse.swt.events.MouseListener;
 import org.eclipse.swt.events.MouseMoveListener;
+import org.eclipse.swt.events.PaintEvent;
+import org.eclipse.swt.events.PaintListener;
 import org.eclipse.swt.events.VerifyEvent;
 import org.eclipse.swt.events.VerifyListener;
 import org.eclipse.swt.graphics.Color;
@@ -21,10 +23,14 @@ import org.eclipse.swt.graphics.FontMetrics;
 import org.eclipse.swt.graphics.GC;
 import org.eclipse.swt.graphics.GlyphMetrics;
 import org.eclipse.swt.graphics.Image;
+import org.eclipse.swt.graphics.ImageData;
+import org.eclipse.swt.graphics.PaletteData;
 import org.eclipse.swt.graphics.Point;
+import org.eclipse.swt.graphics.RGB;
 import org.eclipse.swt.graphics.Rectangle;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Control;
+import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.Label;
 import org.eclipse.ui.PartInitException;
 import org.eclipse.ui.PlatformUI;
@@ -42,20 +48,19 @@ public class WarlockText extends StyledText {
 	public static final char OBJECT_HOLDER = '\uFFFc';
 	
 	private Hashtable<Object, StyleRangeWithData> objects = new Hashtable<Object, StyleRangeWithData>();
+	private Hashtable<Control, Rectangle> anchoredControls = new Hashtable<Control, Rectangle>();
 	private Color linkColor;
 	private Cursor handCursor, defaultCursor;
-	
-	private static class StyleRangeWithData extends StyleRange
-	{
-		public Hashtable<String, String> data = new Hashtable<String, String>();
-	}
+	private PaletteData palette;
 	
 	public WarlockText(Composite parent, int style) {
 		super(parent, style);
 		
-		linkColor = new Color(getDisplay(), 0xF0, 0x80, 0);
-		handCursor = new Cursor(parent.getDisplay(), SWT.CURSOR_HAND);
+		Display display = parent.getDisplay();
+		linkColor = new Color(display, 0xF0, 0x80, 0);
+		handCursor = new Cursor(display, SWT.CURSOR_HAND);
 		defaultCursor = parent.getCursor();
+		palette = new PaletteData(new RGB[] { display.getSystemColor(SWT.COLOR_WHITE).getRGB(), display.getSystemColor(SWT.COLOR_BLACK).getRGB() });
 		
 		addVerifyListener(new VerifyListener()  {
 			public void verifyText(VerifyEvent e) {
@@ -155,6 +160,24 @@ public class WarlockText extends StyledText {
 				}
 			}
 		});
+		
+		addPaintListener(new PaintListener () {
+			public void paintControl(PaintEvent e) {
+				for (Control anchoredControl : anchoredControls.keySet())
+				{
+					Rectangle rect = anchoredControls.get(anchoredControl);
+									
+					anchoredControl.setLocation(rect.x, rect.y);
+					anchoredControl.setSize(rect.width, rect.height);
+					
+//					ImageData data = new ImageData(rect.width, rect.height, 24, palette);
+//					
+//					data.transparentPixel = SWT.COLOR_BLUE;
+//					anchoredControl.setBackgroundImage(new Image(getDisplay(), data));
+				}
+				update();
+			}
+		});
 	}
 	
 	private int getCurrentHolderOffset ()
@@ -166,6 +189,13 @@ public class WarlockText extends StyledText {
 	{
 		String text = getText();
 		return text.indexOf(OBJECT_HOLDER);
+	}
+	
+	public void addAnchoredControl (Control control, Rectangle dimensions)
+	{
+		anchoredControls.put(control, dimensions);
+		
+		update();
 	}
 	
 	public void addControls (Control[] controls)

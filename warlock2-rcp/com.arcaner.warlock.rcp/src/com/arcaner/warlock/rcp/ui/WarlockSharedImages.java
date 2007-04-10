@@ -21,35 +21,39 @@ import com.arcaner.warlock.rcp.plugin.Warlock2Plugin;
  * Window - Preferences - Java - Code Style - Code Templates
  */
 public class WarlockSharedImages {
-	public static final String IMG_WIZBAN_WARLOCK = "warlock.wizard.image";
-	public static final String IMG_CHARACTER = "warlock.character";
-	public static final String IMG_GAME = "warlock.game";
+	
+	public static final String IMG_WIZBAN_WARLOCK = "/images/warlock-wizard-icon.png";
+	public static final String IMG_CHARACTER = "/images/character.gif";
+	public static final String IMG_GAME = "/images/game.gif";
 	
 	// Compass Images
-	public static final String IMG_COMPASS_NORTH_OFF = "compass.north.off";
-	public static final String IMG_COMPASS_NORTH_ON = "compass.north.on";
-	public static final String IMG_COMPASS_SOUTH_OFF = "compass.south.off";
-	public static final String IMG_COMPASS_SOUTH_ON = "compass.south.on";
-	public static final String IMG_COMPASS_EAST_OFF = "compass.east.off";
-	public static final String IMG_COMPASS_EAST_ON = "compass.east.on";
-	public static final String IMG_COMPASS_WEST_OFF = "compass.west.off";
-	public static final String IMG_COMPASS_WEST_ON = "compass.west.on";
-	public static final String IMG_COMPASS_NORTHEAST_OFF = "compass.northeast.off";
-	public static final String IMG_COMPASS_NORTHEAST_ON = "compass.northeast.on";
-	public static final String IMG_COMPASS_NORTHWEST_OFF = "compass.northwest.off";
-	public static final String IMG_COMPASS_NORTHWEST_ON = "compass.northwest.on";
-	public static final String IMG_COMPASS_SOUTHEAST_OFF = "compass.southeast.off";
-	public static final String IMG_COMPASS_SOUTHEAST_ON = "compass.southeast.on";
-	public static final String IMG_COMPASS_SOUTHWEST_OFF = "compass.southwest.off";
-	public static final String IMG_COMPASS_SOUTHWEST_ON = "compass.southwest.on";
-	public static final String IMG_COMPASS_UP_ON = "compass.up.on";
-	public static final String IMG_COMPASS_UP_OFF = "compass.up.off";
-	public static final String IMG_COMPASS_DOWN_ON = "compass.down.on";
-	public static final String IMG_COMPASS_DOWN_OFF = "compass.down.off";
-	public static final String IMG_COMPASS_OUT_ON = "compass.out.on";
-	public static final String IMG_COMPASS_OUT_OFF = "compass.out.off";
+	public static final String IMG_COMPASS_LARGE_MAIN = "/images/compass/large/compass_main.png";
+	public static final String IMG_COMPASS_LARGE_NORTH_ON = "/images/compass/large/north_on.png";
+	public static final String IMG_COMPASS_LARGE_SOUTH_ON = "/images/compass/large/south_on.png";
+	public static final String IMG_COMPASS_LARGE_EAST_ON = "/images/compass/large/east_on.png";
+	public static final String IMG_COMPASS_LARGE_WEST_ON = "/images/compass/large/west_on.png";
+	public static final String IMG_COMPASS_LARGE_NORTHEAST_ON = "/images/compass/large/northeast_on.png";
+	public static final String IMG_COMPASS_LARGE_NORTHWEST_ON = "/images/compass/large/northwest_on.png";
+	public static final String IMG_COMPASS_LARGE_SOUTHEAST_ON = "/images/compass/large/southeast_on.png";
+	public static final String IMG_COMPASS_LARGE_SOUTHWEST_ON = "/images/compass/large/southwest_on.png";
+	public static final String IMG_COMPASS_LARGE_UP_ON = "/images/compass/large/up_on.png";
+	public static final String IMG_COMPASS_LARGE_DOWN_ON = "/images/compass/large/down_on.png";
+	public static final String IMG_COMPASS_LARGE_OUT_ON = "/images/compass/large/out_on.png";
 	
-	public static final String IMG_CONNECT = "connect";
+	public static final String IMG_COMPASS_SMALL_MAIN = "/images/compass/small/compass_main.png";
+	public static final String IMG_COMPASS_SMALL_NORTH_ON = "/images/compass/small/north_on.png";
+	public static final String IMG_COMPASS_SMALL_SOUTH_ON = "/images/compass/small/south_on.png";
+	public static final String IMG_COMPASS_SMALL_EAST_ON = "/images/compass/small/east_on.png";
+	public static final String IMG_COMPASS_SMALL_WEST_ON = "/images/compass/small/west_on.png";
+	public static final String IMG_COMPASS_SMALL_NORTHEAST_ON = "/images/compass/small/northeast_on.png";
+	public static final String IMG_COMPASS_SMALL_NORTHWEST_ON = "/images/compass/small/northwest_on.png";
+	public static final String IMG_COMPASS_SMALL_SOUTHEAST_ON = "/images/compass/small/southeast_on.png";
+	public static final String IMG_COMPASS_SMALL_SOUTHWEST_ON = "/images/compass/small/southwest_on.png";
+	public static final String IMG_COMPASS_SMALL_UP_ON = "/images/compass/small/up_on.png";
+	public static final String IMG_COMPASS_SMALL_DOWN_ON = "/images/compass/small/down_on.png";
+	public static final String IMG_COMPASS_SMALL_OUT_ON = "/images/compass/small/out_on.png";
+	
+	public static final String IMG_CONNECT = "/images/connect.png";
 	
 	private static WarlockSharedImages instance;
 	
@@ -61,47 +65,15 @@ public class WarlockSharedImages {
 		instance = this;
 		images = new HashMap<String, Image>();
 		descriptors = new HashMap<String, ImageDescriptor>();
-		
-		addImage(IMG_WIZBAN_WARLOCK, "/images/warlock-wizard-icon.png");
-		addImage(IMG_CHARACTER, "/images/character.gif");
-		addImage(IMG_GAME, "/images/game.gif");
-		
-		
-		addImage(IMG_COMPASS_NORTH_OFF, "/images/north.gif");
-		addImage(IMG_COMPASS_NORTH_ON, "/images/north_on.gif");
-		addImage(IMG_COMPASS_SOUTH_OFF, "/images/south.gif");
-		addImage(IMG_COMPASS_SOUTH_ON, "/images/south_on.gif");
-		addImage(IMG_COMPASS_EAST_OFF, "/images/east.gif");
-		addImage(IMG_COMPASS_EAST_ON, "/images/east_on.gif");
-		addImage(IMG_COMPASS_WEST_OFF, "/images/west.gif");
-		addImage(IMG_COMPASS_WEST_ON, "/images/west_on.gif");
-		addImage(IMG_COMPASS_NORTHEAST_OFF, "/images/northeast.gif");
-		addImage(IMG_COMPASS_NORTHEAST_ON, "/images/northeast_on.gif");
-		addImage(IMG_COMPASS_NORTHWEST_OFF, "/images/northwest.gif");
-		addImage(IMG_COMPASS_NORTHWEST_ON, "/images/northwest_on.gif");
-		addImage(IMG_COMPASS_SOUTHEAST_OFF, "/images/southeast.gif");
-		addImage(IMG_COMPASS_SOUTHEAST_ON, "/images/southeast_on.gif");
-		addImage(IMG_COMPASS_SOUTHWEST_OFF, "/images/southwest.gif");
-		addImage(IMG_COMPASS_SOUTHWEST_ON, "/images/southwest_on.gif");
-		addImage(IMG_COMPASS_UP_ON, "/images/up_on.gif");
-		addImage(IMG_COMPASS_UP_OFF, "/images/up.gif");
-		addImage(IMG_COMPASS_DOWN_ON, "/images/down_on.gif");
-		addImage(IMG_COMPASS_DOWN_OFF, "/images/down.gif");
-		addImage(IMG_COMPASS_OUT_ON, "/images/out_on.gif");
-		addImage(IMG_COMPASS_OUT_OFF, "/images/out.gif");
-		addImage(IMG_CONNECT, "/images/connect.png");
-		
-		for (String key : descriptors.keySet()) {
-			ImageDescriptor descriptor = descriptor(key);
-			images.put(key,  descriptor.createImage());	
-		}
-		
 	}
 	
-	private void addImage (String id, String path)
+	private void addImage (String path)
 	{
 		Bundle pluginBundle = Warlock2Plugin.getDefault().getBundle();
-		descriptors.put(id, ImageDescriptor.createFromURL(pluginBundle.getEntry(path)));
+		ImageDescriptor descriptor = ImageDescriptor.createFromURL(pluginBundle.getEntry(path));
+		
+		descriptors.put(path, descriptor);
+		images.put(path, descriptor.createImage()); 
 	}
 	
 	private static WarlockSharedImages instance() {
@@ -123,11 +95,21 @@ public class WarlockSharedImages {
 	
 	public Image image(String key)
 	{
+		if (!images.containsKey(key))
+		{
+			addImage(key);
+		}
+		
 		return (Image) images.get(key);
 	}
 	
 	public ImageDescriptor descriptor(String key)
 	{
+		if (!descriptors.containsKey(key))
+		{
+			addImage(key);
+		}
+		
 		return (ImageDescriptor) descriptors.get(key);
 	}
 	
