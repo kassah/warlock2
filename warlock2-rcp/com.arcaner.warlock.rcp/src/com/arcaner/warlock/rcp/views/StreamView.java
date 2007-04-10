@@ -127,4 +127,10 @@ public class StreamView extends ViewPart implements IStreamListener{
 		Font normalFont = new Font(getSite().getShell().getDisplay(), fontFace, fontSize-2, SWT.NONE);
 		text.setFont(normalFont);
 	}
+	
+	@Override
+	public void dispose() {
+		stream.removeStreamListener(this);
+		super.dispose();
+	}
 }
