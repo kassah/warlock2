@@ -134,6 +134,7 @@ public class StormFrontClient extends WarlockClient implements IStormFrontClient
 
 	private void startRoundtime (int seconds)
 	{
+		roundtime.activate();
 		roundtime.set(seconds);
 	}
 	
