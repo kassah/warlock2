@@ -129,31 +129,46 @@ public class BarsView extends ViewPart implements IPropertyListener<Integer> {
 
 	}
 	
-	public void propertyActivated(IProperty<Integer> property) {	}
+	private boolean activateRoundtime = false;
+	public void propertyActivated(IProperty<Integer> property) {
+		if (property.getName().equals("roundtime"))
+		{
+			activateRoundtime = true;
+		}
+	}
+	
 	public void propertyCleared(IProperty<Integer> property, Integer oldValue) {	}
 	public void propertyChanged(IProperty<Integer> property, Integer oldValue) {
 		if (property.getName().equals("health"))
 		{
 			health.setSelection(property.get());
+			health.setLabel("health: " + property.get() + "%");
 		}
 		else if (property.getName().equals("mana"))
 		{
 			mana.setSelection(property.get());
+			mana.setLabel("mana: " + property.get() + "%");
 		}
 		else if (property.getName().equals("spirit"))
 		{
 			spirit.setSelection(property.get());
+			spirit.setLabel("spirit: " + property.get() + "%");
 		}
 		else if (property.getName().equals("fatigue"))
 		{
 			fatigue.setSelection(property.get());
+			fatigue.setLabel("fatigue: " + property.get() + "%");
 		}
 		else if (property.getName().equals("roundtime"))
 		{
-			roundtime.setMaximum(property.get() * 1000);
-			roundtime.setMinimum(0);
+			if (activateRoundtime)
+			{
+				roundtime.setMaximum(property.get() * 1000);
+				roundtime.setMinimum(0);
+				activateRoundtime = false;
+			}
 			roundtime.setSelection(property.get() * 1000);
-			System.out.println("start roundtime: " + property.get() * 1000);
+			roundtime.setLabel("roundtime: " + property.get() + " seconds");
 		}
 	}
 	
