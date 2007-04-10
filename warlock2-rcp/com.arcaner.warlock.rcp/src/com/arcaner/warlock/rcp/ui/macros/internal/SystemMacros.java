@@ -18,8 +18,20 @@ public class SystemMacros {
 	{
 		return new IMacro[] {
 			new Macro(SWT.CR, "\\r"),
-			new Macro(SWT.ARROW_UP, "\\x$lastCommand"),
-			new Macro(SWT.ARROW_DOWN, "\\x$nextCommand")
+			new Macro(SWT.ARROW_UP, "$lastCommand"),
+			new Macro(SWT.ARROW_DOWN, "$nextCommand"),
+			new Macro(SWT.KEYPAD_8, "north\\r"),
+			new Macro(SWT.KEYPAD_9, "northeast\\r"),
+			new Macro(SWT.KEYPAD_6, "east\\r"),
+			new Macro(SWT.KEYPAD_3, "southeast\\r"),
+			new Macro(SWT.KEYPAD_2, "south\\r"),
+			new Macro(SWT.KEYPAD_1, "southwest\\r"),
+			new Macro(SWT.KEYPAD_4, "west\\r"),
+			new Macro(SWT.KEYPAD_7, "northwest\\r"),
+			new Macro(SWT.KEYPAD_DECIMAL, "up\\r"),
+			new Macro(SWT.KEYPAD_0, "down\\r"),
+			new Macro(SWT.KEYPAD_5, "out\\r"),
+			new Macro(SWT.KEYPAD_CR, "$lastCommand\\r")
 		};
 	}
 

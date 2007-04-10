@@ -30,7 +30,8 @@ public class Macro implements IMacro
 		Map<String, IMacroVariable> variables = MacroFactory.instance().getMacroVariables();
 		Map<String, IMacroCommand> commands = MacroFactory.instance().getMacroCommands();
 		
-		String newCommand = context.getCurrentCommand() + new String(command);
+		//context.getCurrentCommand() + 
+		String newCommand = new String(command);
 		
 		for (String var : variables.keySet())
 		{
