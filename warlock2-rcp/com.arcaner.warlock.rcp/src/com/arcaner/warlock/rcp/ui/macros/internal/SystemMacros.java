@@ -17,7 +17,7 @@ public class SystemMacros {
 	public static IMacro[] getSystemMacros ()
 	{
 		return new IMacro[] {
-			new Macro(SWT.CR, "\\r"),
+			new Macro(SWT.CR, "$currentCommand\\r"),
 			new Macro(SWT.ARROW_UP, "$lastCommand"),
 			new Macro(SWT.ARROW_DOWN, "$nextCommand"),
 			new Macro(SWT.KEYPAD_8, "north\\r"),
