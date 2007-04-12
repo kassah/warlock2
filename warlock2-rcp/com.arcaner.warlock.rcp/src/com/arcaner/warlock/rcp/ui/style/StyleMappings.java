@@ -1,5 +1,6 @@
 package com.arcaner.warlock.rcp.ui.style;
 
+import org.eclipse.jface.resource.FontRegistry;
 import org.eclipse.jface.resource.JFaceResources;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.custom.StyleRange;
@@ -39,8 +40,17 @@ public class StyleMappings {
 			{
 				String monoFontFace = settings.getStringSetting(ServerSettings.StringType.MainWindow_MonoFontFace);
 				int monoFontSize = settings.getIntSetting(ServerSettings.IntType.MainWindow_MonoFontSize);
-				
-				range.font = monoFontFace == null ? JFaceResources.getDialogFont() : new Font(display, monoFontFace, monoFontSize, SWT.NONE);
+				if (monoFontFace != null)
+				{
+					if (JFaceResources.getFontRegistry().hasValueFor(monoFontFace))
+					{
+						range.font = new Font(display, monoFontFace, monoFontSize, SWT.NONE);
+						break;
+					}
+					
+				}
+				range.font = JFaceResources.getTextFont();
+				range.font.getFontData()[0].setHeight(monoFontSize);
 			}
 		}
 		
