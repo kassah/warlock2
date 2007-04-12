@@ -7,6 +7,8 @@ import java.util.Hashtable;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.custom.LineBackgroundEvent;
 import org.eclipse.swt.custom.LineBackgroundListener;
+import org.eclipse.swt.custom.LineStyleEvent;
+import org.eclipse.swt.custom.LineStyleListener;
 import org.eclipse.swt.custom.StyleRange;
 import org.eclipse.swt.graphics.Color;
 import org.eclipse.swt.graphics.Font;
@@ -40,6 +42,7 @@ public class StreamView extends ViewPart implements IStreamListener, LineBackgro
 	protected IStormFrontClient client;
 	protected WarlockText text;
 	protected Hashtable<Integer, Color> lineBackgrounds = new Hashtable<Integer,Color>();
+	protected Hashtable<Integer, Color> lineForegrounds = new Hashtable<Integer,Color>();
 	protected Composite mainComposite;
 	// This name is the 'suffix' part of the stream... so we will install listeners for each client
 	protected String streamName;
@@ -141,38 +144,91 @@ public class StreamView extends ViewPart implements IStreamListener, LineBackgro
 		}
 	}
 	
+	private void applyUserHighlights (StyleRange parentStyle, String text, int start, int length)
+	{
+		int lineIndex = this.text.getLineAtOffset(start);
+		Font font = this.text.getFont();
+		if (parentStyle != null)
+		{
+			if (parentStyle.font != null)
+				font = parentStyle.font;
+		}
+		
+		for (String highlight : client.getServerSettings().getHighlightStrings())
+		{
+			int highlightLength = highlight.length();
+			int index = text.indexOf(highlight);
+			while (index > -1)
+			{
+				StyleRangeWithData range = new StyleRangeWithData();
+				range.background = createColor(client.getServerSettings().getHighlightBackgroundColor(highlight));
+				range.foreground = createColor(client.getServerSettings().getHighlightForegroundColor(highlight));
+				range.start = start + index;
+				range.length = highlightLength;
+				range.font = font;
+				
+				if (client.getServerSettings().getHighlightFillEntireLine(highlight))
+				{
+					lineBackgrounds.put(lineIndex, range.background);
+					lineForegrounds.put(lineIndex, range.foreground);
+				}
+				
+				this.text.setStyleRange(range);
+				index = text.indexOf(highlight, index+1);
+			}
+		}
+	}
+	
 	public void streamReceivedText(IStream stream, String text, IWarlockStyle style) {
 		if (this.stream.equals(stream))
 		{
 			StyleRangeWithData range = null;
+			int start = this.text.getCharCount();
+			int length = text.length();
+			
 			try {
-				range = StyleMappings.getStyle(client.getServerSettings(), style, this.text.getCharCount(), text.length());
+				range = StyleMappings.getStyle(client.getServerSettings(), style, start, length);
 			} catch (Exception e) {
 				// TODO Auto-generated catch block
 				e.printStackTrace();
 			}
 			
 			this.text.append(text);
+			int lineIndex = this.text.getLineAtOffset(start);
+			
 			if (range != null) {
 				this.text.setStyleRange(range);
 				if (range.data.containsKey(StyleMappings.FILL_ENTIRE_LINE))
 				{
-					int lineIndex = this.text.getLineAtOffset(range.start);
 					lineBackgrounds.put(lineIndex, range.background);
+					lineForegrounds.put(lineIndex, range.foreground);
 				}
 			}
 			
+			applyUserHighlights(range, text, start, length);
 			scrollToBottom();
 		}
 	}
 	
 	public void lineGetBackground(LineBackgroundEvent event) {
 		int lineIndex = this.text.getLineAtOffset(event.lineOffset);
+		boolean hasBackground = lineBackgrounds.containsKey(lineIndex);
+		boolean hasForeground = lineForegrounds.containsKey(lineIndex);
 		
-		if (lineBackgrounds.containsKey(lineIndex))
+		if (hasBackground)
 		{
 			event.lineBackground = lineBackgrounds.get(lineIndex);
 		}
+		
+//		if (hasForeground)
+//		{
+//			StyleRange lineRange = new StyleRange();
+//			lineRange.start = event.lineOffset;
+//			lineRange.length = event.lineText.length();
+//			lineRange.foreground = lineForegrounds.get(lineIndex);
+//			
+//			this.text.setStyleRange(lineRange);
+//		}
 	}
 	
 	public void streamEchoed(IStream stream, String text) {
