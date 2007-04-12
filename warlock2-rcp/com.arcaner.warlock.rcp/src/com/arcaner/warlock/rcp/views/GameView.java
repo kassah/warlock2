@@ -201,6 +201,9 @@ public class GameView extends StreamView implements KeyListener, IStormFrontClie
 		WarlockColor entryFG = settings.getColorSetting(ServerSettings.ColorType.CommandLine_Foreground);
 		entry.setForeground(createColor(entryFG.equals(WarlockColor.DEFAULT_COLOR) ? fg  : entryFG));
 		entry.setBackground(createColor(entryBG.equals(WarlockColor.DEFAULT_COLOR) ? bg : entryBG));
+		
+		text.setBackground(createColor(bg));
+		text.setForeground(createColor(fg));
 	}
 	
 	public void setViewerTitle(String title) {
