@@ -123,6 +123,16 @@ public class ServerSettings {
 			highlightStrings.put(text, new Hashtable<String, String>());
 			saveAttributes(hElement, highlightStrings.get(text));
 		}
+		
+		Element namesElement = (Element) document.selectSingleNode("/settings/names");
+		for (Object o : namesElement.elements())
+		{
+			Element hElement = (Element) o;
+			String text = hElement.attributeValue("text");
+			
+			highlightStrings.put(text, new Hashtable<String, String>());
+			saveAttributes(hElement, highlightStrings.get(text));
+		}
 	}
 	
 	public String getStringSetting (StringType settingType)
