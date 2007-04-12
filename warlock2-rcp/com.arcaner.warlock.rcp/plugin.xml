@@ -61,7 +61,7 @@
             commandId="com.arcaner.warlock.commands.connectCommand"
             configuration="com.arcaner.warlock.keyConfiguration"/>
    </extension>
-   <extension
+      <extension
          point="com.arcaner.warlock.rcp.scriptEngines">
       <scriptEngine classname="com.arcaner.warlock.script.javascript.JavascriptEngine"/>
    </extension>
@@ -129,6 +129,10 @@
                   class="com.arcaner.warlock.rcp.menu.StreamWindowContributionItem"
                   id="com.arcaner.warlock.rcp.dynamiicViews">
             </dynamic>
+            <separator
+                  name="com.arcaner.warlock.rcp.separator2"
+                  visible="true">
+            </separator>
             <command
                   commandId="com.arcaner.warlock.rcp.command.preferences"
                   icon="images/preferences.png"
