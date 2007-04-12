@@ -2,6 +2,7 @@ package com.arcaner.warlock.configuration;
 
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
+import java.util.Collection;
 import java.util.Hashtable;
 
 import org.dom4j.Attribute;
@@ -22,6 +23,7 @@ public class ServerSettings {
 	private Document document;
 	private Element mainWindowElement, mainWindowFontElement, mainWindowColumnFontElement, commandLineElement;
 	private Hashtable<String, Hashtable<String, String>>presets = new Hashtable<String, Hashtable<String, String>>();
+	private Hashtable<String, Hashtable<String, String>> highlightStrings = new Hashtable<String, Hashtable<String, String>>();
 	
 	public static enum StringType {
 		MainWindow_FontFace, MainWindow_MonoFontFace, CommandLine_FontFace
@@ -68,23 +70,8 @@ public class ServerSettings {
 			mainWindowColumnFontElement = (Element) mainWindowElement.selectSingleNode("columnFont");
 			commandLineElement = (Element) document.selectSingleNode("/settings/cmdline");
 			
-			Element presetsElement = (Element) document.selectSingleNode("/settings/presets");
-			for (Object o : presetsElement.elements())
-			{
-				Element pElement = (Element) o;
-				String presetId = pElement.attributeValue("id");
-				
-				presets.put(presetId, new Hashtable<String, String>());
-				
-				for (Object o2 : pElement.attributes())
-				{
-					Attribute attr = (Attribute) o2;
-					if (!attr.getName().equals("id"))
-					{
-						presets.get(presetId).put(attr.getName(), attr.getValue());
-					}
-				}
-			}
+			loadPresets();
+			loadHighlightStrings();
 			
 			for (IWarlockClientViewer v : client.getViewers())
 			{
@@ -97,6 +84,44 @@ public class ServerSettings {
 		} catch (DocumentException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
+		}
+	}
+	
+	private void saveAttributes (Element element, Hashtable<String, String> table)
+	{
+		for (Object o2 : element.attributes())
+		{
+			Attribute attr = (Attribute) o2;
+			if (!attr.getName().equals("id"))
+			{
+				table.put(attr.getName(), attr.getValue());
+			}
+		}
+	}
+	
+	private void loadPresets ()
+	{
+		Element presetsElement = (Element) document.selectSingleNode("/settings/presets");
+		for (Object o : presetsElement.elements())
+		{
+			Element pElement = (Element) o;
+			String presetId = pElement.attributeValue("id");
+			
+			presets.put(presetId, new Hashtable<String, String>());
+			saveAttributes(pElement, presets.get(presetId));
+		}
+	}
+	
+	private void loadHighlightStrings()
+	{
+		Element stringsElement = (Element) document.selectSingleNode("/settings/strings");
+		for (Object o : stringsElement.elements())
+		{
+			Element hElement = (Element) o;
+			String text = hElement.attributeValue("text");
+			
+			highlightStrings.put(text, new Hashtable<String, String>());
+			saveAttributes(hElement, highlightStrings.get(text));
 		}
 	}
 	
@@ -226,6 +251,59 @@ public class ServerSettings {
 			if (presets.get(presetId).containsKey("line"))
 			{
 				String line = presets.get(presetId).get("line");
+				return "y".equalsIgnoreCase(line);
+			}
+		}
+		return false;
+	}
+	
+	public Collection<String> getHighlightStrings ()
+	{
+		return highlightStrings.keySet();
+	}
+	
+	private WarlockColor getHighlightColor (String highlightString, String colorKey)
+	{
+		if (highlightStrings.containsKey(highlightString))
+		{
+			String color = highlightStrings.get(highlightString).get(colorKey);
+			if (color != null)
+			{
+				if (color.equals("skin") || color.equals(""))
+				{
+					if (colorKey.equals("color"))
+						return getColorSetting(ColorType.MainWindow_Foreground);
+					else if (colorKey.equals("bgcolor"))
+						return getColorSetting(ColorType.MainWindow_Background);
+				}
+				else if (color.charAt(0) == '@')
+				{
+					return getPaletteColor(Integer.parseInt(color.substring(1)));
+				}
+				else return new WarlockColor(color);
+			}
+		}
+		
+		return WarlockColor.DEFAULT_COLOR;
+	}
+	
+	public WarlockColor getHighlightForegroundColor (String highlightString)
+	{
+		return getHighlightColor(highlightString, "color");
+	}
+	
+	public WarlockColor getHighlightBackgroundColor (String highlightString)
+	{
+		return getHighlightColor(highlightString, "bgcolor");
+	}
+	
+	public boolean getHighlightFillEntireLine (String highlightString)
+	{
+		if (highlightStrings.containsKey(highlightString))
+		{
+			if (highlightStrings.get(highlightString).containsKey("line"))
+			{
+				String line = highlightStrings.get(highlightString).get("line");
 				return "y".equalsIgnoreCase(line);
 			}
 		}
