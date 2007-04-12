@@ -223,6 +223,7 @@ public class GameView extends StreamView implements KeyListener, IStormFrontClie
 		this.client = client;
 		
 		setStream(client.getDefaultStream());
+		client.addViewer(wrapper);
 		
 		text.setText("");
 		
