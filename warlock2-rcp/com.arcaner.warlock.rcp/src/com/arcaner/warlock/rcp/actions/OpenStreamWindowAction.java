@@ -2,36 +2,35 @@ package com.arcaner.warlock.rcp.actions;
 
 import org.eclipse.jface.action.Action;
 
-import com.arcaner.warlock.client.stormfront.IStormFrontClient;
 import com.arcaner.warlock.rcp.views.GameView;
 import com.arcaner.warlock.rcp.views.StreamView;
-import com.arcaner.warlock.stormfront.IStream;
 
 public class OpenStreamWindowAction extends Action {
 
-	private IStream stream;
+	private String title, streamName;
 	
-	public OpenStreamWindowAction (IStream stream)
+	public OpenStreamWindowAction (String title, String streamName)
 	{
-		super(stream.getTitle() == null ? stream.getName() : stream.getTitle(), Action.AS_CHECK_BOX);
-		
-		this.stream = stream;
+		super(title, Action.AS_CHECK_BOX);
+		this.title = title;
+		this.streamName = streamName;
 	}
 	
 	@Override
 	public void run() {
 		
-		StreamView streamView = StreamView.createNext(stream.getName());
-		streamView.setStream(stream);
+		StreamView streamView = StreamView.getViewForStream(streamName);
 		
 		GameView inFocus = GameView.getViewInFocus();
 		if (inFocus != null) {
-			streamView.setClient((IStormFrontClient) inFocus.getClient());
+			streamView.setClient(inFocus.getStormFrontClient());
 		}
+		
+		setChecked(true);
 	}
 	
 	@Override
 	public String getText() {
- 		return stream.getTitle() == null ? stream.getName() : stream.getTitle();
+ 		return title;
 	}
 }
