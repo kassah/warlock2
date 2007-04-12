@@ -1,30 +1,30 @@
-package com.arcaner.warlock.client.stormfront.internal;
+package com.arcaner.warlock.client.internal;
 
 import java.net.URL;
 import java.util.Arrays;
 import java.util.Collection;
 
-import com.arcaner.warlock.client.stormfront.IStormFrontStyle;
+import com.arcaner.warlock.client.IWarlockStyle;
 
-public class StormFrontStyle implements IStormFrontStyle {
+public class WarlockStyle implements IWarlockStyle {
 
 	private URL linkAddress;
 	private String styleName;
 	private Collection<StyleType> styleTypes;
 	
-	public static final StormFrontStyle EMPTY_STYLE = new StormFrontStyle(new StyleType[] { StyleType.EMPTY }, "empty", null);
-	public static final StormFrontStyle BOLD_STYLE = new StormFrontStyle(new StyleType[] { StyleType.BOLD }, "bold", null);
+	public static final WarlockStyle EMPTY_STYLE = new WarlockStyle(new StyleType[] { StyleType.EMPTY }, "empty", null);
+	public static final WarlockStyle BOLD_STYLE = new WarlockStyle(new StyleType[] { StyleType.BOLD }, "bold", null);
 	
-	public StormFrontStyle (StyleType[] styleTypes, String styleName, URL linkAddress)
+	public WarlockStyle (StyleType[] styleTypes, String styleName, URL linkAddress)
 	{
 		this.linkAddress = linkAddress;
 		this.styleName = styleName;
 		this.styleTypes = Arrays.asList(styleTypes);
 	}
 	
-	public static StormFrontStyle createCustomStyle (String styleName)
+	public static WarlockStyle createCustomStyle (String styleName)
 	{
-		return new StormFrontStyle(new StyleType[] { StyleType.CUSTOM }, styleName, null);
+		return new WarlockStyle(new StyleType[] { StyleType.CUSTOM }, styleName, null);
 	}
 	
 	public URL getLinkAddress() {

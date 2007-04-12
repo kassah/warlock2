@@ -11,15 +11,9 @@ package com.arcaner.warlock.client;
  * The implementor of this class will be responsible for echoing
  * and appending text to the view of this client.  
  */
-public interface IWarlockClientViewer {
+public interface IWarlockClientViewer extends IStreamListener {
 
-	public void append (String viewName, String text);
-	
-	public void echo (String viewName, String text);
-	
 	public IWarlockClient getWarlockClient ();
-	
-	public void setViewerTitle (String title);
 	
 	public String getCurrentCommand ();
 	

@@ -8,6 +8,7 @@ package com.arcaner.warlock.client.stormfront;
 
 import com.arcaner.warlock.client.ICompass;
 import com.arcaner.warlock.client.IProperty;
+import com.arcaner.warlock.client.IWarlockStyle;
 import com.arcaner.warlock.client.IWarlockClient;
 import com.arcaner.warlock.configuration.ServerSettings;
 
@@ -65,39 +66,12 @@ public interface IStormFrontClient extends IWarlockClient {
 	public ICompass getCompass();
 	
 	/**
-	 * Call this method immediately after displaying a prompt.
-	 */
-	public void setPrompting();
-	
-	/**
-	 * @return whether we just showed a prompt or not
-	 */
-	public boolean isPrompting();
-	
-	/**
 	 * Sets the current style of the storm front client
 	 */
-	public void setCurrentStyle (IStormFrontStyle style);
+	public void setCurrentStyle (IWarlockStyle style);
 	
 	/**
 	 * @return The current style of the storm front client
 	 */
-	public IStormFrontStyle getCurrentStyle();
-	
-	/**
-	 * Append text to all of the viewers of this client using the specified style
-	 * @param viewName The view name to append to
-	 * @param text The text to append
-	 * @param style The style to use
-	 * @deprecated The client should be appended to using IStream.send() (Use Stream.DEFAULT_STREAM for the main window)
-	 */
-	public void append (String viewName, String text, IStormFrontStyle style);
-	
-	/**
-	 * Echo text to all of the viewers of this client using the specified style
-	 * @param viewName The view name to echo to
-	 * @param text The text to echo
-	 * @param style The style to use
-	 */
-	public void echo (String viewName, String text, IStormFrontStyle style);
+	public IWarlockStyle getCurrentStyle();
 }

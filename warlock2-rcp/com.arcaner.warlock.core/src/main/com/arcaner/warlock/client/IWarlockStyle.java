@@ -1,4 +1,4 @@
-package com.arcaner.warlock.client.stormfront;
+package com.arcaner.warlock.client;
 
 import java.net.URL;
 import java.util.Collection;
@@ -8,7 +8,7 @@ import java.util.Collection;
  * @author Marshall
  *
  */
-public interface IStormFrontStyle {
+public interface IWarlockStyle {
 
 	public enum StyleType {
 		BOLD, ITALIC, UNDERLINE, LINK, MONOSPACE, EMPTY, CUSTOM

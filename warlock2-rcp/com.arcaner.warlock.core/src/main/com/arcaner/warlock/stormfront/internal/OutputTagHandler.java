@@ -2,12 +2,11 @@ package com.arcaner.warlock.stormfront.internal;
 
 import org.xml.sax.Attributes;
 
-import com.arcaner.warlock.client.IWarlockClient;
-import com.arcaner.warlock.client.stormfront.internal.StormFrontStyle;
+import com.arcaner.warlock.client.internal.WarlockStyle;
 import com.arcaner.warlock.stormfront.IStormFrontProtocolHandler;
 
 public class OutputTagHandler extends DefaultTagHandler {
-	private StormFrontStyle currentStyle;
+	private WarlockStyle currentStyle;
 	
 	public OutputTagHandler (IStormFrontProtocolHandler handler) {
 		super (handler);
@@ -24,12 +23,12 @@ public class OutputTagHandler extends DefaultTagHandler {
 		if (clazz == null || clazz.length() == 0)
 		{
 			StringBuffer buffer = handler.popBuffer();
-			handler.getClient().append(IWarlockClient.DEFAULT_VIEW, buffer.toString(), currentStyle);	
+			handler.getClient().getDefaultStream().send(buffer.toString(), currentStyle);	
 		}
 		else
 		{
 			handler.pushBuffer();
-			currentStyle = StormFrontStyle.createCustomStyle(clazz);
+			currentStyle = WarlockStyle.createCustomStyle(clazz);
 		}
 	}
 

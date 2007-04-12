@@ -3,7 +3,7 @@ package com.arcaner.warlock.stormfront.internal;
 import org.xml.sax.Attributes;
 
 import com.arcaner.warlock.client.IWarlockClient;
-import com.arcaner.warlock.client.stormfront.internal.StormFrontStyle;
+import com.arcaner.warlock.client.internal.WarlockStyle;
 import com.arcaner.warlock.stormfront.IStormFrontProtocolHandler;
 
 public class PresetTagHandler extends DefaultTagHandler {
@@ -22,7 +22,7 @@ public class PresetTagHandler extends DefaultTagHandler {
 	@Override
 	public void handleStart(Attributes atts) {
 		this.id = atts.getValue("id");
-		handler.setCurrentStyle(StormFrontStyle.createCustomStyle(id));
+		handler.setCurrentStyle(WarlockStyle.createCustomStyle(id));
 	}
 	
 	@Override

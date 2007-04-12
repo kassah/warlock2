@@ -2,6 +2,7 @@ package com.arcaner.warlock.stormfront.internal;
 
 import org.xml.sax.Attributes;
 
+import com.arcaner.warlock.client.internal.Stream;
 import com.arcaner.warlock.stormfront.IStormFrontProtocolHandler;
 
 public class StreamWindowTagHandler extends DefaultTagHandler {
@@ -23,7 +24,7 @@ public class StreamWindowTagHandler extends DefaultTagHandler {
 		
 		if (id != null && title != null)
 		{
-			Stream.fromName(id).setTitle(title);
+			handler.getClient().getStream(id).getTitle().set(title);
 		}
 	}
 }

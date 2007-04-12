@@ -35,6 +35,13 @@ public class ServerSettings {
 		MainWindow_FontSize, MainWindow_MonoFontSize, CommandLine_FontSize
 	}
 	
+	public static int getPixelSizeInPoints (int pixelSize)
+	{
+		// we'll assume 96 dpi for now
+		double points = pixelSize * (72.0/96.0);
+		return (int) Math.round(points);
+	}
+	
 	public ServerSettings (IStormFrontClient client)
 	{
 		this.client = client;
@@ -159,7 +166,7 @@ public class ServerSettings {
 		
 		if (fontElement != null)
 		{
-			return Integer.parseInt(fontElement.attributeValue("size"));
+			return getPixelSizeInPoints(Integer.parseInt(fontElement.attributeValue("size")));
 		}
 		
 		return -1;
@@ -212,6 +219,18 @@ public class ServerSettings {
 		return getPresetColor(presetId, "bgcolor");
 	}
 	
+	public boolean getPresetFillEntireLine (String presetId)
+	{
+		if (presets.containsKey(presetId))
+		{
+			if (presets.get(presetId).containsKey("line"))
+			{
+				String line = presets.get(presetId).get("line");
+				return "y".equalsIgnoreCase(line);
+			}
+		}
+		return false;
+	}
 
 	// These are hard coded for now, we should either have our own "skin" defined in a configuration somewhere,
 	// or try to pull from stormfront's binary "skn" file somehow?

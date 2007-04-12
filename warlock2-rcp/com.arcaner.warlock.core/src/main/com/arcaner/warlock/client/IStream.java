@@ -1,9 +1,8 @@
 /*
  * Created on Jan 15, 2005
  */
-package com.arcaner.warlock.stormfront;
+package com.arcaner.warlock.client;
 
-import com.arcaner.warlock.client.stormfront.IStormFrontStyle;
 
 /**
  * @author Marshall
@@ -14,11 +13,17 @@ public interface IStream {
 	
 	public void clear();
 	
-	public String getName();
+	public IProperty<String> getName();
 	
-	public String getTitle();
+	public IProperty<String> getTitle();
 	
-	public void send(String data, IStormFrontStyle style);
+	public void send (String text);
+	
+	public void send(String text, IWarlockStyle style);
+	
+	public void prompt(String prompt);
+	
+	public void echo(String text);
 	
 	public void addStreamListener(IStreamListener listener);
 	public void removeStreamListener(IStreamListener listener);

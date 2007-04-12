@@ -8,6 +8,7 @@ import java.util.ArrayList;
 import java.util.Collection;
 
 import com.arcaner.warlock.client.ICommandHistory;
+import com.arcaner.warlock.client.IStream;
 import com.arcaner.warlock.client.IWarlockClient;
 import com.arcaner.warlock.client.IWarlockClientViewer;
 import com.arcaner.warlock.network.IConnection;
@@ -21,9 +22,11 @@ public abstract class WarlockClient implements IWarlockClient {
 	protected IConnection connection;
 	protected ArrayList<IWarlockClientViewer> viewers;
 	protected ICommandHistory commandHistory = new CommandHistory();
+	protected String streamPrefix;
 	
 	public WarlockClient () {
 		viewers = new ArrayList<IWarlockClientViewer>();
+		streamPrefix = "client:" + hashCode() + ":";
 	}
 	
 	// IWarlockClient methods
@@ -33,10 +36,6 @@ public abstract class WarlockClient implements IWarlockClient {
 	}
 	
 	public abstract void connect(String server, int port, String key) throws IOException;
-	
-	public void append (String viewName, String text) {
-		for (IWarlockClientViewer viewer : viewers) viewer.append(viewName, text);
-	}
 	
 	public void send(String command) {
 		if(connection == null) {
@@ -67,23 +66,6 @@ public abstract class WarlockClient implements IWarlockClient {
 		ScriptRunner.runScript(this, "C:\\Code\\warlock2\\test\\" + scriptName);
 	}
 	
-	public void echo (String viewName, String text) {
-		/*
-		 * TODO this needs to only be used for sending commands
-		 *   sending random text needs to go through the append
-		 *   mechanism
-		 */
-		for (IWarlockClientViewer viewer : viewers) viewer.echo(viewName, text);
-	}
-	
-	public void clear(String viewName) {
-		// TODO clear the view here
-	}
-	
-	public void setTitle(String title) {
-		for (IWarlockClientViewer viewer : viewers) viewer.setViewerTitle(title);
-	}
-	
 	public Collection<IWarlockClientViewer> getViewers() {
 		return viewers;
 	}
@@ -92,4 +74,11 @@ public abstract class WarlockClient implements IWarlockClient {
 		viewers.add(viewer);
 	}
 	
+	public IStream getDefaultStream() {
+		return getStream(IWarlockClient.DEFAULT_STREAM_NAME);
+	}
+	
+	public IStream getStream(String streamName) {
+		return Stream.fromName(streamPrefix + streamName);
+	}
 }

@@ -6,6 +6,8 @@ package com.arcaner.warlock.client;
 import java.io.IOException;
 import java.util.Collection;
 
+
+
 /**
  * @author Marshall
  * 
@@ -16,7 +18,7 @@ import java.util.Collection;
  */
 public interface IWarlockClient {
 	
-	public static final String DEFAULT_VIEW = "defaultView";
+	public static final String DEFAULT_STREAM_NAME = "defaultView";
 	
 	/**
 	 * Connect and handshake with the Simutronics server
@@ -36,34 +38,6 @@ public interface IWarlockClient {
 	public ICommandHistory getCommandHistory();
 	
 	/**
-	 * Appends text to the game window. Any text sent in from this method
-	 * will have highlights, etc applied. Script commands will also be
-	 * triggered from this method. 
-	 * @param viewName Name of the view to output to
-	 * @param text Text to append to the game window.
-	 */
-	public void append(String viewName, String text);
-	
-	/**
-	 * Echo text to the warlock window.
-	 * @param text The text to echo
-	 * @param viewName The viewName to echo to.
-	 */
-	public void echo (String viewName, String text);
-	
-	/**
-	 * Clear the view
-	 * @param viewName View to clear
-	 */
-	public void clear(String viewName);
-	
-	/**
-	 * Sets the title for this client. The viewer associated with this client will be responsible for handling this appropriately.
-	 * @param title
-	 */
-	public void setTitle (String title);
-	
-	/**
 	 * @return the list of viewers for this client.
 	 */
 	public Collection<IWarlockClientViewer> getViewers();
@@ -73,6 +47,17 @@ public interface IWarlockClient {
 	 * @param viewer The viewer to add
 	 */
 	public void addViewer (IWarlockClientViewer viewer);
+
+	/**
+	 * Functionally equivalent to getStream(DEFAULT_STREAM_NAME)
+	 * @return The default stream to send data to.
+	 */
+	public IStream getDefaultStream();
 	
+	/**
+	 * @param streamName The stream name
+	 * @return The stream associated with the given name. If this stream does not exist, it will be lazily created.
+	 */
+	public IStream getStream(String streamName);
 	
 }

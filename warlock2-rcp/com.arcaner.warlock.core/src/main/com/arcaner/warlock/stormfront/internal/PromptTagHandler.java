@@ -5,7 +5,6 @@ package com.arcaner.warlock.stormfront.internal;
 
 import org.xml.sax.Attributes;
 
-import com.arcaner.warlock.client.IWarlockClient;
 import com.arcaner.warlock.client.stormfront.IStormFrontClient;
 import com.arcaner.warlock.stormfront.IStormFrontProtocolHandler;
 
@@ -40,16 +39,11 @@ public class PromptTagHandler extends DefaultTagHandler {
 //			lastTime = time;
 //		}
 	}
-
-	public void handleEnd() {
-		client.setPrompting();
-	}
 	
 	public boolean handleCharacters(char[] ch, int start, int length) {
-		if(!client.isPrompting()) {
-			String str = String.copyValueOf(ch, start, length);
-			client.append(IWarlockClient.DEFAULT_VIEW, str);
-		}
+		String prompt = String.copyValueOf(ch, start, length);
+		
+		client.getDefaultStream().prompt(prompt);
 		return true;
 	}
 }

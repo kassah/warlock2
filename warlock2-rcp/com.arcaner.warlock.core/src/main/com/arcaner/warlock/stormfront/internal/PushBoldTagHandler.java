@@ -1,6 +1,6 @@
 package com.arcaner.warlock.stormfront.internal;
 
-import com.arcaner.warlock.client.stormfront.internal.StormFrontStyle;
+import com.arcaner.warlock.client.internal.WarlockStyle;
 import com.arcaner.warlock.stormfront.IStormFrontProtocolHandler;
 
 public class PushBoldTagHandler extends DefaultTagHandler {
@@ -16,7 +16,7 @@ public class PushBoldTagHandler extends DefaultTagHandler {
 	}
 	
 	public void handleEnd() {
-		handler.setCurrentStyle(StormFrontStyle.BOLD_STYLE);
+		handler.setCurrentStyle(WarlockStyle.BOLD_STYLE);
 //		handler.pushBuffer();
 	}
 }

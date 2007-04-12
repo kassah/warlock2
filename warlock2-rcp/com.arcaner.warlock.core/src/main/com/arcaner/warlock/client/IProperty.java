@@ -41,10 +41,4 @@ public interface IProperty<T> {
 	 * @throws IllegalAgumentException if the listener is not listening
 	 */
 	public boolean removeListener(IPropertyListener<T> listener);
-	
-	/**
-	 * gets the client that this property is a part of
-	 * @return the client
-	 */
-	public IWarlockClient getClient();
 }

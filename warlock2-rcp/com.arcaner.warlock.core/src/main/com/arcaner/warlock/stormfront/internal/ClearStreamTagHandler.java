@@ -19,6 +19,7 @@ public class ClearStreamTagHandler extends DefaultTagHandler {
 	
 	public void handleStart(Attributes atts) {
 		String id = atts.getValue("id");
-		handler.getClient().clear(id);
+		
+		handler.getClient().getStream(id).clear();
 	}
 }
