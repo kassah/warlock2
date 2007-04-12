@@ -41,7 +41,7 @@ public class Macro implements IMacro
 				String value = variables.get(var).getValue(context);
 				if (value != null)
 				{
-					newCommand = newCommand.replaceAll(newVar, variables.get(var).getValue(context));
+					newCommand = newCommand.replaceAll(newVar, value);
 				}
 			}
 		}
