@@ -2,6 +2,7 @@ package com.arcaner.warlock.stormfront.internal;
 
 import org.xml.sax.Attributes;
 
+import com.arcaner.warlock.client.IWarlockStyle;
 import com.arcaner.warlock.client.internal.WarlockStyle;
 import com.arcaner.warlock.stormfront.IStormFrontProtocolHandler;
 
@@ -29,6 +30,10 @@ public class OutputTagHandler extends DefaultTagHandler {
 		{
 			handler.pushBuffer();
 			currentStyle = WarlockStyle.createCustomStyle(clazz);
+			
+			if (clazz.equals("mono")) {
+				currentStyle.addStyleType(IWarlockStyle.StyleType.MONOSPACE);
+			}
 		}
 	}
 
