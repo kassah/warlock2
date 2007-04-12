@@ -2,50 +2,89 @@ package com.arcaner.warlock.rcp.ui.client;
 
 import org.eclipse.swt.widgets.Display;
 
-import com.arcaner.warlock.client.stormfront.IStormFrontStyle;
-import com.arcaner.warlock.stormfront.IStreamListener;
+import com.arcaner.warlock.client.IStream;
+import com.arcaner.warlock.client.IStreamListener;
+import com.arcaner.warlock.client.IWarlockStyle;
 
 public class SWTStreamListener implements IStreamListener {
+	
 	private IStreamListener listener;
 	private ListenerWrapper wrapper = new ListenerWrapper();
+	protected boolean asynch;
 	
 	public SWTStreamListener (IStreamListener listener)
 	{
+		this(listener, false);
+	}
+	
+	public SWTStreamListener (IStreamListener listener, boolean asynch)
+	{
 		this.listener = listener;
+		this.asynch = asynch;
 	}
 	
 	private static enum EventType {
-		Cleared, ReceivedText
+		Cleared, ReceivedText, Echoed, Prompted
 	};
 	
 	private class ListenerWrapper implements Runnable
 	{
+		public IStream stream;
 		public String text;
-		public IStormFrontStyle style;
+		public IWarlockStyle style;
 		public EventType eventType;
 		
 		public void run() {
 			switch (eventType)
 			{
-			case Cleared: listener.streamCleared(); break;
-			case ReceivedText: listener.streamReceivedText(text, style); break;
+			case Cleared: listener.streamCleared(stream); break;
+			case ReceivedText: listener.streamReceivedText(stream, text, style); break;
+			case Echoed: listener.streamEchoed(stream, text); break;
+			case Prompted: listener.streamPrompted(stream, text); break;
 			}
 			
 			text = null;
 			style = null;
+			stream = null;
 		}
 	}
 	
-	public void streamCleared() {
+	protected void run(Runnable runnable)
+	{
+		if (asynch)
+		{
+			Display.getDefault().asyncExec(runnable);
+		} else {
+			Display.getDefault().syncExec(runnable);
+		}
+	}
+	
+	public void streamCleared(IStream stream) {
 		wrapper.eventType = EventType.Cleared;
-		Display.getDefault().syncExec(wrapper);
+		wrapper.stream = stream;
+		run(wrapper);
 	}
 
-	public void streamReceivedText(String text, IStormFrontStyle style) {
+	public void streamReceivedText(IStream stream, String text, IWarlockStyle style) {
+		wrapper.stream = stream;
 		wrapper.eventType = EventType.ReceivedText;
 		wrapper.text = text;
 		wrapper.style = style;
-		Display.getDefault().syncExec(wrapper);
+		run(wrapper);
+	}
+	
+	public void streamEchoed(IStream stream, String text) {
+		wrapper.stream = stream;
+		wrapper.text = text;
+		wrapper.eventType = EventType.Echoed;
+		run(wrapper);
+	}
+	
+	public void streamPrompted(IStream stream, String prompt) {
+		wrapper.stream = stream;
+		wrapper.text = prompt;
+		wrapper.eventType = EventType.Prompted;
+		run(wrapper);
 	}
 
 }
