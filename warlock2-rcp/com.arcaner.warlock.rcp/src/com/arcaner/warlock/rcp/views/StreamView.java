@@ -178,7 +178,7 @@ public class StreamView extends ViewPart implements IStreamListener, LineBackgro
 	public void streamEchoed(IStream stream, String text) {
 		if (this.stream.equals(stream))
 		{
-			StyleRange echoStyle = StyleMappings.getEchoStyle(this.text.getCharCount(), text.length());
+			StyleRange echoStyle = StyleMappings.getEchoStyle(client.getServerSettings(), this.text.getCharCount(), text.length());
 			this.text.append(text + "\n");
 			this.text.setStyleRange(echoStyle);
 			

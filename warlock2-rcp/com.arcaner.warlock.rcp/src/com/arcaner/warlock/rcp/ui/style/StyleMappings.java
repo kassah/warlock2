@@ -9,6 +9,7 @@ import org.eclipse.swt.graphics.Font;
 import org.eclipse.swt.widgets.Display;
 
 import com.arcaner.warlock.client.IWarlockStyle;
+import com.arcaner.warlock.client.internal.WarlockStyle;
 import com.arcaner.warlock.client.stormfront.WarlockColor;
 import com.arcaner.warlock.configuration.ServerSettings;
 import com.arcaner.warlock.rcp.ui.StyleRangeWithData;
@@ -81,17 +82,19 @@ public class StyleMappings {
 		return range;
 	}
 	
-	public static StyleRange getEchoStyle (int start, int length)
+	public static StyleRange getEchoStyle (ServerSettings settings, int start, int length)
 	{
-		Display display = Display.getDefault();
+		return getStyle(settings, WarlockStyle.createCustomStyle("command"), start, length);
 		
-		StyleRange range = new StyleRange();
-		range.background = new Color(display, 0x30, 0x30, 0x30);
-		range.foreground = new Color(display, 255, 255, 255);
-		range.fontStyle = SWT.BOLD;
-		range.start = start;
-		range.length = length;
-		
-		return range;
+//		Display display = Display.getDefault();
+//		
+//		StyleRange range = new StyleRange();
+//		range.background = new Color(display, 0x30, 0x30, 0x30);
+//		range.foreground = new Color(display, 255, 255, 255);
+//		range.fontStyle = SWT.BOLD;
+//		range.start = start;
+//		range.length = length;
+//		
+//		return range;
 	}
 }
