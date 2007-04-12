@@ -16,6 +16,7 @@ public class PromptTagHandler extends DefaultTagHandler {
 	protected int lastTime = 0;
 	protected RoundtimeTagHandler roundtimeHandler;
 	protected IStormFrontClient client;
+	protected String prompt;
 	
 	public PromptTagHandler (IStormFrontProtocolHandler handler, RoundtimeTagHandler roundtimeHandler) {
 		super(handler);
@@ -33,17 +34,16 @@ public class PromptTagHandler extends DefaultTagHandler {
 			roundtimeHandler.processFollowingPrompt(time);
 		}
 		
-//		if (lastTime != time)
-//		{
-//			handler.getClient().append();
-//			lastTime = time;
-//		}
+		prompt = "";
 	}
 	
 	public boolean handleCharacters(char[] ch, int start, int length) {
-		String prompt = String.copyValueOf(ch, start, length);
-		
-		client.getDefaultStream().prompt(prompt);
+		prompt += String.copyValueOf(ch, start, length);
 		return true;
+	}
+	
+	@Override
+	public void handleEnd() {
+		client.getDefaultStream().prompt(prompt);
 	}
 }
