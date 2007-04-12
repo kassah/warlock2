@@ -39,6 +39,7 @@ public class StormFrontClient extends WarlockClient implements IStormFrontClient
 	protected ClientProperty<String> playerId;
 	protected IWarlockStyle currentStyle = WarlockStyle.EMPTY_STYLE;
 	protected ServerSettings serverSettings;
+	protected RoundtimeRunnable rtRunnable;
 	
 	public StormFrontClient() {
 		compass = new Compass(this);
@@ -50,45 +51,45 @@ public class StormFrontClient extends WarlockClient implements IStormFrontClient
 		spirit = new ClientProperty<Integer>(this, "spirit");
 		playerId = new ClientProperty<String>(this, "playerId");
 		serverSettings = new ServerSettings(this);
+		rtRunnable = new RoundtimeRunnable();
 	}
 
 	public IProperty<Integer> getRoundtime() {
 		return roundtime;
 	}
 
-	private void startRoundtime (int seconds)
+	private class RoundtimeRunnable implements Runnable
+	{
+		public int roundtime;
+		
+		public synchronized void run () 
+		{
+			for (int i = 0; i < roundtime; i++)
+			{
+				try {
+					Thread.sleep(1000);
+				} catch (InterruptedException e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+				}
+				
+				updateRoundtime(StormFrontClient.this.roundtime.get() - 1);
+			}
+		}
+	}
+	
+	public void startRoundtime (int seconds)
 	{
 		roundtime.activate();
 		roundtime.set(seconds);
+		rtRunnable.roundtime = seconds;
+		
+		new Thread(rtRunnable).start();
 	}
 	
-	private void updateRoundtimes (int currentRoundtime)
+	public void updateRoundtime (int currentRoundtime)
 	{
 		roundtime.set(currentRoundtime);
-	}
-	
-	public void startRoundtime (final int seconds, String label) {
-		new Thread (new Runnable () {
-			private int elapsed = 0;
-			
-			public void run() {
-				try {
-					startRoundtime(seconds);
-					
-					while (elapsed < seconds)
-					{
-						updateRoundtimes(seconds - elapsed);
-						
-						elapsed++;
-						Thread.sleep((long)1000);
-					}
-					
-					updateRoundtimes(0);
-				} catch (InterruptedException e) {
-					e.printStackTrace();
-				}
-			}
-		}).start();
 	}
 	
 	public IProperty<Integer> getHealth() {

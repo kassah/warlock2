@@ -38,7 +38,9 @@ public interface IStormFrontClient extends IWarlockClient {
 	 * @param seconds The number of seconds to count down in the Roundtime bar.
 	 * @param label The label to show in the roundtime bar.
 	 */
-	public void startRoundtime(int seconds, String label);
+	public void startRoundtime(int seconds);
+	
+	public void updateRoundtime(int secondsLeft);
 	
 	/**
 	 * @return The health property

@@ -17,7 +17,7 @@ import com.arcaner.warlock.stormfront.IStormFrontProtocolHandler;
  * Window - Preferences - Java - Code Style - Code Templates
  */
 public class RoundtimeTagHandler extends DefaultTagHandler {
-	protected boolean waitingForPrompt;
+	protected boolean waitingForPrompt, roundtimeStarted;
 	protected int rtEnds;
 	
 	public boolean isWaitingForPrompt() { return waitingForPrompt; }
@@ -33,6 +33,7 @@ public class RoundtimeTagHandler extends DefaultTagHandler {
 	public void handleStart(Attributes atts) {
 		rtEnds = Integer.parseInt(atts.getValue("value"));
 		waitingForPrompt = true;
+		roundtimeStarted = false;
 	}
 
 	public void handleEnd() {
@@ -42,7 +43,7 @@ public class RoundtimeTagHandler extends DefaultTagHandler {
 	public void processFollowingPrompt (int currentPromptTime)
 	{
 		int time = rtEnds - currentPromptTime;
-		handler.getClient().startRoundtime(time, "rt: " + time);
+		handler.getClient().startRoundtime(time);
 		
 		waitingForPrompt = false;
 	}

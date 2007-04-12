@@ -13,7 +13,7 @@ import com.arcaner.warlock.stormfront.IStormFrontProtocolHandler;
  */
 public class PromptTagHandler extends DefaultTagHandler {
 	
-	protected int lastTime = 0;
+	protected int currentTime = 0;
 	protected RoundtimeTagHandler roundtimeHandler;
 	protected IStormFrontClient client;
 	protected String prompt;
@@ -29,9 +29,9 @@ public class PromptTagHandler extends DefaultTagHandler {
 	}
 	
 	public void handleStart(Attributes atts) {
-		int time = Integer.parseInt(atts.getValue("time"));
+		currentTime = Integer.parseInt(atts.getValue("time"));
 		if (roundtimeHandler.isWaitingForPrompt()) {
-			roundtimeHandler.processFollowingPrompt(time);
+			roundtimeHandler.processFollowingPrompt(currentTime);
 		}
 		
 		prompt = "";
