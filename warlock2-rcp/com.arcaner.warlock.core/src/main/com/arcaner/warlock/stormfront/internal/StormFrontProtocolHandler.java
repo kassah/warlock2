@@ -75,6 +75,7 @@ public class StormFrontProtocolHandler extends DefaultHandler implements IStormF
 		new ComponentTagHandler(this);
 		new StyleTagHandler(this);
 		
+		new BoldTagHandler(this);
 		new PushBoldTagHandler(this);
 		new PopBoldTagHandler(this);
 		new PresetTagHandler(this);
