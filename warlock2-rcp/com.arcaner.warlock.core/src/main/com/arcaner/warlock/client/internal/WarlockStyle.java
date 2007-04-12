@@ -1,6 +1,7 @@
 package com.arcaner.warlock.client.internal;
 
 import java.net.URL;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
 
@@ -19,7 +20,8 @@ public class WarlockStyle implements IWarlockStyle {
 	{
 		this.linkAddress = linkAddress;
 		this.styleName = styleName;
-		this.styleTypes = Arrays.asList(styleTypes);
+		this.styleTypes = new ArrayList<StyleType>();
+		this.styleTypes.addAll(Arrays.asList(styleTypes));
 	}
 	
 	public static WarlockStyle createCustomStyle (String styleName)
