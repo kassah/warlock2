@@ -102,36 +102,45 @@ public class ServerSettings {
 	private void loadPresets ()
 	{
 		Element presetsElement = (Element) document.selectSingleNode("/settings/presets");
-		for (Object o : presetsElement.elements())
+		if (presetsElement == null)
 		{
-			Element pElement = (Element) o;
-			String presetId = pElement.attributeValue("id");
-			
-			presets.put(presetId, new Hashtable<String, String>());
-			saveAttributes(pElement, presets.get(presetId));
+			for (Object o : presetsElement.elements())
+			{
+				Element pElement = (Element) o;
+				String presetId = pElement.attributeValue("id");
+				
+				presets.put(presetId, new Hashtable<String, String>());
+				saveAttributes(pElement, presets.get(presetId));
+			}
 		}
 	}
 	
 	private void loadHighlightStrings()
 	{
 		Element stringsElement = (Element) document.selectSingleNode("/settings/strings");
-		for (Object o : stringsElement.elements())
+		if (stringsElement != null)
 		{
-			Element hElement = (Element) o;
-			String text = hElement.attributeValue("text");
-			
-			highlightStrings.put(text, new Hashtable<String, String>());
-			saveAttributes(hElement, highlightStrings.get(text));
+			for (Object o : stringsElement.elements())
+			{
+				Element hElement = (Element) o;
+				String text = hElement.attributeValue("text");
+				
+				highlightStrings.put(text, new Hashtable<String, String>());
+				saveAttributes(hElement, highlightStrings.get(text));
+			}
 		}
 		
 		Element namesElement = (Element) document.selectSingleNode("/settings/names");
-		for (Object o : namesElement.elements())
+		if (namesElement != null)
 		{
-			Element hElement = (Element) o;
-			String text = hElement.attributeValue("text");
-			
-			highlightStrings.put(text, new Hashtable<String, String>());
-			saveAttributes(hElement, highlightStrings.get(text));
+			for (Object o : namesElement.elements())
+			{
+				Element hElement = (Element) o;
+				String text = hElement.attributeValue("text");
+				
+				highlightStrings.put(text, new Hashtable<String, String>());
+				saveAttributes(hElement, highlightStrings.get(text));
+			}
 		}
 	}
 	
