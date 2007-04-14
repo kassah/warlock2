@@ -102,7 +102,7 @@ public class ServerSettings {
 	private void loadPresets ()
 	{
 		Element presetsElement = (Element) document.selectSingleNode("/settings/presets");
-		if (presetsElement == null)
+		if (presetsElement != null)
 		{
 			for (Object o : presetsElement.elements())
 			{
