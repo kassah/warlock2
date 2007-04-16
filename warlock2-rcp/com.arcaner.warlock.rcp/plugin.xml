@@ -64,6 +64,9 @@
       <extension
          point="com.arcaner.warlock.rcp.scriptEngines">
       <scriptEngine classname="com.arcaner.warlock.script.javascript.JavascriptEngine"/>
+      <scriptEngine
+            classname="com.arcaner.warlock.script.wsl.WarlockWSLEngine">
+      </scriptEngine>
    </extension>
    <extension
          point="com.arcaner.warlock.rcp.macroVariables">
