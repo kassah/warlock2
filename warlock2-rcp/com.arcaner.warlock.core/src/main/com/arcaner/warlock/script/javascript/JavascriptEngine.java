@@ -6,14 +6,14 @@
  */
 package com.arcaner.warlock.script.javascript;
 
-import java.io.FileReader;
+import java.io.Reader;
 
 import org.mozilla.javascript.Context;
 import org.mozilla.javascript.Scriptable;
 
-import com.arcaner.warlock.client.IWarlockClient;
 import com.arcaner.warlock.client.stormfront.IStormFrontClient;
 import com.arcaner.warlock.script.IScript;
+import com.arcaner.warlock.script.IScriptCommands;
 import com.arcaner.warlock.script.IScriptEngine;
 
 /**
@@ -31,30 +31,31 @@ public class JavascriptEngine implements IScriptEngine {
 	}
 	
 	public String getScriptEngineName() {
-		return "Standard Javascript Engine (c) 2007 Warlock Team";
+		return "Standard Javascript Engine (c) 2002-2007 Warlock Team";
 	}
 	
 	public String[] getSupportedExtensions() {
 		return new String[] { "js" };
 	}
 	
-	public IScript startScript(final IWarlockClient client, String path) {
-		final JavascriptScript script = new JavascriptScript (path);
+	public IScript startScript(final IScriptCommands commands, final String scriptName, final Reader scriptReader, final String[] arguments) {
+		final JavascriptScript script = new JavascriptScript (scriptName);
 		new Thread(new Runnable() {
 			public void run () {
 				Context context = Context.enter();
 				try {
 					Scriptable scope = context.initStandardObjects();
-					scope.put("client", scope, client);
+					scope.put("script", scope, commands);
+					scope.put("arguments", scope, arguments);
 					
-					if (client instanceof IStormFrontClient)
+					if (commands.getClient() instanceof IStormFrontClient)
 					{
-						IStormFrontClient sfClient = (IStormFrontClient) client;
+						IStormFrontClient sfClient = (IStormFrontClient) commands.getClient();
 						scope.put("compass", scope, sfClient.getCompass());
 						scope.put("commandHistory", scope, sfClient.getCommandHistory());
 					}
 					
-					Object result = context.evaluateReader(scope, new FileReader(script.getPath()), "<cmd>", 1, null);
+					Object result = context.evaluateReader(scope, scriptReader, scriptName, 1, null);
 					System.out.println("script result: " + Context.toString(result));
 				}
 				catch (Exception e) {

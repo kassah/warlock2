@@ -16,15 +16,15 @@ import com.arcaner.warlock.script.IScript;
  */
 public class JavascriptScript implements IScript {
 
-	private String path;
+	private String name;
 	
-	public JavascriptScript (String path)
+	public JavascriptScript (String name)
 	{
-		this.path = path;
+		this.name = name;
 	}
 	
-	public String getPath() {
-		return path;
+	public String getName() {
+		return name;
 	}
 
 	public boolean isRunning() {
@@ -36,6 +36,11 @@ public class JavascriptScript implements IScript {
 	}
 	public void suspend() {
 
+	}
+	
+	public void resume() {
+		// TODO Auto-generated method stub
+		
 	}
 
 }
