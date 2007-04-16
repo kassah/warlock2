@@ -6,6 +6,8 @@ package com.arcaner.warlock.client;
 import java.io.IOException;
 import java.util.Collection;
 
+import com.arcaner.warlock.script.IScriptCommands;
+
 
 
 /**
@@ -59,5 +61,4 @@ public interface IWarlockClient {
 	 * @return The stream associated with the given name. If this stream does not exist, it will be lazily created.
 	 */
 	public IStream getStream(String streamName);
-	
 }

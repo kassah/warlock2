@@ -12,7 +12,6 @@ import com.arcaner.warlock.client.IStream;
 import com.arcaner.warlock.client.IWarlockClient;
 import com.arcaner.warlock.client.IWarlockClientViewer;
 import com.arcaner.warlock.network.IConnection;
-import com.arcaner.warlock.script.internal.ScriptRunner;
 
 /**
  * @author Marshall
@@ -46,26 +45,12 @@ public abstract class WarlockClient implements IWarlockClient {
 		commandHistory.addCommand(command);
 		
 		try {
-			if (command.startsWith(".")){
-				runScriptCommand(command);
-			} else {
-				connection.send(command + "\n");
-			}
+			connection.send(command + "\n");
 		} catch(IOException e) {
 			e.printStackTrace();
 		}
 	}
 
-	private void runScriptCommand(String command) {
-		int firstSpace = command.indexOf(" ") - 1;
-		
-		String scriptName = command.substring(1, (firstSpace < 0 ? command.length() : firstSpace));
-		// Need to parse and handle args at this point.. TODO
-		
-		System.out.println("scriptname=" +scriptName);
-		ScriptRunner.runScript(this, "C:\\Code\\warlock2\\test\\" + scriptName);
-	}
-	
 	public Collection<IWarlockClientViewer> getViewers() {
 		return viewers;
 	}
