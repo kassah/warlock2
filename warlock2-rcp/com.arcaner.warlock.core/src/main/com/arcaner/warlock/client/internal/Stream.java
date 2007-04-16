@@ -66,7 +66,12 @@ public class Stream implements IStream {
 	
 	public void send(String data, IWarlockStyle style) {
 		for(IStreamListener listener : listeners) {
-			listener.streamReceivedText(this, data, style);
+			try {
+				listener.streamReceivedText(this, data, style);
+			} catch (Throwable t) {
+				// TODO Auto-generated catch block
+				t.printStackTrace();
+			}
 		}
 		
 		if (data.length() > 0 && !isEmpty(data))
