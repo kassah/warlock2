@@ -1,0 +1,10 @@
+<project name="build-antlr">
+
+	<target name="build-antlr">
+		<property name="pkg" value="com/arcaner/warlock/script/wsl/internal"/>
+			
+		<mkdir dir="${pkg}"/>
+		<antlr target="wsl.g" outputdirectory="${pkg}"/>
+	</target>
+
+</project>
