@@ -6,7 +6,7 @@
  */
 package com.arcaner.warlock.script;
 
-import com.arcaner.warlock.client.IWarlockClient;
+import java.io.Reader;
 
 /**
  * @author Marshall
@@ -20,10 +20,13 @@ public interface IScriptEngine {
 	 * This method will run the script at the given path. Note that this should return immediately, so the engine
 	 * will need to probably create a thread to execute the script.
 	 * 
-	 * @param client The warlock client associated with this script
+	 * @param commands This is a special interface that script engines can use to only deal with scripting issues
+	 * @param scriptName The name of the script including the extension
+	 * @param scriptReader A java.io.Reader that contains the content of this script
+	 * @param argumetns The arguments passed to the script
 	 * @return The script that is running.
 	 */
-	public IScript startScript(IWarlockClient client, String path);
+	public IScript startScript(IScriptCommands commands, String scriptName, Reader scriptReader, String[] arguments);
 	
 	/**
 	 * @return The file extensions that this scripting engine can handle.
