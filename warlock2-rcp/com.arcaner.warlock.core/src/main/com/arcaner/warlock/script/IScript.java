@@ -15,7 +15,7 @@ package com.arcaner.warlock.script;
  */
 public interface IScript {
 
-	public String getPath ();
+	public String getName ();
 	
 	public boolean isRunning ();
 	
@@ -23,4 +23,5 @@ public interface IScript {
 	
 	public void suspend();
 	
+	public void resume();
 }
