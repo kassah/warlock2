@@ -11,6 +11,7 @@ import com.arcaner.warlock.client.IProperty;
 import com.arcaner.warlock.client.IWarlockStyle;
 import com.arcaner.warlock.client.IWarlockClient;
 import com.arcaner.warlock.configuration.ServerSettings;
+import com.arcaner.warlock.script.IScriptCommands;
 
 /**
  * @author Marshall
@@ -76,4 +77,9 @@ public interface IStormFrontClient extends IWarlockClient {
 	 * @return The current style of the storm front client
 	 */
 	public IWarlockStyle getCurrentStyle();
+
+	/**
+	 * @return The script commands interface that corresponds to this client
+	 */
+	public IScriptCommands getScriptCommands ();
 }

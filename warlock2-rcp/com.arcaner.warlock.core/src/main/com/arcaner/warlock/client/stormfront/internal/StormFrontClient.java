@@ -6,6 +6,7 @@
  */
 package com.arcaner.warlock.client.stormfront.internal;
 
+import java.io.File;
 import java.io.IOException;
 
 import com.arcaner.warlock.client.ICompass;
@@ -13,13 +14,16 @@ import com.arcaner.warlock.client.IProperty;
 import com.arcaner.warlock.client.IWarlockStyle;
 import com.arcaner.warlock.client.internal.ClientProperty;
 import com.arcaner.warlock.client.internal.Compass;
-import com.arcaner.warlock.client.internal.WarlockStyle;
-import com.arcaner.warlock.client.internal.Stream;
 import com.arcaner.warlock.client.internal.WarlockClient;
+import com.arcaner.warlock.client.internal.WarlockStyle;
 import com.arcaner.warlock.client.stormfront.IStormFrontClient;
 import com.arcaner.warlock.configuration.ServerSettings;
 import com.arcaner.warlock.network.StormFrontConnection;
+import com.arcaner.warlock.script.IScriptCommands;
+import com.arcaner.warlock.script.internal.ScriptCommands;
+import com.arcaner.warlock.script.internal.ScriptRunner;
 import com.arcaner.warlock.stormfront.IStormFrontProtocolHandler;
+import com.martiansoftware.jsap.CommandLineTokenizer;
 
 /**
  * @author Marshall
@@ -40,6 +44,7 @@ public class StormFrontClient extends WarlockClient implements IStormFrontClient
 	protected IWarlockStyle currentStyle = WarlockStyle.EMPTY_STYLE;
 	protected ServerSettings serverSettings;
 	protected RoundtimeRunnable rtRunnable;
+	protected ScriptCommands scriptCommands;
 	
 	public StormFrontClient() {
 		compass = new Compass(this);
@@ -52,8 +57,33 @@ public class StormFrontClient extends WarlockClient implements IStormFrontClient
 		playerId = new ClientProperty<String>(this, "playerId");
 		serverSettings = new ServerSettings(this);
 		rtRunnable = new RoundtimeRunnable();
+		scriptCommands = new ScriptCommands(this);
 	}
 
+	@Override
+	public void send(String command) {
+		if (command.startsWith(".")){
+			runScriptCommand(command);
+		} else {
+			super.send(command);
+		}
+	}
+	
+	protected  void runScriptCommand(String command) {
+		command = command.substring(1);
+		int firstSpace = command.indexOf(" ") - 1;
+		String scriptName = command.substring(0, (firstSpace < 0 ? command.length() : firstSpace));
+		String[] arguments = new String[0];
+		
+		if (firstSpace > 0)
+		{
+			String args = command.substring(firstSpace+1);
+			arguments = CommandLineTokenizer.tokenize(args);
+		}
+		
+		ScriptRunner.runScriptFromFile(scriptCommands, new File("/home/marshall/Scripts"), scriptName, arguments);
+	}
+	
 	public IProperty<Integer> getRoundtime() {
 		return roundtime;
 	}
@@ -156,5 +186,9 @@ public class StormFrontClient extends WarlockClient implements IStormFrontClient
 	
 	public ServerSettings getServerSettings() {
 		return serverSettings;
+	}
+	
+	public IScriptCommands getScriptCommands() {
+		return scriptCommands;
 	}
 }
