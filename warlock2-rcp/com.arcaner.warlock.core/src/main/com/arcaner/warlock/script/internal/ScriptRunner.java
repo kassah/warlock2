@@ -7,9 +7,12 @@
 package com.arcaner.warlock.script.internal;
 
 import java.io.File;
+import java.io.FileNotFoundException;
+import java.io.FileReader;
+import java.io.Reader;
 import java.util.Collection;
 
-import com.arcaner.warlock.client.IWarlockClient;
+import com.arcaner.warlock.script.IScriptCommands;
 import com.arcaner.warlock.script.IScriptEngine;
 
 /**
@@ -20,26 +23,53 @@ import com.arcaner.warlock.script.IScriptEngine;
  */
 public class ScriptRunner {
 
-	public static void runScript (IWarlockClient client, String scriptPath)
+	public static void runScriptFromFile (IScriptCommands commands, File baseDir, String scriptName, String[] arguments)
 	{
 		Collection<IScriptEngine> engines = ScriptEngineRegistry.getScriptEngines();
 		
-		System.out.println("engines = " + engines);
-		for (IScriptEngine engine : engines)
+		File[] scriptFiles = baseDir.listFiles();
+		for (File scriptFile : scriptFiles)
 		{
-			String path = scriptPath.toString();
-			String extensions[] = engine.getSupportedExtensions();
-			
-			for (int i = 0; i < extensions.length; i++)
+			if (scriptFile.getName().startsWith(scriptName + "."))
 			{
-				System.out.println("searching for '"+path+"."+extensions[i] +"'...");
-				if (new File(path+"."+extensions[i]).exists())
+				boolean handled = false;
+				String extension = scriptFile.getName().substring(scriptFile.getName().lastIndexOf(".") + 1);
+				
+				for (IScriptEngine engine : engines)
 				{
-					System.out.println("Engine (" + engine.getScriptEngineName() + ") starting " + scriptPath);
-					engine.startScript(client, path+"."+extensions[i]);
-					return;	
+					if (!handled)
+					{
+						String extensions[] = engine.getSupportedExtensions();
+						for (String ext : extensions)
+						{
+							if (extension.equalsIgnoreCase(ext)) { handled = true; break; }
+						}
+						
+						if (handled)
+						{
+							try {
+								FileReader reader = new FileReader(scriptFile);
+								engine.startScript(commands, scriptName, reader, arguments);
+							} catch (FileNotFoundException e) {
+								// TODO Auto-generated catch block
+								e.printStackTrace();
+							}
+						}
+					}
 				}
 			}
-		}	
+		}
+	}
+	
+	public static void runScriptFromReader (IScriptCommands commands, String engineId, String scriptName, Reader reader, String[] arguments)
+	{
+		Collection<IScriptEngine> engines = ScriptEngineRegistry.getScriptEngines();
+		for (IScriptEngine engine : engines)
+		{
+			if (engine.getScriptEngineId().equals(engineId))
+			{
+				engine.startScript(commands, scriptName, reader, arguments);
+			}
+		}
 	}
 }
