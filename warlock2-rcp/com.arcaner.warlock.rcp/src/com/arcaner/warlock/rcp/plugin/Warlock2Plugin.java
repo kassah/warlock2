@@ -1,6 +1,5 @@
 package com.arcaner.warlock.rcp.plugin;
 
-import java.util.ArrayList;
 import java.util.Collection;
 import java.util.MissingResourceException;
 import java.util.ResourceBundle;
@@ -14,6 +13,7 @@ import org.eclipse.ui.plugin.AbstractUIPlugin;
 import org.osgi.framework.BundleContext;
 
 import com.arcaner.warlock.script.IScriptEngine;
+import com.arcaner.warlock.script.internal.ScriptEngineRegistry;
 
 /**
  * The main plugin class to be used in the desktop.
@@ -23,7 +23,6 @@ public class Warlock2Plugin extends AbstractUIPlugin {
 	private static Warlock2Plugin plugin;
 	//Resource bundle.
 	private ResourceBundle resourceBundle;
-	private ArrayList<IScriptEngine> engines;
 	
 	public static final String PLUGIN_ID = "com.arcaner.warlock.rcp";
 	
@@ -33,7 +32,6 @@ public class Warlock2Plugin extends AbstractUIPlugin {
 	public Warlock2Plugin() {
 		super();
 		plugin = this;
-		engines = new ArrayList<IScriptEngine>();
 		
 		try {
 			resourceBundle = ResourceBundle.getBundle("com.arcaner.warlock.rcp.plugin.Warlock2PluginResources");
@@ -58,7 +56,7 @@ public class Warlock2Plugin extends AbstractUIPlugin {
 				
 				if (obj instanceof IScriptEngine)
 				{
-					engines.add((IScriptEngine) obj);
+					ScriptEngineRegistry.addScriptEngine((IScriptEngine)obj);
 				}
 			}
 		}
@@ -109,6 +107,6 @@ public class Warlock2Plugin extends AbstractUIPlugin {
 	
 	public Collection<IScriptEngine> getScriptEngines ()
 	{
-		return engines;
+		return ScriptEngineRegistry.getScriptEngines();
 	}
 }
