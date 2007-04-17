@@ -156,14 +156,17 @@ public class ScriptCommands implements IScriptCommands, IStreamListener, IProper
 	protected boolean waitingForRoundtime;
 	protected void waitForRoundtime ()
 	{
-		waitingForRoundtime = true;
-		while (waitingForRoundtime)
+		if (client.getRoundtime().get() > 0)
 		{
-			try {
-				Thread.sleep(200);
-			} catch (InterruptedException e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
+			waitingForRoundtime = true;
+			while (waitingForRoundtime)
+			{
+				try {
+					Thread.sleep(200);
+				} catch (InterruptedException e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+				}
 			}
 		}
 	}
