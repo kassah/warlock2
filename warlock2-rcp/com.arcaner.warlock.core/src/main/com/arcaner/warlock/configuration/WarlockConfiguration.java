@@ -25,6 +25,17 @@ public class WarlockConfiguration {
 		return new File(getUserHomeDirectory(), ".warlock2"); 
 	}
 	
+	public static File getConfigurationDirectory (String directory, boolean lazyCreate)
+	{
+		File dirFile = new File(getConfigurationDirectory(), directory);
+		
+		if (lazyCreate && !dirFile.exists())
+		{
+			dirFile.mkdirs();
+		}
+		return dirFile;
+	}
+	
 	public static File getConfigurationFile (String fileName)
 	{
 		return getConfigurationFile(fileName, true);

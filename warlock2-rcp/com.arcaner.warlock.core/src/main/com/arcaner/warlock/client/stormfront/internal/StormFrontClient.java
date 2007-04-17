@@ -18,6 +18,7 @@ import com.arcaner.warlock.client.internal.WarlockClient;
 import com.arcaner.warlock.client.internal.WarlockStyle;
 import com.arcaner.warlock.client.stormfront.IStormFrontClient;
 import com.arcaner.warlock.configuration.ServerSettings;
+import com.arcaner.warlock.configuration.WarlockConfiguration;
 import com.arcaner.warlock.network.StormFrontConnection;
 import com.arcaner.warlock.script.IScriptCommands;
 import com.arcaner.warlock.script.internal.ScriptCommands;
@@ -81,7 +82,8 @@ public class StormFrontClient extends WarlockClient implements IStormFrontClient
 			arguments = CommandLineTokenizer.tokenize(args);
 		}
 		
-		ScriptRunner.runScriptFromFile(scriptCommands, new File("/home/marshall/Scripts"), scriptName, arguments);
+		File scriptDirectory = WarlockConfiguration.getConfigurationDirectory("scripts", true);
+		ScriptRunner.runScriptFromFile(scriptCommands, scriptDirectory, scriptName, arguments);
 	}
 	
 	public IProperty<Integer> getRoundtime() {
