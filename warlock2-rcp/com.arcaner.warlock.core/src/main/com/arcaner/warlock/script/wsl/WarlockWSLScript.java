@@ -427,7 +427,10 @@ public class WarlockWSLScript implements IScript, IScriptCallback, Runnable {
 			int time = Integer.parseInt(arguments.get(0));
 			commands.pause(time);
 		}
-		else { /* TODO throw error */ }
+		else {
+			// "empty" pause.. just means wait for RT
+			commands.pause(0);
+		}
 	}
 	
 	protected void handleMove (List<String> arguments)
