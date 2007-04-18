@@ -80,7 +80,6 @@ public class StormFrontProtocolHandler extends DefaultHandler implements IStormF
 		new BoldTagHandler(this);
 		new PushBoldTagHandler(this);
 		new PresetTagHandler(this);
-		new OutputTagHandler(this);
 	}
 	
 	/*
@@ -405,7 +404,7 @@ public class StormFrontProtocolHandler extends DefaultHandler implements IStormF
 			parentBuffer.getBuffer().append(buffer.getBuffer());
 		}
 		else {
-			getCurrentStream().send(buffer);
+			getCurrentStream().send(buffer, true);
 		}
 	}
 }

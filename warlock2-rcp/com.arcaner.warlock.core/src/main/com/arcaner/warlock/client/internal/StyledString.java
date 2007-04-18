@@ -27,6 +27,20 @@ public class StyledString implements IStyledString {
 		styles.add(position, style);
 	}
 	
+	public void append(IStyledString string) {
+		if (!string.equals(this))
+		{
+			int offset = buffer.length();
+			buffer.append(string.getBuffer());
+			
+			for (IWarlockStyle style : string.getStyles())
+			{
+				style.setStart(style.getStart() + offset);
+				addStyle(style);
+			}
+		}
+	}
+	
 	public boolean readyToFlush() {
 		return buffer.indexOf("\n") > -1;
 	}

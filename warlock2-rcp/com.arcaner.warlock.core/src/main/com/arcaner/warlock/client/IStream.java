@@ -20,6 +20,7 @@ public interface IStream {
 	public void send (String text);
 	public void send (String text, IWarlockStyle style);
 	public void send (IStyledString text);
+	public void send (IStyledString text, boolean buffer);
 	
 	public void prompt(String prompt);
 	

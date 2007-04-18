@@ -8,6 +8,7 @@ package com.arcaner.warlock.stormfront.internal;
 
 import org.xml.sax.Attributes;
 
+import com.arcaner.warlock.client.IWarlockStyle;
 import com.arcaner.warlock.client.internal.WarlockStyle;
 import com.arcaner.warlock.stormfront.IStormFrontProtocolHandler;
 
@@ -17,6 +18,8 @@ import com.arcaner.warlock.stormfront.IStormFrontProtocolHandler;
  * Handles Style nodes. This is a basically a no-op handler so that we can handle styled text for now, and apply style later.
  */
 public class StyleTagHandler extends DefaultTagHandler {
+	private IWarlockStyle currentStyle;
+	
 	/**
 	 * @param handler
 	 */
@@ -25,19 +28,35 @@ public class StyleTagHandler extends DefaultTagHandler {
 	}
 	
 	public String[] getTagNames() {
-		return new String[] { "style" };
+		return new String[] { "style", "output" };
 	}
 
 	public void handleStart(Attributes atts) {
-		String styleId = atts.getValue("id");
+		String styleId = null;
+		
+		if ("style".equals(getCurrentTag()))
+			styleId = atts.getValue("id");
+		else if ("output".equals(getCurrentTag()))
+			styleId = atts.getValue("class");
 		
 		if (styleId == null || styleId.length() == 0)
 		{
+			currentStyle.setLength(handler.peekBuffer().getBuffer().length());
+			handler.peekBuffer().addStyle(currentStyle, 0);
+			
+			handler.sendAndPopBuffer();
 			handler.clearCurrentStyle();
 		}
 		else
 		{
-			handler.setCurrentStyle(WarlockStyle.createCustomStyle(styleId, 0, -1));
+			handler.pushBuffer();
+			currentStyle = WarlockStyle.createCustomStyle(styleId, 0, -1);
+			
+			if (styleId.equals("mono")) {
+				currentStyle.addStyleType(IWarlockStyle.StyleType.MONOSPACE);
+			}
+			handler.setCurrentStyle(currentStyle);
+			
 		}
 	}
 }

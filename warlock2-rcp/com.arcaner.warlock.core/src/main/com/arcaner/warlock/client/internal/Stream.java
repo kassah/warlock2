@@ -90,7 +90,7 @@ public class Stream implements IStream {
 		
 		if (buffer.readyToFlush())
 		{
-			send(buffer);
+			send(buffer, false);
 
 			buffer = null;
 		}
@@ -98,25 +98,31 @@ public class Stream implements IStream {
 
 	public void send (IStyledString text)
 	{
-		if (buffer != null && !text.equals(buffer))
-		{
-			// send the current buffer, that way ordering is correct
-			send(buffer);
-			buffer = null;
-		}
+		send (text, false);
+	}
+	
+	public void send (IStyledString text, boolean doBuffer)
+	{
+		if (buffer == null)
+			buffer = new StyledString();
 		
-		for(IStreamListener listener : listeners) {
-			try {
-				listener.streamReceivedText(this, text);
-			} catch (Throwable t) {
-				// TODO Auto-generated catch block
-				t.printStackTrace();
+		buffer.append(text);
+		if (buffer.readyToFlush())
+		{
+			for(IStreamListener listener : listeners) {
+				try {
+					listener.streamReceivedText(this, buffer);
+				} catch (Throwable t) {
+					// TODO Auto-generated catch block
+					t.printStackTrace();
+				}
 			}
-		}
-		
-		if (text.getBuffer().length() > 0 && !isEmpty(text.getBuffer()))
-		{
-			isPrompting = false;
+			
+			if (buffer.getBuffer().length() > 0 && !isEmpty(buffer.getBuffer()))
+			{
+				isPrompting = false;
+			}
+			buffer = null;
 		}
 	}
 	
