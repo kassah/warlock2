@@ -1,6 +1,6 @@
-<project name="build-antlr">
+<project name="build-antlr" default="build-antlr">
 
-	<target name="build-antlr">
+	<target name="build-antlr" >
 		<property name="pkg" value="com/arcaner/warlock/script/wsl/internal"/>
 			
 		<mkdir dir="${pkg}"/>
