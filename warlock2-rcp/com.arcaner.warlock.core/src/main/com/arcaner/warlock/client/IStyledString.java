@@ -9,6 +9,7 @@ public interface IStyledString {
 	public Collection<IWarlockStyle> getStyles();
 
 	public void addStyle (IWarlockStyle style);
+	public void addStyle (IWarlockStyle style, int position);
 	
 	public boolean readyToFlush();
 }

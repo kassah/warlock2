@@ -23,6 +23,10 @@ public class StyledString implements IStyledString {
 		styles.add(style);
 	}
 	
+	public void addStyle(IWarlockStyle style, int position) {
+		styles.add(position, style);
+	}
+	
 	public boolean readyToFlush() {
 		return buffer.indexOf("\n") > -1;
 	}
