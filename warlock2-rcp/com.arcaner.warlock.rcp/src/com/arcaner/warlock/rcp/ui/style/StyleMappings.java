@@ -34,7 +34,7 @@ public class StyleMappings {
 				range.fontStyle |= SWT.BOLD;
 			else if (styleType.equals(IWarlockStyle.StyleType.ITALIC))
 				range.fontStyle |= SWT.ITALIC;
-			else if (styleType.equals(IWarlockStyle.StyleType.UNDERLINE))
+			else if (styleType.equals(IWarlockStyle.StyleType.UNDERLINE) || styleType.equals(IWarlockStyle.StyleType.LINK))
 				range.underline = true;
 			else if (styleType.equals(IWarlockStyle.StyleType.MONOSPACE))
 			{
