@@ -1,5 +1,6 @@
 package com.arcaner.warlock.client.internal;
 
+import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -24,6 +25,22 @@ public class WarlockStyle implements IWarlockStyle {
 		this.styleTypes.addAll(Arrays.asList(styleTypes));
 		this.start = start;
 		this.length = length;
+	}
+	
+	public WarlockStyle (IWarlockStyle other)
+	{
+		try {
+			this.linkAddress = other.getLinkAddress() == null ? null : new URL(other.getLinkAddress().toExternalForm());
+		} catch (MalformedURLException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		
+		this.styleName = other.getStyleName() == null ? null : new String(other.getStyleName());
+		this.styleTypes  = new ArrayList<StyleType>();
+		if (other.getStyleTypes() != null) styleTypes.addAll(other.getStyleTypes());
+		this.start = other.getStart();
+		this.length = other.getLength();
 	}
 	
 	public static WarlockStyle createCustomStyle (String styleName, int start, int length)
@@ -75,5 +92,14 @@ public class WarlockStyle implements IWarlockStyle {
 	
 	public void setStart(int start) {
 		this.start = start;
+	}
+	
+	public void inheritFrom(IWarlockStyle style) {
+		// Right now this just deals with inheriting monospace, eventually we should figure out a way to inherit other properties as well
+		if (style.getStyleTypes().contains(StyleType.MONOSPACE)
+			&& !styleTypes.contains(StyleType.MONOSPACE))
+		{
+			styleTypes.add(StyleType.MONOSPACE);
+		}
 	}
 }

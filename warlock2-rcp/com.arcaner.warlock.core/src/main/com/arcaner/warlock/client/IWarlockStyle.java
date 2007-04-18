@@ -31,4 +31,6 @@ public interface IWarlockStyle {
 	
 	public int getLength();
 	public void setLength(int length);
+	
+	public void inheritFrom(IWarlockStyle style);
 }
