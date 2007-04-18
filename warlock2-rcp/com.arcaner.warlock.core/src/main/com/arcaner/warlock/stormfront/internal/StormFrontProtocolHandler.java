@@ -18,7 +18,9 @@ import org.xml.sax.SAXParseException;
 import org.xml.sax.helpers.DefaultHandler;
 
 import com.arcaner.warlock.client.IStream;
+import com.arcaner.warlock.client.IStyledString;
 import com.arcaner.warlock.client.IWarlockStyle;
+import com.arcaner.warlock.client.internal.StyledString;
 import com.arcaner.warlock.client.internal.WarlockStyle;
 import com.arcaner.warlock.client.stormfront.IStormFrontClient;
 import com.arcaner.warlock.stormfront.IStormFrontProtocolHandler;
@@ -36,7 +38,7 @@ public class StormFrontProtocolHandler extends DefaultHandler implements IStormF
 	protected HashMap<String, IStormFrontTagHandler> tagHandlers = new HashMap<String, IStormFrontTagHandler>();
 	protected Stack<IStream> streamStack = new Stack<IStream>();
 	protected Stack<String> tagStack = new Stack<String>();
-	protected Stack<StringBuffer> bufferStack = new Stack<StringBuffer>();
+	protected Stack<IStyledString> bufferStack = new Stack<IStyledString>();
 	protected StringBuffer rawXMLBuffer;
 	protected String rawXMLEndOnTag;
 	protected int currentSpacing = 0;
@@ -77,7 +79,6 @@ public class StormFrontProtocolHandler extends DefaultHandler implements IStormF
 		
 		new BoldTagHandler(this);
 		new PushBoldTagHandler(this);
-		new PopBoldTagHandler(this);
 		new PresetTagHandler(this);
 		new OutputTagHandler(this);
 	}
@@ -146,6 +147,7 @@ public class StormFrontProtocolHandler extends DefaultHandler implements IStormF
 		
 			// if we have a handler, let it try to handle the characters
 			if(tagHandler != null) {
+				tagHandler.setCurrentTag(tagName);
 				handled = tagHandler.handleCharacters(ch, start, length);
 			}
 		}
@@ -157,7 +159,7 @@ public class StormFrontProtocolHandler extends DefaultHandler implements IStormF
 			
 			if (bufferStack.size() > 0)
 			{
-				bufferStack.peek().append(str);
+				bufferStack.peek().getBuffer().append(str);
 			}
 			else
 			{
@@ -217,6 +219,7 @@ public class StormFrontProtocolHandler extends DefaultHandler implements IStormF
 		// call the method for the object
         IStormFrontTagHandler tagHandler = tagHandlers.get(name);
         if(tagHandler != null) {
+        	tagHandler.setCurrentTag(name);
         	tagHandler.handleEnd();
         }
 	}
@@ -307,6 +310,7 @@ public class StormFrontProtocolHandler extends DefaultHandler implements IStormF
         // call the method for the object
         IStormFrontTagHandler tagHandler = tagHandlers.get(name);
         if(tagHandler != null) {
+        	tagHandler.setCurrentTag(name);
         	tagHandler.handleStart(atts);
         }
 	}
@@ -338,11 +342,17 @@ public class StormFrontProtocolHandler extends DefaultHandler implements IStormF
 	}
 	
 	public void pushBuffer() {
-		bufferStack.push(new StringBuffer());
+		bufferStack.push(new StyledString());
 	}
 	
-	public StringBuffer popBuffer() {
+	public IStyledString popBuffer() {
 		return bufferStack.pop();
+	}
+	
+	public IStyledString peekBuffer() {
+		if (bufferStack.size() > 0)
+			return bufferStack.peek();
+		else return null;
 	}
 	
 	public void startSavingRawXML(StringBuffer buffer, String endOnTag) {
@@ -367,7 +377,35 @@ public class StormFrontProtocolHandler extends DefaultHandler implements IStormF
 		this.currentStyle = style;
 	}
 	
+	public IWarlockStyle getCurrentStyle() {
+		return currentStyle;
+	}
+	
 	public void clearCurrentStyle() {
 		this.currentStyle = WarlockStyle.EMPTY_STYLE;
+	}
+	
+	public void sendAndPopBuffer() {
+		IStyledString buffer = popBuffer();
+		if (peekBuffer() != null)
+		{
+			IStyledString parentBuffer = peekBuffer();
+			
+			for (IWarlockStyle style : buffer.getStyles())
+			{
+				style.setStart(parentBuffer.getBuffer().length() + style.getStart());
+				if (!WarlockStyle.EMPTY_STYLE.equals(currentStyle))
+				{
+					// the current style in this context will be used for style inheritance
+					style.inheritFrom(currentStyle);
+				}
+				
+				parentBuffer.addStyle(style);
+			}
+			parentBuffer.getBuffer().append(buffer.getBuffer());
+		}
+		else {
+			getCurrentStream().send(buffer);
+		}
 	}
 }

@@ -6,8 +6,9 @@
  */
 package com.arcaner.warlock.stormfront;
 
-import com.arcaner.warlock.client.IWarlockStyle;
 import com.arcaner.warlock.client.IStream;
+import com.arcaner.warlock.client.IStyledString;
+import com.arcaner.warlock.client.IWarlockStyle;
 import com.arcaner.warlock.client.stormfront.IStormFrontClient;
 
 /**
@@ -23,9 +24,12 @@ public interface IStormFrontProtocolHandler {
 	public void pushStream(String name);
 	public void popStream();
 	public IStream getCurrentStream();
+	public IWarlockStyle getCurrentStyle();
 	
 	public void pushBuffer();
-	public StringBuffer popBuffer();
+	public IStyledString popBuffer();
+	public IStyledString peekBuffer();
+	public void sendAndPopBuffer();
 	
 	public void startSavingRawXML(StringBuffer buffer, String endOnTag);
 	public void stopSavingRawXML();
