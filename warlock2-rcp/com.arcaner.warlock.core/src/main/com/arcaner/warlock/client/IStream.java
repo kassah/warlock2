@@ -18,8 +18,8 @@ public interface IStream {
 	public IProperty<String> getTitle();
 	
 	public void send (String text);
-	
-	public void send(String text, IWarlockStyle style);
+	public void send (String text, IWarlockStyle style);
+	public void send (IStyledString text);
 	
 	public void prompt(String prompt);
 	

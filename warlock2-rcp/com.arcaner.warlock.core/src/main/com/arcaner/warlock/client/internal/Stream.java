@@ -10,6 +10,7 @@ import java.util.Hashtable;
 import com.arcaner.warlock.client.IProperty;
 import com.arcaner.warlock.client.IStream;
 import com.arcaner.warlock.client.IStreamListener;
+import com.arcaner.warlock.client.IStyledString;
 import com.arcaner.warlock.client.IWarlockStyle;
 
 /**
@@ -54,7 +55,7 @@ public class Stream implements IStream {
 		send (text, WarlockStyle.EMPTY_STYLE);
 	}
 	
-	private boolean isEmpty (String data)
+	private boolean isEmpty (CharSequence data)
 	{
 		for (int i = 0; i < data.length(); i++)
 		{
@@ -89,24 +90,36 @@ public class Stream implements IStream {
 		
 		if (buffer.readyToFlush())
 		{
-			for(IStreamListener listener : listeners) {
-				try {
-					listener.streamReceivedText(this, buffer);
-				} catch (Throwable t) {
-					// TODO Auto-generated catch block
-					t.printStackTrace();
-				}
-			}
-			
-			if (data.length() > 0 && !isEmpty(data))
-			{
-				isPrompting = false;
-			}
-			
+			send(buffer);
+
 			buffer = null;
 		}
 	}
 
+	public void send (IStyledString text)
+	{
+		if (buffer != null && !text.equals(buffer))
+		{
+			// send the current buffer, that way ordering is correct
+			send(buffer);
+			buffer = null;
+		}
+		
+		for(IStreamListener listener : listeners) {
+			try {
+				listener.streamReceivedText(this, text);
+			} catch (Throwable t) {
+				// TODO Auto-generated catch block
+				t.printStackTrace();
+			}
+		}
+		
+		if (text.getBuffer().length() > 0 && !isEmpty(text.getBuffer()))
+		{
+			isPrompting = false;
+		}
+	}
+	
 	public void prompt(String prompt) {
 		if (!isPrompting)
 		{
@@ -114,9 +127,10 @@ public class Stream implements IStream {
 			{
 				listener.streamPrompted(this, prompt);
 			}
+
+			newlineAfterPrompt = false;
 		}
 		isPrompting = true;
-		newlineAfterPrompt = false;
 	}
 	
 	public void echo(String text) {
