@@ -66,6 +66,9 @@ public class Stream implements IStream {
 	}
 	
 	public void send(String data, IWarlockStyle style) {
+		// ignore empty lines (the tail end of stream appends etc) if we are currently prompting
+		if (isEmpty(data) && isPrompting)
+			return;
 		
 		if (buffer == null)
 		{
