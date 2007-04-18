@@ -24,6 +24,7 @@ public class Stream implements IStream {
 	protected IProperty<String> streamName, streamTitle;
 	protected ArrayList<IStreamListener> listeners;
 	protected boolean isPrompting = false;
+	protected StyledString buffer = null;
 	
 	private Stream (String streamName) {
 		this.streamName = new Property<String>("streamName");
@@ -65,18 +66,38 @@ public class Stream implements IStream {
 	}
 	
 	public void send(String data, IWarlockStyle style) {
-		for(IStreamListener listener : listeners) {
-			try {
-				listener.streamReceivedText(this, data, style);
-			} catch (Throwable t) {
-				// TODO Auto-generated catch block
-				t.printStackTrace();
-			}
+		
+		if (buffer == null)
+		{
+			buffer = new StyledString();
+		}
+		int currentOffset = buffer.getBuffer().length();
+		
+		buffer.getBuffer().append(data);
+		if (!buffer.getStyles().contains(style))
+		{
+			// allows styles to be relative to the string they're using
+			style.setStart(style.getStart() + currentOffset);
+			buffer.addStyle(style);
 		}
 		
-		if (data.length() > 0 && !isEmpty(data))
+		if (buffer.readyToFlush())
 		{
-			isPrompting = false;
+			for(IStreamListener listener : listeners) {
+				try {
+					listener.streamReceivedText(this, buffer);
+				} catch (Throwable t) {
+					// TODO Auto-generated catch block
+					t.printStackTrace();
+				}
+			}
+			
+			if (data.length() > 0 && !isEmpty(data))
+			{
+				isPrompting = false;
+			}
+			
+			buffer = null;
 		}
 	}
 

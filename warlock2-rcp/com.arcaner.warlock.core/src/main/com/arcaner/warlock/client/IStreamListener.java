@@ -11,7 +11,7 @@ package com.arcaner.warlock.client;
  */
 public interface IStreamListener {
 
-	public void streamReceivedText (IStream stream, String text, IWarlockStyle style);
+	public void streamReceivedText (IStream stream, IStyledString text);
 	
 	public void streamPrompted (IStream stream, String prompt);
 	
