@@ -23,7 +23,7 @@ public class Stream implements IStream {
 	
 	protected IProperty<String> streamName, streamTitle;
 	protected ArrayList<IStreamListener> listeners;
-	protected boolean isPrompting = false;
+	protected boolean isPrompting = false, newlineAfterPrompt = false;
 	protected StyledString buffer = null;
 	
 	private Stream (String streamName) {
@@ -68,7 +68,10 @@ public class Stream implements IStream {
 	public void send(String data, IWarlockStyle style) {
 		// ignore empty lines (the tail end of stream appends etc) if we are currently prompting
 		if (isEmpty(data) && isPrompting)
-			return;
+		{
+			if (newlineAfterPrompt) return;
+			newlineAfterPrompt = true;
+		}
 		
 		if (buffer == null)
 		{
@@ -113,6 +116,7 @@ public class Stream implements IStream {
 			}
 		}
 		isPrompting = true;
+		newlineAfterPrompt = false;
 	}
 	
 	public void echo(String text) {
