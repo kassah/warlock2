@@ -7,8 +7,6 @@ import java.util.Hashtable;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.custom.LineBackgroundEvent;
 import org.eclipse.swt.custom.LineBackgroundListener;
-import org.eclipse.swt.custom.LineStyleEvent;
-import org.eclipse.swt.custom.LineStyleListener;
 import org.eclipse.swt.custom.StyleRange;
 import org.eclipse.swt.graphics.Color;
 import org.eclipse.swt.graphics.Font;
@@ -23,6 +21,7 @@ import org.eclipse.ui.part.ViewPart;
 import com.arcaner.warlock.client.IProperty;
 import com.arcaner.warlock.client.IStream;
 import com.arcaner.warlock.client.IStreamListener;
+import com.arcaner.warlock.client.IStyledString;
 import com.arcaner.warlock.client.IWarlockStyle;
 import com.arcaner.warlock.client.PropertyListener;
 import com.arcaner.warlock.client.stormfront.IStormFrontClient;
@@ -145,9 +144,8 @@ public class StreamView extends ViewPart implements IStreamListener, LineBackgro
 		}
 	}
 	
-	private void applyUserHighlights (StyleRange parentStyle, String text, int start, int length)
+	private void applyUserHighlights (StyleRange parentStyle, String text, int start, int lineIndex)
 	{
-		int lineIndex = this.text.getLineAtOffset(start);
 		Font font = this.text.getFont();
 		if (parentStyle != null)
 		{
@@ -180,37 +178,39 @@ public class StreamView extends ViewPart implements IStreamListener, LineBackgro
 		}
 	}
 	
-	public void streamReceivedText(IStream stream, String text, IWarlockStyle style) {
+	public void streamReceivedText(IStream stream, IStyledString string) {
 		if (this.stream.equals(stream))
 		{
-			String streamText = new String(text);
+			String streamText = string.getBuffer().toString();
+			
 			if (appendNewlines)
 				streamText += "\n";
 			
-			StyleRangeWithData range = null;
-			int start = this.text.getCharCount();
-			int length = streamText.length();
-			
-			try {
-				range = StyleMappings.getStyle(client.getServerSettings(), style, start, length);
-			} catch (Exception e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
+			int charCount = this.text.getCharCount();
+			StyleRangeWithData ranges[] = new StyleRangeWithData[string.getStyles().size()];
+			int i = 0;
+			for (IWarlockStyle style : string.getStyles())
+			{
+				ranges[i] = StyleMappings.getStyle(client.getServerSettings(), style, charCount + style.getStart(), style.getLength());
+				i++;
 			}
 			
 			this.text.append(streamText);
-			int lineIndex = this.text.getLineAtOffset(start);
 			
-			if (range != null) {
-				this.text.setStyleRange(range);
-				if (range.data.containsKey(StyleMappings.FILL_ENTIRE_LINE))
-				{
-					lineBackgrounds.put(lineIndex, range.background);
-					lineForegrounds.put(lineIndex, range.foreground);
+			for (StyleRangeWithData range : ranges)
+			{
+				if (range != null) {
+					int lineIndex = this.text.getLineAtOffset(range.start);
+					this.text.setStyleRange(range);
+					if (range.data.containsKey(StyleMappings.FILL_ENTIRE_LINE))
+					{
+						lineBackgrounds.put(lineIndex, range.background);
+						lineForegrounds.put(lineIndex, range.foreground);
+					}
+					applyUserHighlights(range, streamText, range.start, lineIndex);
 				}
 			}
 			
-			applyUserHighlights(range, streamText, start, length);
 			scrollToBottom();
 		}
 	}
