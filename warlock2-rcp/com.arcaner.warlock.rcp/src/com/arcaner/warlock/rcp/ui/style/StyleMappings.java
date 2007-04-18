@@ -1,6 +1,5 @@
 package com.arcaner.warlock.rcp.ui.style;
 
-import org.eclipse.jface.resource.FontRegistry;
 import org.eclipse.jface.resource.JFaceResources;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.custom.StyleRange;
@@ -84,7 +83,7 @@ public class StyleMappings {
 	
 	public static StyleRange getEchoStyle (ServerSettings settings, int start, int length)
 	{
-		return getStyle(settings, WarlockStyle.createCustomStyle("command"), start, length);
+		return getStyle(settings, WarlockStyle.createCustomStyle("command", start, length), start, length);
 		
 //		Display display = Display.getDefault();
 //		

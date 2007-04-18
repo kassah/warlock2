@@ -4,6 +4,7 @@ import org.eclipse.swt.widgets.Display;
 
 import com.arcaner.warlock.client.IStream;
 import com.arcaner.warlock.client.IStreamListener;
+import com.arcaner.warlock.client.IStyledString;
 import com.arcaner.warlock.client.IWarlockStyle;
 
 public class SWTStreamListener implements IStreamListener {
@@ -31,6 +32,7 @@ public class SWTStreamListener implements IStreamListener {
 	{
 		public IStream stream;
 		public String text;
+		public IStyledString string;
 		public IWarlockStyle style;
 		public EventType eventType;
 		
@@ -38,7 +40,7 @@ public class SWTStreamListener implements IStreamListener {
 			switch (eventType)
 			{
 			case Cleared: listener.streamCleared(stream); break;
-			case ReceivedText: listener.streamReceivedText(stream, text, style); break;
+			case ReceivedText: listener.streamReceivedText(stream, string); break;
 			case Echoed: listener.streamEchoed(stream, text); break;
 			case Prompted: listener.streamPrompted(stream, text); break;
 			}
@@ -65,11 +67,10 @@ public class SWTStreamListener implements IStreamListener {
 		run(wrapper);
 	}
 
-	public void streamReceivedText(IStream stream, String text, IWarlockStyle style) {
+	public void streamReceivedText(IStream stream, IStyledString string) {
 		wrapper.stream = stream;
 		wrapper.eventType = EventType.ReceivedText;
-		wrapper.text = text;
-		wrapper.style = style;
+		wrapper.string = string;
 		run(wrapper);
 	}
 	
