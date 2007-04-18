@@ -7,6 +7,7 @@ import com.arcaner.warlock.stormfront.IStormFrontTagHandler;
 
 abstract public class DefaultTagHandler implements IStormFrontTagHandler {
 	protected IStormFrontProtocolHandler handler;
+	protected String currentTag;
 	
 	public DefaultTagHandler(IStormFrontProtocolHandler handler) {
 		this.handler = handler;
@@ -27,5 +28,13 @@ abstract public class DefaultTagHandler implements IStormFrontTagHandler {
 
 	public boolean handleCharacters(char[] ch, int start, int length) {
 		return false;
+	}
+	
+	public String getCurrentTag() {
+		return currentTag;
+	}
+	
+	public void setCurrentTag(String tagName) {
+		this.currentTag = tagName;
 	}
 }

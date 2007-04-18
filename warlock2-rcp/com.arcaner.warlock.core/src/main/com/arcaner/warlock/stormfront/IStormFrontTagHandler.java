@@ -19,6 +19,9 @@ public interface IStormFrontTagHandler {
 	
 	public String[] getTagNames();
 	
+	public String getCurrentTag();
+	public void setCurrentTag(String tagName);
+	
 	/**
 	 * Handle the start tag 
 	 * @param atts
