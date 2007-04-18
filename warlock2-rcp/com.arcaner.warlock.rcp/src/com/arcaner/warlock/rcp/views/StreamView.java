@@ -192,6 +192,10 @@ public class StreamView extends ViewPart implements IStreamListener, LineBackgro
 			for (IWarlockStyle style : string.getStyles())
 			{
 				ranges[i] = StyleMappings.getStyle(client.getServerSettings(), style, charCount + style.getStart(), style.getLength());
+				if (style.getStyleTypes().contains(IWarlockStyle.StyleType.LINK))
+				{
+					ranges[i].data.put("link.url", style.getLinkAddress().toString());
+				}
 				i++;
 			}
 			
