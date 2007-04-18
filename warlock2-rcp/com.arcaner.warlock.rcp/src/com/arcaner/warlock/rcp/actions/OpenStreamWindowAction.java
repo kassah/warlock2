@@ -20,6 +20,7 @@ public class OpenStreamWindowAction extends Action {
 	public void run() {
 		
 		StreamView streamView = StreamView.getViewForStream(streamName);
+		streamView.setAppendNewlines(true);
 		
 		GameView inFocus = GameView.getViewInFocus();
 		if (inFocus != null) {

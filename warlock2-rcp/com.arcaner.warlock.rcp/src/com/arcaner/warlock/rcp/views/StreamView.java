@@ -48,6 +48,7 @@ public class StreamView extends ViewPart implements IStreamListener, LineBackgro
 	protected String streamName;
 	protected SWTStreamListener streamListenerWrapper;
 	protected SWTPropertyListener<String> propertyListenerWrapper;
+	protected boolean appendNewlines = false;
 	
 	public StreamView() {
 		openViews.add(this);
@@ -182,9 +183,13 @@ public class StreamView extends ViewPart implements IStreamListener, LineBackgro
 	public void streamReceivedText(IStream stream, String text, IWarlockStyle style) {
 		if (this.stream.equals(stream))
 		{
+			String streamText = new String(text);
+			if (appendNewlines)
+				streamText += "\n";
+			
 			StyleRangeWithData range = null;
 			int start = this.text.getCharCount();
-			int length = text.length();
+			int length = streamText.length();
 			
 			try {
 				range = StyleMappings.getStyle(client.getServerSettings(), style, start, length);
@@ -193,7 +198,7 @@ public class StreamView extends ViewPart implements IStreamListener, LineBackgro
 				e.printStackTrace();
 			}
 			
-			this.text.append(text);
+			this.text.append(streamText);
 			int lineIndex = this.text.getLineAtOffset(start);
 			
 			if (range != null) {
@@ -205,7 +210,7 @@ public class StreamView extends ViewPart implements IStreamListener, LineBackgro
 				}
 			}
 			
-			applyUserHighlights(range, text, start, length);
+			applyUserHighlights(range, streamText, start, length);
 			scrollToBottom();
 		}
 	}
@@ -295,5 +300,9 @@ public class StreamView extends ViewPart implements IStreamListener, LineBackgro
 
 	public void setStreamName(String streamName) {
 		this.streamName = streamName;
+	}
+
+	public void setAppendNewlines(boolean appendNewlines) {
+		this.appendNewlines = appendNewlines;
 	}
 }
