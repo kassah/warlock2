@@ -23,10 +23,11 @@ public class OutputTagHandler extends DefaultTagHandler {
 		
 		if (clazz == null || clazz.length() == 0)
 		{
-			StringBuffer buffer = handler.popBuffer();
-			currentStyle.setLength(buffer.length());
+			currentStyle.setLength(handler.peekBuffer().getBuffer().length());
+			handler.peekBuffer().addStyle(currentStyle, 0);
 			
-			handler.getClient().getDefaultStream().send(buffer.toString(), currentStyle);	
+			handler.sendAndPopBuffer();
+			handler.clearCurrentStyle();
 		}
 		else
 		{
@@ -36,6 +37,8 @@ public class OutputTagHandler extends DefaultTagHandler {
 			if (clazz.equals("mono")) {
 				currentStyle.addStyleType(IWarlockStyle.StyleType.MONOSPACE);
 			}
+			handler.setCurrentStyle(currentStyle);
+			
 		}
 	}
 
