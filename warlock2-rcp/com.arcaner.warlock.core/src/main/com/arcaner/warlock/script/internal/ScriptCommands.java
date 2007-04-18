@@ -6,7 +6,7 @@ import com.arcaner.warlock.client.IProperty;
 import com.arcaner.warlock.client.IPropertyListener;
 import com.arcaner.warlock.client.IStream;
 import com.arcaner.warlock.client.IStreamListener;
-import com.arcaner.warlock.client.IWarlockStyle;
+import com.arcaner.warlock.client.IStyledString;
 import com.arcaner.warlock.client.stormfront.IStormFrontClient;
 import com.arcaner.warlock.script.CallbackEvent;
 import com.arcaner.warlock.script.IMatch;
@@ -93,7 +93,9 @@ public class ScriptCommands implements IScriptCommands, IStreamListener, IProper
 	public void streamEchoed(IStream stream, String text) {}
 	public void streamPrompted(IStream stream, String prompt) {}
 	
-	public void streamReceivedText(IStream stream, String text, IWarlockStyle style) {
+	public void streamReceivedText(IStream stream, IStyledString string) {
+		String text = string.getBuffer().toString();
+		
 		if (waiting)
 		{
 			CallbackEvent event = new CallbackEvent(IScriptCallback.CallbackType.FinishedWaiting);

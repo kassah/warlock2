@@ -8,7 +8,6 @@ package com.arcaner.warlock.stormfront.internal;
 
 import org.xml.sax.Attributes;
 
-import com.arcaner.warlock.client.IWarlockClient;
 import com.arcaner.warlock.client.internal.WarlockStyle;
 import com.arcaner.warlock.stormfront.IStormFrontProtocolHandler;
 
@@ -18,8 +17,6 @@ import com.arcaner.warlock.stormfront.IStormFrontProtocolHandler;
  * Handles Style nodes. This is a basically a no-op handler so that we can handle styled text for now, and apply style later.
  */
 public class StyleTagHandler extends DefaultTagHandler {
-	private WarlockStyle currentStyle;
-	
 	/**
 	 * @param handler
 	 */
@@ -36,15 +33,11 @@ public class StyleTagHandler extends DefaultTagHandler {
 		
 		if (styleId == null || styleId.length() == 0)
 		{
-//			StringBuffer buffer = handler.popBuffer();
-//			handler.getClient().append(IWarlockClient.DEFAULT_VIEW, buffer.toString(), currentStyle);
 			handler.clearCurrentStyle();
 		}
 		else
 		{
-//			handler.pushBuffer();
-//			currentStyle = StormFrontStyle.createCustomStyle(styleId);
-			handler.setCurrentStyle(WarlockStyle.createCustomStyle(styleId));
+			handler.setCurrentStyle(WarlockStyle.createCustomStyle(styleId, 0, -1));
 		}
 	}
 }

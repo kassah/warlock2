@@ -24,12 +24,14 @@ public class OutputTagHandler extends DefaultTagHandler {
 		if (clazz == null || clazz.length() == 0)
 		{
 			StringBuffer buffer = handler.popBuffer();
+			currentStyle.setLength(buffer.length());
+			
 			handler.getClient().getDefaultStream().send(buffer.toString(), currentStyle);	
 		}
 		else
 		{
 			handler.pushBuffer();
-			currentStyle = WarlockStyle.createCustomStyle(clazz);
+			currentStyle = WarlockStyle.createCustomStyle(clazz, 0, -1);
 			
 			if (clazz.equals("mono")) {
 				currentStyle.addStyleType(IWarlockStyle.StyleType.MONOSPACE);

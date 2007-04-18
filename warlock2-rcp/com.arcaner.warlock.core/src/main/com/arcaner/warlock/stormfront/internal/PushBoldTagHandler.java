@@ -16,7 +16,6 @@ public class PushBoldTagHandler extends DefaultTagHandler {
 	}
 	
 	public void handleEnd() {
-		handler.setCurrentStyle(WarlockStyle.BOLD_STYLE);
-//		handler.pushBuffer();
+		handler.setCurrentStyle(WarlockStyle.createBoldStyle(0, -1));
 	}
 }

@@ -168,6 +168,11 @@ public class StormFrontProtocolHandler extends DefaultHandler implements IStormF
 					stream = client.getDefaultStream();
 				}
 
+				if (!WarlockStyle.EMPTY_STYLE.equals(currentStyle))
+				{
+					currentStyle.setLength(str.length());
+				}
+				
 				stream.send(str, currentStyle);
 				//streamTable.send(stream, str);
 			}

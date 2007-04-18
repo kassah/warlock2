@@ -22,7 +22,7 @@ public class PresetTagHandler extends DefaultTagHandler {
 	@Override
 	public void handleStart(Attributes atts) {
 		this.id = atts.getValue("id");
-		handler.setCurrentStyle(WarlockStyle.createCustomStyle(id));
+		handler.setCurrentStyle(WarlockStyle.createCustomStyle(id, 0, -1));
 	}
 	
 	@Override
