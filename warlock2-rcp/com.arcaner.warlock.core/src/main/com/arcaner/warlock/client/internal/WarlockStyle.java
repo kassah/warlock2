@@ -12,21 +12,28 @@ public class WarlockStyle implements IWarlockStyle {
 	private URL linkAddress;
 	private String styleName;
 	private Collection<StyleType> styleTypes;
+	private int start, length;
 	
-	public static final WarlockStyle EMPTY_STYLE = new WarlockStyle(new StyleType[] { StyleType.EMPTY }, "empty", null);
-	public static final WarlockStyle BOLD_STYLE = new WarlockStyle(new StyleType[] { StyleType.BOLD }, "bold", null);
+	public static final WarlockStyle EMPTY_STYLE = new WarlockStyle(new StyleType[] { StyleType.EMPTY }, "empty", null, -1, -1);
 	
-	public WarlockStyle (StyleType[] styleTypes, String styleName, URL linkAddress)
+	public WarlockStyle (StyleType[] styleTypes, String styleName, URL linkAddress, int start, int length)
 	{
 		this.linkAddress = linkAddress;
 		this.styleName = styleName;
 		this.styleTypes = new ArrayList<StyleType>();
 		this.styleTypes.addAll(Arrays.asList(styleTypes));
+		this.start = start;
+		this.length = length;
 	}
 	
-	public static WarlockStyle createCustomStyle (String styleName)
+	public static WarlockStyle createCustomStyle (String styleName, int start, int length)
 	{
-		return new WarlockStyle(new StyleType[] { StyleType.CUSTOM }, styleName, null);
+		return new WarlockStyle(new StyleType[] { StyleType.CUSTOM }, styleName, null, start, length);
+	}
+	
+	public static WarlockStyle createBoldStyle (int start, int length)
+	{
+		return new WarlockStyle(new StyleType[] { StyleType.BOLD }, "bold", null, start, length);
 	}
 	
 	public URL getLinkAddress() {
@@ -54,4 +61,19 @@ public class WarlockStyle implements IWarlockStyle {
 		this.styleName = styleName;
 	}
 
+	public int getLength() {
+		return length;
+	}
+	
+	public int getStart() {
+		return start;
+	}
+	
+	public void setLength(int length) {
+		this.length = length;
+	}
+	
+	public void setStart(int start) {
+		this.start = start;
+	}
 }
