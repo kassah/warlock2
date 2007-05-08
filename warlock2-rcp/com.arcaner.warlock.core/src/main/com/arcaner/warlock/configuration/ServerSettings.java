@@ -376,7 +376,7 @@ public class ServerSettings {
 		}
 		else if ("main".equals(presetId))
 		{
-			return new WarlockColor("#D4D4D4");
+			return new WarlockColor("#F0F0FF");
 		}
 		
 		return WarlockColor.DEFAULT_COLOR;
@@ -395,7 +395,7 @@ public class ServerSettings {
 		}
 		else if ("main".equals(presetId))
 		{
-			return new WarlockColor("#000000");
+			return new WarlockColor("#191932");
 		}
 		else if ("cmdline".equals(presetId))
 		{
