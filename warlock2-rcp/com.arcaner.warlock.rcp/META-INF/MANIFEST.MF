@@ -9,10 +9,11 @@ Bundle-ClassPath: dom4j-1.5.2.jar,
 Bundle-Activator: com.arcaner.warlock.rcp.plugin.Warlock2Plugin
 Bundle-Vendor: Warlock Team
 Bundle-Localization: plugin
-Require-Bundle: org.eclipse.ui,
- org.eclipse.core.runtime,
- org.eclipse.jface.text,
- com.arcaner.warlock.core
+Require-Bundle: org.eclipse.core.runtime,
+ com.arcaner.warlock.core,
+ org.eclipse.swt,
+ org.eclipse.jface,
+ org.eclipse.ui.workbench
 Eclipse-LazyStart: true
 Export-Package: com.arcaner.warlock.rcp.actions,
  com.arcaner.warlock.rcp.application,
