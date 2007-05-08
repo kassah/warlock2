@@ -82,7 +82,7 @@ public class WarlockCompass implements PaintListener, MouseMoveListener, MouseLi
 		if (x == -1)
 			x = text.getClientArea().width - compassBounds.width - 5;
 		if (y == -1)
-			y = 5;
+			y = text.getClientArea().height - compassBounds.height - 5;
 		
 		gc.drawImage(compassImage, x, y);
 		if (compass != null)
@@ -90,6 +90,16 @@ public class WarlockCompass implements PaintListener, MouseMoveListener, MouseLi
 			for (DirectionType direction : DirectionType.values())
 			{
 				if (direction != DirectionType.None && compass.getDirections().get(direction))
+				{
+					Point point = theme.getDirectionPosition(direction);
+					gc.drawImage(theme.getDirectionImage(direction), point.x + x, point.y + y);
+				}
+			}
+		} else {
+			// draw all "on" by default
+			for (DirectionType direction : DirectionType.values())
+			{
+				if (direction != DirectionType.None)
 				{
 					Point point = theme.getDirectionPosition(direction);
 					gc.drawImage(theme.getDirectionImage(direction), point.x + x, point.y + y);
