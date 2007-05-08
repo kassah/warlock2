@@ -293,8 +293,11 @@ public class StreamView extends ViewPart implements IStreamListener, LineBackgro
 	
 	@Override
 	public void dispose() {
-		stream.removeStreamListener(streamListenerWrapper);
-		stream.getTitle().removeListener(propertyListenerWrapper);
+		if (stream != null) {
+			stream.removeStreamListener(streamListenerWrapper);
+			stream.getTitle().removeListener(propertyListenerWrapper);
+		}
+		
 		super.dispose();
 	}
 
