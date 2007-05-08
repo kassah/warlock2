@@ -13,7 +13,7 @@ Require-Bundle: org.eclipse.core.runtime,
  com.arcaner.warlock.core,
  org.eclipse.swt,
  org.eclipse.jface,
- org.eclipse.ui.workbench
+ org.eclipse.ui
 Eclipse-LazyStart: true
 Export-Package: com.arcaner.warlock.rcp.actions,
  com.arcaner.warlock.rcp.application,
