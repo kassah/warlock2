@@ -73,7 +73,10 @@ public class WarlockCompass implements PaintListener, MouseMoveListener, MouseLi
 	
 	public void redraw ()
 	{
-		this.text.redraw(x, 0, compassBounds.width, text.getBounds().height, true);
+		if (!this.text.isDisposed())
+		{
+			this.text.redraw(x, 0, compassBounds.width, text.getBounds().height, true);
+		}
 //		text.redraw();
 	}
 	
