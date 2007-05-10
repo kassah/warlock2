@@ -1,0 +1,21 @@
+<shortcuts>
+	<programGroup defaultName="Warlock 2"
+		location="games" />
+	<shortcut name="Warlock2" programGroup="yes"
+		desktop="yes" applications="no" startMenu="yes" startup="no"
+		target="$INSTALL_PATH/warlock2" iconFile="$INSTALL_PATH/warlock2.gif"
+		commandLine="-vmargs -Xms40m -Xmx256m"
+		workingDirectory="$INSTALL_PATH"
+		description="Run Warlock2" type="Application"
+		encoding="UTF-8" terminal="false" KdeSubstUID="false"
+		initialState="normal" categories="" createForAll="true" />
+
+	<shortcut name="Uninstall" programGroup="yes" desktop="no"
+		applications="no" startMenu="yes" startup="no" target="java"
+		commandLine="-jar uninstaller.jar"
+		workingDirectory="$INSTALL_PATH/Uninstaller"
+		description="Uninstall Warlock2 " type="Application"
+		encoding="UTF-8" terminal="false" KdeSubstUID="false"
+		initialState="normal" categories="" createForAll="true" />
+
+</shortcuts>

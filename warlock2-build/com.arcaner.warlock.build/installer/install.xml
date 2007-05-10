@@ -1,0 +1,91 @@
+<?xml version="1.0"?>
+<installation version="1.0">
+	<info>
+		<appname>Warlock2</appname>
+		<appversion>
+			Warlock @{warlock-version}
+		</appversion>
+		<authors>
+			<author name="Marshall Culpepper" email="marshall@arcaner.com" />
+			<author name="Sean Proctor" email="sproctor@gmail.com"/>
+			<author name="Will Robertson" email="will@element9.net"/>
+		</authors>
+		<url>http://warlock.sf.net/</url>
+		<javaversion>1.5</javaversion>
+		<summarylogfilepath>
+			$INSTALL_PATH/InstallSummary.html
+		</summarylogfilepath>
+	</info>
+	
+	<native type="izpack" name="ShellLink.dll"/>
+	<guiprefs width="640" height="480" resizable="no">
+		<laf name="looks">
+			<os family="unix" />
+			<param name="variant" value="plastic"/>
+		</laf>
+		<laf name="looks">
+			<os family="windows" />
+			<param name="variant" value="plasticXP" />
+		</laf>
+
+		<modifier key="useButtonIcons" value="yes" />
+		<modifier key="useLabelIcons" value="yes" />
+		<modifier key="useFlags" value="no" />
+		<modifier key="langDisplayType" value="native" />
+		<modifier key="useHeadingPanel" value="yes" />
+		<modifier key="headingFontSize" value="1.5"/>
+  		<modifier key="headingBackgroundColor" value="0x00ffffff"/>
+  		<modifier key="headingForegroundColor" value="0x007c0a12"/>
+  		<modifier key="headingImageBorderSize" value="0"/>
+  		<modifier key="headingPanelCounter" value="text"/>
+  		<modifier key="headingPanelCounterPos" value="inHeading"/>
+	</guiprefs>
+	<locale>
+		<langpack iso3="eng" />
+	</locale>
+
+	<resources>
+		<res id="Heading.image" src="images/heading.gif"/>
+	
+		<res id="HTMLLicencePanel.licence" src="gpl.html" />
+		<res id="HTMLInfoPanel.info" src="info.html" />
+		<res src="default_shortcut_specification.xml" id="shortcutSpec.xml" />
+		<res src="unix_shortcut_specification.xml" id="Unix_shortcutSpec.xml" />
+	</resources>
+
+	<listeners>
+		<listener installer="ChmodInstallerListener"/>
+	</listeners>
+	
+	<panels>
+		<!-- Display the release readme panel -->
+		<panel classname="HTMLInfoPanel" id="introduction" />
+		
+		<!-- Display the license panel -->
+		<panel classname="HTMLLicencePanel" id="licence" />
+		
+		<!-- Display an installation location panel -->
+		<panel classname="TargetPanel" id="target" />
+
+		<!-- This panel shows summary information -->
+		<panel classname="SummaryPanel" id="summary" />
+		
+		<!-- Do the install -->
+		<panel classname="InstallPanel" id="install" />
+		
+		<!-- This panel creates shortcuts -->
+		<panel classname="ShortcutPanel" id="shortcut" />
+		
+		<!-- This panel shows final information -->
+		<panel classname="SimpleFinishPanel" id="finish" />
+	</panels>
+
+	<packs>
+		<pack name="Warlock2 Core Plugins" required="yes">
+			<description>The Warlock2 core plugins (required)</description>
+			<fileset dir="@{warlock-output-dir}" targetdir="$INSTALL_PATH"/>
+			<singlefile src="@{warlock-output-dir}/plugins/com.arcaner.warlock.rcp_@{warlock-version}/images/character.gif" target="$INSTALL_PATH/warlock2.gif"/>
+		</pack>
+	</packs>
+	
+</installation>

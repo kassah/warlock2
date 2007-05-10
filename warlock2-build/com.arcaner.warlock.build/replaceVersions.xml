@@ -1,0 +1,32 @@
+<project default="replace-versions">
+	<property file="warlock-build.properties"/>
+	
+	<path id="svn-classpath">
+		<fileset dir="lib">
+			<include name="*.jar"/>
+		</fileset>
+	</path>
+	
+	<typedef resource="org/tigris/subversion/svnant/svnantlib.xml" classpathref="svn-classpath"/> 
+	
+	<target name="replace-versions">
+		<getWarlockVersion property="version"/>
+		<echo>Building warlock version ${version}...</echo>
+		
+		<eclipse.versionReplacer path="${buildDirectory}/plugins/com.arcaner.warlock.core" version="${version}"/>
+		<eclipse.versionReplacer path="${buildDirectory}/plugins/com.arcaner.warlock.rcp" version="${version}"/>
+		
+	</target>
+	
+	<macrodef name="getWarlockVersion">
+		<attribute name="property"/>
+		<sequential>
+			<svn javahl="false">
+				<wcVersion path="../../warlock2-rcp"/>
+			</svn>
+			
+			<property name="@{property}" value="${warlock2-version-prefix}.${revision.max}.${warlock2-version-suffix}"/>
+		</sequential>
+	</macrodef>
+	
+</project>

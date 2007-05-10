@@ -1,0 +1,14 @@
+<shortcuts>
+	<skipIfNotSupported />
+	<programGroup defaultName="Warlock2" location="applications" />
+	<shortcut name="Warlock2"
+		target="$INSTALL_PATH\warlock2.exe" iconFile="$INSTALL_PATH/warlock2.gif"
+		workingDirectory="$INSTALL_PATH"
+		commandLine="-vmargs -Xmx256M -Xms40M -XX:PermSize=128M -XX:MaxPermSize=128M"
+		description="Start Warlock2" initialState="normal"
+		programGroup="yes" desktop="yes" startMenu="no" />
+	<shortcut name="Uninstall" target="javaw"
+		commandLine="-jar &quot;$INSTALL_PATH/Uninstaller/uninstaller.jar&quot;"
+		description="Uninstall Warlock2" initialState="normal"
+		programGroup="yes" desktop="no" startMenu="no" />
+</shortcuts>

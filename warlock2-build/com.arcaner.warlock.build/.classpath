@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<classpath>
+	<classpathentry kind="src" path="src"/>
+	<classpathentry kind="con" path="org.eclipse.jdt.launching.JRE_CONTAINER"/>
+	<classpathentry kind="var" path="ECLIPSE_HOME/plugins/org.eclipse.pde.build_3.3.0.v20070430-1700/lib/pdebuild-ant.jar" sourcepath="/ECLIPSE_HOME/plugins/org.eclipse.pde.source_3.3.0.v20061114-0800-7N7M-DUUEF6EkLW7Gz-GE/src/org.eclipse.pde.build_3.3.0.v20070430-1700/lib/pdebuild-antsrc.zip"/>
+	<classpathentry kind="var" path="ECLIPSE_HOME/plugins/org.eclipse.pde.build_3.3.0.v20070430-1700/pdebuild.jar"/>
+	<classpathentry kind="lib" path="lib/standalone-compiler.jar"/>
+	<classpathentry kind="lib" path="lib/izevent.jar"/>
+	<classpathentry kind="output" path="bin"/>
+</classpath>

@@ -1,0 +1,75 @@
+<project default="build-installers">
+	
+	<path id="izpack-classpath">
+		<fileset file="lib/standalone-compiler.jar"/>
+		<fileset file="lib/izevent.jar"/>
+	</path>
+			
+	<taskdef name="izpack" classpathref="izpack-classpath" classname="com.izforge.izpack.ant.IzPackTask"/>
+		
+	<taskdef resource="net/sf/antcontrib/antlib.xml">
+	  <classpath>
+	    <pathelement location="lib/ant-contrib-1.0b3.jar"/>
+	  </classpath>
+	</taskdef>
+	<import file="replaceVersions.xml"/>
+	
+	<property file="warlock-build.properties"/>
+	<property file="build.properties"/>
+	
+	<target name="prepare-installer">
+		<for param="binary">
+			<fileset dir="${buildDirectory}/${buildLabel}">
+				<include name="${buildId}*.*"/>
+			</fileset>
+			<sequential>
+				<propertyregex
+					property="platform-name"
+					input="@{binary}"
+					regexp="${buildId}-(.+)-(.+)\.(.+)"
+					select="\2"
+					override="true"/>
+				
+				<mkdir dir="installer/binaries/${platform-name}"/>
+				<unzip src="@{binary}" dest="installer/binaries/${platform-name}"/>
+			</sequential>
+		</for>
+		
+		<javac srcdir="src" destdir="bin" classpathref="izpack-classpath"/>
+		<mkdir dir="bin/customActions"/>
+		<jar destfile="bin/customActions/ChmodInstallerListener.jar">
+			<fileset dir="bin" includes="com/**/*"/>
+			<zipfileset src="lib/izevent.jar"/>
+		</jar>
+		
+	</target>
+	
+	<target name="build-installers" depends="prepare-installer">
+		<getWarlockVersion property="warlock-version"/>
+		
+		<for param="binary">
+			<fileset dir="${buildDirectory}/${buildLabel}">
+				<include name="${buildId}*.*"/>
+			</fileset>
+			<sequential>
+				<propertyregex
+					property="platform-name"
+					input="@{binary}"
+					regexp="${buildId}-(.+)-(.+)\.(.+)"
+					select="\2"
+					override="true"/>
+		
+				<var name="warlock-output-dir" value="binaries/${platform-name}/warlock2"/>
+				<izpack
+					basedir="installer"
+					input="installer/install.xml"
+					output="${buildDirectory}/${buildLabel}/${buildId}-${warlock-version}-${platform-name}-installer.jar"
+					>
+					
+					<property name="warlock-version" value="${warlock-version}"/>
+					<property name="warlock-output-dir" value="${warlock-output-dir}"/>
+				</izpack>
+			</sequential>
+		</for>
+	</target>
+</project>

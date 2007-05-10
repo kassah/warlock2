@@ -1,0 +1,87 @@
+<project name="warlock2-build" default="build-product">
+	<property file="warlock-build.properties"/>
+	<property file="build.properties"/>
+	<import file="replaceVersions.xml"/>
+	
+	<taskdef resource="net/sf/antcontrib/antlib.xml">
+	  <classpath>
+	    <pathelement location="lib/ant-contrib-1.0b3.jar"/>
+	  </classpath>
+	</taskdef>
+	
+	<target name="clean">
+		<delete includeemptydirs="true" failonerror="false">
+			<fileset dir="${buildDirectory}" includes="**/*"/>
+			<fileset dir="installer/binaries" includes="**/*"/>
+		</delete>
+	</target>
+		
+	<target name="copy-code">
+		<mkdir dir="${buildDirectory}"/>
+
+		<copy todir="${buildDirectory}/plugins">
+			<fileset dir="../../warlock2-rcp">
+				<include name="com.arcaner.warlock.core/**/*"/>
+				<include name="com.arcaner.warlock.rcp/**/*"/>
+			</fileset>
+		</copy>
+	</target>
+
+	<target name="build-product" depends="copy-code">
+		<fileset dir="${eclipseDir}/plugins" id="launcher-fileset">
+			<include name="org.eclipse.equinox.launcher_*.jar"/>
+		</fileset>
+		<pathconvert pathsep="," property="launcher-jar" refid="launcher-fileset"/>
+
+		<fileset dir="${eclipseDir}/plugins" id="productBuild-fileset">
+			<include name="org.eclipse.pde.build_*/scripts/productBuild/productBuild.xml"/>
+		</fileset>
+		<pathconvert pathsep="," property="productBuild-script" refid="productBuild-fileset"/>
+		
+		<antRunner antfile="replaceVersions.xml"/>
+		
+		<antRunner antfile="${productBuild-script}">
+			<syspropertyset>
+				<propertyref builtin="all"/>
+			</syspropertyset>
+			
+			<sysproperty key="builder" value="${basedir}"/>
+		</antRunner>
+		
+		<antcall target="rename-binaries"/>
+		<ant antfile="buildInstallers.xml"/>
+	</target>
+	
+	<target name="rename-binaries">
+		<getWarlockVersion property="warlock-version"/>
+		
+		<for param="binary">
+			<fileset dir="${buildDirectory}/${buildLabel}">
+				<include name="${buildId}*.*"/>
+			</fileset>
+			<sequential>
+				<propertyregex
+					property="new-binary-name"
+					input="@{binary}"
+					regexp="${buildId}-(.+)\.(.+)"
+					replace="${buildId}-${warlock-version}-\1.\2"
+					override="true"/>
+				
+				<move file="@{binary}" tofile="${new-binary-name}"/>
+			</sequential>
+		</for>
+	</target>
+	
+	<macrodef name="antRunner">
+		<attribute name="antfile"/>
+		<element name="arguments" implicit="true" optional="true"/>
+			
+		<sequential>	
+			<java fork="true" jar="${launcher-jar}">
+				<arg line="-application org.eclipse.ant.core.antRunner"/>
+				<arg line="-buildfile @{antfile}"/>
+				<arguments/>
+			</java>
+		</sequential>
+	</macrodef>
+</project>
