@@ -175,25 +175,24 @@ public class ServerSettings {
 			case CommandLine_Foreground: color = commandLineElement.attributeValue("fgcolor"); break;
 		}
 		
-		if (color != null) 
+		if (color == null) color = "skin";
+		
+		if (color.charAt(0) == '@')
 		{
-			if (color.charAt(0) == '@')
-			{
-				return getPaletteColor(Integer.parseInt(color.substring(1)));
-			}
-			else if ("skin".equals(color))
-			{
-				if (settingType == ColorType.MainWindow_Background)
-					return getSkinBackgroundColor("main");
-				else if (settingType == ColorType.MainWindow_Foreground)
-					return getSkinForegroundColor("main");
-				else if (settingType == ColorType.CommandLine_Background)
-					return getSkinBackgroundColor("cmdline");
-				else if (settingType == ColorType.CommandLine_Foreground)
-					return getSkinForegroundColor("cmdline");
-			}
-			else return new WarlockColor(color);
+			return getPaletteColor(Integer.parseInt(color.substring(1)));
 		}
+		else if ("skin".equals(color))
+		{
+			if (settingType == ColorType.MainWindow_Background)
+				return getSkinBackgroundColor("main");
+			else if (settingType == ColorType.MainWindow_Foreground)
+				return getSkinForegroundColor("main");
+			else if (settingType == ColorType.CommandLine_Background)
+				return getSkinBackgroundColor("cmdline");
+			else if (settingType == ColorType.CommandLine_Foreground)
+				return getSkinForegroundColor("cmdline");
+		}
+		else return new WarlockColor(color);
 		
 		return WarlockColor.DEFAULT_COLOR;
 	}
