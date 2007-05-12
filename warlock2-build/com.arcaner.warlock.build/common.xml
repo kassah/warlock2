@@ -1,0 +1,57 @@
+<project>
+	<property file="warlock-build.properties"/>
+	<property file="build.properties"/>
+	
+	<taskdef resource="net/sf/antcontrib/antlib.xml">
+	  <classpath>
+	    <pathelement location="lib/ant-contrib-1.0b3.jar"/>
+	  </classpath>
+	</taskdef>
+	
+	<path id="svn-classpath">
+		<fileset dir="lib">
+			<include name="*.jar"/>
+		</fileset>
+	</path>
+	
+	<typedef resource="org/tigris/subversion/svnant/svnantlib.xml" classpathref="svn-classpath"/> 
+	
+	<!--  common macros -->	
+	<macrodef name="getWarlockVersion">
+		<attribute name="property"/>
+		<sequential>
+			<svn javahl="false">
+				<wcVersion path="../../warlock2-rcp"/>
+			</svn>
+			
+			<property name="@{property}" value="${warlock2-version-prefix}.${revision.max}.${warlock2-version-suffix}"/>
+		</sequential>
+	</macrodef>
+	
+	<macrodef name="getPlatforms">
+		<attribute name="property"/>
+		<sequential>
+			<var name="platforms" value=""/>
+			<var name="comma" value=","/>
+			<for list="${configs}" delimiter="&amp;" trim="true" param="platform">
+				<sequential>
+					<propertyregex
+						property="platform-string"
+						input="@{platform}"
+						regexp="(.+),(.+),(.+)"
+						replace="\1.\2.\3"
+						override="true"/>
+					<propertyregex
+						property="platform-string"
+						input="${platform-string}"
+						regexp=" +" replace=""
+						override="true"/>
+					
+					<var name="platforms" value="${platforms}${comma}${platform-string}"/>
+					<var name="comma" value=","/>
+				</sequential>
+			</for>
+			<property name="@{property}" value="${platforms}"/>
+		</sequential>
+	</macrodef>
+</project>
