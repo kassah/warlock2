@@ -85,9 +85,9 @@
 		<mkdir dir="${user.home}/.ant/lib"/>
 		<copy file="lib/jsch.jar" todir="${user.home}/.ant/lib"/>
 		
-		<copy todir="${buildDirectory}/${buildLabel}">
+		<copy todir="${buildDirectory}/${buildLabel}/${warlock-version}">
 			<fileset dir=".">
-				<include name="index.html"/>
+				<include name="index.php"/>
 				<include name="latest-build.php"/>
 			</fileset>
 			<filterchain>
@@ -96,12 +96,12 @@
 		</copy>
 		
 		<echo>Publishing build ${warlock-version}...</echo>
-		<scp todir="${sf.project.userName}@shell.sourceforge.net:/home/groups/w/wa/warlock/htdocs/builds" password="${sf.project.password}">
+		<!--scp trust="true" todir="${sf.project.userName}@shell.sourceforge.net:/home/groups/w/wa/warlock/htdocs/builds" password="${sf.project.password}">
 			<fileset file="${buildDirectory}/${buildLabel}/${warlock-version}/latest-build.php"/>
 			<fileset dir="${buildDirectory}/${buildLabel}">
-				<include name="${warlock-version}/index.html"/>
+				<include name="${warlock-version}/index.php"/>
 			</fileset>
-		</scp>
+		</scp-->
 		
 		<ant antfile="sourceforgeRelease.xml"/>
 	</target>
