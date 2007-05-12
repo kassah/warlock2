@@ -1,0 +1,84 @@
+<project default="publish-to-sourceforge">
+	<property file="warlock-build.properties"/>
+	<property file="build.properties"/>
+	
+	<path id="sfutils-classpath">
+		<fileset file="lib/httpunit.jar"/>
+		<fileset file="lib/js.jar"/>
+		<fileset file="lib/nekohtml-0.7.6.jar"/>
+		<fileset file="lib/sfutils.jar"/>
+		<fileset file="lib/xerces-2.4.0.jar"/>
+		<fileset file="lib/xmlParserAPIs-2.2.1.jar"/>
+	</path>
+	
+	<taskdef name="sfpublish" classpathref="sfutils-classpath"
+		classname="org.apache.tools.ant.taskdefs.optional.sourceforge.SourceForgePublish"/>
+	
+	<macrodef name="getPlatformProperties">
+		<attribute name="platform"/>
+		<attribute name="binary-extension" default="zip"/>
+		<sequential>
+			<property name="@{platform}-binary" value="${buildDirectory}/${buildLabel}/${warlock-version}/${buildId}-${warlock-version}-@{platform}.@{binary-extension}"/>
+			<property name="@{platform}-installer" value="${buildDirectory}/${buildLabel}/${warlock-version}/${buildId}-${warlock-version}-@{platform}-installer.jar"/>
+		</sequential>
+	</macrodef>
+			
+	<target name="publish-to-sourceforge">
+		<tstamp>
+			<format pattern="MM/dd/yyyy HH:mm:ss" property="releasedate"/>
+		</tstamp>
+		
+		<getPlatformProperties platform="linux.gtk.x86"/> 
+		<getPlatformProperties platform="linux.gtk.x86_64"/>
+		<getPlatformProperties platform="win32.win32.x86"/>
+		<getPlatformProperties platform="macosx.carbon.ppc" binary-extension="tar.gz"/>
+		
+		<echo>
+		Releasing ${warlock-version} on ${releasedate} files:
+	        ${linux.gtk.x86-installer}
+			${win32.win32.x86-installer}
+			${linux.gtk.x86_64-installer}
+			${macosx.carbon.ppc-installer}
+			${linux.gtk.x86-binary}
+			${win32.win32.x86-binary}
+			${linux.gtk.x86_64-binary}
+			${macosx.carbon.ppc-binary}
+		</echo>
+		
+		<sfpublish releasename="${warlock-version}"
+                 packagename="${sf.project.packageName}"
+                 packagehidden="no"
+                 hidden="no"
+                 projectshortname="${sf.project.shortName}"
+                 projectname="${sf.project.name}"
+                 username="${sf.project.userName}"
+                 password="${sf.project.password}"
+                 releasedate="${releasedate}">
+        <filespec file="${linux.gtk.x86-installer}"
+                  filetype="jar"
+                  processortype="i386"/>
+		<filespec file="${win32.win32.x86-installer}"
+                  filetype="jar"
+                  processortype="i386"/>
+		<filespec file="${linux.gtk.x86_64-installer}"
+                  filetype="jar"
+                  processortype="i386"/>
+		<filespec file="${macosx.carbon.ppc-installer}"
+                  filetype="jar"
+                  processortype="ppc"/>
+		<filespec file="${linux.gtk.x86-binary}"
+                  filetype="binary_zip"
+                  processortype="i386"/>
+		<filespec file="${win32.win32.x86-binary}"
+                  filetype="binary_zip"
+                  processortype="i386"/>
+		<filespec file="${linux.gtk.x86_64-binary}"
+                  filetype="binary_zip"
+                  processortype="i386"/>
+		<filespec file="${macosx.carbon.ppc-binary}"
+                  filetype="binary_gzip"
+                  processortype="ppc"/>
+      </sfpublish>
+	</target>
+	
+</project>
