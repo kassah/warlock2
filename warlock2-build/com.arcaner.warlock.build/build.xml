@@ -1,7 +1,7 @@
 <project name="warlock2-build" default="build-product">
 	<property file="warlock-build.properties"/>
 	<property file="build.properties"/>
-	<import file="replaceVersions.xml"/>
+	<import file="common.xml"/>
 	
 	<taskdef resource="net/sf/antcontrib/antlib.xml">
 	  <classpath>
@@ -28,6 +28,8 @@
 	</target>
 
 	<target name="build-product" depends="copy-code">
+		<getWarlockVersion property="warlock-version"/>
+		
 		<fileset dir="${eclipseDir}/plugins" id="launcher-fileset">
 			<include name="org.eclipse.equinox.launcher_*.jar"/>
 		</fileset>
@@ -50,10 +52,16 @@
 		
 		<antcall target="rename-binaries"/>
 		<ant antfile="buildInstallers.xml"/>
+		<if>
+			<equals arg1="${publish-build}" arg2="true" casesensitive="false"/>
+			<then>
+				<antcall target="publish-build"/>
+			</then>
+		</if>
 	</target>
 	
 	<target name="rename-binaries">
-		<getWarlockVersion property="warlock-version"/>
+		<mkdir dir="${buildDirectory}/${buildLabel}/${warlock-version}"/>
 		
 		<for param="binary">
 			<fileset dir="${buildDirectory}/${buildLabel}">
@@ -67,11 +75,37 @@
 					replace="${buildId}-${warlock-version}-\1.\2"
 					override="true"/>
 				
-				<move file="@{binary}" tofile="${new-binary-name}"/>
+				<move file="@{binary}"  tofile="${new-binary-name}"/>
+				<move file="${new-binary-name}" todir="${buildDirectory}/${buildLabel}/${warlock-version}"/>
 			</sequential>
 		</for>
 	</target>
 	
+	<target name="publish-build">
+		<mkdir dir="${user.home}/.ant/lib"/>
+		<copy file="lib/jsch.jar" todir="${user.home}/.ant/lib"/>
+		
+		<copy todir="${buildDirectory}/${buildLabel}">
+			<fileset dir=".">
+				<include name="index.html"/>
+				<include name="latest-build.php"/>
+			</fileset>
+			<filterchain>
+				<expandproperties/>
+			</filterchain>
+		</copy>
+		
+		<echo>Publishing build ${warlock-version}...</echo>
+		<scp todir="${sf.project.userName}@shell.sourceforge.net:/home/groups/w/wa/warlock/htdocs/builds" password="${sf.project.password}">
+			<fileset file="${buildDirectory}/${buildLabel}/${warlock-version}/latest-build.php"/>
+			<fileset dir="${buildDirectory}/${buildLabel}">
+				<include name="${warlock-version}/index.html"/>
+			</fileset>
+		</scp>
+		
+		<ant antfile="sourceforgeRelease.xml"/>
+	</target>
+		
 	<macrodef name="antRunner">
 		<attribute name="antfile"/>
 		<element name="arguments" implicit="true" optional="true"/>

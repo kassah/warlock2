@@ -12,26 +12,26 @@
 	    <pathelement location="lib/ant-contrib-1.0b3.jar"/>
 	  </classpath>
 	</taskdef>
-	<import file="replaceVersions.xml"/>
+	<import file="common.xml"/>
 	
 	<property file="warlock-build.properties"/>
 	<property file="build.properties"/>
 	
 	<target name="prepare-installer">
-		<for param="binary">
-			<fileset dir="${buildDirectory}/${buildLabel}">
-				<include name="${buildId}*.*"/>
-			</fileset>
+		<getPlatforms property="platforms"/>
+		<for param="platform-name" list="${platforms}">
 			<sequential>
-				<propertyregex
-					property="platform-name"
-					input="@{binary}"
-					regexp="${buildId}-(.+)-(.+)\.(.+)"
-					select="\2"
-					override="true"/>
-				
-				<mkdir dir="installer/binaries/${platform-name}"/>
-				<unzip src="@{binary}" dest="installer/binaries/${platform-name}"/>
+				<mkdir dir="installer/binaries/@{platform-name}"/>
+				<property name="binary-prefix" value="${buildDirectory}/${buildLabel}/${warlock-version}/${buildId}-${warlock-version}-@{platform-name}"/>
+				<if>
+					<available file="${binary-prefix}.zip"/>
+					<then>
+						<unzip src="${binary-prefix}.zip" dest="installer/binaries/@{platform-name}"/>		
+					</then>
+					<else>
+						<untar src="${binary-prefix}.tar.gz" compression="gzip" dest="installer/binaries/@{platform-name}" />
+					</else>
+				</if>
 			</sequential>
 		</for>
 		
@@ -47,23 +47,14 @@
 	<target name="build-installers" depends="prepare-installer">
 		<getWarlockVersion property="warlock-version"/>
 		
-		<for param="binary">
-			<fileset dir="${buildDirectory}/${buildLabel}">
-				<include name="${buildId}*.*"/>
-			</fileset>
+		<for param="platform-name" list="${platforms}">
 			<sequential>
-				<propertyregex
-					property="platform-name"
-					input="@{binary}"
-					regexp="${buildId}-(.+)-(.+)\.(.+)"
-					select="\2"
-					override="true"/>
 		
-				<var name="warlock-output-dir" value="binaries/${platform-name}/warlock2"/>
+				<var name="warlock-output-dir" value="binaries/@{platform-name}/warlock2"/>
 				<izpack
 					basedir="installer"
 					input="installer/install.xml"
-					output="${buildDirectory}/${buildLabel}/${buildId}-${warlock-version}-${platform-name}-installer.jar"
+					output="${buildDirectory}/${buildLabel}/${warlock-version}/${buildId}-${warlock-version}-@{platform-name}-installer.jar"
 					>
 					
 					<property name="warlock-version" value="${warlock-version}"/>
