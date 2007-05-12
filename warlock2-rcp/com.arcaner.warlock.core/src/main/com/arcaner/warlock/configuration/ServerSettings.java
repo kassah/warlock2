@@ -197,6 +197,8 @@ public class ServerSettings {
 		return WarlockColor.DEFAULT_COLOR;
 	}
 	
+	public static final int DEFAULT_FONT_SIZE = 12;
+	
 	public int getIntSetting (IntType settingType)
 	{
 		Element fontElement = null;
@@ -212,7 +214,7 @@ public class ServerSettings {
 			return getPixelSizeInPoints(Integer.parseInt(fontElement.attributeValue("size")));
 		}
 		
-		return -1;
+		return DEFAULT_FONT_SIZE;
 	}
 	
 	public WarlockColor getPaletteColor (int id)
