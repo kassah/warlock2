@@ -1,30 +1,41 @@
 
-header {
-	package com.arcaner.warlock.script.wsl.internal;
-}
-
-
-{ import java.util.ArrayList; }
-class WarlockWSLParser extends Parser;
+grammar wsl;
 options { k = 2; }
 
-script returns [ArrayList<ArrayList<String>> scriptLines]
-{ scriptLines = new ArrayList<ArrayList<String>>(); ArrayList<String> scriptLine, scriptLine2; }
-: (
-	scriptLine=line { if(!scriptLine.isEmpty())scriptLines.add(scriptLine); }
-	(EOL scriptLine2=line { if(!scriptLine2.isEmpty())scriptLines.add(scriptLine2); })*
-	(EOL)?
-	EOF
-);
+@parser::header {
+package com.arcaner.warlock.script.wsl.internal;
+}
 
-line returns [ArrayList<String> scriptLine]
-{ scriptLine = new ArrayList<String>(); }
-: (token:STRING {scriptLine.add(token.getText()); })*;
+@lexer::header {
+package com.arcaner.warlock.script.wsl.internal;
+}
 
-class WarlockWSLLexer extends Lexer;
+primary_exp:	exp_list | '(' or_exp ')';
+unary_exp:		primary_exp | '!' unary_exp | 'exists' unary_exp;
+multiply_exp:	unary_exp (('*' | '/') unary_exp)*;
+additive_exp:	multiply_exp (('+' | '-') multiply_exp)*;
+relational_exp:	additive_exp (('=' | '==' | '<=' | '>=' | '!=' | '<>' | '<' | '>') additive_exp)*;
+and_exp:		relational_exp ('&&' relational_exp)*;
+or_exp:			and_exp ('||' and_exp)*;
+if_var:			'if_' (alnum)+;
+if_statement:	'if' or_exp 'then';
+condition_statement:	if_var | if_statement;
 
-SPACE: (' ' | '\t' ) { $setType(Token.SKIP); };
-EOL: ('\n' {newline();} | '\r');
+label:			(alnum)+ ':';
 
-STRING: (~(' '|'\t'|'\r'|'\n'|'#'))+;
-COMMENT: '#' STRING EOL { $setType(Token.SKIP); };
+command:		arg_list;
+
+line:			space (label)? (comment | ((condition_statement)* command))? EOL;
+
+exp_list:		exp_data | (exp_data exp_list);
+exp_data:		(alnum (alnum | space)*) | script_variable;
+
+arg_list:		script_data | (script_data arg_list);
+script_data:	script_string | script_variable;
+script_variable:	'%' (alnum)+;
+script_string:	(~('%' | EOL))+;
+space:			(' ' | '\t' ) { skip(); };
+EOL:	('\n' | '\r' '\n') { };
+alnum: 'a'..'z' | 'A'..'Z' | '0'..'9';
+
+comment:		'#' (~('\n' | '\r'))* { skip(); };
