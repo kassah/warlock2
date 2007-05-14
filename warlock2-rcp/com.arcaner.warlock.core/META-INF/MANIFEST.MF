@@ -2,7 +2,7 @@ Manifest-Version: 1.0
 Bundle-ManifestVersion: 2
 Bundle-Name: Warlock2 Core Plug-in
 Bundle-SymbolicName: com.arcaner.warlock.core
-Bundle-Version: 2.0.0
+Bundle-Version: 2.0.246.snapshot
 Bundle-Activator: com.arcaner.warlock.core.Activator
 Bundle-Vendor: Warlock Team
 Require-Bundle: org.eclipse.core.runtime
@@ -17,19 +17,7 @@ Bundle-ClassPath: lib/js.jar,
  lib/antlr-2.7.7.jar,
  lib/antlr-3.0b7.jar,
  lib/stringtemplate-3.0.jar
-Export-Package: antlr,
- antlr.ASdebug,
- antlr.actions.cpp,
- antlr.actions.csharp,
- antlr.actions.java,
- antlr.actions.python,
- antlr.build,
- antlr.collections,
- antlr.collections.impl,
- antlr.debug,
- antlr.debug.misc,
- antlr.preprocessor,
- com.arcaner.warlock.client,
+Export-Package: com.arcaner.warlock.client,
  com.arcaner.warlock.client.internal,
  com.arcaner.warlock.client.stormfront,
  com.arcaner.warlock.client.stormfront.internal,
@@ -75,3 +63,4 @@ Export-Package: antlr,
  org.mozilla.javascript.tools.shell,
  org.mozilla.javascript.xml,
  org.mozilla.javascript.xmlimpl
+Bundle-RequiredExecutionEnvironment: J2SE-1.5
