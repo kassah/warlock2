@@ -2,7 +2,7 @@ package com.arcaner.warlock.rcp.ui.client;
 
 import com.arcaner.warlock.client.stormfront.IStormFrontClient;
 import com.arcaner.warlock.client.stormfront.IStormFrontClientViewer;
-import com.arcaner.warlock.configuration.ServerSettings;
+import com.arcaner.warlock.configuration.server.ServerSettings;
 
 public class SWTStormFrontClientViewer extends SWTWarlockClientViewer implements IStormFrontClientViewer
 {
