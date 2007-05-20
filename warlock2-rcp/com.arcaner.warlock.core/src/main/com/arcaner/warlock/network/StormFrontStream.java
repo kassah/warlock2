@@ -167,7 +167,8 @@ public class StormFrontStream extends InputStream {
 //			System.out.println("Original bytesRead: " + bytesRead + ", toRead: " + toRead + ", len: " + len);
 			
 			// do some debug outputting
-			System.out.write(b, off, bytesRead);
+//			if (bytesRead != -1)
+//				System.out.write(b, off, bytesRead);
 		} else {
 			if(buffer != null) {
 				bytesRead = 0;
