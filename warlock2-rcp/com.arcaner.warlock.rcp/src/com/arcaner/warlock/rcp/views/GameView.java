@@ -13,9 +13,13 @@ import org.eclipse.swt.events.FocusEvent;
 import org.eclipse.swt.events.FocusListener;
 import org.eclipse.swt.events.KeyEvent;
 import org.eclipse.swt.events.KeyListener;
+import org.eclipse.swt.events.SelectionAdapter;
+import org.eclipse.swt.events.SelectionEvent;
 import org.eclipse.swt.graphics.Color;
 import org.eclipse.swt.graphics.Font;
 import org.eclipse.swt.layout.GridData;
+import org.eclipse.swt.layout.GridLayout;
+import org.eclipse.swt.widgets.Button;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Text;
 import org.eclipse.ui.IWorkbenchPage;
@@ -25,7 +29,9 @@ import com.arcaner.warlock.client.IWarlockClient;
 import com.arcaner.warlock.client.stormfront.IStormFrontClient;
 import com.arcaner.warlock.client.stormfront.IStormFrontClientViewer;
 import com.arcaner.warlock.client.stormfront.WarlockColor;
-import com.arcaner.warlock.configuration.ServerSettings;
+import com.arcaner.warlock.configuration.server.ServerSettings;
+import com.arcaner.warlock.configuration.skin.IWarlockSkin;
+import com.arcaner.warlock.rcp.application.WarlockApplication;
 import com.arcaner.warlock.rcp.ui.WarlockCompass;
 import com.arcaner.warlock.rcp.ui.WarlockText;
 import com.arcaner.warlock.rcp.ui.client.SWTStormFrontClientViewer;
@@ -78,6 +84,7 @@ public class GameView extends StreamView implements KeyListener, IStormFrontClie
 			if (!firstInstanceIsUsed)
 			{
 				firstInstanceIsUsed = true;
+				viewInFocus = firstInstance;
 				return firstInstance;
 			}
 			
@@ -85,6 +92,7 @@ public class GameView extends StreamView implements KeyListener, IStormFrontClie
 				IWorkbenchPage page = firstInstance.getSite().getPage();
 				try {
 					GameView nextInstance = (GameView) page.showView(VIEW_ID, generateUniqueId(), IWorkbenchPage.VIEW_ACTIVATE);
+					viewInFocus = nextInstance;
 					return nextInstance;
 				} catch (PartInitException e) {
 					e.printStackTrace();
@@ -188,17 +196,17 @@ public class GameView extends StreamView implements KeyListener, IStormFrontClie
 	
 	public void loadServerSettings (final ServerSettings settings)
 	{
-		WarlockColor bg = settings.getColorSetting(ServerSettings.ColorType.MainWindow_Background);
-		WarlockColor fg = settings.getColorSetting(ServerSettings.ColorType.MainWindow_Foreground);
+		WarlockColor bg = settings.getColorSetting(IWarlockSkin.ColorType.MainWindow_Background);
+		WarlockColor fg = settings.getColorSetting(IWarlockSkin.ColorType.MainWindow_Foreground);
 		
-		String fontFace = settings.getStringSetting(ServerSettings.StringType.MainWindow_FontFace);
-		int fontSize = settings.getIntSetting(ServerSettings.IntType.MainWindow_FontSize);
+		String fontFace = settings.getFontFaceSetting(IWarlockSkin.FontFaceType.MainWindow_FontFace);
+		int fontSize = settings.getFontSizeSetting(IWarlockSkin.FontSizeType.MainWindow_FontSize);
 		
 		normalFont = fontFace == null ? JFaceResources.getDefaultFont() : new Font(getSite().getShell().getDisplay(), fontFace, fontSize, SWT.NONE);
 		text.setFont(normalFont);
 		
-		WarlockColor entryBG = settings.getColorSetting(ServerSettings.ColorType.CommandLine_Background);
-		WarlockColor entryFG = settings.getColorSetting(ServerSettings.ColorType.CommandLine_Foreground);
+		WarlockColor entryBG = settings.getColorSetting(IWarlockSkin.ColorType.CommandLine_Background);
+		WarlockColor entryFG = settings.getColorSetting(IWarlockSkin.ColorType.CommandLine_Foreground);
 		entry.setForeground(createColor(entryFG.equals(WarlockColor.DEFAULT_COLOR) ? fg  : entryFG));
 		entry.setBackground(createColor(entryBG.equals(WarlockColor.DEFAULT_COLOR) ? bg : entryBG));
 		
@@ -222,7 +230,9 @@ public class GameView extends StreamView implements KeyListener, IStormFrontClie
 	public void setStormFrontClient(IStormFrontClient client) {
 		this.client = client;
 		
-		setStream(client.getDefaultStream());
+		setMainStream(client.getDefaultStream());
+		addStream(client.getStream(IStormFrontClient.DEATH_STREAM_NAME));
+		
 		client.addViewer(wrapper);
 		
 		text.setText("");
