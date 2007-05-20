@@ -10,13 +10,19 @@ import com.arcaner.warlock.client.ICompass;
 import com.arcaner.warlock.client.IProperty;
 import com.arcaner.warlock.client.IWarlockStyle;
 import com.arcaner.warlock.client.IWarlockClient;
-import com.arcaner.warlock.configuration.ServerSettings;
+import com.arcaner.warlock.configuration.server.ServerSettings;
 import com.arcaner.warlock.script.IScriptCommands;
 
 /**
  * @author Marshall
  */
 public interface IStormFrontClient extends IWarlockClient {
+	
+	public static final String DEATH_STREAM_NAME = "death";
+	
+	public static final String INVENTORY_STREAM_NAME = "inv";
+	
+	public static final String THOUGHTS_STREAM_NAME = "thoughts";
 	
 	/**
 	 * The server settings for this client
@@ -82,4 +88,9 @@ public interface IStormFrontClient extends IWarlockClient {
 	 * @return The script commands interface that corresponds to this client
 	 */
 	public IScriptCommands getScriptCommands ();
+	
+	/**
+	 * @return The name of the character associated with this client.
+	 */
+	public IProperty<String> getCharacterName();
 }

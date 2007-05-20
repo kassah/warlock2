@@ -17,8 +17,8 @@ import com.arcaner.warlock.client.internal.Compass;
 import com.arcaner.warlock.client.internal.WarlockClient;
 import com.arcaner.warlock.client.internal.WarlockStyle;
 import com.arcaner.warlock.client.stormfront.IStormFrontClient;
-import com.arcaner.warlock.configuration.ServerSettings;
 import com.arcaner.warlock.configuration.WarlockConfiguration;
+import com.arcaner.warlock.configuration.server.ServerSettings;
 import com.arcaner.warlock.network.StormFrontConnection;
 import com.arcaner.warlock.script.IScriptCommands;
 import com.arcaner.warlock.script.internal.ScriptCommands;
@@ -41,7 +41,7 @@ public class StormFrontClient extends WarlockClient implements IStormFrontClient
 	protected StringBuffer buffer = new StringBuffer();
 	protected IStormFrontProtocolHandler handler;
 	protected boolean isBold;
-	protected ClientProperty<String> playerId;
+	protected ClientProperty<String> playerId, characterName;
 	protected IWarlockStyle currentStyle = WarlockStyle.EMPTY_STYLE;
 	protected ServerSettings serverSettings;
 	protected RoundtimeRunnable rtRunnable;
@@ -56,6 +56,7 @@ public class StormFrontClient extends WarlockClient implements IStormFrontClient
 		fatigue = new ClientProperty<Integer>(this, "fatigue");
 		spirit = new ClientProperty<Integer>(this, "spirit");
 		playerId = new ClientProperty<String>(this, "playerId");
+		characterName = new ClientProperty<String>(this, "characterName");
 		serverSettings = new ServerSettings(this);
 		rtRunnable = new RoundtimeRunnable();
 		scriptCommands = new ScriptCommands(this);
@@ -192,5 +193,9 @@ public class StormFrontClient extends WarlockClient implements IStormFrontClient
 	
 	public IScriptCommands getScriptCommands() {
 		return scriptCommands;
+	}
+	
+	public IProperty<String> getCharacterName() {
+		return characterName;
 	}
 }
