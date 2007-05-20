@@ -51,11 +51,13 @@ public class SettingsTagHandler extends DefaultTagHandler {
 		try {
 
 			FileOutputStream stream = new FileOutputStream(serverSettings);
-			TransformerFactory factory = TransformerFactory.newInstance();
-			Transformer transformer = factory.newTransformer();
-			transformer.setOutputProperty(OutputKeys.INDENT, "yes");
-			transformer.setOutputProperty("{http://xml.apache.org/xslt}indent-amount", "2");
-			transformer.transform(new StreamSource(new ByteArrayInputStream(buffer.toString().getBytes())), new StreamResult(stream));
+			stream.write(buffer.toString().getBytes());
+			
+//			TransformerFactory factory = TransformerFactory.newInstance();
+//			Transformer transformer = factory.newTransformer();
+//			transformer.setOutputProperty(OutputKeys.INDENT, "yes");
+//			transformer.setOutputProperty("{http://xml.apache.org/xslt}indent-amount", "2");
+//			transformer.transform(new StreamSource(new ByteArrayInputStream(buffer.toString().getBytes())), new StreamResult(stream));
 //			stream.write(buffer.toString().getBytes());
 			stream.close();
 			buffer = null;
