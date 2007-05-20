@@ -66,4 +66,8 @@ public abstract class WarlockClient implements IWarlockClient {
 	public IStream getStream(String streamName) {
 		return Stream.fromName(streamPrefix + streamName);
 	}
+	
+	public IConnection getConnection() {
+		return connection;
+	}
 }

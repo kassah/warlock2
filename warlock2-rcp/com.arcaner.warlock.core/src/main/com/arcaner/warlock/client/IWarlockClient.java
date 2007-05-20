@@ -6,7 +6,7 @@ package com.arcaner.warlock.client;
 import java.io.IOException;
 import java.util.Collection;
 
-import com.arcaner.warlock.script.IScriptCommands;
+import com.arcaner.warlock.network.IConnection;
 
 
 
@@ -61,4 +61,12 @@ public interface IWarlockClient {
 	 * @return The stream associated with the given name. If this stream does not exist, it will be lazily created.
 	 */
 	public IStream getStream(String streamName);
+	
+	/**
+	 * Get the connection associated with this client.
+	 * @@WARNING@@ 
+	 * Do not use the raw connection unless you know what you are doing!
+	 * @return
+	 */
+	public IConnection getConnection ();
 }
