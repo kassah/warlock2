@@ -25,5 +25,6 @@ public class AppTagHandler extends DefaultTagHandler {
 		String gameName = atts.getValue("game");
 		
 		handler.getClient().getDefaultStream().getTitle().set("[" + gameName + "] " + characterName);
+		handler.getClient().getCharacterName().set(new String(characterName));
 	}
 }
