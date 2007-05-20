@@ -54,6 +54,9 @@ public class WarlockSharedImages {
 	public static final String IMG_COMPASS_SMALL_OUT_ON = "/images/compass/small/out_on.png";
 	
 	public static final String IMG_CONNECT = "/images/connect.png";
+	public static final String IMG_WINDOW = "/images/window.png";
+	public static final String IMG_ADD = "/images/add.png";
+	public static final String IMG_REMOVE = "/images/remove.png";
 	
 	private static WarlockSharedImages instance;
 	
