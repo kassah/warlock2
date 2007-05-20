@@ -10,7 +10,9 @@ import org.eclipse.swt.widgets.Display;
 import com.arcaner.warlock.client.IWarlockStyle;
 import com.arcaner.warlock.client.internal.WarlockStyle;
 import com.arcaner.warlock.client.stormfront.WarlockColor;
-import com.arcaner.warlock.configuration.ServerSettings;
+import com.arcaner.warlock.configuration.server.Preset;
+import com.arcaner.warlock.configuration.server.ServerSettings;
+import com.arcaner.warlock.configuration.skin.IWarlockSkin;
 import com.arcaner.warlock.rcp.ui.StyleRangeWithData;
 
 public class StyleMappings {
@@ -38,8 +40,8 @@ public class StyleMappings {
 				range.underline = true;
 			else if (styleType.equals(IWarlockStyle.StyleType.MONOSPACE))
 			{
-				String monoFontFace = settings.getStringSetting(ServerSettings.StringType.MainWindow_MonoFontFace);
-				int monoFontSize = settings.getIntSetting(ServerSettings.IntType.MainWindow_MonoFontSize);
+				String monoFontFace = settings.getFontFaceSetting(IWarlockSkin.FontFaceType.MainWindow_MonoFontFace);
+				int monoFontSize = settings.getFontSizeSetting(IWarlockSkin.FontSizeType.MainWindow_MonoFontSize);
 				if (monoFontFace != null)
 				{
 					if (JFaceResources.getFontRegistry().hasValueFor(monoFontFace))
@@ -65,15 +67,16 @@ public class StyleMappings {
 //				range.font = JFaceResources.getFont(systemStyle.getFontName());
 //		}
 		
-		WarlockColor foreground = settings.getPresetForegroundColor(style.getStyleName());
-		WarlockColor background = settings.getPresetBackgroundColor(style.getStyleName());
+		Preset stylePreset = settings.getPreset(style.getStyleName());
+		WarlockColor foreground = stylePreset == null ? WarlockColor.DEFAULT_COLOR : stylePreset.getForegroundColor();
+		WarlockColor background = stylePreset == null ? WarlockColor.DEFAULT_COLOR : stylePreset.getBackgroundColor();
 		
 		if (foreground != WarlockColor.DEFAULT_COLOR)
 			range.foreground = new Color(display, foreground.getRed(), foreground.getGreen(), foreground.getBlue());
 		if (background != WarlockColor.DEFAULT_COLOR)
 			range.background = new Color(display, background.getRed(), background.getGreen(), background.getBlue());
 		
-		if (settings.getPresetFillEntireLine(style.getStyleName()))
+		if (stylePreset != null && stylePreset.isFillEntireLine())
 		{
 			range.data.put(FILL_ENTIRE_LINE, "true");
 		}
