@@ -2,7 +2,6 @@ package com.arcaner.warlock.rcp.prefs;
 
 
 import org.eclipse.jface.preference.ColorSelector;
-import org.eclipse.jface.preference.PreferencePage;
 import org.eclipse.jface.resource.JFaceResources;
 import org.eclipse.jface.util.IPropertyChangeListener;
 import org.eclipse.jface.util.PropertyChangeEvent;
@@ -20,14 +19,15 @@ import org.eclipse.swt.widgets.Control;
 import org.eclipse.swt.widgets.Group;
 import org.eclipse.swt.widgets.Label;
 import org.eclipse.ui.IWorkbench;
-import org.eclipse.ui.IWorkbenchPreferencePage;
+import org.eclipse.ui.IWorkbenchPropertyPage;
+import org.eclipse.ui.dialogs.PropertyPage;
 
 import com.arcaner.warlock.rcp.ui.style.SavedStyles;
 import com.arcaner.warlock.rcp.ui.style.Style;
 import com.arcaner.warlock.rcp.util.FontSelector;
 
-public class StandardColorsAndFontsPreferencePage extends PreferencePage implements
-		IWorkbenchPreferencePage {
+public class PresetsPreferencePage extends PropertyPage implements
+		IWorkbenchPropertyPage {
 
 	public static final String PAGE_ID = "com.arcaner.warlock.rcp.prefs.standardColorsAndFonts";
 	
@@ -48,16 +48,11 @@ public class StandardColorsAndFontsPreferencePage extends PreferencePage impleme
 	private StyleRange roomNameStyleRange;
 	private StyleRange speechStyleRange;
 	
-	public StandardColorsAndFontsPreferencePage() {
-		super("Standard Colors");
-	}
-
 	@Override
 	protected Control createContents(Composite parent) {
 		Composite main = new Composite (parent, SWT.NONE);
 		main.setLayout(new GridLayout(3, false));
 		main.setLayoutData(new GridData(GridData.FILL_BOTH));
-
 		
 		mainBGSelector = colorSelectorWithLabel(main, "Main window background color:");
 		mainFGSelector = colorSelectorWithLabel(main, "Main window foreground color:");
