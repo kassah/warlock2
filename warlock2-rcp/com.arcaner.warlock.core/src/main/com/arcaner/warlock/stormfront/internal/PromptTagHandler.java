@@ -29,12 +29,17 @@ public class PromptTagHandler extends DefaultTagHandler {
 	}
 	
 	public void handleStart(Attributes atts) {
-		currentTime = Integer.parseInt(atts.getValue("time"));
-		if (roundtimeHandler.isWaitingForPrompt()) {
-			roundtimeHandler.processFollowingPrompt(currentTime);
-		}
+		prompt = null;
 		
-		prompt = "";
+		if (atts.getValue("time") != null)
+		{
+			currentTime = Integer.parseInt(atts.getValue("time"));
+			if (roundtimeHandler.isWaitingForPrompt()) {
+				roundtimeHandler.processFollowingPrompt(currentTime);
+			}
+			
+			prompt = "";
+		}
 	}
 	
 	public boolean handleCharacters(char[] ch, int start, int length) {
@@ -44,6 +49,7 @@ public class PromptTagHandler extends DefaultTagHandler {
 	
 	@Override
 	public void handleEnd() {
-		client.getDefaultStream().prompt(prompt);
+		if (prompt != null)
+			client.getDefaultStream().prompt(prompt);
 	}
 }
