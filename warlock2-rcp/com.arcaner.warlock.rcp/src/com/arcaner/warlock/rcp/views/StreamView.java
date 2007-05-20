@@ -26,7 +26,9 @@ import com.arcaner.warlock.client.IWarlockStyle;
 import com.arcaner.warlock.client.PropertyListener;
 import com.arcaner.warlock.client.stormfront.IStormFrontClient;
 import com.arcaner.warlock.client.stormfront.WarlockColor;
-import com.arcaner.warlock.configuration.ServerSettings;
+import com.arcaner.warlock.configuration.server.HighlightString;
+import com.arcaner.warlock.configuration.server.ServerSettings;
+import com.arcaner.warlock.configuration.skin.IWarlockSkin;
 import com.arcaner.warlock.rcp.ui.StyleRangeWithData;
 import com.arcaner.warlock.rcp.ui.WarlockText;
 import com.arcaner.warlock.rcp.ui.client.SWTPropertyListener;
@@ -34,23 +36,31 @@ import com.arcaner.warlock.rcp.ui.client.SWTStreamListener;
 import com.arcaner.warlock.rcp.ui.style.StyleMappings;
 
 public class StreamView extends ViewPart implements IStreamListener, LineBackgroundListener {
-	public static final String VIEW_ID = "com.arcaner.warlock.rcp.views.StreamView";
+	
+	public static final String STREAM_VIEW_PREFIX = "com.arcaner.warlock.rcp.views.stream.";
+	public static final String DEATH_VIEW_ID =  STREAM_VIEW_PREFIX + IStormFrontClient.DEATH_STREAM_NAME;
+	public static final String INVENTORY_VIEW_ID = STREAM_VIEW_PREFIX  + IStormFrontClient.INVENTORY_STREAM_NAME;
+	public static final String THOUGHTS_VIEW_ID = STREAM_VIEW_PREFIX + IStormFrontClient.THOUGHTS_STREAM_NAME ;
+	
 	protected static ArrayList<StreamView> openViews = new ArrayList<StreamView>();
 	
-	protected IStream stream;
+	protected IStream mainStream;
+	protected ArrayList<IStream> streams;
 	protected IStormFrontClient client;
 	protected WarlockText text;
 	protected Hashtable<Integer, Color> lineBackgrounds = new Hashtable<Integer,Color>();
 	protected Hashtable<Integer, Color> lineForegrounds = new Hashtable<Integer,Color>();
 	protected Composite mainComposite;
 	// This name is the 'suffix' part of the stream... so we will install listeners for each client
-	protected String streamName;
+	protected String mainStreamName;
 	protected SWTStreamListener streamListenerWrapper;
 	protected SWTPropertyListener<String> propertyListenerWrapper;
 	protected boolean appendNewlines = false;
 	
 	public StreamView() {
 		openViews.add(this);
+		streamListenerWrapper = new SWTStreamListener(this);
+		streams = new ArrayList<IStream>();
 	}
 
 	public static StreamView getViewForStream (String streamName) {
@@ -67,7 +77,7 @@ public class StreamView extends ViewPart implements IStreamListener, LineBackgro
 		
 		// none of the already created views match, create a new one
 		try {
-			StreamView nextInstance = (StreamView) page.showView(VIEW_ID, streamName, IWorkbenchPage.VIEW_ACTIVATE);
+			StreamView nextInstance = (StreamView) page.showView(STREAM_VIEW_PREFIX + streamName);
 			nextInstance.setStreamName(streamName);
 			
 			return nextInstance;
@@ -98,7 +108,7 @@ public class StreamView extends ViewPart implements IStreamListener, LineBackgro
 		GameView currentGameView = GameView.getViewInFocus();
 		if (currentGameView != null && currentGameView.getStormFrontClient() != null)
 		{
-			setPartName(currentGameView.getStormFrontClient().getStream(streamName).getTitle().get());
+			setPartName(currentGameView.getStormFrontClient().getStream(mainStreamName).getTitle().get());
 		}
 	}
 
@@ -108,14 +118,13 @@ public class StreamView extends ViewPart implements IStreamListener, LineBackgro
 
 	}
 
-	public IStream getStream() {
-		return stream;
+	public IStream getMainStream() {
+		return mainStream;
 	}
 
-	public void setStream(IStream stream) {
-		this.stream = stream;
+	public void setMainStream(IStream stream) {
+		this.mainStream = stream;
 		
-		streamListenerWrapper = new SWTStreamListener(this);
 		stream.addStreamListener(streamListenerWrapper);
 		propertyListenerWrapper = new SWTPropertyListener<String>(new PropertyListener<String>() {
 			@Override
@@ -129,9 +138,13 @@ public class StreamView extends ViewPart implements IStreamListener, LineBackgro
 		stream.getTitle().addListener(propertyListenerWrapper);
 	}
 	
+	public void addStream (IStream stream) {
+		stream.addStreamListener(streamListenerWrapper);
+		streams.add(stream);
+	}
 	
 	public void streamCleared(IStream stream) {
-		if (this.stream.equals(stream))
+		if (this.mainStream.equals(stream))
 			text.setText("");
 	}
 	
@@ -153,33 +166,33 @@ public class StreamView extends ViewPart implements IStreamListener, LineBackgro
 				font = parentStyle.font;
 		}
 		
-		for (String highlight : client.getServerSettings().getHighlightStrings())
+		for (HighlightString highlight : client.getServerSettings().getHighlightStrings())
 		{
-			int highlightLength = highlight.length();
-			int index = text.indexOf(highlight);
+			int highlightLength = highlight.getText().length();
+			int index = text.indexOf(highlight.getText());
 			while (index > -1)
 			{
 				StyleRangeWithData range = new StyleRangeWithData();
-				range.background = createColor(client.getServerSettings().getHighlightBackgroundColor(highlight));
-				range.foreground = createColor(client.getServerSettings().getHighlightForegroundColor(highlight));
+				range.background = createColor(highlight.getBackgroundColor());
+				range.foreground = createColor(highlight.getForegroundColor());
 				range.start = start + index;
 				range.length = highlightLength;
 				range.font = font;
 				
-				if (client.getServerSettings().getHighlightFillEntireLine(highlight))
+				if (highlight.isFillEntireLine())
 				{
 					lineBackgrounds.put(lineIndex, range.background);
 					lineForegrounds.put(lineIndex, range.foreground);
 				}
 				
 				this.text.setStyleRange(range);
-				index = text.indexOf(highlight, index+1);
+				index = text.indexOf(highlight.getText(), index+1);
 			}
 		}
 	}
 	
 	public void streamReceivedText(IStream stream, IStyledString string) {
-		if (this.stream.equals(stream))
+		if (this.mainStream.equals(stream) || this.streams.contains(stream))
 		{
 			String streamText = string.getBuffer().toString();
 			
@@ -195,6 +208,10 @@ public class StreamView extends ViewPart implements IStreamListener, LineBackgro
 				if (style.getStyleTypes().contains(IWarlockStyle.StyleType.LINK))
 				{
 					ranges[i].data.put("link.url", style.getLinkAddress().toString());
+					// skip any leading spaces
+					int j = 0;
+					while (string.getBuffer().charAt(j) == ' ') j++;
+					ranges[i].start = ranges[i].start + j;
 				}
 				i++;
 			}
@@ -209,7 +226,8 @@ public class StreamView extends ViewPart implements IStreamListener, LineBackgro
 					if (range.data.containsKey(StyleMappings.FILL_ENTIRE_LINE))
 					{
 						lineBackgrounds.put(lineIndex, range.background);
-						lineForegrounds.put(lineIndex, range.foreground);
+						if (range.foreground != null)
+							lineForegrounds.put(lineIndex, range.foreground);
 					}
 					applyUserHighlights(range, streamText, range.start, lineIndex);
 				}
@@ -241,7 +259,7 @@ public class StreamView extends ViewPart implements IStreamListener, LineBackgro
 	}
 	
 	public void streamEchoed(IStream stream, String text) {
-		if (this.stream.equals(stream))
+		if (this.mainStream.equals(stream) || this.streams.contains(stream))
 		{
 			StyleRange echoStyle = StyleMappings.getEchoStyle(client.getServerSettings(), this.text.getCharCount(), text.length());
 			this.text.append(text + "\n");
@@ -252,7 +270,7 @@ public class StreamView extends ViewPart implements IStreamListener, LineBackgro
 	}
 	
 	public void streamPrompted(IStream stream, String prompt) {
-		if (this.stream.equals(stream))
+		if (this.mainStream.equals(stream) || this.streams.contains(stream))
 		{
 			this.text.append(prompt);
 			scrollToBottom();
@@ -273,16 +291,16 @@ public class StreamView extends ViewPart implements IStreamListener, LineBackgro
 	{
 		this.client = client;
 		
-		setStream(client.getStream(streamName));
+		setMainStream(client.getStream(mainStreamName));
 	}
 	
 	public void loadServerSettings (ServerSettings settings)
 	{
 		// just inherit from the main window for now
-		WarlockColor bg = settings.getColorSetting(ServerSettings.ColorType.MainWindow_Background);
-		WarlockColor fg = settings.getColorSetting(ServerSettings.ColorType.MainWindow_Foreground);
-		String fontFace = settings.getStringSetting(ServerSettings.StringType.MainWindow_FontFace);
-		int fontSize = settings.getIntSetting(ServerSettings.IntType.MainWindow_FontSize);
+		WarlockColor bg = settings.getColorSetting(IWarlockSkin.ColorType.MainWindow_Background);
+		WarlockColor fg = settings.getColorSetting(IWarlockSkin.ColorType.MainWindow_Foreground);
+		String fontFace = settings.getFontFaceSetting(IWarlockSkin.FontFaceType.MainWindow_FontFace);
+		int fontSize = settings.getFontSizeSetting(IWarlockSkin.FontSizeType.MainWindow_FontSize);
 		
 		text.setBackground(createColor(bg));
 		text.setForeground(createColor(fg));
@@ -293,23 +311,42 @@ public class StreamView extends ViewPart implements IStreamListener, LineBackgro
 	
 	@Override
 	public void dispose() {
-		if (stream != null) {
+		if (mainStream != null) {
+			mainStream.removeStreamListener(streamListenerWrapper);
+			mainStream.getTitle().removeListener(propertyListenerWrapper);
+		}
+		
+		for (IStream stream : streams)
+		{
 			stream.removeStreamListener(streamListenerWrapper);
-			stream.getTitle().removeListener(propertyListenerWrapper);
 		}
 		
 		super.dispose();
 	}
 
+	@Override
+	public Object getAdapter(Class adapter) {
+		if (IStormFrontClient.class.equals(adapter))
+		{
+			return client;
+		}
+		return super.getAdapter(adapter);
+	}
+	
 	public String getStreamName() {
-		return streamName;
+		return mainStreamName;
 	}
 
 	public void setStreamName(String streamName) {
-		this.streamName = streamName;
+		this.mainStreamName = streamName;
 	}
 
 	public void setAppendNewlines(boolean appendNewlines) {
 		this.appendNewlines = appendNewlines;
+	}
+	
+	public void setViewTitle (String title)
+	{
+		setPartName(title);
 	}
 }
