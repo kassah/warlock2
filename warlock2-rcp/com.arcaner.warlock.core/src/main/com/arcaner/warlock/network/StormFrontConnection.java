@@ -72,7 +72,7 @@ public class StormFrontConnection implements IConnection {
 				socket = new Socket(host, port);
 				
 				sendLine(key);
-				sendLine("/FE:WIZARD /VERSION:1.0.1.22 /P:WIN_98 /XML");
+				sendLine("/FE:WARLOCK /VERSION:1.0.1.22 /XML");
 				
 				StormFrontStream inputStream = new StormFrontStream(StormFrontConnection.this, socket.getInputStream());
 
