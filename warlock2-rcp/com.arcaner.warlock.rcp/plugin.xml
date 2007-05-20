@@ -25,10 +25,21 @@
             name="Bars"
             id="com.arcaner.warlock.rcp.views.barsView"/>
       <view
-            allowMultiple="true"
+            allowMultiple="false"
             class="com.arcaner.warlock.rcp.views.StreamView"
-            id="com.arcaner.warlock.rcp.views.StreamView"
-            name="Stream View">
+            id="com.arcaner.warlock.rcp.views.stream.death"
+            name="Deaths">
+      </view>
+      <view
+            allowMultiple="false"
+            class="com.arcaner.warlock.rcp.views.StreamView"
+            id="com.arcaner.warlock.rcp.views.stream.inv"
+            name="Inventory">
+      </view>
+      <view
+            class="com.arcaner.warlock.rcp.views.StreamView"
+            id="com.arcaner.warlock.rcp.views.stream.thoughts"
+            name="Thoughts">
       </view>
    </extension>
    <extension
@@ -130,7 +141,7 @@
                mnemonic="P">
             <dynamic
                   class="com.arcaner.warlock.rcp.menu.StreamWindowContributionItem"
-                  id="com.arcaner.warlock.rcp.dynamiicViews">
+                  id="com.arcaner.warlock.rcp.dynamicViews">
             </dynamic>
             <separator
                   name="com.arcaner.warlock.rcp.separator2"
@@ -160,17 +171,60 @@
       </command>
    </extension>
    <extension
-         point="org.eclipse.ui.preferencePages">
+         point="org.eclipse.ui.propertyPages">
       <page
+            category="com.arcaner.warlock.rcp.prefs.characterPrefs"
             class="com.arcaner.warlock.rcp.prefs.LookAndFeelPreferencePage"
             id="com.arcaner.warlock.rcp.prefs.lookAndFeel"
             name="Look and Feel">
+         <enabledWhen>
+            <instanceof
+                  value="com.arcaner.warlock.rcp.views.GameView">
+            </instanceof>
+         </enabledWhen>
+      </page>
+      <page
+            class="com.arcaner.warlock.rcp.prefs.CharacterPreferencesPage"
+            id="com.arcaner.warlock.rcp.prefs.characterPrefs"
+            name="Character Preferences">
+         <enabledWhen>
+            <instanceof
+                  value="com.arcaner.warlock.rcp.views.GameView">
+            </instanceof>
+         </enabledWhen>
       </page>
       <page
             category="com.arcaner.warlock.rcp.prefs.lookAndFeel"
-            class="com.arcaner.warlock.rcp.prefs.StandardColorsAndFontsPreferencePage"
-            id="com.arcaner.warlock.rcp.prefs.standardColorsAndFonts"
-            name="Standard Colors">
+            class="com.arcaner.warlock.rcp.prefs.HighlightStringsPreferencePage"
+            id="com.arcaner.warlock.rcp.prefs.highlightStrings"
+            name="Highlight Strings">
+         <enabledWhen>
+            <instanceof
+                  value="com.arcaner.warlock.rcp.views.GameView">
+            </instanceof>
+         </enabledWhen>
+      </page>
+      <page
+            category="com.arcaner.warlock.rcp.prefs.lookAndFeel"
+            class="com.arcaner.warlock.rcp.prefs.HighlightNamesPreferencePage"
+            id="com.arcaner.warlock.rcp.prefs.highlightNames"
+            name="Highlight Names">
+         <enabledWhen>
+            <instanceof
+                  value="com.arcaner.warlock.rcp.views.GameView">
+            </instanceof>
+         </enabledWhen>
+      </page>
+      <page
+            category="com.arcaner.warlock.rcp.prefs.lookAndFeel"
+            class="com.arcaner.warlock.rcp.prefs.PresetsPreferencePage"
+            id="com.arcaner.warlock.rcp.prefs.standardPresets"
+            name="Standard Presets">
+         <enabledWhen>
+            <instanceof
+                  value="com.arcaner.warlock.rcp.views.GameView">
+            </instanceof>
+         </enabledWhen>
       </page>
    </extension>
 
