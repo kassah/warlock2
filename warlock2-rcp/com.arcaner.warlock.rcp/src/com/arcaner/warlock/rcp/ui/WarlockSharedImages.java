@@ -57,6 +57,10 @@ public class WarlockSharedImages {
 	public static final String IMG_WINDOW = "/images/window.png";
 	public static final String IMG_ADD = "/images/add.png";
 	public static final String IMG_REMOVE = "/images/remove.png";
+	public static final String IMG_LEFT_HAND = "/images/left_hand.gif";
+	public static final String IMG_RIGHT_HAND = "/images/right_hand.gif";
+	public static final String IMG_LEFT_HAND_SMALL = "/images/left_hand_small.gif";
+	public static final String IMG_RIGHT_HAND_SMALL= "/images/right_hand_small.gif";
 	
 	private static WarlockSharedImages instance;
 	

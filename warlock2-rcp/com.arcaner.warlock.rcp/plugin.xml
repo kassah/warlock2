@@ -41,6 +41,12 @@
             id="com.arcaner.warlock.rcp.views.stream.thoughts"
             name="Thoughts">
       </view>
+      <view
+            allowMultiple="false"
+            class="com.arcaner.warlock.rcp.views.HandsView"
+            id="com.arcaner.warlock.rcp.views.HandsView"
+            name="Hands">
+      </view>
    </extension>
    <extension
          id="warlock"

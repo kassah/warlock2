@@ -13,13 +13,9 @@ import org.eclipse.swt.events.FocusEvent;
 import org.eclipse.swt.events.FocusListener;
 import org.eclipse.swt.events.KeyEvent;
 import org.eclipse.swt.events.KeyListener;
-import org.eclipse.swt.events.SelectionAdapter;
-import org.eclipse.swt.events.SelectionEvent;
 import org.eclipse.swt.graphics.Color;
 import org.eclipse.swt.graphics.Font;
 import org.eclipse.swt.layout.GridData;
-import org.eclipse.swt.layout.GridLayout;
-import org.eclipse.swt.widgets.Button;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Text;
 import org.eclipse.ui.IWorkbenchPage;
@@ -31,7 +27,6 @@ import com.arcaner.warlock.client.stormfront.IStormFrontClientViewer;
 import com.arcaner.warlock.client.stormfront.WarlockColor;
 import com.arcaner.warlock.configuration.server.ServerSettings;
 import com.arcaner.warlock.configuration.skin.IWarlockSkin;
-import com.arcaner.warlock.rcp.application.WarlockApplication;
 import com.arcaner.warlock.rcp.ui.WarlockCompass;
 import com.arcaner.warlock.rcp.ui.WarlockText;
 import com.arcaner.warlock.rcp.ui.client.SWTStormFrontClientViewer;
@@ -238,6 +233,9 @@ public class GameView extends StreamView implements KeyListener, IStormFrontClie
 		text.setText("");
 		
 		compass.setCompass(client.getCompass());
+		
+		if (HandsView.getDefault() != null)
+			HandsView.getDefault().setClient(client);
 		
 		if (BarsView.getDefault() != null)
 			BarsView.getDefault().init(client);
