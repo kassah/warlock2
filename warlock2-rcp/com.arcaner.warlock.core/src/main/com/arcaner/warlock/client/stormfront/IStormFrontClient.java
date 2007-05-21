@@ -73,6 +73,16 @@ public interface IStormFrontClient extends IWarlockClient {
 	 * @return The client's compass.
 	 */
 	public ICompass getCompass();
+
+	/**
+	 * @return The left hand property
+	 */
+	public IProperty<String> getLeftHand();
+	
+	/**
+	 * @return The right hand property
+	 */
+	public IProperty<String> getRightHand();
 	
 	/**
 	 * Sets the current style of the storm front client
