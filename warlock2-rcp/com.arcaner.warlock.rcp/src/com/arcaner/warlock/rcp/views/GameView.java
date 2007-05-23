@@ -7,6 +7,8 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Random;
 
+import org.eclipse.core.runtime.IProgressMonitor;
+import org.eclipse.jface.dialogs.ProgressMonitorDialog;
 import org.eclipse.jface.resource.JFaceResources;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.FocusEvent;
@@ -18,8 +20,10 @@ import org.eclipse.swt.graphics.Font;
 import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Text;
+import org.eclipse.ui.ISharedImages;
 import org.eclipse.ui.IWorkbenchPage;
 import org.eclipse.ui.PartInitException;
+import org.eclipse.ui.PlatformUI;
 
 import com.arcaner.warlock.client.IWarlockClient;
 import com.arcaner.warlock.client.stormfront.IStormFrontClient;
@@ -187,6 +191,30 @@ public class GameView extends StreamView implements KeyListener, IStormFrontClie
 	private Color createColor (WarlockColor color)
 	{
 		return new Color(getSite().getShell().getDisplay(), color.getRed(), color.getGreen(), color.getBlue());
+	}
+	
+	private ProgressMonitorDialog settingsProgressDialog;
+	public void startDownloadingServerSettings() {
+		settingsProgressDialog = new ProgressMonitorDialog(getSite().getShell());
+		settingsProgressDialog.setBlockOnOpen(false);
+		settingsProgressDialog.open();
+		
+		IProgressMonitor monitor = settingsProgressDialog.getProgressMonitor();
+		monitor.beginTask("Downloading server settings...", SettingType.values().length);
+	}
+	
+	public void receivedServerSetting(SettingType settingType)
+	{
+		IProgressMonitor monitor = settingsProgressDialog.getProgressMonitor();
+		monitor.subTask("Downloading " + settingType.toString() + "...");
+		
+		monitor.worked(1);
+	}
+	
+	public void finishedDownloadingServerSettings() {
+		IProgressMonitor monitor = settingsProgressDialog.getProgressMonitor();
+		monitor.done();
+		settingsProgressDialog.close();
 	}
 	
 	public void loadServerSettings (final ServerSettings settings)

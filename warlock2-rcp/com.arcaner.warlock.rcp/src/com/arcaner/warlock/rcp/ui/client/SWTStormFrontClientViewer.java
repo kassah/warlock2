@@ -21,18 +21,22 @@ public class SWTStormFrontClientViewer extends SWTWarlockClientViewer implements
 	}
 	
 	private static enum EventType {
-		LoadServerSettings
+		LoadServerSettings, StartDownloadingServerSettings, ReceivedServerSetting, FinishedDownloadingServerSettings
 	};
 	
 	private class ListenerWrapper implements Runnable
 	{
 		private EventType eventType;
 		private ServerSettings settings;
+		private SettingType settingType;
 		
 		public void run() {
 			switch (eventType)
 			{
 				case LoadServerSettings: viewer.loadServerSettings(settings); break;
+				case StartDownloadingServerSettings: viewer.startDownloadingServerSettings(); break;
+				case ReceivedServerSetting: viewer.receivedServerSetting(settingType);
+				case FinishedDownloadingServerSettings: viewer.finishedDownloadingServerSettings(); break;
 			}
 			
 			settings = null;
@@ -49,4 +53,19 @@ public class SWTStormFrontClientViewer extends SWTWarlockClientViewer implements
 		return viewer.getStormFrontClient();
 	}
 
+	public void startDownloadingServerSettings() {
+		wrapper.eventType = EventType.StartDownloadingServerSettings;
+		run(wrapper);
+	}
+	
+	public void receivedServerSetting(SettingType settingType) {
+		wrapper.eventType = EventType.ReceivedServerSetting;
+		wrapper.settingType = settingType;
+		run(wrapper);
+	}
+	
+	public void finishedDownloadingServerSettings() {
+		wrapper.eventType = EventType.FinishedDownloadingServerSettings;
+		run(wrapper);
+	}
 }
