@@ -6,6 +6,7 @@
  */
 package com.arcaner.warlock.stormfront.internal;
 
+import java.util.ArrayList;
 import java.util.EmptyStackException;
 import java.util.HashMap;
 import java.util.Stack;
@@ -35,7 +36,7 @@ import com.arcaner.warlock.stormfront.IStormFrontTagHandler;
 public class StormFrontProtocolHandler extends DefaultHandler implements IStormFrontProtocolHandler {
 	
 	protected IStormFrontClient client;
-	protected HashMap<String, IStormFrontTagHandler> tagHandlers = new HashMap<String, IStormFrontTagHandler>();
+	protected HashMap<String, ArrayList<IStormFrontTagHandler>> tagHandlers = new HashMap<String, ArrayList<IStormFrontTagHandler>>();
 	protected Stack<IStream> streamStack = new Stack<IStream>();
 	protected Stack<String> tagStack = new Stack<String>();
 	protected Stack<IStyledString> bufferStack = new Stack<IStyledString>();
@@ -88,7 +89,11 @@ public class StormFrontProtocolHandler extends DefaultHandler implements IStormF
 	public void registerHandler(IStormFrontTagHandler tagHandler) {
 		for (String tagName : tagHandler.getTagNames())
 		{
-			tagHandlers.put(tagName, tagHandler);
+			if (!tagHandlers.containsKey(tagName))
+			{
+				tagHandlers.put(tagName, new ArrayList<IStormFrontTagHandler>());
+			}
+			tagHandlers.get(tagName).add(tagHandler);
 		}
 	}
 	
@@ -134,7 +139,6 @@ public class StormFrontProtocolHandler extends DefaultHandler implements IStormF
 		if (rawXMLBuffer != null)
 		{
 			rawXMLBuffer.append(StringEscapeUtils.escapeXml(String.copyValueOf(ch, start, length)));
-			return;
 		}
 		
 		boolean handled = false;
@@ -142,12 +146,18 @@ public class StormFrontProtocolHandler extends DefaultHandler implements IStormF
 		// get the handler
 		if(!tagStack.isEmpty()) {
 			String tagName = tagStack.peek();
-			IStormFrontTagHandler tagHandler = tagHandlers.get(tagName);
-		
+			
 			// if we have a handler, let it try to handle the characters
-			if(tagHandler != null) {
-				tagHandler.setCurrentTag(tagName);
-				handled = tagHandler.handleCharacters(ch, start, length);
+			if(tagHandlers.containsKey(tagName)) {
+				ArrayList<IStormFrontTagHandler> tagHandlers = this.tagHandlers.get(tagName);
+				for (IStormFrontTagHandler tagHandler : tagHandlers)
+				{
+					if (!handled)
+					{
+						tagHandler.setCurrentTag(tagName);
+						handled = tagHandler.handleCharacters(ch, start, length);
+					}
+				}
 			}
 		}
 		
@@ -206,7 +216,6 @@ public class StormFrontProtocolHandler extends DefaultHandler implements IStormF
 			} else {
 				rawXMLBuffer.append(repeat("\t", currentSpacing) + "</" + name + ">\n");
 				currentSpacing -= 1;
-				return;
 			}
 		}
 		
@@ -215,12 +224,20 @@ public class StormFrontProtocolHandler extends DefaultHandler implements IStormF
 		String popName = tagStack.pop();
 		assert(name == popName);
 		
+		boolean handled = false;
 		// call the method for the object
-        IStormFrontTagHandler tagHandler = tagHandlers.get(name);
-        if(tagHandler != null) {
-        	tagHandler.setCurrentTag(name);
-        	tagHandler.handleEnd();
-        }
+		if(tagHandlers.containsKey(name)) {
+			ArrayList<IStormFrontTagHandler> tagHandlers = this.tagHandlers.get(name);
+			for (IStormFrontTagHandler tagHandler : tagHandlers)
+			{
+				if (!handled)
+				{
+					tagHandler.setCurrentTag(name);
+					tagHandler.handleEnd();
+					handled = true;
+				}
+			}
+		}
 	}
 	
 	/* (non-Javadoc)
@@ -300,18 +317,25 @@ public class StormFrontProtocolHandler extends DefaultHandler implements IStormF
 			rawXMLBuffer.append(repeat("\t", currentSpacing) + startTag + "\n");
 			
 			currentSpacing += 1;
-			return;
 		}
         //System.out.print(">");
         
 		tagStack.push(name);
 		
-        // call the method for the object
-        IStormFrontTagHandler tagHandler = tagHandlers.get(name);
-        if(tagHandler != null) {
-        	tagHandler.setCurrentTag(name);
-        	tagHandler.handleStart(atts);
-        }
+		boolean handled = false;
+		// call the method for the object
+		if(tagHandlers.containsKey(name)) {
+			ArrayList<IStormFrontTagHandler> tagHandlers = this.tagHandlers.get(name);
+			for (IStormFrontTagHandler tagHandler : tagHandlers)
+			{
+				if (!handled)
+				{
+					tagHandler.setCurrentTag(name);
+					tagHandler.handleStart(atts);
+					handled = true;
+				}
+			}
+		}
 	}
 	
 	/* (non-Javadoc)
