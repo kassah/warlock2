@@ -10,9 +10,9 @@ import org.eclipse.ui.IPageLayout;
 import org.eclipse.ui.IPerspectiveFactory;
 import org.eclipse.ui.IPlaceholderFolderLayout;
 
-import com.arcaner.warlock.client.stormfront.IStormFrontClient;
 import com.arcaner.warlock.rcp.views.BarsView;
 import com.arcaner.warlock.rcp.views.GameView;
+import com.arcaner.warlock.rcp.views.HandsView;
 import com.arcaner.warlock.rcp.views.StreamView;
 
 /**
@@ -40,9 +40,10 @@ public class WarlockPerspectiveFactory implements IPerspectiveFactory {
 		
 		layout.setEditorAreaVisible(false);
 		layout.addView(GameView.VIEW_ID, IPageLayout.LEFT, 0.15f, layout.getEditorArea());
+		layout.addStandaloneView(HandsView.VIEW_ID, false, IPageLayout.TOP, 0.05f, GameView.VIEW_ID);
 		
 		IPlaceholderFolderLayout topFolder =
-			layout.createPlaceholderFolder(TOP_FOLDER_ID, IPageLayout.TOP, 0.15f, GameView.VIEW_ID);
+			layout.createPlaceholderFolder(TOP_FOLDER_ID, IPageLayout.TOP, 0.15f, HandsView.VIEW_ID);
 		
 		topFolder.addPlaceholder(StreamView.DEATH_VIEW_ID);
 		topFolder.addPlaceholder(StreamView.THOUGHTS_VIEW_ID);
