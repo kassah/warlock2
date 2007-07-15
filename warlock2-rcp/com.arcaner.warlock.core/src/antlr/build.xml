@@ -13,7 +13,7 @@
 			</classpath>
 			
 			<arg line="-o ${pkg}"/>
-			<arg value="wsl.g"/>
+			<arg value="WarlockWSL.g"/>
 		</java>
 	</target>
 
