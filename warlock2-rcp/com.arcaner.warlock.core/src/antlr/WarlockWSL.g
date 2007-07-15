@@ -1,5 +1,5 @@
 
-grammar wsl;
+grammar WarlockWSL;
 options { k = 2; }
 
 @parser::header {
