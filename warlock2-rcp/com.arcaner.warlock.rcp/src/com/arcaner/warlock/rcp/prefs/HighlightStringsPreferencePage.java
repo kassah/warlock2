@@ -25,7 +25,6 @@ import org.eclipse.swt.events.SelectionEvent;
 import org.eclipse.swt.events.SelectionListener;
 import org.eclipse.swt.graphics.Color;
 import org.eclipse.swt.graphics.Image;
-import org.eclipse.swt.graphics.RGB;
 import org.eclipse.swt.graphics.Rectangle;
 import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.layout.GridLayout;
@@ -43,6 +42,7 @@ import com.arcaner.warlock.client.stormfront.IStormFrontClient;
 import com.arcaner.warlock.client.stormfront.WarlockColor;
 import com.arcaner.warlock.configuration.server.HighlightString;
 import com.arcaner.warlock.rcp.ui.WarlockSharedImages;
+import com.arcaner.warlock.rcp.util.ColorUtil;
 
 public class HighlightStringsPreferencePage extends PropertyPage implements
 		IWorkbenchPropertyPage {
@@ -279,8 +279,8 @@ public class HighlightStringsPreferencePage extends PropertyPage implements
 		customBG.setSelection(!bgIsDefault);
 		customBGSelector.setEnabled(!bgIsDefault);
 		
-		customFGSelector.setColorValue(colorToRGB(fgColor));
-		customBGSelector.setColorValue(colorToRGB(bgColor));
+		customFGSelector.setColorValue(ColorUtil.warlockColorToRGB(fgColor));
+		customBGSelector.setColorValue(ColorUtil.warlockColorToRGB(bgColor));
 		fillLineButton.setSelection(string.isFillEntireLine());
 	}
 	
@@ -288,14 +288,14 @@ public class HighlightStringsPreferencePage extends PropertyPage implements
 	{
 		selectedString.setDefaultForegroundColor();
 		customFGSelector.setEnabled(false);
-		customFGSelector.setColorValue(colorToRGB(selectedString.getForegroundColor()));
+		customFGSelector.setColorValue(ColorUtil.warlockColorToRGB(selectedString.getForegroundColor()));
 		stringTable.update(selectedString, null);
 		setValid(true);
 	}
 	
 	private void customForegroundChanged ()
 	{
-		selectedString.setForegroundColor(rgbToColor(customFGSelector.getColorValue()));
+		selectedString.setForegroundColor(ColorUtil.rgbToWarlockColor(customFGSelector.getColorValue()));
 		stringTable.update(selectedString, null);
 		setValid(true);
 	}
@@ -304,14 +304,14 @@ public class HighlightStringsPreferencePage extends PropertyPage implements
 	{
 		selectedString.setDefaultBackgroundColor();
 		customBGSelector.setEnabled(false);
-		customBGSelector.setColorValue(colorToRGB(selectedString.getBackgroundColor()));
+		customBGSelector.setColorValue(ColorUtil.warlockColorToRGB(selectedString.getBackgroundColor()));
 		stringTable.update(selectedString, null);	
 		setValid(true);
 	}
 	
 	private void customBackgroundChanged ()
 	{
-		selectedString.setBackgroundColor(rgbToColor(customBGSelector.getColorValue()));
+		selectedString.setBackgroundColor(ColorUtil.rgbToWarlockColor(customBGSelector.getColorValue()));
 		stringTable.update(selectedString, null);
 		setValid(true);
 	}
@@ -329,16 +329,6 @@ public class HighlightStringsPreferencePage extends PropertyPage implements
 		
 		stringTable.add(newString);
 		stringTable.editElement(newString, 0);
-	}
-	
-	private RGB colorToRGB (WarlockColor color)
-	{
-		return new RGB(color.getRed(), color.getGreen(), color.getBlue());
-	}
-	
-	private WarlockColor rgbToColor (RGB rgb)
-	{
-		return new WarlockColor(rgb.red, rgb.green, rgb.blue);
 	}
 	
 	protected class StringsLabelProvider implements ITableLabelProvider, ITableColorProvider
@@ -365,14 +355,14 @@ public class HighlightStringsPreferencePage extends PropertyPage implements
 
 		public Color getBackground(Object element, int columnIndex) {
 			Color c = new Color(HighlightStringsPreferencePage.this.getShell().getDisplay(),
-					colorToRGB(((HighlightString)element).getBackgroundColor()));
+					ColorUtil.warlockColorToRGB(((HighlightString)element).getBackgroundColor()));
 			
 			return c;
 		}
 
 		public Color getForeground(Object element, int columnIndex) {
 			Color c = new Color(HighlightStringsPreferencePage.this.getShell().getDisplay(),
-					colorToRGB(((HighlightString)element).getForegroundColor()));
+					ColorUtil.warlockColorToRGB(((HighlightString)element).getForegroundColor()));
 			
 			return c;
 		}

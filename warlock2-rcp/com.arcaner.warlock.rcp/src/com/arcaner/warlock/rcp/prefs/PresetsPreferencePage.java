@@ -1,6 +1,7 @@
 package com.arcaner.warlock.rcp.prefs;
 
 
+import org.eclipse.core.runtime.IAdaptable;
 import org.eclipse.jface.preference.ColorSelector;
 import org.eclipse.jface.resource.JFaceResources;
 import org.eclipse.jface.util.IPropertyChangeListener;
@@ -18,18 +19,22 @@ import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Control;
 import org.eclipse.swt.widgets.Group;
 import org.eclipse.swt.widgets.Label;
-import org.eclipse.ui.IWorkbench;
 import org.eclipse.ui.IWorkbenchPropertyPage;
 import org.eclipse.ui.dialogs.PropertyPage;
 
+import com.arcaner.warlock.client.stormfront.IStormFrontClient;
+import com.arcaner.warlock.configuration.server.Preset;
+import com.arcaner.warlock.configuration.server.ServerSettings;
+import com.arcaner.warlock.configuration.skin.IWarlockSkin;
 import com.arcaner.warlock.rcp.ui.style.SavedStyles;
 import com.arcaner.warlock.rcp.ui.style.Style;
+import com.arcaner.warlock.rcp.util.ColorUtil;
 import com.arcaner.warlock.rcp.util.FontSelector;
 
 public class PresetsPreferencePage extends PropertyPage implements
 		IWorkbenchPropertyPage {
 
-	public static final String PAGE_ID = "com.arcaner.warlock.rcp.prefs.standardColorsAndFonts";
+	public static final String PAGE_ID = "com.arcaner.warlock.rcp.prefs.standardPresets";
 	
 	private RGB mainBG, mainFG, roomNameBG, roomNameFG, speechBG, speechFG;
 	private Font mainFont, roomNameFont, speechFont;
@@ -150,32 +155,29 @@ public class PresetsPreferencePage extends PropertyPage implements
 		SavedStyles.getStyleFromName(styleName).setFontName(font.toString());
 	}
 	
-	public void init(IWorkbench workbench) {
-		Style main = SavedStyles.getStyleFromName(SavedStyles.STYLE_MAIN_WINDOW);
-		if (main != null)
+	@Override
+	public void setElement(IAdaptable element) {
+		IStormFrontClient client = (IStormFrontClient) element.getAdapter(IStormFrontClient.class);
+		if (client != null)
 		{
-			if (main.getBackground() != null) mainBG = main.getBackground().getRGB();
-			if (main.getForeground() != null) mainFG = main.getForeground().getRGB();
-			if (main.getFontName() != null) mainFont = JFaceResources.getFont(main.getFontName());
-		}
-		
-		Style roomName = SavedStyles.getStyleFromName(SavedStyles.STYLE_ROOM_NAME);
-		if (roomName != null)
-		{
-			if (roomName.getBackground() != null) roomNameBG = roomName.getBackground().getRGB();
-			if (roomName.getForeground() != null) roomNameFG = roomName.getForeground().getRGB();
-			if (roomName.getFontName() != null) roomNameFont = JFaceResources.getFont(roomName.getFontName());
-		}
-		
-		Style speech = SavedStyles.getStyleFromName(SavedStyles.STYLE_SPEECH);
-		if (speech != null)
-		{
-			if (speech.getBackground() != null) speechBG = speech.getBackground().getRGB();
-			if (speech.getForeground() != null) speechFG = speech.getForeground().getRGB();
-			if (speech.getFontName() != null) speechFont = JFaceResources.getFont(speech.getFontName());
+			ServerSettings settings = client.getServerSettings();
+			
+			mainBG = ColorUtil.warlockColorToRGB(settings.getColorSetting(IWarlockSkin.ColorType.MainWindow_Background));
+			mainFG = ColorUtil.warlockColorToRGB(settings.getColorSetting(IWarlockSkin.ColorType.MainWindow_Foreground));
+			mainFont = JFaceResources.getFont(settings.getFontFaceSetting(IWarlockSkin.FontFaceType.MainWindow_FontFace));
+			
+			Preset roomNamePreset = settings.getPreset(Preset.PRESET_ROOM_NAME);
+			roomNameBG = ColorUtil.warlockColorToRGB(roomNamePreset.getBackgroundColor());
+			roomNameFG = ColorUtil.warlockColorToRGB(roomNamePreset.getForegroundColor());
+			roomNameFont = mainFont;
+			
+			Preset speechPreset = client.getServerSettings().getPreset(Preset.PRESET_SPEECH);
+			speechBG = ColorUtil.warlockColorToRGB(speechPreset.getBackgroundColor());
+			speechFG = ColorUtil.warlockColorToRGB(speechPreset.getForegroundColor());
+			speechFont = mainFont;
 		}
 	}
-
+	
 	private void initValues ()
 	{
 		if (mainBG != null)
