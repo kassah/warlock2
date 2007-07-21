@@ -75,6 +75,9 @@ public class ServerSettings implements Comparable<ServerSettings>
 			loadPalette();
 			loadPresets();
 			loadHighlightStrings();
+
+			// initalize before we call the viewers
+			defaultSkin = new DefaultSkin(this);
 			
 			for (IWarlockClientViewer v : client.getViewers())
 			{
@@ -82,7 +85,6 @@ public class ServerSettings implements Comparable<ServerSettings>
 				viewer.loadServerSettings(this);
 			}
 			
-			defaultSkin = new DefaultSkin(this);
 		} catch (FileNotFoundException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
