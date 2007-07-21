@@ -22,7 +22,7 @@
 		<for param="platform-name" list="${platforms}">
 			<sequential>
 				<mkdir dir="installer/binaries/@{platform-name}"/>
-				<property name="binary-prefix" value="${buildDirectory}/${buildLabel}/${warlock-version}/${buildId}-${warlock-version}-@{platform-name}"/>
+				<var name="binary-prefix" value="${buildDirectory}/${buildLabel}/${warlock-version}/${buildId}-${warlock-version}-@{platform-name}"/>
 				<if>
 					<available file="${binary-prefix}.zip"/>
 					<then>
