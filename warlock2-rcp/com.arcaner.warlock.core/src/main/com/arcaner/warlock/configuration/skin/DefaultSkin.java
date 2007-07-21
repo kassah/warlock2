@@ -37,14 +37,15 @@ public class DefaultSkin implements IWarlockSkin {
 		fgColors.put("command", skinColor("#FFFFFF"));
 		
 		WarlockColor mainFG = settings.getColorSetting(ColorType.MainWindow_Foreground, false);
-		fgColors.put("main", mainFG.equals(WarlockColor.DEFAULT_COLOR) ? skinColor("#F0F0FF") : mainFG);
-		
-		bgColors.put("roomName", skinColor("#0000FF"));
+		mainFG = mainFG.equals(WarlockColor.DEFAULT_COLOR) ? skinColor("#F0F0FF") : mainFG;
 		
 		WarlockColor mainBG = settings.getColorSetting(ColorType.MainWindow_Background, false);
 		mainBG = mainBG.equals(WarlockColor.DEFAULT_COLOR) ? skinColor("#191932") : mainBG;
 		
-		fgColors.put("main", mainBG);
+		fgColors.put("main", mainFG);
+		bgColors.put("main", mainBG);
+		
+		bgColors.put("roomName", skinColor("#0000FF"));
 		bgColors.put("bold", mainBG);
 		bgColors.put("speech", mainBG);
 		bgColors.put("whisper", mainBG);
