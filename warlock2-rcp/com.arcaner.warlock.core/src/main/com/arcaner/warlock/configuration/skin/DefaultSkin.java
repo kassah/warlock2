@@ -42,7 +42,7 @@ public class DefaultSkin implements IWarlockSkin {
 		bgColors.put("roomName", skinColor("#0000FF"));
 		
 		WarlockColor mainBG = settings.getColorSetting(ColorType.MainWindow_Background, false);
-		mainBG = mainBG.equals(WarlockColor.DEFAULT_COLOR) ? skinColor("#F0F0FF") : mainBG;
+		mainBG = mainBG.equals(WarlockColor.DEFAULT_COLOR) ? skinColor("#191932") : mainBG;
 		
 		fgColors.put("main", mainBG);
 		bgColors.put("bold", mainBG);
