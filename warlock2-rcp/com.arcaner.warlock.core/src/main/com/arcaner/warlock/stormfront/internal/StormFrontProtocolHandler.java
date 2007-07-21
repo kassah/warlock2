@@ -97,6 +97,14 @@ public class StormFrontProtocolHandler extends DefaultHandler implements IStormF
 		}
 	}
 	
+	public void removeHandler(IStormFrontTagHandler tagHandler) {
+		for (String tagName : tagHandlers.keySet())
+		{
+			if (tagHandlers.get(tagName).contains(tagHandler))
+				tagHandlers.get(tagName).remove(tagHandler);
+		}
+	}
+	
 	/*
 	 * The purpose of this function is painfully obvious.
 	 */

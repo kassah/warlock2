@@ -13,6 +13,7 @@ import com.arcaner.warlock.stormfront.IStormFrontProtocolHandler;
 public class SettingsTagHandler extends DefaultTagHandler {
 
 	private StringBuffer buffer = new StringBuffer();
+	private boolean handlingSettings = false;
 	
 	public SettingsTagHandler(IStormFrontProtocolHandler handler) {
 		super(handler);
@@ -35,21 +36,34 @@ public class SettingsTagHandler extends DefaultTagHandler {
 		}
 	}
 	
+	private static final String[] onlySettingsTag = new String[] { "settings" };
+	private static final String[] settingsTags = new String[] {
+		"settings", "presets", "strings", "stream", "scripts",
+		"names", "macros", "palette", "vars", "dialog",
+		"panels", "toggles", "misc", "options", "cmdline",
+		"keys", "p", "k", "i", "w", "h", "k", "v", "s", "m", "o",
+		"font", "columnFont", "detach", "ignores", "builtin",
+		"group", "toggles", "app", "display"};
+	
 	@Override
 	public String[] getTagNames() {
-		return new String[] {
-			"settings", "presets", "strings", "stream", "scripts",
-			"names", "macros", "palette", "vars", "dialog",
-			"panels", "toggles", "misc", "options", "cmdline",
-			"keys", "p", "k", "i", "w", "h", "k", "v", "s", "m", "o",
-			"font", "columnFont", "detach", "ignores", "builtin",
-			"group", "toggles", "app", "display"};
+		return handlingSettings ? settingsTags : onlySettingsTag;
+	}
+	
+	private void reregister ()
+	{
+		//forced re-registration to change which tags we handle
+		handler.removeHandler(this);
+		handler.registerHandler(this);
 	}
 	
 	@Override
 	public void handleStart(Attributes atts) {
 		if ("settings".equals(getCurrentTag()))
 		{
+			handlingSettings = true;
+			reregister();
+			
 			buffer.setLength(0);	
 			handler.startSavingRawXML(buffer, "settings");
 			visitViewers(new ViewerVisitor() {
@@ -64,6 +78,9 @@ public class SettingsTagHandler extends DefaultTagHandler {
 	public void handleEnd() {
 		if ("settings".equals(getCurrentTag()))
 		{
+			handlingSettings = false;
+			reregister();
+			
 			handler.stopSavingRawXML();
 			buffer.insert(0, "<?xml version=\"1.0\" encoding=\"ISO-8859-1\"?>\n<settings>\n");
 			buffer.append("</settings>");
