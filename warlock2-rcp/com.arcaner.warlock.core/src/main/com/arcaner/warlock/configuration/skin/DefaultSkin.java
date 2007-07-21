@@ -3,6 +3,7 @@ package com.arcaner.warlock.configuration.skin;
 import java.util.Hashtable;
 
 import com.arcaner.warlock.client.stormfront.WarlockColor;
+import com.arcaner.warlock.configuration.server.ServerSettings;
 
 /**
  * The default skin handles any attributes who's values are "skin"
@@ -12,8 +13,8 @@ public class DefaultSkin implements IWarlockSkin {
 
 	public static final int DEFAULT_FONT_SIZE = 12;
 	
-	protected static Hashtable<String, WarlockColor> fgColors = new Hashtable<String, WarlockColor>();
-	protected static Hashtable<String, WarlockColor> bgColors = new Hashtable<String, WarlockColor>();
+	protected Hashtable<String, WarlockColor> fgColors = new Hashtable<String, WarlockColor>();
+	protected Hashtable<String, WarlockColor> bgColors = new Hashtable<String, WarlockColor>();
 	
 	protected static WarlockColor skinColor (String color)
 	{
@@ -22,7 +23,8 @@ public class DefaultSkin implements IWarlockSkin {
 		return c;
 	}
 	
-	static {
+	public DefaultSkin (ServerSettings settings)
+	{
 		fgColors.put("bold", skinColor("#FFFF00"));
 		fgColors.put("roomName", skinColor("#FFFFFF"));
 		fgColors.put("speech", skinColor("#80FF80"));
@@ -33,10 +35,16 @@ public class DefaultSkin implements IWarlockSkin {
 		fgColors.put("link", skinColor("#62B0FF"));
 		fgColors.put("selectedLink", skinColor("#000000"));
 		fgColors.put("command", skinColor("#FFFFFF"));
-		fgColors.put("main", skinColor("#F0F0FF"));
+		
+		WarlockColor mainFG = settings.getColorSetting(ColorType.MainWindow_Foreground, false);
+		fgColors.put("main", mainFG.equals(WarlockColor.DEFAULT_COLOR) ? skinColor("#F0F0FF") : mainFG);
 		
 		bgColors.put("roomName", skinColor("#0000FF"));
-		WarlockColor mainBG = skinColor("#191932");
+		
+		WarlockColor mainBG = settings.getColorSetting(ColorType.MainWindow_Background, false);
+		mainBG = mainBG.equals(WarlockColor.DEFAULT_COLOR) ? skinColor("#F0F0FF") : mainBG;
+		
+		fgColors.put("main", mainBG);
 		bgColors.put("bold", mainBG);
 		bgColors.put("speech", mainBG);
 		bgColors.put("whisper", mainBG);

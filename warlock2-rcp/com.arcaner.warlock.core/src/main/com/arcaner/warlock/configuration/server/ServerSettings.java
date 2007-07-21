@@ -17,7 +17,7 @@ import com.arcaner.warlock.client.stormfront.IStormFrontClient;
 import com.arcaner.warlock.client.stormfront.IStormFrontClientViewer;
 import com.arcaner.warlock.client.stormfront.WarlockColor;
 import com.arcaner.warlock.configuration.WarlockConfiguration;
-import com.arcaner.warlock.configuration.skin.WarlockSkins;
+import com.arcaner.warlock.configuration.skin.DefaultSkin;
 import com.arcaner.warlock.configuration.skin.IWarlockSkin.ColorType;
 import com.arcaner.warlock.configuration.skin.IWarlockSkin.FontFaceType;
 import com.arcaner.warlock.configuration.skin.IWarlockSkin.FontSizeType;
@@ -34,6 +34,7 @@ public class ServerSettings implements Comparable<ServerSettings>
 	protected Palette palette;
 	protected Hashtable<String, Preset> presets;
 	protected Hashtable<String, HighlightString> highlightStrings;
+	protected DefaultSkin defaultSkin;
 	
 	private Element mainWindowElement, mainWindowFontElement,
 		mainWindowColumnFontElement, commandLineElement, paletteElement, presetsElement, stringsElement, namesElement;
@@ -80,6 +81,8 @@ public class ServerSettings implements Comparable<ServerSettings>
 				IStormFrontClientViewer viewer = (IStormFrontClientViewer) v;
 				viewer.loadServerSettings(this);
 			}
+			
+			defaultSkin = new DefaultSkin(this);
 		} catch (FileNotFoundException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
@@ -163,6 +166,11 @@ public class ServerSettings implements Comparable<ServerSettings>
 	
 	public WarlockColor getColorSetting (ColorType settingType)
 	{
+		return getColorSetting(settingType, true);
+	}
+	
+	public WarlockColor getColorSetting (ColorType settingType, boolean skinFallback)
+	{
 		String color = null;
 		
 		switch (settingType)
@@ -181,11 +189,15 @@ public class ServerSettings implements Comparable<ServerSettings>
 			paletteColor.addPaletteReference(this);
 			return paletteColor;
 		}
-		else if ("skin".equals(color))
+		else if ("skin".equals(color) && skinFallback)
 		{
-			return WarlockSkins.getDefault().getColor(settingType);
+			return defaultSkin.getColor(settingType);
 		}
-		else return new WarlockColor(color);
+		else if (color.charAt(0) == '#') {
+			return new WarlockColor(color);
+		}
+		
+		else return WarlockColor.DEFAULT_COLOR;
 	}
 	
 	
@@ -204,7 +216,7 @@ public class ServerSettings implements Comparable<ServerSettings>
 			return getPixelSizeInPoints(Integer.parseInt(fontElement.attributeValue("size")));
 		}
 		
-		return WarlockSkins.getDefault().getFontSize(settingType);
+		return defaultSkin.getFontSize(settingType);
 	}
 	
 	public Palette getPalette ()
@@ -372,5 +384,10 @@ public class ServerSettings implements Comparable<ServerSettings>
 	public int compareTo(ServerSettings o) {
 		if (this == o) return 0;
 		return -1;
+	}
+	
+	public DefaultSkin getDefaultSkin ()
+	{
+		return defaultSkin;
 	}
 }

@@ -4,10 +4,18 @@ import org.dom4j.Element;
 
 import com.arcaner.warlock.client.stormfront.WarlockColor;
 import com.arcaner.warlock.configuration.skin.IWarlockSkin;
-import com.arcaner.warlock.configuration.skin.WarlockSkins;
 
 public class Preset extends ServerSetting implements Comparable<Preset> {
 
+	public static final String PRESET_ROOM_NAME = "roomName";
+	public static final String PRESET_SPEECH = "speech";
+	public static final String PRESET_WHISPER = "whisper";
+	public static final String PRESET_THOUGHT = "thought";
+	public static final String PRESET_WATCHING = "watching";
+	public static final String PRESET_LINK = "link";
+	public static final String PRESET_SELECTED_LINK = "selectedLink";
+	public static final String PRESET_COMMAND = "command";
+	
 	public static final String KEY_FGCOLOR = "color";
 	public static final String KEY_BGCOLOR = "bgcolor";
 	public static final String KEY_FILL_ENTIRE_LINE = "line";
@@ -50,9 +58,9 @@ public class Preset extends ServerSetting implements Comparable<Preset> {
 		else if ("skin".equals(color))
 		{
 			if (KEY_FGCOLOR.equals(key))
-				return WarlockSkins.getDefault().getSkinForegroundColor(getName());
+				return serverSettings.getDefaultSkin().getSkinForegroundColor(getName());
 			else if (KEY_BGCOLOR.equals(key))
-				return WarlockSkins.getDefault().getSkinBackgroundColor(getName());
+				return serverSettings.getDefaultSkin().getSkinBackgroundColor(getName());
 		}
 		
 		return new WarlockColor(color);
