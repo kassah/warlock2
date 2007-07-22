@@ -96,6 +96,8 @@
 	</target>
 	
 	<target name="publish-build">
+		<getWarlockVersion property="warlock-version"/>
+		
 		<mkdir dir="${user.home}/.ant/lib"/>
 		<copy file="lib/jsch.jar" todir="${user.home}/.ant/lib"/>
 		
@@ -110,7 +112,7 @@
 		</copy>
 		
 		<echo>Publishing build ${warlock-version}...</echo>
-		<!--scp trust="true" todir="${sf.project.userName}@shell.sourceforge.net:/home/groups/w/wa/warlock/htdocs/builds" password="${sf.project.password}">
+		<!--scp  failonerror="true" verbose="true" trust="true" todir="${sf.project.userName}@shell.sourceforge.net:/home/groups/w/wa/warlock/htdocs/builds" password="${sf.project.password}">
 			<fileset file="${buildDirectory}/${buildLabel}/${warlock-version}/latest-build.php"/>
 			<fileset dir="${buildDirectory}/${buildLabel}">
 				<include name="${warlock-version}/index.php"/>
