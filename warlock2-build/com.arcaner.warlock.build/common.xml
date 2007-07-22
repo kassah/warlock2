@@ -20,11 +20,16 @@
 	<macrodef name="getWarlockVersion">
 		<attribute name="property"/>
 		<sequential>
-			<svn javahl="false">
-				<wcVersion path="../../warlock2-rcp"/>
-			</svn>
-			
-			<property name="@{property}" value="${warlock2-version-prefix}.${revision.max}.${warlock2-version-suffix}"/>
+			<if>
+				<not><isset property="@{property}"/></not>
+				<then>
+					<svn javahl="false">
+						<wcVersion path="../../warlock2-rcp"/>
+					</svn>
+					
+					<property name="@{property}" value="${warlock2-version-prefix}.${revision.max}.${warlock2-version-suffix}"/>
+				</then>
+			</if>
 		</sequential>
 	</macrodef>
 	
