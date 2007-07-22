@@ -75,8 +75,22 @@
 					replace="${buildId}-${warlock-version}-\1.\2"
 					override="true"/>
 				
+				<if>
+					<contains string="${new-binary-name}" substring=".tar.gz"/>
+					<then>
+						<propertyregex
+							property="new-binary-name"
+							input="${new-binary-name}"
+							regexp="\.tar\.gz"
+							replace=".zip"
+							override="true"
+						/>
+					</then>
+				</if>
+
 				<move file="@{binary}"  tofile="${new-binary-name}"/>
 				<move file="${new-binary-name}" todir="${buildDirectory}/${buildLabel}/${warlock-version}"/>
+				
 			</sequential>
 		</for>
 	</target>

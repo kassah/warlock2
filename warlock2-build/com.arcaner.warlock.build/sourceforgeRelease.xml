@@ -31,7 +31,7 @@
 		<getPlatformProperties platform="linux.gtk.x86"/> 
 		<getPlatformProperties platform="linux.gtk.x86_64"/>
 		<getPlatformProperties platform="win32.win32.x86"/>
-		<getPlatformProperties platform="macosx.carbon.ppc" binary-extension="tar.gz"/>
+		<getPlatformProperties platform="macosx.carbon.ppc"/>
 		
 		<echo>
 		Releasing ${warlock-version} on ${releasedate} files:
@@ -76,7 +76,7 @@
                   filetype="binary_zip"
                   processortype="i386"/>
 		<filespec file="${macosx.carbon.ppc-binary}"
-                  filetype="binary_gzip"
+                  filetype="binary_zip"
                   processortype="ppc"/>
       </sfpublish>
 	</target>
