@@ -45,7 +45,31 @@
 			${macosx.carbon.ppc-binary}
 		</echo>
 		
-		<sfpublish releasename="${warlock-version}"
+		<exec executable="perl">
+			<arg value="copher.pl"/>
+			<arg value="-u"/>
+			<arg value="${sf.project.userName}"/>
+			<arg value="-P"/>
+			<arg value="${sf.project.password}"/>
+			<arg value="-p"/>
+			<arg value="${sf.project.shortName}"/>
+			<arg value="-k"/>
+			<arg value="${sf.project.packageName}"/>
+			<arg value="-r"/>
+			<arg value="${warlock-version}-FAKEFAKE"/>
+			
+			<arg value="${linux.gtk.x86-installer}"/>
+			<arg value="${linux.gtk.x86_64-installer}"/>
+			<arg value="${win32.win32.x86-installer}"/>
+			<arg value="${macosx.carbon.ppc-installer}"/>
+			
+			<arg value="${linux.gtk.x86-binary}"/>
+			<arg value="${linux.gtk.x86_64-binary}"/>
+			<arg value="${win32.win32.x86-binary}"/>
+			<arg value="${macosx.carbon.ppc-binary}"/>
+		</exec>
+			
+		<!--sfpublish releasename="${warlock-version}"
                  packagename="${sf.project.packageName}"
                  packagehidden="no"
                  hidden="no"
@@ -78,7 +102,7 @@
 		<filespec file="${macosx.carbon.ppc-binary}"
                   filetype="binary_zip"
                   processortype="ppc"/>
-      </sfpublish>
+      </sfpublish-->
 	</target>
 	
 </project>
