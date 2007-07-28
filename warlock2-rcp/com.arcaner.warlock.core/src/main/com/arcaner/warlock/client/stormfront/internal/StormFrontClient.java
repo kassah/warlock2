@@ -37,7 +37,7 @@ public class StormFrontClient extends WarlockClient implements IStormFrontClient
 	protected ICompass compass;
 	protected int lastPrompt;
 	protected ClientProperty<Integer> roundtime, health, mana, fatigue, spirit;
-	protected ClientProperty<String> leftHand, rightHand;
+	protected ClientProperty<String> leftHand, rightHand, currentSpell;
 	protected boolean isPrompting = false;
 	protected StringBuffer buffer = new StringBuffer();
 	protected IStormFrontProtocolHandler handler;
@@ -52,6 +52,7 @@ public class StormFrontClient extends WarlockClient implements IStormFrontClient
 		compass = new Compass(this);
 		leftHand = new ClientProperty<String>(this, "leftHand");
 		rightHand = new ClientProperty<String>(this, "rightHand");
+		currentSpell = new ClientProperty<String>(this, "currentSpell");
 		
 		roundtime = new ClientProperty<Integer>(this, "roundtime");
 		health = new ClientProperty<Integer>(this, "health");
@@ -208,5 +209,9 @@ public class StormFrontClient extends WarlockClient implements IStormFrontClient
 	
 	public IProperty<String> getRightHand() {
 		return rightHand;
+	}
+	
+	public IProperty<String> getCurrentSpell() {
+		return currentSpell;
 	}
 }

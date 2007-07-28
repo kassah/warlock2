@@ -85,6 +85,11 @@ public interface IStormFrontClient extends IWarlockClient {
 	public IProperty<String> getRightHand();
 	
 	/**
+	 * @return The current spell property
+	 */
+	public IProperty<String> getCurrentSpell();
+	
+	/**
 	 * Sets the current style of the storm front client
 	 */
 	public void setCurrentStyle (IWarlockStyle style);
