@@ -232,8 +232,8 @@ public class ServerSettings implements Comparable<ServerSettings>
 	}
 	
 	public Collection<HighlightString> getHighlightStrings ()
-	{
-		return highlightStrings.values();
+	{	
+		return highlightStrings == null ? null : highlightStrings.values();
 	}
 	
 	public void clearHighlightStrings ()
