@@ -159,6 +159,9 @@ public class StreamView extends ViewPart implements IStreamListener, LineBackgro
 	
 	private void applyUserHighlights (StyleRange parentStyle, String text, int start, int lineIndex)
 	{
+		if (client.getServerSettings().getHighlightStrings() == null)
+			return;
+		
 		Font font = this.text.getFont();
 		if (parentStyle != null)
 		{
@@ -168,14 +171,14 @@ public class StreamView extends ViewPart implements IStreamListener, LineBackgro
 		
 		for (HighlightString highlight : client.getServerSettings().getHighlightStrings())
 		{
-			int highlightLength = highlight.getText().length();
+			int highlightLength = highlight.isFillEntireLine() ? text.length() : highlight.getText().length();
 			int index = text.indexOf(highlight.getText());
 			while (index > -1)
 			{
 				StyleRangeWithData range = new StyleRangeWithData();
 				range.background = createColor(highlight.getBackgroundColor());
 				range.foreground = createColor(highlight.getForegroundColor());
-				range.start = start + index;
+				range.start = highlight.isFillEntireLine() ? start : start + index;
 				range.length = highlightLength;
 				range.font = font;
 				
@@ -186,6 +189,10 @@ public class StreamView extends ViewPart implements IStreamListener, LineBackgro
 				}
 				
 				this.text.setStyleRange(range);
+				
+				if (highlight.isFillEntireLine())
+					break;
+				
 				index = text.indexOf(highlight.getText(), index+1);
 			}
 		}
