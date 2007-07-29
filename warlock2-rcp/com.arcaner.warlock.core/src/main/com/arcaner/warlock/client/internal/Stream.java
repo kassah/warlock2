@@ -70,7 +70,7 @@ public class Stream implements IStream {
 		// ignore empty lines (the tail end of stream appends etc) if we are currently prompting
 		if (isEmpty(data) && isPrompting)
 		{
-			if (newlineAfterPrompt) return;
+			if (newlineAfterPrompt && buffer == null) return;
 			newlineAfterPrompt = true;
 		}
 		
