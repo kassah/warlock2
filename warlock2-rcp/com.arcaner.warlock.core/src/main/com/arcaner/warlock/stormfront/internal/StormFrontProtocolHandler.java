@@ -86,6 +86,17 @@ public class StormFrontProtocolHandler extends DefaultHandler implements IStormF
 	/*
 	 * This function is to register handlers for xml tags
 	 */
+	public void registerHandler(IStormFrontTagHandler tagHandler, int priority) {
+		for (String tagName : tagHandler.getTagNames())
+		{
+			if (!tagHandlers.containsKey(tagName))
+			{
+				tagHandlers.put(tagName, new ArrayList<IStormFrontTagHandler>());
+			}
+			tagHandlers.get(tagName).add(priority, tagHandler);
+		}
+	}
+	
 	public void registerHandler(IStormFrontTagHandler tagHandler) {
 		for (String tagName : tagHandler.getTagNames())
 		{

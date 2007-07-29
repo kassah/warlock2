@@ -20,6 +20,8 @@ import com.arcaner.warlock.client.stormfront.IStormFrontClient;
 public interface IStormFrontProtocolHandler {
 	
 	public void registerHandler(IStormFrontTagHandler tagHandler);
+	public void registerHandler(IStormFrontTagHandler tagHandler, int priority);
+	
 	public void removeHandler(IStormFrontTagHandler tagHandler);
 	public IStormFrontClient getClient();
 	public void pushStream(String name);

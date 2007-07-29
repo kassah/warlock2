@@ -54,7 +54,7 @@ public class SettingsTagHandler extends DefaultTagHandler {
 	{
 		//forced re-registration to change which tags we handle
 		handler.removeHandler(this);
-		handler.registerHandler(this);
+		handler.registerHandler(this, 0);
 	}
 	
 	@Override
