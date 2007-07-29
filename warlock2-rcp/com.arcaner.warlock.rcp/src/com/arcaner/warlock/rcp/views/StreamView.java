@@ -218,6 +218,8 @@ public class StreamView extends ViewPart implements IStreamListener, LineBackgro
 			
 			this.text.append(streamText);
 			
+			boolean userHighlightsApplied = false;
+			
 			for (StyleRangeWithData range : ranges)
 			{
 				if (range != null) {
@@ -229,8 +231,14 @@ public class StreamView extends ViewPart implements IStreamListener, LineBackgro
 						if (range.foreground != null)
 							lineForegrounds.put(lineIndex, range.foreground);
 					}
+					
 					applyUserHighlights(range, streamText, range.start, lineIndex);
+					userHighlightsApplied = true;
 				}
+			}
+			
+			if (!userHighlightsApplied) {
+				applyUserHighlights(null, streamText, charCount, this.text.getLineAtOffset(charCount));
 			}
 			
 			scrollToBottom();
