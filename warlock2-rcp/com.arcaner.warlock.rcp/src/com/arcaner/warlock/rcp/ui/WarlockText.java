@@ -162,6 +162,8 @@ public class WarlockText extends StyledText {
 		});
 		
 		addPaintListener(new PaintListener () {
+
+			private boolean updating = false;
 			public void paintControl(PaintEvent e) {
 				for (Control anchoredControl : anchoredControls.keySet())
 				{
@@ -175,7 +177,12 @@ public class WarlockText extends StyledText {
 //					data.transparentPixel = SWT.COLOR_BLUE;
 //					anchoredControl.setBackgroundImage(new Image(getDisplay(), data));
 				}
-				update();
+				if (!updating)
+				{
+					updating = true;
+					update();
+					updating = false;
+				}
 			}
 		});
 	}
