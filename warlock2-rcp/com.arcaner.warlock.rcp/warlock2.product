@@ -16,6 +16,7 @@
       startupProgressRect="0,79,444,19" />
    <launcher name="warlock2">
       <linux icon="/com.arcaner.warlock.rcp/images/warlock-app-icon.xpm"/>
+      <macosx icon="/com.arcaner.warlock.rcp/images/warlock-app-icon.icns"/>
       <solaris/>
       <win useIco="false">
          <bmp
