@@ -21,8 +21,8 @@
 
 		<copy todir="${buildDirectory}/plugins">
 			<fileset dir="../../warlock2-rcp">
-				<include name="com.arcaner.warlock.core/**/*"/>
-				<include name="com.arcaner.warlock.rcp/**/*"/>
+				<include name="cc.warlock.core/**/*"/>
+				<include name="cc.warlock.rcp/**/*"/>
 			</fileset>
 		</copy>
 	</target>

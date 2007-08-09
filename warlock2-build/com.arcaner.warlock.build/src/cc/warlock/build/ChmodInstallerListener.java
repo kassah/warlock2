@@ -1,4 +1,4 @@
-package com.arcaner.warlock.build;
+package cc.warlock.build;
 
 import java.io.File;
 import java.io.IOException;

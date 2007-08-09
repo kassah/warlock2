@@ -6,11 +6,11 @@
 			Warlock @{warlock-version}
 		</appversion>
 		<authors>
-			<author name="Marshall Culpepper" email="marshall@arcaner.com" />
+			<author name="Marshall Culpepper" email="marshall@warlock.cc" />
 			<author name="Sean Proctor" email="sproctor@gmail.com"/>
-			<author name="Will Robertson" email="will@element9.net"/>
+			<author name="Will Robertson" email="will@warlock.cc"/>
 		</authors>
-		<url>http://warlock.sf.net/</url>
+		<url>http://warlock.cc/</url>
 		<javaversion>1.5</javaversion>
 		<summarylogfilepath>
 			$INSTALL_PATH/InstallSummary.html
@@ -84,7 +84,7 @@
 		<pack name="Warlock2 Core Plugins" required="yes">
 			<description>The Warlock2 core plugins (required)</description>
 			<fileset dir="@{warlock-output-dir}" targetdir="$INSTALL_PATH"/>
-			<singlefile src="@{warlock-output-dir}/plugins/com.arcaner.warlock.rcp_@{warlock-version}/images/character.gif" target="$INSTALL_PATH/warlock2.gif"/>
+			<singlefile src="@{warlock-output-dir}/plugins/cc.warlock.rcp_@{warlock-version}/images/character.gif" target="$INSTALL_PATH/warlock2.gif"/>
 		</pack>
 	</packs>
 	

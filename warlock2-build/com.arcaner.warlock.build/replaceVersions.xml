@@ -10,8 +10,8 @@
 		<getWarlockVersion property="version"/>
 		<echo>Building warlock version ${version}...</echo>
 		
-		<eclipse.versionReplacer path="${buildDirectory}/plugins/com.arcaner.warlock.core" version="${version}"/>
-		<eclipse.versionReplacer path="${buildDirectory}/plugins/com.arcaner.warlock.rcp" version="${version}"/>
+		<eclipse.versionReplacer path="${buildDirectory}/plugins/cc.warlock.core" version="${version}"/>
+		<eclipse.versionReplacer path="${buildDirectory}/plugins/cc.warlock.rcp" version="${version}"/>
 		
 	</target>
 	
