@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <feature
-      id="com.arcaner.warlock.feature"
+      id="cc.warlock.feature"
       label="Warlock2 Feature"
       version="1.0.0"
       provider-name="Warlock Team">
@@ -18,13 +18,13 @@
    </license>
 
    <plugin
-         id="com.arcaner.warlock.core"
+         id="cc.warlock.core"
          download-size="0"
          install-size="0"
          version="0.0.0"/>
 
    <plugin
-         id="com.arcaner.warlock.rcp"
+         id="cc.warlock.rcp"
          download-size="0"
          install-size="0"
          version="0.0.0"/>
