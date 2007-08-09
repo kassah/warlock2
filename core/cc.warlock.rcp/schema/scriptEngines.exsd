@@ -1,9 +1,9 @@
 <?xml version='1.0' encoding='UTF-8'?>
 <!-- Schema file written by PDE -->
-<schema targetNamespace="com.arcaner.warlock.rcp">
+<schema targetNamespace="cc.warlock.rcp">
 <annotation>
       <appInfo>
-         <meta.schema plugin="com.arcaner.warlock.rcp" id="scriptEngine" name="Warlock Script Engine"/>
+         <meta.schema plugin="cc.warlock.rcp" id="scriptEngine" name="Warlock Script Engine"/>
       </appInfo>
       <documentation>
          [Enter description of this extension point.]
@@ -50,7 +50,7 @@
                   
                </documentation>
                <appInfo>
-                  <meta.attribute kind="java" basedOn="com.arcaner.warlock.script.IScriptEngine"/>
+                  <meta.attribute kind="java" basedOn="cc.warlock.script.IScriptEngine"/>
                </appInfo>
             </annotation>
          </attribute>

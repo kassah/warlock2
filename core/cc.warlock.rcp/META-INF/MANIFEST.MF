@@ -1,34 +1,34 @@
 Manifest-Version: 1.0
 Bundle-ManifestVersion: 2
 Bundle-Name: Warlock: Simutronics Game Client
-Bundle-SymbolicName: com.arcaner.warlock.rcp;singleton:=true
+Bundle-SymbolicName: cc.warlock.rcp;singleton:=true
 Bundle-Version: 2.0.0
 Bundle-ClassPath: dom4j-1.5.2.jar,
  jaxen-1.1-beta-4.jar,
  warlock2-rcp.jar
-Bundle-Activator: com.arcaner.warlock.rcp.plugin.Warlock2Plugin
+Bundle-Activator: cc.warlock.rcp.plugin.Warlock2Plugin
 Bundle-Vendor: Warlock Team
 Bundle-Localization: plugin
 Require-Bundle: org.eclipse.core.runtime,
- com.arcaner.warlock.core,
+ cc.warlock.core,
  org.eclipse.swt,
  org.eclipse.jface,
  org.eclipse.ui
 Eclipse-LazyStart: true
-Export-Package: com.arcaner.warlock.rcp.actions,
- com.arcaner.warlock.rcp.application,
- com.arcaner.warlock.rcp.menu,
- com.arcaner.warlock.rcp.plugin,
- com.arcaner.warlock.rcp.prefs,
- com.arcaner.warlock.rcp.ui,
- com.arcaner.warlock.rcp.ui.client,
- com.arcaner.warlock.rcp.ui.macros,
- com.arcaner.warlock.rcp.ui.macros.internal,
- com.arcaner.warlock.rcp.ui.macros.internal.commands,
- com.arcaner.warlock.rcp.ui.macros.internal.variables,
- com.arcaner.warlock.rcp.ui.network,
- com.arcaner.warlock.rcp.ui.style,
- com.arcaner.warlock.rcp.util,
- com.arcaner.warlock.rcp.views,
- com.arcaner.warlock.rcp.wizards
+Export-Package: cc.warlock.rcp.actions,
+ cc.warlock.rcp.application,
+ cc.warlock.rcp.menu,
+ cc.warlock.rcp.plugin,
+ cc.warlock.rcp.prefs,
+ cc.warlock.rcp.ui,
+ cc.warlock.rcp.ui.client,
+ cc.warlock.rcp.ui.macros,
+ cc.warlock.rcp.ui.macros.internal,
+ cc.warlock.rcp.ui.macros.internal.commands,
+ cc.warlock.rcp.ui.macros.internal.variables,
+ cc.warlock.rcp.ui.network,
+ cc.warlock.rcp.ui.style,
+ cc.warlock.rcp.util,
+ cc.warlock.rcp.views,
+ cc.warlock.rcp.wizards
 Bundle-RequiredExecutionEnvironment: J2SE-1.5
