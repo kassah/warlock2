@@ -37,7 +37,7 @@ import cc.warlock.rcp.ui.style.StyleMappings;
 
 public class StreamView extends ViewPart implements IStreamListener, LineBackgroundListener {
 	
-	public static final String STREAM_VIEW_PREFIX = "com.arcaner.warlock.rcp.views.stream.";
+	public static final String STREAM_VIEW_PREFIX = "cc.warlock.rcp.views.stream.";
 	public static final String DEATH_VIEW_ID =  STREAM_VIEW_PREFIX + IStormFrontClient.DEATH_STREAM_NAME;
 	public static final String INVENTORY_VIEW_ID = STREAM_VIEW_PREFIX  + IStormFrontClient.INVENTORY_STREAM_NAME;
 	public static final String THOUGHTS_VIEW_ID = STREAM_VIEW_PREFIX + IStormFrontClient.THOUGHTS_STREAM_NAME ;

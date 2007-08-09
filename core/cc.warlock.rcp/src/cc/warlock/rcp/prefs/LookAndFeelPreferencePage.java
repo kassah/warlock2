@@ -11,7 +11,7 @@ import org.eclipse.ui.dialogs.PropertyPage;
 public class LookAndFeelPreferencePage extends PropertyPage implements
 		IWorkbenchPropertyPage {
 
-	public static final String PAGE_ID = "com.arcaner.warlock.rcp.prefs.lookAndFeel";
+	public static final String PAGE_ID = "cc.warlock.rcp.prefs.lookAndFeel";
 	
 	private IWorkbench workbench;
 	

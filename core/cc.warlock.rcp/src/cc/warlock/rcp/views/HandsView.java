@@ -15,7 +15,7 @@ import cc.warlock.rcp.ui.client.SWTPropertyListener;
 
 public class HandsView extends ViewPart implements IPropertyListener<String> 
 {
-	public static final String VIEW_ID = "com.arcaner.warlock.rcp.views.HandsView";
+	public static final String VIEW_ID = "cc.warlock.rcp.views.HandsView";
 	protected static HandsView _instance;
 	
 	protected Label leftHandText, rightHandText, spellText;

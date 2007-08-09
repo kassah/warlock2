@@ -9,7 +9,7 @@ import org.osgi.framework.BundleContext;
 public class Activator extends Plugin {
 
 	// The plug-in ID
-	public static final String PLUGIN_ID = "com.arcaner.warlock.core";
+	public static final String PLUGIN_ID = "cc.warlock.core";
 
 	// The shared instance
 	private static Activator plugin;

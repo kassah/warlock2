@@ -12,7 +12,7 @@ import cc.warlock.script.IScriptEngine;
 
 public class WarlockWSLEngine implements IScriptEngine {
 
-	public static final String ENGINE_ID = "com.arcaner.warlock.script.wsl.WarlockWSLEngine";
+	public static final String ENGINE_ID = "cc.warlock.script.wsl.WarlockWSLEngine";
 	
 	public String getScriptEngineId() {
 		return ENGINE_ID;

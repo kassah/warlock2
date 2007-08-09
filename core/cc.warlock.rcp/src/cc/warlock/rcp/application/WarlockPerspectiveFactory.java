@@ -22,11 +22,11 @@ public class WarlockPerspectiveFactory implements IPerspectiveFactory {
 
 	private static IPageLayout myLayout = null;
 	
-	public static final String WARLOCK_PERSPECTIVE_ID = "com.arcaner.warlock.warlockPerspective";
-	public static final String BOTTOM_FOLDER_ID = "com.arcaner.warlock.bottomFolder";
-	public static final String TOP_FOLDER_ID = "com.arcaner.warlock.topFolder";
-	public static final String RIGHT_FOLDER_ID = "com.arcaner.warlock.rightFolder";
-	public static final String LEFT_FOLDER_ID = "com.arcaner.warlock.leftFolder";
+	public static final String WARLOCK_PERSPECTIVE_ID = "cc.warlock.warlockPerspective";
+	public static final String BOTTOM_FOLDER_ID = "cc.warlock.bottomFolder";
+	public static final String TOP_FOLDER_ID = "cc.warlock.topFolder";
+	public static final String RIGHT_FOLDER_ID = "cc.warlock.rightFolder";
+	public static final String LEFT_FOLDER_ID = "cc.warlock.leftFolder";
 	
 	public static IPageLayout getLayout() {
 		return myLayout;

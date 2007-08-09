@@ -35,7 +35,7 @@ import cc.warlock.rcp.util.FontSelector;
 public class PresetsPreferencePage extends PropertyPage implements
 		IWorkbenchPropertyPage {
 
-	public static final String PAGE_ID = "com.arcaner.warlock.rcp.prefs.standardPresets";
+	public static final String PAGE_ID = "cc.warlock.rcp.prefs.standardPresets";
 	
 	private RGB mainBG, mainFG, roomNameBG, roomNameFG, speechBG, speechFG;
 	private Font mainFont, roomNameFont, speechFont;

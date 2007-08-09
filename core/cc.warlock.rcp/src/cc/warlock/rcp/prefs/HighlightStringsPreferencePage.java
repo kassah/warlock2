@@ -48,7 +48,7 @@ import cc.warlock.rcp.util.ColorUtil;
 public class HighlightStringsPreferencePage extends PropertyPage implements
 		IWorkbenchPropertyPage {
 
-	public static final String PAGE_ID = "com.arcaner.warlock.rcp.prefs.highlightStrings";
+	public static final String PAGE_ID = "cc.warlock.rcp.prefs.highlightStrings";
 	
 	protected TableViewer stringTable;
 	protected Button fillLineButton;

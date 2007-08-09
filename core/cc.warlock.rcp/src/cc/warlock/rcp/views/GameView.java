@@ -41,7 +41,7 @@ import cc.warlock.rcp.ui.style.CompassThemes;
  */
 public class GameView extends StreamView implements KeyListener, IStormFrontClientViewer {
 
-	public static final String VIEW_ID = "com.arcaner.warlock.rcp.views.gameView";
+	public static final String VIEW_ID = "cc.warlock.rcp.views.gameView";
 	
 	private static GameView firstInstance;
 	private static boolean firstInstanceIsUsed = false;

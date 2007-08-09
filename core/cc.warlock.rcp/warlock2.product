@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <?pde version="3.1"?>
 
-<product name="Warlock 2" id="com.arcaner.warlock.rcp.product" application="com.arcaner.warlock.rcp.warlock" useFeatures="false">
+<product name="Warlock 2" id="cc.warlock.rcp.product" application="cc.warlock.rcp.warlock" useFeatures="false">
 
    <configIni use="default"/>
 
@@ -12,15 +12,15 @@
    <windowImages i16="images/character.gif"/>
 
    <splash
-      location="com.arcaner.warlock.rcp"
+      location="cc.warlock.rcp"
       startupProgressRect="0,79,444,19" />
    <launcher name="warlock2">
-      <linux icon="/com.arcaner.warlock.rcp/images/warlock-app-icon.xpm"/>
-      <macosx icon="/com.arcaner.warlock.rcp/images/warlock-app-icon.icns"/>
+      <linux icon="/cc.warlock.rcp/images/warlock-app-icon.xpm"/>
+      <macosx icon="/cc.warlock.rcp/images/warlock-app-icon.icns"/>
       <solaris/>
       <win useIco="false">
          <bmp
-            winSmallLow="/com.arcaner.warlock.rcp/images/warlock-app-icon.bmp"/>
+            winSmallLow="/cc.warlock.rcp/images/warlock-app-icon.bmp"/>
       </win>
    </launcher>
 
@@ -28,8 +28,8 @@
    </vm>
 
    <plugins>
-      <plugin id="com.arcaner.warlock.core"/>
-      <plugin id="com.arcaner.warlock.rcp"/>
+      <plugin id="cc.warlock.core"/>
+      <plugin id="cc.warlock.rcp"/>
       <plugin id="com.ibm.icu.base"/>
       <plugin id="javax.servlet"/>
       <plugin id="org.eclipse.core.commands"/>
@@ -64,7 +64,7 @@
    </plugins>
 
    <features>
-      <feature id="com.arcaner.warlock.feature" version="2.0.238.snapshot"/>
+      <feature id="cc.warlock.feature" version="2.0.238.snapshot"/>
    </features>
 
 </product>

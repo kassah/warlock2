@@ -8,7 +8,7 @@ import cc.warlock.configuration.server.HighlightString;
 public class HighlightNamesPreferencePage extends
 		HighlightStringsPreferencePage {
 
-	public static final String PAGE_ID = "com.arcaner.warlock.rcp.prefs.highlightNames";
+	public static final String PAGE_ID = "cc.warlock.rcp.prefs.highlightNames";
 	
 	@Override
 	protected String getDisplayName() {

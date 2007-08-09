@@ -25,7 +25,7 @@ import cc.warlock.script.IScriptEngine;
  */
 public class JavascriptEngine implements IScriptEngine {
 
-	public static final String ENGINE_ID = "com.arcaner.warlock.script.javascript.JavascriptEngine";
+	public static final String ENGINE_ID = "cc.warlock.script.javascript.JavascriptEngine";
 	
 	public String getScriptEngineId() {
 		return ENGINE_ID;

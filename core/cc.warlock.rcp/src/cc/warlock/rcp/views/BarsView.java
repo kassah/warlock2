@@ -29,7 +29,7 @@ import cc.warlock.rcp.ui.client.SWTPropertyListener;
  */
 public class BarsView extends ViewPart implements IPropertyListener<Integer> {
 
-	public static final String VIEW_ID = "com.arcaner.warlock.rcp.views.barsView";
+	public static final String VIEW_ID = "cc.warlock.rcp.views.barsView";
 	
 	protected static BarsView instance;
 	protected Color roundtimeFG, roundtimeBG, healthFG, healthBG, manaFG, manaBG, fatigueFG, fatigueBG, spiritFG, spiritBG;

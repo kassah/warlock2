@@ -111,7 +111,7 @@ public class MacroFactory {
 	
 	private void loadCommands () {
 		try {
-			IExtension[] extensions = Warlock2Plugin.getDefault().getExtensions("com.arcaner.warlock.rcp.macroCommands");
+			IExtension[] extensions = Warlock2Plugin.getDefault().getExtensions("cc.warlock.rcp.macroCommands");
 			for (int i = 0; i < extensions.length; i++) {
 				IExtension ext = extensions[i];
 				IConfigurationElement[] ce = ext.getConfigurationElements();
@@ -135,7 +135,7 @@ public class MacroFactory {
 	
 	private void loadVariables () {
 		try {
-			IExtension[] extensions = Warlock2Plugin.getDefault().getExtensions("com.arcaner.warlock.rcp.macroVariables");
+			IExtension[] extensions = Warlock2Plugin.getDefault().getExtensions("cc.warlock.rcp.macroVariables");
 			for (int i = 0; i < extensions.length; i++) {
 				IExtension ext = extensions[i];
 				IConfigurationElement[] ce = ext.getConfigurationElements();

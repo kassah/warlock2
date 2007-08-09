@@ -14,7 +14,7 @@ import cc.warlock.client.stormfront.IStormFrontClient;
 public class CharacterPreferencesPage extends PropertyPage implements
 		IWorkbenchPropertyPage {
 
-	public static final String PAGE_ID = "com.arcaner.warlock.rcp.prefs.characterPrefs";
+	public static final String PAGE_ID = "cc.warlock.rcp.prefs.characterPrefs";
 	
 	protected IStormFrontClient client;
 	

@@ -147,7 +147,7 @@ public class LoginView extends ViewPart implements ISGEConnectionListener {
 	}
 	
 	/* (non-Javadoc)
-	 * @see com.arcaner.warlock.network.ISGEConnectionListener#readyToPlay(com.arcaner.warlock.network.SGEConnection, java.util.Map)
+	 * @see cc.warlock.network.ISGEConnectionListener#readyToPlay(cc.warlock.network.SGEConnection, java.util.Map)
 	 */
 	public void readyToPlay(SGEConnection connection, Map loginProperties) {
 		// TODO Auto-generated method stub
