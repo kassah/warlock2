@@ -1,5 +1,5 @@
 header {
-	package com.arcaner.warlock.script.wsl.internal;
+	package cc.warlock.script.wsl.internal;
 }
 
 
