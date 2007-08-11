@@ -205,7 +205,7 @@ public class WarlockWSLScript implements IScript, IScriptCallback, Runnable {
 			{
 				try {
 					String argument = scriptArguments.get(i-1);
-					newToken.replaceAll("\\%" + i, argument);
+					newToken = newToken.replaceAll("\\%" + i, argument);
 				}
 				catch (IndexOutOfBoundsException ex) { }
 			}
