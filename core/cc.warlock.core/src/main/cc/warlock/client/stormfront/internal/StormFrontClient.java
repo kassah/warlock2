@@ -70,7 +70,7 @@ public class StormFrontClient extends WarlockClient implements IStormFrontClient
 	@Override
 	public void send(String command) {
 		if (command.startsWith(".")){
-//			runScriptCommand(command);
+			runScriptCommand(command);
 		} else {
 			super.send(command);
 		}
