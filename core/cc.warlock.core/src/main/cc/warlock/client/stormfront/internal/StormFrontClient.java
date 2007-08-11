@@ -78,7 +78,7 @@ public class StormFrontClient extends WarlockClient implements IStormFrontClient
 	
 	protected  void runScriptCommand(String command) {
 		command = command.substring(1);
-		int firstSpace = command.indexOf(" ") - 1;
+		int firstSpace = command.indexOf(" ");
 		String scriptName = command.substring(0, (firstSpace < 0 ? command.length() : firstSpace));
 		String[] arguments = new String[0];
 		
