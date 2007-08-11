@@ -23,7 +23,7 @@ import cc.warlock.script.wsl.internal.WarlockWSLParser;
 public class WarlockWSLScript implements IScript, IScriptCallback, Runnable {
 	
 	protected String script, scriptName;
-	protected boolean running, waiting;
+	protected boolean running, stopped;
 	protected Hashtable<String, Integer> labelOffsets = new Hashtable<String, Integer>();
 	protected Hashtable<String, String> variables = new Hashtable<String, String>();
 	protected ArrayList<String> scriptArguments = new ArrayList<String>();
@@ -54,6 +54,11 @@ public class WarlockWSLScript implements IScript, IScriptCallback, Runnable {
 	protected static final String FUNCTION_DELETE_FROM_HIGHLIGHT_STRINGS = "deletefromhighlightstrings";
 	protected static final String FUNCTION_DELETE_FROM_HIGHLIGHT_NAMES = "deletefromhighlightnames";
 	protected static final String FUNCTION_EXIT = "exit";
+	
+	private String mode;
+	private static final String MODE_START = "start";
+	private static final String MODE_CONTINUE = "continue";
+	private static final String MODE_WAITING = "waiting";
 	
 	public WarlockWSLScript (IScriptCommands commands, String scriptName, Reader scriptReader)
 		throws IOException
@@ -106,6 +111,7 @@ public class WarlockWSLScript implements IScript, IScriptCallback, Runnable {
 			
 			commands.echo("[script started: " + scriptName + "]");
 			running = true;
+			stopped = false;
 			
 			for (ArrayList<String> tokens : lineTokens)
 			{
@@ -114,9 +120,6 @@ public class WarlockWSLScript implements IScript, IScriptCallback, Runnable {
 			}
 			
 			processLineTokens(0);
-			
-			if (!waiting && !running)
-				commands.echo("[script finished: " + scriptName + "]");
 		} catch (RecognitionException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
@@ -152,7 +155,7 @@ public class WarlockWSLScript implements IScript, IScriptCallback, Runnable {
 		commands.removeCallback(this);
 		
 		running = false;
-		waiting = false;
+		stopped = true;
 		nextLine = EXIT_LINE;
 		commands.echo("[script exited: " + scriptName + "]");
 	}
@@ -160,7 +163,6 @@ public class WarlockWSLScript implements IScript, IScriptCallback, Runnable {
 	public void suspend() {
 		commands.removeCallback(this);
 		running = false;
-		waiting = true;
 		pauseLine = nextLine;
 		
 		commands.echo("[script paused: " + scriptName + "]");
@@ -169,7 +171,6 @@ public class WarlockWSLScript implements IScript, IScriptCallback, Runnable {
 	public void resume() {
 		nextLine = pauseLine;
 		running = true;
-		waiting = false;
 		
 		commands.echo("[script resumed: " + scriptName + "]");
 	}
@@ -232,6 +233,8 @@ public class WarlockWSLScript implements IScript, IScriptCallback, Runnable {
 	
 	protected void parseLine (ArrayList<String> tokens, int lineIndex)
 	{
+		mode = MODE_CONTINUE;
+		
 		if (tokens.size() == 0) return ;// empty line -- most likely a label
 		
 		String function = replaceVariables(tokens.get(0));
@@ -343,15 +346,18 @@ public class WarlockWSLScript implements IScript, IScriptCallback, Runnable {
 	}
 
 	private void handleMatchWait(List<String> arguments) {
+		mode = MODE_WAITING;
+		
 		commands.matchWait(matchset.toArray(new IMatch[matchset.size()]), this);
 		running = false;
-		waiting = true;
 	}
 
 	private ArrayList<IMatch> matchset = new ArrayList<IMatch>();
 	private void handleMatchRe(List<String> arguments) {
 		if (arguments.size() >= 2)
 		{
+			mode = MODE_WAITING;
+			
 			String regex = toString(arguments.subList(1, arguments.size()));
 			Match match = new Match();
 			
@@ -387,6 +393,8 @@ public class WarlockWSLScript implements IScript, IScriptCallback, Runnable {
 	private void handleWaitForRe(List<String> arguments) {
 		if (arguments.size() >= 1)
 		{
+			mode = MODE_WAITING;
+			
 			String regex = toString(arguments);
 			int end = regex.length() - 1;
 			boolean ignoreCase = false;
@@ -400,7 +408,6 @@ public class WarlockWSLScript implements IScript, IScriptCallback, Runnable {
 			
 			commands.waitFor(regex, true, ignoreCase, this);
 			running = false;
-			waiting = true;
 		} else { /* TODO throw error */ }
 	}
 
@@ -411,14 +418,15 @@ public class WarlockWSLScript implements IScript, IScriptCallback, Runnable {
 			
 			commands.waitFor(text, false, true, this);
 			running = false;
-			waiting = true;
+			mode = MODE_WAITING;
 		} else { /* TODO throw error */ }
 	}
 
 	private void handleWait(List<String> arguments) {
+		mode = MODE_WAITING;
+		
 		commands.waitForLine(this);
 		running = false;
-		waiting = true;
 	}
 
 	protected void handlePut (List<String> arguments)
@@ -433,6 +441,8 @@ public class WarlockWSLScript implements IScript, IScriptCallback, Runnable {
 	
 	protected void handlePause (List<String> arguments)
 	{
+		mode = MODE_WAITING;
+		
 		if (arguments.size() == 1)
 		{
 			int time = Integer.parseInt(arguments.get(0));
@@ -447,15 +457,13 @@ public class WarlockWSLScript implements IScript, IScriptCallback, Runnable {
 	protected void handleMove (List<String> arguments)
 	{
 		commands.move(toString(arguments), this);
-		running = false;
-		waiting = true;
+		mode = MODE_WAITING;
 	}
 	
 	protected void handleNextRoom (List<String> arguments)
 	{
 		commands.nextRoom(this);
-		running = false;
-		waiting = true;
+		mode = MODE_WAITING;
 	}
 	
 	private void handleExit(List<String> arguments) {
@@ -476,25 +484,26 @@ public class WarlockWSLScript implements IScript, IScriptCallback, Runnable {
 		// TODO Auto-generated method stub
 	}
 	
-	private String mode;
-	private static final String MODE_START = "start";
-	private static final String MODE_CONTINUE = "continue";
-	
 	public void run ()
 	{
-		if (MODE_START.equals(mode)) { doStart(); }
-		else if (MODE_CONTINUE.equals(mode)) { processLineTokens(nextLine); }
+		try {
+			while (!stopped)
+			{
+				if (MODE_START.equals(mode)) { doStart(); }
+				else if (MODE_CONTINUE.equals(mode)) { processLineTokens(nextLine); }
+				
+				/* MODE_WAITING is implicit */
+				Thread.sleep((long) 200);
+			}
+		} catch (InterruptedException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
 	}
 	
 	protected void continueAtNextLine ()
 	{
-		running = true;
-		waiting = false;
 		mode = MODE_CONTINUE;
-		
-		scriptThread = new Thread(this);
-		scriptThread.setName("Wizard Script: " + scriptName);
-		scriptThread.start();
 	}
 	
 	public void handleCallback(CallbackEvent event) {
