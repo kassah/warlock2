@@ -29,9 +29,9 @@ public class Stream implements IStream {
 	protected StyledString buffer = null;
 	
 	private Stream (String streamName) {
-		this.streamName = new Property<String>("streamName");
+		this.streamName = new Property<String>("streamName", null);
 		this.streamName.set(streamName);
-		this.streamTitle = new Property<String>("streamTitle");
+		this.streamTitle = new Property<String>("streamTitle", null);
 		
 		listeners = new ArrayList<IStreamListener>();
 		

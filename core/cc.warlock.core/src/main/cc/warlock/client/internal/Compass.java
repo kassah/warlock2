@@ -32,7 +32,7 @@ public class Compass extends ClientProperty<String> implements ICompass {
 	}
 	
 	public Compass(IWarlockClient client) {
-		super(client, "compass");
+		super(client, "compass", null);
 		
 		compass = new Hashtable<DirectionType, Boolean>();
 		

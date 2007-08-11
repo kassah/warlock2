@@ -51,17 +51,17 @@ public class StormFrontClient extends WarlockClient implements IStormFrontClient
 	
 	public StormFrontClient() {
 		compass = new Compass(this);
-		leftHand = new ClientProperty<String>(this, "leftHand");
-		rightHand = new ClientProperty<String>(this, "rightHand");
-		currentSpell = new ClientProperty<String>(this, "currentSpell");
+		leftHand = new ClientProperty<String>(this, "leftHand", null);
+		rightHand = new ClientProperty<String>(this, "rightHand", null);
+		currentSpell = new ClientProperty<String>(this, "currentSpell", null);
 		
-		roundtime = new ClientProperty<Integer>(this, "roundtime");
-		health = new ClientProperty<Integer>(this, "health");
-		mana = new ClientProperty<Integer>(this, "mana");
-		fatigue = new ClientProperty<Integer>(this, "fatigue");
-		spirit = new ClientProperty<Integer>(this, "spirit");
-		playerId = new ClientProperty<String>(this, "playerId");
-		characterName = new ClientProperty<String>(this, "characterName");
+		roundtime = new ClientProperty<Integer>(this, "roundtime", 0);
+		health = new ClientProperty<Integer>(this, "health", 0);
+		mana = new ClientProperty<Integer>(this, "mana", 0);
+		fatigue = new ClientProperty<Integer>(this, "fatigue", 0);
+		spirit = new ClientProperty<Integer>(this, "spirit", 0);
+		playerId = new ClientProperty<String>(this, "playerId", null);
+		characterName = new ClientProperty<String>(this, "characterName", null);
 		serverSettings = new ServerSettings(this);
 		rtRunnable = new RoundtimeRunnable();
 		scriptCommands = new ScriptCommands(this);

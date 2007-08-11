@@ -1,5 +1,6 @@
 package cc.warlock.client.internal;
 
+import java.lang.reflect.Type;
 import java.util.ArrayList;
 
 import cc.warlock.client.IProperty;
@@ -11,8 +12,9 @@ public class Property<T> implements IProperty<T> {
 	protected T data;
 	protected ArrayList<IPropertyListener<T>> listeners = new ArrayList<IPropertyListener<T>>();
 	
-	public Property(String name) {
+	public Property(String name, T value) {
 		this.name = name;
+		this.data = value;
 	}
 	
 	public void set(T data) {

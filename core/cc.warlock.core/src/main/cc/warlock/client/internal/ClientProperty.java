@@ -7,8 +7,8 @@ public class ClientProperty<T> extends Property<T> {
 
 	protected IWarlockClient client;
 	
-	public ClientProperty(IWarlockClient client, String name) {
-		super(name);
+	public ClientProperty(IWarlockClient client, String name, T value) {
+		super(name, value);
 		this.client = client;
 	}
 	
