@@ -5,6 +5,7 @@ package cc.warlock.rcp.views;
 
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Date;
 import java.util.Random;
 
 import org.eclipse.core.runtime.IProgressMonitor;
@@ -15,6 +16,8 @@ import org.eclipse.swt.events.FocusEvent;
 import org.eclipse.swt.events.FocusListener;
 import org.eclipse.swt.events.KeyEvent;
 import org.eclipse.swt.events.KeyListener;
+import org.eclipse.swt.events.ModifyEvent;
+import org.eclipse.swt.events.ModifyListener;
 import org.eclipse.swt.graphics.Color;
 import org.eclipse.swt.graphics.Font;
 import org.eclipse.swt.layout.GridData;
@@ -23,7 +26,9 @@ import org.eclipse.swt.widgets.Text;
 import org.eclipse.ui.IWorkbenchPage;
 import org.eclipse.ui.PartInitException;
 
+import cc.warlock.client.ICommand;
 import cc.warlock.client.IWarlockClient;
+import cc.warlock.client.internal.Command;
 import cc.warlock.client.stormfront.IStormFrontClient;
 import cc.warlock.client.stormfront.IStormFrontClientViewer;
 import cc.warlock.client.stormfront.WarlockColor;
@@ -33,7 +38,7 @@ import cc.warlock.rcp.ui.WarlockCompass;
 import cc.warlock.rcp.ui.WarlockText;
 import cc.warlock.rcp.ui.client.SWTStormFrontClientViewer;
 import cc.warlock.rcp.ui.macros.IMacro;
-import cc.warlock.rcp.ui.macros.MacroFactory;
+import cc.warlock.rcp.ui.macros.MacroRegistry;
 import cc.warlock.rcp.ui.style.CompassThemes;
 
 /**
@@ -50,6 +55,7 @@ public class GameView extends StreamView implements KeyListener, IStormFrontClie
 	
 	protected Text entry;
 	protected WarlockCompass compass;
+	protected ICommand currentCommand;
 	
 	protected SWTStormFrontClientViewer wrapper;
 //	protected ViewEvents viewer;
@@ -59,6 +65,7 @@ public class GameView extends StreamView implements KeyListener, IStormFrontClie
 		if (firstInstance == null)
 			firstInstance = this;
 		
+		currentCommand = new Command("", new Date());
 		wrapper = new SWTStormFrontClientViewer(this);
 //		viewer = new ViewEvents(client);
 		openViews.add(this);
@@ -174,10 +181,16 @@ public class GameView extends StreamView implements KeyListener, IStormFrontClie
 		
 		entry = new Text(mainComposite, SWT.BORDER);
 		entry.setLayoutData(new GridData(GridData.FILL, GridData.VERTICAL_ALIGN_END, true, false, 1, 1));
-		entry.addKeyListener(this);
 		
 		compass = new WarlockCompass(text, CompassThemes.getCompassTheme("small"));
 		text.setBackgroundMode(SWT.INHERIT_DEFAULT);
+		
+		entry.addModifyListener(new ModifyListener () {
+			public void modifyText(ModifyEvent e) {
+				((Command)currentCommand).setCommand(entry.getText());
+			}
+		});
+		entry.addKeyListener(this);
 	}
 	
 	public void setFocus() {
@@ -239,13 +252,15 @@ public class GameView extends StreamView implements KeyListener, IStormFrontClie
 		setPartName(title);
 	}
 	
-	public String getCurrentCommand ()
+	public ICommand getCurrentCommand ()
 	{
-		return GameView.this.entry.getText();
+		return GameView.this.currentCommand;
 	}
 	
-	public void setCurrentCommand(String command) {
-		GameView.this.entry.setText(command);
+	public void setCurrentCommand(ICommand command) {
+		GameView.this.currentCommand = command;
+		GameView.this.entry.setText(command.getCommand());
+		GameView.this.entry.setSelection(command.getCommand().length());
 	}
 	
 	public void setStormFrontClient(IStormFrontClient client) {
@@ -283,22 +298,19 @@ public class GameView extends StreamView implements KeyListener, IStormFrontClie
 	}
 
 	public void keyPressed(KeyEvent e) {}
+	
 	public void keyReleased(KeyEvent e) {
-		Collection<IMacro> macros = MacroFactory.instance().getMacros();
+		Collection<IMacro> macros = MacroRegistry.instance().getMacros();
+		e.doit = true;
 		
 		for (IMacro macro : macros)
 		{
-			if (macro.getKeyCode() == e.keyCode)
+			if (macro.getKeyCode() == e.keyCode && macro.getModifiers() == e.stateMask)
 			{
-				String result = macro.executeCommand(wrapper);
-				if (result != null)
-				{
-					entry.setText(result);
-				}
-//				e.doit = false;
+				 macro.execute(wrapper);
+				e.doit = false;
 				break;
 			}
 		}
-		
 	}
 }
