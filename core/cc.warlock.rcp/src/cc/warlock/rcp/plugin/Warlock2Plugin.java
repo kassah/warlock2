@@ -12,6 +12,7 @@ import org.eclipse.core.runtime.Platform;
 import org.eclipse.ui.plugin.AbstractUIPlugin;
 import org.osgi.framework.BundleContext;
 
+import cc.warlock.rcp.ui.macros.MacroRegistry;
 import cc.warlock.script.IScriptEngine;
 import cc.warlock.script.internal.ScriptEngineRegistry;
 
@@ -45,6 +46,9 @@ public class Warlock2Plugin extends AbstractUIPlugin {
 	 */
 	public void start(BundleContext context) throws Exception {
 		super.start(context);
+		
+		// force load of the Macro registry
+		MacroRegistry.instance();
 		
 		IExtension extensions[] = getExtensions("cc.warlock.rcp.scriptEngines");
 		for (int i = 0; i < extensions.length; i++) {
