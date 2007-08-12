@@ -6,20 +6,32 @@
  */
 package cc.warlock.rcp.ui.macros;
 
+import java.util.Collection;
+
 import cc.warlock.client.IWarlockClientViewer;
 
 /**
  * @author Marshall
  *
- * TODO To change the template for this generated type comment go to
- * Window - Preferences - Java - Code Style - Code Templates
+ * A macro represents a certain key code / modifier combination and the list of handlers (ordered by precedence) that are able/willing to handle the macro.
  */
 public interface IMacro {
 
-	public String executeCommand (IWarlockClientViewer context);
+	public static final int NO_MODIFIERS = 0;
 	
-	public String getCommand ();
-	public void setCommand (String command);
 	public int getKeyCode ();
 	public void setKeyCode (int keycode);
+	
+	public int getModifiers ();
+	public void setModifiers (int modifiers);
+	
+	public void addHandler (IMacroHandler handler);
+	public void removeHandler (IMacroHandler handler);
+	
+	public Collection<IMacroHandler> getHandlers();
+	
+	public void execute(IWarlockClientViewer viewer);
+	
+	public Object getUserData();
+	public void setUserData(Object object);
 }

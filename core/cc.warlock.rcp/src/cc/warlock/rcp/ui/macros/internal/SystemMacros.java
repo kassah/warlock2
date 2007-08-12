@@ -3,9 +3,12 @@
  */
 package cc.warlock.rcp.ui.macros.internal;
 
+import java.util.ArrayList;
+
 import org.eclipse.swt.SWT;
 
 import cc.warlock.rcp.ui.macros.IMacro;
+import cc.warlock.rcp.ui.macros.MacroRegistry;
 
 /**
  * @author Marshall
@@ -16,23 +19,27 @@ public class SystemMacros {
 
 	public static IMacro[] getSystemMacros ()
 	{
-		return new IMacro[] {
-			new Macro(SWT.CR, "$currentCommand\\r"),
-			new Macro(SWT.ARROW_UP, "$lastCommand"),
-			new Macro(SWT.ARROW_DOWN, "$nextCommand"),
-			new Macro(SWT.KEYPAD_8, "north\\r"),
-			new Macro(SWT.KEYPAD_9, "northeast\\r"),
-			new Macro(SWT.KEYPAD_6, "east\\r"),
-			new Macro(SWT.KEYPAD_3, "southeast\\r"),
-			new Macro(SWT.KEYPAD_2, "south\\r"),
-			new Macro(SWT.KEYPAD_1, "southwest\\r"),
-			new Macro(SWT.KEYPAD_4, "west\\r"),
-			new Macro(SWT.KEYPAD_7, "northwest\\r"),
-			new Macro(SWT.KEYPAD_DECIMAL, "up\\r"),
-			new Macro(SWT.KEYPAD_0, "down\\r"),
-			new Macro(SWT.KEYPAD_5, "out\\r"),
-			new Macro(SWT.KEYPAD_CR, "$lastCommand\\r")
-		};
+		ArrayList<IMacro> systemMacros = new ArrayList<IMacro>();
+		CommandHistoryMacroHandler commandHistoryMacroHandler = new CommandHistoryMacroHandler();
+		for (IMacro macro : commandHistoryMacroHandler.getMacros())
+		{
+			systemMacros.add(macro);
+		}
+		
+		systemMacros.add(MacroRegistry.createCommandMacro(SWT.KEYPAD_8, "north\\r"));
+		systemMacros.add(MacroRegistry.createCommandMacro(SWT.KEYPAD_9, "northeast\\r"));
+		systemMacros.add(MacroRegistry.createCommandMacro(SWT.KEYPAD_6, "east\\r"));
+		systemMacros.add(MacroRegistry.createCommandMacro(SWT.KEYPAD_3, "southeast\\r"));
+		systemMacros.add(MacroRegistry.createCommandMacro(SWT.KEYPAD_2, "south\\r"));
+		systemMacros.add(MacroRegistry.createCommandMacro(SWT.KEYPAD_1, "southwest\\r"));
+		systemMacros.add(MacroRegistry.createCommandMacro(SWT.KEYPAD_4, "west\\r"));
+		systemMacros.add(MacroRegistry.createCommandMacro(SWT.KEYPAD_7, "northwest\\r"));
+		systemMacros.add(MacroRegistry.createCommandMacro(SWT.KEYPAD_DECIMAL, "up\\r"));
+		systemMacros.add(MacroRegistry.createCommandMacro(SWT.KEYPAD_0, "down\\r"));
+		systemMacros.add(MacroRegistry.createCommandMacro(SWT.KEYPAD_5, "out\\r"));
+		systemMacros.add(MacroRegistry.createCommandMacro(SWT.KEYPAD_CR, "$lastCommand\\r"));
+		
+		return systemMacros.toArray(new IMacro[systemMacros.size()]);
 	}
 
 }
