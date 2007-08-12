@@ -25,5 +25,5 @@ class WarlockWSLLexer extends Lexer;
 SPACE: (' ' | '\t' ) { $setType(Token.SKIP); };
 EOL: ('\n' {newline();} | '\r');
 
-STRING: (~(' '|'\t'|'\r'|'\n'|'#'))+;
-COMMENT: '#' STRING EOL { $setType(Token.SKIP); };
+STRING: (~(' '|'\t'|'\r'|'\n'))+;
+COMMENT: ('#')* STRING EOL { $setType(Token.SKIP); };
