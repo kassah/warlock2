@@ -28,7 +28,7 @@ import cc.warlock.rcp.ui.macros.internal.SystemMacros;
  * TODO To change the template for this generated type comment go to
  * Window - Preferences - Java - Code Style - Code Templates
  */
-public class MacroFactory {
+public class MacroRegistry {
 
 	private static Preferences prefs = Preferences.userNodeForPackage(IMacro.class);
 	
@@ -36,13 +36,13 @@ public class MacroFactory {
 	private static final String PREF_MACRO_PREFIX = "macro-";
 	private static final String PREF_MACRO_KEYCODE = "-keycode";
 	private static final String PREF_MACRO_COMMAND = "-command";
-	private static MacroFactory instance;
+	private static MacroRegistry instance;
 	
 	private ArrayList<IMacro> macros;
 	private Hashtable<String,IMacroVariable> variables;
 	private Hashtable<String,IMacroCommand> commands;
 	
-	MacroFactory () {
+	MacroRegistry () {
 		macros = new ArrayList<IMacro>();
 		variables = new Hashtable<String,IMacroVariable>();
 		commands = new Hashtable<String,IMacroCommand>();
@@ -52,12 +52,35 @@ public class MacroFactory {
 		loadCommands();
 	}
 	
-	public static MacroFactory instance ()
+	public static MacroRegistry instance ()
 	{
 		if (instance == null)
-			instance = new MacroFactory();
+			instance = new MacroRegistry();
 		
 		return instance;
+	}
+	
+	public static IMacro createCommandMacro(int keyCode, String command)
+	{
+		return createMacro(keyCode, new CommandMacroHandler(command));
+	}
+	
+	public static IMacro createCommandMacro(int keyCode, int modifiers, String command)
+	{
+		return createMacro(keyCode, modifiers, new CommandMacroHandler(command));
+	}
+	
+	public static IMacro createMacro (int keyCode, IMacroHandler handler)
+	{
+		return createMacro(keyCode, IMacro.NO_MODIFIERS, handler);
+	}
+	
+	public static IMacro createMacro (int keyCode, int modifiers, IMacroHandler handler)
+	{
+		Macro macro = new Macro(keyCode, modifiers);
+		macro.addHandler(handler);
+		
+		return macro;
 	}
 	
 	public Collection<IMacro> getMacros ()
@@ -77,7 +100,12 @@ public class MacroFactory {
 	
 	public void addMacro (int keycode, String command)
 	{
-		macros.add(new Macro(keycode, command));
+		macros.add(createCommandMacro(keycode, command));
+	}
+	
+	public void addMacro (IMacro macro)
+	{
+		macros.add(macro);
 	}
 	
 	public void save ()
@@ -87,9 +115,15 @@ public class MacroFactory {
 		int i = 0;
 		for (IMacro macro : macros)
 		{
-			prefs.putInt(PREF_MACRO_PREFIX + i + PREF_MACRO_KEYCODE, macro.getKeyCode());
-			prefs.put(PREF_MACRO_PREFIX + i + PREF_MACRO_COMMAND, macro.getCommand());
-			i++;
+			for (IMacroHandler handler : macro.getHandlers())
+			{
+				if (handler instanceof CommandMacroHandler)
+				{
+					prefs.putInt(PREF_MACRO_PREFIX + i + PREF_MACRO_KEYCODE, macro.getKeyCode());
+					prefs.put(PREF_MACRO_PREFIX + i + PREF_MACRO_COMMAND, ((CommandMacroHandler)handler).getCommand());
+					i++;
+				}
+			}
 		}
 	}
 	
