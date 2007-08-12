@@ -6,6 +6,7 @@
  */
 package cc.warlock.rcp.ui.client;
 
+import cc.warlock.client.ICommand;
 import cc.warlock.client.IWarlockClient;
 import cc.warlock.client.IWarlockClientViewer;
 
@@ -37,21 +38,21 @@ public class SWTWarlockClientViewer extends SWTStreamListener implements IWarloc
 	}
 	
 	protected class ListenerWrapper implements Runnable {
-		public String text;
+		public ICommand command;
 		public IWarlockClient client;
 		public EventType eventType;
 		
 		public void run () {
 			switch (eventType)
 			{
-				case SetCurrentCommand: viewer.setCurrentCommand(text); break;
+				case SetCurrentCommand: viewer.setCurrentCommand(command); break;
 			}
-			text = null;
+			command = null;
 			client = null;
 		}
 	}
 	
-	public String getCurrentCommand() {
+	public ICommand getCurrentCommand() {
 		return viewer.getCurrentCommand();
 	}
 	
@@ -59,8 +60,8 @@ public class SWTWarlockClientViewer extends SWTStreamListener implements IWarloc
 		return viewer.getWarlockClient();
 	}
 	
-	public void setCurrentCommand(String command) {
-		wrapper.text = command;
+	public void setCurrentCommand(ICommand command) {
+		wrapper.command = command;
 		wrapper.eventType = EventType.SetCurrentCommand;
 		run(wrapper);
 	}
