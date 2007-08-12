@@ -32,7 +32,6 @@ public class WarlockWSLScript implements IScript, IScriptCallback, Runnable {
 	protected int pauseLine, nextLine;
 	protected Thread scriptThread;
 	
-	protected static final int EXIT_LINE = -99;
 	protected static final String FUNCTION_PUT = "put";
 	protected static final String FUNCTION_ECHO = "echo";
 	protected static final String FUNCTION_PAUSE = "pause";
@@ -59,6 +58,7 @@ public class WarlockWSLScript implements IScript, IScriptCallback, Runnable {
 	private static final String MODE_START = "start";
 	private static final String MODE_CONTINUE = "continue";
 	private static final String MODE_WAITING = "waiting";
+	private static final String MODE_EXIT = "exit";
 	
 	public WarlockWSLScript (IScriptCommands commands, String scriptName, Reader scriptReader)
 		throws IOException
@@ -133,13 +133,12 @@ public class WarlockWSLScript implements IScript, IScriptCallback, Runnable {
 	{
 		for (int i = startLine; i < lineTokens.size();)
 		{
-			if (!running) break;
+			if (stopped) break;
+			
 			nextLine = i+1;
 			
 			ArrayList<String> tokens = lineTokens.get(i);
 			parseLine(tokens, i);
-			
-			if (nextLine == EXIT_LINE) break;
 			
 			if ((i+1) < lineTokens.size() && nextLine != i+1)
 			{
@@ -156,8 +155,7 @@ public class WarlockWSLScript implements IScript, IScriptCallback, Runnable {
 		
 		running = false;
 		stopped = true;
-		nextLine = EXIT_LINE;
-		commands.echo("[script exited: " + scriptName + "]");
+		mode = MODE_EXIT;
 	}
 
 	public void suspend() {
@@ -335,6 +333,11 @@ public class WarlockWSLScript implements IScript, IScriptCallback, Runnable {
 		{
 			this.nextLine = offset;
 		}
+		else {
+			commands.echo ("***********");
+			commands.echo ("*** WARNING: Label \"" + label + "\" doesn't exist, skipping goto statement ***");
+			commands.echo ("***********");
+		}
 	}
 	
 	protected void handleGoto(List<String> arguments) {
@@ -467,7 +470,10 @@ public class WarlockWSLScript implements IScript, IScriptCallback, Runnable {
 	}
 	
 	private void handleExit(List<String> arguments) {
-		this.nextLine = EXIT_LINE;
+		running = false;
+		stopped = true;
+		
+		mode = MODE_EXIT;
 	}
 	
 	private void handleDeleteFromHighlightNames(List<String> arguments) {
@@ -491,10 +497,13 @@ public class WarlockWSLScript implements IScript, IScriptCallback, Runnable {
 			{
 				if (MODE_START.equals(mode)) { doStart(); }
 				else if (MODE_CONTINUE.equals(mode)) { processLineTokens(nextLine); }
+				else if (MODE_EXIT.equals(mode)) { break; }
 				
 				/* MODE_WAITING is implicit */
 				Thread.sleep((long) 200);
 			}
+			
+			commands.echo("[script finished: " + scriptName + "]");		
 		} catch (InterruptedException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
