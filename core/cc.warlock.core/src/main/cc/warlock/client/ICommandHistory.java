@@ -31,10 +31,23 @@ public interface ICommandHistory {
 	public ICommand current();
 	
 	/**
-	 * Add a command to the command history
+	 * Reset to the position of the "latest" command
+	 */
+	public void resetPosition();
+	
+	/**
+	 * Add a command to the command history.
+	 * Equivalent to addCommand(new Command(command, new Date()))
+	 * 
 	 * @param command
 	 */
 	public void addCommand (String command);
+	
+	/**
+	 * Add a command to the command history
+	 * @param command
+	 */
+	public void addCommand (ICommand command);
 	
 	/**
 	 * Save this command history

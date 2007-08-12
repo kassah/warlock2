@@ -89,10 +89,29 @@ public class CommandHistory implements ICommandHistory {
 		}
 	}
 	
-	public void addCommand(String command) {
-		commands.push(new Command(command, new Date()));
-		System.out.println("position = " + (commands.size() - 1));
+	public void resetPosition() {
 		position = commands.size() - 1;
+	}
+	
+	public void addCommand (String string)
+	{
+		addCommand(new Command(string, new Date()));
+	}
+	
+	public void addCommand(ICommand command) {
+		if (commands.size() == 0) {
+			command.setFirst(true);
+			command.setLast(true);
+		}
+		else {
+			commands.get(commands.size()-1).setLast(false);
+			command.setLast(true);
+		}
+		
+		command.setInHistory(true);
+		commands.push(command);
+		
+		resetPosition();
 	}
 	
 	public void save () {
