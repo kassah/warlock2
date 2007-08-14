@@ -297,9 +297,7 @@ public class GameView extends StreamView implements KeyListener, IStormFrontClie
 		return client;
 	}
 
-	public void keyPressed(KeyEvent e) {}
-	
-	public void keyReleased(KeyEvent e) {
+	public void keyPressed(KeyEvent e) {
 		Collection<IMacro> macros = MacroRegistry.instance().getMacros();
 		e.doit = true;
 		
@@ -313,4 +311,6 @@ public class GameView extends StreamView implements KeyListener, IStormFrontClie
 			}
 		}
 	}
+	
+	public void keyReleased(KeyEvent e) {	}
 }
