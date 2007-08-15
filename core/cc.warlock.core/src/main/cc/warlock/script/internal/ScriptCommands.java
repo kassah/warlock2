@@ -10,6 +10,7 @@ import cc.warlock.client.IStyledString;
 import cc.warlock.client.stormfront.IStormFrontClient;
 import cc.warlock.script.CallbackEvent;
 import cc.warlock.script.IMatch;
+import cc.warlock.script.IScript;
 import cc.warlock.script.IScriptCallback;
 import cc.warlock.script.IScriptCommands;
 
@@ -35,6 +36,10 @@ public class ScriptCommands implements IScriptCommands, IStreamListener, IProper
 	
 	public void echo (String text) {
 		client.getDefaultStream().echo(text);
+	}
+	
+	public void echo (IScript script, String text) {
+		client.getDefaultStream().echo("[" + script.getName() + "]: " + text);
 	}
 
 	public void matchWait (IMatch[] matches, IScriptCallback callback) {
@@ -67,6 +72,11 @@ public class ScriptCommands implements IScriptCommands, IStreamListener, IProper
 	public void put (String text) {
 		client.send(text);
 		client.getDefaultStream().echo(text);
+	}
+	
+	public void put (IScript script, String text) {
+		client.send(text);
+		client.getDefaultStream().echo("[" + script.getName() + "]: " + text);
 	}
 
 	public void waitFor (String text, boolean regex, boolean ignoreCase, IScriptCallback callback) {

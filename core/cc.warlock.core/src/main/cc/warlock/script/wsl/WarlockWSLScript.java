@@ -133,7 +133,7 @@ public class WarlockWSLScript implements IScript, IScriptCallback, Runnable {
 	{
 		for (int i = startLine; i < lineTokens.size();)
 		{
-			if (stopped) break;
+			if (stopped || mode == MODE_WAITING) break;
 			
 			nextLine = i+1;
 			
@@ -417,11 +417,12 @@ public class WarlockWSLScript implements IScript, IScriptCallback, Runnable {
 	private void handleWaitFor(List<String> arguments) {
 		if (arguments.size() >= 1)
 		{
+			mode = MODE_WAITING;
+			
 			String text = toString(arguments);
 			
 			commands.waitFor(text, false, true, this);
 			running = false;
-			mode = MODE_WAITING;
 		} else { /* TODO throw error */ }
 	}
 
@@ -434,12 +435,12 @@ public class WarlockWSLScript implements IScript, IScriptCallback, Runnable {
 
 	protected void handlePut (List<String> arguments)
 	{
-		commands.put(toString(arguments));
+		commands.put(this, toString(arguments));
 	}
 	
 	protected void handleEcho (List<String> arguments)
 	{
-		commands.echo(toString(arguments));
+		commands.echo(this, toString(arguments));
 	}
 	
 	protected void handlePause (List<String> arguments)

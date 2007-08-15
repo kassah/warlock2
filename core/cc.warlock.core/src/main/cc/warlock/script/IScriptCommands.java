@@ -5,8 +5,10 @@ import cc.warlock.client.stormfront.IStormFrontClient;
 public interface IScriptCommands {
 
 	public void put (String text);
+	public void put (IScript script, String text);
 	
 	public void echo (String text);
+	public void echo (IScript script, String text);
 	
 	public void move (String direction, IScriptCallback callback);
 	
