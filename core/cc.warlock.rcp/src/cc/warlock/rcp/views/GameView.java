@@ -107,55 +107,6 @@ public class GameView extends StreamView implements KeyListener, IStormFrontClie
 		return null;
 	}
 	
-//	private class ViewEvents implements IStormFrontClientViewer {
-//		
-//		private SWTStormFrontClientViewer viewerWrapper;
-//		
-//		public ViewEvents (IStormFrontClient client)
-//		{
-//			super(client);
-//			
-//			viewerWrapper = new SWTStormFrontClientViewer(this);
-//		}
-//		
-//		public void append (IStream stream, String toAppend, IWarlockStyle style) {
-//			GameView.this.append(stream, toAppend, style);
-//		}
-//		
-//		public void echo (IStream stream, String text, IWarlockStyle style) {
-//			GameView.this.echo(stream, text, style);
-//		}
-//		
-//		public void setViewerTitle(String title) {
-//			GameView.this.setViewerTitle(title);
-//		}
-//		
-//		public String getCurrentCommand ()
-//		{
-//			return GameView.this.getCurrentCommand();
-//		}
-//		
-//		public void setClient (IStormFrontClient client)
-//		{
-//			this.client = client;
-//			
-//			client.addViewer(viewerWrapper);
-//		}
-//
-//		public SWTStormFrontClientViewer getViewerWrapper() {
-//			return viewerWrapper;
-//		}
-//		
-//		public void loadServerSettings (ServerSettings settings)
-//		{
-//			GameView.this.loadServerSettings(settings);
-//		}
-//		
-//		public void setCurrentCommand(String command) {
-//			entry.setText(command);
-//		}
-//	}
-	
 	private static String generateUniqueId () {
 		return new Random().nextInt() + "";
 	}
@@ -177,7 +128,7 @@ public class GameView extends StreamView implements KeyListener, IStormFrontClie
 			"Good luck, and happy hunting!\n\n" +
 			"Copyright (c) 2001-2007 " + WarlockText.OBJECT_HOLDER);
 		
-		text.addLink("http://warlock.sf.net", "The Warlock Team");
+		text.addLink("http://warlock.cc", "The Warlock Team");
 		
 		entry = new Text(mainComposite, SWT.BORDER);
 		entry.setLayoutData(new GridData(GridData.FILL, GridData.VERTICAL_ALIGN_END, true, false, 1, 1));
