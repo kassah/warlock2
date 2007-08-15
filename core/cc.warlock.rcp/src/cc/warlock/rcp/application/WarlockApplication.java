@@ -58,7 +58,7 @@ public class WarlockApplication extends WorkbenchAdvisor implements IApplication
 		FlaggedOption profileOption = new FlaggedOption("profile",
 			JSAP.STRING_PARSER, JSAP.NO_DEFAULT, JSAP.NOT_REQUIRED, 'p', "profile", "The profile to start Warlock with");
 		
-		Switch debugSwitch = new Switch("debug", 'd', "debug", "Start Warlock in debug mode (allows raw input/output mode)");
+		Switch debugSwitch = new Switch("debugConsole", 'd', "debugConsole", "Start Warlock in debug mode (allows raw input/output mode)");
 		debugSwitch.setDefault("false");
 		
 		try {
@@ -74,11 +74,12 @@ public class WarlockApplication extends WorkbenchAdvisor implements IApplication
 		{
 			startWithProfile = result.getString("profile");
 		}
-		if (result.contains("debug"))
+		if (result.contains("debugConsole"))
 		{
-			if (result.getBoolean("debug"))
+			if (result.getBoolean("debugConsole"))
 			{
 				debugMode = true;
+				
 			}
 		}
 	}
