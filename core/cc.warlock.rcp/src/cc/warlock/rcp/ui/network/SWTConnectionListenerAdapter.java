@@ -5,7 +5,7 @@ package cc.warlock.rcp.ui.network;
 
 import org.eclipse.swt.widgets.Display;
 
-import cc.warlock.network.Connection;
+import cc.warlock.network.IConnection;
 import cc.warlock.network.IConnectionListener;
 
 /**
@@ -22,14 +22,14 @@ public class SWTConnectionListenerAdapter implements IConnectionListener {
 	
 	private class ConnectedRunnable implements Runnable
 	{
-		public Connection connection;
+		public IConnection connection;
 		
 		public void run () {
 			listener.connected(connection);
 		}
 	}
 	
-	public void connected(Connection connection) {
+	public void connected(IConnection connection) {
 		ConnectedRunnable connectedRunnable = new ConnectedRunnable();
 		connectedRunnable.connection = connection;
 		Display.getDefault().asyncExec(connectedRunnable);
@@ -37,7 +37,7 @@ public class SWTConnectionListenerAdapter implements IConnectionListener {
 	
 	private class DataReadyRunnable implements Runnable
 	{
-		public Connection connection;
+		public IConnection connection;
 		public String line;
 		
 		public void run () {
@@ -45,7 +45,7 @@ public class SWTConnectionListenerAdapter implements IConnectionListener {
 		}
 	}
 	
-	public void dataReady(Connection connection, String line) {
+	public void dataReady(IConnection connection, String line) {
 		DataReadyRunnable dataReadyRunnable = new DataReadyRunnable();
 		dataReadyRunnable.connection = connection;
 		dataReadyRunnable.line = line;
@@ -54,14 +54,14 @@ public class SWTConnectionListenerAdapter implements IConnectionListener {
 
 	private class DisconnectedRunnable implements Runnable
 	{
-		public Connection connection;
+		public IConnection connection;
 		
 		public void run () {
 			listener.disconnected(connection);
 		}
 	}
 	
-	public void disconnected(Connection connection) {
+	public void disconnected(IConnection connection) {
 		DisconnectedRunnable disconnectedRunnable = new DisconnectedRunnable();
 		disconnectedRunnable.connection = connection;
 		Display.getDefault().asyncExec(disconnectedRunnable);
