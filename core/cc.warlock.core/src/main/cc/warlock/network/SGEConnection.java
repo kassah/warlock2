@@ -134,7 +134,7 @@ public class SGEConnection extends Connection implements IConnectionListener {
 		}
 	}
 	
-	public void connected(Connection connection) {
+	public void connected(IConnection connection) {
 		try {
 			connection.sendLine("K");
 			state = SGE_INITIAL;
@@ -144,7 +144,7 @@ public class SGEConnection extends Connection implements IConnectionListener {
 		}
 	}
 
-	public void dataReady(Connection connection, String line) {
+	public void dataReady(IConnection connection, String line) {
 		try {
 			
 			System.out.println("SGE:" + line);
@@ -243,7 +243,7 @@ public class SGEConnection extends Connection implements IConnectionListener {
 		}	
 	}
 	
-	public void disconnected(Connection connection) {
+	public void disconnected(IConnection connection) {
 
 	}
 

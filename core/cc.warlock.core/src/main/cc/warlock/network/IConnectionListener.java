@@ -9,8 +9,8 @@ package cc.warlock.network;
  */
 public interface IConnectionListener {
 
-	public void connected (Connection connection);
-	public void dataReady (Connection connection, String line);
-	public void disconnected (Connection connection);
+	public void connected (IConnection connection);
+	public void dataReady (IConnection connection, String line);
+	public void disconnected (IConnection connection);
 	
 }

@@ -5,6 +5,7 @@ package cc.warlock.network;
 
 import java.io.IOException;
 import java.io.InputStream;
+import java.util.ArrayList;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -167,7 +168,9 @@ public class StormFrontStream extends InputStream {
 //			System.out.println("Original bytesRead: " + bytesRead + ", toRead: " + toRead + ", len: " + len);
 			
 			// do some debug outputting
-//			if (bytesRead != -1)
+			if (bytesRead != -1)
+				connection.dataReady(new String(b, off, bytesRead));
+			
 //				System.out.write(b, off, bytesRead);
 		} else {
 			if(buffer != null) {

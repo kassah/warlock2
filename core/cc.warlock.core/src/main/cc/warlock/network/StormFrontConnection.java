@@ -5,6 +5,7 @@ package cc.warlock.network;
 
 import java.io.IOException;
 import java.net.Socket;
+import java.util.ArrayList;
 
 import javax.xml.parsers.SAXParser;
 import javax.xml.parsers.SAXParserFactory;
@@ -25,6 +26,7 @@ public class StormFrontConnection implements IConnection {
 	protected IStormFrontClient client;
 	protected Socket socket;
 	protected String key;
+	private ArrayList<IConnectionListener> listeners = new ArrayList<IConnectionListener>();
 	
 	public StormFrontConnection (IStormFrontClient client, String key) {
 		this.client = client;
@@ -45,6 +47,7 @@ public class StormFrontConnection implements IConnection {
 	}
 	
 	public void addConnectionListener (IConnectionListener listener) {
+		listeners.add(listener);
 	}
 	
 	public void send (String toSend)
@@ -66,6 +69,11 @@ public class StormFrontConnection implements IConnection {
 		return client;
 	}
 	
+	public void dataReady (String data)
+	{
+		for (IConnectionListener listener : listeners) listener.dataReady(this, data);
+	}
+	
 	class XmlParser implements Runnable {
 		public void run() {
 			try {
@@ -83,6 +91,14 @@ public class StormFrontConnection implements IConnection {
 				t.printStackTrace();
 			}
 		}
+	}
+
+	public String getHost() {
+		return host;
+	}
+
+	public int getPort() {
+		return port;
 	}
 
 }

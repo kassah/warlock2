@@ -26,4 +26,6 @@ public interface IConnection {
 	public void sendLine(String line) throws IOException;
 	public IWarlockClient getClient();
 	
+	public String getHost();
+	public int getPort();
 }
