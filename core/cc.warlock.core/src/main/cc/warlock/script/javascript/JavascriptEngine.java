@@ -40,7 +40,7 @@ public class JavascriptEngine implements IScriptEngine {
 	}
 	
 	public IScript startScript(final IScriptCommands commands, final String scriptName, final Reader scriptReader, final String[] arguments) {
-		final JavascriptScript script = new JavascriptScript (scriptName);
+		final JavascriptScript script = new JavascriptScript (commands, scriptName);
 		new Thread(new Runnable() {
 			public void run () {
 				Context context = Context.enter();

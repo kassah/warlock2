@@ -8,6 +8,8 @@ package cc.warlock.client.stormfront.internal;
 
 import java.io.File;
 import java.io.IOException;
+import java.util.ArrayList;
+import java.util.List;
 
 import cc.warlock.client.ICompass;
 import cc.warlock.client.IProperty;
@@ -20,7 +22,9 @@ import cc.warlock.client.stormfront.IStormFrontClient;
 import cc.warlock.configuration.WarlockConfiguration;
 import cc.warlock.configuration.server.ServerSettings;
 import cc.warlock.network.StormFrontConnection;
+import cc.warlock.script.IScript;
 import cc.warlock.script.IScriptCommands;
+import cc.warlock.script.IScriptListener;
 import cc.warlock.script.internal.ScriptCommands;
 import cc.warlock.script.internal.ScriptRunner;
 import cc.warlock.stormfront.IStormFrontProtocolHandler;
@@ -33,7 +37,7 @@ import com.martiansoftware.jsap.CommandLineTokenizer;
  * TODO To change the template for this generated type comment go to
  * Window - Preferences - Java - Code Style - Code Templates
  */
-public class StormFrontClient extends WarlockClient implements IStormFrontClient {
+public class StormFrontClient extends WarlockClient implements IStormFrontClient, IScriptListener {
 
 	protected ICompass compass;
 	protected int lastPrompt;
@@ -48,6 +52,7 @@ public class StormFrontClient extends WarlockClient implements IStormFrontClient
 	protected ServerSettings serverSettings;
 	protected RoundtimeRunnable rtRunnable;
 	protected ScriptCommands scriptCommands;
+	protected ArrayList<IScript> runningScripts;
 	
 	public StormFrontClient() {
 		compass = new Compass(this);
@@ -65,6 +70,7 @@ public class StormFrontClient extends WarlockClient implements IStormFrontClient
 		serverSettings = new ServerSettings(this);
 		rtRunnable = new RoundtimeRunnable();
 		scriptCommands = new ScriptCommands(this);
+		runningScripts = new ArrayList<IScript>();
 	}
 
 	@Override
@@ -89,7 +95,21 @@ public class StormFrontClient extends WarlockClient implements IStormFrontClient
 		}
 		
 		File scriptDirectory = WarlockConfiguration.getConfigurationDirectory("scripts", true);
-		ScriptRunner.runScriptFromFile(scriptCommands, scriptDirectory, scriptName, arguments);
+		IScript script = ScriptRunner.runScriptFromFile(scriptCommands, scriptDirectory, scriptName, arguments);
+		
+		if (script != null)
+		{
+			script.addScriptListener(this);
+			runningScripts.add(script);
+		}
+	}
+	
+	public void scriptPaused(IScript script) {}
+	public void scriptResumed(IScript script) {}
+	public void scriptStarted(IScript script) {}
+	
+	public void scriptStopped(IScript script, boolean userStopped) {
+		runningScripts.remove(script);
 	}
 	
 	public IProperty<Integer> getRoundtime() {
@@ -214,5 +234,9 @@ public class StormFrontClient extends WarlockClient implements IStormFrontClient
 	
 	public IProperty<String> getCurrentSpell() {
 		return currentSpell;
+	}
+	
+	public List<IScript> getRunningScripts() {
+		return runningScripts;
 	}
 }

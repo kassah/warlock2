@@ -6,7 +6,8 @@
  */
 package cc.warlock.script.javascript;
 
-import cc.warlock.script.IScript;
+import cc.warlock.script.AbstractScript;
+import cc.warlock.script.IScriptCommands;
 
 /**
  * @author Marshall
@@ -14,12 +15,14 @@ import cc.warlock.script.IScript;
  * TODO To change the template for this generated type comment go to
  * Window - Preferences - Java - Code Style - Code Templates
  */
-public class JavascriptScript implements IScript {
+public class JavascriptScript extends AbstractScript {
 
 	private String name;
 	
-	public JavascriptScript (String name)
+	public JavascriptScript (IScriptCommands commands, String name)
 	{
+		super(commands);
+		
 		this.name = name;
 	}
 	

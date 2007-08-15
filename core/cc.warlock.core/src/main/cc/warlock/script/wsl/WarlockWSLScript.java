@@ -11,16 +11,17 @@ import java.util.regex.Pattern;
 
 import antlr.RecognitionException;
 import antlr.TokenStreamException;
+import cc.warlock.script.AbstractScript;
 import cc.warlock.script.CallbackEvent;
 import cc.warlock.script.IMatch;
-import cc.warlock.script.IScript;
 import cc.warlock.script.IScriptCallback;
 import cc.warlock.script.IScriptCommands;
+import cc.warlock.script.IScriptListener;
 import cc.warlock.script.internal.Match;
 import cc.warlock.script.wsl.internal.WarlockWSLLexer;
 import cc.warlock.script.wsl.internal.WarlockWSLParser;
 
-public class WarlockWSLScript implements IScript, IScriptCallback, Runnable {
+public class WarlockWSLScript extends AbstractScript implements IScriptCallback, Runnable {
 	
 	protected String script, scriptName;
 	protected boolean running, stopped;
@@ -28,7 +29,6 @@ public class WarlockWSLScript implements IScript, IScriptCallback, Runnable {
 	protected Hashtable<String, String> variables = new Hashtable<String, String>();
 	protected ArrayList<String> scriptArguments = new ArrayList<String>();
 	protected ArrayList<ArrayList<String>> lineTokens;
-	protected IScriptCommands commands;
 	protected int pauseLine, nextLine;
 	protected Thread scriptThread;
 	
@@ -63,7 +63,7 @@ public class WarlockWSLScript implements IScript, IScriptCallback, Runnable {
 	public WarlockWSLScript (IScriptCommands commands, String scriptName, Reader scriptReader)
 		throws IOException
 	{
-		this.commands = commands;
+		super(commands);
 		this.scriptName = scriptName;
 		
 		StringBuffer script = new StringBuffer();
@@ -98,6 +98,8 @@ public class WarlockWSLScript implements IScript, IScriptCallback, Runnable {
 		scriptThread = new Thread(this);
 		scriptThread.setName("Wizard Script: " + scriptName);
 		scriptThread.start();
+		
+		for (IScriptListener listener : listeners) listener.scriptStarted(this);
 	}
 	
 	protected void doStart ()
@@ -156,21 +158,29 @@ public class WarlockWSLScript implements IScript, IScriptCallback, Runnable {
 		running = false;
 		stopped = true;
 		mode = MODE_EXIT;
+		
+		super.stop();
 	}
 
 	public void suspend() {
+		mode = MODE_WAITING;
 		commands.removeCallback(this);
 		running = false;
 		pauseLine = nextLine;
 		
 		commands.echo("[script paused: " + scriptName + "]");
+		super.suspend();
 	}
 	
 	public void resume() {
+		mode = MODE_CONTINUE;
+		
 		nextLine = pauseLine;
 		running = true;
 		
 		commands.echo("[script resumed: " + scriptName + "]");
+
+		super.resume();
 	}
 	
 	private Pattern labelPattern = Pattern.compile("^([^:]+): *$");

@@ -12,6 +12,7 @@ import java.io.FileReader;
 import java.io.Reader;
 import java.util.Collection;
 
+import cc.warlock.script.IScript;
 import cc.warlock.script.IScriptCommands;
 import cc.warlock.script.IScriptEngine;
 
@@ -24,7 +25,7 @@ import cc.warlock.script.IScriptEngine;
  */
 public class ScriptRunner {
 
-	public static void runScriptFromFile (IScriptCommands commands, File baseDir, String scriptName, String[] arguments)
+	public static IScript runScriptFromFile (IScriptCommands commands, File baseDir, String scriptName, String[] arguments)
 	{
 		Collection<IScriptEngine> engines = ScriptEngineRegistry.getScriptEngines();
 		
@@ -50,7 +51,7 @@ public class ScriptRunner {
 						{
 							try {
 								FileReader reader = new FileReader(scriptFile);
-								engine.startScript(commands, scriptName, reader, arguments);
+								return engine.startScript(commands, scriptName, reader, arguments);
 							} catch (FileNotFoundException e) {
 								// TODO Auto-generated catch block
 								e.printStackTrace();
@@ -60,17 +61,22 @@ public class ScriptRunner {
 				}
 			}
 		}
+		
+		return null;
 	}
 	
-	public static void runScriptFromReader (IScriptCommands commands, String engineId, String scriptName, Reader reader, String[] arguments)
+	public static IScript runScriptFromReader (IScriptCommands commands, String engineId, String scriptName, Reader reader, String[] arguments)
 	{
 		Collection<IScriptEngine> engines = ScriptEngineRegistry.getScriptEngines();
 		for (IScriptEngine engine : engines)
 		{
 			if (engine.getScriptEngineId().equals(engineId))
 			{
-				engine.startScript(commands, scriptName, reader, arguments);
+				IScript script = engine.startScript(commands, scriptName, reader, arguments);
+				return script;
 			}
 		}
+		
+		return null;
 	}
 }

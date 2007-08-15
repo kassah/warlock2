@@ -6,11 +6,14 @@
  */
 package cc.warlock.client.stormfront;
 
+import java.util.List;
+
 import cc.warlock.client.ICompass;
 import cc.warlock.client.IProperty;
 import cc.warlock.client.IWarlockClient;
 import cc.warlock.client.IWarlockStyle;
 import cc.warlock.configuration.server.ServerSettings;
+import cc.warlock.script.IScript;
 import cc.warlock.script.IScriptCommands;
 
 /**
@@ -108,4 +111,9 @@ public interface IStormFrontClient extends IWarlockClient {
 	 * @return The name of the character associated with this client.
 	 */
 	public IProperty<String> getCharacterName();
+	
+	/**
+	 * @return A list of currently running scripts
+	 */
+	public List<IScript> getRunningScripts();
 }
