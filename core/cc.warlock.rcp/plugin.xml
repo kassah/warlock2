@@ -47,6 +47,12 @@
             id="cc.warlock.rcp.views.HandsView"
             name="Hands">
       </view>
+      <view
+            allowMultiple="false"
+            class="cc.warlock.rcp.views.DebugView"
+            id="cc.warlock.rcp.views.DebugView"
+            name="Debug Console">
+      </view>
    </extension>
    <extension
          id="warlock"
