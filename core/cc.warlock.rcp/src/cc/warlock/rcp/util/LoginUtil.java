@@ -5,9 +5,14 @@ import java.util.Map;
 
 import org.eclipse.jface.dialogs.MessageDialog;
 import org.eclipse.swt.widgets.Display;
+import org.eclipse.ui.PartInitException;
+import org.eclipse.ui.PlatformUI;
 
 import cc.warlock.client.stormfront.internal.StormFrontClient;
 import cc.warlock.network.SGEConnection;
+import cc.warlock.rcp.application.WarlockApplication;
+import cc.warlock.rcp.ui.network.SWTConnectionListenerAdapter;
+import cc.warlock.rcp.views.DebugView;
 import cc.warlock.rcp.views.GameView;
 
 
@@ -27,8 +32,18 @@ public class LoginUtil {
 		
 		try {
 			client.connect(server, port, key);
+			
+			if (WarlockApplication.instance().inDebugMode())
+			{
+				PlatformUI.getWorkbench().getActiveWorkbenchWindow().getActivePage().showView(DebugView.VIEW_ID);
+				
+				client.getConnection().addConnectionListener(new SWTConnectionListenerAdapter(DebugView.instance()));
+			}
+			
 		} catch (IOException e) {
 			// TODO Auto-generated catch block
+			e.printStackTrace();
+		} catch (PartInitException e) {
 			e.printStackTrace();
 		}
 	}

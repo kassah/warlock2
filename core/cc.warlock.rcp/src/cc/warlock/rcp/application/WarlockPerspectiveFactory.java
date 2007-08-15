@@ -11,6 +11,7 @@ import org.eclipse.ui.IPerspectiveFactory;
 import org.eclipse.ui.IPlaceholderFolderLayout;
 
 import cc.warlock.rcp.views.BarsView;
+import cc.warlock.rcp.views.DebugView;
 import cc.warlock.rcp.views.GameView;
 import cc.warlock.rcp.views.HandsView;
 import cc.warlock.rcp.views.StreamView;
@@ -49,9 +50,10 @@ public class WarlockPerspectiveFactory implements IPerspectiveFactory {
 		topFolder.addPlaceholder(StreamView.THOUGHTS_VIEW_ID);
 		
 		IPlaceholderFolderLayout rightFolder =
-			layout.createPlaceholderFolder(RIGHT_FOLDER_ID, IPageLayout.RIGHT, 0.80f, GameView.VIEW_ID);
+			layout.createPlaceholderFolder(RIGHT_FOLDER_ID, IPageLayout.RIGHT, 0.75f, GameView.VIEW_ID);
 		
 		rightFolder.addPlaceholder(StreamView.INVENTORY_VIEW_ID);
+		rightFolder.addPlaceholder(DebugView.VIEW_ID);
 		
 //		IFolderLayout folder = layout.createFolder(BOTTOM_FOLDER_ID, IPageLayout.BOTTOM, 0.90f, GameView.VIEW_ID);
 		layout.addStandaloneView(BarsView.VIEW_ID, false, IPageLayout.BOTTOM, 0.95f, GameView.VIEW_ID);
