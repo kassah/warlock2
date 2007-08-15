@@ -89,6 +89,14 @@ public class CommandHistory implements ICommandHistory {
 		}
 	}
 	
+	public int size() {
+		return commands.size();
+	}
+	
+	public ICommand getCommandAt(int position) {
+		return commands.elementAt(position);
+	}
+	
 	public void resetPosition() {
 		position = commands.size() - 1;
 	}

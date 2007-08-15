@@ -32,6 +32,12 @@ public interface IWarlockClient {
 	 * Send command to the game.
 	 * @param command The command to send.
 	 */
+	public void send (ICommand command);
+	
+	/**
+	 * Send command to the game.
+	 * @param command The command to send.
+	 */
 	public void send(String command);
 	
 	/**

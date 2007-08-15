@@ -6,7 +6,9 @@ package cc.warlock.client.internal;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Date;
 
+import cc.warlock.client.ICommand;
 import cc.warlock.client.ICommandHistory;
 import cc.warlock.client.IStream;
 import cc.warlock.client.IWarlockClient;
@@ -38,15 +40,20 @@ public abstract class WarlockClient implements IWarlockClient {
 	public abstract void connect(String server, int port, String key) throws IOException;
 	
 	public void send(String command) {
+		send(new Command(command, new Date()));
+	}
+	
+	public void send(ICommand command) {
 		if(connection == null) {
 			// Not yet connected to server
 			return;
 		}
 		
-		commandHistory.addCommand(command);
+		if (!command.isInHistory())
+			commandHistory.addCommand(command);
 		
 		try {
-			connection.send(command + "\n");
+			connection.send(command.getCommand() + "\n");
 		} catch(IOException e) {
 			e.printStackTrace();
 		}

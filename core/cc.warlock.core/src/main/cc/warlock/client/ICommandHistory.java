@@ -31,6 +31,17 @@ public interface ICommandHistory {
 	public ICommand current();
 	
 	/**
+	 * @return The size of the command history
+	 */
+	public int size();
+	
+	/**
+	 * @param position
+	 * @return The command at the given position
+	 */
+	public ICommand getCommandAt(int position);
+	
+	/**
 	 * Reset to the position of the "latest" command
 	 */
 	public void resetPosition();
