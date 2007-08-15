@@ -53,6 +53,7 @@ public class StormFrontClient extends WarlockClient implements IStormFrontClient
 	protected RoundtimeRunnable rtRunnable;
 	protected ScriptCommands scriptCommands;
 	protected ArrayList<IScript> runningScripts;
+	protected ArrayList<IScriptListener> scriptListeners;
 	
 	public StormFrontClient() {
 		compass = new Compass(this);
@@ -71,6 +72,7 @@ public class StormFrontClient extends WarlockClient implements IStormFrontClient
 		rtRunnable = new RoundtimeRunnable();
 		scriptCommands = new ScriptCommands(this);
 		runningScripts = new ArrayList<IScript>();
+		scriptListeners = new ArrayList<IScriptListener>();
 	}
 
 	@Override
@@ -100,16 +102,28 @@ public class StormFrontClient extends WarlockClient implements IStormFrontClient
 		if (script != null)
 		{
 			script.addScriptListener(this);
+			for (IScriptListener listener : scriptListeners) listener.scriptStarted(script);
+			
 			runningScripts.add(script);
 		}
 	}
 	
-	public void scriptPaused(IScript script) {}
-	public void scriptResumed(IScript script) {}
-	public void scriptStarted(IScript script) {}
+	public void scriptPaused(IScript script) {
+		for (IScriptListener listener : scriptListeners) listener.scriptPaused(script);
+	}
+	
+	public void scriptResumed(IScript script) {
+		for (IScriptListener listener : scriptListeners) listener.scriptResumed(script);
+	}
+	
+	public void scriptStarted(IScript script) {
+		for (IScriptListener listener : scriptListeners) listener.scriptStarted(script);
+	}
 	
 	public void scriptStopped(IScript script, boolean userStopped) {
 		runningScripts.remove(script);
+		
+		for (IScriptListener listener : scriptListeners) listener.scriptStopped(script, userStopped);
 	}
 	
 	public IProperty<Integer> getRoundtime() {
@@ -238,5 +252,16 @@ public class StormFrontClient extends WarlockClient implements IStormFrontClient
 	
 	public List<IScript> getRunningScripts() {
 		return runningScripts;
+	}
+	
+	public void addScriptListener(IScriptListener listener)
+	{
+		scriptListeners.add(listener);
+	}
+	
+	public void removeScriptListener (IScriptListener listener)
+	{
+		if (scriptListeners.contains(listener))
+			scriptListeners.remove(listener);
 	}
 }

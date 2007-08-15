@@ -15,6 +15,7 @@ import cc.warlock.client.IWarlockStyle;
 import cc.warlock.configuration.server.ServerSettings;
 import cc.warlock.script.IScript;
 import cc.warlock.script.IScriptCommands;
+import cc.warlock.script.IScriptListener;
 
 /**
  * @author Marshall
@@ -116,4 +117,12 @@ public interface IStormFrontClient extends IWarlockClient {
 	 * @return A list of currently running scripts
 	 */
 	public List<IScript> getRunningScripts();
+	
+	/**
+	 * Add a script listener
+	 * @param listener
+	 */
+	public void addScriptListener (IScriptListener listener);
+	
+	public void removeScriptListener (IScriptListener listener);
 }
