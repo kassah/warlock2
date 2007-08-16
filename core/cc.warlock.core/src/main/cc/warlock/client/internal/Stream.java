@@ -25,7 +25,7 @@ public class Stream implements IStream {
 	
 	protected IProperty<String> streamName, streamTitle;
 	protected ArrayList<IStreamListener> listeners;
-	protected boolean isPrompting = false, newlineAfterPrompt = false;
+	protected boolean isPrompting = false;
 	protected StyledString buffer = null;
 	
 	private Stream (String streamName) {
@@ -56,24 +56,7 @@ public class Stream implements IStream {
 		send (text, WarlockStyle.EMPTY_STYLE);
 	}
 	
-	private boolean isEmpty (CharSequence data)
-	{
-		for (int i = 0; i < data.length(); i++)
-		{
-			char c = data.charAt(i);
-			if (c != ' ' && c != '\n' && c != '\r')
-				return false;
-		}
-		return true;
-	}
-	
 	public void send(String data, IWarlockStyle style) {
-		// ignore empty lines (the tail end of stream appends etc) if we are currently prompting
-		if (isEmpty(data) && isPrompting)
-		{
-			if (newlineAfterPrompt && buffer == null) return;
-			newlineAfterPrompt = true;
-		}
 		
 		if (buffer == null)
 		{
@@ -110,8 +93,16 @@ public class Stream implements IStream {
 		buffer.append(text);
 		if (buffer.readyToFlush())
 		{
+			if(isPrompting) {
+				
+			}
+			StyledString newline = new StyledString();
+			newline.getBuffer().append("\n");
 			for(IStreamListener listener : listeners) {
 				try {
+					if(isPrompting) {
+						listener.streamReceivedText(this, newline);
+					}
 					listener.streamReceivedText(this, buffer);
 				} catch (Throwable t) {
 					// TODO Auto-generated catch block
@@ -119,7 +110,7 @@ public class Stream implements IStream {
 				}
 			}
 			
-			if (buffer.getBuffer().length() > 0 && !isEmpty(buffer.getBuffer()))
+			if (buffer.getBuffer().length() > 0)
 			{
 				isPrompting = false;
 			}
@@ -135,9 +126,8 @@ public class Stream implements IStream {
 				listener.streamPrompted(this, prompt);
 			}
 
-			newlineAfterPrompt = false;
+			isPrompting = true;
 		}
-		isPrompting = true;
 	}
 	
 	public void echo(String text) {
