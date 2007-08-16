@@ -66,7 +66,8 @@ public class ScriptCommands implements IScriptCommands, IStreamListener, IProper
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
-		waitForRoundtime();
+		// Wait for RT will be addressed elsewhere
+		//waitForRoundtime();
 	}
 
 	public void put (String text) {
@@ -167,9 +168,9 @@ public class ScriptCommands implements IScriptCommands, IStreamListener, IProper
 	}
 	
 	protected boolean waitingForRoundtime;
-	protected void waitForRoundtime ()
+	public void waitForRoundtime (boolean blockUntilRoundtime)
 	{
-		if (client.getRoundtime().get() > 0)
+		if ((!blockUntilRoundtime)&&(client.getRoundtime().get() > 0))
 		{
 			waitingForRoundtime = true;
 			while (waitingForRoundtime)

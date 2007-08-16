@@ -16,6 +16,8 @@ public interface IScriptCommands {
 	
 	public void waitFor (String text, boolean regex, boolean ignoreCase, IScriptCallback callback);
 	
+	public void waitForRoundtime (boolean blockUntilRoundtime);
+	
 	public void matchWait (IMatch[] matches, IScriptCallback callback);
 	
 	public void pause (int seconds);

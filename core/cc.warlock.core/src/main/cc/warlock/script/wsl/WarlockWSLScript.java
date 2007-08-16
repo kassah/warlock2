@@ -431,8 +431,13 @@ public class WarlockWSLScript extends AbstractScript implements IScriptCallback,
 			
 			String text = toString(arguments);
 			
-			commands.waitFor(text, false, true, this);
-			running = false;
+			if (text.equalsIgnoreCase("Roundtime")) 
+			{
+				commands.waitForRoundtime(true);
+			} else {
+				commands.waitFor(text, false, true, this);
+				running = false;
+			}
 		} else { /* TODO throw error */ }
 	}
 
@@ -466,6 +471,7 @@ public class WarlockWSLScript extends AbstractScript implements IScriptCallback,
 			// "empty" pause.. just means wait for RT
 			commands.pause(0);
 		}
+		commands.waitForRoundtime(false);
 	}
 	
 	protected void handleMove (List<String> arguments)
