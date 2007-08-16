@@ -20,7 +20,7 @@
 		<mkdir dir="${buildDirectory}"/>
 
 		<copy todir="${buildDirectory}/plugins">
-			<fileset dir="../../warlock2-rcp">
+			<fileset dir="../../core">
 				<include name="cc.warlock.core/**/*"/>
 				<include name="cc.warlock.rcp/**/*"/>
 			</fileset>
