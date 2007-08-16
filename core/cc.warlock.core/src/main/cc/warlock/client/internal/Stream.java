@@ -72,25 +72,19 @@ public class Stream implements IStream {
 			buffer.addStyle(style);
 		}
 		
-		if (buffer.readyToFlush())
-		{
-			send(buffer, false);
-
-			buffer = null;
-		}
+		sendBuffer();
 	}
 
 	public void send (IStyledString text)
-	{
-		send (text, false);
-	}
-	
-	public void send (IStyledString text, boolean doBuffer)
 	{
 		if (buffer == null)
 			buffer = new StyledString();
 		
 		buffer.append(text);
+		sendBuffer();
+	}
+	
+	private void sendBuffer() {
 		if (buffer.readyToFlush())
 		{
 			StyledString newline = new StyledString();

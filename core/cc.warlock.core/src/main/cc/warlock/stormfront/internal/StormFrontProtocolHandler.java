@@ -448,7 +448,7 @@ public class StormFrontProtocolHandler extends DefaultHandler implements IStormF
 			parentBuffer.getBuffer().append(buffer.getBuffer());
 		}
 		else {
-			getCurrentStream().send(buffer, true);
+			getCurrentStream().send(buffer);
 		}
 	}
 }
