@@ -18,7 +18,7 @@ import cc.warlock.stormfront.internal.StormFrontProtocolHandler;
  * @author Sean Proctor
  * @author Marshall
  *
- * The Internal Storm Front protocol handler. Not meant to be insantiated outside of Warlock.
+ * The Internal Storm Front protocol handler. Not meant to be instantiated outside of Warlock.
  */
 public class StormFrontConnection implements IConnection {
 	protected String host;

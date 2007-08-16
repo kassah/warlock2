@@ -52,10 +52,9 @@ public abstract class WarlockClient implements IWarlockClient {
 		if (!command.isInHistory())
 			commandHistory.addCommand(command);
 		
-		/* FIXME: instead of stopping prompting, we should call a method
-		 * displayCommand() from the stream a lot of different places send 
-		 * commands, all of them should be updated with the described
-		 * functionality
+		/* FIXME: instead of stopping prompting, we should add a method
+		 * displayCommand() to IStream. a lot of different places send 
+		 * commands, all of them should be updated with that functionality
 		 */
 		getDefaultStream().donePrompting();
 		
