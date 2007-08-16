@@ -93,9 +93,6 @@ public class Stream implements IStream {
 		buffer.append(text);
 		if (buffer.readyToFlush())
 		{
-			if(isPrompting) {
-				
-			}
 			StyledString newline = new StyledString();
 			newline.getBuffer().append("\n");
 			for(IStreamListener listener : listeners) {
@@ -128,6 +125,10 @@ public class Stream implements IStream {
 
 			isPrompting = true;
 		}
+	}
+	
+	public void donePrompting() {
+		isPrompting = false;
 	}
 	
 	public void echo(String text) {
