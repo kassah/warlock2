@@ -512,7 +512,7 @@ public class WarlockWSLScript extends AbstractScript implements IScriptCallback,
 		public void execute (List<String> arguments) {
 			mode = MODE_WAITING;
 			
-			commands.waitForLine(WarlockWSLScript.this);
+			commands.waitForPrompt(WarlockWSLScript.this);
 			running = false;
 		}
 	}

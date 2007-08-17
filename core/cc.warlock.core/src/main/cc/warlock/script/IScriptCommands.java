@@ -22,7 +22,7 @@ public interface IScriptCommands {
 	
 	public void pause (int seconds);
 	
-	public void waitForLine (IScriptCallback callback);
+	public void waitForPrompt (IScriptCallback callback);
 	
 	public void removeCallback (IScriptCallback callback);
 	

@@ -88,7 +88,7 @@ public class ScriptCommands implements IScriptCommands, IStreamListener, IProper
 		waitingForText = true;
 	}
 
-	public void waitForLine (IScriptCallback callback) {
+	public void waitForPrompt (IScriptCallback callback) {
 		callbacks.add(callback);
 		waiting = true;
 	}
@@ -103,11 +103,9 @@ public class ScriptCommands implements IScriptCommands, IStreamListener, IProper
 	
 	public void streamCleared(IStream stream) {}
 	public void streamEchoed(IStream stream, String text) {}
-	public void streamPrompted(IStream stream, String prompt) {}
 	
-	public void streamReceivedText(IStream stream, IStyledString string) {
-		String text = string.getBuffer().toString();
-		
+	public void streamPrompted(IStream stream, String prompt)
+	{
 		if (waiting)
 		{
 			CallbackEvent event = new CallbackEvent(IScriptCallback.CallbackType.FinishedWaiting);
@@ -115,7 +113,12 @@ public class ScriptCommands implements IScriptCommands, IStreamListener, IProper
 			callbacks.clear();
 			waiting = false;
 		}
-		else if (waitingForMatches)
+	}
+	
+	public void streamReceivedText(IStream stream, IStyledString string) {
+		String text = string.getBuffer().toString();
+		
+		if (waitingForMatches)
 		{
 			IMatch foundMatch = null;
 			for (IMatch match : matches)
