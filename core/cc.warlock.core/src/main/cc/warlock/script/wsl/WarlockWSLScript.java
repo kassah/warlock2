@@ -52,6 +52,19 @@ public class WarlockWSLScript extends AbstractScript implements IScriptCallback,
 		addCommand(new WarlockWSLPause());
 		addCommand(new WarlockWSLShift());
 		addCommand(new WarlockWSLSave());
+		addCommand(new WarlockWSLCounter());
+		addCommand(new WarlockWSLDeleteVariable());
+		addCommand(new WarlockWSLSetVariable());
+		addCommand(new WarlockWSLGoto());
+		addCommand(new WarlockWSLMatchWait());
+		addCommand(new WarlockWSLMatchRe());
+		addCommand(new WarlockWSLMatch());
+		addCommand(new WarlockWSLWaitForRe());
+		addCommand(new WarlockWSLWaitFor());
+		addCommand(new WarlockWSLWait());
+		addCommand(new WarlockWSLMove());
+		addCommand(new WarlockWSLNextRoom());
+		addCommand(new WarlockWSLExit());
 		
 		this.scriptName = scriptName;
 		
