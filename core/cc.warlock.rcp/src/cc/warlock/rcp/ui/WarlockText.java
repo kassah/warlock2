@@ -2,10 +2,13 @@ package cc.warlock.rcp.ui;
 
 import java.net.MalformedURLException;
 import java.net.URL;
+import java.util.ArrayList;
 import java.util.Hashtable;
 import java.util.Iterator;
 
 import org.eclipse.swt.SWT;
+import org.eclipse.swt.custom.LineBackgroundEvent;
+import org.eclipse.swt.custom.LineBackgroundListener;
 import org.eclipse.swt.custom.PaintObjectEvent;
 import org.eclipse.swt.custom.PaintObjectListener;
 import org.eclipse.swt.custom.StyleRange;
@@ -34,6 +37,8 @@ import org.eclipse.swt.widgets.Label;
 import org.eclipse.ui.PartInitException;
 import org.eclipse.ui.PlatformUI;
 
+import cc.warlock.rcp.ui.style.StyleMappings;
+
 /**
  * This is an extension of the StyledText widget which has special support for embedding of arbitrary Controls/Links
  * 
@@ -42,7 +47,7 @@ import org.eclipse.ui.PlatformUI;
  * 
  * @author Marshall
  */
-public class WarlockText extends StyledText {
+public class WarlockText extends StyledText implements LineBackgroundListener {
 
 	public static final char OBJECT_HOLDER = '\uFFFc';
 	
@@ -52,6 +57,9 @@ public class WarlockText extends StyledText {
 	private Cursor handCursor, defaultCursor;
 	private PaletteData palette;
 	private int lineLimit = -1;
+
+	protected Hashtable<Integer, Color> lineBackgrounds = new Hashtable<Integer,Color>();
+	protected Hashtable<Integer, Color> lineForegrounds = new Hashtable<Integer,Color>();
 	
 	public WarlockText(Composite parent, int style) {
 		super(parent, style);
@@ -185,6 +193,8 @@ public class WarlockText extends StyledText {
 				}
 			}
 		});
+		
+		addLineBackgroundListener(this);
 	}
 	
 	private int getCurrentHolderOffset ()
@@ -264,8 +274,8 @@ public class WarlockText extends StyledText {
 	}
 	
 	public void append(String string) {
-		super.append(string);
 		constrainLineLimit();
+		super.append(string);
 	}
 	
 	private void constrainLineLimit() {
@@ -275,7 +285,59 @@ public class WarlockText extends StyledText {
 				int x;
 				x = len - lineLimit;
 				x = getOffsetAtLine(x);
+				
 				replaceTextRange(0,x,"");
+				updateLineBackgrounds(len - lineLimit);
+			}
+		}
+	}
+	
+	private void updateLineBackgrounds (int lines)
+	{
+		Hashtable<Integer, Color> copy = (Hashtable<Integer, Color>) lineBackgrounds.clone(); 
+		lineBackgrounds.clear();
+		
+		for (int lineIndex : copy.keySet())
+		{
+			if (lineIndex > lines)
+			{
+				lineBackgrounds.put(lineIndex - lines, copy.get(lineIndex));
+			}
+		}
+	}
+	
+	public void lineGetBackground(LineBackgroundEvent event) {
+		int lineIndex = getLineAtOffset(event.lineOffset);
+		boolean hasBackground = lineBackgrounds.containsKey(lineIndex);
+		
+		if (hasBackground)
+		{
+			event.lineBackground = lineBackgrounds.get(lineIndex);
+		}
+	}
+	
+	public void setLineForeground (int line, Color foreground)
+	{
+		lineForegrounds.put(line, foreground);
+	}
+	
+	public void setLineBackground (int line, Color background)
+	{
+		lineBackgrounds.put(line, background);
+	}
+	
+	@Override
+	public void setStyleRange(StyleRange range) {
+		int lineIndex = getLineAtOffset(range.start);
+		super.setStyleRange(range);
+		if (range instanceof StyleRangeWithData)
+		{
+			StyleRangeWithData range2 = (StyleRangeWithData) range;
+			if (range2.data.containsKey(StyleMappings.FILL_ENTIRE_LINE))
+			{
+				lineBackgrounds.put(lineIndex, range.background);
+				if (range.foreground != null)
+					lineForegrounds.put(lineIndex, range.foreground);
 			}
 		}
 	}

@@ -35,7 +35,7 @@ import cc.warlock.rcp.ui.client.SWTPropertyListener;
 import cc.warlock.rcp.ui.client.SWTStreamListener;
 import cc.warlock.rcp.ui.style.StyleMappings;
 
-public class StreamView extends ViewPart implements IStreamListener, LineBackgroundListener {
+public class StreamView extends ViewPart implements IStreamListener {
 	
 	public static final String STREAM_VIEW_PREFIX = "cc.warlock.rcp.views.stream.";
 	public static final String DEATH_VIEW_ID =  STREAM_VIEW_PREFIX + IStormFrontClient.DEATH_STREAM_NAME;
@@ -48,8 +48,6 @@ public class StreamView extends ViewPart implements IStreamListener, LineBackgro
 	protected ArrayList<IStream> streams;
 	protected IStormFrontClient client;
 	protected WarlockText text;
-	protected Hashtable<Integer, Color> lineBackgrounds = new Hashtable<Integer,Color>();
-	protected Hashtable<Integer, Color> lineForegrounds = new Hashtable<Integer,Color>();
 	protected Composite mainComposite;
 	// This name is the 'suffix' part of the stream... so we will install listeners for each client
 	protected String mainStreamName;
@@ -103,7 +101,6 @@ public class StreamView extends ViewPart implements IStreamListener, LineBackgro
 		text.setWordWrap(true);
 		text.setBackground(new Color(text.getDisplay(), 25, 25, 50));
 		text.setForeground(new Color(text.getDisplay(), 240, 240, 255));
-		text.addLineBackgroundListener(this);
 		
 		GameView currentGameView = GameView.getViewInFocus();
 		if (currentGameView != null && currentGameView.getStormFrontClient() != null)
@@ -184,8 +181,8 @@ public class StreamView extends ViewPart implements IStreamListener, LineBackgro
 				
 				if (highlight.isFillEntireLine())
 				{
-					lineBackgrounds.put(lineIndex, range.background);
-					lineForegrounds.put(lineIndex, range.foreground);
+					this.text.setLineBackground(lineIndex, range.background);
+					this.text.setLineForeground(lineIndex, range.foreground);
 				}
 				
 				this.text.setStyleRange(range);
@@ -206,7 +203,9 @@ public class StreamView extends ViewPart implements IStreamListener, LineBackgro
 			if (appendNewlines)
 				streamText += "\n";
 			
-			int charCount = this.text.getCharCount();
+			this.text.append(streamText);
+			
+			int charCount = this.text.getCharCount() - streamText.length();
 			StyleRangeWithData ranges[] = new StyleRangeWithData[string.getStyles().size()];
 			int i = 0;
 			for (IWarlockStyle style : string.getStyles())
@@ -223,8 +222,6 @@ public class StreamView extends ViewPart implements IStreamListener, LineBackgro
 				i++;
 			}
 			
-			this.text.append(streamText);
-			
 			boolean userHighlightsApplied = false;
 			
 			for (StyleRangeWithData range : ranges)
@@ -232,12 +229,6 @@ public class StreamView extends ViewPart implements IStreamListener, LineBackgro
 				if (range != null) {
 					int lineIndex = this.text.getLineAtOffset(range.start);
 					this.text.setStyleRange(range);
-					if (range.data.containsKey(StyleMappings.FILL_ENTIRE_LINE))
-					{
-						lineBackgrounds.put(lineIndex, range.background);
-						if (range.foreground != null)
-							lineForegrounds.put(lineIndex, range.foreground);
-					}
 					
 					applyUserHighlights(range, streamText, range.start, lineIndex);
 					userHighlightsApplied = true;
@@ -251,28 +242,7 @@ public class StreamView extends ViewPart implements IStreamListener, LineBackgro
 			scrollToBottom();
 		}
 	}
-	
-	public void lineGetBackground(LineBackgroundEvent event) {
-		int lineIndex = this.text.getLineAtOffset(event.lineOffset);
-		boolean hasBackground = lineBackgrounds.containsKey(lineIndex);
-		boolean hasForeground = lineForegrounds.containsKey(lineIndex);
 		
-		if (hasBackground)
-		{
-			event.lineBackground = lineBackgrounds.get(lineIndex);
-		}
-		
-//		if (hasForeground)
-//		{
-//			StyleRange lineRange = new StyleRange();
-//			lineRange.start = event.lineOffset;
-//			lineRange.length = event.lineText.length();
-//			lineRange.foreground = lineForegrounds.get(lineIndex);
-//			
-//			this.text.setStyleRange(lineRange);
-//		}
-	}
-	
 	public void streamEchoed(IStream stream, String text) {
 		if (this.mainStream.equals(stream) || this.streams.contains(stream))
 		{
