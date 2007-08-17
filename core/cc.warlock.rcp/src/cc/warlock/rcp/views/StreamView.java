@@ -246,8 +246,9 @@ public class StreamView extends ViewPart implements IStreamListener {
 	public void streamEchoed(IStream stream, String text) {
 		if (this.mainStream.equals(stream) || this.streams.contains(stream))
 		{
-			StyleRange echoStyle = StyleMappings.getEchoStyle(client.getServerSettings(), this.text.getCharCount(), text.length());
 			this.text.append(text + "\n");
+			
+			StyleRange echoStyle = StyleMappings.getEchoStyle(client.getServerSettings(), this.text.getCharCount() - text.length() - 1, text.length());
 			this.text.setStyleRange(echoStyle);
 			
 			scrollToBottom();
