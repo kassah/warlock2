@@ -4,7 +4,9 @@ import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.io.Reader;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.Hashtable;
+import java.util.Iterator;
 import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -29,30 +31,9 @@ public class WarlockWSLScript extends AbstractScript implements IScriptCallback,
 	protected Hashtable<String, String> variables = new Hashtable<String, String>();
 	protected ArrayList<String> scriptArguments = new ArrayList<String>();
 	protected ArrayList<ArrayList<String>> lineTokens;
+	protected HashMap<String, WarlockWSLCommand> wslCommands = new HashMap<String, WarlockWSLCommand>();
 	protected int pauseLine, nextLine;
 	protected Thread scriptThread;
-	
-	protected static final String FUNCTION_PUT = "put";
-	protected static final String FUNCTION_ECHO = "echo";
-	protected static final String FUNCTION_PAUSE = "pause";
-	protected static final String FUNCTION_MOVE = "move";
-	protected static final String FUNCTION_NEXT_ROOM = "nextroom";
-	protected static final String FUNCTION_WAIT = "wait";
-	protected static final String FUNCTION_WAIT_FOR = "waitfor";
-	protected static final String FUNCTION_WAIT_FOR_RE = "waitforre";
-	protected static final String FUNCTION_MATCH = "match";
-	protected static final String FUNCTION_MATCH_RE = "matchre";
-	protected static final String FUNCTION_MATCH_WAIT = "matchwait";
-	protected static final String FUNCTION_GOTO = "goto";
-	protected static final String FUNCTION_SET_VARIABLE = "setvariable";
-	protected static final String FUNCTION_DELETE_VARIABLE = "deletevariable";
-	protected static final String FUNCTION_COUNTER = "counter";
-	protected static final String FUNCTION_SHIFT = "shift";
-	protected static final String FUNCTION_SAVE = "save";
-	protected static final String FUNCTION_ADD_TO_HIGHLIGHT_STRINGS = "addtohighlightstrings";
-	protected static final String FUNCTION_DELETE_FROM_HIGHLIGHT_STRINGS = "deletefromhighlightstrings";
-	protected static final String FUNCTION_DELETE_FROM_HIGHLIGHT_NAMES = "deletefromhighlightnames";
-	protected static final String FUNCTION_EXIT = "exit";
 	
 	private String mode;
 	private static final String MODE_START = "start";
@@ -64,6 +45,14 @@ public class WarlockWSLScript extends AbstractScript implements IScriptCallback,
 		throws IOException
 	{
 		super(commands);
+		
+		// add command handlers
+		addCommand(new WarlockWSLPut());
+		addCommand(new WarlockWSLEcho());
+		addCommand(new WarlockWSLPause());
+		addCommand(new WarlockWSLShift());
+		addCommand(new WarlockWSLSave());
+		
 		this.scriptName = scriptName;
 		
 		StringBuffer script = new StringBuffer();
@@ -222,22 +211,7 @@ public class WarlockWSLScript extends AbstractScript implements IScriptCallback,
 		
 		return newToken;
 	}
-	
-	protected String toString (List<String> strings)
-	{
-		String str = "";
-		boolean first = true;
-		for (String string : strings)
-		{
-			if (!first)
-			{
-				str += " ";
-			}
-			str += string;
-			first = false;
-		}
-		return replaceVariables(str);
-	}
+
 	
 	protected void parseLine (ArrayList<String> tokens, int lineIndex)
 	{
@@ -245,88 +219,126 @@ public class WarlockWSLScript extends AbstractScript implements IScriptCallback,
 		
 		if (tokens.size() == 0) return ;// empty line -- most likely a label
 		
-		String function = replaceVariables(tokens.get(0));
+		String curCommandName = replaceVariables(tokens.get(0));
 		List<String> arguments = null;
 		if (tokens.size() > 0) arguments = tokens.subList(1, tokens.size());
 		
 		this.nextLine = lineIndex + 1;
 		
-		if (FUNCTION_PUT.equalsIgnoreCase(function)) handlePut(arguments);
-		else if (FUNCTION_ECHO.equalsIgnoreCase(function)) handleEcho(arguments);
-		else if (FUNCTION_PAUSE.equalsIgnoreCase(function)) handlePause(arguments);
-		else if (FUNCTION_MOVE.equalsIgnoreCase(function)) handleMove(arguments);
-		else if (FUNCTION_NEXT_ROOM.equalsIgnoreCase(function)) handleNextRoom(arguments);
-		else if (FUNCTION_WAIT.equalsIgnoreCase(function)) handleWait(arguments);
-		else if (FUNCTION_WAIT_FOR.equalsIgnoreCase(function)) handleWaitFor(arguments);
-		else if (FUNCTION_WAIT_FOR_RE.equalsIgnoreCase(function)) handleWaitForRe(arguments);
-		else if (FUNCTION_MATCH.equalsIgnoreCase(function)) handleMatch(arguments);
-		else if (FUNCTION_MATCH_RE.equalsIgnoreCase(function)) handleMatchRe(arguments);
-		else if (FUNCTION_MATCH_WAIT.equalsIgnoreCase(function)) handleMatchWait(arguments);
-		else if (FUNCTION_GOTO.equalsIgnoreCase(function)) handleGoto(arguments);
-		else if (FUNCTION_SET_VARIABLE.equalsIgnoreCase(function)) handleSetVariable(arguments);
-		else if (FUNCTION_DELETE_VARIABLE.equalsIgnoreCase(function)) handleDeleteVariable(arguments);
-		else if (FUNCTION_COUNTER.equalsIgnoreCase(function)) handleCounter(arguments);
-		else if (FUNCTION_SHIFT.equalsIgnoreCase(function)) handleShift(arguments);
-		else if (FUNCTION_SAVE.equalsIgnoreCase(function)) handleSave(arguments);
-		else if (FUNCTION_ADD_TO_HIGHLIGHT_STRINGS.equalsIgnoreCase(function)) handleAddToHighlightStrings(arguments);
-		else if (FUNCTION_DELETE_FROM_HIGHLIGHT_STRINGS.equalsIgnoreCase(function)) handleDeleteFromHighlightStrings(arguments);
-		else if (FUNCTION_DELETE_FROM_HIGHLIGHT_NAMES.equalsIgnoreCase(function)) handleDeleteFromHighlightNames(arguments);
-		else if (FUNCTION_EXIT.equalsIgnoreCase(function)) handleExit(arguments);
-		
+		WarlockWSLCommand command = wslCommands.get(curCommandName);
+		if(command != null) {
+			command.execute(arguments);
+		} else {
+			// this acts as a comment
+		}
 	}
 	
-	private void handleSave(List<String> arguments) {
-		variables.put("s", toString(arguments));
+	protected void addCommand (WarlockWSLCommand command) {
+		wslCommands.put(command.getName(), command);
 	}
-
-	private void handleShift(List<String> arguments) {
-		scriptArguments.remove(0);
-	}
-
-	private void handleCounter(List<String> arguments) {
-		if (arguments.size() == 2)
+	
+	abstract protected class WarlockWSLCommand {
+		protected String toString (List<String> strings)
 		{
-			String counterFunction = arguments.get(0);
-			int value = variables.containsKey("c") ? Integer.parseInt(variables.get("c")) : 0;
-			
-			if ("set".equalsIgnoreCase(counterFunction))
+			StringBuffer buffer = new StringBuffer();
+			Iterator<String> iter = strings.iterator();
+			while (iter.hasNext())
 			{
-				variables.put("c", replaceVariables(arguments.get(1)));
+				buffer.append(iter.next());
+				if(iter.hasNext()) {
+					buffer.append(' ');
+				}
 			}
-			else if ("add".equalsIgnoreCase(counterFunction))
-			{	
-				int newValue = value + Integer.parseInt(arguments.get(1));
-				variables.put("c", "" + newValue);
-			}
-			else if ("subtract".equalsIgnoreCase(counterFunction))
-			{
-				int newValue = value - Integer.parseInt(arguments.get(1));
-				variables.put("c", "" + newValue);
-			}
-			else if ("multiply".equalsIgnoreCase(counterFunction))
-			{
-				int newValue = value * Integer.parseInt(arguments.get(1));
-				variables.put("c", "" + newValue);
-			}
-			else if ("divide".equalsIgnoreCase(counterFunction))
-			{
-				int newValue = value / Integer.parseInt(arguments.get(1));
-				variables.put("c", "" + newValue);
-			}
-		} else { /*throw error */ }
+			return replaceVariables(buffer.toString());
+		}
+		
+		abstract public String getName();
+		
+		abstract public void execute(List<String> arguments);
+	}
+	
+	protected class WarlockWSLSave extends WarlockWSLCommand {
+		public String getName() {
+			return "save";
+		}
+		
+		public void execute(List<String> arguments) {
+			variables.put("s", toString(arguments));
+		}
 	}
 
-	private void handleDeleteVariable(List<String> arguments) {
-		variables.remove(arguments.get(1));
+	protected class WarlockWSLShift extends WarlockWSLCommand {
+		public String getName() {
+			return "shift";
+		}
+		
+		public void execute (List<String> arguments) {
+			scriptArguments.remove(0);
+		}
 	}
 
-	private void handleSetVariable(List<String> arguments) {
-		if (arguments.size() == 2)
-		{
-			variables.put(arguments.get(0), arguments.get(1));
-		} else { /*throw error*/ }
+	protected class WarlockWSLCounter extends WarlockWSLCommand {
+		public String getName() {
+			return "counter";
+		}
+		
+		public void execute (List<String> arguments) {
+			if (arguments.size() == 2)
+			{
+				String counterFunction = arguments.get(0);
+				int value = variables.containsKey("c") ? Integer.parseInt(variables.get("c")) : 0;
+
+				if ("set".equalsIgnoreCase(counterFunction))
+				{
+					variables.put("c", replaceVariables(arguments.get(1)));
+				}
+				else if ("add".equalsIgnoreCase(counterFunction))
+				{	
+					int newValue = value + Integer.parseInt(arguments.get(1));
+					variables.put("c", "" + newValue);
+				}
+				else if ("subtract".equalsIgnoreCase(counterFunction))
+				{
+					int newValue = value - Integer.parseInt(arguments.get(1));
+					variables.put("c", "" + newValue);
+				}
+				else if ("multiply".equalsIgnoreCase(counterFunction))
+				{
+					int newValue = value * Integer.parseInt(arguments.get(1));
+					variables.put("c", "" + newValue);
+				}
+				else if ("divide".equalsIgnoreCase(counterFunction))
+				{
+					int newValue = value / Integer.parseInt(arguments.get(1));
+					variables.put("c", "" + newValue);
+				}
+			} else { /*throw error */ }
+		}
 	}
 
+	protected class WarlockWSLDeleteVariable extends WarlockWSLCommand {
+		public String getName() {
+			return "deletevariable";
+		}
+		
+		public void execute (List<String> arguments) {
+			variables.remove(arguments.get(1));
+		}
+	}
+
+	protected class WarlockWSLSetVariable extends WarlockWSLCommand {
+		public String getName() {
+			return "setvariable";
+		}
+		
+		public void execute (List<String> arguments) {
+			if (arguments.size() == 2)
+			{
+				variables.put(arguments.get(0), arguments.get(1));
+			} else { /*throw error*/ }
+		}
+	}
+	
 	protected void gotoLabel (String label)
 	{
 		int offset = -1;
@@ -350,147 +362,226 @@ public class WarlockWSLScript extends AbstractScript implements IScriptCallback,
 		}
 	}
 	
-	protected void handleGoto(List<String> arguments) {
-		if (arguments.size() == 1)
-		{
-			String label = replaceVariables(arguments.get(0));
-			gotoLabel(label);
-		} else { /*throw error*/ }
+	protected class WarlockWSLGoto extends WarlockWSLCommand {
+		public String getName() {
+			return "goto";
+		}
+		
+		public void execute (List<String> arguments) {
+			if (arguments.size() == 1)
+			{
+				String label = replaceVariables(arguments.get(0));
+				gotoLabel(label);
+			} else { /*throw error*/ }
+		}
 	}
 
-	private void handleMatchWait(List<String> arguments) {
-		mode = MODE_WAITING;
+	protected class WarlockWSLMatchWait extends WarlockWSLCommand {
+		public String getName() {
+			return "matchwait";
+		}
 		
-		commands.matchWait(matchset.toArray(new IMatch[matchset.size()]), this);
-		running = false;
+		public void execute (List<String> arguments) {
+			mode = MODE_WAITING;
+			
+			commands.matchWait(matchset.toArray(new IMatch[matchset.size()]), WarlockWSLScript.this);
+			running = false;
+		}
 	}
 
 	private ArrayList<IMatch> matchset = new ArrayList<IMatch>();
-	private void handleMatchRe(List<String> arguments) {
-		if (arguments.size() >= 2)
-		{
-			mode = MODE_WAITING;
-			
-			String regex = toString(arguments.subList(1, arguments.size()));
-			Match match = new Match();
-			
-			int end = regex.length() - 1;
-			if (regex.endsWith("/i"))
+	
+	protected class WarlockWSLMatchRe extends WarlockWSLCommand {
+		public String getName() {
+			return "matchre";
+		}
+		
+		public void execute (List<String> arguments) {
+			if (arguments.size() >= 2)
 			{
+				mode = MODE_WAITING;
+				
+				String regex = toString(arguments.subList(1, arguments.size()));
+				Match match = new Match();
+				
+				int end = regex.length() - 1;
+				if (regex.endsWith("/i"))
+				{
+					match.ignoreCase = true;
+					end = regex.length() - 2;
+				}
+				regex = regex.substring(1, end);
+				
+				match.data.put("label", replaceVariables(arguments.get(0)));
+				match.matchText = regex; 
+				match.regex = true;
+				
+				matchset.add(match);
+			} else { /* TODO throw error */ }
+		}
+
+	}
+
+	protected class WarlockWSLMatch extends WarlockWSLCommand {
+		public String getName() {
+			return "match";
+		}
+		
+		public void execute (List<String> arguments) {
+			if (arguments.size() >= 2)
+			{
+				Match match = new Match();
+				match.data.put("label", replaceVariables(arguments.get(0)));
+				match.matchText = toString(arguments.subList(1, arguments.size()));
+				match.regex = false;
 				match.ignoreCase = true;
-				end = regex.length() - 2;
-			}
-			regex = regex.substring(1, end);
-			
-			match.data.put("label", replaceVariables(arguments.get(0)));
-			match.matchText = regex; 
-			match.regex = true;
-			
-			matchset.add(match);
-		} else { /* TODO throw error */ }
+				
+				matchset.add(match);
+			} else { /* TODO throw error */ }
+		}
 	}
 
-	private void handleMatch(List<String> arguments) {
-		if (arguments.size() >= 2)
-		{
-			Match match = new Match();
-			match.data.put("label", replaceVariables(arguments.get(0)));
-			match.matchText = toString(arguments.subList(1, arguments.size()));
-			match.regex = false;
-			match.ignoreCase = true;
-			
-			matchset.add(match);
-		} else { /* TODO throw error */ }
-	}
-
-	private void handleWaitForRe(List<String> arguments) {
-		if (arguments.size() >= 1)
-		{
-			mode = MODE_WAITING;
-			
-			String regex = toString(arguments);
-			int end = regex.length() - 1;
-			boolean ignoreCase = false;
-			
-			if (regex.endsWith("/i"))
+	protected class WarlockWSLWaitForRe extends WarlockWSLCommand {
+		public String getName() {
+			return "waitforre";
+		}
+		
+		public void execute (List<String> arguments) {
+			if (arguments.size() >= 1)
 			{
-				ignoreCase = true;
-				end = regex.length() - 2;
-			}
-			regex = regex.substring(1, end);
-			
-			commands.waitFor(regex, true, ignoreCase, this);
-			running = false;
-		} else { /* TODO throw error */ }
-	}
-
-	private void handleWaitFor(List<String> arguments) {
-		if (arguments.size() >= 1)
-		{
-			mode = MODE_WAITING;
-			
-			String text = toString(arguments);
-			
-			if (text.equalsIgnoreCase("Roundtime")) 
-			{
-				commands.waitForRoundtime(true);
-			} else {
-				commands.waitFor(text, false, true, this);
+				mode = MODE_WAITING;
+				
+				String regex = toString(arguments);
+				int end = regex.length() - 1;
+				boolean ignoreCase = false;
+				
+				if (regex.endsWith("/i"))
+				{
+					ignoreCase = true;
+					end = regex.length() - 2;
+				}
+				regex = regex.substring(1, end);
+				
+				commands.waitFor(regex, true, ignoreCase, WarlockWSLScript.this);
 				running = false;
-			}
-		} else { /* TODO throw error */ }
-	}
-
-	private void handleWait(List<String> arguments) {
-		mode = MODE_WAITING;
-		
-		commands.waitForLine(this);
-		running = false;
-	}
-
-	protected void handlePut (List<String> arguments)
-	{
-		commands.put(this, toString(arguments));
+			} else { /* TODO throw error */ }
+		}
 	}
 	
-	protected void handleEcho (List<String> arguments)
-	{
-		commands.echo(this, toString(arguments));
+	protected class WarlockWSLWaitFor extends WarlockWSLCommand {
+		public String getName() {
+			return "waitfor";
+		}
+		
+		public void execute (List<String> arguments) {
+			if (arguments.size() >= 1)
+			{
+				mode = MODE_WAITING;
+				
+				String text = toString(arguments);
+				
+				if (text.equalsIgnoreCase("Roundtime")) 
+				{
+					commands.waitForRoundtime(true);
+				} else {
+					commands.waitFor(text, false, true, WarlockWSLScript.this);
+					running = false;
+				}
+			} else { /* TODO throw error */ }
+		}
+	}
+
+	protected class WarlockWSLWait extends WarlockWSLCommand {
+		public String getName() {
+			return "wait";
+		}
+		
+		public void execute (List<String> arguments) {
+			mode = MODE_WAITING;
+			
+			commands.waitForLine(WarlockWSLScript.this);
+			running = false;
+		}
 	}
 	
-	protected void handlePause (List<String> arguments)
-	{
-		mode = MODE_WAITING;
+	protected class WarlockWSLPut extends WarlockWSLCommand {
+		public String getName() {
+			return "put";
+		}
 		
-		if (arguments.size() == 1)
+		public void execute(List<String> arguments) {
+			commands.put(WarlockWSLScript.this, toString(arguments));
+		}
+	}
+	
+	protected class WarlockWSLEcho extends WarlockWSLCommand {
+		public String getName() {
+			return "echo";
+		}
+		
+		public void execute (List<String> arguments)
 		{
-			int time = Integer.parseInt(arguments.get(0));
-			commands.pause(time);
+			commands.echo(WarlockWSLScript.this, toString(arguments));
 		}
-		else {
-			// "empty" pause.. just means wait for RT
-			commands.pause(0);
+	}
+	
+	protected class WarlockWSLPause extends WarlockWSLCommand {
+		public String getName() {
+			return "pause";
 		}
-		commands.waitForRoundtime(false);
-	}
-	
-	protected void handleMove (List<String> arguments)
-	{
-		commands.move(toString(arguments), this);
-		mode = MODE_WAITING;
-	}
-	
-	protected void handleNextRoom (List<String> arguments)
-	{
-		commands.nextRoom(this);
-		mode = MODE_WAITING;
-	}
-	
-	private void handleExit(List<String> arguments) {
-		running = false;
-		stopped = true;
 		
-		mode = MODE_EXIT;
+		public void execute (List<String> arguments)
+		{
+			mode = MODE_WAITING;
+			
+			if (arguments.size() == 1)
+			{
+				int time = Integer.parseInt(arguments.get(0));
+				commands.pause(time);
+			}
+			else {
+				// "empty" pause.. just means wait for RT
+				commands.pause(0);
+			}
+			commands.waitForRoundtime(false);
+		}
+	}
+	
+	protected class WarlockWSLMove extends WarlockWSLCommand {
+		public String getName() {
+			return "move";
+		}
+		
+		public void execute (List<String> arguments)
+		{
+			commands.move(toString(arguments), WarlockWSLScript.this);
+			mode = MODE_WAITING;
+		}
+	}
+	
+	protected class WarlockWSLNextRoom extends WarlockWSLCommand {
+		public String getName() {
+			return "nextroom";
+		}
+		
+		public void execute (List<String> arguments)
+		{
+			commands.nextRoom(WarlockWSLScript.this);
+			mode = MODE_WAITING;
+		}
+	}
+	
+	protected class WarlockWSLExit extends WarlockWSLCommand {
+		public String getName() {
+			return "exit";
+		}
+		
+		public void execute (List<String> arguments) {
+			running = false;
+			stopped = true;
+			
+			mode = MODE_EXIT;
+		}
 	}
 	
 	private void handleDeleteFromHighlightNames(List<String> arguments) {
