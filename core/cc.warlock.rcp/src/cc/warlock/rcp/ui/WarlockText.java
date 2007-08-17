@@ -51,6 +51,7 @@ public class WarlockText extends StyledText {
 	private Color linkColor;
 	private Cursor handCursor, defaultCursor;
 	private PaletteData palette;
+	private int lineLimit = -1;
 	
 	public WarlockText(Composite parent, int style) {
 		super(parent, style);
@@ -255,6 +256,27 @@ public class WarlockText extends StyledText {
 		} catch (MalformedURLException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
+		}
+	}
+	
+	public void setLineLimit(int limit) {
+		lineLimit = limit;
+	}
+	
+	public void append(String string) {
+		super.append(string);
+		constrainLineLimit();
+	}
+	
+	private void constrainLineLimit() {
+		if (lineLimit > 0) {
+			int len = getLineCount();
+			if (len > lineLimit) {
+				int x;
+				x = len - lineLimit;
+				x = getOffsetAtLine(x);
+				replaceTextRange(0,x,"");
+			}
 		}
 	}
 }
