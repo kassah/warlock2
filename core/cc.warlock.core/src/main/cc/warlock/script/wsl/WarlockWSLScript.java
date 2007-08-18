@@ -218,10 +218,13 @@ public class WarlockWSLScript extends AbstractScript implements IScriptCallback,
 					String argument = scriptArguments.get(i-1);
 					newToken = newToken.replaceAll("\\%" + i, argument);
 				}
-				catch (IndexOutOfBoundsException ex) { }
+				catch (IndexOutOfBoundsException ex) {
+					newToken = newToken.replaceAll("\\%" + i, "");
+				}
 			}
 		}
 		
+		newToken = newToken.replace("\\%[A-Za-z0-9_]+", "");
 		return newToken;
 	}
 
@@ -492,14 +495,9 @@ public class WarlockWSLScript extends AbstractScript implements IScriptCallback,
 				mode = MODE_WAITING;
 				
 				String text = toString(arguments);
+				commands.waitFor(text, false, true, WarlockWSLScript.this);
+				running = false;
 				
-				if (text.equalsIgnoreCase("Roundtime")) 
-				{
-					commands.waitForRoundtime(true);
-				} else {
-					commands.waitFor(text, false, true, WarlockWSLScript.this);
-					running = false;
-				}
 			} else { /* TODO throw error */ }
 		}
 	}
@@ -555,7 +553,6 @@ public class WarlockWSLScript extends AbstractScript implements IScriptCallback,
 				// "empty" pause.. just means wait for RT
 				commands.pause(0, WarlockWSLScript.this);
 			}
-			commands.waitForRoundtime(false);
 		}
 	}
 	
@@ -640,6 +637,8 @@ public class WarlockWSLScript extends AbstractScript implements IScriptCallback,
 		{
 			case FinishedPausing:
 			case FinishedWaiting:
+				commands.waitForRoundtime(this); break;
+			case FinishedWaitingForRoundtime:
 			case InNextRoom:
 				continueAtNextLine(); break;
 			case Matched:

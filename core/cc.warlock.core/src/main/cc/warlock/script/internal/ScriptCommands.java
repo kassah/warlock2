@@ -172,20 +172,23 @@ public class ScriptCommands implements IScriptCommands, IStreamListener, IProper
 	}
 	
 	protected boolean waitingForRoundtime;
-	public void waitForRoundtime (boolean blockUntilRoundtime)
+	public void waitForRoundtime (final IScriptCallback callback)
 	{
-		if ((!blockUntilRoundtime)&&(client.getRoundtime().get() > 0))
+		if (client.getRoundtime().get() > 0)
 		{
 			waitingForRoundtime = true;
-			while (waitingForRoundtime)
-			{
-				try {
-					Thread.sleep(200);
-				} catch (InterruptedException e) {
-					// TODO Auto-generated catch block
-					e.printStackTrace();
+			
+			final Timer timer = new Timer(true);
+			timer.schedule(new TimerTask () {
+				public void run() {
+					if (!waitingForRoundtime)
+					{
+						timer.cancel();
+						CallbackEvent event = new CallbackEvent(IScriptCallback.CallbackType.FinishedWaitingForRoundtime);
+						callback.handleCallback(event);
+					}
 				}
-			}
+			}, 200, 200);
 		}
 	}
 	
