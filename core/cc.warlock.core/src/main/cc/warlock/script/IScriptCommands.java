@@ -20,7 +20,7 @@ public interface IScriptCommands {
 	
 	public void matchWait (IMatch[] matches, IScriptCallback callback);
 	
-	public void pause (int seconds);
+	public void pause (int seconds, IScriptCallback callback);
 	
 	public void waitForPrompt (IScriptCallback callback);
 	

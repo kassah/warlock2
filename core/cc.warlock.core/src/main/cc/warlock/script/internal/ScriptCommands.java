@@ -1,6 +1,8 @@
 package cc.warlock.script.internal;
 
 import java.util.ArrayList;
+import java.util.Timer;
+import java.util.TimerTask;
 
 import cc.warlock.client.IProperty;
 import cc.warlock.client.IPropertyListener;
@@ -59,15 +61,14 @@ public class ScriptCommands implements IScriptCommands, IStreamListener, IProper
 		waitingForRoom = true;
 	}
 
-	public void pause (int seconds) {
-		try {
-			Thread.sleep(1000 * seconds);
-		} catch (InterruptedException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
-		// Wait for RT will be addressed elsewhere
-		//waitForRoundtime();
+	public void pause (int seconds, final IScriptCallback callback) {
+		Timer timer = new Timer();
+		timer.schedule(new TimerTask() {
+			public void run() {
+				CallbackEvent event = new CallbackEvent(IScriptCallback.CallbackType.FinishedPausing);
+				callback.handleCallback(event);
+			}
+		}, seconds*1000);
 	}
 
 	public void put (String text) {

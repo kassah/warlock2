@@ -546,15 +546,14 @@ public class WarlockWSLScript extends AbstractScript implements IScriptCallback,
 		public void execute (List<String> arguments)
 		{
 			mode = MODE_WAITING;
-			
 			if (arguments.size() == 1)
 			{
 				int time = Integer.parseInt(arguments.get(0));
-				commands.pause(time);
+				commands.pause(time, WarlockWSLScript.this);
 			}
 			else {
 				// "empty" pause.. just means wait for RT
-				commands.pause(0);
+				commands.pause(0, WarlockWSLScript.this);
 			}
 			commands.waitForRoundtime(false);
 		}
@@ -639,6 +638,7 @@ public class WarlockWSLScript extends AbstractScript implements IScriptCallback,
 	public void handleCallback(CallbackEvent event) {
 		switch (event.type)
 		{
+			case FinishedPausing:
 			case FinishedWaiting:
 			case InNextRoom:
 				continueAtNextLine(); break;

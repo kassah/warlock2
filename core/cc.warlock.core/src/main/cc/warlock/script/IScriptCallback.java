@@ -4,7 +4,7 @@ public interface IScriptCallback {
 
 	public enum CallbackType
 	{
-		Matched, FinishedWaiting, InNextRoom
+		Matched, FinishedWaiting, InNextRoom, FinishedPausing
 	};
 		
 	public void handleCallback (CallbackEvent event);
