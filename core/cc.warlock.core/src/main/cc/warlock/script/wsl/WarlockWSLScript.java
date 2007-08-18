@@ -65,6 +65,10 @@ public class WarlockWSLScript extends AbstractScript implements IScriptCallback,
 		addCommand(new WarlockWSLMove());
 		addCommand(new WarlockWSLNextRoom());
 		addCommand(new WarlockWSLExit());
+		// change these to be added/removed as variables are set/deleted
+		for(int i = 1; i <= 9; i++) {
+			addCommand(new WarlockWSLIf_(Integer.toString(i)));
+		}
 		
 		this.scriptName = scriptName;
 		
@@ -598,6 +602,32 @@ public class WarlockWSLScript extends AbstractScript implements IScriptCallback,
 			stopped = true;
 			
 			mode = MODE_EXIT;
+		}
+	}
+	
+	protected class WarlockWSLIf_ extends WarlockWSLCommand {
+		protected String variableName;
+		
+		public WarlockWSLIf_ (String variableName) {
+			this.variableName = variableName;
+		}
+		
+		public String getName () {
+			return "if_" + variableName;
+		}
+		
+		public void execute (List<String> arguments) {
+			if (variables.containsKey(variableName)) {
+				String curCommandName = arguments.get(0);
+				arguments = arguments.subList(1, arguments.size());
+				
+				WarlockWSLCommand command = wslCommands.get(curCommandName);
+				if(command != null) {
+					command.execute(arguments);
+				} else {
+					// this acts as a comment
+				}
+			}
 		}
 	}
 	
