@@ -4,6 +4,7 @@ import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.FileWriter;
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Hashtable;
 
@@ -36,6 +37,7 @@ public class ServerSettings implements Comparable<ServerSettings>
 	protected Hashtable<String, Preset> presets;
 	protected Hashtable<String, HighlightString> highlightStrings;
 	protected Hashtable<String, String> variables;
+	protected ArrayList<ArrayList<MacroKey>> macroSets;
 	protected DefaultSkin defaultSkin;
 	
 	private Element mainWindowElement, mainWindowFontElement,
@@ -78,6 +80,7 @@ public class ServerSettings implements Comparable<ServerSettings>
 			loadPresets();
 			loadHighlightStrings();
 			loadVariables();
+			loadMacros();
 			
 			// initalize before we call the viewers
 			defaultSkin = new DefaultSkin(this);
@@ -161,6 +164,29 @@ public class ServerSettings implements Comparable<ServerSettings>
 			{
 				Element varElement = (Element) o;
 				variables.put(varElement.attributeValue("name"), varElement.attributeValue("value"));
+			}
+		}
+	}
+	
+	private void loadMacros ()
+	{
+		macroSets = new ArrayList<ArrayList<MacroKey>>();
+		
+		Element macrosElement = (Element) document.selectSingleNode("/settings/macros");
+		if (macrosElement != null)
+		{
+			for (Object o : macrosElement.elements())
+			{
+				Element keysElement = (Element) o;
+				ArrayList<MacroKey> keys = new ArrayList<MacroKey>();
+				macroSets.add(keys);
+				
+				for (Object k : keysElement.elements())
+				{
+					Element kElement = (Element) k;
+					
+					keys.add(new MacroKey(this, kElement.attributeValue("key"), kElement.attributeValue("action")));
+				}
 			}
 		}
 	}
@@ -424,5 +450,10 @@ public class ServerSettings implements Comparable<ServerSettings>
 	public Collection<String> getVariableNames ()
 	{
 		return variables.keySet();
+	}
+	
+	public ArrayList<MacroKey> getMacroSet (int set)
+	{
+		return macroSets.get(set);
 	}
 }
