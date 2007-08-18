@@ -101,6 +101,7 @@ public class StreamView extends ViewPart implements IStreamListener {
 		text.setWordWrap(true);
 		text.setBackground(new Color(text.getDisplay(), 25, 25, 50));
 		text.setForeground(new Color(text.getDisplay(), 240, 240, 255));
+		text.setScrollDirection(SWT.DOWN);
 		
 		GameView currentGameView = GameView.getViewInFocus();
 		if (currentGameView != null && currentGameView.getStormFrontClient() != null)
@@ -238,8 +239,6 @@ public class StreamView extends ViewPart implements IStreamListener {
 			if (!userHighlightsApplied) {
 				applyUserHighlights(null, streamText, charCount, this.text.getLineAtOffset(charCount));
 			}
-			
-			scrollToBottom();
 		}
 	}
 		
@@ -250,8 +249,6 @@ public class StreamView extends ViewPart implements IStreamListener {
 			
 			StyleRange echoStyle = StyleMappings.getEchoStyle(client.getServerSettings(), this.text.getCharCount() - text.length() - 1, text.length());
 			this.text.setStyleRange(echoStyle);
-			
-			scrollToBottom();
 		}
 	}
 	
@@ -259,7 +256,6 @@ public class StreamView extends ViewPart implements IStreamListener {
 		if (this.mainStream.equals(stream) || this.streams.contains(stream))
 		{
 			this.text.append(prompt);
-			scrollToBottom();
 		}
 	}
 

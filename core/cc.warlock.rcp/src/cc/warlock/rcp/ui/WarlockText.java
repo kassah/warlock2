@@ -56,7 +56,8 @@ public class WarlockText extends StyledText implements LineBackgroundListener {
 	private Color linkColor;
 	private Cursor handCursor, defaultCursor;
 	private PaletteData palette;
-	private int lineLimit = -1;
+	private int lineLimit = 5000;
+	private int doScrollDirection = SWT.UP;
 
 	protected Hashtable<Integer, Color> lineBackgrounds = new Hashtable<Integer,Color>();
 	protected Hashtable<Integer, Color> lineForegrounds = new Hashtable<Integer,Color>();
@@ -276,6 +277,7 @@ public class WarlockText extends StyledText implements LineBackgroundListener {
 	public void append(String string) {
 		constrainLineLimit();
 		super.append(string);
+		scrollToBottom ();
 	}
 	
 	private void constrainLineLimit() {
@@ -340,5 +342,22 @@ public class WarlockText extends StyledText implements LineBackgroundListener {
 					lineForegrounds.put(lineIndex, range.foreground);
 			}
 		}
+	}
+	
+	private void scrollToBottom ()
+	{
+		if (doScrollDirection == SWT.DOWN) {
+			int length = this.getContent().getCharCount();		
+			if (this.getCaretOffset() < length) {
+				this.setCaretOffset(length);
+				this.showSelection();
+			}
+		}
+	}
+	
+	public void setScrollDirection(int dir) {
+		if (dir == SWT.DOWN || dir == SWT.UP)
+			doScrollDirection = dir;
+		// TODO: Else throw an error
 	}
 }

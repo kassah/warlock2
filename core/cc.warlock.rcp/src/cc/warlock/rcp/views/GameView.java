@@ -116,6 +116,7 @@ public class GameView extends StreamView implements KeyListener, IStormFrontClie
 		super.createPartControl(parent);
 		
 		text.setLineLimit(2000);
+		text.setScrollDirection(SWT.DOWN);
 		text.addFocusListener(new FocusListener () { 
 			public void focusGained(FocusEvent e) {
 				entry.setFocus();

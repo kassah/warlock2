@@ -1,7 +1,8 @@
 package cc.warlock.rcp.views;
 
 import org.eclipse.swt.SWT;
-import org.eclipse.swt.custom.StyledText;
+//import org.eclipse.swt.custom.StyledText;
+import cc.warlock.rcp.ui.WarlockText;
 import org.eclipse.swt.events.SelectionAdapter;
 import org.eclipse.swt.events.SelectionEvent;
 import org.eclipse.swt.layout.GridData;
@@ -16,7 +17,7 @@ import cc.warlock.rcp.application.WarlockApplication;
 
 public class DebugView extends ViewPart implements IConnectionListener {
 
-	protected StyledText console;
+	protected WarlockText console;
 	protected Button copyAll;
 	
 	public static final String VIEW_ID = "cc.warlock.rcp.views.DebugView";
@@ -36,7 +37,6 @@ public class DebugView extends ViewPart implements IConnectionListener {
 	{
 		if (WarlockApplication.instance().inDebugMode()) {
 			console.append(message);
-			scrollToBottom();
 		}
 	}
 	
@@ -57,8 +57,9 @@ public class DebugView extends ViewPart implements IConnectionListener {
 		copyAll = new Button(main, SWT.PUSH);
 		copyAll.setText("Copy All");
 		
-		console = new StyledText(main, SWT.V_SCROLL | SWT.H_SCROLL);
+		console = new WarlockText(main, SWT.V_SCROLL | SWT.H_SCROLL);
 		console.setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, true));
+		console.setScrollDirection(SWT.DOWN);
 		
 		copyAll.addSelectionListener(new SelectionAdapter() {
 			public void widgetSelected(SelectionEvent e) {
