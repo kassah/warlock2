@@ -3,8 +3,6 @@ package cc.warlock.script.internal;
 import java.util.ArrayList;
 import java.util.Timer;
 import java.util.TimerTask;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
 
 import cc.warlock.client.IProperty;
 import cc.warlock.client.IPropertyListener;
@@ -94,6 +92,18 @@ public class ScriptCommands implements IScriptCommands, IStreamListener, IProper
 	public void waitForPrompt (IScriptCallback callback) {
 		addCallback(callback);
 		waiting = true;
+		
+		final Timer timer = new Timer();
+		timer.schedule(new TimerTask () {
+			public void run () {
+				if (client.getDefaultStream().isPrompting())
+				{
+					timer.cancel();
+					waiting = false;
+					sendEvent(new CallbackEvent(IScriptCallback.CallbackType.FinishedWaitingForPrompt), false);
+				}
+			}
+		}, 0, 200);
 	}
 	
 	protected void addCallback (IScriptCallback callback)
@@ -114,14 +124,24 @@ public class ScriptCommands implements IScriptCommands, IStreamListener, IProper
 		callbacks.clear();
 	}
 	
-	public void sendEvent (final CallbackEvent event)
+	public void sendEvent (CallbackEvent event)
+	{
+		sendEvent(event, true);
+	}
+	
+	public void sendEvent (final CallbackEvent event, boolean asynch)
 	{
 		for (final IScriptCallback callback : callbacks) {
-			new Timer().schedule(new TimerTask() {
-				public void run () {
-					callback.handleCallback(event);
-				}
-			}, 100);
+			if (asynch)
+			{
+				new Timer().schedule(new TimerTask() {
+					public void run () {
+						callback.handleCallback(event);
+					}
+				}, 100);
+			} else {
+				callback.handleCallback(event);
+			}
 		}
 	}
 	
@@ -132,15 +152,7 @@ public class ScriptCommands implements IScriptCommands, IStreamListener, IProper
 	public void streamCleared(IStream stream) {}
 	public void streamEchoed(IStream stream, String text) {}
 	
-	public void streamPrompted(IStream stream, String prompt)
-	{
-		if (waiting)
-		{
-			waiting = false;
-			
-			sendEvent(new CallbackEvent(IScriptCallback.CallbackType.FinishedWaitingForPrompt));
-		}
-	}
+	public void streamPrompted(IStream stream, String prompt) { }
 	
 	public void streamReceivedText(IStream stream, IStyledString string) {
 		String text = string.getBuffer().toString();

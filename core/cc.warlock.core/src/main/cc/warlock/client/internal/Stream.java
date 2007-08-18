@@ -125,6 +125,10 @@ public class Stream implements IStream {
 		isPrompting = false;
 	}
 	
+	public boolean isPrompting () {
+		return isPrompting;
+	}
+	
 	public void echo(String text) {
 		for (IStreamListener listener : listeners)
 		{
