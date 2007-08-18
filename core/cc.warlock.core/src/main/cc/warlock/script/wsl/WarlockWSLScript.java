@@ -210,6 +210,14 @@ public class WarlockWSLScript extends AbstractScript implements IScriptCallback,
 			}
 		}
 		
+		for (String var : commands.getClient().getServerSettings().getVariableNames())
+		{
+			if (newToken.contains("%" + var))
+			{
+				newToken = newToken.replaceAll("\\%" + var, commands.getClient().getServerSettings().getVariable(var));
+			}
+		}
+		
 		for (int i = 0; i <= 9; i++)
 		{
 			if (newToken.contains("%" + i))

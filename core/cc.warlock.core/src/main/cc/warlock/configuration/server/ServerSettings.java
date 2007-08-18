@@ -35,6 +35,7 @@ public class ServerSettings implements Comparable<ServerSettings>
 	protected Palette palette;
 	protected Hashtable<String, Preset> presets;
 	protected Hashtable<String, HighlightString> highlightStrings;
+	protected Hashtable<String, String> variables;
 	protected DefaultSkin defaultSkin;
 	
 	private Element mainWindowElement, mainWindowFontElement,
@@ -76,7 +77,8 @@ public class ServerSettings implements Comparable<ServerSettings>
 			loadPalette();
 			loadPresets();
 			loadHighlightStrings();
-
+			loadVariables();
+			
 			// initalize before we call the viewers
 			defaultSkin = new DefaultSkin(this);
 			
@@ -144,6 +146,21 @@ public class ServerSettings implements Comparable<ServerSettings>
 				
 				highlightStrings.put(text, new HighlightString(this, hElement, palette));
 				highlightStrings.get(text).setIsName(true);
+			}
+		}
+	}
+	
+	private void loadVariables()
+	{
+		variables = new Hashtable<String, String>();
+		
+		Element varsElement = (Element) document.selectSingleNode("/settings/vars");
+		if (varsElement != null)
+		{
+			for (Object o : varsElement.elements())
+			{
+				Element varElement = (Element) o;
+				variables.put(varElement.attributeValue("name"), varElement.attributeValue("value"));
 			}
 		}
 	}
@@ -392,5 +409,20 @@ public class ServerSettings implements Comparable<ServerSettings>
 	public DefaultSkin getDefaultSkin ()
 	{
 		return defaultSkin;
+	}
+	
+	public boolean containsVariable (String name)
+	{
+		return variables.containsKey(name);
+	}
+	
+	public String getVariable (String name)
+	{
+		return variables.get(name);
+	}
+	
+	public Collection<String> getVariableNames ()
+	{
+		return variables.keySet();
 	}
 }
