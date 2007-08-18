@@ -3,7 +3,8 @@ package cc.warlock.script.internal;
 import java.util.ArrayList;
 import java.util.Timer;
 import java.util.TimerTask;
-import java.util.Vector;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 import cc.warlock.client.IProperty;
 import cc.warlock.client.IPropertyListener;
@@ -172,7 +173,7 @@ public class ScriptCommands implements IScriptCommands, IStreamListener, IProper
 		{
 			if (!regex)
 			{
-				if (text.contains(waitForText))
+				if (text.toUpperCase().contains(waitForText.toUpperCase()))
 				{
 					sendEvent(new CallbackEvent(IScriptCallback.CallbackType.FinishedWaiting));
 					clearCallbacks();
