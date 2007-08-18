@@ -39,6 +39,7 @@ import cc.warlock.rcp.ui.WarlockText;
 import cc.warlock.rcp.ui.client.SWTStormFrontClientViewer;
 import cc.warlock.rcp.ui.macros.IMacro;
 import cc.warlock.rcp.ui.macros.MacroRegistry;
+import cc.warlock.rcp.ui.macros.internal.SystemMacros;
 import cc.warlock.rcp.ui.style.CompassThemes;
 
 /**
@@ -198,6 +199,8 @@ public class GameView extends StreamView implements KeyListener, IStormFrontClie
 		
 		text.setBackground(createColor(bg));
 		text.setForeground(createColor(fg));
+		
+		SystemMacros.addMacrosFromServerSettings(settings);
 	}
 	
 	public void setViewerTitle(String title) {
