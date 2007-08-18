@@ -3,6 +3,7 @@ package cc.warlock.script.internal;
 import java.util.ArrayList;
 import java.util.Timer;
 import java.util.TimerTask;
+import java.util.Vector;
 
 import cc.warlock.client.IProperty;
 import cc.warlock.client.IPropertyListener;
@@ -45,7 +46,7 @@ public class ScriptCommands implements IScriptCommands, IStreamListener, IProper
 	}
 
 	public void matchWait (IMatch[] matches, IScriptCallback callback) {
-		callbacks.add(callback);
+		addCallback(callback);
 		this.matches = matches;
 		waitingForMatches = true;
 	}
@@ -57,7 +58,7 @@ public class ScriptCommands implements IScriptCommands, IStreamListener, IProper
 	}
 
 	public void nextRoom (IScriptCallback callback) {
-		callbacks.add(callback);
+		addCallback(callback);
 		waitingForRoom = true;
 	}
 
@@ -82,7 +83,7 @@ public class ScriptCommands implements IScriptCommands, IStreamListener, IProper
 	}
 
 	public void waitFor (String text, boolean regex, boolean ignoreCase, IScriptCallback callback) {
-		callbacks.add(callback);
+		addCallback(callback);
 		this.waitForText = text;
 		this.regex = regex;
 		this.ignoreCase = ignoreCase;
@@ -90,18 +91,43 @@ public class ScriptCommands implements IScriptCommands, IStreamListener, IProper
 	}
 
 	public void waitForPrompt (IScriptCallback callback) {
-		callbacks.add(callback);
+		addCallback(callback);
 		waiting = true;
+	}
+	
+	protected void addCallback (IScriptCallback callback)
+	{
+		callbacks.add(callback);
+	}
+	
+	public void removeCallback (IScriptCallback callback)
+	{
+		if (callbacks.contains(callback))
+		{
+			callbacks.remove(callback);
+		}
+	}
+	
+	protected void clearCallbacks ()
+	{
+		callbacks.clear();
+	}
+	
+	public void sendEvent (final CallbackEvent event)
+	{
+		for (final IScriptCallback callback : callbacks) {
+			new Timer().schedule(new TimerTask() {
+				public void run () {
+					callback.handleCallback(event);
+				}
+			}, 100);
+		}
 	}
 	
 	public IStormFrontClient getClient() {
 		return this.client;
 	}
-	
-	public void removeCallback(IScriptCallback callback) {
-		if (callbacks.contains(callback)) callbacks.remove(callback);
-	}
-	
+		
 	public void streamCleared(IStream stream) {}
 	public void streamEchoed(IStream stream, String text) {}
 	
@@ -109,10 +135,9 @@ public class ScriptCommands implements IScriptCommands, IStreamListener, IProper
 	{
 		if (waiting)
 		{
-			CallbackEvent event = new CallbackEvent(IScriptCallback.CallbackType.FinishedWaiting);
-			for (IScriptCallback callback : callbacks) callback.handleCallback(event);
-			callbacks.clear();
 			waiting = false;
+			
+			sendEvent(new CallbackEvent(IScriptCallback.CallbackType.FinishedWaitingForPrompt));
 		}
 	}
 	
@@ -137,12 +162,9 @@ public class ScriptCommands implements IScriptCommands, IStreamListener, IProper
 			{
 				CallbackEvent event = new CallbackEvent(IScriptCallback.CallbackType.Matched);
 				event.data.put(CallbackEvent.DATA_MATCH, foundMatch);
-				for (IScriptCallback callback : callbacks)
-				{
-					callback.handleCallback(event);
-				}
+				sendEvent(event);
 				
-				callbacks.clear();
+				clearCallbacks();
 				waitingForMatches = false;
 			}
 		}
@@ -152,9 +174,8 @@ public class ScriptCommands implements IScriptCommands, IStreamListener, IProper
 			{
 				if (text.contains(waitForText))
 				{
-					CallbackEvent event = new CallbackEvent(IScriptCallback.CallbackType.FinishedWaiting);
-					for (IScriptCallback callback : callbacks) callback.handleCallback(event);
-					callbacks.clear();
+					sendEvent(new CallbackEvent(IScriptCallback.CallbackType.FinishedWaiting));
+					clearCallbacks();
 					waitingForText = false;
 				}
 			}
@@ -164,9 +185,8 @@ public class ScriptCommands implements IScriptCommands, IStreamListener, IProper
 	public void movedToRoom() {
 		if (waitingForRoom)
 		{
-			CallbackEvent event = new CallbackEvent(IScriptCallback.CallbackType.InNextRoom);
-			for (IScriptCallback callback : callbacks) callback.handleCallback(event);
-			callbacks.clear();
+			sendEvent(new CallbackEvent(IScriptCallback.CallbackType.InNextRoom));
+			clearCallbacks();
 			waitingForRoom = false;
 		}
 	}
@@ -189,6 +209,9 @@ public class ScriptCommands implements IScriptCommands, IStreamListener, IProper
 					}
 				}
 			}, 200, 200);
+		} else {
+			CallbackEvent event = new CallbackEvent(IScriptCallback.CallbackType.FinishedWaitingForRoundtime);
+			callback.handleCallback(event);
 		}
 	}
 	

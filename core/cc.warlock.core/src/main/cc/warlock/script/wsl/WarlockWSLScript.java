@@ -635,9 +635,12 @@ public class WarlockWSLScript extends AbstractScript implements IScriptCallback,
 	public void handleCallback(CallbackEvent event) {
 		switch (event.type)
 		{
+			case FinishedWaitingForPrompt:
+				commands.waitForRoundtime(this); break;
 			case FinishedPausing:
 			case FinishedWaiting:
-				commands.waitForRoundtime(this); break;
+				commands.waitForPrompt(this);
+				break;
 			case FinishedWaitingForRoundtime:
 			case InNextRoom:
 				continueAtNextLine(); break;
