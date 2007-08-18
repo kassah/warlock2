@@ -1,0 +1,37 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?eclipse version="3.2"?>
+<plugin>
+   <extension
+         point="org.eclipse.ui.views">
+      <view
+            allowMultiple="false"
+            class="cc.warlock.scribe.ui.views.ScriptControlView"
+            id="cc.warlock.scribe.ui.ScriptControlView"
+            name="Script Control">
+      </view>
+   </extension>
+   <extension
+         point="org.eclipse.ui.startup">
+      <startup
+            class="cc.warlock.scribe.ui.Activator">
+      </startup>
+   </extension>
+   <extension
+         point="org.eclipse.ui.perspectiveExtensions">
+      <perspectiveExtension
+            targetID="cc.warlock.warlockPerspective">
+         <view
+               closeable="true"
+               id="cc.warlock.scribe.ui.ScriptControlView"
+               moveable="true"
+               ratio=".05"
+               relationship="top"
+               relative="cc.warlock.rcp.views.gameView"
+               showTitle="false"
+               standalone="true"
+               visible="true">
+         </view>
+      </perspectiveExtension>
+   </extension>
+
+</plugin>

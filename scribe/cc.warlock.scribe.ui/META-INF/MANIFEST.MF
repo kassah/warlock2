@@ -1,0 +1,12 @@
+Manifest-Version: 1.0
+Bundle-ManifestVersion: 2
+Bundle-Name: Warlock Scribe UI Plug-in
+Bundle-SymbolicName: cc.warlock.scribe.ui;singleton:=true
+Bundle-Version: 2.0.0
+Bundle-Activator: cc.warlock.scribe.ui.Activator
+Require-Bundle: org.eclipse.ui,
+ org.eclipse.core.runtime,
+ cc.warlock.core,
+ cc.warlock.rcp,
+ org.eclipse.ui.forms
+Eclipse-LazyStart: true
