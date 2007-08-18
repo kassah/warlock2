@@ -137,7 +137,7 @@ public class BarsView extends ViewPart implements IPropertyListener<Integer> {
 	
 	public void propertyCleared(IProperty<Integer> property, Integer oldValue) {	}
 	public void propertyChanged(IProperty<Integer> property, Integer oldValue) {
-		if (property.getName() == null) return;
+		if (property == null || property.getName() == null) return;
 		
 		if (property.getName().equals("health"))
 		{
