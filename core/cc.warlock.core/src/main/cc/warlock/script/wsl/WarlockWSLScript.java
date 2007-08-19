@@ -195,7 +195,7 @@ public class WarlockWSLScript extends AbstractScript implements IScriptCallback,
 		String firstToken = tokens.get(0);
 		Matcher matcher = labelPattern.matcher(firstToken);
 		
-		if (matcher.matches())
+		if (matcher.find())
 		{
 			labelOffsets.put(matcher.group(1), lineIndex);
 			tokens.remove(0);
