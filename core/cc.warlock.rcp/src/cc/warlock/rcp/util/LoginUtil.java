@@ -22,13 +22,13 @@ import cc.warlock.rcp.views.GameView;
  */
 public class LoginUtil {
 
-	public static void connectAndOpenGameView (Map<String,String> loginProperties)
+	public static void connect (GameView gameView, Map<String,String> loginProperties)
 	{
 		String server = loginProperties.get("GAMEHOST");
 		int port = Integer.parseInt (loginProperties.get("GAMEPORT"));
 		String key = loginProperties.get("KEY");
 		StormFrontClient client = new StormFrontClient();
-		GameView.createNext().setStormFrontClient(client);
+		gameView.setStormFrontClient(client);
 		
 		try {
 			client.connect(server, port, key);
@@ -46,6 +46,11 @@ public class LoginUtil {
 		} catch (PartInitException e) {
 			e.printStackTrace();
 		}
+	}
+	
+	public static void connectAndOpenGameView (Map<String,String> loginProperties)
+	{
+		connect (GameView.createNext(), loginProperties);
 	}
 	
 	public static void showAuthenticationError (int status)

@@ -23,6 +23,7 @@ import org.eclipse.swt.graphics.Font;
 import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Text;
+import org.eclipse.ui.IViewSite;
 import org.eclipse.ui.IWorkbenchPage;
 import org.eclipse.ui.PartInitException;
 
@@ -32,8 +33,12 @@ import cc.warlock.client.internal.Command;
 import cc.warlock.client.stormfront.IStormFrontClient;
 import cc.warlock.client.stormfront.IStormFrontClientViewer;
 import cc.warlock.client.stormfront.WarlockColor;
+import cc.warlock.configuration.Profile;
+import cc.warlock.configuration.SavedProfiles;
 import cc.warlock.configuration.server.ServerSettings;
 import cc.warlock.configuration.skin.IWarlockSkin;
+import cc.warlock.rcp.actions.ProfileConnectAction;
+import cc.warlock.rcp.application.WarlockApplication;
 import cc.warlock.rcp.ui.WarlockCompass;
 import cc.warlock.rcp.ui.WarlockText;
 import cc.warlock.rcp.ui.client.SWTStormFrontClientViewer;
@@ -70,7 +75,39 @@ public class GameView extends StreamView implements KeyListener, IStormFrontClie
 		wrapper = new SWTStormFrontClientViewer(this);
 //		viewer = new ViewEvents(client);
 		openViews.add(this);
+		
 		setStreamName(IWarlockClient.DEFAULT_STREAM_NAME);
+		
+	}
+	
+	@Override
+	public void init(IViewSite site) throws PartInitException {
+		super.init(site);
+		
+		if (WarlockApplication.instance().getStartWithProfile() != null)
+		{
+			autoConnect();
+		}
+	}
+	
+	protected void autoConnect ()
+	{
+		Profile connectToProfile = null;
+		
+		for (Profile profile : SavedProfiles.getAllProfiles())
+		{
+			if (WarlockApplication.instance().getStartWithProfile().equals(profile.getCharacterName()))
+			{
+				connectToProfile = profile;
+			}
+		}
+		
+		if (connectToProfile == null) /* TODO show a warning */ return;
+		
+		ProfileConnectAction action = new ProfileConnectAction(connectToProfile);
+		action.setGameView(this);
+		
+		action.run();
 	}
 	
 	public static Collection<GameView> getOpenGameViews ()

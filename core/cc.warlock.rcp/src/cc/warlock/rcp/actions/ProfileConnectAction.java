@@ -16,12 +16,14 @@ import cc.warlock.rcp.plugin.Warlock2Plugin;
 import cc.warlock.rcp.ui.WarlockSharedImages;
 import cc.warlock.rcp.ui.network.SWTSGEConnectionListenerAdapter;
 import cc.warlock.rcp.util.LoginUtil;
+import cc.warlock.rcp.views.GameView;
 
 public class ProfileConnectAction extends Action implements ISGEConnectionListener {
 	private Profile profile;
 	private IProgressMonitor monitor;
 	private boolean finished;
 	private IStatus status;
+	private GameView gameView;
 	
 	public ProfileConnectAction (Profile profile) {
 		super(profile.getCharacterName(),
@@ -104,11 +106,18 @@ public class ProfileConnectAction extends Action implements ISGEConnectionListen
 		
 		if (!monitor.isCanceled())
 		{
-			LoginUtil.connectAndOpenGameView(loginProperties);
+			if (gameView == null)
+				LoginUtil.connectAndOpenGameView(loginProperties);
+			else
+				LoginUtil.connect(gameView, loginProperties);
 		} else {
 			status = Status.CANCEL_STATUS;
 			finished = true;
 		}
+	}
+
+	public void setGameView(GameView gameView) {
+		this.gameView = gameView;
 	}
 
 }
