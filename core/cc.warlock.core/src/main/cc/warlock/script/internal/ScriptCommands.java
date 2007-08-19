@@ -77,6 +77,16 @@ public class ScriptCommands implements IScriptCommands, IStreamListener, IProper
 	}
 	
 	public void put (IScript script, String text) {
+		while (!client.getDefaultStream().isPrompting())
+		{
+			try {
+				Thread.sleep(200);
+			} catch (InterruptedException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
+		}
+		
 		client.send(text);
 		client.getDefaultStream().echo("[" + script.getName() + "]: " + text);
 	}
