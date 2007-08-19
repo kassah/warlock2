@@ -413,7 +413,6 @@ public class WarlockWSLScript extends AbstractScript implements IScriptCallback,
 			mode = MODE_WAITING;
 			
 			commands.matchWait(matchset.toArray(new IMatch[matchset.size()]), WarlockWSLScript.this);
-			running = false;
 		}
 	}
 
@@ -491,7 +490,6 @@ public class WarlockWSLScript extends AbstractScript implements IScriptCallback,
 				regex = regex.substring(1, end);
 				
 				commands.waitFor(regex, true, ignoreCase, WarlockWSLScript.this);
-				running = false;
 			} else { /* TODO throw error */ }
 		}
 	}
@@ -508,7 +506,6 @@ public class WarlockWSLScript extends AbstractScript implements IScriptCallback,
 				
 				String text = toString(arguments);
 				commands.waitFor(text, false, true, WarlockWSLScript.this);
-				running = false;
 				
 			} else { /* TODO throw error */ }
 		}
@@ -523,7 +520,6 @@ public class WarlockWSLScript extends AbstractScript implements IScriptCallback,
 			mode = MODE_WAITING;
 			
 			commands.waitForPrompt(WarlockWSLScript.this);
-			running = false;
 		}
 	}
 	
@@ -671,6 +667,8 @@ public class WarlockWSLScript extends AbstractScript implements IScriptCallback,
 	}
 	
 	public void handleCallback(CallbackEvent event) {
+		if (!running) return;
+		
 		switch (event.type)
 		{
 			case FinishedWaitingForPrompt:
