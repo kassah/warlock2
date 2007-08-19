@@ -14,6 +14,7 @@ import java.util.List;
 import cc.warlock.client.ICompass;
 import cc.warlock.client.IProperty;
 import cc.warlock.client.IWarlockStyle;
+import cc.warlock.client.WarlockClientRegistry;
 import cc.warlock.client.internal.ClientProperty;
 import cc.warlock.client.internal.Compass;
 import cc.warlock.client.internal.WarlockClient;
@@ -73,6 +74,8 @@ public class StormFrontClient extends WarlockClient implements IStormFrontClient
 		scriptCommands = new ScriptCommands(this);
 		runningScripts = new ArrayList<IScript>();
 		scriptListeners = new ArrayList<IScriptListener>();
+		
+		WarlockClientRegistry.activateClient(this);
 	}
 
 	@Override
@@ -188,6 +191,8 @@ public class StormFrontClient extends WarlockClient implements IStormFrontClient
 		try {
 			connection = new StormFrontConnection(this, key);
 			connection.connect(server, port);
+			
+			WarlockClientRegistry.clientConnected(this);
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
@@ -263,5 +268,11 @@ public class StormFrontClient extends WarlockClient implements IStormFrontClient
 	{
 		if (scriptListeners.contains(listener))
 			scriptListeners.remove(listener);
+	}
+	
+	@Override
+	protected void finalize() throws Throwable {
+		WarlockClientRegistry.removeClient(this);
+		super.finalize();
 	}
 }
