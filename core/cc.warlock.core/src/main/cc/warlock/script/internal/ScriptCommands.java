@@ -26,6 +26,7 @@ public class ScriptCommands implements IScriptCommands, IStreamListener, IProper
 	protected String waitForText;
 	protected boolean ignoreCase, regex;
 	protected boolean waitingForMatches, waitingForRoom, waitingForText, waiting;
+	protected Timer timer = new Timer();
 	
 	public ScriptCommands (IStormFrontClient client)
 	{
@@ -62,7 +63,6 @@ public class ScriptCommands implements IScriptCommands, IStreamListener, IProper
 	}
 
 	public void pause (int seconds, final IScriptCallback callback) {
-		Timer timer = new Timer();
 		timer.schedule(new TimerTask() {
 			public void run() {
 				CallbackEvent event = new CallbackEvent(IScriptCallback.CallbackType.FinishedPausing);
@@ -93,17 +93,16 @@ public class ScriptCommands implements IScriptCommands, IStreamListener, IProper
 		addCallback(callback);
 		waiting = true;
 		
-		final Timer timer = new Timer();
 		timer.schedule(new TimerTask () {
 			public void run () {
 				if (client.getDefaultStream().isPrompting())
 				{
-					timer.cancel();
+					cancel();
 					waiting = false;
 					sendEvent(new CallbackEvent(IScriptCallback.CallbackType.FinishedWaitingForPrompt), false);
 				}
 			}
-		}, 0, 200);
+		}, 200, 200);
 	}
 	
 	protected void addCallback (IScriptCallback callback)
@@ -134,7 +133,7 @@ public class ScriptCommands implements IScriptCommands, IStreamListener, IProper
 		for (final IScriptCallback callback : callbacks) {
 			if (asynch)
 			{
-				new Timer().schedule(new TimerTask() {
+				timer.schedule(new TimerTask() {
 					public void run () {
 						callback.handleCallback(event);
 					}
@@ -211,12 +210,11 @@ public class ScriptCommands implements IScriptCommands, IStreamListener, IProper
 		{
 			waitingForRoundtime = true;
 			
-			final Timer timer = new Timer(true);
 			timer.schedule(new TimerTask () {
 				public void run() {
 					if (!waitingForRoundtime)
 					{
-						timer.cancel();
+						cancel();
 						CallbackEvent event = new CallbackEvent(IScriptCallback.CallbackType.FinishedWaitingForRoundtime);
 						callback.handleCallback(event);
 					}
