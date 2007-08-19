@@ -129,6 +129,8 @@ public class BarsView extends ViewPart implements IPropertyListener<Integer> {
 	
 	private boolean activateRoundtime = false;
 	public void propertyActivated(IProperty<Integer> property) {
+		if (property == null || property.getName() == null) return;
+		
 		if ("roundtime".equals(property.getName()))
 		{
 			activateRoundtime = true;
