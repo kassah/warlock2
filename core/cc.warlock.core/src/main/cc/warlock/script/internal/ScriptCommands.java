@@ -173,7 +173,7 @@ public class ScriptCommands implements IScriptCommands, IStreamListener, IProper
 			{
 				if (!match.isRegex())
 				{
-					if (text.contains(match.getMatchText()))
+					if (text.toUpperCase().contains(match.getMatchText().toUpperCase()))
 					{
 						foundMatch = match; break;
 					}
