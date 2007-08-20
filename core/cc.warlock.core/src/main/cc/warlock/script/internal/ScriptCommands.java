@@ -1,6 +1,7 @@
 package cc.warlock.script.internal;
 
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.Timer;
 import java.util.TimerTask;
 
@@ -9,6 +10,7 @@ import cc.warlock.client.IPropertyListener;
 import cc.warlock.client.IStream;
 import cc.warlock.client.IStreamListener;
 import cc.warlock.client.IStyledString;
+import cc.warlock.client.internal.Command;
 import cc.warlock.client.stormfront.IStormFrontClient;
 import cc.warlock.script.CallbackEvent;
 import cc.warlock.script.IMatch;
@@ -72,7 +74,11 @@ public class ScriptCommands implements IScriptCommands, IStreamListener, IProper
 	}
 
 	public void put (String text) {
-		client.send(text);
+		// false command so it doesn't get added to the command history
+		Command command = new Command(text, new Date());
+		command.setInHistory(true);
+		
+		client.send(command);
 		client.getDefaultStream().echo(text);
 	}
 	
@@ -87,7 +93,11 @@ public class ScriptCommands implements IScriptCommands, IStreamListener, IProper
 			}
 		}
 		
-		client.send(text);
+		// false command so it doesn't get added to the command history
+		Command command = new Command(text, new Date());
+		command.setInHistory(true);
+		
+		client.send(command);
 		client.getDefaultStream().echo("[" + script.getName() + "]: " + text);
 	}
 
