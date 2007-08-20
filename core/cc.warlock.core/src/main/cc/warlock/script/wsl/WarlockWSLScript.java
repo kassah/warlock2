@@ -681,7 +681,7 @@ public class WarlockWSLScript extends AbstractScript implements IScriptCallback,
 				{
 					matchset.clear();
 					gotoLabel(replaceVariables(match.getData().get("label")));
-					continueAtNextLine();
+					commands.waitForRoundtime(this);
 				}
 			} break;
 		}
