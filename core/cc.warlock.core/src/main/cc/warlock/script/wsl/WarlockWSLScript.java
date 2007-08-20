@@ -550,7 +550,7 @@ public class WarlockWSLScript extends AbstractScript implements IScriptCallback,
 		public void execute (List<String> arguments)
 		{
 			mode = MODE_WAITING;
-			if (arguments.size() == 1)
+			if (arguments.size() >= 1)
 			{
 				int time = Integer.parseInt(arguments.get(0));
 				commands.pause(time, WarlockWSLScript.this);
