@@ -3,6 +3,8 @@ package cc.warlock.rcp.ui;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.custom.ExtendedModifyEvent;
 import org.eclipse.swt.custom.ExtendedModifyListener;
+import org.eclipse.swt.events.ControlEvent;
+import org.eclipse.swt.events.ControlListener;
 import org.eclipse.swt.events.MouseEvent;
 import org.eclipse.swt.events.MouseListener;
 import org.eclipse.swt.events.MouseMoveListener;
@@ -32,7 +34,7 @@ public class WarlockCompass implements PaintListener, MouseMoveListener, MouseLi
 	private WarlockText text;
 	private boolean dragging = false;
 	private Point originalPosition = new Point(-1,-1), startedDraggingFrom = new Point(-1,-1);
-	private int x = -1, y = -1;
+	private int x = -1, y = -1, rightDiff, bottomDiff;
 	private Cursor moveCursor;
 	private CompassTheme theme;
 	private ICompass compass;
@@ -52,6 +54,13 @@ public class WarlockCompass implements PaintListener, MouseMoveListener, MouseLi
 		text.addPaintListener(this);
 		text.addMouseListener(this);
 		text.addMouseMoveListener(this);
+		text.addControlListener(new ControlListener () {
+			public void controlMoved(ControlEvent e) {}
+			public void controlResized(ControlEvent e) {
+				textResized(e);
+			}
+		});
+		
 		text.getVerticalBar().addSelectionListener(new SelectionListener () {
 			public void widgetDefaultSelected(SelectionEvent e) {
 				widgetSelected(e);
@@ -83,9 +92,9 @@ public class WarlockCompass implements PaintListener, MouseMoveListener, MouseLi
 	private void drawCompass (GC gc)
 	{
 		if (x == -1)
-			x = text.getClientArea().width - compassBounds.width - 5;
+			setX(text.getClientArea().width - compassBounds.width - 5);
 		if (y == -1)
-			y = text.getClientArea().height - compassBounds.height - 5;
+			setY(text.getClientArea().height - compassBounds.height - 5);
 		
 		gc.drawImage(compassImage, x, y);
 		if (compass != null)
@@ -143,8 +152,8 @@ public class WarlockCompass implements PaintListener, MouseMoveListener, MouseLi
 			int newY = originalPosition.y + (e.y - startedDraggingFrom.y);
 			if (boundsInsideText(newX, newY))
 			{
-				this.x = newX;
-				this.y = newY;
+				setX(newX);
+				setY(newY);
 				text.redraw();
 			}
 		}
@@ -164,6 +173,24 @@ public class WarlockCompass implements PaintListener, MouseMoveListener, MouseLi
 		}
 	}
 	
+	protected void textResized (ControlEvent e)
+	{
+		Rectangle textBounds = text.getBounds();
+		
+		if (x <= rightDiff)
+		{
+			redraw();
+		} else {
+			setX(textBounds.width - rightDiff);
+		}
+		
+		if (y <= bottomDiff)
+		{
+			redraw();
+		} else {
+			setY(textBounds.height - bottomDiff);
+		}
+	}
 	
 	public void mouseUp(MouseEvent e) {
 		dragging = false;
@@ -175,6 +202,7 @@ public class WarlockCompass implements PaintListener, MouseMoveListener, MouseLi
 
 	public void setX(int x) {
 		this.x = x;
+		this.rightDiff = text.getBounds().width - x;
 	}
 
 	public int getY() {
@@ -183,6 +211,8 @@ public class WarlockCompass implements PaintListener, MouseMoveListener, MouseLi
 
 	public void setY(int y) {
 		this.y = y;
+		
+		this.bottomDiff = text.getBounds().height - y;
 	}
 
 	public ICompass getCompass() {

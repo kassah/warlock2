@@ -13,6 +13,8 @@ import org.eclipse.swt.custom.PaintObjectEvent;
 import org.eclipse.swt.custom.PaintObjectListener;
 import org.eclipse.swt.custom.StyleRange;
 import org.eclipse.swt.custom.StyledText;
+import org.eclipse.swt.events.ControlEvent;
+import org.eclipse.swt.events.ControlListener;
 import org.eclipse.swt.events.MouseEvent;
 import org.eclipse.swt.events.MouseListener;
 import org.eclipse.swt.events.MouseMoveListener;
@@ -196,6 +198,13 @@ public class WarlockText extends StyledText implements LineBackgroundListener {
 		});
 		
 		addLineBackgroundListener(this);
+		addControlListener(new ControlListener () {
+			public void controlMoved(ControlEvent e) {}
+			public void controlResized(ControlEvent e) {
+				scrollToBottom();
+				redraw();
+			}
+		});
 	}
 	
 	private int getCurrentHolderOffset ()
