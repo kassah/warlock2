@@ -194,8 +194,7 @@ public class WarlockWSLScript extends AbstractScript implements IScriptCallback,
 	private Pattern labelPattern = Pattern.compile("^([\\w_]+):\\s*$");
 	protected void parseLabel (ArrayList<String> tokens, int lineIndex)
 	{
-		String firstToken = tokens.get(0);
-		Matcher matcher = labelPattern.matcher(firstToken);
+		Matcher matcher = labelPattern.matcher(tokens.get(0));
 		
 		if (matcher.find())
 		{
@@ -235,7 +234,11 @@ public class WarlockWSLScript extends AbstractScript implements IScriptCallback,
 		
 		if (tokens.size() == 0) return ;// empty line -- most likely a label
 		
-		String curCommandName = replaceVariables(tokens.get(0)).toLowerCase();
+		for (int i = 0; i < tokens.size(); i++) {
+			tokens.set(i, replaceVariables(tokens.get(i)));
+		}
+		
+		String curCommandName = tokens.get(0).toLowerCase();
 		List<String> arguments = null;
 		if (tokens.size() > 0) arguments = tokens.subList(1, tokens.size());
 		
@@ -265,7 +268,7 @@ public class WarlockWSLScript extends AbstractScript implements IScriptCallback,
 					buffer.append(' ');
 				}
 			}
-			return replaceVariables(buffer.toString());
+			return buffer.toString();
 		}
 		
 		abstract public String getName();
@@ -313,7 +316,7 @@ public class WarlockWSLScript extends AbstractScript implements IScriptCallback,
 
 				if ("set".equalsIgnoreCase(counterFunction))
 				{
-					variables.put("c", replaceVariables(arguments.get(1)));
+					variables.put("c", arguments.get(1));
 				}
 				else if ("add".equalsIgnoreCase(counterFunction))
 				{	
@@ -393,7 +396,7 @@ public class WarlockWSLScript extends AbstractScript implements IScriptCallback,
 		public void execute (List<String> arguments) {
 			if (arguments.size() == 1)
 			{
-				String label = replaceVariables(arguments.get(0));
+				String label = arguments.get(0);
 				gotoLabel(label);
 			} else { /*throw error*/ }
 		}
@@ -434,7 +437,7 @@ public class WarlockWSLScript extends AbstractScript implements IScriptCallback,
 				}
 				regex = regex.substring(1, end);
 				
-				match.data.put("label", replaceVariables(arguments.get(0)));
+				match.data.put("label", arguments.get(0));
 				match.matchText = regex; 
 				match.regex = true;
 				
@@ -453,7 +456,7 @@ public class WarlockWSLScript extends AbstractScript implements IScriptCallback,
 			if (arguments.size() >= 2)
 			{
 				Match match = new Match();
-				match.data.put("label", replaceVariables(arguments.get(0)));
+				match.data.put("label", arguments.get(0));
 				match.matchText = toString(arguments.subList(1, arguments.size()));
 				match.regex = false;
 				match.ignoreCase = true;
@@ -549,7 +552,7 @@ public class WarlockWSLScript extends AbstractScript implements IScriptCallback,
 			mode = MODE_WAITING;
 			if (arguments.size() == 1)
 			{
-				int time = Integer.parseInt(replaceVariables(arguments.get(0)));
+				int time = Integer.parseInt(arguments.get(0));
 				commands.pause(time, WarlockWSLScript.this);
 			}
 			else {
@@ -680,7 +683,7 @@ public class WarlockWSLScript extends AbstractScript implements IScriptCallback,
 				if (match != null)
 				{
 					matchset.clear();
-					gotoLabel(replaceVariables(match.getData().get("label")));
+					gotoLabel(match.getData().get("label"));
 					commands.waitForPrompt(this);
 				}
 			} break;
