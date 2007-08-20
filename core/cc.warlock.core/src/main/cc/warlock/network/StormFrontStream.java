@@ -24,6 +24,7 @@ public class StormFrontStream extends InputStream {
 			new Replacer(Pattern.compile("\034"), "\\\\\\^"),
 			new Replacer(Pattern.compile("<(?=[^\\w/])"), "&lt;"),
 			//new Replacer(Pattern.compile("(?<=^[^<]+)>"), "&gt;"),
+			new Replacer(Pattern.compile("&(?![a-zA-z]+;)"), "&amp;"),
 			new Replacer(Pattern.compile("\07"), ""),
 			new Replacer(Pattern.compile("(?<!/)>(\\n|\\r\\n)"), ">"),
 			new Replacer(Pattern.compile("\\w+=\"[^\"]*(\")[^=]*\"(\\s+\\w+=|\\s*/>)"), "&quot;", 1),
