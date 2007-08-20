@@ -29,7 +29,6 @@ public class WarlockWSLScript extends AbstractScript implements IScriptCallback,
 	protected boolean running, stopped;
 	protected Hashtable<String, Integer> labelOffsets = new Hashtable<String, Integer>();
 	protected Hashtable<String, String> variables = new Hashtable<String, String>();
-	protected ArrayList<String> scriptArguments = new ArrayList<String>();
 	protected ArrayList<ArrayList<String>> lineTokens;
 	protected HashMap<String, WarlockWSLCommand> wslCommands = new HashMap<String, WarlockWSLCommand>();
 	protected int pauseLine, nextLine;
@@ -98,7 +97,10 @@ public class WarlockWSLScript extends AbstractScript implements IScriptCallback,
 	
 	public void start (ArrayList<String> arguments)
 	{
-		this.scriptArguments.addAll(arguments);
+		for (int i = 0; i < arguments.size(); i++) {
+			variables.put(Integer.toString(i + 1), arguments.get(i));
+		}
+
 		mode = MODE_START;
 		
 		scriptThread = new Thread(this);
@@ -189,7 +191,7 @@ public class WarlockWSLScript extends AbstractScript implements IScriptCallback,
 		super.resume();
 	}
 	
-	private Pattern labelPattern = Pattern.compile("^([^:]+): *$");
+	private Pattern labelPattern = Pattern.compile("^([\\w_]+):\\s*$");
 	protected void parseLabel (ArrayList<String> tokens, int lineIndex)
 	{
 		String firstToken = tokens.get(0);
@@ -222,20 +224,6 @@ public class WarlockWSLScript extends AbstractScript implements IScriptCallback,
 			}
 		}
 		
-		for (int i = 0; i <= 9; i++)
-		{
-			if (newToken.contains("%" + i))
-			{
-				try {
-					String argument = scriptArguments.get(i-1);
-					newToken = newToken.replaceAll("\\%" + i, argument);
-				}
-				catch (IndexOutOfBoundsException ex) {
-					newToken = newToken.replaceAll("\\%" + i, "");
-				}
-			}
-		}
-		
 		newToken = newToken.replace("\\%[A-Za-z0-9_]+", "");
 		return newToken;
 	}
@@ -247,7 +235,7 @@ public class WarlockWSLScript extends AbstractScript implements IScriptCallback,
 		
 		if (tokens.size() == 0) return ;// empty line -- most likely a label
 		
-		String curCommandName = replaceVariables(tokens.get(0));
+		String curCommandName = replaceVariables(tokens.get(0)).toLowerCase();
 		List<String> arguments = null;
 		if (tokens.size() > 0) arguments = tokens.subList(1, tokens.size());
 		
@@ -301,7 +289,14 @@ public class WarlockWSLScript extends AbstractScript implements IScriptCallback,
 		}
 		
 		public void execute (List<String> arguments) {
-			scriptArguments.remove(0);
+			for (int i = 0; ; i++) {
+				String arg = variables.get(Integer.toString(i + 1));
+				if (arg == null) {
+					variables.remove(Integer.toString(i));
+					break;
+				}
+				variables.put(Integer.toString(i), arg);
+			}
 		}
 	}
 
@@ -614,7 +609,7 @@ public class WarlockWSLScript extends AbstractScript implements IScriptCallback,
 		
 		public void execute (List<String> arguments) {
 			if (variables.containsKey(variableName)) {
-				String curCommandName = arguments.get(0);
+				String curCommandName = arguments.get(0).toLowerCase();
 				arguments = arguments.subList(1, arguments.size());
 				
 				WarlockWSLCommand command = wslCommands.get(curCommandName);
