@@ -54,6 +54,7 @@ public class StreamView extends ViewPart implements IStreamListener {
 	protected SWTStreamListener streamListenerWrapper;
 	protected SWTPropertyListener<String> propertyListenerWrapper;
 	protected boolean appendNewlines = false;
+	protected boolean isPrompting = false;
 	
 	public StreamView() {
 		openViews.add(this);
@@ -199,6 +200,11 @@ public class StreamView extends ViewPart implements IStreamListener {
 	public void streamReceivedText(IStream stream, IStyledString string) {
 		if (this.mainStream.equals(stream) || this.streams.contains(stream))
 		{
+			if (isPrompting) {
+				this.text.append("\n");
+				isPrompting = false;
+			}
+			
 			String streamText = string.getBuffer().toString();
 			
 			if (appendNewlines)
@@ -245,6 +251,8 @@ public class StreamView extends ViewPart implements IStreamListener {
 	public void streamEchoed(IStream stream, String text) {
 		if (this.mainStream.equals(stream) || this.streams.contains(stream))
 		{
+			isPrompting = false;
+			
 			this.text.append(text + "\n");
 			
 			StyleRange echoStyle = StyleMappings.getEchoStyle(client.getServerSettings(), this.text.getCharCount() - text.length() - 1, text.length());
@@ -255,8 +263,13 @@ public class StreamView extends ViewPart implements IStreamListener {
 	public void streamPrompted(IStream stream, String prompt) {
 		if (this.mainStream.equals(stream) || this.streams.contains(stream))
 		{
+			isPrompting = true;
 			this.text.append(prompt);
 		}
+	}
+	
+	public void streamDonePrompting (IStream stream) {
+		isPrompting = false;
 	}
 
 	public static Collection<StreamView> getOpenViews ()

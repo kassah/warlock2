@@ -172,6 +172,7 @@ public class ScriptCommands implements IScriptCommands, IStreamListener, IProper
 	public void streamEchoed(IStream stream, String text) {}
 	
 	public void streamPrompted(IStream stream, String prompt) { }
+	public void streamDonePrompting (IStream stream) { }
 	
 	public void streamReceivedText(IStream stream, IStyledString string) {
 		String text = string.getBuffer().toString();

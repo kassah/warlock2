@@ -88,12 +88,8 @@ public class Stream implements IStream {
 		if (buffer.readyToFlush())
 		{
 			StyledString newline = new StyledString();
-			newline.getBuffer().append("\n");
 			for(IStreamListener listener : listeners) {
 				try {
-					if(isPrompting) {
-						listener.streamReceivedText(this, newline);
-					}
 					listener.streamReceivedText(this, buffer);
 				} catch (Throwable t) {
 					// TODO Auto-generated catch block
@@ -101,10 +97,7 @@ public class Stream implements IStream {
 				}
 			}
 			
-			if (buffer.getBuffer().length() > 0)
-			{
-				isPrompting = false;
-			}
+			isPrompting = false;
 			buffer = null;
 		}
 	}
@@ -122,7 +115,15 @@ public class Stream implements IStream {
 	}
 	
 	public void donePrompting() {
-		isPrompting = false;
+		if (isPrompting) {
+			
+			for (IStreamListener listener : listeners)
+			{
+				listener.streamDonePrompting(this);
+			}
+			
+			isPrompting = false;
+		}
 	}
 	
 	public boolean isPrompting () {

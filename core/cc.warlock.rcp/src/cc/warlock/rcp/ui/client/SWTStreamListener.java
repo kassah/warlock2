@@ -88,4 +88,5 @@ public class SWTStreamListener implements IStreamListener {
 		run(wrapper);
 	}
 
+	public void streamDonePrompting (IStream stream) { }
 }

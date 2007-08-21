@@ -14,6 +14,7 @@ public interface IStreamListener {
 	public void streamReceivedText (IStream stream, IStyledString text);
 	
 	public void streamPrompted (IStream stream, String prompt);
+	public void streamDonePrompting (IStream stream);
 	
 	public void streamEchoed (IStream stream, String text);
 	
