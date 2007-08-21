@@ -87,7 +87,6 @@ public class Stream implements IStream {
 	private void sendBuffer() {
 		if (buffer.readyToFlush())
 		{
-			StyledString newline = new StyledString();
 			for(IStreamListener listener : listeners) {
 				try {
 					listener.streamReceivedText(this, buffer);
@@ -103,27 +102,21 @@ public class Stream implements IStream {
 	}
 	
 	public void prompt(String prompt) {
-		if (!isPrompting)
+		for (IStreamListener listener : listeners)
 		{
-			for (IStreamListener listener : listeners)
-			{
-				listener.streamPrompted(this, prompt);
-			}
-
-			isPrompting = true;
+			listener.streamPrompted(this, prompt);
 		}
+		
+		isPrompting = true;
 	}
 	
 	public void donePrompting() {
-		if (isPrompting) {
-			
-			for (IStreamListener listener : listeners)
-			{
-				listener.streamDonePrompting(this);
-			}
-			
-			isPrompting = false;
+		for (IStreamListener listener : listeners)
+		{
+			listener.streamDonePrompting(this);
 		}
+		
+		isPrompting = false;
 	}
 	
 	public boolean isPrompting () {
