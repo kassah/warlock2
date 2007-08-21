@@ -107,11 +107,11 @@ public class BarsView extends ViewPart implements IPropertyListener<Integer> {
 	private void initBarColors() {
 		Display display = getSite().getShell().getDisplay();
 		
-		healthBG = new Color(display, 192, 0, 0);
+		healthBG = new Color(display, 255, 63, 127);
 		healthFG = new Color(display, 0, 0, 0);
-		manaBG = new Color(display, 16, 64, 255);
+		manaBG = new Color(display, 63, 127, 255);
 		manaFG = new Color(display, 0, 0, 0);
-		fatigueBG = new Color(display, 208, 152, 47);
+		fatigueBG = new Color(display, 255, 127, 63);
 		fatigueFG = new Color(display, 0, 0, 0);
 		spiritBG = new Color(display, 192, 192, 192);
 		spiritFG = new Color(display, 0, 0, 0);
