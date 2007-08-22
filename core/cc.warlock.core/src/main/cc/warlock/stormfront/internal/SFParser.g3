@@ -24,7 +24,7 @@ tokens {
     }
 }
 
-document : element ;
+document : element* ;
 
 element
     : startTag
@@ -33,6 +33,7 @@ element
         )*
         endTag
     | emptyElement
+    | data=PCDATA { handler.characters($data.text.toCharArray(), 0, $data.text.length()); }
     ;
 
 startTag  : TAG_START_OPEN name=GENERIC_ID (attribute)* TAG_CLOSE { System.out.print("got tag " + $name.text); handler.startElement($name.text, currentAttributes); }
