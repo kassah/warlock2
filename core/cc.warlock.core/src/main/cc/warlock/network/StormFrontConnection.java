@@ -63,10 +63,12 @@ public class StormFrontConnection extends Connection implements IConnectionListe
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
+		
+		new Thread(new SFParser()).start();
 	}
 	
 	public void dataReady(IConnection connection, String line) {
-		CharStream input = new ANTLRStringStream(line);
+		/*CharStream input = new ANTLRStringStream(line);
 		SFLexerLexer lex = new SFLexerLexer(input);
 		CommonTokenStream tokens = new CommonTokenStream(lex);
 		
@@ -78,36 +80,36 @@ public class StormFrontConnection extends Connection implements IConnectionListe
 		} catch (RecognitionException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
-		}
+		}*/
 	}
 	
 	public void disconnected(IConnection connection) {}
 	
-//	class SFParser implements Runnable {
-//		public void run() {
-//			try {
-//				
-//				// StormFrontStream inputStream = new StormFrontStream(StormFrontConnection.this, socket.getInputStream());
-//				System.out.print("about to create input\n");
-//				System.out.flush();
-//				CharStream input = new ANTLRInputStream(socket.getInputStream());
-//				System.out.print("about to pass input to lexer\n");
-//				System.out.flush();
-//				SFLexerLexer lex = new SFLexerLexer(input);
-//				System.out.print("about to create token stream\n");
-//				System.out.flush();
-//				CommonTokenStream tokens = new CommonTokenStream(lex);
-//				
-//				System.out.print("about to run parser\n");
-//				System.out.flush();
-//				SFParserParser parser = new SFParserParser(tokens);
-//				parser.setHandler(new StormFrontProtocolHandler(client));
-//				parser.document();
-//			} catch (Throwable t) {
-//				t.printStackTrace();
-//			}
-//		}
-//	}
+	class SFParser implements Runnable {
+		public void run() {
+			try {
+				
+				// StormFrontStream inputStream = new StormFrontStream(StormFrontConnection.this, socket.getInputStream());
+				System.out.print("about to create input\n");
+				System.out.flush();
+				CharStream input = new StormFrontCharStream(socket.getInputStream());
+				System.out.print("about to pass input to lexer\n");
+				System.out.flush();
+				SFLexerLexer lex = new SFLexerLexer(input);
+				System.out.print("about to create token stream\n");
+				System.out.flush();
+				CommonTokenStream tokens = new CommonTokenStream(lex);
+				
+				System.out.print("about to run parser\n");
+				System.out.flush();
+				SFParserParser parser = new SFParserParser(tokens);
+				parser.setHandler(new StormFrontProtocolHandler(client));
+				parser.document();
+			} catch (Throwable t) {
+				t.printStackTrace();
+			}
+		}
+	}
 
 	public String getHost() {
 		return host;
