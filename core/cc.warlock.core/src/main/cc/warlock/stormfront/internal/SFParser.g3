@@ -36,10 +36,10 @@ element
     | data=PCDATA { handler.characters($data.text.toCharArray(), 0, $data.text.length()); }
     ;
 
-startTag  : TAG_START_OPEN name=GENERIC_ID (attribute)* TAG_CLOSE { System.out.print("got tag " + $name.text); handler.startElement($name.text, currentAttributes); }
+startTag  : TAG_START_OPEN name=GENERIC_ID (attribute)* TAG_CLOSE { System.out.println("got tag " + $name.text); handler.startElement($name.text, currentAttributes); }
 	;
 
-attribute  : name=GENERIC_ID ATTR_EQ value=ATTR_VALUE { currentAttributes.put($name.text, $value.text); };
+attribute  : name=GENERIC_ID ATTR_EQ value=ATTR_VALUE { currentAttributes.put($name.text, $value.text.substring(1, $value.text.length() - 1)); };
 
 endTag :  TAG_END_OPEN name=GENERIC_ID TAG_CLOSE { handler.endElement($name.text); currentAttributes.clear(); }
 	;
