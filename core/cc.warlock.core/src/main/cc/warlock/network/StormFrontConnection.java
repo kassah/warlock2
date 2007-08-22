@@ -25,6 +25,7 @@ import cc.warlock.stormfront.internal.StormFrontProtocolHandler;
  * The Internal Storm Front protocol handler. Not meant to be instantiated outside of Warlock.
  */
 public class StormFrontConnection extends Connection implements IConnectionListener{
+	protected StormFrontProtocolHandler handler;
 	protected IStormFrontClient client;
 	protected String key;
 	
@@ -32,6 +33,7 @@ public class StormFrontConnection extends Connection implements IConnectionListe
 		super();
 		this.client = client;
 		this.key = key;
+		this.handler = new StormFrontProtocolHandler(client);
 		
 		addConnectionListener(this);
 	}
@@ -69,7 +71,7 @@ public class StormFrontConnection extends Connection implements IConnectionListe
 		CommonTokenStream tokens = new CommonTokenStream(lex);
 		
 		SFParserParser parser = new SFParserParser(tokens);
-		parser.setHandler(new StormFrontProtocolHandler(client));
+		parser.setHandler(handler);
 		
 		try {
 			parser.document();
