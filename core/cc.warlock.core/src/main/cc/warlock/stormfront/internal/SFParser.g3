@@ -1,0 +1,45 @@
+parser grammar SFParser;
+options {
+    tokenVocab=SFLexer;
+}
+
+tokens {
+    ELEMENT;
+    ATTRIBUTE;
+}
+
+@header {
+	package cc.warlock.stormfront.internal;
+	import cc.warlock.stormfront.internal.StormFrontProtocolHandler;
+}
+
+@members {
+    protected boolean tagMode = false;
+    protected StormFrontProtocolHandler handler;
+    
+    public void setHandler(StormFrontProtocolHandler h) {
+    	handler = h;
+    }
+}
+
+document : element ;
+
+element
+    : startTag
+        (element
+        | data=PCDATA { handler.characters($data.text.toCharArray(), 0, $data.text.length()); }
+        )*
+        endTag
+    | emptyElement
+    ;
+
+startTag  : TAG_START_OPEN name=GENERIC_ID (attribute)* TAG_CLOSE { System.out.print("got tag " + $name.text); handler.startElement($name.text, null); }
+	;
+
+attribute  : GENERIC_ID ATTR_EQ ATTR_VALUE ;
+
+endTag :  TAG_END_OPEN name=GENERIC_ID TAG_CLOSE { handler.endElement($name.text); }
+	;
+
+emptyElement : TAG_START_OPEN name=GENERIC_ID  (attribute)* TAG_EMPTY_CLOSE { handler.startElement($name.text, null); handler.endElement($name.text); }
+	;
