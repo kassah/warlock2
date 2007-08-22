@@ -11,11 +11,13 @@ tokens {
 @header {
 	package cc.warlock.stormfront.internal;
 	import cc.warlock.stormfront.internal.StormFrontProtocolHandler;
+	import java.util.Hashtable;
 }
 
 @members {
     protected boolean tagMode = false;
     protected StormFrontProtocolHandler handler;
+    protected Hashtable<String,String> currentAttributes = new Hashtable<String,String>();
     
     public void setHandler(StormFrontProtocolHandler h) {
     	handler = h;
@@ -33,13 +35,13 @@ element
     | emptyElement
     ;
 
-startTag  : TAG_START_OPEN name=GENERIC_ID (attribute)* TAG_CLOSE { System.out.print("got tag " + $name.text); handler.startElement($name.text, null); }
+startTag  : TAG_START_OPEN name=GENERIC_ID (attribute)* TAG_CLOSE { System.out.print("got tag " + $name.text); handler.startElement($name.text, currentAttributes); }
 	;
 
-attribute  : GENERIC_ID ATTR_EQ ATTR_VALUE ;
+attribute  : name=GENERIC_ID ATTR_EQ value=ATTR_VALUE { currentAttributes.put($name.text, $value.text); };
 
-endTag :  TAG_END_OPEN name=GENERIC_ID TAG_CLOSE { handler.endElement($name.text); }
+endTag :  TAG_END_OPEN name=GENERIC_ID TAG_CLOSE { handler.endElement($name.text); currentAttributes.clear(); }
 	;
 
-emptyElement : TAG_START_OPEN name=GENERIC_ID  (attribute)* TAG_EMPTY_CLOSE { handler.startElement($name.text, null); handler.endElement($name.text); }
+emptyElement : TAG_START_OPEN name=GENERIC_ID  (attribute)* TAG_EMPTY_CLOSE { handler.startElement($name.text, currentAttributes); handler.endElement($name.text); }
 	;

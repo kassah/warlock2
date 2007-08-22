@@ -1,6 +1,6 @@
 package cc.warlock.stormfront.internal;
 
-import org.xml.sax.Attributes;
+import java.util.Hashtable;
 
 import cc.warlock.stormfront.IStormFrontProtocolHandler;
 
@@ -18,8 +18,8 @@ public class PlayerIDTagHandler extends DefaultTagHandler {
 	}
 	
 	@Override
-	public void handleStart(Attributes attributes) {
-		handler.getClient().getPlayerId().set(attributes.getValue("id"));
+	public void handleStart(Hashtable<String,String> attributes) {
+		handler.getClient().getPlayerId().set(attributes.get("id"));
 	}
 
 }

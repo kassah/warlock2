@@ -1,6 +1,6 @@
 package cc.warlock.stormfront.internal;
 
-import org.xml.sax.Attributes;
+import java.util.Hashtable;
 
 import cc.warlock.stormfront.IStormFrontProtocolHandler;
 
@@ -17,8 +17,8 @@ public class StreamTagHandler extends DefaultTagHandler {
 	}
 
 	 @Override
-	public void handleStart(Attributes attributes) {
-		 String id = attributes.getValue("id");
+	public void handleStart(Hashtable<String,String> attributes) {
+		 String id = attributes.get("id");
 		 if (id != null)
 		 {
 			String streamId = new String(id);

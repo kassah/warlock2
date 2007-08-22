@@ -9,14 +9,13 @@ package cc.warlock.stormfront.internal;
 import java.util.ArrayList;
 import java.util.EmptyStackException;
 import java.util.HashMap;
+import java.util.Hashtable;
 import java.util.Stack;
 
 import org.apache.commons.lang.StringEscapeUtils;
-import org.xml.sax.Attributes;
 import org.xml.sax.Locator;
 import org.xml.sax.SAXException;
 import org.xml.sax.SAXParseException;
-import org.xml.sax.helpers.DefaultHandler;
 
 import cc.warlock.client.IStream;
 import cc.warlock.client.IStyledString;
@@ -308,18 +307,17 @@ public class StormFrontProtocolHandler implements IStormFrontProtocolHandler {
 	/* (non-Javadoc)
 	 * @see org.xml.sax.ContentHandler#startElement(java.lang.String, java.lang.String, java.lang.String, org.xml.sax.Attributes)
 	 */
-	public void startElement(String name, Attributes atts) {
+	public void startElement(String name, Hashtable<String,String> attributes) {
 		
 		//System.out.print("<" + name);
 		if (rawXMLBuffer != null)
 		{
 			String startTag = "<" + name;
-			if (atts != null) {
-	            for (int i = 0; i < atts.getLength(); i++) {
-	                String aName = atts.getLocalName(i); // Attr name
-	                if ("".equals(aName)) aName = atts.getQName(i);
+			if (attributes != null) {
+	            for (String aName : attributes.keySet())
+	            {
 	                startTag += " ";
-	                startTag += aName + "=\"" + atts.getValue(i) + "\"";
+	                startTag += aName + "=\"" + attributes.get(aName) + "\"";
 	            }
 	        }
 			startTag += ">";
@@ -340,7 +338,7 @@ public class StormFrontProtocolHandler implements IStormFrontProtocolHandler {
 				if (!handled)
 				{
 					tagHandler.setCurrentTag(name);
-					tagHandler.handleStart(atts);
+					tagHandler.handleStart(attributes);
 					handled = true;
 				}
 			}
