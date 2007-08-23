@@ -1,6 +1,6 @@
 package cc.warlock.stormfront.internal;
 
-import java.util.Hashtable;
+import org.xml.sax.Attributes;
 
 import cc.warlock.stormfront.IStormFrontProtocolHandler;
 
@@ -18,7 +18,7 @@ public class LeftTagHandler extends DefaultTagHandler {
 	}
 
 	@Override
-	public void handleStart(Hashtable<String,String> atts) {
+	public void handleStart(Attributes atts) {
 		leftHandText = new StringBuffer();
 	}
 	

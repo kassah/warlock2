@@ -3,7 +3,7 @@
  */
 package cc.warlock.stormfront;
 
-import java.util.Hashtable;
+import org.xml.sax.Attributes;
 
 /**
  * @author Marshall
@@ -26,7 +26,7 @@ public interface IStormFrontTagHandler {
 	 * Handle the start tag 
 	 * @param atts
 	 */
-	public void handleStart(Hashtable<String,String> attributes);
+	public void handleStart(Attributes atts);
 	
 	/**
 	 * handle the end tag

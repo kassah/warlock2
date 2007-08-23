@@ -1,6 +1,6 @@
 package cc.warlock.stormfront.internal;
 
-import java.util.Hashtable;
+import org.xml.sax.Attributes;
 
 import cc.warlock.client.internal.WarlockStyle;
 import cc.warlock.stormfront.IStormFrontProtocolHandler;
@@ -20,8 +20,8 @@ public class PresetTagHandler extends DefaultTagHandler {
 	}
 	
 	@Override
-	public void handleStart(Hashtable<String,String> atts) {
-		this.id = atts.get("id");
+	public void handleStart(Attributes atts) {
+		this.id = atts.getValue("id");
 		handler.setCurrentStyle(WarlockStyle.createCustomStyle(id, 0, -1));
 	}
 	

@@ -2,7 +2,8 @@ package cc.warlock.stormfront.internal;
 
 import java.io.File;
 import java.io.FileOutputStream;
-import java.util.Hashtable;
+
+import org.xml.sax.Attributes;
 
 import cc.warlock.client.IWarlockClientViewer;
 import cc.warlock.client.stormfront.IStormFrontClientViewer;
@@ -58,7 +59,7 @@ public class SettingsTagHandler extends DefaultTagHandler {
 	}
 	
 	@Override
-	public void handleStart(Hashtable<String,String> atts) {
+	public void handleStart(Attributes atts) {
 		if ("settings".equals(getCurrentTag()))
 		{
 			handlingSettings = true;
