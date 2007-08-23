@@ -5,17 +5,13 @@ package cc.warlock.network;
 
 import java.io.IOException;
 import java.net.Socket;
+import java.util.ArrayList;
 
-import org.antlr.runtime.ANTLRInputStream;
-import org.antlr.runtime.ANTLRStringStream;
-import org.antlr.runtime.CharStream;
-import org.antlr.runtime.CommonTokenStream;
-import org.antlr.runtime.RecognitionException;
+import javax.xml.parsers.SAXParser;
+import javax.xml.parsers.SAXParserFactory;
 
 import cc.warlock.client.IWarlockClient;
 import cc.warlock.client.stormfront.IStormFrontClient;
-import cc.warlock.stormfront.internal.SFLexerLexer;
-import cc.warlock.stormfront.internal.SFParserParser;
 import cc.warlock.stormfront.internal.StormFrontProtocolHandler;
 
 /**
@@ -24,18 +20,17 @@ import cc.warlock.stormfront.internal.StormFrontProtocolHandler;
  *
  * The Internal Storm Front protocol handler. Not meant to be instantiated outside of Warlock.
  */
-public class StormFrontConnection extends Connection implements IConnectionListener{
-	protected StormFrontProtocolHandler handler;
+public class StormFrontConnection implements IConnection {
+	protected String host;
+	protected int port;
 	protected IStormFrontClient client;
+	protected Socket socket;
 	protected String key;
+	private ArrayList<IConnectionListener> listeners = new ArrayList<IConnectionListener>();
 	
 	public StormFrontConnection (IStormFrontClient client, String key) {
-		super();
 		this.client = client;
 		this.key = key;
-		this.handler = new StormFrontProtocolHandler(client);
-		
-		addConnectionListener(this);
 	}
 	
 	public void connect(String host, int port)
@@ -43,7 +38,26 @@ public class StormFrontConnection extends Connection implements IConnectionListe
 		this.host = host;
 		this.port = port;
 		
-		super.connect(host, port);
+		new Thread(new XmlParser()).start();
+	}
+	
+	public void disconnect()
+	throws IOException {
+		// Stub Function
+	}
+	
+	public void addConnectionListener (IConnectionListener listener) {
+		listeners.add(listener);
+	}
+	
+	public void send (String toSend)
+	throws IOException {
+		send(toSend.getBytes());
+	}
+	
+	public void send (byte[] bytes)
+	throws IOException {
+		socket.getOutputStream().write(bytes);
 	}
 	
 	public void sendLine (String line)
@@ -55,56 +69,24 @@ public class StormFrontConnection extends Connection implements IConnectionListe
 		return client;
 	}
 	
-	public void connected(IConnection connection) {
-		try {
-			sendLine(key);
-			sendLine("/FE:WARLOCK /VERSION:1.0.1.22 /XML\n");
-		} catch (IOException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
-		
-		new Thread(new SFParser()).start();
+	public void dataReady (String data)
+	{
+		for (IConnectionListener listener : listeners) listener.dataReady(this, data);
 	}
 	
-	public void dataReady(IConnection connection, String line) {
-		/*CharStream input = new ANTLRStringStream(line);
-		SFLexerLexer lex = new SFLexerLexer(input);
-		CommonTokenStream tokens = new CommonTokenStream(lex);
-		
-		SFParserParser parser = new SFParserParser(tokens);
-		parser.setHandler(handler);
-		
-		try {
-			parser.document();
-		} catch (RecognitionException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}*/
-	}
-	
-	public void disconnected(IConnection connection) {}
-	
-	class SFParser implements Runnable {
+	class XmlParser implements Runnable {
 		public void run() {
 			try {
+				socket = new Socket(host, port);
 				
-				// StormFrontStream inputStream = new StormFrontStream(StormFrontConnection.this, socket.getInputStream());
-				System.out.print("about to create input\n");
-				System.out.flush();
-				CharStream input = new StormFrontCharStream(socket.getInputStream());
-				System.out.print("about to pass input to lexer\n");
-				System.out.flush();
-				SFLexerLexer lex = new SFLexerLexer(input);
-				System.out.print("about to create token stream\n");
-				System.out.flush();
-				CommonTokenStream tokens = new CommonTokenStream(lex);
+				sendLine(key);
+				sendLine("/FE:WARLOCK /VERSION:1.0.1.22 /XML");
 				
-				System.out.print("about to run parser\n");
-				System.out.flush();
-				SFParserParser parser = new SFParserParser(tokens);
-				parser.setHandler(new StormFrontProtocolHandler(client));
-				parser.document();
+				StormFrontStream inputStream = new StormFrontStream(StormFrontConnection.this, socket.getInputStream());
+
+				SAXParserFactory factory = SAXParserFactory.newInstance();
+				SAXParser saxParser = factory.newSAXParser();
+				saxParser.parse(inputStream, new StormFrontProtocolHandler(client));
 			} catch (Throwable t) {
 				t.printStackTrace();
 			}
