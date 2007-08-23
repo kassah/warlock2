@@ -4,16 +4,16 @@
 		<property name="pkg" value="cc/warlock/script/wsl/internal"/>
 			
 		<mkdir dir="${pkg}"/>
-		<java classname="antlr.Tool" fork="true">
+		<java classname="org.antlr.Tool" fork="true">
 			<classpath>
 				<fileset dir="../../lib">
-					<include name="antlr-2.7.7.jar"/>
+					<include name="antlr-*.jar"/>
 					<include name="stringtemplate*.jar"/>
 				</fileset>
 			</classpath>
 			
 			<arg line="-o ${pkg}"/>
-			<arg value="WarlockWSL.g"/>
+			<arg value="../../src/main/cc/warlock/script/wsl/WarlockWSL.g3"/>
 		</java>
 	</target>
 
