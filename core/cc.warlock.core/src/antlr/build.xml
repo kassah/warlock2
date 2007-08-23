@@ -1,6 +1,19 @@
-<project name="build-antlr" default="build-antlr">
+<project name="build-antlr" default="build-grammars">
 
-	<target name="build-antlr" >
+	<target name="build-grammars">
+		<antcall target="build-grammar">
+			<param name="grammar-file" value="cc/warlock/script/wsl/WarlockWSL.g3"/>
+		</antcall>
+		<antcall target="build-grammar">
+			<param name="grammar-file" value="cc/warlock/stormfront/internal/SFLexer.g3"/>
+		</antcall>
+		<antcall target="build-grammar">
+			<param name="grammar-file" value="cc/warlock/stormfront/internal/SFParser.g3"/>
+		</antcall>
+	</target>
+	
+	<target name="build-grammar" >
+		<echo>Building grammar ${grammar-file}</echo>
 		<java classname="org.antlr.Tool" fork="true" dir="../../src/main">
 			<classpath>
 				<fileset dir="../../lib">
@@ -10,7 +23,7 @@
 			</classpath>
 			
 			<arg line="-o ../../src/antlr"/>
-			<arg value="cc/warlock/script/wsl/WarlockWSL.g3"/>
+			<arg value="${grammar-file}"/>
 		</java>
 	</target>
 
