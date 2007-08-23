@@ -110,7 +110,7 @@ public class StormFrontClient extends WarlockClient implements IStormFrontClient
 			runningScripts.add(script);
 		}
 		
-		getCommandHistory().addCommand(command);
+		getCommandHistory().addCommand("." + command);
 	}
 	
 	public void scriptPaused(IScript script) {
