@@ -119,7 +119,6 @@ public class WarlockWSLScript extends AbstractScript implements IScriptCallback,
 		WarlockWSLParser parser = new WarlockWSLParser(tokens);
 		
 		parser.setScript(this);
-		parser.setLexer(lex);
 		
 		try {
 			parser.script();

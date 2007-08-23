@@ -12,9 +12,8 @@ grammar WarlockWSL;
 
 @parser::members {
 	private WarlockWSLScript script;
-	private WarlockWSLLexer lex;
+	private int lineNum = 1;
 	public void setScript(WarlockWSLScript s) { script = s; }
-	public void setLexer(WarlockWSLLexer l) { lex = l; }
 }
 
 @lexer::members {
@@ -22,8 +21,6 @@ grammar WarlockWSL;
 	private boolean atStart = true;
 	private State state = State.base;
 	private State savedState = State.base;
-	private int lineNum = 1;
-	public int getLineNumber() { return lineNum; }
 }
 
 script
@@ -31,15 +28,17 @@ script
 	;
 
 line
-	: (COMMENT | expr)? EOL
+	: (COMMENT | expr)? EOL { System.out.print("passed line " + Integer.toString(lineNum) + "\n"); lineNum++; }
 	;
 
 expr returns [WarlockWSLScriptLine line]
 	: (label=NORMAL_STRING COLON l=expr { line = l; script.addLabel($label.text, line); })
 	| start=NORMAL_STRING args=arg_list		{
-				line = new WarlockWSLScriptLine(script, lex.getLineNumber());
+				line = new WarlockWSLScriptLine(script, lineNum);
 				line.addArg(new WarlockWSLScriptString($start.text));
 				line.addArgs(args);
+				script.addLine(line);
+				System.out.print("added line " + Integer.toString(lineNum) + "\n");
 	/*
 	| (IF conditional THEN
 		expr)*/
@@ -70,19 +69,19 @@ WS
 		(' ' | '\t')+			{ channel = 99; if(state == State.expr) state = State.command; }
 	;
 EOL
-	: '\r'? '\n' { state = State.base; atStart = true; lineNum++; }
+	: '\r'? '\n' { state = State.base; atStart = true; }
 	;
 COMMENT
-	: { atStart }?=>
+	: { atStart && state == State.base }?=>
 		~NORMAL_CHAR (~('\n'|'\r'))* { atStart = false; }
 	;
 NORMAL_STRING
 	: { state == State.base }?=>
-		NORMAL_CHAR+		{ atStart = false; }
+		NORMAL_CHAR+		{ atStart = false; state = State.expr; }
 	;
 COLON
 	: { state == State.expr }?=>
-		NORMAL_CHAR+ ':'	{ state = State.base; }
+		':'	{ state = State.base; }
 	;
 START_VARIABLE
 	: '%' 					{
