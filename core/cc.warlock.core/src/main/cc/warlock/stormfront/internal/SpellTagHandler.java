@@ -1,6 +1,6 @@
 package cc.warlock.stormfront.internal;
 
-import org.xml.sax.Attributes;
+import java.util.Hashtable;
 
 import cc.warlock.stormfront.IStormFrontProtocolHandler;
 
@@ -18,7 +18,7 @@ public class SpellTagHandler extends DefaultTagHandler {
 	}
 	
 	@Override
-	public void handleStart(Attributes atts) {
+	public void handleStart(Hashtable<String,String> atts) {
 		spellText = new StringBuffer();
 	}
 

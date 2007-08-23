@@ -29,11 +29,11 @@ document : element* ;
 element
     : startTag
         (element
-        | data=PCDATA { handler.characters($data.text.toCharArray(), 0, $data.text.length()); }
+        | data=PCDATA { System.out.println("got chars: " + $data.text); handler.characters($data.text.toCharArray(), 0, $data.text.length()); }
         )*
         endTag
     | emptyElement
-    | data=PCDATA { handler.characters($data.text.toCharArray(), 0, $data.text.length()); }
+    | data=PCDATA { System.out.println("got chars: " + $data.text); handler.characters($data.text.toCharArray(), 0, $data.text.length()); }
     ;
 
 startTag  : TAG_START_OPEN name=GENERIC_ID (attribute)* TAG_CLOSE { System.out.println("got tag " + $name.text); handler.startElement($name.text, currentAttributes); }
@@ -44,5 +44,5 @@ attribute  : name=GENERIC_ID ATTR_EQ value=ATTR_VALUE { currentAttributes.put($n
 endTag :  TAG_END_OPEN name=GENERIC_ID TAG_CLOSE { handler.endElement($name.text); currentAttributes.clear(); }
 	;
 
-emptyElement : TAG_START_OPEN name=GENERIC_ID  (attribute)* TAG_EMPTY_CLOSE { handler.startElement($name.text, currentAttributes); handler.endElement($name.text); }
+emptyElement : TAG_START_OPEN name=GENERIC_ID  (attribute)* TAG_EMPTY_CLOSE { System.out.println("got empty tag " + $name.text); handler.startElement($name.text, currentAttributes); handler.endElement($name.text); }
 	;

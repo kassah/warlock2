@@ -9,14 +9,13 @@ package cc.warlock.stormfront.internal;
 import java.util.ArrayList;
 import java.util.EmptyStackException;
 import java.util.HashMap;
+import java.util.Hashtable;
 import java.util.Stack;
 
 import org.apache.commons.lang.StringEscapeUtils;
-import org.xml.sax.Attributes;
 import org.xml.sax.Locator;
 import org.xml.sax.SAXException;
 import org.xml.sax.SAXParseException;
-import org.xml.sax.helpers.DefaultHandler;
 
 import cc.warlock.client.IStream;
 import cc.warlock.client.IStyledString;
@@ -34,7 +33,7 @@ import cc.warlock.stormfront.IStormFrontTagHandler;
  * TODO To change the template for this generated type comment go to
  * Window - Preferences - Java - Code Style - Code Templates
  */
-public class StormFrontProtocolHandler extends DefaultHandler implements IStormFrontProtocolHandler {
+public class StormFrontProtocolHandler implements IStormFrontProtocolHandler {
 	
 	protected IStormFrontClient client;
 	protected HashMap<String, ArrayList<IStormFrontTagHandler>> tagHandlers = new HashMap<String, ArrayList<IStormFrontTagHandler>>();
@@ -151,8 +150,7 @@ public class StormFrontProtocolHandler extends DefaultHandler implements IStormF
 	/* (non-Javadoc)
 	 * @see org.xml.sax.ContentHandler#characters(char[], int, int)
 	 */
-	public void characters(char[] ch, int start, int length)
-	throws SAXException {
+	public void characters(char[] ch, int start, int length) {
 		/*String str = String.copyValueOf(ch, start, length);
 		System.out.print(str);*/
 		
@@ -221,12 +219,7 @@ public class StormFrontProtocolHandler extends DefaultHandler implements IStormF
 	/* (non-Javadoc)
 	 * @see org.xml.sax.ContentHandler#endElement(java.lang.String, java.lang.String, java.lang.String)
 	 */
-	public void endElement(String uri, String localName, String qName)
-	throws SAXException {
-		// TODO Auto-generated method stub
-		String name;
-		if("".equals(localName)) name = qName;
-		else name = localName;
+	public void endElement(String name) {
 		
 		if (rawXMLBuffer != null)
 		{
@@ -314,23 +307,17 @@ public class StormFrontProtocolHandler extends DefaultHandler implements IStormF
 	/* (non-Javadoc)
 	 * @see org.xml.sax.ContentHandler#startElement(java.lang.String, java.lang.String, java.lang.String, org.xml.sax.Attributes)
 	 */
-	public void startElement(String uri, String localName, String qName,
-			Attributes atts) throws SAXException {
-		// debug info
-		String name;
-		if("".equals(localName)) name = qName;
-		else name = localName;
+	public void startElement(String name, Hashtable<String,String> attributes) {
 		
 		//System.out.print("<" + name);
 		if (rawXMLBuffer != null)
 		{
 			String startTag = "<" + name;
-			if (atts != null) {
-	            for (int i = 0; i < atts.getLength(); i++) {
-	                String aName = atts.getLocalName(i); // Attr name
-	                if ("".equals(aName)) aName = atts.getQName(i);
+			if (attributes != null) {
+	            for (String aName : attributes.keySet())
+	            {
 	                startTag += " ";
-	                startTag += aName + "=\"" + atts.getValue(i) + "\"";
+	                startTag += aName + "=\"" + attributes.get(aName) + "\"";
 	            }
 	        }
 			startTag += ">";
@@ -351,7 +338,7 @@ public class StormFrontProtocolHandler extends DefaultHandler implements IStormF
 				if (!handled)
 				{
 					tagHandler.setCurrentTag(name);
-					tagHandler.handleStart(atts);
+					tagHandler.handleStart(attributes);
 					handled = true;
 				}
 			}
