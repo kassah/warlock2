@@ -1,6 +1,9 @@
 <project name="build-antlr" default="build-grammars">
 
 	<target name="build-grammars">
+		<mkdir dir="cc/warlock/script/wsl"/>
+		<mkdir dir="cc/warlock/stormfront/internal"/>
+			
 		<antcall target="build-grammar">
 			<param name="grammar-file" value="cc/warlock/script/wsl/WarlockWSL.g3"/>
 			<param name="lib-dir" value="cc/warlock/script/wsl"/>
