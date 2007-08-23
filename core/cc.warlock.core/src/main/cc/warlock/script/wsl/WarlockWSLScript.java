@@ -5,7 +5,6 @@ import java.io.Reader;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Hashtable;
-import java.util.Iterator;
 import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -129,7 +128,7 @@ public class WarlockWSLScript extends AbstractScript implements IScriptCallback,
 		commands.echo("[script started: " + scriptName + "]");
 		running = true;
 		stopped = false;
-		mode = Mode.cont;
+		
 		runScript();
 	}
 	
@@ -279,7 +278,7 @@ public class WarlockWSLScript extends AbstractScript implements IScriptCallback,
 		private Pattern format;
 		
 		public WarlockWSLSetVariable() {
-			format = Pattern.compile("^\\s+([\\w_]+)\\s+(.*)");
+			format = Pattern.compile("^([\\w_]+)\\s+(.*)");
 		}
 		
 		public String getName() {
@@ -290,8 +289,11 @@ public class WarlockWSLScript extends AbstractScript implements IScriptCallback,
 			Matcher m = format.matcher(arguments);
 			if (m.matches())
 			{
+				System.out.print("variable: " + m.group(1) + " value \"" + m.group(2) + "\"\n");
 				variables.put(m.group(1), m.group(2));
-			} else { /*throw error*/ }
+			} else {
+				System.out.print("Didn't match \"" + arguments + "\"\n");
+			}
 		}
 	}
 	
@@ -345,7 +347,7 @@ public class WarlockWSLScript extends AbstractScript implements IScriptCallback,
 		private Pattern format;
 		
 		public WarlockWSLMatchRe() {
-			format = Pattern.compile("^\\s+([\\w_]+)\\s+/(.*)/(\\w*)");
+			format = Pattern.compile("^([\\w_]+)\\s+/(.*)/(\\w*)");
 		}
 		
 		public String getName() {
@@ -381,7 +383,7 @@ public class WarlockWSLScript extends AbstractScript implements IScriptCallback,
 		private Pattern format;
 		
 		public WarlockWSLMatch() {
-			format = Pattern.compile("^\\s+([\\w_]+)\\s+(.*)");
+			format = Pattern.compile("^([\\w_]+)\\s+(.*)");
 		}
 		
 		public String getName() {
@@ -408,7 +410,7 @@ public class WarlockWSLScript extends AbstractScript implements IScriptCallback,
 		private Pattern format;
 		
 		public WarlockWSLWaitForRe() {
-			format = Pattern.compile("^\\s+/(.*)/(\\w*)");
+			format = Pattern.compile("^/(.*)/(\\w*)");
 		}
 		
 		public String getName() {
@@ -538,7 +540,7 @@ public class WarlockWSLScript extends AbstractScript implements IScriptCallback,
 			running = false;
 			stopped = true;
 			
-			mode = Mode.waiting;
+			mode = Mode.exit;
 		}
 	}
 	
@@ -548,7 +550,7 @@ public class WarlockWSLScript extends AbstractScript implements IScriptCallback,
 		
 		public WarlockWSLIf_ (String variableName) {
 			this.variableName = variableName;
-			format = Pattern.compile("^\\s+([\\w_]+)\\s+(.*)");
+			format = Pattern.compile("^([\\w_]+)\\s+(.*)");
 		}
 		
 		public String getName () {
@@ -634,5 +636,9 @@ public class WarlockWSLScript extends AbstractScript implements IScriptCallback,
 				}
 			} break;
 		}
+	}
+	
+	public void stopScript() {
+		mode = Mode.exit;
 	}
 }

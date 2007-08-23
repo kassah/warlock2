@@ -24,7 +24,7 @@ grammar WarlockWSL;
 }
 
 script
-	: line*
+	: line* EOF { script.stopScript(); }
 	;
 
 line
@@ -52,7 +52,7 @@ arg_list returns [ArrayList<WarlockWSLScriptArg> list]
 
 script_data returns [WarlockWSLScriptArg arg]
 	: str=STRING		{ arg = new WarlockWSLScriptString($str.text); }
-	| var=VARIABLE		{ arg = new WarlockWSLScriptVariable($var.text); 
+	| var=VARIABLE		{ arg = new WarlockWSLScriptVariable($var.text);
  /*
 conditional
 	: OPEN_PAREN conditional CLOSE_PAREN
@@ -73,7 +73,7 @@ EOL
 	;
 COMMENT
 	: { atStart && state == State.base }?=>
-		~NORMAL_CHAR (~('\n'|'\r'))* { atStart = false; }
+		~(NORMAL_CHAR|'%') (~('\n'|'\r'))* { atStart = false; }
 	;
 NORMAL_STRING
 	: { state == State.base }?=>
@@ -85,7 +85,8 @@ COLON
 	;
 START_VARIABLE
 	: '%' 					{
-								if(state == State.expr) savedState = State.command;
+								if(state == State.expr || state == State.base)
+									savedState = State.command;
 								else savedState = state;
 								state = State.variable;
 								channel = 99;
