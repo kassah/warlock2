@@ -27,6 +27,8 @@ public class WarlockWSLScriptLine {
 			buffer.append(arg.getString(variables));
 		}
 		
+		System.out.print("running line: " + buffer.toString() + "\n");
+		
 		Matcher m = commandPattern.matcher(buffer.toString());
 		
 		String commandName = m.group(1).toLowerCase();

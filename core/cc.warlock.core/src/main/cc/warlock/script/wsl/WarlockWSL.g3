@@ -65,8 +65,8 @@ conditional
 	;
 	
 WS
-	: { state != State.command }?=>
-		(' ' | '\t')+			{ channel = 99; if(state == State.expr) state = State.command; }
+	: { state != State.command && state != State.expr }?=>
+		(' ' | '\t')+			{ channel = 99; }
 	;
 EOL
 	: '\r'? '\n' { state = State.base; atStart = true; }
@@ -81,7 +81,7 @@ NORMAL_STRING
 	;
 COLON
 	: { state == State.expr }?=>
-		':'	{ state = State.base; }
+		':'					{ state = State.base; }
 	;
 START_VARIABLE
 	: '%' 					{
@@ -99,7 +99,9 @@ STRING
 	: ({ state == State.command }?=>
 		(~('%'|'\n'|'\r'))+)
 	| ({ state == State.variable }?=>
-		~NORMAL_CHAR)		{ state = savedState; }
+		~NORMAL_CHAR		{ state = savedState; } )
+	| ({ state == State.expr }?=>
+		(' ' | '\t')+		{ state = State.command; } )
 	;
 
 fragment NORMAL_CHAR
