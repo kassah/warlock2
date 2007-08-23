@@ -3,12 +3,15 @@
 	<target name="build-grammars">
 		<antcall target="build-grammar">
 			<param name="grammar-file" value="cc/warlock/script/wsl/WarlockWSL.g3"/>
+			<param name="lib-dir" value="cc/warlock/script/wsl"/>
 		</antcall>
 		<antcall target="build-grammar">
 			<param name="grammar-file" value="cc/warlock/stormfront/internal/SFLexer.g3"/>
+			<param name="lib-dir" value="cc/warlock/stormfront/internal"/>
 		</antcall>
 		<antcall target="build-grammar">
 			<param name="grammar-file" value="cc/warlock/stormfront/internal/SFParser.g3"/>
+			<param name="lib-dir" value="cc/warlock/stormfront/internal"/>
 		</antcall>
 	</target>
 	
@@ -21,8 +24,8 @@
 					<include name="stringtemplate*.jar"/>
 				</fileset>
 			</classpath>
-			
 			<arg line="-o ../../src/antlr"/>
+			<arg line="-lib ../../src/antlr/${lib-dir}"/>
 			<arg value="${grammar-file}"/>
 		</java>
 	</target>
