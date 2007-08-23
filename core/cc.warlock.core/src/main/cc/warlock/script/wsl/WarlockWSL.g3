@@ -1,0 +1,108 @@
+grammar WarlockWSL;
+
+@parser::header {
+	package cc.warlock.script.wsl;
+	import java.util.ArrayList;
+}
+
+@lexer::header {
+	package cc.warlock.script.wsl;
+	import java.util.ArrayList;
+}
+
+@parser::members {
+	private WarlockWSLScript script;
+	private WarlockWSLLexer lex;
+	public void setScript(WarlockWSLScript s) { script = s; }
+	public void setLexer(WarlockWSLLexer l) { lex = l; }
+}
+
+@lexer::members {
+	private enum State { base, expr, variable, command, condition }
+	private boolean atStart = true;
+	private State state = State.base;
+	private State savedState = State.base;
+	private int lineNum = 1;
+	public int getLineNumber() { return lineNum; }
+}
+
+script
+	: line*
+	;
+
+line
+	: (COMMENT | expr)? EOL
+	;
+
+expr returns [WarlockWSLScriptLine line]
+	: (label=NORMAL_STRING COLON l=expr { line = l; script.addLabel($label.text, line); })
+	| start=NORMAL_STRING args=arg_list		{
+				line = new WarlockWSLScriptLine(script, lex.getLineNumber());
+				line.addArg(new WarlockWSLScriptString($start.text));
+				line.addArgs(args);
+	/*
+	| (IF conditional THEN
+		expr)*/
+		}
+	;
+
+arg_list returns [ArrayList<WarlockWSLScriptArg> list]
+	:	{ list = new ArrayList<WarlockWSLScriptArg>(); }
+	| data=script_data l=arg_list	{ list = l; list.add(data); }
+	;
+
+script_data returns [WarlockWSLScriptArg arg]
+	: str=STRING		{ arg = new WarlockWSLScriptString($str.text); }
+	| var=VARIABLE		{ arg = new WarlockWSLScriptVariable($var.text); 
+ /*
+conditional
+	: OPEN_PAREN conditional CLOSE_PAREN
+	| conditional BINARY_OP conditional
+	| UNARY_OP conditional
+	| arg_list COMPARE_OP arg_list
+	| TEST_OP arg_list
+	;
+*/ }
+	;
+	
+WS
+	: { state != State.command }?=>
+		(' ' | '\t')+			{ channel = 99; if(state == State.expr) state = State.command; }
+	;
+EOL
+	: '\r'? '\n' { state = State.base; atStart = true; lineNum++; }
+	;
+COMMENT
+	: { atStart }?=>
+		~NORMAL_CHAR (~('\n'|'\r'))* { atStart = false; }
+	;
+NORMAL_STRING
+	: { state == State.base }?=>
+		NORMAL_CHAR+		{ atStart = false; }
+	;
+COLON
+	: { state == State.expr }?=>
+		NORMAL_CHAR+ ':'	{ state = State.base; }
+	;
+START_VARIABLE
+	: '%' 					{
+								if(state == State.expr) savedState = State.command;
+								else savedState = state;
+								state = State.variable;
+								channel = 99;
+							}
+	;
+VARIABLE
+	: { state == State.variable }?=>
+		NORMAL_CHAR+		{ state = savedState; }
+	;
+STRING
+	: ({ state == State.command }?=>
+		(~('%'|'\n'|'\r'))+)
+	| ({ state == State.variable }?=>
+		~NORMAL_CHAR)		{ state = savedState; }
+	;
+
+fragment NORMAL_CHAR
+	: 'A'..'Z'|'a'..'z'|'0'..'9'|'_'
+	;

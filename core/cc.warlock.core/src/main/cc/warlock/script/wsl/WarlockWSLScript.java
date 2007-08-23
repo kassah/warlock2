@@ -1,6 +1,5 @@
 package cc.warlock.script.wsl;
 
-import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.io.Reader;
 import java.util.ArrayList;
@@ -11,8 +10,11 @@ import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-import antlr.RecognitionException;
-import antlr.TokenStreamException;
+import org.antlr.runtime.ANTLRStringStream;
+import org.antlr.runtime.CharStream;
+import org.antlr.runtime.CommonTokenStream;
+import org.antlr.runtime.RecognitionException;
+
 import cc.warlock.script.AbstractScript;
 import cc.warlock.script.CallbackEvent;
 import cc.warlock.script.IMatch;
@@ -20,25 +22,24 @@ import cc.warlock.script.IScriptCallback;
 import cc.warlock.script.IScriptCommands;
 import cc.warlock.script.IScriptListener;
 import cc.warlock.script.internal.Match;
-import cc.warlock.script.wsl.internal.WarlockWSLLexer;
-import cc.warlock.script.wsl.internal.WarlockWSLParser;
 
 public class WarlockWSLScript extends AbstractScript implements IScriptCallback, Runnable {
 	
 	protected String script, scriptName;
 	protected boolean running, stopped;
-	protected Hashtable<String, Integer> labelOffsets = new Hashtable<String, Integer>();
-	protected Hashtable<String, String> variables = new Hashtable<String, String>();
-	protected ArrayList<ArrayList<String>> lineTokens;
+	protected Hashtable<String, WarlockWSLScriptLine> labels = new Hashtable<String, WarlockWSLScriptLine>();
+	protected WarlockWSLScriptLine nextLine;
+	protected WarlockWSLScriptLine curLine;
+	protected WarlockWSLScriptLine endLine;
+	protected HashMap<String, String> variables = new HashMap<String, String>();
 	protected HashMap<String, WarlockWSLCommand> wslCommands = new HashMap<String, WarlockWSLCommand>();
-	protected int pauseLine, nextLine;
+	protected int pauseLine;
 	protected Thread scriptThread;
 	
-	private String mode;
-	private static final String MODE_START = "start";
-	private static final String MODE_CONTINUE = "continue";
-	private static final String MODE_WAITING = "waiting";
-	private static final String MODE_EXIT = "exit";
+	protected enum Mode { start, cont, waiting, exit }
+	private Mode mode;
+	
+	private static final String argSeparator = "\\s+";
 	
 	public WarlockWSLScript (IScriptCommands commands, String scriptName, Reader scriptReader)
 		throws IOException
@@ -101,7 +102,7 @@ public class WarlockWSLScript extends AbstractScript implements IScriptCallback,
 			variables.put(Integer.toString(i + 1), arguments.get(i));
 		}
 
-		mode = MODE_START;
+		mode = Mode.start;
 		
 		scriptThread = new Thread(this);
 		scriptThread.setName("Wizard Script: " + scriptName);
@@ -112,52 +113,46 @@ public class WarlockWSLScript extends AbstractScript implements IScriptCallback,
 	
 	protected void doStart ()
 	{
-		WarlockWSLParser parser = new WarlockWSLParser(new WarlockWSLLexer(new ByteArrayInputStream(script.getBytes())));
+		CharStream input = new ANTLRStringStream(script);
+		WarlockWSLLexer lex = new WarlockWSLLexer(input);
+		CommonTokenStream tokens = new CommonTokenStream(lex);
+		WarlockWSLParser parser = new WarlockWSLParser(tokens);
+		
+		parser.setScript(this);
+		parser.setLexer(lex);
 		
 		try {
-			lineTokens = parser.script();
-			
-			int i = 0;
-			
-			commands.echo("[script started: " + scriptName + "]");
-			running = true;
-			stopped = false;
-			
-			for (ArrayList<String> tokens : lineTokens)
-			{
-				parseLabel(tokens, i);
-				i++;
-			}
-			
-			processLineTokens(0);
+			parser.script();
 		} catch (RecognitionException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		} catch (TokenStreamException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
+			// TODO handle the exception
+		}
+
+		commands.echo("[script started: " + scriptName + "]");
+		running = true;
+		stopped = false;
+		mode = Mode.cont;
+	}
+	
+	protected void runScript() {
+		while(nextLine != null) {
+			nextLine = curLine.getNext();
+			curLine.execute(variables, wslCommands);
+			curLine = nextLine;
 		}
 	}
 	
-	protected void processLineTokens (int startLine)
-	{
-		for (int i = startLine; i < lineTokens.size();)
-		{
-			if (stopped || mode == MODE_WAITING) break;
-			
-			nextLine = i+1;
-			
-			ArrayList<String> tokens = lineTokens.get(i);
-			parseLine(tokens, i);
-			
-			if ((i+1) < lineTokens.size() && nextLine != i+1)
-			{
-				i = nextLine;
-				continue;
-			}
-			
-			i++;
+	public void addLabel(String label, WarlockWSLScriptLine line) {
+		labels.put(label, line);
+	}
+	
+	public void addLine(WarlockWSLScriptLine line) {
+		if(curLine == null) {
+			curLine = line;
 		}
+		if(endLine != null) {
+			endLine.setNext(line);
+		}
+		endLine = line;
 	}
 	
 	public void stop() {
@@ -165,25 +160,25 @@ public class WarlockWSLScript extends AbstractScript implements IScriptCallback,
 		
 		running = false;
 		stopped = true;
-		mode = MODE_EXIT;
+		mode = Mode.exit;
 		
 		super.stop();
 	}
 
 	public void suspend() {
-		mode = MODE_WAITING;
+		mode = Mode.waiting;
 		commands.removeCallback(this);
 		running = false;
-		pauseLine = nextLine;
+		//pauseLine = nextLine;
 		
 		commands.echo("[script paused: " + scriptName + "]");
 		super.suspend();
 	}
 	
 	public void resume() {
-		mode = MODE_CONTINUE;
+		mode = Mode.cont;
 		
-		nextLine = pauseLine;
+		//nextLine = pauseLine;
 		running = true;
 		
 		commands.echo("[script resumed: " + scriptName + "]");
@@ -191,89 +186,14 @@ public class WarlockWSLScript extends AbstractScript implements IScriptCallback,
 		super.resume();
 	}
 	
-	private Pattern labelPattern = Pattern.compile("^([\\w_]+):\\s*$");
-	protected void parseLabel (ArrayList<String> tokens, int lineIndex)
-	{
-		Matcher matcher = labelPattern.matcher(tokens.get(0));
-		
-		if (matcher.find())
-		{
-			labelOffsets.put(matcher.group(1), lineIndex);
-			tokens.remove(0);
-		}
-	}
-	
-	protected String replaceVariables (String token)
-	{
-		String newToken = new String(token);
-		
-		for (String varName : variables.keySet())
-		{
-			if (newToken.contains("%" + varName))
-			{
-				newToken = newToken.replaceAll("\\%" + varName, variables.get(varName));
-			}
-		}
-		
-		for (String var : commands.getClient().getServerSettings().getVariableNames())
-		{
-			if (newToken.contains("%" + var))
-			{
-				newToken = newToken.replaceAll("\\%" + var, commands.getClient().getServerSettings().getVariable(var));
-			}
-		}
-		
-		newToken = newToken.replace("\\%[A-Za-z0-9_]+", "");
-		return newToken;
-	}
-
-	
-	protected void parseLine (ArrayList<String> tokens, int lineIndex)
-	{
-		mode = MODE_CONTINUE;
-		
-		if (tokens.size() == 0) return ;// empty line -- most likely a label
-		
-		for (int i = 0; i < tokens.size(); i++) {
-			tokens.set(i, replaceVariables(tokens.get(i)));
-		}
-		
-		String curCommandName = tokens.get(0).toLowerCase();
-		List<String> arguments = null;
-		if (tokens.size() > 0) arguments = tokens.subList(1, tokens.size());
-		
-		this.nextLine = lineIndex + 1;
-		
-		WarlockWSLCommand command = wslCommands.get(curCommandName);
-		if(command != null) {
-			command.execute(arguments);
-		} else {
-			// this acts as a comment
-		}
-	}
-	
 	protected void addCommand (WarlockWSLCommand command) {
 		wslCommands.put(command.getName(), command);
 	}
 	
 	abstract protected class WarlockWSLCommand {
-		protected String toString (List<String> strings)
-		{
-			StringBuffer buffer = new StringBuffer();
-			Iterator<String> iter = strings.iterator();
-			while (iter.hasNext())
-			{
-				buffer.append(iter.next());
-				if(iter.hasNext()) {
-					buffer.append(' ');
-				}
-			}
-			return buffer.toString();
-		}
-		
 		abstract public String getName();
 		
-		abstract public void execute(List<String> arguments);
+		abstract public void execute(String arguments);
 	}
 	
 	protected class WarlockWSLSave extends WarlockWSLCommand {
@@ -281,8 +201,8 @@ public class WarlockWSLScript extends AbstractScript implements IScriptCallback,
 			return "save";
 		}
 		
-		public void execute(List<String> arguments) {
-			variables.put("s", toString(arguments));
+		public void execute(String arguments) {
+			variables.put("s", arguments);
 		}
 	}
 
@@ -291,7 +211,7 @@ public class WarlockWSLScript extends AbstractScript implements IScriptCallback,
 			return "shift";
 		}
 		
-		public void execute (List<String> arguments) {
+		public void execute (String arguments) {
 			for (int i = 0; ; i++) {
 				String arg = variables.get(Integer.toString(i + 1));
 				if (arg == null) {
@@ -308,34 +228,35 @@ public class WarlockWSLScript extends AbstractScript implements IScriptCallback,
 			return "counter";
 		}
 		
-		public void execute (List<String> arguments) {
-			if (arguments.size() == 2)
+		public void execute (String arguments) {
+			String[] args = arguments.split(argSeparator);
+			if (args.length >= 2)
 			{
-				String counterFunction = arguments.get(0);
+				String counterFunction = args[0];
 				int value = variables.containsKey("c") ? Integer.parseInt(variables.get("c")) : 0;
 
 				if ("set".equalsIgnoreCase(counterFunction))
 				{
-					variables.put("c", arguments.get(1));
+					variables.put("c", args[1]);
 				}
 				else if ("add".equalsIgnoreCase(counterFunction))
 				{	
-					int newValue = value + Integer.parseInt(arguments.get(1));
+					int newValue = value + Integer.parseInt(args[1]);
 					variables.put("c", "" + newValue);
 				}
 				else if ("subtract".equalsIgnoreCase(counterFunction))
 				{
-					int newValue = value - Integer.parseInt(arguments.get(1));
+					int newValue = value - Integer.parseInt(args[1]);
 					variables.put("c", "" + newValue);
 				}
 				else if ("multiply".equalsIgnoreCase(counterFunction))
 				{
-					int newValue = value * Integer.parseInt(arguments.get(1));
+					int newValue = value * Integer.parseInt(args[1]);
 					variables.put("c", "" + newValue);
 				}
 				else if ("divide".equalsIgnoreCase(counterFunction))
 				{
-					int newValue = value / Integer.parseInt(arguments.get(1));
+					int newValue = value / Integer.parseInt(args[1]);
 					variables.put("c", "" + newValue);
 				}
 			} else { /*throw error */ }
@@ -347,39 +268,41 @@ public class WarlockWSLScript extends AbstractScript implements IScriptCallback,
 			return "deletevariable";
 		}
 		
-		public void execute (List<String> arguments) {
-			variables.remove(arguments.get(1));
+		public void execute (String arguments) {
+			String var = arguments.split(argSeparator)[0];
+			variables.remove(var);
 		}
 	}
 
 	protected class WarlockWSLSetVariable extends WarlockWSLCommand {
+		private Pattern format;
+		
+		public WarlockWSLSetVariable() {
+			format = Pattern.compile("^\\s+([\\w_]+)\\s+(.*)");
+		}
+		
 		public String getName() {
 			return "setvariable";
 		}
 		
-		public void execute (List<String> arguments) {
-			if (arguments.size() == 2)
+		public void execute (String arguments) {
+			Matcher m = format.matcher(arguments);
+			if (m.matches())
 			{
-				variables.put(arguments.get(0), arguments.get(1));
+				variables.put(m.group(1), m.group(2));
 			} else { /*throw error*/ }
 		}
 	}
 	
 	protected void gotoLabel (String label)
 	{
-		int offset = -1;
-		if (labelOffsets.containsKey(label))
+		if (labels.containsKey(label))
 		{
-			offset = labelOffsets.get(label);
+			nextLine = labels.get(label);
 		}
-		else if (labelOffsets.containsKey("labelError"))
+		else if (labels.containsKey("labelerror"))
 		{
-			offset = labelOffsets.get("labelError");
-		}
-		
-		if (offset > -1)
-		{
-			this.nextLine = offset;
+			nextLine = labels.get("labelerror");
 		}
 		else {
 			commands.echo ("***********");
@@ -393,10 +316,11 @@ public class WarlockWSLScript extends AbstractScript implements IScriptCallback,
 			return "goto";
 		}
 		
-		public void execute (List<String> arguments) {
-			if (arguments.size() == 1)
+		public void execute (String arguments) {
+			String[] args = arguments.split(argSeparator);
+			if (args.length >= 1)
 			{
-				String label = arguments.get(0);
+				String label = args[0];
 				gotoLabel(label);
 			} else { /*throw error*/ }
 		}
@@ -407,8 +331,8 @@ public class WarlockWSLScript extends AbstractScript implements IScriptCallback,
 			return "matchwait";
 		}
 		
-		public void execute (List<String> arguments) {
-			mode = MODE_WAITING;
+		public void execute (String arguments) {
+			mode = Mode.waiting;
 			
 			commands.matchWait(matchset.toArray(new IMatch[matchset.size()]), WarlockWSLScript.this);
 		}
@@ -417,27 +341,32 @@ public class WarlockWSLScript extends AbstractScript implements IScriptCallback,
 	private ArrayList<IMatch> matchset = new ArrayList<IMatch>();
 	
 	protected class WarlockWSLMatchRe extends WarlockWSLCommand {
+		private Pattern format;
+		
+		public WarlockWSLMatchRe() {
+			format = Pattern.compile("^\\s+([\\w_]+)\\s+/(.*)/(\\w*)");
+		}
+		
 		public String getName() {
 			return "matchre";
 		}
 		
-		public void execute (List<String> arguments) {
-			if (arguments.size() >= 2)
+		public void execute (String arguments) {
+			Matcher m = format.matcher(arguments);
+			
+			if (m.matches())
 			{
-				mode = MODE_WAITING;
+				mode = Mode.waiting;
 				
-				String regex = toString(arguments.subList(1, arguments.size()));
+				String regex = m.group(2);
 				Match match = new Match();
 				
-				int end = regex.length() - 1;
-				if (regex.endsWith("/i"))
+				if (m.group(3).contains("i"))
 				{
 					match.ignoreCase = true;
-					end = regex.length() - 2;
 				}
-				regex = regex.substring(1, end);
 				
-				match.data.put("label", arguments.get(0));
+				match.data.put("label", m.group(1));
 				match.matchText = regex; 
 				match.regex = true;
 				
@@ -448,16 +377,24 @@ public class WarlockWSLScript extends AbstractScript implements IScriptCallback,
 	}
 
 	protected class WarlockWSLMatch extends WarlockWSLCommand {
+		private Pattern format;
+		
+		public WarlockWSLMatch() {
+			format = Pattern.compile("^\\s+([\\w_]+)\\s+(.*)");
+		}
+		
 		public String getName() {
 			return "match";
 		}
 		
-		public void execute (List<String> arguments) {
-			if (arguments.size() >= 2)
+		public void execute (String arguments) {
+			Matcher m = format.matcher(arguments);
+			
+			if (m.matches())
 			{
 				Match match = new Match();
-				match.data.put("label", arguments.get(0));
-				match.matchText = toString(arguments.subList(1, arguments.size()));
+				match.data.put("label", m.group(1));
+				match.matchText = m.group(2);
 				match.regex = false;
 				match.ignoreCase = true;
 				
@@ -467,25 +404,30 @@ public class WarlockWSLScript extends AbstractScript implements IScriptCallback,
 	}
 
 	protected class WarlockWSLWaitForRe extends WarlockWSLCommand {
+		private Pattern format;
+		
+		public WarlockWSLWaitForRe() {
+			format = Pattern.compile("^\\s+/(.*)/(\\w*)");
+		}
+		
 		public String getName() {
 			return "waitforre";
 		}
 		
-		public void execute (List<String> arguments) {
-			if (arguments.size() >= 1)
+		public void execute (String arguments) {
+			Matcher m = format.matcher(arguments);
+			
+			if (m.matches())
 			{
-				mode = MODE_WAITING;
+				mode = Mode.waiting;
 				
-				String regex = toString(arguments);
-				int end = regex.length() - 1;
+				String regex = m.group(1);
 				boolean ignoreCase = false;
 				
-				if (regex.endsWith("/i"))
+				if (m.group(2).contains("i"))
 				{
 					ignoreCase = true;
-					end = regex.length() - 2;
 				}
-				regex = regex.substring(1, end);
 				
 				commands.waitFor(regex, true, ignoreCase, WarlockWSLScript.this);
 			} else { /* TODO throw error */ }
@@ -497,13 +439,12 @@ public class WarlockWSLScript extends AbstractScript implements IScriptCallback,
 			return "waitfor";
 		}
 		
-		public void execute (List<String> arguments) {
-			if (arguments.size() >= 1)
+		public void execute (String arguments) {
+			if (arguments.length() >= 1)
 			{
-				mode = MODE_WAITING;
+				mode = Mode.waiting;
 				
-				String text = toString(arguments);
-				commands.waitFor(text, false, true, WarlockWSLScript.this);
+				commands.waitFor(arguments, false, true, WarlockWSLScript.this);
 				
 			} else { /* TODO throw error */ }
 		}
@@ -514,8 +455,8 @@ public class WarlockWSLScript extends AbstractScript implements IScriptCallback,
 			return "wait";
 		}
 		
-		public void execute (List<String> arguments) {
-			mode = MODE_WAITING;
+		public void execute (String arguments) {
+			mode = Mode.waiting;
 			
 			commands.waitForPrompt(WarlockWSLScript.this);
 		}
@@ -526,8 +467,8 @@ public class WarlockWSLScript extends AbstractScript implements IScriptCallback,
 			return "put";
 		}
 		
-		public void execute(List<String> arguments) {
-			commands.put(WarlockWSLScript.this, toString(arguments));
+		public void execute(String arguments) {
+			commands.put(WarlockWSLScript.this, arguments);
 		}
 	}
 	
@@ -536,9 +477,9 @@ public class WarlockWSLScript extends AbstractScript implements IScriptCallback,
 			return "echo";
 		}
 		
-		public void execute (List<String> arguments)
+		public void execute (String arguments)
 		{
-			commands.echo(WarlockWSLScript.this, toString(arguments));
+			commands.echo(WarlockWSLScript.this, arguments);
 		}
 	}
 	
@@ -547,17 +488,18 @@ public class WarlockWSLScript extends AbstractScript implements IScriptCallback,
 			return "pause";
 		}
 		
-		public void execute (List<String> arguments)
+		public void execute (String arguments)
 		{
-			mode = MODE_WAITING;
-			if (arguments.size() >= 1)
+			mode = Mode.waiting;
+			String[] args = arguments.split(argSeparator);
+			if (args.length >= 1)
 			{
-				int time = Integer.parseInt(arguments.get(0));
+				int time = Integer.parseInt(args[0]);
 				commands.pause(time, WarlockWSLScript.this);
 			}
 			else {
-				// "empty" pause.. just means wait for RT
-				commands.pause(0, WarlockWSLScript.this);
+				// "empty" pause.. means wait 1 second
+				commands.pause(1, WarlockWSLScript.this);
 			}
 		}
 	}
@@ -567,10 +509,10 @@ public class WarlockWSLScript extends AbstractScript implements IScriptCallback,
 			return "move";
 		}
 		
-		public void execute (List<String> arguments)
+		public void execute (String arguments)
 		{
-			commands.move(toString(arguments), WarlockWSLScript.this);
-			mode = MODE_WAITING;
+			commands.move(arguments, WarlockWSLScript.this);
+			mode = Mode.waiting;
 		}
 	}
 	
@@ -579,10 +521,10 @@ public class WarlockWSLScript extends AbstractScript implements IScriptCallback,
 			return "nextroom";
 		}
 		
-		public void execute (List<String> arguments)
+		public void execute (String arguments)
 		{
 			commands.nextRoom(WarlockWSLScript.this);
-			mode = MODE_WAITING;
+			mode = Mode.waiting;
 		}
 	}
 	
@@ -591,33 +533,36 @@ public class WarlockWSLScript extends AbstractScript implements IScriptCallback,
 			return "exit";
 		}
 		
-		public void execute (List<String> arguments) {
+		public void execute (String arguments) {
 			running = false;
 			stopped = true;
 			
-			mode = MODE_EXIT;
+			mode = Mode.waiting;
 		}
 	}
 	
 	protected class WarlockWSLIf_ extends WarlockWSLCommand {
 		protected String variableName;
+		private Pattern format;
 		
 		public WarlockWSLIf_ (String variableName) {
 			this.variableName = variableName;
+			format = Pattern.compile("^\\s+([\\w_]+)\\s+(.*)");
 		}
 		
 		public String getName () {
 			return "if_" + variableName;
 		}
 		
-		public void execute (List<String> arguments) {
+		public void execute (String arguments) {
 			if (variables.containsKey(variableName)) {
-				String curCommandName = arguments.get(0).toLowerCase();
-				arguments = arguments.subList(1, arguments.size());
+				Matcher m = format.matcher(arguments);
+				
+				String curCommandName = m.group(1).toLowerCase();
 				
 				WarlockWSLCommand command = wslCommands.get(curCommandName);
 				if(command != null) {
-					command.execute(arguments);
+					command.execute(m.group(2));
 				} else {
 					// this acts as a comment
 				}
@@ -644,9 +589,9 @@ public class WarlockWSLScript extends AbstractScript implements IScriptCallback,
 		try {
 			while (!stopped)
 			{
-				if (MODE_START.equals(mode)) { doStart(); }
-				else if (MODE_CONTINUE.equals(mode)) { processLineTokens(nextLine); }
-				else if (MODE_EXIT.equals(mode)) { break; }
+				if (mode == Mode.start) { doStart(); }
+				else if (mode == Mode.cont) { runScript(); }
+				else if (mode == Mode.exit) { break; }
 				
 				/* MODE_WAITING is implicit */
 				Thread.sleep((long) 200);
@@ -661,7 +606,7 @@ public class WarlockWSLScript extends AbstractScript implements IScriptCallback,
 	
 	protected void continueAtNextLine ()
 	{
-		mode = MODE_CONTINUE;
+		mode = Mode.cont;
 	}
 	
 	public void handleCallback(CallbackEvent event) {
