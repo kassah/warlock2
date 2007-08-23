@@ -18,12 +18,14 @@ public class WarlockWSLScriptLine {
 	public WarlockWSLScriptLine(WarlockWSLScript script, int lineNumber) {
 		this.script = script;
 		this.lineNumber = lineNumber;
-		commandPattern = Pattern.compile("^([\\w_]+)\\s+(.*)");
+		commandPattern = Pattern.compile("^([\\w_]+)(\\s+(.*))?");
 	}
 	
 	public void execute(HashMap<String, String> variables, HashMap<String, WarlockWSLCommand> commands) {
 		StringBuffer buffer = new StringBuffer();
 		for(WarlockWSLScriptArg arg : args) {
+			System.out.print("appending arg \"" + arg.getString(variables) + "\"\n");
+			
 			buffer.append(arg.getString(variables));
 		}
 		
@@ -31,11 +33,18 @@ public class WarlockWSLScriptLine {
 		
 		Matcher m = commandPattern.matcher(buffer.toString());
 		
+		if (!m.matches()) {
+			// TODO handle the error
+			return;
+		}
+		
 		String commandName = m.group(1).toLowerCase();
-		String args = m.group(2);
+		System.out.print("command \"" + commandName + "\"\n");
+		String arguments = m.group(3);
+		System.out.print("arguments \"" + arguments + "\"\n");
 		
 		WarlockWSLCommand command = commands.get(commandName);
-		if(command != null) command.execute(args);
+		if(command != null) command.execute(arguments);
 	}
 	
 	public int getLineNumber() {

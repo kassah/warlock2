@@ -47,7 +47,7 @@ expr returns [WarlockWSLScriptLine line]
 
 arg_list returns [ArrayList<WarlockWSLScriptArg> list]
 	:	{ list = new ArrayList<WarlockWSLScriptArg>(); }
-	| data=script_data l=arg_list	{ list = l; list.add(data); }
+	| data=script_data l=arg_list	{ list = l; list.add(0, data); }
 	;
 
 script_data returns [WarlockWSLScriptArg arg]
