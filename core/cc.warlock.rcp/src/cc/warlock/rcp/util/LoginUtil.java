@@ -8,9 +8,10 @@ import org.eclipse.swt.widgets.Display;
 import org.eclipse.ui.PartInitException;
 import org.eclipse.ui.PlatformUI;
 
-import cc.warlock.client.stormfront.internal.StormFrontClient;
+import cc.warlock.client.stormfront.IStormFrontClient;
 import cc.warlock.network.SGEConnection;
 import cc.warlock.rcp.application.WarlockApplication;
+import cc.warlock.rcp.plugin.Warlock2Plugin;
 import cc.warlock.rcp.ui.network.SWTConnectionListenerAdapter;
 import cc.warlock.rcp.views.DebugView;
 import cc.warlock.rcp.views.GameView;
@@ -27,8 +28,7 @@ public class LoginUtil {
 		String server = loginProperties.get("GAMEHOST");
 		int port = Integer.parseInt (loginProperties.get("GAMEPORT"));
 		String key = loginProperties.get("KEY");
-		StormFrontClient client = new StormFrontClient();
-		gameView.setStormFrontClient(client);
+		IStormFrontClient client = Warlock2Plugin.getDefault().createNextClient();
 		
 		try {
 			client.connect(server, port, key);

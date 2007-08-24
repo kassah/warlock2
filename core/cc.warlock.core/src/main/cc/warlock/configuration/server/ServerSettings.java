@@ -34,10 +34,10 @@ public class ServerSettings implements Comparable<ServerSettings>
 	private String playerId;
 	private Document document;
 	protected Palette palette;
-	protected Hashtable<String, Preset> presets;
-	protected Hashtable<String, HighlightString> highlightStrings;
-	protected Hashtable<String, String> variables;
-	protected ArrayList<ArrayList<MacroKey>> macroSets;
+	protected Hashtable<String, Preset> presets = new Hashtable<String,Preset>();
+	protected Hashtable<String, HighlightString> highlightStrings = new Hashtable<String, HighlightString>();
+	protected Hashtable<String, String> variables = new Hashtable<String, String>();
+	protected ArrayList<ArrayList<MacroKey>> macroSets = new ArrayList<ArrayList<MacroKey>>();
 	protected DefaultSkin defaultSkin;
 	
 	private Element mainWindowElement, mainWindowFontElement,
@@ -108,8 +108,6 @@ public class ServerSettings implements Comparable<ServerSettings>
 	
 	private void loadPresets ()
 	{
-		presets = new Hashtable<String, Preset>();
-		
 		presetsElement = (Element) document.selectSingleNode("/settings/presets");
 		if (presetsElement != null)
 		{
@@ -125,8 +123,6 @@ public class ServerSettings implements Comparable<ServerSettings>
 	
 	private void loadHighlightStrings()
 	{
-		highlightStrings = new Hashtable<String, HighlightString>();
-		
 		stringsElement = (Element) document.selectSingleNode("/settings/strings");
 		if (stringsElement != null)
 		{
@@ -155,8 +151,6 @@ public class ServerSettings implements Comparable<ServerSettings>
 	
 	private void loadVariables()
 	{
-		variables = new Hashtable<String, String>();
-		
 		Element varsElement = (Element) document.selectSingleNode("/settings/vars");
 		if (varsElement != null)
 		{
@@ -170,8 +164,6 @@ public class ServerSettings implements Comparable<ServerSettings>
 	
 	private void loadMacros ()
 	{
-		macroSets = new ArrayList<ArrayList<MacroKey>>();
-		
 		Element macrosElement = (Element) document.selectSingleNode("/settings/macros");
 		if (macrosElement != null)
 		{

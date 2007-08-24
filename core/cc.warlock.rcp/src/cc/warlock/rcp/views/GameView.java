@@ -39,6 +39,7 @@ import cc.warlock.configuration.server.ServerSettings;
 import cc.warlock.configuration.skin.IWarlockSkin;
 import cc.warlock.rcp.actions.ProfileConnectAction;
 import cc.warlock.rcp.application.WarlockApplication;
+import cc.warlock.rcp.plugin.Warlock2Plugin;
 import cc.warlock.rcp.ui.WarlockCompass;
 import cc.warlock.rcp.ui.WarlockText;
 import cc.warlock.rcp.ui.client.SWTStormFrontClientViewer;
@@ -166,7 +167,8 @@ public class GameView extends StreamView implements KeyListener, IStormFrontClie
 			"Hello, and welcome to Warlock 2!\n" + 
 			"To get started, you can connect to your play.net account by opening the \"Connect\" menu, and pressing \"New Connection\".\n" +
 			"Good luck, and happy hunting!\n\n" +
-			"Copyright (c) 2001-2007 " + WarlockText.OBJECT_HOLDER);
+			"Copyright (c) 2001-2007 " + WarlockText.OBJECT_HOLDER +
+			"\n\n");
 		
 		text.addLink("http://warlock.cc", "The Warlock Team");
 		
@@ -182,6 +184,8 @@ public class GameView extends StreamView implements KeyListener, IStormFrontClie
 			}
 		});
 		entry.addKeyListener(this);
+		
+		setClient(Warlock2Plugin.getDefault().getCurrentClient());
 	}
 	
 	public void setFocus() {
@@ -298,7 +302,13 @@ public class GameView extends StreamView implements KeyListener, IStormFrontClie
 		{
 			if (macro.getKeyCode() == e.keyCode && macro.getModifiers() == e.stateMask)
 			{
-				 macro.execute(wrapper);
+				 try {
+					macro.execute(wrapper);
+				} catch (Exception ex) {
+					// TODO Auto-generated catch block
+					ex.printStackTrace();
+				}
+				
 				e.doit = false;
 				break;
 			}

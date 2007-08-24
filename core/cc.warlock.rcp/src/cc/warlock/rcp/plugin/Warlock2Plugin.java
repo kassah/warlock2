@@ -1,5 +1,6 @@
 package cc.warlock.rcp.plugin;
 
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.MissingResourceException;
 import java.util.ResourceBundle;
@@ -12,6 +13,8 @@ import org.eclipse.core.runtime.Platform;
 import org.eclipse.ui.plugin.AbstractUIPlugin;
 import org.osgi.framework.BundleContext;
 
+import cc.warlock.client.stormfront.IStormFrontClient;
+import cc.warlock.client.stormfront.internal.StormFrontClient;
 import cc.warlock.rcp.ui.macros.MacroRegistry;
 import cc.warlock.script.IScriptEngine;
 import cc.warlock.script.internal.ScriptEngineRegistry;
@@ -24,6 +27,7 @@ public class Warlock2Plugin extends AbstractUIPlugin {
 	private static Warlock2Plugin plugin;
 	//Resource bundle.
 	private ResourceBundle resourceBundle;
+	private ArrayList<IStormFrontClient> clients = new ArrayList<IStormFrontClient>();
 	
 	public static final String PLUGIN_ID = "cc.warlock.rcp";
 	
@@ -64,6 +68,22 @@ public class Warlock2Plugin extends AbstractUIPlugin {
 				}
 			}
 		}
+		
+		// force-load our initial client so we can do offline scripting
+		clients.add(new StormFrontClient());
+	}
+	
+	public IStormFrontClient getCurrentClient ()
+	{
+		return clients.get(clients.size()-1);
+	}
+	
+	public IStormFrontClient createNextClient ()
+	{
+		IStormFrontClient client = getCurrentClient();
+		
+		clients.add(new StormFrontClient());
+		return client;
 	}
 	
 	public IExtension[] getExtensions (String extensionPoint)
