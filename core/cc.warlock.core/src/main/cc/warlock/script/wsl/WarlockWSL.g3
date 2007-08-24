@@ -28,11 +28,20 @@ script
 	;
 
 line
-	: (COMMENT | expr)? EOL { System.out.print("passed line " + Integer.toString(lineNum) + "\n"); lineNum++; }
+	: (COMMENT | expr | WS)? EOL { System.out.print("passed line " + Integer.toString(lineNum) + "\n"); lineNum++; }
 	;
 
 expr returns [WarlockWSLScriptLine line]
-	: (label=NORMAL_STRING COLON l=expr { line = l; script.addLabel($label.text, line); })
+	: (label=NORMAL_STRING COLON (l=expr)? {
+		if (l == null) {
+			line = new WarlockWSLScriptLine(script, lineNum, true);
+			script.addLine(line);
+		} else {
+			line = l;
+		}
+		
+		script.addLabel($label.text, line);
+	})
 	| start=NORMAL_STRING args=arg_list		{
 				line = new WarlockWSLScriptLine(script, lineNum);
 				line.addArg(new WarlockWSLScriptString($start.text));
