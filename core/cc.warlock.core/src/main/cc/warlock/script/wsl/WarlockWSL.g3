@@ -28,7 +28,7 @@ script
 	;
 
 line
-	: (COMMENT | expr | WS)? EOL { System.out.print("passed line " + Integer.toString(lineNum) + "\n"); lineNum++; }
+	: (COMMENT | expr)? EOL { System.out.print("passed line " + Integer.toString(lineNum) + "\n"); lineNum++; }
 	;
 
 expr returns [WarlockWSLScriptLine line]
@@ -82,7 +82,7 @@ EOL
 	;
 COMMENT
 	: { atStart && state == State.base }?=>
-		~(NORMAL_CHAR|'%') (~('\n'|'\r'))* { atStart = false; }
+		~(NORMAL_CHAR|'%'|'\n'|'\r') (~('\n'|'\r'))* { atStart = false; }
 	;
 NORMAL_STRING
 	: { state == State.base }?=>
@@ -109,7 +109,7 @@ STRING
 	: ({ state == State.command }?=>
 		(~('%'|'\n'|'\r'))+)
 	| ({ state == State.variable }?=>
-		~NORMAL_CHAR		{ state = savedState; } )
+		~(NORMAL_CHAR|'\r'|'\n')		{ state = savedState; } )
 	| ({ state == State.expr }?=>
 		(' ' | '\t')+		{ state = State.command; } )
 	;
