@@ -503,7 +503,12 @@ public class WarlockWSLScript extends AbstractScript implements IScriptCallback,
 			String[] args = arguments.split(argSeparator);
 			if (args.length >= 1)
 			{
-				int time = Integer.parseInt(args[0]);
+				int time;
+				try {
+					time = Integer.parseInt(args[0]);
+				} catch(NumberFormatException e) {
+					time = 1;
+				}
 				commands.pause(time, WarlockWSLScript.this);
 			}
 			else {

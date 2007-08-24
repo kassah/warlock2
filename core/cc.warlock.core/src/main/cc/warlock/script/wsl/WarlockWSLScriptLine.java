@@ -48,6 +48,7 @@ public class WarlockWSLScriptLine {
 		String commandName = m.group(1).toLowerCase();
 		System.out.print("command \"" + commandName + "\"\n");
 		String arguments = m.group(3);
+		if(arguments == null) arguments = "";
 		System.out.print("arguments \"" + arguments + "\"\n");
 		
 		WarlockWSLCommand command = commands.get(commandName);
