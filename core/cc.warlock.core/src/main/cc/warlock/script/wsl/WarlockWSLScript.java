@@ -550,7 +550,7 @@ public class WarlockWSLScript extends AbstractScript implements IScriptCallback,
 		
 		public WarlockWSLIf_ (String variableName) {
 			this.variableName = variableName;
-			format = Pattern.compile("^([\\w_]+)\\s+(.*)");
+			format = Pattern.compile("^([a-zA-Z0-9_]+) +(.*)");
 		}
 		
 		public String getName () {
@@ -560,6 +560,7 @@ public class WarlockWSLScript extends AbstractScript implements IScriptCallback,
 		public void execute (String arguments) {
 			if (variables.containsKey(variableName)) {
 				Matcher m = format.matcher(arguments);
+				m.find();
 				
 				String curCommandName = m.group(1).toLowerCase();
 				
