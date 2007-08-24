@@ -7,7 +7,6 @@ grammar WarlockWSL;
 
 @lexer::header {
 	package cc.warlock.script.wsl;
-	import java.util.ArrayList;
 }
 
 @parser::members {
@@ -17,10 +16,9 @@ grammar WarlockWSL;
 }
 
 @lexer::members {
-	private enum State { base, expr, variable, command, condition }
+	private enum State { base, expr, command, condition }
 	private boolean atStart = true;
 	private State state = State.base;
-	private State savedState = State.base;
 }
 
 script
@@ -73,9 +71,9 @@ conditional
 */ }
 	;
 	
-WS
+WHITESPACE
 	: { state != State.command && state != State.expr }?=>
-		(' ' | '\t')+			{ channel = 99; }
+		WS+			{ channel = 99; }
 	;
 EOL
 	: '\r'? '\n' { state = State.base; atStart = true; }
@@ -92,28 +90,20 @@ COLON
 	: { state == State.expr }?=>
 		':'					{ state = State.base; }
 	;
-START_VARIABLE
-	: '%' 					{
-								if(state == State.expr || state == State.base)
-									savedState = State.command;
-								else savedState = state;
-								state = State.variable;
-								channel = 99;
-							}
-	;
 VARIABLE
-	: { state == State.variable }?=>
-		NORMAL_CHAR+		{ state = savedState; }
+	: '%'! NORMAL_CHAR+
 	;
 STRING
 	: ({ state == State.command }?=>
 		(~('%'|'\n'|'\r'))+)
-	| ({ state == State.variable }?=>
-		~(NORMAL_CHAR|'\r'|'\n')		{ state = savedState; } )
+	| ('%' ~(NORMAL_CHAR|'\r'|'\n'))
 	| ({ state == State.expr }?=>
-		(' ' | '\t')+		{ state = State.command; } )
+		WS+		{ state = State.command; } )
 	;
 
+fragment WS
+	: (' ' | '\t')
+	;
 fragment NORMAL_CHAR
 	: 'A'..'Z'|'a'..'z'|'0'..'9'|'_'
 	;
