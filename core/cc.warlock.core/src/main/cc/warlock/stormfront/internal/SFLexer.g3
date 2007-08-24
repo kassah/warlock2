@@ -16,8 +16,8 @@ TAG_EMPTY_CLOSE : { tagMode }?=> '/>' { tagMode = false; } ;
 ATTR_EQ : { tagMode }?=> '=' ;
 
 ATTR_VALUE : { tagMode }?=>
-        ( '"' (~'"')* '"'
-        | '\'' (~'\'')* '\''
+        ( '"'! (~'"')* '"'!
+        | '\''! (~'\'')* '\''!
         )
     ;
 
