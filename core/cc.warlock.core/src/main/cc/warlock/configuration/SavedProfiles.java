@@ -191,6 +191,19 @@ public class SavedProfiles {
 		return profiles.get(account);
 	}
 	
+	public static Profile getProfileByCharacterName (String characterName)
+	{
+		for (ArrayList<Profile> profiles2 : profiles.values())
+		{
+			for (Profile profile : profiles2)
+			{
+				if (profile.getCharacterName().equals(characterName))
+					return profile;
+			}
+		}
+		return null;
+	}
+	
 	private static String[] getSavedAccountIds ()
 	{
 		String savedAccounts = props.getProperty(SAVED_ACCOUNTS);
