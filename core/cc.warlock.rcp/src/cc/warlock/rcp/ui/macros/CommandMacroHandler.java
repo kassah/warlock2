@@ -1,5 +1,6 @@
 package cc.warlock.rcp.ui.macros;
 
+import java.util.Date;
 import java.util.Map;
 
 import cc.warlock.client.IWarlockClientViewer;
@@ -50,7 +51,7 @@ public class CommandMacroHandler implements IMacroHandler {
 			}
 		}
 		
-		viewer.setCurrentCommand(new Command(newCommand));
+		viewer.setCurrentCommand(new Command(newCommand, new Date()));
 		return true;
 	}
 	
