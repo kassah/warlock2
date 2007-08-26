@@ -12,6 +12,38 @@ public class StormFrontProtocolParser {
 	{
 		this.handler = handler;
 	}
+	
+	protected void characters (Token characters)
+	{
+		String string = characters.image;
+		
+		System.out.println("characters: " + string);
+		handler.characters(string.toCharArray(), 0, string.length());
+	}
+	
+	protected void startElement (Token name)
+	{
+		System.out.println("startElement: " + name.image);
+		
+		handler.startElement(name.image, currentAttributes);
+	}
+	
+	protected void addAttribute (Token name, Token value)
+	{
+		String newValue = value.image.substring(1, value.image.length()-1);
+		
+		System.out.println("addAttribute name=" + name.image + ",value=" +newValue);
+		
+		currentAttributes.put(name.image, newValue);
+	}
+	
+	protected void endElement (Token name)
+	{
+		System.out.println("end element: " + name.image);
+		
+		handler.endElement(name.image);
+		currentAttributes.clear();
+	}
 }
 
 PARSER_END(StormFrontProtocolParser)
@@ -24,32 +56,32 @@ void Document() : {}
 void Element() : {Token data;}
 {
 	(
-	( StartTag() (Element() | data=<PCDATA> { handler.characters(data.image.toCharArray(), 0, data.image.length()); })* EndTag() )
+	( StartTag() (Element() | data=<PCDATA> { characters(data); })* EndTag() )
 	|
 	( EmptyElement() )
 	|
-	( data=<PCDATA> { handler.characters(data.image.toCharArray(), 0, data.image.length()); } )
+	( data=<PCDATA> { characters(data); } )
 	)
 }
 
 void StartTag() : {Token name;}
 {
-	<TAG_START_OPEN> name=<GENERIC_ID> (Attribute())* <TAG_CLOSE> { handler.startElement(name.image, currentAttributes); }
+	<TAG_START_OPEN> name=<GENERIC_ID> (Attribute())* <TAG_CLOSE> {  startElement(name); }
 }
 
 void Attribute(): {Token name, value;}
 {
-	name=<GENERIC_ID> <ATTR_EQ> value=<ATTR_VALUE> { currentAttributes.put(name.image, value.image.substring(1, value.image.length()-1)); }
+	name=<GENERIC_ID> <ATTR_EQ> value=<ATTR_VALUE> { addAttribute(name,value); }
 }
 
 void EndTag(): {Token name;}
 {
-	<TAG_END_OPEN> name=<GENERIC_ID> <TAG_CLOSE> { handler.endElement(name.image); currentAttributes.clear(); }
+	<TAG_END_OPEN> name=<GENERIC_ID> <TAG_CLOSE> { endElement(name); }
 }
 
 void EmptyElement(): {Token name;}
 {
-	<TAG_START_OPEN> name=<GENERIC_ID> (Attribute())* <TAG_EMPTY_CLOSE> { handler.startElement(name.image, currentAttributes); handler.endElement(name.image); }
+	<TAG_START_OPEN> name=<GENERIC_ID> (Attribute())* <TAG_EMPTY_CLOSE> { startElement(name); endElement(name); }
 }
 
 TOKEN: {

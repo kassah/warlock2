@@ -80,6 +80,7 @@ public class StormFrontConnection implements IConnection
 				
 				// StormFrontStream inputStream = new StormFrontStream(StormFrontConnection.this, socket.getInputStream());
 				StormFrontProtocolParser parser = new StormFrontProtocolParser(socket.getInputStream());
+				parser.setHandler(handler);
 				parser.Document();
 				
 //				System.out.println("about to create input");

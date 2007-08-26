@@ -4,7 +4,7 @@
 		<mkdir dir="cc/warlock/stormfront/internal"/>
 		
 		<antcall target="javacc">
-			<param name="arguments" value="-OUTPUT_DIRECTORY:cc/warlock/stormfront/internal -STATIC:false -LOOKAHEAD:3"/>
+			<param name="arguments" value="-OUTPUT_DIRECTORY:cc/warlock/stormfront/internal -STATIC:false -LOOKAHEAD:6"/>
 			<param name="grammar-file" value="../../src/main/cc/warlock/stormfront/internal/stormfront.jj"/>
 		</antcall>
 	</target>
