@@ -1,6 +1,6 @@
 package cc.warlock.stormfront.internal;
 
-import org.xml.sax.Attributes;
+import java.util.Hashtable;
 
 import cc.warlock.stormfront.IStormFrontProtocolHandler;
 
@@ -15,7 +15,7 @@ public class InvTagHandler extends DefaultTagHandler {
 		return new String[] { "inv" };
 	}
 
-	public void handleStart(Attributes atts) {
+	public void handleStart(Hashtable<String,String> attributes) {
 	}
 	
 	public boolean handleCharacters(char[] ch, int start, int length) {

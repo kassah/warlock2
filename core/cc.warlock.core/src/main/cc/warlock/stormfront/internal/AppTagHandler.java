@@ -3,7 +3,7 @@
  */
 package cc.warlock.stormfront.internal;
 
-import org.xml.sax.Attributes;
+import java.util.Hashtable;
 
 import cc.warlock.stormfront.IStormFrontProtocolHandler;
 
@@ -21,9 +21,9 @@ public class AppTagHandler extends DefaultTagHandler {
 		return new String[] { "app" };
 	}
 	
-	public void handleStart(Attributes atts) {
-		String characterName = atts.getValue("char");
-		String gameName = atts.getValue("game");
+	public void handleStart(Hashtable<String,String> attributes) {
+		String characterName = attributes.get("char");
+		String gameName = attributes.get("game");
 		
 		handler.getClient().getDefaultStream().getTitle().set("[" + gameName + "] " + characterName);
 		handler.getClient().getCharacterName().set(new String(characterName));

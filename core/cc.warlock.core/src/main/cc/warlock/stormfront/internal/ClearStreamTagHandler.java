@@ -1,6 +1,6 @@
 package cc.warlock.stormfront.internal;
 
-import org.xml.sax.Attributes;
+import java.util.Hashtable;
 
 import cc.warlock.stormfront.IStormFrontProtocolHandler;
 
@@ -18,8 +18,8 @@ public class ClearStreamTagHandler extends DefaultTagHandler {
 		return new String[] { "clearStream"};
 	}
 	
-	public void handleStart(Attributes atts) {
-		String id = atts.getValue("id");
+	public void handleStart(Hashtable<String,String> attributes) {
+		String id = attributes.get("id");
 		
 		handler.getClient().getStream(id).clear();
 	}

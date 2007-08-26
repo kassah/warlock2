@@ -3,7 +3,7 @@
  */
 package cc.warlock.stormfront.internal;
 
-import org.xml.sax.Attributes;
+import java.util.Hashtable;
 
 import cc.warlock.client.stormfront.IStormFrontClient;
 import cc.warlock.stormfront.IStormFrontProtocolHandler;
@@ -24,8 +24,8 @@ public class BarTagHandler extends DefaultTagHandler {
 		return new String[] { "progressBar" };
 	}
 
-	public void handleStart(Attributes atts) {
-    	handleProgressBar(atts.getValue("id"), Integer.parseInt(atts.getValue("value")), atts.getValue("text"));	
+	public void handleStart(Hashtable<String,String> attributes) {
+    	handleProgressBar(attributes.get("id"), Integer.parseInt(attributes.get("value")), attributes.get("text"));	
 	}
 	
 	private void handleProgressBar (String which, int percentage, String label)

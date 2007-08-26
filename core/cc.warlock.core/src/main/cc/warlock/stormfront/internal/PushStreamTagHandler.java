@@ -3,7 +3,7 @@
  */
 package cc.warlock.stormfront.internal;
 
-import org.xml.sax.Attributes;
+import java.util.Hashtable;
 
 import cc.warlock.stormfront.IStormFrontProtocolHandler;
 
@@ -23,8 +23,8 @@ public class PushStreamTagHandler extends DefaultTagHandler {
 		return new String[] { "pushStream" };
 	}
 	
-	public void handleStart(Attributes attributes) {
-		String id = attributes.getValue("id");
+	public void handleStart(Hashtable<String,String> attributes) {
+		String id = attributes.get("id");
 		handler.pushStream(id);
 	}
 }

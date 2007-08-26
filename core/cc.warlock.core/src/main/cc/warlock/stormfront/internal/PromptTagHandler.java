@@ -3,7 +3,7 @@
  */
 package cc.warlock.stormfront.internal;
 
-import org.xml.sax.Attributes;
+import java.util.Hashtable;
 
 import cc.warlock.client.stormfront.IStormFrontClient;
 import cc.warlock.stormfront.IStormFrontProtocolHandler;
@@ -29,12 +29,12 @@ public class PromptTagHandler extends DefaultTagHandler {
 		return new String[] { "prompt" };
 	}
 	
-	public void handleStart(Attributes atts) {
+	public void handleStart(Hashtable<String,String> attributes) {
 		prompt = null;
 		
-		if (atts.getValue("time") != null)
+		if (attributes.get("time") != null)
 		{
-			currentTime = Integer.parseInt(atts.getValue("time"));
+			currentTime = Integer.parseInt(attributes.get("time"));
 			if (roundtimeHandler.isWaitingForPrompt()) {
 				roundtimeHandler.processFollowingPrompt(currentTime);
 			}

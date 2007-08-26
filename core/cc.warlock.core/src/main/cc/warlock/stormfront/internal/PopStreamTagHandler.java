@@ -1,6 +1,6 @@
 package cc.warlock.stormfront.internal;
 
-import org.xml.sax.Attributes;
+import java.util.Hashtable;
 
 import cc.warlock.stormfront.IStormFrontProtocolHandler;
 
@@ -18,7 +18,7 @@ public class PopStreamTagHandler extends DefaultTagHandler {
 		return new String[] { "popStream" };
 	}
 	
-	public void handleStart(Attributes atts) {
+	public void handleStart(Hashtable<String,String> attributes) {
 		handler.popStream();
 	}
 }

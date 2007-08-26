@@ -6,7 +6,7 @@
  */
 package cc.warlock.stormfront.internal;
 
-import org.xml.sax.Attributes;
+import java.util.Hashtable;
 
 import cc.warlock.client.IWarlockStyle;
 import cc.warlock.client.internal.WarlockStyle;
@@ -32,13 +32,13 @@ public class StyleTagHandler extends DefaultTagHandler {
 		return new String[] { "style", "output" };
 	}
 
-	public void handleStart(Attributes atts) {
+	public void handleStart(Hashtable<String,String> attributes) {
 		String styleId = null;
 		
 		if ("style".equals(getCurrentTag()))
-			styleId = atts.getValue("id");
+			styleId = attributes.get("id");
 		else if ("output".equals(getCurrentTag()))
-			styleId = atts.getValue("class");
+			styleId = attributes.get("class");
 		
 		if (styleId == null || styleId.length() == 0)
 		{
