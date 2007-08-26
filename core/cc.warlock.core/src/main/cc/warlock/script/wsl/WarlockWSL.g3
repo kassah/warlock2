@@ -60,6 +60,7 @@ arg_list returns [ArrayList<WarlockWSLScriptArg> list]
 script_data returns [WarlockWSLScriptArg arg]
 	: str=STRING		{ arg = new WarlockWSLScriptString($str.text); }
 	| var=VARIABLE		{ arg = new WarlockWSLScriptVariable($var.text);
+	System.out.print("VARIABLE: \"" + $var.text + "\"\n");
  /*
 conditional
 	: OPEN_PAREN conditional CLOSE_PAREN
@@ -73,7 +74,7 @@ conditional
 	
 WHITESPACE
 	: { state != State.command && state != State.expr }?=>
-		WS+			{ channel = 99; }
+		WS+			{ channel = HIDDEN; }
 	;
 EOL
 	: '\r'? '\n' { state = State.base; atStart = true; }
@@ -91,7 +92,7 @@ COLON
 		':'					{ state = State.base; }
 	;
 VARIABLE
-	: '%'! NORMAL_CHAR+
+	: '%' var=NORMAL_CHAR+ { setText($var.text); }
 	;
 STRING
 	: ({ state == State.command }?=>
