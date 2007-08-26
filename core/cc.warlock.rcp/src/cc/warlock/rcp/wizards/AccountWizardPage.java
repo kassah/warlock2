@@ -53,6 +53,7 @@ public class AccountWizardPage extends WizardPageWithNotification {
 		this.connection = connection;
 		listener = new Listener();
 		connection.addSGEConnectionListener(new SWTSGEConnectionListenerAdapter(listener));
+		connection.connect();
 	}
 	
 	public void createControl(Composite parent) {

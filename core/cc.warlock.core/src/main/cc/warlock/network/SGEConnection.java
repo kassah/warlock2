@@ -6,6 +6,9 @@ package cc.warlock.network;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.Map;
+
+import cc.warlock.configuration.Profile;
 
 /**
  * @author Marshall
@@ -19,6 +22,10 @@ public class SGEConnection extends Connection implements IConnectionListener {
 	public static final int INVALID_ACCOUNT = 1;
 	public static final int ACCOUNT_REJECTED = 2;
 	public static final int LOGIN_SUCCESS = 3;
+	
+	public static final String PROPERTY_KEY = "KEY";
+	public static final String PROPERTY_GAMEHOST = "GAMEHOST";
+	public static final String PROPERTY_GAMEPORT = "GAMEPORT";
 	
 	protected static final int SGE_NONE = 0;
 	protected static final int SGE_INITIAL = 1;
@@ -50,12 +57,15 @@ public class SGEConnection extends Connection implements IConnectionListener {
 		games = new HashMap<String, String>();
 		characters = new HashMap<String, String>();
 		loginProperties = new HashMap<String, String>();
-		
+	}
+	
+	public void connect ()
+	{
 		try {
 			connect (SGE_SERVER, SGE_PORT);
 		} catch (IOException e) {
 			e.printStackTrace();
-		}
+		}	
 	}
 	
 	public void addSGEConnectionListener (ISGEConnectionListener listener)
@@ -245,6 +255,60 @@ public class SGEConnection extends Connection implements IConnectionListener {
 	
 	public void disconnected(IConnection connection) {
 
+	}
+	
+	private static class AutoLoginListener extends SGEConnectionListener
+	{
+		public Profile profile;
+		public boolean loggedIn = false;
+		public Map <String,String> properties = null;
+		
+		public void loginReady(SGEConnection connection) {
+			connection.login(profile.getAccount().getAccountName(), profile.getAccount().getPassword());
+		}
+		
+		public void loginFinished(SGEConnection connection, int status) {/* noop */}
+		
+		public void gamesReady(SGEConnection connection,
+				Map<String, String> games) {
+			connection.selectGame(profile.getGameCode());
+		}
+		
+		public void charactersReady(SGEConnection connection,
+				Map<String, String> characters) {
+			connection.selectCharacter(profile.getCharacterCode());
+		}
+		
+		@Override
+		public void readyToPlay(SGEConnection connection,
+				Map<String, String> loginProperties) {
+			this.properties = loginProperties;
+			this.loggedIn = true;
+		}
+	}
+	
+	public static Map<String, String> autoLogin (Profile profile, ISGEConnectionListener extraListener)
+	{
+		SGEConnection connection = new SGEConnection();
+		AutoLoginListener listener = new AutoLoginListener();
+		listener.profile = profile;
+		
+		connection.addSGEConnectionListener(listener);
+		if (extraListener != null) {
+			connection.addSGEConnectionListener(extraListener);
+		}
+			
+		connection.connect();
+		while (!listener.loggedIn) {
+			try {
+				Thread.sleep(200);
+			} catch (InterruptedException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
+		}
+		
+		return listener.properties;
 	}
 
 }

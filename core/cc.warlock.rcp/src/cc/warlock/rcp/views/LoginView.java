@@ -37,6 +37,7 @@ public class LoginView extends ViewPart implements ISGEConnectionListener {
 
 		sgeConnection = new SGEConnection();
 		sgeConnection.addSGEConnectionListener(new SWTSGEConnectionListenerAdapter(this));
+		sgeConnection.connect();
 		
 		Composite top = new Composite (parent, SWT.NONE);
 		GridLayout layout = new GridLayout(2, false);

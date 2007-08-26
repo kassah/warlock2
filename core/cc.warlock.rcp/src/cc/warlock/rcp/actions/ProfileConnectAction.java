@@ -44,6 +44,8 @@ public class ProfileConnectAction extends Action implements ISGEConnectionListen
 				SGEConnection connection = new SGEConnection();
 				connection.addSGEConnectionListener(new SWTSGEConnectionListenerAdapter(ProfileConnectAction.this));
 				monitor.beginTask("Logging into profile \"" + profile.getCharacterName() + "\"...", 5);
+
+				connection.connect();
 				
 				while (!ProfileConnectAction.this.finished) {
 					Display.getDefault().syncExec(new Runnable() {
