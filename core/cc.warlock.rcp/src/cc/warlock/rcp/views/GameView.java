@@ -184,8 +184,6 @@ public class GameView extends StreamView implements KeyListener, IStormFrontClie
 			}
 		});
 		entry.addKeyListener(this);
-		
-		setClient(Warlock2Plugin.getDefault().getCurrentClient());
 	}
 	
 	public void setFocus() {

@@ -29,6 +29,7 @@ public class LoginUtil {
 		int port = Integer.parseInt (loginProperties.get("GAMEPORT"));
 		String key = loginProperties.get("KEY");
 		IStormFrontClient client = Warlock2Plugin.getDefault().createNextClient();
+		gameView.setStormFrontClient(client);
 		
 		try {
 			client.connect(server, port, key);
