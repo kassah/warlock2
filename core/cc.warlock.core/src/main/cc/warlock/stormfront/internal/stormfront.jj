@@ -94,7 +94,7 @@ TOKEN: {
 }
 
 <IN_TAG_MODE> TOKEN: {
-	<TAG_CLOSE: ">"> : DEFAULT |
+	<TAG_CLOSE: ">" (("\r")? "\n")?> : DEFAULT |
 	<TAG_EMPTY_CLOSE: "/>"> : DEFAULT |
 	
 		
