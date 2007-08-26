@@ -15,6 +15,7 @@ public class DefaultSkin implements IWarlockSkin {
 	
 	protected Hashtable<String, WarlockColor> fgColors = new Hashtable<String, WarlockColor>();
 	protected Hashtable<String, WarlockColor> bgColors = new Hashtable<String, WarlockColor>();
+	protected WarlockColor commandLineBarColor;
 	
 	protected static WarlockColor skinColor (String color)
 	{
@@ -56,6 +57,8 @@ public class DefaultSkin implements IWarlockSkin {
 		bgColors.put("cmdline", skinColor("#000000"));
 		bgColors.put("selectedLink", skinColor("#62B0FF"));
 		bgColors.put("command", skinColor("#404040"));
+		
+		commandLineBarColor = skinColor("#FFFFFF");
 	}
 	
 	public WarlockColor getColor(ColorType type) {
@@ -67,6 +70,8 @@ public class DefaultSkin implements IWarlockSkin {
 			return getSkinBackgroundColor("cmdline");
 		else if (type == ColorType.CommandLine_Foreground)
 			return getSkinForegroundColor("cmdline");
+		else if (type == ColorType.CommandLine_BarColor)
+			return commandLineBarColor;
 		
 		return WarlockColor.DEFAULT_COLOR;
 	}

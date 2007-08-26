@@ -9,7 +9,7 @@ public interface IWarlockSkin {
 	};
 	
 	public static enum ColorType {
-		MainWindow_Background, MainWindow_Foreground, CommandLine_Background, CommandLine_Foreground
+		MainWindow_Background, MainWindow_Foreground, CommandLine_Background, CommandLine_Foreground, CommandLine_BarColor
 	};
 	
 	public static enum FontSizeType {

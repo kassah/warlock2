@@ -217,6 +217,7 @@ public class ServerSettings implements Comparable<ServerSettings>
 			case MainWindow_Foreground: color = mainWindowElement.attributeValue("fgcolor"); break;
 			case CommandLine_Background: color = commandLineElement.attributeValue("bgcolor"); break;
 			case CommandLine_Foreground: color = commandLineElement.attributeValue("fgcolor"); break;
+			case CommandLine_BarColor: color = commandLineElement.attributeValue("barcolor"); break;
 		}
 		
 		if (color == null) color = "skin";
