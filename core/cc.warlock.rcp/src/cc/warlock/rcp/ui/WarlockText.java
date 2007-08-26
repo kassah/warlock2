@@ -36,6 +36,7 @@ import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Control;
 import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.Label;
+import org.eclipse.swt.widgets.ScrollBar;
 import org.eclipse.ui.PartInitException;
 import org.eclipse.ui.PlatformUI;
 
@@ -58,6 +59,7 @@ public class WarlockText extends StyledText implements LineBackgroundListener {
 	private Color linkColor;
 	private Cursor handCursor, defaultCursor;
 	private PaletteData palette;
+	private ScrollBar vscroll;
 	private int lineLimit = 5000;
 	private int doScrollDirection = SWT.UP;
 
@@ -71,6 +73,7 @@ public class WarlockText extends StyledText implements LineBackgroundListener {
 		linkColor = new Color(display, 0xF0, 0x80, 0);
 		handCursor = new Cursor(display, SWT.CURSOR_HAND);
 		defaultCursor = parent.getCursor();
+		vscroll = getVerticalBar ();
 		palette = new PaletteData(new RGB[] { display.getSystemColor(SWT.COLOR_WHITE).getRGB(), display.getSystemColor(SWT.COLOR_BLACK).getRGB() });
 		
 		addVerifyListener(new VerifyListener()  {
@@ -284,9 +287,11 @@ public class WarlockText extends StyledText implements LineBackgroundListener {
 	}
 	
 	public void append(String string) {
+		boolean atbottom = isScrolledToBottom(); 
 		constrainLineLimit();
 		super.append(string);
-		scrollToBottom ();
+		if (atbottom) 
+			scrollToBottom();
 	}
 	
 	private void constrainLineLimit() {
@@ -353,9 +358,19 @@ public class WarlockText extends StyledText implements LineBackgroundListener {
 		}
 	}
 	
+	private boolean isScrolledToBottom() {
+		if (vscroll.getSelection() >= vscroll.getMaximum() - vscroll.getPageIncrement() - 20) {
+			return true;
+		} else {
+			return false;
+		}
+	}
+	
 	private void scrollToBottom ()
 	{
+		//if (1 == 2) {
 		if (doScrollDirection == SWT.DOWN) {
+			//vscroll.setSelection(vscroll.getMaximum());
 			int length = this.getContent().getCharCount();		
 			if (this.getCaretOffset() < length) {
 				this.setCaretOffset(length);
