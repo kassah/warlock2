@@ -3,7 +3,7 @@
  */
 package cc.warlock.stormfront.internal;
 
-import org.xml.sax.Attributes;
+import java.util.Hashtable;
 
 import cc.warlock.stormfront.IStormFrontProtocolHandler;
 
@@ -27,8 +27,8 @@ public class CompDefTagHandler extends DefaultTagHandler {
 		return new String[] { "compDef" };
 	}
 
-	public void handleStart(Attributes atts) {
-		if (atts.getValue("id").equals("room exits")) {
+	public void handleStart(Hashtable<String,String> attributes) {
+		if (attributes.get("id").equals("room exits")) {
 			handler.getClient().getCompass().clear();					
 		}
 	}
