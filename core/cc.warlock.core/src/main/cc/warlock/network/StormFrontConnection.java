@@ -3,7 +3,9 @@
  */
 package cc.warlock.network;
 
+import java.io.BufferedReader;
 import java.io.IOException;
+import java.io.InputStreamReader;
 import java.net.Socket;
 import java.util.ArrayList;
 
@@ -68,6 +70,14 @@ public class StormFrontConnection implements IConnection
 		return client;
 	}
 	
+	public void dataReady (String line)
+	{
+		for (IConnectionListener listener : listeners)
+		{
+			listener.dataReady(this, line);
+		}
+	}
+	
 	class SFParser implements Runnable {
 		public void run() {
 			try {
@@ -75,7 +85,8 @@ public class StormFrontConnection implements IConnection
 				sendLine("/FE:WARLOCK /VERSION:1.0.1.22 /XML\n");
 				
 				// StormFrontStream inputStream = new StormFrontStream(StormFrontConnection.this, socket.getInputStream());
-				StormFrontProtocolParser parser = new StormFrontProtocolParser(socket.getInputStream());
+				StormFrontReader reader = new StormFrontReader(StormFrontConnection.this, new InputStreamReader(socket.getInputStream()));
+				StormFrontProtocolParser parser = new StormFrontProtocolParser(reader);
 				parser.setHandler(handler);
 				parser.Document();
 				

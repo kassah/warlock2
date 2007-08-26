@@ -2,7 +2,10 @@ package cc.warlock.rcp.views;
 
 import org.eclipse.swt.SWT;
 //import org.eclipse.swt.custom.StyledText;
+import cc.warlock.rcp.plugin.Warlock2Plugin;
 import cc.warlock.rcp.ui.WarlockText;
+import cc.warlock.rcp.ui.network.SWTConnectionListenerAdapter;
+
 import org.eclipse.swt.events.SelectionAdapter;
 import org.eclipse.swt.events.SelectionEvent;
 import org.eclipse.swt.layout.GridData;
