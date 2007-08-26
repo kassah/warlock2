@@ -2,11 +2,8 @@ package cc.warlock.rcp.views;
 
 import java.util.ArrayList;
 import java.util.Collection;
-import java.util.Hashtable;
 
 import org.eclipse.swt.SWT;
-import org.eclipse.swt.custom.LineBackgroundEvent;
-import org.eclipse.swt.custom.LineBackgroundListener;
 import org.eclipse.swt.custom.StyleRange;
 import org.eclipse.swt.graphics.Color;
 import org.eclipse.swt.graphics.Font;
@@ -261,7 +258,7 @@ public class StreamView extends ViewPart implements IStreamListener {
 	}
 	
 	public void streamPrompted(IStream stream, String prompt) {
-		if (this.mainStream.equals(stream) || this.streams.contains(stream))
+		if (!isPrompting && (this.mainStream.equals(stream) || this.streams.contains(stream)))
 		{
 			isPrompting = true;
 			this.text.append(prompt);
