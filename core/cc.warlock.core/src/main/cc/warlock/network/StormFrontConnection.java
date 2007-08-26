@@ -7,12 +7,8 @@ import java.io.IOException;
 import java.net.Socket;
 import java.util.ArrayList;
 
-import org.antlr.runtime.CharStream;
-
 import cc.warlock.client.IWarlockClient;
 import cc.warlock.client.stormfront.IStormFrontClient;
-import cc.warlock.stormfront.internal.SFLexerLexer;
-import cc.warlock.stormfront.internal.SFParserParser;
 import cc.warlock.stormfront.internal.StormFrontProtocolHandler;
 import cc.warlock.stormfront.internal.StormFrontProtocolParser;
 
