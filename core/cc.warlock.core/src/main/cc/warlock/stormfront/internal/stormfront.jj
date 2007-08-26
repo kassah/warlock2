@@ -56,17 +56,15 @@ void Document() : {}
 void Element() : {Token data;}
 {
 	(
-	( StartTag() (Element() | data=<PCDATA> { characters(data); })* EndTag() )
-	|
-	( EmptyElement() )
+	Tag()
 	|
 	( data=<PCDATA> { characters(data); } )
 	)
 }
 
-void StartTag() : {Token name;}
+void Tag() : {Token name;}
 {
-	<TAG_START_OPEN> name=<GENERIC_ID> (Attribute())* <TAG_CLOSE> {  startElement(name); }
+	<TAG_START_OPEN> name=<GENERIC_ID> (Attribute())* {  startElement(name); } ((<TAG_CLOSE> (Element())* EndTag()) | <TAG_EMPTY_CLOSE> { endElement(name); })
 }
 
 void Attribute(): {Token name, value;}
@@ -77,11 +75,6 @@ void Attribute(): {Token name, value;}
 void EndTag(): {Token name;}
 {
 	<TAG_END_OPEN> name=<GENERIC_ID> <TAG_CLOSE> { endElement(name); }
-}
-
-void EmptyElement(): {Token name;}
-{
-	<TAG_START_OPEN> name=<GENERIC_ID> (Attribute())* <TAG_EMPTY_CLOSE> { startElement(name); endElement(name); }
 }
 
 TOKEN: {
