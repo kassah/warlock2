@@ -14,6 +14,7 @@ import cc.warlock.client.stormfront.IStormFrontClient;
 import cc.warlock.stormfront.internal.SFLexerLexer;
 import cc.warlock.stormfront.internal.SFParserParser;
 import cc.warlock.stormfront.internal.StormFrontProtocolHandler;
+import cc.warlock.stormfront.internal.StormFrontProtocolParser;
 
 /**
  * @author Sean Proctor
@@ -78,17 +79,20 @@ public class StormFrontConnection implements IConnection
 				sendLine("/FE:WARLOCK /VERSION:1.0.1.22 /XML\n");
 				
 				// StormFrontStream inputStream = new StormFrontStream(StormFrontConnection.this, socket.getInputStream());
-				System.out.println("about to create input");
-				CharStream input = new StormFrontCharStream(socket.getInputStream());
-				System.out.println("about to pass input to lexer");
-				SFLexerLexer lex = new SFLexerLexer(input);
-				System.out.println("about to create token stream");
-				StormFrontTokenStream tokens = new StormFrontTokenStream(lex);
+				StormFrontProtocolParser parser = new StormFrontProtocolParser(socket.getInputStream());
+				parser.Document();
 				
-				System.out.println("about to run parser");
-				SFParserParser parser = new SFParserParser(tokens);
-				parser.setHandler(new StormFrontProtocolHandler(client));
-				parser.document();
+//				System.out.println("about to create input");
+//				CharStream input = new StormFrontCharStream(socket.getInputStream());
+//				System.out.println("about to pass input to lexer");
+//				SFLexerLexer lex = new SFLexerLexer(input);
+//				System.out.println("about to create token stream");
+//				StormFrontTokenStream tokens = new StormFrontTokenStream(lex);
+//				
+//				System.out.println("about to run parser");
+//				SFParserParser parser = new SFParserParser(tokens);
+//				parser.setHandler(new StormFrontProtocolHandler(client));
+//				parser.document();
 			} catch (Throwable t) {
 				t.printStackTrace();
 			}

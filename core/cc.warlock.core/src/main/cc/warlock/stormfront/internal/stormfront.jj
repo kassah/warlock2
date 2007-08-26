@@ -1,0 +1,78 @@
+PARSER_BEGIN(StormFrontProtocolParser)
+package cc.warlock.stormfront.internal;
+
+import cc.warlock.stormfront.internal.StormFrontProtocolHandler;
+import java.util.Hashtable;
+
+public class StormFrontProtocolParser {
+	protected StormFrontProtocolHandler handler;
+	protected Hashtable<String,String> currentAttributes = new Hashtable<String,String>();
+	
+	public void setHandler (StormFrontProtocolHandler handler)
+	{
+		this.handler = handler;
+	}
+}
+
+PARSER_END(StormFrontProtocolParser)
+
+void Document() : {}
+{
+	(Element())*
+}
+
+void Element() : {Token data;}
+{
+	(
+	( StartTag() (Element() | data=<PCDATA> { handler.characters(data.image.toCharArray(), 0, data.image.length()); })* EndTag() )
+	|
+	( EmptyElement() )
+	|
+	( data=<PCDATA> { handler.characters(data.image.toCharArray(), 0, data.image.length()); } )
+	)
+}
+
+void StartTag() : {Token name;}
+{
+	<TAG_START_OPEN> name=<GENERIC_ID> (Attribute())* <TAG_CLOSE> { handler.startElement(name.image, currentAttributes); }
+}
+
+void Attribute(): {Token name, value;}
+{
+	name=<GENERIC_ID> <ATTR_EQ> value=<ATTR_VALUE> { currentAttributes.put(name.image, value.image.substring(1, value.image.length()-1)); }
+}
+
+void EndTag(): {Token name;}
+{
+	<TAG_END_OPEN> name=<GENERIC_ID> <TAG_CLOSE> { handler.endElement(name.image); currentAttributes.clear(); }
+}
+
+void EmptyElement(): {Token name;}
+{
+	<TAG_START_OPEN> name=<GENERIC_ID> (Attribute())* <TAG_EMPTY_CLOSE> { handler.startElement(name.image, currentAttributes); handler.endElement(name.image); }
+}
+
+TOKEN: {
+	<TAG_START_OPEN: "<"> : IN_TAG_MODE |
+	<TAG_END_OPEN: "</"> : IN_TAG_MODE |
+	
+	<PCDATA: (~["<"])+> |
+	 <NAMECHAR: (<LETTER> | <DIGIT> | "." | "-" | "_" | ":")> |
+	 <DIGIT: (["0"-"9"])> |
+	 <LETTER: (["A"-"Z","a"-"z"])>
+}
+
+<IN_TAG_MODE> TOKEN: {
+	<TAG_CLOSE: ">"> : DEFAULT |
+	<TAG_EMPTY_CLOSE: "/>"> : DEFAULT |
+	
+		
+	<ATTR_EQ: "="> |
+	<ATTR_VALUE: ("\"" (~["\""])* "\"" | "'" (~["'"])* "'")> |
+	
+	<GENERIC_ID: (<LETTER> | "_" | ":") (<NAMECHAR>)*> 
+}
+
+<IN_TAG_MODE> SKIP: {
+	 <WS: ([" ","\r","\t","\u000C","\n"])>
+}
