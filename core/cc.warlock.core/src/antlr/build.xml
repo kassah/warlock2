@@ -8,14 +8,6 @@
 			<param name="grammar-file" value="cc/warlock/script/wsl/WarlockWSL.g3"/>
 			<param name="lib-dir" value="cc/warlock/script/wsl"/>
 		</antcall>
-		<antcall target="build-grammar">
-			<param name="grammar-file" value="cc/warlock/stormfront/internal/SFLexer.g3"/>
-			<param name="lib-dir" value="cc/warlock/stormfront/internal"/>
-		</antcall>
-		<antcall target="build-grammar">
-			<param name="grammar-file" value="cc/warlock/stormfront/internal/SFParser.g3"/>
-			<param name="lib-dir" value="cc/warlock/stormfront/internal"/>
-		</antcall>
 	</target>
 	
 	<target name="build-grammar" >
