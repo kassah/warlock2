@@ -12,6 +12,7 @@ import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.jface.dialogs.ProgressMonitorDialog;
 import org.eclipse.jface.resource.JFaceResources;
 import org.eclipse.swt.SWT;
+import org.eclipse.swt.custom.StyledText;
 import org.eclipse.swt.events.FocusEvent;
 import org.eclipse.swt.events.FocusListener;
 import org.eclipse.swt.events.KeyEvent;
@@ -20,9 +21,16 @@ import org.eclipse.swt.events.ModifyEvent;
 import org.eclipse.swt.events.ModifyListener;
 import org.eclipse.swt.graphics.Color;
 import org.eclipse.swt.graphics.Font;
+import org.eclipse.swt.graphics.GC;
+import org.eclipse.swt.graphics.Image;
+import org.eclipse.swt.graphics.ImageData;
+import org.eclipse.swt.graphics.PaletteData;
+import org.eclipse.swt.graphics.RGB;
+import org.eclipse.swt.graphics.Rectangle;
 import org.eclipse.swt.layout.GridData;
+import org.eclipse.swt.widgets.Caret;
 import org.eclipse.swt.widgets.Composite;
-import org.eclipse.swt.widgets.Text;
+import org.eclipse.swt.widgets.Display;
 import org.eclipse.ui.IViewSite;
 import org.eclipse.ui.IWorkbenchPage;
 import org.eclipse.ui.PartInitException;
@@ -39,7 +47,6 @@ import cc.warlock.configuration.server.ServerSettings;
 import cc.warlock.configuration.skin.IWarlockSkin;
 import cc.warlock.rcp.actions.ProfileConnectAction;
 import cc.warlock.rcp.application.WarlockApplication;
-import cc.warlock.rcp.plugin.Warlock2Plugin;
 import cc.warlock.rcp.ui.WarlockCompass;
 import cc.warlock.rcp.ui.WarlockText;
 import cc.warlock.rcp.ui.client.SWTStormFrontClientViewer;
@@ -60,7 +67,7 @@ public class GameView extends StreamView implements KeyListener, IStormFrontClie
 	private static ArrayList<GameView> openViews = new ArrayList<GameView>();
 	private static GameView viewInFocus;
 	
-	protected Text entry;
+	protected StyledText entry;
 	protected WarlockCompass compass;
 	protected ICommand currentCommand;
 	
@@ -172,8 +179,11 @@ public class GameView extends StreamView implements KeyListener, IStormFrontClie
 		
 		text.addLink("http://warlock.cc", "The Warlock Team");
 		
-		entry = new Text(mainComposite, SWT.BORDER);
+		entry = new StyledText(mainComposite, SWT.BORDER);
 		entry.setLayoutData(new GridData(GridData.FILL, GridData.VERTICAL_ALIGN_END, true, false, 1, 1));
+		entry.setEditable(true);
+		entry.setLineSpacing(5);
+		entry.setIndent(5);
 		
 		compass = new WarlockCompass(text, CompassThemes.getCompassTheme("small"));
 		text.setBackgroundMode(SWT.INHERIT_DEFAULT);
@@ -221,6 +231,45 @@ public class GameView extends StreamView implements KeyListener, IStormFrontClie
 		settingsProgressDialog.close();
 	}
 	
+	private Image createCaretImage (int width, Color foreground)
+	{
+		PaletteData caretPalette = new PaletteData(new RGB[] {
+				new RGB(0, 0, 0), new RGB(255, 255, 255) });
+		
+		int widthOffset = width - 1;
+		ImageData imageData = new ImageData(4 + widthOffset, entry
+				.getLineHeight(), 1, caretPalette);
+		Display display = entry.getDisplay();
+		Image bracketImage = new Image(display, imageData);
+		GC gc = new GC(bracketImage);
+		gc.setForeground(foreground);
+		gc.setLineWidth(1);
+		// gap between two bars of one third of the height
+		// draw boxes using lines as drawing a line of a certain width produces
+		// rounded corners.
+		for (int i = 0; i < width; i++) {
+			gc.drawLine(i, 0, i, imageData.height - 1);
+		}
+
+		gc.dispose();
+
+		return bracketImage;
+	}
+
+	private Caret createCaret (int width, Color foreground) {
+		Caret caret = new Caret(entry, SWT.NULL);
+		Image image = createCaretImage(width, foreground);
+		
+		if (image != null)
+			caret.setImage(image);
+		else
+			caret.setSize(width, entry.getLineHeight());
+
+		caret.setFont(entry.getFont());
+
+		return caret;
+	}
+	
 	public void loadServerSettings (final ServerSettings settings)
 	{
 		WarlockColor bg = settings.getColorSetting(IWarlockSkin.ColorType.MainWindow_Background);
@@ -236,6 +285,9 @@ public class GameView extends StreamView implements KeyListener, IStormFrontClie
 		WarlockColor entryFG = settings.getColorSetting(IWarlockSkin.ColorType.CommandLine_Foreground);
 		entry.setForeground(createColor(entryFG.equals(WarlockColor.DEFAULT_COLOR) ? fg  : entryFG));
 		entry.setBackground(createColor(entryBG.equals(WarlockColor.DEFAULT_COLOR) ? bg : entryBG));
+		
+		Caret newCaret = createCaret(1, createColor(settings.getColorSetting(IWarlockSkin.ColorType.CommandLine_BarColor)));
+		entry.setCaret(newCaret);
 		
 		text.setBackground(createColor(bg));
 		text.setForeground(createColor(fg));
