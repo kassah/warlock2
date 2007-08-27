@@ -54,6 +54,7 @@ import cc.warlock.rcp.ui.macros.IMacro;
 import cc.warlock.rcp.ui.macros.MacroRegistry;
 import cc.warlock.rcp.ui.macros.internal.SystemMacros;
 import cc.warlock.rcp.ui.style.CompassThemes;
+import cc.warlock.rcp.util.ColorUtil;
 
 /**
  * @author marshall
@@ -201,12 +202,7 @@ public class GameView extends StreamView implements KeyListener, IStormFrontClie
 		
 		viewInFocus = this;
 	}
-	
-	private Color createColor (WarlockColor color)
-	{
-		return new Color(getSite().getShell().getDisplay(), color.getRed(), color.getGreen(), color.getBlue());
-	}
-	
+		
 	private ProgressMonitorDialog settingsProgressDialog;
 	public void startDownloadingServerSettings() {
 		settingsProgressDialog = new ProgressMonitorDialog(getSite().getShell());
@@ -283,16 +279,21 @@ public class GameView extends StreamView implements KeyListener, IStormFrontClie
 		
 		WarlockColor entryBG = settings.getColorSetting(IWarlockSkin.ColorType.CommandLine_Background);
 		WarlockColor entryFG = settings.getColorSetting(IWarlockSkin.ColorType.CommandLine_Foreground);
-		entry.setForeground(createColor(entryFG.equals(WarlockColor.DEFAULT_COLOR) ? fg  : entryFG));
-		entry.setBackground(createColor(entryBG.equals(WarlockColor.DEFAULT_COLOR) ? bg : entryBG));
+		entry.setForeground(ColorUtil.warlockColorToColor(entryFG.equals(WarlockColor.DEFAULT_COLOR) ? fg  : entryFG));
+		entry.setBackground(ColorUtil.warlockColorToColor(entryBG.equals(WarlockColor.DEFAULT_COLOR) ? bg : entryBG));
 		
-		Caret newCaret = createCaret(1, createColor(settings.getColorSetting(IWarlockSkin.ColorType.CommandLine_BarColor)));
+		Caret newCaret = createCaret(1, ColorUtil.warlockColorToColor(settings.getColorSetting(IWarlockSkin.ColorType.CommandLine_BarColor)));
 		entry.setCaret(newCaret);
 		
-		text.setBackground(createColor(bg));
-		text.setForeground(createColor(fg));
+		text.setBackground(ColorUtil.warlockColorToColor(bg));
+		text.setForeground(ColorUtil.warlockColorToColor(fg));
 		
 		SystemMacros.addMacrosFromServerSettings(settings);
+		
+		if (HandsView.getDefault() != null)
+		{
+			HandsView.getDefault().loadServerSettings(settings);
+		}
 	}
 	
 	public void setViewerTitle(String title) {
