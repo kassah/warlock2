@@ -4,8 +4,8 @@ import java.io.IOException;
 import java.io.Reader;
 import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.Hashtable;
 import java.util.List;
+import java.util.Map;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -16,17 +16,16 @@ import org.antlr.runtime.RecognitionException;
 
 import cc.warlock.script.AbstractScript;
 import cc.warlock.script.CallbackEvent;
-import cc.warlock.script.IMatch;
 import cc.warlock.script.IScriptCallback;
 import cc.warlock.script.IScriptCommands;
 import cc.warlock.script.IScriptListener;
-import cc.warlock.script.internal.Match;
+import cc.warlock.script.Match;
 
 public class WarlockWSLScript extends AbstractScript implements IScriptCallback, Runnable {
 	
 	protected String script, scriptName;
 	protected boolean running, stopped;
-	protected Hashtable<String, WarlockWSLScriptLine> labels = new Hashtable<String, WarlockWSLScriptLine>();
+	protected HashMap<String, WarlockWSLScriptLine> labels = new HashMap<String, WarlockWSLScriptLine>();
 	protected WarlockWSLScriptLine nextLine;
 	protected WarlockWSLScriptLine curLine;
 	protected WarlockWSLScriptLine endLine;
@@ -34,6 +33,7 @@ public class WarlockWSLScript extends AbstractScript implements IScriptCallback,
 	protected HashMap<String, WarlockWSLCommand> wslCommands = new HashMap<String, WarlockWSLCommand>();
 	protected int pauseLine;
 	protected Thread scriptThread;
+	private ArrayList<Match> matchset = new ArrayList<Match>();
 	
 	protected enum Mode { start, cont, waiting, exit }
 	private Mode mode;
@@ -91,6 +91,14 @@ public class WarlockWSLScript extends AbstractScript implements IScriptCallback,
 		return scriptName;
 	}
 
+	public Map<String, String> getVariables() {
+		return variables;
+	}
+	
+	public Map<String, WarlockWSLCommand> getCommands() {
+		return wslCommands;
+	}
+	
 	public boolean isRunning() {
 		return running;
 	}
@@ -142,7 +150,7 @@ public class WarlockWSLScript extends AbstractScript implements IScriptCallback,
 				nextLine = nextLine.getNext();
 			}
 			
-			curLine.execute(variables, wslCommands);
+			curLine.execute();
 			curLine = nextLine;
 		}
 	}
@@ -305,18 +313,27 @@ public class WarlockWSLScript extends AbstractScript implements IScriptCallback,
 	
 	protected void gotoLabel (String label)
 	{
-		if (labels.containsKey(label))
+		System.out.println("going to label: \"" + label + "\"");
+		
+		WarlockWSLScriptLine command = labels.get(label);
+		
+		if (command != null)
 		{
-			nextLine = labels.get(label);
-		}
-		else if (labels.containsKey("labelerror"))
-		{
-			nextLine = labels.get("labelerror");
+			System.out.println("found label");
+			curLine = nextLine = command;
 		}
 		else {
-			commands.echo ("***********");
-			commands.echo ("*** WARNING: Label \"" + label + "\" doesn't exist, skipping goto statement ***");
-			commands.echo ("***********");
+			System.out.println("label not found");
+			command = labels.get("labelerror");
+			if (command != null)
+			{
+				curLine = nextLine = command;
+			}
+			else {
+				commands.echo ("***********");
+				commands.echo ("*** WARNING: Label \"" + label + "\" doesn't exist, skipping goto statement ***");
+				commands.echo ("***********");
+			}
 		}
 	}
 	
@@ -343,11 +360,11 @@ public class WarlockWSLScript extends AbstractScript implements IScriptCallback,
 		public void execute (String arguments) {
 			mode = Mode.waiting;
 			
-			commands.matchWait(matchset.toArray(new IMatch[matchset.size()]), WarlockWSLScript.this);
+			commands.matchWait(matchset.toArray(new Match[matchset.size()]), WarlockWSLScript.this);
 		}
 	}
 
-	private ArrayList<IMatch> matchset = new ArrayList<IMatch>();
+
 	
 	protected class WarlockWSLMatchRe extends WarlockWSLCommand {
 		private Pattern format;
@@ -372,12 +389,12 @@ public class WarlockWSLScript extends AbstractScript implements IScriptCallback,
 				
 				if (m.group(3).contains("i"))
 				{
-					match.ignoreCase = true;
+					match.setRegex(regex, true);
+				} else {
+					match.setRegex(regex, false);
 				}
 				
-				match.data.put("label", m.group(1));
-				match.matchText = regex; 
-				match.regex = true;
+				match.setAttribute("label", m.group(1));
 				
 				matchset.add(match);
 			} else { /* TODO throw error */ }
@@ -402,10 +419,10 @@ public class WarlockWSLScript extends AbstractScript implements IScriptCallback,
 			if (m.matches())
 			{
 				Match match = new Match();
-				match.data.put("label", m.group(1));
-				match.matchText = m.group(2);
-				match.regex = false;
-				match.ignoreCase = true;
+				match.setAttribute("label", m.group(1));
+				match.setMatchText(m.group(2));
+				
+				System.out.println("adding match \"" + m.group(1) + "\": \"" + m.group(2) + "\"");
 				
 				matchset.add(match);
 			} else { /* TODO throw error */ }
@@ -639,12 +656,16 @@ public class WarlockWSLScript extends AbstractScript implements IScriptCallback,
 				continueAtNextLine(); break;
 			case Matched:
 			{
-				IMatch match = (IMatch) event.data.get(CallbackEvent.DATA_MATCH);
+				System.out.println("matched a label\n");
+				Match match = (Match) event.data.get(CallbackEvent.DATA_MATCH);
 				if (match != null)
 				{
+					System.out.println("matched label: \"" + match.getAttribute("label") + "\"");
 					matchset.clear();
-					gotoLabel(match.getData().get("label"));
+					gotoLabel(match.getAttribute("label"));
 					commands.waitForPrompt(this);
+				} else {
+					commands.echo("*** Internal error, no match was found!! ***\n");
 				}
 			} break;
 		}

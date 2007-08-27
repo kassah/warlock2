@@ -1,14 +1,15 @@
 PARSER_BEGIN(StormFrontProtocolParser)
 package cc.warlock.stormfront.internal;
 
-import cc.warlock.stormfront.internal.StormFrontProtocolHandler;
-import java.util.Hashtable;
+import cc.warlock.stormfront.IStormFrontProtocolHandler;
+import java.util.Map;
+import java.util.HashMap;
 
 public class StormFrontProtocolParser {
-	protected StormFrontProtocolHandler handler;
-	protected Hashtable<String,String> currentAttributes = new Hashtable<String,String>();
+	protected IStormFrontProtocolHandler handler;
+	protected Map<String,String> currentAttributes = new HashMap<String,String>();
 	
-	public void setHandler (StormFrontProtocolHandler handler)
+	public void setHandler (IStormFrontProtocolHandler handler)
 	{
 		this.handler = handler;
 	}
@@ -17,13 +18,13 @@ public class StormFrontProtocolParser {
 	{
 		String string = characters.image;
 		
-		System.out.println("characters: " + string);
+		// System.out.println("characters: " + string);
 		handler.characters(string.toCharArray(), 0, string.length());
 	}
 	
 	protected void startElement (Token name)
 	{
-		System.out.println("startElement: " + name.image);
+		// System.out.println("startElement: " + name.image);
 		
 		handler.startElement(name.image, currentAttributes);
 	}
@@ -32,14 +33,14 @@ public class StormFrontProtocolParser {
 	{
 		String newValue = value.image.substring(1, value.image.length()-1);
 		
-		System.out.println("addAttribute name=" + name.image + ",value=" +newValue);
+		// System.out.println("addAttribute name=" + name.image + ",value=" +newValue);
 		
 		currentAttributes.put(name.image, newValue);
 	}
 	
 	protected void endElement (Token name)
 	{
-		System.out.println("end element: " + name.image);
+		// System.out.println("end element: " + name.image);
 		
 		handler.endElement(name.image);
 		currentAttributes.clear();

@@ -6,6 +6,8 @@
  */
 package cc.warlock.stormfront;
 
+import java.util.Map;
+
 import cc.warlock.client.IStream;
 import cc.warlock.client.IStyledString;
 import cc.warlock.client.IWarlockStyle;
@@ -28,6 +30,10 @@ public interface IStormFrontProtocolHandler {
 	public void popStream();
 	public IStream getCurrentStream();
 	public IWarlockStyle getCurrentStyle();
+	
+	public void characters(char[] ch, int start, int length);
+	public void startElement(String name, Map<String,String> attributes);
+	public void endElement(String name);
 	
 	public void pushBuffer();
 	public IStyledString popBuffer();

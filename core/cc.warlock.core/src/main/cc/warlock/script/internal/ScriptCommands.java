@@ -13,10 +13,10 @@ import cc.warlock.client.IStyledString;
 import cc.warlock.client.internal.Command;
 import cc.warlock.client.stormfront.IStormFrontClient;
 import cc.warlock.script.CallbackEvent;
-import cc.warlock.script.IMatch;
 import cc.warlock.script.IScript;
 import cc.warlock.script.IScriptCallback;
 import cc.warlock.script.IScriptCommands;
+import cc.warlock.script.Match;
 
 
 public class ScriptCommands implements IScriptCommands, IStreamListener, IPropertyListener<Integer>
@@ -24,7 +24,7 @@ public class ScriptCommands implements IScriptCommands, IStreamListener, IProper
 
 	protected IStormFrontClient client;
 	protected ArrayList<IScriptCallback> callbacks = new ArrayList<IScriptCallback>();
-	protected IMatch[] matches;
+	protected Match[] matches;
 	protected String waitForText;
 	protected boolean ignoreCase, regex;
 	protected boolean waitingForMatches, waitingForRoom, waitingForText, waiting;
@@ -47,7 +47,7 @@ public class ScriptCommands implements IScriptCommands, IStreamListener, IProper
 		client.getDefaultStream().echo("[" + script.getName() + "]: " + text);
 	}
 
-	public void matchWait (IMatch[] matches, IScriptCallback callback) {
+	public void matchWait (Match[] matches, IScriptCallback callback) {
 		addCallback(callback);
 		this.matches = matches;
 		waitingForMatches = true;
@@ -179,15 +179,13 @@ public class ScriptCommands implements IScriptCommands, IStreamListener, IProper
 		
 		if (waitingForMatches)
 		{
-			IMatch foundMatch = null;
-			for (IMatch match : matches)
+			Match foundMatch = null;
+			for (Match match : matches)
 			{
-				if (!match.isRegex())
+				if (match.matches(text))
 				{
-					if (text.toUpperCase().contains(match.getMatchText().toUpperCase()))
-					{
-						foundMatch = match; break;
-					}
+					foundMatch = match;
+					break;
 				}
 			}
 			

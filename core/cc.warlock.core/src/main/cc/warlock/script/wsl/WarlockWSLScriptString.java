@@ -1,6 +1,6 @@
 package cc.warlock.script.wsl;
 
-import java.util.HashMap;
+import java.util.Map;
 
 public class WarlockWSLScriptString extends WarlockWSLScriptArg {
 	private String string;
@@ -10,7 +10,7 @@ public class WarlockWSLScriptString extends WarlockWSLScriptArg {
 	}
 	
 	@Override
-	public String getString(HashMap<String, String> variables) {
+	public String getString(Map<String, String> variables) {
 		return string;
 	}
 

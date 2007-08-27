@@ -9,13 +9,8 @@ package cc.warlock.stormfront.internal;
 import java.util.ArrayList;
 import java.util.EmptyStackException;
 import java.util.HashMap;
-import java.util.Hashtable;
+import java.util.Map;
 import java.util.Stack;
-
-import org.apache.commons.lang.StringEscapeUtils;
-import org.xml.sax.Locator;
-import org.xml.sax.SAXException;
-import org.xml.sax.SAXParseException;
 
 import cc.warlock.client.IStream;
 import cc.warlock.client.IStyledString;
@@ -156,7 +151,7 @@ public class StormFrontProtocolHandler implements IStormFrontProtocolHandler {
 		
 		if (rawXMLBuffer != null)
 		{
-			rawXMLBuffer.append(StringEscapeUtils.escapeXml(String.copyValueOf(ch, start, length)));
+			rawXMLBuffer.append(String.copyValueOf(ch, start, length));
 		}
 		
 		boolean handled = false;
@@ -209,14 +204,6 @@ public class StormFrontProtocolHandler implements IStormFrontProtocolHandler {
 	}
 	
 	/* (non-Javadoc)
-	 * @see org.xml.sax.ContentHandler#endDocument()
-	 */
-	public void endDocument() throws SAXException {
-		// TODO Auto-generated method stub
-		System.out.println("END DOCUMENT");
-	}
-	
-	/* (non-Javadoc)
 	 * @see org.xml.sax.ContentHandler#endElement(java.lang.String, java.lang.String, java.lang.String)
 	 */
 	public void endElement(String name) {
@@ -254,60 +241,9 @@ public class StormFrontProtocolHandler implements IStormFrontProtocolHandler {
 	}
 	
 	/* (non-Javadoc)
-	 * @see org.xml.sax.ContentHandler#endPrefixMapping(java.lang.String)
-	 */
-	public void endPrefixMapping(String prefix) throws SAXException {
-		// TODO Auto-generated method stub
-
-	}
-	
-	/* (non-Javadoc)
-	 * @see org.xml.sax.ContentHandler#ignorableWhitespace(char[], int, int)
-	 */
-	public void ignorableWhitespace(char[] ch, int start, int length)
-			throws SAXException {
-		// TODO Auto-generated method stub
-
-	}
-	
-	/* (non-Javadoc)
-	 * @see org.xml.sax.ContentHandler#processingInstruction(java.lang.String, java.lang.String)
-	 */
-	public void processingInstruction(String target, String data)
-	throws SAXException {
-		// TODO Auto-generated method stub
-		System.out.print("PROCESS: ");
-		System.out.print("<?"+target+" "+data+"?>");
-	}
-	
-	/* (non-Javadoc)
-	 * @see org.xml.sax.ContentHandler#setDocumentLocator(org.xml.sax.Locator)
-	 */
-	public void setDocumentLocator(Locator locator) {
-		// TODO Auto-generated method stub
-
-	}
-	
-	/* (non-Javadoc)
-	 * @see org.xml.sax.ContentHandler#skippedEntity(java.lang.String)
-	 */
-	public void skippedEntity(String name) throws SAXException {
-		// TODO Auto-generated method stub
-
-	}
-	
-	/* (non-Javadoc)
-	 * @see org.xml.sax.ContentHandler#startDocument()
-	 */
-	public void startDocument() throws SAXException {
-		// TODO Auto-generated method stub
-		System.out.println("START DOCUMENT");
-	}
-	
-	/* (non-Javadoc)
 	 * @see org.xml.sax.ContentHandler#startElement(java.lang.String, java.lang.String, java.lang.String, org.xml.sax.Attributes)
 	 */
-	public void startElement(String name, Hashtable<String,String> attributes) {
+	public void startElement(String name, Map<String,String> attributes) {
 		
 		//System.out.print("<" + name);
 		if (rawXMLBuffer != null)
@@ -343,32 +279,6 @@ public class StormFrontProtocolHandler implements IStormFrontProtocolHandler {
 				}
 			}
 		}
-	}
-	
-	/* (non-Javadoc)
-	 * @see org.xml.sax.ContentHandler#startPrefixMapping(java.lang.String, java.lang.String)
-	 */
-	public void startPrefixMapping(String prefix, String uri)
-	throws SAXException {
-		// TODO Auto-generated method stub
-
-	}
-	
-	public void warning(SAXParseException e)
-	throws SAXParseException {
-		System.out.println("WARNING");
-		e.printStackTrace();
-	}
-	
-	public void error(SAXParseException e)
-	throws SAXParseException {
-		System.out.println("RECOVERABLE ERROR");
-		e.printStackTrace();
-	}
-	
-	public void fatalError(SAXParseException e)
-	throws SAXParseException {
-		System.out.println("FATAL ERROR");
 	}
 	
 	public void pushBuffer() {

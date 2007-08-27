@@ -1,6 +1,6 @@
 package cc.warlock.script.wsl;
 
-import java.util.HashMap;
+import java.util.Map;
 
 public class WarlockWSLScriptVariable extends WarlockWSLScriptArg {
 	private String variableName;
@@ -10,7 +10,7 @@ public class WarlockWSLScriptVariable extends WarlockWSLScriptArg {
 	}
 	
 	@Override
-	public String getString(HashMap<String, String> variables) {
+	public String getString(Map<String, String> variables) {
 		String value = variables.get(variableName);
 		if(value == null) return "";
 		return value;

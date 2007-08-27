@@ -1,6 +1,6 @@
 package cc.warlock.stormfront.internal;
 
-import java.util.Hashtable;
+import java.util.Map;
 
 import cc.warlock.stormfront.IStormFrontProtocolHandler;
 import cc.warlock.stormfront.IStormFrontTagHandler;
@@ -16,7 +16,7 @@ abstract public class DefaultTagHandler implements IStormFrontTagHandler {
 	
 	public abstract String[] getTagNames();
 	
-	public void handleStart(Hashtable<String,String> atts) {
+	public void handleStart(Map<String,String> atts) {
 		// TODO Auto-generated method stub
 
 	}

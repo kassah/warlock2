@@ -1,6 +1,6 @@
 package cc.warlock.stormfront.internal;
 
-import java.util.Hashtable;
+import java.util.Map;
 
 import cc.warlock.stormfront.IStormFrontProtocolHandler;
 
@@ -18,7 +18,7 @@ public class StreamWindowTagHandler extends DefaultTagHandler {
 	}
 
 	@Override
-	public void handleStart(Hashtable<String,String> attributes) {
+	public void handleStart(Map<String,String> attributes) {
 		String title = attributes.get("title");
 		String id = attributes.get("id");
 		

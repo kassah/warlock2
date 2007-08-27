@@ -8,8 +8,8 @@ import java.util.regex.Pattern;
 import cc.warlock.script.wsl.WarlockWSLScript.WarlockWSLCommand;
 
 public class WarlockWSLScriptLine {
-	private int lineNumber;
 	private WarlockWSLScript script;
+	private int lineNumber;
 	private WarlockWSLScriptLine next;
 	private ArrayList<WarlockWSLScriptArg> args = new ArrayList<WarlockWSLScriptArg>();
 	private boolean isLabel;
@@ -28,20 +28,21 @@ public class WarlockWSLScriptLine {
 	}
 	
 	
-	public void execute(HashMap<String, String> variables, HashMap<String, WarlockWSLCommand> commands) {
+	public void execute() {
 		StringBuffer buffer = new StringBuffer();
 		for(WarlockWSLScriptArg arg : args) {
-			System.out.print("appending arg \"" + arg.getString(variables) + "\"\n");
+			// System.out.print("appending arg \"" + arg.getString(variables) + "\"\n");
 			
-			buffer.append(arg.getString(variables));
+			buffer.append(arg.getString(script.getVariables()));
 		}
 		
-		System.out.print("running line: " + buffer.toString() + "\n");
+		String line = buffer.toString();
+		System.out.print("running line: " + line + "\n");
 		
-		Matcher m = commandPattern.matcher(buffer.toString());
+		Matcher m = commandPattern.matcher(line);
 		
 		if (!m.find()) {
-			// TODO handle the error
+			System.out.println("Couldn't find the command");
 			return;
 		}
 		
@@ -51,7 +52,7 @@ public class WarlockWSLScriptLine {
 		if(arguments == null) arguments = "";
 		System.out.print("arguments \"" + arguments + "\"\n");
 		
-		WarlockWSLCommand command = commands.get(commandName);
+		WarlockWSLCommand command = script.getCommands().get(commandName);
 		if(command != null) command.execute(arguments);
 	}
 	
