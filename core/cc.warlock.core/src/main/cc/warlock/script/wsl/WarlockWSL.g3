@@ -94,7 +94,7 @@ STRING
 	: ({ state == State.command }?=>
 		(~('%'|'\n'|'\r'))+)
 	| ({ state == State.base}?=>
-		NORMAL_STRING WS+ { if(state == State.base) state = State.command; })
+		NORMAL_STRING (~(':'))=> { if(state == State.base) state = State.command; })
 	| ('%' ~(NORMAL_CHAR|'\r'|'\n') { if(state == State.base) state = State.command; })
 	;
 
