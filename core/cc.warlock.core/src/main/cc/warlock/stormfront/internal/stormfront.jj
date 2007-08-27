@@ -70,7 +70,7 @@ void Tag() : {Token name;}
 
 void Attribute(): {Token name, value;}
 {
-	name=<GENERIC_ID> <ATTR_EQ> value=<ATTR_VALUE> { addAttribute(name,value); }
+	name=<GENERIC_ID> { value = name; } (<ATTR_EQ> value=<ATTR_VALUE>)?	{ addAttribute(name,value); }
 }
 
 void EndTag(): {Token name;}
