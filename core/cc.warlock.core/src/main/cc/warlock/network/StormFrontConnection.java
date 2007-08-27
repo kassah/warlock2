@@ -90,6 +90,11 @@ public class StormFrontConnection implements IConnection
 				parser.setHandler(handler);
 				parser.Document();
 				
+				client.getDefaultStream().echo(
+						"**************************\n"+
+						"* Disconnected from the game\n" +
+						"**************************");
+				
 //				System.out.println("about to create input");
 //				CharStream input = new StormFrontCharStream(socket.getInputStream());
 //				System.out.println("about to pass input to lexer");
