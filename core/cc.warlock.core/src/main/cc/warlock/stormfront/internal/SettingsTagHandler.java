@@ -2,6 +2,7 @@ package cc.warlock.stormfront.internal;
 
 import java.io.File;
 import java.io.FileOutputStream;
+import java.util.HashMap;
 import java.util.Map;
 
 import cc.warlock.client.IWarlockClientViewer;
@@ -14,13 +15,13 @@ import cc.warlock.stormfront.IStormFrontTagHandler;
 public class SettingsTagHandler extends DefaultTagHandler {
 
 	private StringBuffer buffer = new StringBuffer();
-	private boolean handlingSettings = false;
-	private Map<String, IStormFrontTagHandler> tagHandlers;
+	private Map<String, IStormFrontTagHandler> tagHandlers = new HashMap<String, IStormFrontTagHandler>();
 	
-	public SettingsTagHandler(IStormFrontProtocolHandler handler,
-			Map<String, IStormFrontTagHandler> tagHandlers) {
+	public SettingsTagHandler(IStormFrontProtocolHandler handler) {
 		super(handler);
-		this.tagHandlers = tagHandlers;
+		for(String tagName : settingsTags) {
+			tagHandlers.put(tagName, this);
+		}
 	}
 
 	private static interface ViewerVisitor {
@@ -50,23 +51,13 @@ public class SettingsTagHandler extends DefaultTagHandler {
 	
 	@Override
 	public String[] getTagNames() {
-		return handlingSettings ? settingsTags : onlySettingsTag;
-	}
-	
-	private void reregister ()
-	{
-		//forced re-registration to change which tags we handle
-		handler.removeHandler(this);
-		handler.registerHandler(this);
+		return onlySettingsTag;
 	}
 	
 	@Override
 	public void handleStart(Map<String,String> atts) {
 		if ("settings".equals(getCurrentTag()))
-		{
-			handlingSettings = true;
-			reregister();
-			
+		{	
 			buffer.setLength(0);	
 			handler.startSavingRawXML(buffer, "settings");
 			visitViewers(new ViewerVisitor() {
@@ -81,9 +72,6 @@ public class SettingsTagHandler extends DefaultTagHandler {
 	public void handleEnd() {
 		if ("settings".equals(getCurrentTag()))
 		{
-			handlingSettings = false;
-			reregister();
-			
 			handler.stopSavingRawXML();
 			buffer.insert(0, "<?xml version=\"1.0\" encoding=\"ISO-8859-1\"?>\n<settings>\n");
 			buffer.append("</settings>");
