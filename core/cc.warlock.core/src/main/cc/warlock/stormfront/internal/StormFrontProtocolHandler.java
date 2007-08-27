@@ -207,7 +207,6 @@ public class StormFrontProtocolHandler implements IStormFrontProtocolHandler {
 		if(!name.equals(popName))
 			System.out.println("Whoa!! close tag we got \"" + name + "\" is not what we expected \"" + popName + "\"");
 		assert(name.equals(popName));
-		System.out.println("</" + name + ">");
 		
 		// call the method for the object
 		IStormFrontTagHandler tagHandler = getTagHandlerForElement(name, defaultTagHandlers, 0);
@@ -224,7 +223,7 @@ public class StormFrontProtocolHandler implements IStormFrontProtocolHandler {
 	 */
 	public void startElement(String name, Map<String,String> attributes) {
 		
-		System.out.print("<" + name);
+		//System.out.print("<" + name);
 		if (rawXMLBuffer != null)
 		{
 			String startTag = "<" + name;
@@ -240,7 +239,7 @@ public class StormFrontProtocolHandler implements IStormFrontProtocolHandler {
 			
 			currentSpacing += 1;
 		}
-        System.out.println(">");
+        //System.out.println(">");
 		
 		// call the method for the object
 		IStormFrontTagHandler tagHandler = getTagHandlerForElement(name, defaultTagHandlers, 0);

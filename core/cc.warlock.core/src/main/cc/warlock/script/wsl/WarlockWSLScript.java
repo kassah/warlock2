@@ -120,7 +120,7 @@ public class WarlockWSLScript extends AbstractScript implements IScriptCallback,
 	
 	protected void doStart ()
 	{
-		CharStream input = new ANTLRStringStream(script);
+		CharStream input = new ANTLRStringStream(script + "\n");
 		WarlockWSLLexer lex = new WarlockWSLLexer(input);
 		CommonTokenStream tokens = new CommonTokenStream(lex);
 		WarlockWSLParser parser = new WarlockWSLParser(tokens);
