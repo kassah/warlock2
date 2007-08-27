@@ -4,6 +4,7 @@
 package cc.warlock.script;
 
 import java.util.HashMap;
+import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 public class Match
@@ -32,7 +33,10 @@ public class Match
 	}
 	
 	public void setRegex(String text, boolean ignoreCase) {
-		regex = Pattern.compile(text);
+		int flags = 0;
+		if(ignoreCase) flags |= Pattern.CASE_INSENSITIVE;
+		
+		regex = Pattern.compile(text, flags);
 		this.ignoreCase = ignoreCase;
 	}
 	
@@ -62,7 +66,11 @@ public class Match
 		}
 		
 		if(regex != null) {
-			// TODO handle the regex case
+			Matcher m = regex.matcher(text);
+			if(m.matches()) {
+				rv = true;
+			}
+			// TODO should set some variables for the groups here
 		}
 		
 		return rv;
