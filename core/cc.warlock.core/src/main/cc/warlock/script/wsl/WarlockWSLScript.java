@@ -298,7 +298,7 @@ public class WarlockWSLScript extends AbstractScript implements IScriptCallback,
 			Matcher m = format.matcher(arguments);
 			if (m.matches())
 			{
-				System.out.print("variable: " + m.group(1) + " value \"" + m.group(2) + "\"\n");
+				System.out.print("variable: \"" + m.group(1) + "\" value: \"" + m.group(2) + "\"\n");
 				variables.put(m.group(1), m.group(2));
 			} else {
 				System.out.print("Didn't match \"" + arguments + "\"\n");

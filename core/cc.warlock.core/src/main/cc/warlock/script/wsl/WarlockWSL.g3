@@ -59,7 +59,7 @@ arg_list returns [ArrayList<WarlockWSLScriptArg> list]
 script_data returns [WarlockWSLScriptArg arg]
 	: str=STRING		{ arg = new WarlockWSLScriptString($str.text); }
 	| var=VARIABLE		{ arg = new WarlockWSLScriptVariable($var.text);
-	System.out.print("VARIABLE: \"" + $var.text + "\"\n");
+	System.out.print("var: \"" + $var.text + "\"\n");
  /*
 conditional
 	: OPEN_PAREN conditional CLOSE_PAREN
@@ -84,16 +84,16 @@ COMMENT
 	;
 LABEL
 	: { state == State.base }?=>
-		label=NORMAL_CHAR+ ':'			{ setText($label.text); }
+		label=NORMAL_STRING ':'			{ setText($label.text); }
 	;
 VARIABLE
-	: '%' var=NORMAL_CHAR+ { setText($var.text); if(state == State.base) state = State.command; }
+	: '%' var=NORMAL_STRING { System.out.println("VARIABLE: \"" + $var.text + "\""); setText($var.text); if(state == State.base) state = State.command; }
 	;
 STRING
 	: ({ state == State.command }?=>
 		(~('%'|'\n'|'\r'))+)
 	| ({ state == State.base}?=>
-		NORMAL_CHAR+ WS+ { if(state == State.base) state = State.command; })
+		NORMAL_STRING WS+ { if(state == State.base) state = State.command; })
 	| ('%' ~(NORMAL_CHAR|'\r'|'\n') { if(state == State.base) state = State.command; })
 	;
 
@@ -102,4 +102,7 @@ fragment WS
 	;
 fragment NORMAL_CHAR
 	: 'A'..'Z'|'a'..'z'|'0'..'9'|'_'
+	;
+fragment NORMAL_STRING
+	: NORMAL_CHAR+
 	;

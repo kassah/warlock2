@@ -1,6 +1,7 @@
 package cc.warlock.script.wsl;
 
 import java.util.ArrayList;
+import java.util.Map;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -25,10 +26,11 @@ public class WarlockWSLScriptLine {
 		if(args == null) return; // in a label
 		
 		StringBuffer buffer = new StringBuffer();
+		Map<String, String> vars = script.getVariables();
 		for(WarlockWSLScriptArg arg : args) {
 			// System.out.print("appending arg \"" + arg.getString(variables) + "\"\n");
 			
-			buffer.append(arg.getString(script.getVariables()));
+			buffer.append(arg.getString(vars));
 		}
 		
 		String line = buffer.toString();
