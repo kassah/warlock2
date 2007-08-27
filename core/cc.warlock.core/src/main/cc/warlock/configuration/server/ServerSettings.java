@@ -193,7 +193,16 @@ public class ServerSettings implements Comparable<ServerSettings>
 			for (Object s : scriptsElement.elements())
 			{
 				Element sElement = (Element) s;
-				scripts.put(sElement.attributeValue("name"), new ServerScript(this, sElement));
+				if(sElement != null) {
+					String name = sElement.attributeValue("name");
+					if(name != null) {
+						scripts.put(name, new ServerScript(this, sElement));
+					} else {
+						System.out.println("Couldn't find name");
+					}
+				} else {
+					System.out.println("didn't get element in script");
+				}
 			}
 		}
 	}
