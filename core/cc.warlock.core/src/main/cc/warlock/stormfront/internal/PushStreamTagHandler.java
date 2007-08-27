@@ -3,7 +3,7 @@
  */
 package cc.warlock.stormfront.internal;
 
-import java.util.Hashtable;
+import java.util.Map;
 
 import cc.warlock.stormfront.IStormFrontProtocolHandler;
 
@@ -23,7 +23,7 @@ public class PushStreamTagHandler extends DefaultTagHandler {
 		return new String[] { "pushStream" };
 	}
 	
-	public void handleStart(Hashtable<String,String> attributes) {
+	public void handleStart(Map<String,String> attributes) {
 		String id = attributes.get("id");
 		handler.pushStream(id);
 	}

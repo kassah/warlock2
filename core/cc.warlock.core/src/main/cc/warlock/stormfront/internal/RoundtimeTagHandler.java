@@ -6,7 +6,7 @@
  */
 package cc.warlock.stormfront.internal;
 
-import java.util.Hashtable;
+import java.util.Map;
 
 import cc.warlock.stormfront.IStormFrontProtocolHandler;
 
@@ -31,7 +31,7 @@ public class RoundtimeTagHandler extends DefaultTagHandler {
 		return new String[] { "roundTime" };
 	}
 	
-	public void handleStart(Hashtable<String,String> attributes) {
+	public void handleStart(Map<String,String> attributes) {
 		rtEnds = Integer.parseInt(attributes.get("value"));
 		waitingForPrompt = true;
 		roundtimeStarted = false;

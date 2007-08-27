@@ -6,7 +6,7 @@
  */
 package cc.warlock.stormfront.internal;
 
-import java.util.Hashtable;
+import java.util.Map;
 
 import cc.warlock.client.IWarlockStyle;
 import cc.warlock.client.internal.WarlockStyle;
@@ -32,7 +32,7 @@ public class StyleTagHandler extends DefaultTagHandler {
 		return new String[] { "style", "output" };
 	}
 
-	public void handleStart(Hashtable<String,String> attributes) {
+	public void handleStart(Map<String,String> attributes) {
 		String styleId = null;
 		
 		if ("style".equals(getCurrentTag()))

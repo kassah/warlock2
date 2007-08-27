@@ -15,9 +15,6 @@ public class InvTagHandler extends DefaultTagHandler {
 		return new String[] { "inv" };
 	}
 
-	public void handleStart(Hashtable<String,String> attributes) {
-	}
-	
 	public boolean handleCharacters(char[] ch, int start, int length) {
 		return true;
 	}

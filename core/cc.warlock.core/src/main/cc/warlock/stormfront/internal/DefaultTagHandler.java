@@ -16,15 +16,9 @@ abstract public class DefaultTagHandler implements IStormFrontTagHandler {
 	
 	public abstract String[] getTagNames();
 	
-	public void handleStart(Map<String,String> atts) {
-		// TODO Auto-generated method stub
+	public void handleStart(Map<String,String> atts) { }
 
-	}
-
-	public void handleEnd() {
-		// TODO Auto-generated method stub
-
-	}
+	public void handleEnd() { }
 
 	public boolean handleCharacters(char[] ch, int start, int length) {
 		return false;

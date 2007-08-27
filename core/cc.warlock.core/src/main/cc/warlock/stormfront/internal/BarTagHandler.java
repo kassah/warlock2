@@ -3,7 +3,7 @@
  */
 package cc.warlock.stormfront.internal;
 
-import java.util.HashMap;
+import java.util.Map;
 
 import cc.warlock.client.stormfront.IStormFrontClient;
 import cc.warlock.stormfront.IStormFrontProtocolHandler;
@@ -24,7 +24,7 @@ public class BarTagHandler extends DefaultTagHandler {
 		return new String[] { "progressBar" };
 	}
 
-	public void handleStart(HashMap<String,String> attributes) {
+	public void handleStart(Map<String,String> attributes) {
     	handleProgressBar(attributes.get("id"), Integer.parseInt(attributes.get("value")), attributes.get("text"));	
 	}
 	

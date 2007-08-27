@@ -3,7 +3,7 @@
  */
 package cc.warlock.stormfront.internal;
 
-import java.util.Hashtable;
+import java.util.Map;
 
 import cc.warlock.client.stormfront.IStormFrontClient;
 import cc.warlock.stormfront.IStormFrontProtocolHandler;
@@ -29,8 +29,9 @@ public class PromptTagHandler extends DefaultTagHandler {
 		return new String[] { "prompt" };
 	}
 	
-	public void handleStart(Hashtable<String,String> attributes) {
-		prompt = null;
+	public void handleStart(Map<String,String> attributes) {
+		//System.out.println("got prompt");
+		prompt = "";
 		
 		if (attributes.get("time") != null)
 		{
@@ -38,8 +39,6 @@ public class PromptTagHandler extends DefaultTagHandler {
 			if (roundtimeHandler.isWaitingForPrompt()) {
 				roundtimeHandler.processFollowingPrompt(currentTime);
 			}
-			
-			prompt = "";
 		}
 	}
 	
