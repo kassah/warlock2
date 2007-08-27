@@ -81,7 +81,7 @@ EOL
 	;
 COMMENT
 	: { atStart && state == State.base }?=>
-		~(NORMAL_CHAR|'%'|'\n'|'\r') (~('\n'|'\r'))* { atStart = false; }
+		~(NORMAL_CHAR|'%'|WS|'\n'|'\r') (~('\n'|'\r'))* { atStart = false; }
 	;
 NORMAL_STRING
 	: { state == State.base }?=>
