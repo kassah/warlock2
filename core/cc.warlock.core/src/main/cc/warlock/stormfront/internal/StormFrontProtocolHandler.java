@@ -74,6 +74,7 @@ public class StormFrontProtocolHandler implements IStormFrontProtocolHandler {
 		new BoldTagHandler(this);
 		new PushBoldTagHandler(this);
 		new PresetTagHandler(this);
+		new IndicatorTagHandler(this);
 	}
 	
 	/*

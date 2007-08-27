@@ -12,10 +12,12 @@ import java.io.StringReader;
 import java.util.ArrayList;
 import java.util.List;
 
+import cc.warlock.client.ICharacterStatus;
 import cc.warlock.client.ICompass;
 import cc.warlock.client.IProperty;
 import cc.warlock.client.IWarlockStyle;
 import cc.warlock.client.WarlockClientRegistry;
+import cc.warlock.client.internal.CharacterStatus;
 import cc.warlock.client.internal.ClientProperty;
 import cc.warlock.client.internal.Compass;
 import cc.warlock.client.internal.WarlockClient;
@@ -46,6 +48,7 @@ import com.martiansoftware.jsap.CommandLineTokenizer;
 public class StormFrontClient extends WarlockClient implements IStormFrontClient, IScriptListener {
 
 	protected ICompass compass;
+	protected ICharacterStatus status;
 	protected int lastPrompt;
 	protected ClientProperty<Integer> roundtime, health, mana, fatigue, spirit;
 	protected ClientProperty<String> leftHand, rightHand, currentSpell;
@@ -63,6 +66,7 @@ public class StormFrontClient extends WarlockClient implements IStormFrontClient
 	
 	public StormFrontClient() {
 		compass = new Compass(this);
+		status = new CharacterStatus(this);
 		leftHand = new ClientProperty<String>(this, "leftHand", null);
 		rightHand = new ClientProperty<String>(this, "rightHand", null);
 		currentSpell = new ClientProperty<String>(this, "currentSpell", null);
@@ -273,6 +277,10 @@ public class StormFrontClient extends WarlockClient implements IStormFrontClient
 	
 	public IProperty<String> getCurrentSpell() {
 		return currentSpell;
+	}
+	
+	public ICharacterStatus getCharacterStatus() {
+		return status;
 	}
 	
 	public List<IScript> getRunningScripts() {

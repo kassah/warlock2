@@ -8,6 +8,7 @@ package cc.warlock.client.stormfront;
 
 import java.util.List;
 
+import cc.warlock.client.ICharacterStatus;
 import cc.warlock.client.ICompass;
 import cc.warlock.client.IProperty;
 import cc.warlock.client.IWarlockClient;
@@ -92,6 +93,11 @@ public interface IStormFrontClient extends IWarlockClient {
 	 * @return The current spell property
 	 */
 	public IProperty<String> getCurrentSpell();
+	
+	/**
+	 * @return The character status
+	 */
+	public ICharacterStatus getCharacterStatus();
 	
 	/**
 	 * Sets the current style of the storm front client
