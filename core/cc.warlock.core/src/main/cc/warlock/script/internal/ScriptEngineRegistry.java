@@ -23,4 +23,15 @@ public class ScriptEngineRegistry {
 	{
 		return engines;
 	}
+	
+	public static IScriptEngine getScriptEngine (String engineId)
+	{
+		for (IScriptEngine engine : engines)
+		{
+			if (engine.getScriptEngineId().equals(engineId))
+				return engine;
+		}
+		
+		return null;
+	}
 }

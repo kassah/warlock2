@@ -30,6 +30,7 @@ public class ScriptRunner {
 		Collection<IScriptEngine> engines = ScriptEngineRegistry.getScriptEngines();
 		
 		File[] scriptFiles = baseDir.listFiles();
+		
 		for (File scriptFile : scriptFiles)
 		{
 			if (scriptFile.getName().startsWith(scriptName + "."))

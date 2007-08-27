@@ -38,6 +38,7 @@ public class ServerSettings implements Comparable<ServerSettings>
 	protected Hashtable<String, HighlightString> highlightStrings = new Hashtable<String, HighlightString>();
 	protected Hashtable<String, String> variables = new Hashtable<String, String>();
 	protected ArrayList<ArrayList<MacroKey>> macroSets = new ArrayList<ArrayList<MacroKey>>();
+	protected Hashtable<String, ServerScript> scripts = new Hashtable<String, ServerScript>();
 	protected DefaultSkin defaultSkin;
 	
 	private Element mainWindowElement, mainWindowFontElement,
@@ -81,6 +82,7 @@ public class ServerSettings implements Comparable<ServerSettings>
 			loadHighlightStrings();
 			loadVariables();
 			loadMacros();
+			loadScripts();
 			
 			// initalize before we call the viewers
 			defaultSkin = new DefaultSkin(this);
@@ -179,6 +181,19 @@ public class ServerSettings implements Comparable<ServerSettings>
 					
 					keys.add(new MacroKey(this, kElement.attributeValue("key"), kElement.attributeValue("action")));
 				}
+			}
+		}
+	}
+	
+	private void loadScripts ()
+	{
+		Element scriptsElement = (Element) document.selectSingleNode("/settings/scripts");
+		if (scriptsElement != null)
+		{
+			for (Object s : scriptsElement.elements())
+			{
+				Element sElement = (Element) s;
+				scripts.put(sElement.attributeValue("name"), new ServerScript(this, sElement));
 			}
 		}
 	}
@@ -448,5 +463,15 @@ public class ServerSettings implements Comparable<ServerSettings>
 	public ArrayList<MacroKey> getMacroSet (int set)
 	{
 		return macroSets.get(set);
+	}
+	
+	public boolean containsServerScript (String scriptName)
+	{
+		return scripts.containsKey(scriptName);
+	}
+	
+	public ServerScript getServerScript (String scriptName)
+	{
+		return scripts.get(scriptName);
 	}
 }

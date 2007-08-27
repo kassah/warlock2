@@ -8,6 +8,7 @@ package cc.warlock.client.stormfront.internal;
 
 import java.io.File;
 import java.io.IOException;
+import java.io.StringReader;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -21,13 +22,17 @@ import cc.warlock.client.internal.WarlockClient;
 import cc.warlock.client.internal.WarlockStyle;
 import cc.warlock.client.stormfront.IStormFrontClient;
 import cc.warlock.configuration.WarlockConfiguration;
+import cc.warlock.configuration.server.ServerScript;
 import cc.warlock.configuration.server.ServerSettings;
 import cc.warlock.network.StormFrontConnection;
 import cc.warlock.script.IScript;
 import cc.warlock.script.IScriptCommands;
+import cc.warlock.script.IScriptEngine;
 import cc.warlock.script.IScriptListener;
 import cc.warlock.script.internal.ScriptCommands;
+import cc.warlock.script.internal.ScriptEngineRegistry;
 import cc.warlock.script.internal.ScriptRunner;
+import cc.warlock.script.wsl.WarlockWSLEngine;
 import cc.warlock.stormfront.IStormFrontProtocolHandler;
 
 import com.martiansoftware.jsap.CommandLineTokenizer;
@@ -89,6 +94,8 @@ public class StormFrontClient extends WarlockClient implements IStormFrontClient
 	
 	protected  void runScriptCommand(String command) {
 		command = command.substring(1);
+		command = command.replaceAll("[\\r\\n]", "");
+		
 		int firstSpace = command.indexOf(" ");
 		String scriptName = command.substring(0, (firstSpace < 0 ? command.length() : firstSpace));
 		String[] arguments = new String[0];
@@ -99,8 +106,19 @@ public class StormFrontClient extends WarlockClient implements IStormFrontClient
 			arguments = CommandLineTokenizer.tokenize(args);
 		}
 		
-		File scriptDirectory = WarlockConfiguration.getConfigurationDirectory("scripts", true);
-		IScript script = ScriptRunner.runScriptFromFile(scriptCommands, scriptDirectory, scriptName, arguments);
+		IScript script = null;
+		if (serverSettings.containsServerScript(scriptName))
+		{
+			ServerScript serverScript = serverSettings.getServerScript(scriptName);
+			StringReader reader = new StringReader(serverScript.getScriptContents());
+			
+			IScriptEngine engine = ScriptEngineRegistry.getScriptEngine(WarlockWSLEngine.ENGINE_ID);
+			script = engine.startScript(scriptCommands, scriptName, reader, arguments);
+		}
+		else {
+			File scriptDirectory = WarlockConfiguration.getConfigurationDirectory("scripts", true);
+			script = ScriptRunner.runScriptFromFile(scriptCommands, scriptDirectory, scriptName, arguments);
+		}
 		
 		if (script != null)
 		{
