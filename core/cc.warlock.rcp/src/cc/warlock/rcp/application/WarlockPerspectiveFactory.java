@@ -14,6 +14,7 @@ import cc.warlock.rcp.views.BarsView;
 import cc.warlock.rcp.views.DebugView;
 import cc.warlock.rcp.views.GameView;
 import cc.warlock.rcp.views.HandsView;
+import cc.warlock.rcp.views.StatusView;
 import cc.warlock.rcp.views.StreamView;
 
 /**
@@ -41,7 +42,9 @@ public class WarlockPerspectiveFactory implements IPerspectiveFactory {
 		
 		layout.setEditorAreaVisible(false);
 		layout.addView(GameView.VIEW_ID, IPageLayout.LEFT, 0.15f, layout.getEditorArea());
+
 		layout.addStandaloneView(HandsView.VIEW_ID, false, IPageLayout.TOP, 0.05f, GameView.VIEW_ID);
+		layout.addStandaloneView(StatusView.VIEW_ID, false, IPageLayout.RIGHT, 0.5f, HandsView.VIEW_ID);
 		
 		IPlaceholderFolderLayout topFolder =
 			layout.createPlaceholderFolder(TOP_FOLDER_ID, IPageLayout.TOP, 0.15f, HandsView.VIEW_ID);

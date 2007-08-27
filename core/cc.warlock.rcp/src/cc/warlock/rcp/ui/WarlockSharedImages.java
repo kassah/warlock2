@@ -26,6 +26,14 @@ public class WarlockSharedImages {
 	public static final String IMG_CHARACTER = "/images/character.gif";
 	public static final String IMG_GAME = "/images/game.gif";
 	
+	// Status images
+	public static final String IMG_STATUS_BLANK = "/images/status/standard/blank.gif";
+	public static final String IMG_STATUS_HIDE = "/images/status/standard/hide.gif";
+	public static final String IMG_STATUS_KNEEL = "/images/status/standard/kneel.gif";
+	public static final String IMG_STATUS_LIE = "/images/status/standard/lie.gif";
+	public static final String IMG_STATUS_SIT = "/images/status/standard/sit.gif";
+	public static final String IMG_STATUS_STAND = "/images/status/standard/stand.gif";
+	
 	// Compass Images
 	public static final String IMG_COMPASS_LARGE_MAIN = "/images/compass/large/compass_main.png";
 	public static final String IMG_COMPASS_LARGE_NORTH_ON = "/images/compass/large/north_on.png";

@@ -53,6 +53,11 @@
             id="cc.warlock.rcp.views.DebugView"
             name="Debug Console">
       </view>
+      <view
+            class="cc.warlock.rcp.views.StatusView"
+            id="cc.warlock.rcp.views.StatusView"
+            name="Status">
+      </view>
    </extension>
    <extension
          id="warlock"
