@@ -44,7 +44,7 @@ public class ServerScript extends ServerSetting {
 		shortCommands.put("I", "move out\n");
 		shortCommands.put("J", "move up\n");
 		shortCommands.put("K", "move down\n");
-		shortCommands.put("L", "put");
+		shortCommands.put("L", "put ");
 	}
 	
 	protected void convertTokScript(String tokScript)
@@ -54,27 +54,26 @@ public class ServerScript extends ServerSetting {
 			tokScript = tokScript.substring(1);
 		}
 		
-		Pattern pattern = Pattern.compile("(\\\\\\.)?([A-L]*)\\\\");
+		tokScript = tokScript.replaceAll("\\\\\\.", "\n");
+		
+		Pattern pattern = Pattern.compile("([A-L]*)\\\\");
 		
 		Matcher matcher = pattern.matcher(tokScript);
-		int startIndex = 0;
 		StringBuffer buffer = new StringBuffer();
 		
 		while (matcher.find())
 		{
-			boolean appendNewline = true;
 			String replacement = "";
-			if (matcher.groupCount() == 2)
+			if (matcher.groupCount() == 1)
 			{
-				String commands = matcher.group(2);
+				String commands = matcher.group(1);
 				for (char command : commands.toCharArray())
 				{
 					replacement += shortCommands.get("" + command);
-					if (command == 'L') appendNewline = false;
 				}
 			}
 			
-			matcher.appendReplacement(buffer, appendNewline ? replacement + "\n" : replacement + " ");
+			matcher.appendReplacement(buffer, replacement);
 		}
 		matcher.appendTail(buffer);
 		scriptContents = buffer.toString();
