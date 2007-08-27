@@ -32,7 +32,7 @@ line
 expr returns [WarlockWSLScriptLine line]
 	: (label=NORMAL_STRING COLON (l=expr)? {
 		if (l == null) {
-			line = new WarlockWSLScriptLine(script, lineNum, true);
+			line = new WarlockWSLScriptLine(script, lineNum);
 			script.addLine(line);
 		} else {
 			line = l;

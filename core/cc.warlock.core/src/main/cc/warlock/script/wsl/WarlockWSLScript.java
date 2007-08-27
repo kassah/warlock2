@@ -145,11 +145,6 @@ public class WarlockWSLScript extends AbstractScript implements IScriptCallback,
 			if (stopped || mode == Mode.waiting) break;
 			nextLine = curLine.getNext();
 			
-			while (curLine.isLabel()) {
-				curLine = nextLine;
-				nextLine = nextLine.getNext();
-			}
-			
 			curLine.execute();
 			curLine = nextLine;
 		}

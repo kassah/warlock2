@@ -1,7 +1,6 @@
 package cc.warlock.script.wsl;
 
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -12,23 +11,19 @@ public class WarlockWSLScriptLine {
 	private int lineNumber;
 	private WarlockWSLScriptLine next;
 	private ArrayList<WarlockWSLScriptArg> args = new ArrayList<WarlockWSLScriptArg>();
-	private boolean isLabel;
 	
 	private Pattern commandPattern;
 	
 	public WarlockWSLScriptLine(WarlockWSLScript script, int lineNumber) {
-		this(script, lineNumber, false);
-	}
-	
-	public WarlockWSLScriptLine(WarlockWSLScript script, int lineNumber, boolean isLabel) {
 		this.script = script;
 		this.lineNumber = lineNumber;
-		this.isLabel = isLabel;
 		commandPattern = Pattern.compile("^([\\w_]+)(\\s+(.*))?");
 	}
 	
 	
 	public void execute() {
+		if(args == null) return; // in a label
+		
 		StringBuffer buffer = new StringBuffer();
 		for(WarlockWSLScriptArg arg : args) {
 			// System.out.print("appending arg \"" + arg.getString(variables) + "\"\n");
@@ -76,9 +71,5 @@ public class WarlockWSLScriptLine {
 		for(WarlockWSLScriptArg arg : args) {
 			addArg(arg);
 		}
-	}
-
-	public boolean isLabel() {
-		return isLabel;
 	}
 }
