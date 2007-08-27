@@ -28,7 +28,10 @@ public class WarlockWSLScriptLine {
 		StringBuffer buffer = new StringBuffer();
 		Map<String, String> vars = script.getVariables();
 		for(WarlockWSLScriptArg arg : args) {
-			// System.out.print("appending arg \"" + arg.getString(variables) + "\"\n");
+			if(arg == null) {
+				System.out.println("weird fucking error");
+			}
+			System.out.print("appending arg \"" + arg.getString(vars) + "\"\n");
 			
 			buffer.append(arg.getString(vars));
 		}

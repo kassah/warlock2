@@ -52,14 +52,15 @@ expr returns [WarlockWSLScriptLine line]
 	;
 
 arg_list returns [ArrayList<WarlockWSLScriptArg> list]
-	:	{ list = new ArrayList<WarlockWSLScriptArg>(); }
-	| data=script_data l=arg_list	{ list = l; list.add(0, data); }
+	: ( data=script_data				{ list = new ArrayList<WarlockWSLScriptArg>(); list.add(data); } )
+	| ( data=script_data l=arg_list		{ list = l; list.add(0, data); } )
 	;
 
 script_data returns [WarlockWSLScriptArg arg]
-	: str=STRING		{ arg = new WarlockWSLScriptString($str.text); }
+	: str=STRING		{ arg = new WarlockWSLScriptString($str.text);
+			System.out.println("STRING: \"" + $str.text + "\""); }
 	| var=VARIABLE		{ arg = new WarlockWSLScriptVariable($var.text);
-	System.out.print("var: \"" + $var.text + "\"\n");
+	System.out.println("VARIABLE: \"" + $var.text + "\"");
  /*
 conditional
 	: OPEN_PAREN conditional CLOSE_PAREN
