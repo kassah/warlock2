@@ -31,4 +31,8 @@ abstract public class DefaultTagHandler implements IStormFrontTagHandler {
 	public void setCurrentTag(String tagName) {
 		this.currentTag = tagName;
 	}
+	
+	public Map<String, IStormFrontTagHandler> getTagHandlers() {
+		return null;
+	}
 }

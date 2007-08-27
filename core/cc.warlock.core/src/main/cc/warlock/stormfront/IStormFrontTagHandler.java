@@ -22,6 +22,8 @@ public interface IStormFrontTagHandler {
 	public String getCurrentTag();
 	public void setCurrentTag(String tagName);
 	
+	public Map<String, IStormFrontTagHandler> getTagHandlers();
+	
 	/**
 	 * Handle the start tag 
 	 * @param atts

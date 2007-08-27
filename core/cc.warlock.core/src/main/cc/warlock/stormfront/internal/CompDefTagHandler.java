@@ -3,9 +3,11 @@
  */
 package cc.warlock.stormfront.internal;
 
-import java.util.Hashtable;
+import java.util.HashMap;
+import java.util.Map;
 
 import cc.warlock.stormfront.IStormFrontProtocolHandler;
+import cc.warlock.stormfront.IStormFrontTagHandler;
 
 
 /**
@@ -18,16 +20,23 @@ import cc.warlock.stormfront.IStormFrontProtocolHandler;
  * looking, or peering.
  */
 public class CompDefTagHandler extends DefaultTagHandler {
+	Map<String, IStormFrontTagHandler> tagHandlers = new HashMap<String, IStormFrontTagHandler>();
 	
 	public CompDefTagHandler (IStormFrontProtocolHandler handler) {
 		super(handler);
+		
+		tagHandlers.put("d", new DirectionTagHandler(handler));
 	}
 	
 	public String[] getTagNames() {
 		return new String[] { "compDef" };
 	}
 
-	public void handleStart(Hashtable<String,String> attributes) {
+	public Map<String, IStormFrontTagHandler> getTagHandlers() {
+		return tagHandlers;
+	}
+	
+	public void handleStart(Map<String,String> attributes) {
 		if (attributes.get("id").equals("room exits")) {
 			handler.getClient().getCompass().clear();					
 		}

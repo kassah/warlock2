@@ -1,7 +1,5 @@
 package cc.warlock.stormfront.internal;
 
-import java.util.Hashtable;
-
 import cc.warlock.stormfront.IStormFrontProtocolHandler;
 
 

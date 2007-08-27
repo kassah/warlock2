@@ -8,16 +8,19 @@ import cc.warlock.client.IWarlockClientViewer;
 import cc.warlock.client.stormfront.IStormFrontClientViewer;
 import cc.warlock.configuration.WarlockConfiguration;
 import cc.warlock.stormfront.IStormFrontProtocolHandler;
+import cc.warlock.stormfront.IStormFrontTagHandler;
 
 
 public class SettingsTagHandler extends DefaultTagHandler {
 
 	private StringBuffer buffer = new StringBuffer();
 	private boolean handlingSettings = false;
+	private Map<String, IStormFrontTagHandler> tagHandlers;
 	
-	public SettingsTagHandler(IStormFrontProtocolHandler handler) {
+	public SettingsTagHandler(IStormFrontProtocolHandler handler,
+			Map<String, IStormFrontTagHandler> tagHandlers) {
 		super(handler);
-		// TODO Auto-generated constructor stub
+		this.tagHandlers = tagHandlers;
 	}
 
 	private static interface ViewerVisitor {
@@ -138,5 +141,9 @@ public class SettingsTagHandler extends DefaultTagHandler {
 	@Override
 	public boolean handleCharacters(char[] ch, int start, int length) {
 		return true;
+	}
+	
+	public Map<String, IStormFrontTagHandler> getTaghandlers() {
+		return tagHandlers;
 	}
 }
