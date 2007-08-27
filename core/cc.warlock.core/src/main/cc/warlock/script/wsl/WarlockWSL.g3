@@ -87,14 +87,14 @@ LABEL
 		label=NORMAL_CHAR+ ':'			{ setText($label.text); }
 	;
 VARIABLE
-	: '%' var=NORMAL_CHAR+ { setText($var.text); }
+	: '%' var=NORMAL_CHAR+ { setText($var.text); if(state == State.base) state = State.command; }
 	;
 STRING
 	: ({ state == State.command }?=>
 		(~('%'|'\n'|'\r'))+)
 	| ({ state == State.base}?=>
-		NORMAL_CHAR+ WS+)
-	| ('%' ~(NORMAL_CHAR|'\r'|'\n'))
+		NORMAL_CHAR+ WS+ { if(state == State.base) state = State.command; })
+	| ('%' ~(NORMAL_CHAR|'\r'|'\n') { if(state == State.base) state = State.command; })
 	;
 
 fragment WS
