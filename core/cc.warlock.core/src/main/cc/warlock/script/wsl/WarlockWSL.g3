@@ -16,7 +16,7 @@ grammar WarlockWSL;
 }
 
 @lexer::members {
-	private enum State { base, expr, command, condition }
+	private enum State { base, command, condition }
 	private boolean atStart = true;
 	private State state = State.base;
 }
@@ -30,7 +30,7 @@ line
 	;
 
 expr returns [WarlockWSLScriptLine line]
-	: (label=NORMAL_STRING COLON (l=expr)? {
+	: (label=LABEL (l=expr)? {
 		if (l == null) {
 			line = new WarlockWSLScriptLine(script, lineNum);
 			script.addLine(line);
@@ -40,9 +40,8 @@ expr returns [WarlockWSLScriptLine line]
 		
 		script.addLabel($label.text, line);
 	})
-	| start=NORMAL_STRING args=arg_list		{
+	| args=arg_list		{
 				line = new WarlockWSLScriptLine(script, lineNum);
-				line.addArg(new WarlockWSLScriptString($start.text));
 				line.addArgs(args);
 				script.addLine(line);
 				System.out.print("added line " + Integer.toString(lineNum) + "\n");
@@ -73,7 +72,7 @@ conditional
 	;
 	
 WHITESPACE
-	: { state != State.command && state != State.expr }?=>
+	: { state != State.command }?=>
 		WS+			{ channel = HIDDEN; }
 	;
 EOL
@@ -83,13 +82,9 @@ COMMENT
 	: { atStart && state == State.base }?=>
 		~(NORMAL_CHAR|'%'|WS|'\n'|'\r') (~('\n'|'\r'))* { atStart = false; }
 	;
-NORMAL_STRING
+LABEL
 	: { state == State.base }?=>
-		NORMAL_CHAR+		{ atStart = false; state = State.expr; }
-	;
-COLON
-	: { state == State.expr }?=>
-		':'					{ state = State.base; }
+		label=NORMAL_CHAR+ ':'			{ setText($label.text); }
 	;
 VARIABLE
 	: '%' var=NORMAL_CHAR+ { setText($var.text); }
@@ -97,9 +92,9 @@ VARIABLE
 STRING
 	: ({ state == State.command }?=>
 		(~('%'|'\n'|'\r'))+)
+	| ({ state == State.base}?=>
+		NORMAL_CHAR+ WS+)
 	| ('%' ~(NORMAL_CHAR|'\r'|'\n'))
-	| ({ state == State.expr }?=>
-		WS+		{ state = State.command; } )
 	;
 
 fragment WS
