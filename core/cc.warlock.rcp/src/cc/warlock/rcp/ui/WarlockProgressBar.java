@@ -40,7 +40,8 @@ public class WarlockProgressBar extends Canvas
 		progressFont = new Font(getShell().getDisplay(), "Arial", 8, SWT.NONE);
 		foreground = new Color(getShell().getDisplay(), 255, 255, 255);
 		background = new Color(getShell().getDisplay(), 0, 0, 0);
-		borderColor = new Color(getShell().getDisplay(), 0, 0, 0);
+		borderColor = new Color(getShell().getDisplay(), 25, 25, 25);
+		
 		borderWidth = 1;
 		
 		addPaintListener(new PaintListener() {
@@ -63,15 +64,22 @@ public class WarlockProgressBar extends Canvas
 					int top = (int) Math.floor(((bounds.height - (borderWidth * 2)) - e.gc.getFontMetrics().getHeight()) / 2.0);
 					
 					int barWidth = 0;
+					int fullBarWidth = (bounds.width - (borderWidth*2));
+					int fullBarHeight = (bounds.height - (borderWidth*2));
 					
 					if (max > min)
 					{
 						double decimal = (selection / ((double)(max - min)));
-						barWidth = (int) Math.floor(decimal * (bounds.width - (borderWidth*2)) - 1);
+						barWidth = (int) Math.floor(decimal * fullBarWidth - 1);
 					}
 					
-					e.gc.setBackground(background);
-					e.gc.fillRectangle(borderWidth, borderWidth, barWidth, (bounds.height - (borderWidth*2)));
+					Color gradientColor = getGradientColor(25, true);
+					e.gc.setBackground(gradientColor);
+					e.gc.setForeground(background);
+					e.gc.fillGradientRectangle(borderWidth, borderWidth, barWidth, fullBarHeight, false);
+					
+					e.gc.setBackground(borderColor);
+					e.gc.fillRectangle(borderWidth + barWidth, borderWidth, fullBarWidth, fullBarHeight);
 					
 					e.gc.setForeground(borderColor);
 					e.gc.setLineWidth(borderWidth);
@@ -85,6 +93,27 @@ public class WarlockProgressBar extends Canvas
 				}
 			}
 		});
+	}
+	
+	private Color getGradientColor (int factor, boolean lighter)
+	{
+		int red = 0;
+		int green = 0;
+		int blue = 0;
+		
+		if (lighter) 
+		{
+			red = background.getRed() < (255 - factor) ? background.getRed() + factor : 255;
+			green = background.getGreen() < (255 - factor) ? background.getGreen() + factor : 255;
+			blue = background.getBlue() < (255 - factor) ? background.getBlue() + factor : 255;
+		}
+		else {
+			red = background.getRed() > factor ? background.getRed() - factor : 0;
+			green = background.getRed() > factor ? background.getRed() - factor : 0;
+			blue = background.getRed() > factor ? background.getRed() - factor : 0;
+		}
+		
+		return new Color(getShell().getDisplay(), red, green, blue);
 	}
 	
 	public void setSize(int width, int height) {
