@@ -114,8 +114,9 @@ public class ProfileConnectAction extends Action implements ISGEConnectionListen
 				LoginUtil.connect(gameView, loginProperties);
 		} else {
 			status = Status.CANCEL_STATUS;
-			finished = true;
 		}
+
+		finished = true;
 	}
 
 	public void setGameView(GameView gameView) {
