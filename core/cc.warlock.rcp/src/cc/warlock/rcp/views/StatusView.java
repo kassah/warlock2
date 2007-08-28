@@ -2,6 +2,8 @@ package cc.warlock.rcp.views;
 
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.graphics.Color;
+import org.eclipse.swt.layout.FillLayout;
+import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Label;
@@ -11,9 +13,12 @@ import cc.warlock.client.ICharacterStatus;
 import cc.warlock.client.IProperty;
 import cc.warlock.client.IPropertyListener;
 import cc.warlock.client.stormfront.IStormFrontClient;
+import cc.warlock.configuration.server.ServerSettings;
+import cc.warlock.configuration.skin.IWarlockSkin;
 import cc.warlock.rcp.plugin.Warlock2Plugin;
 import cc.warlock.rcp.ui.WarlockSharedImages;
 import cc.warlock.rcp.ui.client.SWTPropertyListener;
+import cc.warlock.rcp.util.ColorUtil;
 
 public class StatusView extends ViewPart implements IPropertyListener<String>
 {
@@ -33,20 +38,32 @@ public class StatusView extends ViewPart implements IPropertyListener<String>
 
 	@Override
 	public void createPartControl(Composite parent) {
+		parent.setLayout(new FillLayout());
+		parent.setLayoutData(new GridData(GridData.FILL, GridData.FILL, true, true));
+		
 		Composite main = new Composite(parent, SWT.NONE);
-		GridLayout layout = new GridLayout(5, true);
+		GridLayout layout = new GridLayout(5, false);
 		layout.horizontalSpacing = 0;
+		layout.verticalSpacing = 0;
+		layout.marginHeight = 0;
+		layout.marginWidth = 0;
 		main.setLayout(layout);
+		main.setLayoutData(new GridData(GridData.FILL, GridData.FILL, true, true));
 		
 		for (int i = 0; i < 5; i++)
 		{
-			statusLabels[i] = new Label(parent, SWT.BORDER);
+			statusLabels[i] = new Label(parent, SWT.NONE);
 			statusLabels[i].setImage(WarlockSharedImages.getImage(WarlockSharedImages.IMG_STATUS_BLANK));
-			statusLabels[i].setBackground(new Color(main.getDisplay(), 0, 0, 0));
+			GridData data = new GridData(GridData.FILL, GridData.FILL, true, true);
+			data.minimumHeight = 32;
+			data.minimumWidth = 32;
+			statusLabels[i].setLayoutData(data);
 		}
 		
 		client = Warlock2Plugin.getDefault().getCurrentClient();
 		client.getCharacterStatus().addListener(wrapper);
+		
+		setColors(new Color(main.getDisplay(), 240, 240, 255), new Color(main.getDisplay(), 25, 25, 50));
 	}
 
 	public void propertyActivated(IProperty<String> property) {}
@@ -84,6 +101,23 @@ public class StatusView extends ViewPart implements IPropertyListener<String>
 	@Override
 	public void setFocus() {
 //		this.client = Warlock2Plugin.getDefault().getCurrentClient();
+	}
+	
+	protected void setColors (Color fg, Color bg)
+	{
+		for (int i = 0; i < statusLabels.length; i++)
+		{
+			statusLabels[i].setForeground(fg);
+			statusLabels[i].setBackground(bg);
+		}
+	}
+	
+	public void loadServerSettings (ServerSettings settings)
+	{
+		Color bg = ColorUtil.warlockColorToColor(settings.getColorSetting(IWarlockSkin.ColorType.MainWindow_Background));
+		Color fg = ColorUtil.warlockColorToColor(settings.getColorSetting(IWarlockSkin.ColorType.MainWindow_Foreground));
+		
+		setColors(fg, bg);
 	}
 
 }
