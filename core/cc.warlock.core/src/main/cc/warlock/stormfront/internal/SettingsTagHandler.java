@@ -13,9 +13,12 @@ import cc.warlock.stormfront.IStormFrontProtocolHandler;
 public class SettingsTagHandler extends DefaultTagHandler {
 
 	private StringBuffer buffer = new StringBuffer();
+	private SettingsInfoTagHandler infoTagHandler;
 	
-	public SettingsTagHandler(IStormFrontProtocolHandler handler) {
+	public SettingsTagHandler(IStormFrontProtocolHandler handler, SettingsInfoTagHandler infoTagHandler) {
 		super(handler);
+		this.infoTagHandler = infoTagHandler;
+		
 		for(String tagName : settingsTags) {
 			addTagHandler(tagName, this);
 		}
@@ -72,6 +75,10 @@ public class SettingsTagHandler extends DefaultTagHandler {
 			handler.stopSavingRawXML();
 			buffer.insert(0, "<?xml version=\"1.0\" encoding=\"ISO-8859-1\"?>\n<settings>\n");
 			buffer.append("</settings>");
+			
+			String settings = "<settings>";
+			int index = buffer.indexOf(settings);
+			buffer = buffer.replace(index, index+settings.length(), "<settings crc=\"" + infoTagHandler.getCRC() + "\">");
 			
 			String playerId = handler.getClient().getPlayerId().get();
 			File serverSettings = WarlockConfiguration.getConfigurationFile("serverSettings_" + playerId + ".xml");

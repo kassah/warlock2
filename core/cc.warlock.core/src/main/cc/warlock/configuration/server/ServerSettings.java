@@ -63,6 +63,31 @@ public class ServerSettings implements Comparable<ServerSettings>
 		load(playerId);
 	}
 	
+	public static String getCRC (String playerId)
+	{
+		try {
+			FileInputStream stream = new FileInputStream(WarlockConfiguration.getConfigurationFile("serverSettings_" + playerId + ".xml"));
+			SAXReader reader = new SAXReader();
+			Document document = reader.read(stream);
+			
+			String crc = ((Element)document.selectSingleNode("/settings")).attributeValue("crc");
+			
+			stream.close();
+			return crc;
+		} catch (FileNotFoundException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		} catch (DocumentException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		} catch (IOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		
+		return null;
+	}
+	
 	public void load (String playerId)
 	{
 		this.playerId = playerId;
@@ -93,11 +118,14 @@ public class ServerSettings implements Comparable<ServerSettings>
 				viewer.loadServerSettings(this);
 			}
 			
+			stream.close();
 		} catch (FileNotFoundException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		} catch (DocumentException e) {
 			// TODO Auto-generated catch block
+			e.printStackTrace();
+		} catch (IOException e) {
 			e.printStackTrace();
 		}
 	}
