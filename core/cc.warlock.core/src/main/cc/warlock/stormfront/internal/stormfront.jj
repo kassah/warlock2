@@ -14,35 +14,31 @@ public class StormFrontProtocolParser {
 		this.handler = handler;
 	}
 	
-	protected void characters (Token characters)
+	protected void characters (String characters)
 	{
-		String string = characters.image;
-		
 		// System.out.println("characters: " + string);
-		handler.characters(string.toCharArray(), 0, string.length());
+		handler.characters(characters.toCharArray(), 0, characters.length());
 	}
 	
-	protected void startElement (Token name)
+	protected void startElement (String name)
 	{
 		// System.out.println("startElement: " + name.image);
 		
-		handler.startElement(name.image, currentAttributes);
+		handler.startElement(name, currentAttributes);
 	}
 	
-	protected void addAttribute (Token name, Token value)
-	{
-		String newValue = value.image.substring(1, value.image.length()-1);
-		
+	protected void addAttribute (String name, String value)
+	{	
 		// System.out.println("addAttribute name=" + name.image + ",value=" +newValue);
 		
-		currentAttributes.put(name.image, newValue);
+		currentAttributes.put(name, value);
 	}
 	
-	protected void endElement (Token name)
+	protected void endElement (String name)
 	{
 		// System.out.println("end element: " + name.image);
 		
-		handler.endElement(name.image);
+		handler.endElement(name);
 		currentAttributes.clear();
 	}
 }
@@ -54,40 +50,43 @@ void Document() : {}
 	(Element())*
 }
 
-void Element() : {Token data;}
+void Element() : {Token data; String str; }
 {
 	(
 	Tag()
-	| ( data=<PCDATA> { characters(data); } )
-	| ( data=Entity() { characters(data); } )
+	| ( data=<PCDATA> { characters(data.image); } )
+	| ( str=Entity() { characters(str); } )
 	)
 }
 
 void Tag() : {Token name;}
 {
-	<TAG_START_OPEN> name=<GENERIC_ID> (Attribute())* {  startElement(name); } ((<TAG_CLOSE> (Element())* EndTag()) | <TAG_EMPTY_CLOSE> { endElement(name); })
+	<TAG_START_OPEN> name=<GENERIC_ID> (Attribute())* {  startElement(name.image); } ((<TAG_CLOSE> (Element())* EndTag()) | <TAG_EMPTY_CLOSE> { endElement(name.image); })
 }
 
 void Attribute(): {Token name, value;}
 {
-	name=<GENERIC_ID> { value = name; } (<ATTR_EQ> value=<ATTR_VALUE>)?	{ addAttribute(name,value); }
+	name=<GENERIC_ID> { value = name; } (<ATTR_EQ> value=<ATTR_VALUE>)?	{ addAttribute(name.image,value.image); }
 }
 
 void EndTag(): {Token name;}
 {
-	<TAG_END_OPEN> name=<GENERIC_ID> <TAG_CLOSE> { endElement(name); }
+	<TAG_END_OPEN> name=<GENERIC_ID> <TAG_CLOSE> { endElement(name.image); }
 }
 
-Token Entity(): {Token data;}
+String Entity(): { }
 {
-	data=<ENTITY_GT> { return data; }
+	( <ENTITY_GT>	{ return ">"; }
+	| <ENTITY_LT>	{ return "<"; }
+	)
 }
 
 TOKEN: {
 	<TAG_START_OPEN: "<"> : IN_TAG_MODE |
 	<TAG_END_OPEN: "</"> : IN_TAG_MODE |
 	
-	<ENTITY_GT: "&gt;"> { matchedToken.image = ">"; } |
+	<ENTITY_GT: "&gt;"> |
+	<ENTITY_LT: "&lt;"> |
 	<PCDATA: (~["<","\r","\n","&"])+ | "&" | (["\r","\n"])+> |
 	 <NAMECHAR: (<LETTER> | <DIGIT> | "." | "-" | "_" | ":")> |
 	 <DIGIT: (["0"-"9"])> |
@@ -100,7 +99,7 @@ TOKEN: {
 	
 		
 	<ATTR_EQ: "="> |
-	<ATTR_VALUE: ("\"" (~["\""])* "\"" | "'" (~["'"])* "'")> |
+	<ATTR_VALUE: ("\"" (~["\""])* "\"" | "'" (~["'"])* "'")> { matchedToken.image = matchedToken.image.substring(1, matchedToken.image.length() - 1); }|
 	
 	<GENERIC_ID: (<LETTER> | "_" | ":") (<NAMECHAR>)*> 
 }
