@@ -14,10 +14,11 @@ import cc.warlock.stormfront.IStormFrontProtocolHandler;
  *
  * An XPath Listener that handles the health, mana, fatigue, and spirit bars.
  */
-public class BarTagHandler extends DefaultTagHandler {
+public class BarTagHandler extends BaseTagHandler {
+	private IStormFrontProtocolHandler handler;
 	
 	public BarTagHandler (IStormFrontProtocolHandler handler) {
-		super(handler);
+		this.handler = handler;
 	}
 	
 	public String[] getTagNames() {
@@ -49,5 +50,4 @@ public class BarTagHandler extends DefaultTagHandler {
 			client.getSpirit().set(percentage);
 		}
 	}
-
 }

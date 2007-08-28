@@ -2,25 +2,22 @@ package cc.warlock.stormfront.internal;
 
 import java.io.File;
 import java.io.FileOutputStream;
-import java.util.HashMap;
 import java.util.Map;
 
 import cc.warlock.client.IWarlockClientViewer;
 import cc.warlock.client.stormfront.IStormFrontClientViewer;
 import cc.warlock.configuration.WarlockConfiguration;
 import cc.warlock.stormfront.IStormFrontProtocolHandler;
-import cc.warlock.stormfront.IStormFrontTagHandler;
 
 
 public class SettingsTagHandler extends DefaultTagHandler {
 
 	private StringBuffer buffer = new StringBuffer();
-	private Map<String, IStormFrontTagHandler> tagHandlers = new HashMap<String, IStormFrontTagHandler>();
 	
 	public SettingsTagHandler(IStormFrontProtocolHandler handler) {
 		super(handler);
 		for(String tagName : settingsTags) {
-			tagHandlers.put(tagName, this);
+			addTagHandler(tagName, this);
 		}
 	}
 
@@ -129,9 +126,5 @@ public class SettingsTagHandler extends DefaultTagHandler {
 	@Override
 	public boolean handleCharacters(char[] ch, int start, int length) {
 		return true;
-	}
-	
-	public Map<String, IStormFrontTagHandler> getTaghandlers() {
-		return tagHandlers;
 	}
 }

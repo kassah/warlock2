@@ -53,7 +53,7 @@ public class StormFrontProtocolHandler implements IStormFrontProtocolHandler {
 		
 		// Register the handlers
 		new AppTagHandler(this);
-		new BarTagHandler(this);
+		new DialogDataTagHandler(this);
 		new PromptTagHandler(this, new RoundtimeTagHandler(this));
 		new CompDefTagHandler(this); // compass handler
 		
