@@ -298,27 +298,27 @@ public class WarlockWSLScript extends AbstractScript implements IScriptCallback,
 			Matcher m = format.matcher(arguments);
 			if (m.matches())
 			{
-				System.out.print("variable: \"" + m.group(1) + "\" value: \"" + m.group(2) + "\"\n");
+				// System.out.print("variable: \"" + m.group(1) + "\" value: \"" + m.group(2) + "\"\n");
 				variables.put(m.group(1), m.group(2));
 			} else {
-				System.out.print("Didn't match \"" + arguments + "\"\n");
+				// System.out.print("Didn't match \"" + arguments + "\"\n");
 			}
 		}
 	}
 	
 	protected void gotoLabel (String label)
 	{
-		System.out.println("going to label: \"" + label + "\"");
+		// System.out.println("going to label: \"" + label + "\"");
 		
 		WarlockWSLScriptLine command = labels.get(label);
 		
 		if (command != null)
 		{
-			System.out.println("found label");
+			// System.out.println("found label");
 			curLine = nextLine = command;
 		}
 		else {
-			System.out.println("label not found");
+			// System.out.println("label not found");
 			command = labels.get("labelerror");
 			if (command != null)
 			{
@@ -417,7 +417,7 @@ public class WarlockWSLScript extends AbstractScript implements IScriptCallback,
 				match.setAttribute("label", m.group(1));
 				match.setMatchText(m.group(2));
 				
-				System.out.println("adding match \"" + m.group(1) + "\": \"" + m.group(2) + "\"");
+				// System.out.println("adding match \"" + m.group(1) + "\": \"" + m.group(2) + "\"");
 				
 				matchset.add(match);
 			} else { /* TODO throw error */ }
@@ -651,11 +651,11 @@ public class WarlockWSLScript extends AbstractScript implements IScriptCallback,
 				continueAtNextLine(); break;
 			case Matched:
 			{
-				System.out.println("matched a label\n");
+				// System.out.println("matched a label\n");
 				Match match = (Match) event.data.get(CallbackEvent.DATA_MATCH);
 				if (match != null)
 				{
-					System.out.println("matched label: \"" + match.getAttribute("label") + "\"");
+					// System.out.println("matched label: \"" + match.getAttribute("label") + "\"");
 					matchset.clear();
 					gotoLabel(match.getAttribute("label"));
 					commands.waitForPrompt(this);

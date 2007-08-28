@@ -214,7 +214,7 @@ public class StormFrontProtocolHandler implements IStormFrontProtocolHandler {
 			tagHandler.setCurrentTag(name);
 			tagHandler.handleEnd();
 		} else {
-			System.out.println("Didn't handle end element for \"" + name + "\"");
+			// System.out.println("Didn't handle end element for \"" + name + "\"");
 		}
 	}
 	
@@ -231,7 +231,7 @@ public class StormFrontProtocolHandler implements IStormFrontProtocolHandler {
 	            for (String aName : attributes.keySet())
 	            {
 	                startTag += " " + aName + "=\"" + attributes.get(aName) + "\"";
-	                System.out.print(" " + aName + "=\"" + attributes.get(aName) + "\"");
+	                // System.out.print(" " + aName + "=\"" + attributes.get(aName) + "\"");
 	            }
 	        }
 			startTag += ">";
@@ -250,7 +250,7 @@ public class StormFrontProtocolHandler implements IStormFrontProtocolHandler {
 			tagHandler.setCurrentTag(name);
 			tagHandler.handleStart(attributes);
 		} else {
-			System.out.println("didn't handle start element for \"" + name + "\"");
+			// System.out.println("didn't handle start element for \"" + name + "\"");
 		}
 	}
 	

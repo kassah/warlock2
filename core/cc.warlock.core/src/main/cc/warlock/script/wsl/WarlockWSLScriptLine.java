@@ -28,16 +28,13 @@ public class WarlockWSLScriptLine {
 		StringBuffer buffer = new StringBuffer();
 		Map<String, String> vars = script.getVariables();
 		for(WarlockWSLScriptArg arg : args) {
-			if(arg == null) {
-				System.out.println("weird fucking error");
-			}
-			System.out.print("appending arg \"" + arg.getString(vars) + "\"\n");
+			// System.out.print("appending arg \"" + arg.getString(vars) + "\"\n");
 			
 			buffer.append(arg.getString(vars));
 		}
 		
 		String line = buffer.toString();
-		System.out.print("running line: " + line + "\n");
+		System.out.print("script line: " + line + "\n");
 		
 		Matcher m = commandPattern.matcher(line);
 		
@@ -47,10 +44,10 @@ public class WarlockWSLScriptLine {
 		}
 		
 		String commandName = m.group(1).toLowerCase();
-		System.out.print("command \"" + commandName + "\"\n");
+		// System.out.print("command \"" + commandName + "\"\n");
 		String arguments = m.group(3);
 		if(arguments == null) arguments = "";
-		System.out.print("arguments \"" + arguments + "\"\n");
+		// System.out.print("arguments \"" + arguments + "\"\n");
 		
 		WarlockWSLCommand command = script.getCommands().get(commandName);
 		if(command != null) command.execute(arguments);
