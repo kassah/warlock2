@@ -4,6 +4,9 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.Timer;
 import java.util.TimerTask;
+import java.util.concurrent.locks.Condition;
+import java.util.concurrent.locks.Lock;
+import java.util.concurrent.locks.ReentrantLock;
 
 import cc.warlock.client.IProperty;
 import cc.warlock.client.IPropertyListener;
@@ -27,13 +30,17 @@ public class ScriptCommands implements IScriptCommands, IStreamListener, IProper
 	protected Match[] matches;
 	protected String waitForText;
 	protected boolean ignoreCase, regex;
-	protected boolean waitingForMatches, waitingForRoom, waitingForText, waiting;
+	protected boolean waitingForMatches, waitingForRoom, waiting;
 	protected Timer timer = new Timer();
+	private final Lock lock = new ReentrantLock();
+	private final Condition gotText = lock.newCondition();
+	private String text;
+	private int textWaiters = 0;
 	
 	public ScriptCommands (IStormFrontClient client)
 	{
 		this.client = client;
-		waiting = waitingForMatches = waitingForRoom = waitingForText = waitingForRoundtime = false;
+		waiting = waitingForMatches = waitingForRoom = waitingForRoundtime = false;
 		
 		client.getDefaultStream().addStreamListener(this);
 		client.getRoundtime().addListener(this);
@@ -48,9 +55,37 @@ public class ScriptCommands implements IScriptCommands, IStreamListener, IProper
 	}
 
 	public void matchWait (Match[] matches, IScriptCallback callback) {
-		addCallback(callback);
-		this.matches = matches;
-		waitingForMatches = true;
+		matchWait(matches);
+	}
+	
+	public Match matchWait (Match[] matches) {
+		lock.lock();
+		try {
+			textWaiters++;
+			while(true) {
+				System.out.println("Waiting for text");
+				gotText.await();
+				if(text == null) {
+					System.out.println("No text!!");
+					continue;
+				}
+				System.out.println("Got line: " + text);
+				for(Match match : matches) {
+					System.out.println("Trying a match");
+					if(match.matches(text)) {
+						System.out.println("matched a line");
+						return match;
+					}
+				}
+			}
+		} catch(Exception e) {
+			e.printStackTrace();
+		}finally {
+			System.out.println("Done with matchwait");
+			textWaiters--;
+			lock.unlock();
+		}
+		return null;
 	}
 
 	public void move (String direction, IScriptCallback callback) {
@@ -106,7 +141,7 @@ public class ScriptCommands implements IScriptCommands, IStreamListener, IProper
 		this.waitForText = text;
 		this.regex = regex;
 		this.ignoreCase = ignoreCase;
-		waitingForText = true;
+		// waitingForText = true;
 	}
 
 	public void waitForPrompt (IScriptCallback callback) {
@@ -175,8 +210,18 @@ public class ScriptCommands implements IScriptCommands, IStreamListener, IProper
 	public void streamDonePrompting (IStream stream) { }
 	
 	public void streamReceivedText(IStream stream, IStyledString string) {
-		String text = string.getBuffer().toString();
+		lock.lock();
+		try {
+			text = string.getBuffer().toString();
+			if(textWaiters > 0) {
+				System.out.println("Signaling waiters");
+				gotText.signalAll();
+			}
+		} finally {
+			lock.unlock();
+		}
 		
+		/*
 		if (waitingForMatches)
 		{
 			Match foundMatch = null;
@@ -211,6 +256,7 @@ public class ScriptCommands implements IScriptCommands, IStreamListener, IProper
 				}
 			}
 		}
+		*/
 	}
 	
 	public void movedToRoom() {

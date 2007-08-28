@@ -19,6 +19,7 @@ public interface IScriptCommands {
 	public void waitForRoundtime (IScriptCallback callback);
 	
 	public void matchWait (Match[] matches, IScriptCallback callback);
+	public Match matchWait (Match[] matches);
 	
 	public void pause (int seconds, IScriptCallback callback);
 	
