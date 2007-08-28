@@ -179,7 +179,7 @@ public class GameView extends StreamView implements KeyListener, IStormFrontClie
 		
 		text.addLink("http://warlock.cc", "The Warlock Team");
 		
-		entry = new StyledText(mainComposite, SWT.BORDER);
+		entry = new StyledText(mainComposite, SWT.BORDER | SWT.SINGLE);
 		entry.setLayoutData(new GridData(GridData.FILL, GridData.VERTICAL_ALIGN_END, true, false, 1, 1));
 		entry.setEditable(true);
 		entry.setLineSpacing(5);
