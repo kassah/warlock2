@@ -2,6 +2,8 @@ package cc.warlock.rcp.views;
 
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.graphics.Color;
+import org.eclipse.swt.graphics.Image;
+import org.eclipse.swt.layout.FillLayout;
 import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.widgets.Composite;
@@ -34,38 +36,55 @@ public class HandsView extends ViewPart implements IPropertyListener<String>
 	
 	@Override
 	public void createPartControl(Composite parent) {
+		parent.setLayout(new FillLayout());
+		parent.setLayoutData(new GridData(GridData.FILL, GridData.FILL, true, true));
+		
 		Composite main = new Composite(parent, SWT.NONE);
 		GridLayout layout = new GridLayout(6, false);
 		layout.horizontalSpacing = 0;
+		layout.verticalSpacing = 0;
+		layout.marginHeight = 0;
+		layout.marginWidth = 0;
 		main.setLayout(layout);
+		main.setLayoutData(new GridData(GridData.FILL, GridData.FILL, true, true));
 		
-		leftHandImage = new Label(main, SWT.NONE);
-		leftHandImage.setImage(WarlockSharedImages.getImage(WarlockSharedImages.IMG_LEFT_HAND_SMALL));
-		leftHandText = new WarlockText(main, SWT.NONE);
-		leftHandText.setText("Empty");
-		leftHandText.setLayoutData(new GridData(GridData.FILL, GridData.FILL, true, false));
-		leftHandText.setLineSpacing(5);
-		leftHandText.setIndent(5);
+		leftHandImage = createImageLabel(main, WarlockSharedImages.getImage(WarlockSharedImages.IMG_LEFT_HAND_SMALL));
+		leftHandText = createText(main, "Empty");
 		
-		rightHandImage = new Label(main, SWT.NONE);
-		rightHandImage.setImage(WarlockSharedImages.getImage(WarlockSharedImages.IMG_RIGHT_HAND_SMALL));
-		rightHandText = new WarlockText(main, SWT.NONE);
-		rightHandText.setText("Empty");
-		rightHandText.setLayoutData(new GridData(GridData.FILL, GridData.FILL, true, false));
-		rightHandText.setLineSpacing(5);
-		rightHandText.setIndent(5);
+		rightHandImage = createImageLabel(main, WarlockSharedImages.getImage(WarlockSharedImages.IMG_RIGHT_HAND_SMALL));
+		rightHandText = createText(main, "Empty");
 		
-		spellImage = new Label(main, SWT.NONE);
-		spellImage.setImage(WarlockSharedImages.getImage(WarlockSharedImages.IMG_SPELL_HAND_SMALL));
-		spellText = new WarlockText(main, SWT.NONE);
-		spellText.setText("None");
-		spellText.setLayoutData(new GridData(GridData.FILL, GridData.FILL, true, false));
-		spellText.setLineSpacing(5);
-		spellText.setIndent(5);
+		spellImage = createImageLabel(main, WarlockSharedImages.getImage(WarlockSharedImages.IMG_SPELL_HAND_SMALL));
+		spellText = createText(main, "None");
 		
 		setColors(new Color(main.getDisplay(), 240, 240, 255), new Color(main.getDisplay(), 25, 25, 50));
 	}
 
+	private Label createImageLabel(Composite main, Image image)
+	{
+		Label label = new Label(main, SWT.NONE);
+		label.setImage(image);
+		GridData data = new GridData(GridData.FILL, GridData.FILL, false, false);
+		data.minimumHeight = 32;
+		label.setLayoutData(data);
+		
+		return label;
+	}
+	
+	private WarlockText createText (Composite main, String label)
+	{
+		WarlockText text = new WarlockText(main, SWT.NONE);
+		text.setText(label);
+		GridData data = new GridData(GridData.FILL, GridData.FILL, true, true);
+		data.minimumHeight = 30;
+		data.minimumWidth = 30;
+		text.setLayoutData(data);
+		text.setLineSpacing(5);
+		text.setIndent(5);
+		
+		return text;
+	}
+	
 	@Override
 	public void setFocus() {
 		// TODO Auto-generated method stub
