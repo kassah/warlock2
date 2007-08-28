@@ -44,7 +44,7 @@ public class WarlockPerspectiveFactory implements IPerspectiveFactory {
 		layout.addView(GameView.VIEW_ID, IPageLayout.LEFT, 0.15f, layout.getEditorArea());
 
 		layout.addStandaloneView(HandsView.VIEW_ID, false, IPageLayout.TOP, 0.05f, GameView.VIEW_ID);
-		layout.addStandaloneView(StatusView.VIEW_ID, false, IPageLayout.RIGHT, 0.5f, HandsView.VIEW_ID);
+//		layout.addStandaloneView(StatusView.VIEW_ID, false, IPageLayout.RIGHT, .5f, HandsView.VIEW_ID);
 		
 		IPlaceholderFolderLayout topFolder =
 			layout.createPlaceholderFolder(TOP_FOLDER_ID, IPageLayout.TOP, 0.15f, HandsView.VIEW_ID);
@@ -60,7 +60,6 @@ public class WarlockPerspectiveFactory implements IPerspectiveFactory {
 		
 //		IFolderLayout folder = layout.createFolder(BOTTOM_FOLDER_ID, IPageLayout.BOTTOM, 0.90f, GameView.VIEW_ID);
 		layout.addStandaloneView(BarsView.VIEW_ID, false, IPageLayout.BOTTOM, 0.95f, GameView.VIEW_ID);
-		
 //		folder.addView("org.eclipse.pde.runtime.LogView");
 		
 //		layout.addView(CompassView.VIEW_ID, IPageLayout.RIGHT, 0.85f, BarsView.VIEW_ID);
