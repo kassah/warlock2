@@ -15,13 +15,11 @@ import org.antlr.runtime.CommonTokenStream;
 import org.antlr.runtime.RecognitionException;
 
 import cc.warlock.script.AbstractScript;
-import cc.warlock.script.CallbackEvent;
-import cc.warlock.script.IScriptCallback;
 import cc.warlock.script.IScriptCommands;
 import cc.warlock.script.IScriptListener;
 import cc.warlock.script.Match;
 
-public class WarlockWSLScript extends AbstractScript implements IScriptCallback, Runnable {
+public class WarlockWSLScript extends AbstractScript implements Runnable {
 	
 	protected String script, scriptName;
 	protected boolean running, stopped;
@@ -350,7 +348,7 @@ public class WarlockWSLScript extends AbstractScript implements IScriptCallback,
 				// System.out.println("matched label: \"" + match.getAttribute("label") + "\"");
 				matchset.clear();
 				gotoLabel((String)match.getAttribute("label"));
-				commands.waitForPrompt(WarlockWSLScript.this);
+				commands.waitForPrompt();
 			} else {
 				commands.echo("*** Internal error, no match was found!! ***\n");
 			}
@@ -475,7 +473,7 @@ public class WarlockWSLScript extends AbstractScript implements IScriptCallback,
 		}
 		
 		public void execute (String arguments) {
-			commands.waitForPrompt(WarlockWSLScript.this);
+			commands.waitForPrompt();
 		}
 	}
 	
@@ -532,7 +530,7 @@ public class WarlockWSLScript extends AbstractScript implements IScriptCallback,
 		
 		public void execute (String arguments)
 		{
-			commands.move(arguments, WarlockWSLScript.this);
+			commands.move(arguments);
 		}
 	}
 	
@@ -543,7 +541,7 @@ public class WarlockWSLScript extends AbstractScript implements IScriptCallback,
 		
 		public void execute (String arguments)
 		{
-			commands.nextRoom(WarlockWSLScript.this);
+			commands.nextRoom();
 		}
 	}
 	
@@ -600,37 +598,6 @@ public class WarlockWSLScript extends AbstractScript implements IScriptCallback,
 
 	private void handleAddToHighlightStrings(List<String> arguments) {
 		// TODO Auto-generated method stub
-	}
-	
-	public void handleCallback(CallbackEvent event) {
-		if (!running) return;
-		
-		switch (event.type)
-		{
-			case FinishedWaitingForPrompt:
-				commands.waitForRoundtime(this); break;
-			case FinishedWaiting:
-			case FinishedPausing:
-				commands.waitForPrompt(this); break;
-			case FinishedWaitingForRoundtime:
-			case InNextRoom:
-				// continueAtNextLine();
-				break;
-			case Matched:
-			{
-				// System.out.println("matched a label\n");
-				Match match = (Match) event.data.get(CallbackEvent.DATA_MATCH);
-				if (match != null)
-				{
-					// System.out.println("matched label: \"" + match.getAttribute("label") + "\"");
-					matchset.clear();
-					gotoLabel((String)match.getAttribute("label"));
-					commands.waitForPrompt(this);
-				} else {
-					commands.echo("*** Internal error, no match was found!! ***\n");
-				}
-			} break;
-		}
 	}
 	
 	public void stopScript() {

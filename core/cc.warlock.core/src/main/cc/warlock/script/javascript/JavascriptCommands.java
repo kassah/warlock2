@@ -1,16 +1,13 @@
 package cc.warlock.script.javascript;
 
-import org.mozilla.javascript.Context;
 import org.mozilla.javascript.Function;
 
 import cc.warlock.client.stormfront.IStormFrontClient;
-import cc.warlock.script.CallbackEvent;
 import cc.warlock.script.IScript;
-import cc.warlock.script.IScriptCallback;
 import cc.warlock.script.IScriptCommands;
 import cc.warlock.script.Match;
 
-public class JavascriptCommands implements IScriptCommands, IScriptCallback {
+public class JavascriptCommands implements IScriptCommands {
 
 	private IScriptCommands commands;
 	private JavascriptScript script;
@@ -38,18 +35,30 @@ public class JavascriptCommands implements IScriptCommands, IScriptCallback {
 
 	public Match matchWait(Match[] matches) {
 		return commands.matchWait(matches);
+		/*Match match = (Match)event.data.get(CallbackEvent.DATA_MATCH);
+		Function function = (Function)match.getAttribute("callback");
+		Context cx = Context.enter();
+		try {
+			function.call(cx, script.getScope(), null, new Object[] {});
+		}
+		catch (Exception e) {
+			e.printStackTrace();
+		}
+		finally {
+			Context.exit();
+		}*/
 	}
 
-	public void move(String direction, IScriptCallback callback) {
-		commands.move(direction, callback);
+	public void move(String direction) {
+		commands.move(direction);
 	}
 
 	public void movedToRoom() {
 		commands.movedToRoom();
 	}
 
-	public void nextRoom(IScriptCallback callback) {
-		commands.nextRoom(callback);
+	public void nextRoom() {
+		commands.nextRoom();
 	}
 
 	public void pause(int seconds) {
@@ -68,12 +77,12 @@ public class JavascriptCommands implements IScriptCommands, IScriptCallback {
 		commands.waitFor(match);
 	}
 
-	public void waitForPrompt(IScriptCallback callback) {
-		commands.waitForPrompt(callback);
+	public void waitForPrompt() {
+		commands.waitForPrompt();
 	}
 
-	public void waitForRoundtime(IScriptCallback callback) {
-		commands.waitForRoundtime(callback);
+	public void waitForRoundtime() {
+		commands.waitForRoundtime();
 	}
 
 	public void exit() throws JavascriptStopException {
@@ -86,22 +95,5 @@ public class JavascriptCommands implements IScriptCommands, IScriptCallback {
 		m.setAttribute("callback", function);
 		
 		return m;
-	}
-	
-	public void handleCallback(CallbackEvent event) {
-		if(event.type == CallbackType.Matched) {
-			Match match = (Match)event.data.get(CallbackEvent.DATA_MATCH);
-			Function function = (Function)match.getAttribute("callback");
-			Context cx = Context.enter();
-			try {
-				function.call(cx, script.getScope(), null, new Object[] {});
-			}
-			catch (Exception e) {
-				e.printStackTrace();
-			}
-			finally {
-				Context.exit();
-			}
-		}
 	}
 }

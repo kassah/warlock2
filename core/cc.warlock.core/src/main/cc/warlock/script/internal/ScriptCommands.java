@@ -1,6 +1,5 @@
 package cc.warlock.script.internal;
 
-import java.util.ArrayList;
 import java.util.Date;
 import java.util.Timer;
 import java.util.TimerTask;
@@ -15,9 +14,7 @@ import cc.warlock.client.IStreamListener;
 import cc.warlock.client.IStyledString;
 import cc.warlock.client.internal.Command;
 import cc.warlock.client.stormfront.IStormFrontClient;
-import cc.warlock.script.CallbackEvent;
 import cc.warlock.script.IScript;
-import cc.warlock.script.IScriptCallback;
 import cc.warlock.script.IScriptCommands;
 import cc.warlock.script.Match;
 
@@ -29,6 +26,7 @@ public class ScriptCommands implements IScriptCommands, IStreamListener, IProper
 	protected Match[] matches;
 	protected Match waitForMatch;
 	protected Timer timer = new Timer();
+	private int roundtimeWaiters = 0;
 	private final Lock lock = new ReentrantLock();
 	
 	private final Condition gotText = lock.newCondition();
@@ -55,10 +53,6 @@ public class ScriptCommands implements IScriptCommands, IStreamListener, IProper
 	
 	public void echo (IScript script, String text) {
 		client.getDefaultStream().echo("[" + script.getName() + "]: " + text);
-	}
-
-	public void matchWait (Match[] matches, IScriptCallback callback) {
-		matchWait(matches);
 	}
 	
 	public Match matchWait (Match[] matches) {
@@ -91,13 +85,13 @@ public class ScriptCommands implements IScriptCommands, IStreamListener, IProper
 		return null;
 	}
 
-	public void move (String direction, IScriptCallback callback) {
+	public void move (String direction) {
 		client.send(direction);
 		client.getDefaultStream().echo(direction);
-		nextRoom(callback);
+		nextRoom();
 	}
 
-	public void nextRoom (IScriptCallback callback) {
+	public void nextRoom () {
 		lock.lock();
 		try {
 			nextRoom.await();
@@ -163,7 +157,7 @@ public class ScriptCommands implements IScriptCommands, IStreamListener, IProper
 		}
 	}
 
-	public void waitForPrompt (IScriptCallback callback) {
+	public void waitForPrompt () {
 		lock.lock();
 		try {
 			promptWaiters++;
@@ -258,25 +252,14 @@ public class ScriptCommands implements IScriptCommands, IStreamListener, IProper
 	}
 	
 	protected boolean waitingForRoundtime;
-	public void waitForRoundtime (final IScriptCallback callback)
+	public void waitForRoundtime ()
 	{
-		if (client.getRoundtime().get() > 0)
-		{
-			waitingForRoundtime = true;
-			
-			timer.schedule(new TimerTask () {
-				public void run() {
-					if (!waitingForRoundtime)
-					{
-						cancel();
-						CallbackEvent event = new CallbackEvent(IScriptCallback.CallbackType.FinishedWaitingForRoundtime);
-						callback.handleCallback(event);
-					}
-				}
-			}, 200, 200);
-		} else {
-			CallbackEvent event = new CallbackEvent(IScriptCallback.CallbackType.FinishedWaitingForRoundtime);
-			callback.handleCallback(event);
+		try {
+			while(client.getRoundtime().get() > 0) {
+				Thread.sleep(client.getRoundtime().get() * 1000);
+			}
+		} catch(Exception e) {
+			e.printStackTrace();
 		}
 	}
 	
