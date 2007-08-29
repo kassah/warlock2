@@ -4,6 +4,11 @@ import org.dom4j.Element;
 
 public abstract class ServerSetting {
 
+	public static final String UPDATE_PREFIX = "<<m>";
+	public static final String UPDATE_SUFFIX = "</<m>";
+	public static final String DELETE_PREFIX = "<<d>";
+	public static final String DELETE_SUFFIX = "</<d>";
+	
 	protected Element element;
 	protected ServerSettings serverSettings;
 	
@@ -19,11 +24,17 @@ public abstract class ServerSetting {
 	}
 	
 	protected abstract void saveToDOM ();
+	
 	protected abstract String toStormfrontMarkup();
 	
 	protected void setAttribute (String attrName, String value)
 	{
 		setAttribute(element, attrName, value);
+	}
+	
+	protected void deleteFromDOM ()
+	{
+		element.getParent().remove(element);
 	}
 	
 	protected static void setAttribute (Element element, String attrName, String value)

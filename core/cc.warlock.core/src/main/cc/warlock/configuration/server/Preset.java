@@ -20,8 +20,8 @@ public class Preset extends ServerSetting implements Comparable<Preset> {
 	public static final String KEY_BGCOLOR = "bgcolor";
 	public static final String KEY_FILL_ENTIRE_LINE = "line";
 	
-	public static final String STORMFRONT_MARKUP_PREFIX = "<presets><<m>";
-	public static final String STORMFRONT_MARKUP_SUFFIX = "</<m></presets>";
+	public static final String STORMFRONT_MARKUP_PREFIX = "<presets>";
+	public static final String STORMFRONT_MARKUP_SUFFIX = "</presets>";
 	
 	protected String foregroundColor, backgroundColor;
 	protected boolean needsUpdate = false, fillEntireLine;

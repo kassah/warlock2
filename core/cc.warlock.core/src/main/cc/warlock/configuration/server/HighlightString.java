@@ -6,10 +6,10 @@ public class HighlightString extends Preset {
 
 	public static final String KEY_TEXT = "text";
 	
-	public static final String STORMFRONT_STRINGS_MARKUP_PREFIX = "<strings><<m>";
-	public static final String STORMFRONT_STRINGS_MARKUP_SUFFIX = "</<m></strings>";
-	public static final String STORMFRONT_NAMES_MARKUP_PREFIX = "<names><<m>";
-	public static final String STORMFRONT_NAMES_MARKUP_SUFFIX = "</<m></names>";
+	public static final String STORMFRONT_STRINGS_MARKUP_PREFIX = "<strings>";
+	public static final String STORMFRONT_STRINGS_MARKUP_SUFFIX = "</strings>";
+	public static final String STORMFRONT_NAMES_MARKUP_PREFIX = "<names>";
+	public static final String STORMFRONT_NAMES_MARKUP_SUFFIX = "</names>";
 	
 	protected String text;
 	protected boolean isName;

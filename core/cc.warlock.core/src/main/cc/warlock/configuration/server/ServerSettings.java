@@ -41,6 +41,9 @@ public class ServerSettings implements Comparable<ServerSettings>
 	protected Hashtable<String, ServerScript> scripts = new Hashtable<String, ServerScript>();
 	protected DefaultSkin defaultSkin;
 	
+	protected ArrayList<HighlightString> deletedHighlightStrings = new ArrayList<HighlightString>();
+	protected ArrayList<String> deletedVariables = new ArrayList<String>();
+	
 	private Element mainWindowElement, mainWindowFontElement,
 		mainWindowColumnFontElement, commandLineElement, paletteElement, presetsElement, stringsElement, namesElement;
 	
@@ -319,7 +322,7 @@ public class ServerSettings implements Comparable<ServerSettings>
 	{
 		return presets.get(presetId);
 	}
-	
+		
 	public Collection<HighlightString> getHighlightStrings ()
 	{	
 		return highlightStrings == null ? null : highlightStrings.values();
@@ -335,18 +338,29 @@ public class ServerSettings implements Comparable<ServerSettings>
 		highlightStrings.put(string.getText(), string);
 	}
 	
+	public void deleteHighlightString (HighlightString string)
+	{
+		if (highlightStrings.containsKey(string.getText()))
+		{
+			deletedHighlightStrings.add(string);
+			highlightStrings.remove(string.getText());
+		}
+	}
+	
 	protected void saveHighlights(boolean saveNames)
 	{
-		StringBuffer stringsMarkup = new StringBuffer();
+		StringBuffer stringsUpdateMarkup = new StringBuffer();
+		StringBuffer stringsDeleteMarkup = new StringBuffer();
+		
 		for (HighlightString string : highlightStrings.values())
 		{
 			if (saveNames && string.isName()) {
 				if (string.needsUpdate())
 				{
 					if (string.getOriginalHighlightString() != null)
-						stringsMarkup.append(string.getOriginalHighlightString().toStormfrontMarkup());
+						stringsUpdateMarkup.append(string.getOriginalHighlightString().toStormfrontMarkup());
 					
-					stringsMarkup.append(string.toStormfrontMarkup());
+					stringsUpdateMarkup.append(string.toStormfrontMarkup());
 					string.saveToDOM();
 					string.setNeedsUpdate(false);
 				}
@@ -355,12 +369,25 @@ public class ServerSettings implements Comparable<ServerSettings>
 				if (string.needsUpdate())
 				{
 					if (string.getOriginalHighlightString() != null)
-						stringsMarkup.append(string.getOriginalHighlightString().toStormfrontMarkup());
+						stringsUpdateMarkup.append(string.getOriginalHighlightString().toStormfrontMarkup());
 					
-					stringsMarkup.append(string.toStormfrontMarkup());
+					stringsUpdateMarkup.append(string.toStormfrontMarkup());
 					string.saveToDOM();
 					string.setNeedsUpdate(false);
 				}
+			}
+		}
+		
+		for (HighlightString string : deletedHighlightStrings)
+		{
+			if (saveNames && string.isName()) {
+				stringsDeleteMarkup.append(string.toStormfrontMarkup());
+				string.deleteFromDOM();
+			}
+			else if (!saveNames && !string.isName())
+			{
+				stringsDeleteMarkup.append(string.toStormfrontMarkup());
+				string.deleteFromDOM();
 			}
 		}
 		
@@ -371,20 +398,42 @@ public class ServerSettings implements Comparable<ServerSettings>
 			paletteMarkup = palette.toStormfrontMarkup();
 		}
 		
-		if (stringsMarkup.length() > 0)
+		if (stringsUpdateMarkup.length() > 0)
 		{
 			sendSettingsUpdate(
 				PRESET_OR_STRING_SETTING_UPDATE_PREFIX +
 				(saveNames ? 
 					HighlightString.STORMFRONT_NAMES_MARKUP_PREFIX :
-					HighlightString.STORMFRONT_STRINGS_MARKUP_PREFIX),
-				stringsMarkup,
+					HighlightString.STORMFRONT_STRINGS_MARKUP_PREFIX)
+				+ ServerSetting.UPDATE_PREFIX,
+				stringsUpdateMarkup,
+				ServerSetting.UPDATE_SUFFIX +
 				(saveNames ?
 					HighlightString.STORMFRONT_NAMES_MARKUP_SUFFIX :
 					HighlightString.STORMFRONT_STRINGS_MARKUP_SUFFIX) +
 				IGNORES_TEXT +
 				paletteMarkup);
 		}
+		
+		if (stringsDeleteMarkup.length() > 0)
+		{
+			sendSettingsUpdate(
+				PRESET_OR_STRING_SETTING_UPDATE_PREFIX +
+				(saveNames ?
+					HighlightString.STORMFRONT_NAMES_MARKUP_PREFIX :
+					HighlightString.STORMFRONT_STRINGS_MARKUP_PREFIX)
+				+ ServerSetting.DELETE_PREFIX,
+				stringsDeleteMarkup,
+				ServerSetting.DELETE_SUFFIX +
+				(saveNames ?
+					HighlightString.STORMFRONT_NAMES_MARKUP_SUFFIX :
+					HighlightString.STORMFRONT_STRINGS_MARKUP_SUFFIX) +
+				IGNORES_TEXT +
+				paletteMarkup);
+			
+			deletedHighlightStrings.clear();
+		}
+		
 		saveLocalXml();
 	}
 	
@@ -400,25 +449,27 @@ public class ServerSettings implements Comparable<ServerSettings>
 	
 	public void savePresets ()
 	{
-		StringBuffer presetMarkup = new StringBuffer();
+		StringBuffer presetUpdateMarkup = new StringBuffer();
 		
 		for (Preset preset : presets.values())
 		{
 			if (preset.needsUpdate())
 			{
-				presetMarkup.append(preset.getOriginalPreset().toStormfrontMarkup());
-				presetMarkup.append(preset.toStormfrontMarkup());
+				presetUpdateMarkup.append(preset.getOriginalPreset().toStormfrontMarkup());
+				presetUpdateMarkup.append(preset.toStormfrontMarkup());
 				preset.saveToDOM();
 				preset.setNeedsUpdate(false);
 			}
 		}
-		
-		if (presetMarkup.length() > 0)
+				
+		if (presetUpdateMarkup.length() > 0)
 		{
 			sendSettingsUpdate(
 				PRESET_OR_STRING_SETTING_UPDATE_PREFIX +
-				Preset.STORMFRONT_MARKUP_PREFIX,
-				presetMarkup,
+				Preset.STORMFRONT_MARKUP_PREFIX +
+				ServerSetting.UPDATE_PREFIX,
+				presetUpdateMarkup,
+				ServerSetting.UPDATE_SUFFIX +
 				Preset.STORMFRONT_MARKUP_SUFFIX);
 		}
 		
@@ -445,7 +496,6 @@ public class ServerSettings implements Comparable<ServerSettings>
 			System.out.println("[test-settings-update]\n\n" + prefix + markup.toString() + suffix);
 			
 			try {
-				// pray for all of our souls
 				client.getConnection().send(prefix + markup.toString() + suffix + "\n");
 				
 			} catch (IOException e) {
