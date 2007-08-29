@@ -58,7 +58,6 @@ public class HighlightStringsPreferencePage extends PropertyPage implements
 	protected IStormFrontClient client;
 	protected HighlightString selectedString;
 	protected ArrayList<HighlightString> highlightStrings = new ArrayList<HighlightString>();
-	protected ArrayList<HighlightString> removedStrings = new ArrayList<HighlightString>();
 	
 	private void copyHighlightStrings ()
 	{
@@ -266,6 +265,7 @@ public class HighlightStringsPreferencePage extends PropertyPage implements
 	private void highlightStringSelected (HighlightString string)
 	{
 		selectedString = string;
+		if (string == null) return;
 		
 		WarlockColor fgColor = string.getForegroundColor();
 		WarlockColor bgColor = string.getBackgroundColor();
@@ -319,8 +319,12 @@ public class HighlightStringsPreferencePage extends PropertyPage implements
 	}
 	
 	private void removeStringClicked() {
-		highlightStrings.remove(selectedString);
-		stringTable.remove(selectedString);
+		HighlightString string = selectedString;
+		
+		client.getServerSettings().deleteHighlightString(string);
+		
+		highlightStrings.remove(string);
+		stringTable.remove(string);
 	}
 
 	private void addStringClicked() {
