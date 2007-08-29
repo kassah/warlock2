@@ -12,4 +12,6 @@ public interface IMacroCommand {
 
 	public String getIdentifier ();
 	public String execute (IWarlockClientViewer context, String currentCommand, int position);
+	
+	public int getPrecedence();
 }

@@ -18,6 +18,10 @@ import cc.warlock.rcp.ui.macros.IMacroCommand;
  */
 public class ClearMacroCommand implements IMacroCommand {
 
+	public int getPrecedence() {
+		return 1001;
+	}
+	
 	public String getIdentifier() {
 		return "\\x";
 	}

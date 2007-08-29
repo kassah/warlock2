@@ -12,6 +12,10 @@ import cc.warlock.rcp.ui.macros.IMacroCommand;
  */
 public class SendMacroCommand implements IMacroCommand {
 
+	public int getPrecedence() {
+		return 1002;
+	}
+	
 	public String getIdentifier() {
 		return "\\r";
 	}

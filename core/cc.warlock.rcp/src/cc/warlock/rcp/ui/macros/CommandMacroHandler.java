@@ -1,5 +1,8 @@
 package cc.warlock.rcp.ui.macros;
 
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Comparator;
 import java.util.Date;
 import java.util.Map;
 
@@ -36,13 +39,22 @@ public class CommandMacroHandler implements IMacroHandler {
 			}
 		}
 		
-		for (String command : commands.keySet())
+		ArrayList<IMacroCommand> commandList = new ArrayList<IMacroCommand>();
+		commandList.addAll(commands.values());
+		
+		Collections.sort(commandList, new Comparator<IMacroCommand>() {
+			public int compare(IMacroCommand o1, IMacroCommand o2) {
+				return o1.getPrecedence() - o2.getPrecedence();
+			}
+		});
+		
+		for (IMacroCommand command : commandList)
 		{
-			if (newCommand.contains(command))
+			if (newCommand.contains(command.getIdentifier()))
 			{
-				for ( int i = newCommand.indexOf(command); i > -1 && i < newCommand.length(); i = newCommand.indexOf(command, i+1))
+				for ( int i = newCommand.indexOf(command.getIdentifier()); i > -1 && i < newCommand.length(); i = newCommand.indexOf(command.getIdentifier(), i+1))
 				{
-					String result = commands.get(command).execute(viewer, newCommand, i);
+					String result = commands.get(command.getIdentifier()).execute(viewer, newCommand, i);
 					if (result != null)
 					{
 						newCommand = result;
