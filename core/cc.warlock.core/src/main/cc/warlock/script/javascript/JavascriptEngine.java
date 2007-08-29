@@ -10,6 +10,7 @@ import java.io.Reader;
 
 import org.mozilla.javascript.Context;
 import org.mozilla.javascript.Scriptable;
+import org.mozilla.javascript.WrappedException;
 
 import cc.warlock.client.stormfront.IStormFrontClient;
 import cc.warlock.script.IScript;
@@ -26,6 +27,7 @@ import cc.warlock.script.IScriptEngine;
 public class JavascriptEngine implements IScriptEngine {
 
 	public static final String ENGINE_ID = "cc.warlock.script.javascript.JavascriptEngine";
+	public Scriptable scope;
 	
 	public String getScriptEngineId() {
 		return ENGINE_ID;
@@ -40,13 +42,13 @@ public class JavascriptEngine implements IScriptEngine {
 	}
 	
 	public IScript startScript(final IScriptCommands commands, final String scriptName, final Reader scriptReader, final String[] arguments) {
-		final JavascriptScript script = new JavascriptScript (commands, scriptName);
+		final JavascriptScript script = new JavascriptScript (commands, scriptName, this);
 		new Thread(new Runnable() {
 			public void run () {
 				Context context = Context.enter();
 				try {
-					Scriptable scope = context.initStandardObjects();
-					scope.put("script", scope, commands);
+					scope = context.initStandardObjects();
+					scope.put("script", scope, script.getCommands());
 					scope.put("arguments", scope, arguments);
 					
 					if (commands.getClient() instanceof IStormFrontClient)
@@ -58,6 +60,9 @@ public class JavascriptEngine implements IScriptEngine {
 					
 					Object result = context.evaluateReader(scope, scriptReader, scriptName, 1, null);
 					System.out.println("script result: " + Context.toString(result));
+				}
+				catch (WrappedException e) {
+					
 				}
 				catch (Exception e) {
 					e.printStackTrace();

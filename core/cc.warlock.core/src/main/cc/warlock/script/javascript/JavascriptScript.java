@@ -6,6 +6,8 @@
  */
 package cc.warlock.script.javascript;
 
+import org.mozilla.javascript.Scriptable;
+
 import cc.warlock.script.AbstractScript;
 import cc.warlock.script.IScriptCommands;
 
@@ -18,12 +20,16 @@ import cc.warlock.script.IScriptCommands;
 public class JavascriptScript extends AbstractScript {
 
 	private String name;
+	private JavascriptEngine engine;
 	
-	public JavascriptScript (IScriptCommands commands, String name)
+	public JavascriptScript (IScriptCommands commands, String name, JavascriptEngine engine)
 	{
 		super(commands);
 		
+		this.commands = new JavascriptCommands(commands, this);
+		
 		this.name = name;
+		this.engine = engine;
 	}
 	
 	public String getName() {
@@ -37,6 +43,7 @@ public class JavascriptScript extends AbstractScript {
 	public void stop() {
 
 	}
+	
 	public void suspend() {
 
 	}
@@ -46,4 +53,11 @@ public class JavascriptScript extends AbstractScript {
 		
 	}
 
+	public JavascriptCommands getCommands() {
+		return (JavascriptCommands) commands;
+	}
+	
+	public Scriptable getScope() {
+		return engine.scope;
+	}
 }
