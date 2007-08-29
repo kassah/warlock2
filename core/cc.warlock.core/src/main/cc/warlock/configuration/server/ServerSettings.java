@@ -330,7 +330,7 @@ public class ServerSettings implements Comparable<ServerSettings>
 		highlightStrings.clear();
 	}
 	
-	public void addHighlightString (HighlightString string)
+	public void updateHighlightString (HighlightString string)
 	{
 		highlightStrings.put(string.getText(), string);
 	}

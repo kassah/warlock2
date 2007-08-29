@@ -12,7 +12,7 @@ public class HighlightString extends Preset {
 	public static final String STORMFRONT_NAMES_MARKUP_SUFFIX = "</<m></names>";
 	
 	protected String text;
-	protected boolean name;
+	protected boolean isName;
 	protected HighlightString originalString;
 	
 	protected HighlightString (ServerSettings serverSettings)
@@ -25,7 +25,7 @@ public class HighlightString extends Preset {
 		super(other);
 		
 		this.text = other.text == null ? null : new String(other.text);
-		this.name = other.name;
+		this.isName = other.isName;
 		this.originalString = other;
 	}
 	
@@ -48,11 +48,11 @@ public class HighlightString extends Preset {
 	}
 	
 	public boolean isName() {
-		return name;
+		return isName;
 	}
 
-	public void setIsName(boolean name) {
-		this.name = name;
+	public void setIsName(boolean isName) {
+		this.isName = isName;
 	}
 
 	protected void saveToDOM ()
@@ -78,6 +78,7 @@ public class HighlightString extends Preset {
 		Element element = parent.addElement("h");
 		
 		HighlightString string = new HighlightString(serverSettings, element, serverSettings.getPalette());
+		string.needsUpdate = true;
 		return string;
 	}
 	
@@ -101,5 +102,10 @@ public class HighlightString extends Preset {
 	public HighlightString getOriginalHighlightString ()
 	{
 		return originalString;
+	}
+	
+	@Override
+	public String toString() {
+		return (isName ? "name: " : "string: ") + text;
 	}
 }
