@@ -6,7 +6,11 @@ import org.eclipse.jface.preference.PreferenceDialog;
 import org.eclipse.swt.widgets.Display;
 import org.eclipse.ui.dialogs.PreferencesUtil;
 
+import cc.warlock.client.IWarlockClient;
+import cc.warlock.client.IWarlockClientListener;
+import cc.warlock.client.WarlockClientRegistry;
 import cc.warlock.client.stormfront.IStormFrontClient;
+import cc.warlock.rcp.plugin.Warlock2Plugin;
 import cc.warlock.rcp.prefs.CharacterPreferencesPage;
 import cc.warlock.rcp.prefs.HighlightNamesPreferencePage;
 import cc.warlock.rcp.prefs.HighlightStringsPreferencePage;
@@ -17,19 +21,37 @@ import cc.warlock.rcp.views.GameView;
 
 public class PreferencesHandler extends SimpleCommandHandler
 {
+	protected boolean enabled = false;
+	protected boolean added = false;
 	
 	@Override
 	public boolean isEnabled() {
-		GameView inFocus = GameView.getViewInFocus();
-		if (inFocus != null)
+		if (!added)
 		{
-			IStormFrontClient client = inFocus.getStormFrontClient();
-			if (client != null)
+			final IStormFrontClient currentClient = Warlock2Plugin.getDefault().getCurrentClient();
+			
+			if (currentClient.getConnection() != null)
 			{
-				return client.getCharacterName() != null;
+				enabled = true;
+				added = true;
+			}
+			else {
+				WarlockClientRegistry.addWarlockClientListener(new IWarlockClientListener() {
+					public void clientActivated(IWarlockClient client) {}
+					public void clientConnected(IWarlockClient client) {
+						if (client == currentClient) {
+							enabled = true;
+							WarlockClientRegistry.removeWarlockClientListener(this);
+						}
+					}
+					public void clientDisconnected(IWarlockClient client) {}
+					public void clientRemoved(IWarlockClient client) {}
+				});
+				added = true;
 			}
 		}
-		return false;
+		
+		return enabled;
 	}
 	
 	public Object execute(ExecutionEvent event) throws ExecutionException {
