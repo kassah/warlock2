@@ -62,7 +62,7 @@ public class PreferencesHandler extends SimpleCommandHandler
 				new String[] {
 					CharacterPreferencesPage.PAGE_ID,
 					LookAndFeelPreferencePage.PAGE_ID,
-					PresetsPreferencePage.PAGE_ID,
+//					PresetsPreferencePage.PAGE_ID,
 					HighlightStringsPreferencePage.PAGE_ID,
 					HighlightNamesPreferencePage.PAGE_ID
 				}, null);

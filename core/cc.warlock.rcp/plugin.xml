@@ -232,17 +232,6 @@
             </instanceof>
          </enabledWhen>
       </page>
-      <page
-            category="cc.warlock.rcp.prefs.lookAndFeel"
-            class="cc.warlock.rcp.prefs.PresetsPreferencePage"
-            id="cc.warlock.rcp.prefs.standardPresets"
-            name="Standard Presets">
-         <enabledWhen>
-            <instanceof
-                  value="cc.warlock.rcp.views.GameView">
-            </instanceof>
-         </enabledWhen>
-      </page>
    </extension>
 
 </plugin>
