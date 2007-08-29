@@ -14,11 +14,10 @@ public interface IScriptCommands {
 	
 	public void nextRoom (IScriptCallback callback);
 	
-	public void waitFor (String text, boolean regex, boolean ignoreCase, IScriptCallback callback);
+	public void waitFor (Match match);
 	
 	public void waitForRoundtime (IScriptCallback callback);
 	
-	public void matchWait (Match[] matches, IScriptCallback callback);
 	public Match matchWait (Match[] matches);
 	
 	public void pause (int seconds, IScriptCallback callback);

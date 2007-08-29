@@ -12,7 +12,7 @@ public class Match
 	private String matchText;
 	private Pattern regex;
 	private boolean ignoreCase = true;
-	private HashMap<String,String> data = new HashMap<String,String>();
+	private HashMap<String, Object> data = new HashMap<String, Object>();
 	
 	public void setMatchText(String text) {
 		setMatchText(text, true);
@@ -40,11 +40,11 @@ public class Match
 		this.ignoreCase = ignoreCase;
 	}
 	
-	public String setAttribute(String key, String value) {
+	public Object setAttribute(String key, Object value) {
 		return data.put(key, value);
 	}
 	
-	public String getAttribute(String key) {
+	public Object getAttribute(String key) {
 		return data.get(key);
 	}
 	

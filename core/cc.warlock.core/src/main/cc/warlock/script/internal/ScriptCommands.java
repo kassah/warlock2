@@ -28,7 +28,7 @@ public class ScriptCommands implements IScriptCommands, IStreamListener, IProper
 	protected IStormFrontClient client;
 	protected ArrayList<IScriptCallback> callbacks = new ArrayList<IScriptCallback>();
 	protected Match[] matches;
-	protected String waitForText;
+	protected Match waitForMatch;
 	protected boolean ignoreCase, regex;
 	protected boolean waitingForMatches, waiting;
 	protected Timer timer = new Timer();
@@ -143,12 +143,23 @@ public class ScriptCommands implements IScriptCommands, IStreamListener, IProper
 		client.getDefaultStream().echo("[" + script.getName() + "]: " + text);
 	}
 
-	public void waitFor (String text, boolean regex, boolean ignoreCase, IScriptCallback callback) {
-		addCallback(callback);
-		this.waitForText = text;
-		this.regex = regex;
-		this.ignoreCase = ignoreCase;
-		// waitingForText = true;
+	public void waitFor (Match match) {
+		waitForMatch = match;
+		lock.lock();
+		try {
+			textWaiters++;
+			while(true) {
+				gotText.await();
+				if(waitForMatch.matches(text)) {
+					break;
+				}
+			}
+		} catch(Exception e) {
+			e.printStackTrace();
+		} finally {
+			textWaiters--;
+			lock.unlock();
+		}
 	}
 
 	public void waitForPrompt (IScriptCallback callback) {

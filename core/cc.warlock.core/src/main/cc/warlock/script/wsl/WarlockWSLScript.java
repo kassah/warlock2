@@ -439,20 +439,24 @@ public class WarlockWSLScript extends AbstractScript implements IScriptCallback,
 			
 			if (m.matches())
 			{
-				String regex = m.group(1);
+				String flags = m.group(2);
 				boolean ignoreCase = false;
 				
-				if (m.group(2).contains("i"))
+				if (flags != null && flags.contains("i"))
 				{
 					ignoreCase = true;
 				}
 				
-				commands.waitFor(regex, true, ignoreCase, WarlockWSLScript.this);
+				Match match = new Match();
+				match.setRegex(m.group(1), ignoreCase);
+				
+				commands.waitFor(match);
 			} else { /* TODO throw error */ }
 		}
 	}
 	
 	protected class WarlockWSLWaitFor extends WarlockWSLCommand {
+		
 		public String getName() {
 			return "waitfor";
 		}
@@ -460,7 +464,9 @@ public class WarlockWSLScript extends AbstractScript implements IScriptCallback,
 		public void execute (String arguments) {
 			if (arguments.length() >= 1)
 			{
-				commands.waitFor(arguments, false, true, WarlockWSLScript.this);
+				Match match = new Match();
+				match.setMatchText(arguments);
+				commands.waitFor(match);
 				
 			} else { /* TODO throw error */ }
 		}
