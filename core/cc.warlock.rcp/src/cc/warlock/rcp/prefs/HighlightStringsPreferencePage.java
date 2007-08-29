@@ -58,6 +58,7 @@ public class HighlightStringsPreferencePage extends PropertyPage implements
 	protected IStormFrontClient client;
 	protected HighlightString selectedString;
 	protected ArrayList<HighlightString> highlightStrings = new ArrayList<HighlightString>();
+	protected ArrayList<HighlightString> removedStrings = new ArrayList<HighlightString>();
 	
 	private void copyHighlightStrings ()
 	{
@@ -385,9 +386,13 @@ public class HighlightStringsPreferencePage extends PropertyPage implements
 	
 	@Override
 	public boolean performOk() {
-		client.getServerSettings().clearHighlightStrings();
-		for (HighlightString string : highlightStrings)
-			client.getServerSettings().addHighlightString(string);
+//		client.getServerSettings().clearHighlightStrings();
+		
+		for (HighlightString string : highlightStrings) {
+			if (string.needsUpdate()) {
+				client.getServerSettings().updateHighlightString(string);
+			}
+		}
 		
 		// God save us all
 		saveSettings();
