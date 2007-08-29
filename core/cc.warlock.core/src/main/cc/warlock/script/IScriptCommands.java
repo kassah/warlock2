@@ -8,21 +8,22 @@ public interface IScriptCommands {
 	public void put (IScript script, String text);
 	
 	public void echo (String text);
+	
 	public void echo (IScript script, String text);
 	
-	public void move (String direction, IScriptCallback callback);
+	public void move (String direction);
 	
-	public void nextRoom (IScriptCallback callback);
+	public void nextRoom ();
 	
 	public void waitFor (Match match);
 	
-	public void waitForRoundtime (IScriptCallback callback);
+	public void waitForRoundtime ();
 	
 	public Match matchWait (Match[] matches);
 	
 	public void pause (int seconds);
 	
-	public void waitForPrompt (IScriptCallback callback);
+	public void waitForPrompt ();
 	
 	public IStormFrontClient getClient();
 	
