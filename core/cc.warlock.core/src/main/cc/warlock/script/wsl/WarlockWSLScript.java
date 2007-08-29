@@ -352,7 +352,7 @@ public class WarlockWSLScript extends AbstractScript implements IScriptCallback,
 			{
 				// System.out.println("matched label: \"" + match.getAttribute("label") + "\"");
 				matchset.clear();
-				gotoLabel(match.getAttribute("label"));
+				gotoLabel((String)match.getAttribute("label"));
 				commands.waitForPrompt(WarlockWSLScript.this);
 			} else {
 				commands.echo("*** Internal error, no match was found!! ***\n");
@@ -621,7 +621,7 @@ public class WarlockWSLScript extends AbstractScript implements IScriptCallback,
 				{
 					// System.out.println("matched label: \"" + match.getAttribute("label") + "\"");
 					matchset.clear();
-					gotoLabel(match.getAttribute("label"));
+					gotoLabel((String)match.getAttribute("label"));
 					commands.waitForPrompt(this);
 				} else {
 					commands.echo("*** Internal error, no match was found!! ***\n");

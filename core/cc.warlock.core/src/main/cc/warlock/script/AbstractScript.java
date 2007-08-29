@@ -1,12 +1,17 @@
 package cc.warlock.script;
 
 import java.util.ArrayList;
+import java.util.concurrent.locks.Condition;
+import java.util.concurrent.locks.Lock;
+import java.util.concurrent.locks.ReentrantLock;
 
 public abstract class AbstractScript implements IScript {
 
 	protected IScriptCommands commands;
 	protected ArrayList<IScriptListener> listeners;
 	protected boolean suspended;
+	protected Lock lock = new ReentrantLock();
+	protected Condition suspend = lock.newCondition();
 	
 	public AbstractScript (IScriptCommands commands)
 	{
@@ -15,9 +20,17 @@ public abstract class AbstractScript implements IScript {
 	}
 	
 	public void resume() {
-		this.suspended = false;
+		lock.lock();
+		try {
+			if(suspended) {
+				suspended = false;
 		
-		for (IScriptListener listener : listeners) listener.scriptResumed(this);
+				suspend.signalAll();
+				for (IScriptListener listener : listeners) listener.scriptResumed(this);
+			}
+		} finally {
+			lock.unlock();
+		}	
 	}
 
 	public void stop() {
@@ -25,9 +38,17 @@ public abstract class AbstractScript implements IScript {
 	}
 
 	public void suspend() {
-		this.suspended = true;
+		lock.lock();
+		try {
+			this.suspended = true;
 		
-		for (IScriptListener listener : listeners) listener.scriptPaused(this);
+			for (IScriptListener listener : listeners) listener.scriptPaused(this);
+			suspend.await();
+		} catch(Exception e) {
+			e.printStackTrace();
+		} finally {
+			lock.unlock();
+		}
 	}
 	
 	public boolean isSuspended() {

@@ -30,17 +30,18 @@ public class ScriptCommands implements IScriptCommands, IStreamListener, IProper
 	protected Match[] matches;
 	protected String waitForText;
 	protected boolean ignoreCase, regex;
-	protected boolean waitingForMatches, waitingForRoom, waiting;
+	protected boolean waitingForMatches, waiting;
 	protected Timer timer = new Timer();
 	private final Lock lock = new ReentrantLock();
 	private final Condition gotText = lock.newCondition();
+	private final Condition nextRoom = lock.newCondition();
 	private String text;
 	private int textWaiters = 0;
 	
 	public ScriptCommands (IStormFrontClient client)
 	{
 		this.client = client;
-		waiting = waitingForMatches = waitingForRoom = waitingForRoundtime = false;
+		waiting = waitingForMatches = waitingForRoundtime = false;
 		
 		client.getDefaultStream().addStreamListener(this);
 		client.getRoundtime().addListener(this);
@@ -95,8 +96,14 @@ public class ScriptCommands implements IScriptCommands, IStreamListener, IProper
 	}
 
 	public void nextRoom (IScriptCallback callback) {
-		addCallback(callback);
-		waitingForRoom = true;
+		lock.lock();
+		try {
+			nextRoom.await();
+		} catch(Exception e) {
+			e.printStackTrace();
+		} finally {
+			lock.unlock();
+		}
 	}
 
 	public void pause (int seconds, final IScriptCallback callback) {
@@ -260,11 +267,11 @@ public class ScriptCommands implements IScriptCommands, IStreamListener, IProper
 	}
 	
 	public void movedToRoom() {
-		if (waitingForRoom)
-		{
-			sendEvent(new CallbackEvent(IScriptCallback.CallbackType.InNextRoom));
-			clearCallbacks();
-			waitingForRoom = false;
+		lock.lock();
+		try {
+			nextRoom.notifyAll();
+		} finally {
+			lock.unlock();
 		}
 	}
 	
