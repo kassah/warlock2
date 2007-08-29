@@ -20,11 +20,9 @@ public interface IScriptCommands {
 	
 	public Match matchWait (Match[] matches);
 	
-	public void pause (int seconds, IScriptCallback callback);
+	public void pause (int seconds);
 	
 	public void waitForPrompt (IScriptCallback callback);
-	
-	public void removeCallback (IScriptCallback callback);
 	
 	public IStormFrontClient getClient();
 	

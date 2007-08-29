@@ -26,22 +26,24 @@ public class ScriptCommands implements IScriptCommands, IStreamListener, IProper
 {
 
 	protected IStormFrontClient client;
-	protected ArrayList<IScriptCallback> callbacks = new ArrayList<IScriptCallback>();
 	protected Match[] matches;
 	protected Match waitForMatch;
-	protected boolean ignoreCase, regex;
-	protected boolean waitingForMatches, waiting;
 	protected Timer timer = new Timer();
 	private final Lock lock = new ReentrantLock();
+	
 	private final Condition gotText = lock.newCondition();
-	private final Condition nextRoom = lock.newCondition();
 	private String text;
 	private int textWaiters = 0;
+	
+	private final Condition nextRoom = lock.newCondition();
+	
+	private final Condition gotPrompt = lock.newCondition();
+	private int promptWaiters = 0;
 	
 	public ScriptCommands (IStormFrontClient client)
 	{
 		this.client = client;
-		waiting = waitingForMatches = waitingForRoundtime = false;
+		waitingForRoundtime = false;
 		
 		client.getDefaultStream().addStreamListener(this);
 		client.getRoundtime().addListener(this);
@@ -106,13 +108,12 @@ public class ScriptCommands implements IScriptCommands, IStreamListener, IProper
 		}
 	}
 
-	public void pause (int seconds, final IScriptCallback callback) {
-		timer.schedule(new TimerTask() {
-			public void run() {
-				CallbackEvent event = new CallbackEvent(IScriptCallback.CallbackType.FinishedPausing);
-				callback.handleCallback(event);
-			}
-		}, seconds*1000);
+	public void pause (int seconds) {
+		try {
+			Thread.sleep(seconds * 1000);
+		} catch(Exception e) {
+			e.printStackTrace();
+		}
 	}
 
 	public void put (String text) {
@@ -163,57 +164,15 @@ public class ScriptCommands implements IScriptCommands, IStreamListener, IProper
 	}
 
 	public void waitForPrompt (IScriptCallback callback) {
-		addCallback(callback);
-		waiting = true;
-		
-		timer.schedule(new TimerTask () {
-			public void run () {
-				if (client.getDefaultStream().isPrompting())
-				{
-					cancel();
-					waiting = false;
-					sendEvent(new CallbackEvent(IScriptCallback.CallbackType.FinishedWaitingForPrompt), false);
-				}
-			}
-		}, 200, 200);
-	}
-	
-	protected void addCallback (IScriptCallback callback)
-	{
-		callbacks.add(callback);
-	}
-	
-	public void removeCallback (IScriptCallback callback)
-	{
-		if (callbacks.contains(callback))
-		{
-			callbacks.remove(callback);
-		}
-	}
-	
-	protected void clearCallbacks ()
-	{
-		callbacks.clear();
-	}
-	
-	public void sendEvent (CallbackEvent event)
-	{
-		sendEvent(event, true);
-	}
-	
-	public void sendEvent (final CallbackEvent event, boolean asynch)
-	{
-		for (final IScriptCallback callback : callbacks) {
-			if (asynch)
-			{
-				timer.schedule(new TimerTask() {
-					public void run () {
-						callback.handleCallback(event);
-					}
-				}, 100);
-			} else {
-				callback.handleCallback(event);
-			}
+		lock.lock();
+		try {
+			promptWaiters++;
+			gotPrompt.await();
+		} catch(Exception e) {
+			e.printStackTrace();
+		} finally {
+			promptWaiters--;
+			lock.unlock();
 		}
 	}
 	
@@ -224,7 +183,19 @@ public class ScriptCommands implements IScriptCommands, IStreamListener, IProper
 	public void streamCleared(IStream stream) {}
 	public void streamEchoed(IStream stream, String text) {}
 	
-	public void streamPrompted(IStream stream, String prompt) { }
+	public void streamPrompted(IStream stream, String prompt) {
+		if(promptWaiters > 0) {
+			lock.lock();
+			try {
+				gotPrompt.signalAll();
+			} catch(Exception e) {
+				e.printStackTrace();
+			} finally {
+				lock.unlock();
+			}
+		}
+	}
+	
 	public void streamDonePrompting (IStream stream) { }
 	
 	public void streamReceivedText(IStream stream, IStyledString string) {

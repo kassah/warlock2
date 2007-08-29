@@ -52,8 +52,8 @@ public class JavascriptCommands implements IScriptCommands, IScriptCallback {
 		commands.nextRoom(callback);
 	}
 
-	public void pause(int seconds, IScriptCallback callback) {
-		commands.pause(seconds, callback);
+	public void pause(int seconds) {
+		commands.pause(seconds);
 	}
 
 	public void put(String text) {
@@ -62,10 +62,6 @@ public class JavascriptCommands implements IScriptCommands, IScriptCallback {
 
 	public void put(IScript script, String text) {
 		commands.put(script, text);
-	}
-
-	public void removeCallback(IScriptCallback callback) {
-		commands.removeCallback(callback);
 	}
 
 	public void waitFor(Match match) {

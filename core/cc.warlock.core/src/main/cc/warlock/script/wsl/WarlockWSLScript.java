@@ -159,8 +159,6 @@ public class WarlockWSLScript extends AbstractScript implements IScriptCallback,
 	}
 	
 	public void stop() {
-		commands.removeCallback(this);
-		
 		running = false;
 		stopped = true;
 		
@@ -168,7 +166,6 @@ public class WarlockWSLScript extends AbstractScript implements IScriptCallback,
 	}
 
 	public void suspend() {
-		commands.removeCallback(this);
 		running = false;
 		//pauseLine = nextLine;
 		
@@ -519,11 +516,11 @@ public class WarlockWSLScript extends AbstractScript implements IScriptCallback,
 				} catch(NumberFormatException e) {
 					time = 1;
 				}
-				commands.pause(time, WarlockWSLScript.this);
+				commands.pause(time);
 			}
 			else {
 				// "empty" pause.. means wait 1 second
-				commands.pause(1, WarlockWSLScript.this);
+				commands.pause(1);
 			}
 		}
 	}
