@@ -359,7 +359,7 @@ public class WarlockText extends StyledText implements LineBackgroundListener {
 	}
 	
 	private boolean isScrolledToBottom() {
-		if (vscroll.getSelection() >= vscroll.getMaximum() - vscroll.getPageIncrement() - 20) {
+		if (vscroll.getSelection() >= vscroll.getMaximum() - (vscroll.getPageIncrement() * 1.5)) {
 			return true;
 		} else {
 			return false;
