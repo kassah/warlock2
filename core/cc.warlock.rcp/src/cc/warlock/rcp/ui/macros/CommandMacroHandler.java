@@ -58,6 +58,7 @@ public class CommandMacroHandler implements IMacroHandler {
 					if (result != null)
 					{
 						newCommand = result;
+						i = 0;
 					}
 				}
 			}
