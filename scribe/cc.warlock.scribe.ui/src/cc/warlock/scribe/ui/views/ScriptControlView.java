@@ -87,13 +87,24 @@ public class ScriptControlView extends ViewPart implements IScriptListener {
 	public void setFocus() {}
 	
 	public void scriptPaused(IScript script) {
-		// TODO Auto-generated method stub
-		
+		if (script == currentScript)
+		{
+			pausePressed();
+		}
 	}
 	
 	public void scriptResumed(IScript script) {
-		// TODO Auto-generated method stub
-		
+		if (script == currentScript)
+		{
+			resumePressed();
+		}
+	}
+	
+	public void scriptStopped(IScript script, boolean userStopped) {
+		if (script == currentScript)
+		{
+			stopPressed();
+		}
 	}
 	
 	public void scriptStarted(IScript script) {
@@ -152,6 +163,26 @@ public class ScriptControlView extends ViewPart implements IScriptListener {
 		}, 1000, 1000);
 	}
 	
+	protected void stopPressed ()
+	{		
+		stop.setEnabled(false);
+		pause.setEnabled(false);
+		durationLabel.setText("finished");
+		durationLabel.setEnabled(false);
+	}
+	
+	protected void pausePressed ()
+	{
+		pause.setImage(ScribeSharedImages.getImage(ScribeSharedImages.IMG_RESUME));
+		pause.setText("Resume");
+	}
+	
+	protected void resumePressed ()
+	{
+		pause.setImage(ScribeSharedImages.getImage(ScribeSharedImages.IMG_SUSPEND));
+		pause.setText("Pause");
+	}
+	
 	private void updateScriptComposite (boolean create)
 	{
 		if (create) {
@@ -173,12 +204,10 @@ public class ScriptControlView extends ViewPart implements IScriptListener {
 				public void widgetSelected(SelectionEvent e) {
 					if (pause.getImage().equals(ScribeSharedImages.getImage(ScribeSharedImages.IMG_RESUME)))
 					{
-						pause.setImage(ScribeSharedImages.getImage(ScribeSharedImages.IMG_SUSPEND));
-						pause.setText("Pause");
+						resumePressed();
 						currentScript.resume();
 					} else {
-						pause.setImage(ScribeSharedImages.getImage(ScribeSharedImages.IMG_RESUME));
-						pause.setText("Resume");
+						pausePressed();
 						currentScript.suspend();
 					}
 				}
@@ -187,11 +216,7 @@ public class ScriptControlView extends ViewPart implements IScriptListener {
 			stop.addSelectionListener(new SelectionAdapter() {
 				public void widgetSelected(SelectionEvent e) {
 					currentScript.stop();
-					
-					stop.setEnabled(false);
-					pause.setEnabled(false);
-					durationLabel.setText("finished");
-					durationLabel.setEnabled(false);
+					stopPressed();
 				}
 			});
 		}
@@ -199,10 +224,5 @@ public class ScriptControlView extends ViewPart implements IScriptListener {
 		resetControls();
 		
 		if (create) main.layout();
-	}
-	
-	public void scriptStopped(IScript script, boolean userStopped) {
-		// TODO Auto-generated method stub
-		
 	}
 }
