@@ -380,6 +380,9 @@ public class ServerSettings implements Comparable<ServerSettings>
 		
 		for (HighlightString string : deletedHighlightStrings)
 		{
+			// don't send the delete command if it was re-added after it was marked for deletion
+			if (highlightStrings.containsKey(string.getText())) continue;
+			
 			if (saveNames && string.isName()) {
 				stringsDeleteMarkup.append(string.toStormfrontMarkup());
 				string.deleteFromDOM();
