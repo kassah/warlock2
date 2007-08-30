@@ -26,7 +26,6 @@ public class ScriptCommands implements IScriptCommands, IStreamListener, IProper
 	protected Match[] matches;
 	protected Match waitForMatch;
 	protected Timer timer = new Timer();
-	private int roundtimeWaiters = 0;
 	private final Lock lock = new ReentrantLock();
 	
 	private final Condition gotText = lock.newCondition();
@@ -55,6 +54,18 @@ public class ScriptCommands implements IScriptCommands, IStreamListener, IProper
 		client.getDefaultStream().echo("[" + script.getName() + "]: " + text);
 	}
 	
+	private void assertPrompt() {
+		while (!client.getDefaultStream().isPrompting())
+		{
+			try {
+				Thread.sleep(200);
+			} catch (InterruptedException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
+		}
+	}
+	
 	public Match matchWait (Match[] matches) {
 		lock.lock();
 		try {
@@ -77,10 +88,12 @@ public class ScriptCommands implements IScriptCommands, IStreamListener, IProper
 			}
 		} catch(Exception e) {
 			e.printStackTrace();
-		}finally {
+		} finally {
 			System.out.println("Done with matchwait");
 			textWaiters--;
 			lock.unlock();
+			assertPrompt();
+			waitForRoundtime();
 		}
 		return null;
 	}
@@ -99,6 +112,7 @@ public class ScriptCommands implements IScriptCommands, IStreamListener, IProper
 			e.printStackTrace();
 		} finally {
 			lock.unlock();
+			waitForRoundtime();
 		}
 	}
 
@@ -109,6 +123,7 @@ public class ScriptCommands implements IScriptCommands, IStreamListener, IProper
 			e.printStackTrace();
 		}
 		
+		assertPrompt();
 		waitForRoundtime();
 	}
 
@@ -122,15 +137,7 @@ public class ScriptCommands implements IScriptCommands, IStreamListener, IProper
 	}
 	
 	public void put (IScript script, String text) {
-		while (!client.getDefaultStream().isPrompting())
-		{
-			try {
-				Thread.sleep(200);
-			} catch (InterruptedException e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
-			}
-		}
+		assertPrompt();
 		
 		// false command so it doesn't get added to the command history
 		Command command = new Command(text, new Date());
@@ -156,6 +163,8 @@ public class ScriptCommands implements IScriptCommands, IStreamListener, IProper
 		} finally {
 			textWaiters--;
 			lock.unlock();
+			assertPrompt();
+			waitForRoundtime();
 		}
 	}
 
@@ -169,6 +178,7 @@ public class ScriptCommands implements IScriptCommands, IStreamListener, IProper
 		} finally {
 			promptWaiters--;
 			lock.unlock();
+			waitForRoundtime();
 		}
 	}
 	
