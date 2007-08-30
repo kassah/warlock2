@@ -197,7 +197,7 @@ public class GameView extends StreamView implements KeyListener, IStormFrontClie
 		});
 		entry.addKeyListener(this);
 		
-		setStormFrontClient(Warlock2Plugin.getDefault().getCurrentClient());
+		this.client = Warlock2Plugin.getDefault().getCurrentClient();
 	}
 	
 	public void setFocus() {
@@ -319,8 +319,6 @@ public class GameView extends StreamView implements KeyListener, IStormFrontClie
 	}
 	
 	public void setStormFrontClient(IStormFrontClient client) {
-		if (client == this.client) return;
-		
 		this.client = client;
 		
 		setMainStream(client.getDefaultStream());
