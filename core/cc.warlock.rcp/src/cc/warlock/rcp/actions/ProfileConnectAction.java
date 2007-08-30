@@ -59,7 +59,9 @@ public class ProfileConnectAction extends Action implements ISGEConnectionListen
 			}
 		};
 		
+		connectJob.setUser(true);
 		connectJob.schedule();
+		
 	}
 
 	public void loginReady(SGEConnection connection) {
