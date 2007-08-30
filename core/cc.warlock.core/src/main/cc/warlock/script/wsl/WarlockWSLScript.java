@@ -6,6 +6,9 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.locks.Condition;
+import java.util.concurrent.locks.Lock;
+import java.util.concurrent.locks.ReentrantLock;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -32,6 +35,9 @@ public class WarlockWSLScript extends AbstractScript implements Runnable {
 	protected int pauseLine;
 	protected Thread scriptThread;
 	private ArrayList<Match> matchset = new ArrayList<Match>();
+	
+	private final Lock lock = new ReentrantLock();
+	private final Condition gotResume = lock.newCondition();
 	
 	private static final String argSeparator = "\\s+";
 	
@@ -135,10 +141,24 @@ public class WarlockWSLScript extends AbstractScript implements Runnable {
 		doStart();
 		
 		while(curLine != null && !stopped) {
+			checkState();
 			nextLine = curLine.getNext();
 			
 			curLine.execute();
 			curLine = nextLine;
+		}
+	}
+	
+	private void checkState() {
+		while(!running && !stopped) {
+			lock.lock();
+			try {
+				gotResume.await();
+			} catch(Exception e) {
+				e.printStackTrace();
+			} finally {
+				lock.unlock();
+			}
 		}
 	}
 	
@@ -160,6 +180,7 @@ public class WarlockWSLScript extends AbstractScript implements Runnable {
 		running = false;
 		stopped = true;
 		
+		commands.echo("[script stopped: " + scriptName + "]");
 		super.stop();
 	}
 
@@ -179,6 +200,15 @@ public class WarlockWSLScript extends AbstractScript implements Runnable {
 		commands.echo("[script resumed: " + scriptName + "]");
 
 		super.resume();
+		
+		lock.lock();
+		try {
+			gotResume.signalAll();
+		} catch(Exception e) {
+			e.printStackTrace();
+		} finally {
+			lock.unlock();
+		}
 	}
 	
 	protected void addCommand (WarlockWSLCommand command) {
@@ -506,20 +536,19 @@ public class WarlockWSLScript extends AbstractScript implements Runnable {
 		public void execute (String arguments)
 		{
 			String[] args = arguments.split(argSeparator);
+			int time = 1;
+			
 			if (args.length >= 1)
 			{
-				int time;
 				try {
 					time = Integer.parseInt(args[0]);
 				} catch(NumberFormatException e) {
-					time = 1;
+					// time = 1;
 				}
-				commands.pause(time);
-			}
-			else {
+			} else {
 				// "empty" pause.. means wait 1 second
-				commands.pause(1);
 			}
+			commands.pause(time);
 		}
 	}
 	

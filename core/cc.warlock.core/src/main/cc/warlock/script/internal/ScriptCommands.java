@@ -108,6 +108,8 @@ public class ScriptCommands implements IScriptCommands, IStreamListener, IProper
 		} catch(Exception e) {
 			e.printStackTrace();
 		}
+		
+		waitForRoundtime();
 	}
 
 	public void put (String text) {
