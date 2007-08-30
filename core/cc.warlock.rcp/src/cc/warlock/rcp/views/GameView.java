@@ -46,6 +46,7 @@ import cc.warlock.configuration.server.ServerSettings;
 import cc.warlock.configuration.skin.IWarlockSkin;
 import cc.warlock.rcp.actions.ProfileConnectAction;
 import cc.warlock.rcp.application.WarlockApplication;
+import cc.warlock.rcp.plugin.Warlock2Plugin;
 import cc.warlock.rcp.ui.WarlockCompass;
 import cc.warlock.rcp.ui.WarlockText;
 import cc.warlock.rcp.ui.client.SWTStormFrontClientViewer;
@@ -76,8 +77,9 @@ public class GameView extends StreamView implements KeyListener, IStormFrontClie
 	private Font normalFont = JFaceResources.getDefaultFont();
 	
 	public GameView () {
-		if (firstInstance == null)
+		if (firstInstance == null) {
 			firstInstance = this;
+		}
 		
 		currentCommand = new Command("", new Date());
 		wrapper = new SWTStormFrontClientViewer(this);
@@ -194,6 +196,8 @@ public class GameView extends StreamView implements KeyListener, IStormFrontClie
 			}
 		});
 		entry.addKeyListener(this);
+		
+		setStormFrontClient(Warlock2Plugin.getDefault().getCurrentClient());
 	}
 	
 	public void setFocus() {
@@ -322,7 +326,7 @@ public class GameView extends StreamView implements KeyListener, IStormFrontClie
 		
 		client.addViewer(wrapper);
 		
-		text.setText("");
+//		text.setText("");
 		
 		compass.setCompass(client.getCompass());
 		

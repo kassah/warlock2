@@ -20,40 +20,7 @@ import cc.warlock.rcp.views.GameView;
 
 
 public class PreferencesHandler extends SimpleCommandHandler
-{
-	protected boolean enabled = false;
-	protected boolean added = false;
-	
-	@Override
-	public boolean isEnabled() {
-		if (!added)
-		{
-			final IStormFrontClient currentClient = Warlock2Plugin.getDefault().getCurrentClient();
-			
-			if (currentClient.getConnection() != null)
-			{
-				enabled = true;
-				added = true;
-			}
-			else {
-				WarlockClientRegistry.addWarlockClientListener(new IWarlockClientListener() {
-					public void clientActivated(IWarlockClient client) {}
-					public void clientConnected(IWarlockClient client) {
-						if (client == currentClient) {
-							enabled = true;
-							WarlockClientRegistry.removeWarlockClientListener(this);
-						}
-					}
-					public void clientDisconnected(IWarlockClient client) {}
-					public void clientRemoved(IWarlockClient client) {}
-				});
-				added = true;
-			}
-		}
-		
-		return enabled;
-	}
-	
+{	
 	public Object execute(ExecutionEvent event) throws ExecutionException {
 		
 		PreferenceDialog dialog = PreferencesUtil.createPropertyDialogOn(Display.getDefault().getActiveShell(),
