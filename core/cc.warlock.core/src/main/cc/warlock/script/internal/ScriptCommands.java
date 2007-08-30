@@ -2,7 +2,6 @@ package cc.warlock.script.internal;
 
 import java.util.Date;
 import java.util.Timer;
-import java.util.TimerTask;
 import java.util.concurrent.locks.Condition;
 import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReentrantLock;
@@ -55,6 +54,7 @@ public class ScriptCommands implements IScriptCommands, IStreamListener, IProper
 	}
 	
 	private void assertPrompt() {
+		/*
 		while (!client.getDefaultStream().isPrompting())
 		{
 			try {
@@ -63,7 +63,7 @@ public class ScriptCommands implements IScriptCommands, IStreamListener, IProper
 				// TODO Auto-generated catch block
 				e.printStackTrace();
 			}
-		}
+		}*/
 	}
 	
 	public Match matchWait (Match[] matches) {
@@ -92,7 +92,6 @@ public class ScriptCommands implements IScriptCommands, IStreamListener, IProper
 			System.out.println("Done with matchwait");
 			textWaiters--;
 			lock.unlock();
-			assertPrompt();
 			waitForRoundtime();
 		}
 		return null;
@@ -123,7 +122,6 @@ public class ScriptCommands implements IScriptCommands, IStreamListener, IProper
 			e.printStackTrace();
 		}
 		
-		assertPrompt();
 		waitForRoundtime();
 	}
 
@@ -163,7 +161,6 @@ public class ScriptCommands implements IScriptCommands, IStreamListener, IProper
 		} finally {
 			textWaiters--;
 			lock.unlock();
-			assertPrompt();
 			waitForRoundtime();
 		}
 	}
@@ -266,6 +263,7 @@ public class ScriptCommands implements IScriptCommands, IStreamListener, IProper
 	protected boolean waitingForRoundtime;
 	public void waitForRoundtime ()
 	{
+		assertPrompt();
 		try {
 			while(client.getRoundtime().get() > 0) {
 				Thread.sleep(client.getRoundtime().get() * 1000);
