@@ -398,23 +398,6 @@ public class ServerSettings implements Comparable<ServerSettings>
 			paletteMarkup = palette.toStormfrontMarkup();
 		}
 		
-		if (stringsUpdateMarkup.length() > 0)
-		{
-			sendSettingsUpdate(
-				PRESET_OR_STRING_SETTING_UPDATE_PREFIX +
-				(saveNames ? 
-					HighlightString.STORMFRONT_NAMES_MARKUP_PREFIX :
-					HighlightString.STORMFRONT_STRINGS_MARKUP_PREFIX)
-				+ ServerSetting.UPDATE_PREFIX,
-				stringsUpdateMarkup,
-				ServerSetting.UPDATE_SUFFIX +
-				(saveNames ?
-					HighlightString.STORMFRONT_NAMES_MARKUP_SUFFIX :
-					HighlightString.STORMFRONT_STRINGS_MARKUP_SUFFIX) +
-				IGNORES_TEXT +
-				paletteMarkup);
-		}
-		
 		if (stringsDeleteMarkup.length() > 0)
 		{
 			sendSettingsUpdate(
@@ -433,6 +416,25 @@ public class ServerSettings implements Comparable<ServerSettings>
 			
 			deletedHighlightStrings.clear();
 		}
+		
+		if (stringsUpdateMarkup.length() > 0)
+		{
+			sendSettingsUpdate(
+				PRESET_OR_STRING_SETTING_UPDATE_PREFIX +
+				(saveNames ? 
+					HighlightString.STORMFRONT_NAMES_MARKUP_PREFIX :
+					HighlightString.STORMFRONT_STRINGS_MARKUP_PREFIX)
+				+ ServerSetting.UPDATE_PREFIX,
+				stringsUpdateMarkup,
+				ServerSetting.UPDATE_SUFFIX +
+				(saveNames ?
+					HighlightString.STORMFRONT_NAMES_MARKUP_SUFFIX :
+					HighlightString.STORMFRONT_STRINGS_MARKUP_SUFFIX) +
+				IGNORES_TEXT +
+				paletteMarkup);
+		}
+		
+
 		
 		saveLocalXml();
 	}
