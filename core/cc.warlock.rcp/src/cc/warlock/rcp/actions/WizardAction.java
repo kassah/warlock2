@@ -9,6 +9,8 @@ import org.eclipse.jface.wizard.IWizard;
 import org.eclipse.jface.wizard.WizardDialog;
 import org.eclipse.swt.widgets.Display;
 
+import cc.warlock.rcp.ui.WarlockWizardDialog;
+
 /**
  * @author Marshall
  */
@@ -29,7 +31,7 @@ public class WizardAction extends Action {
 	
 	public void run() {
 		try {
-			WizardDialog dialog = new WizardDialog (Display.getCurrent().getActiveShell(), wizardClass.newInstance());
+			WarlockWizardDialog dialog = new WarlockWizardDialog (Display.getCurrent().getActiveShell(), wizardClass.newInstance());
 			dialog.create();
 			dialog.getShell().setSize(450, 500);
 			int response = dialog.open();

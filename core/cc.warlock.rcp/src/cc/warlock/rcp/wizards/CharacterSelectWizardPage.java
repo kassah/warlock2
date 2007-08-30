@@ -35,6 +35,7 @@ import cc.warlock.configuration.SavedProfiles;
 import cc.warlock.network.SGEConnection;
 import cc.warlock.network.SGEConnectionListener;
 import cc.warlock.rcp.ui.WarlockSharedImages;
+import cc.warlock.rcp.ui.WarlockWizardDialog;
 import cc.warlock.rcp.ui.network.SWTSGEConnectionListenerAdapter;
 import cc.warlock.rcp.util.LoginUtil;
 
@@ -90,8 +91,11 @@ public class CharacterSelectWizardPage extends WizardPage {
 				characterSelected(characterViewer.getSelection());
 				
 				complete = true;
-				getWizard().performFinish();
-				getWizard().dispose();
+				if (getWizard().getContainer() instanceof WarlockWizardDialog)
+				{
+					WarlockWizardDialog dialog = (WarlockWizardDialog) getWizard().getContainer();
+					dialog.finish();
+				}
 			}
 		});
 		setControl(controls);
