@@ -37,6 +37,12 @@ public class ScriptControlView extends ViewPart implements IScriptListener {
 	protected Label scriptNameLabel, durationLabel;
 	protected int duration = 0;
 	protected IScript currentScript;
+
+	protected void setClient (IStormFrontClient client)
+	{
+		this.client = client;
+		client.addScriptListener(wrapper);
+	}
 	
 	protected void updateCurrentClient ()
 	{
@@ -45,7 +51,7 @@ public class ScriptControlView extends ViewPart implements IScriptListener {
 			IWarlockClient client = WarlockClientRegistry.getActiveClients().get(0);
 			if (client instanceof IStormFrontClient)
 			{
-				this.client = (IStormFrontClient) client;
+				setClient((IStormFrontClient) client);
 			}
 		} else {
 			WarlockClientRegistry.addWarlockClientListener(new SWTWarlockClientListener(
@@ -53,8 +59,7 @@ public class ScriptControlView extends ViewPart implements IScriptListener {
 				public void clientActivated(IWarlockClient client) {
 					if (client instanceof IStormFrontClient)
 					{
-						ScriptControlView.this.client = (IStormFrontClient) client;
-						ScriptControlView.this.client.addScriptListener(ScriptControlView.this.wrapper);
+						setClient((IStormFrontClient) client);
 					}
 				}
 				public void clientConnected(IWarlockClient client) {}
