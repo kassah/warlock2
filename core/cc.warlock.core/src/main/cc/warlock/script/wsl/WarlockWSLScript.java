@@ -381,6 +381,7 @@ public class WarlockWSLScript extends AbstractScript implements Runnable {
 				matchset.clear();
 				gotoLabel((String)match.getAttribute("label"));
 				commands.waitForPrompt();
+				commands.waitForRoundtime();
 			} else {
 				commands.echo("*** Internal error, no match was found!! ***\n");
 			}

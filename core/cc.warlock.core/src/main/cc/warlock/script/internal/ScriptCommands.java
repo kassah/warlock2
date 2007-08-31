@@ -54,7 +54,6 @@ public class ScriptCommands implements IScriptCommands, IStreamListener, IProper
 	}
 	
 	private void assertPrompt() {
-		/*
 		while (!client.getDefaultStream().isPrompting())
 		{
 			try {
@@ -63,7 +62,7 @@ public class ScriptCommands implements IScriptCommands, IStreamListener, IProper
 				// TODO Auto-generated catch block
 				e.printStackTrace();
 			}
-		}*/
+		}
 	}
 	
 	public Match matchWait (Match[] matches) {
@@ -92,7 +91,6 @@ public class ScriptCommands implements IScriptCommands, IStreamListener, IProper
 			System.out.println("Done with matchwait");
 			textWaiters--;
 			lock.unlock();
-			waitForRoundtime();
 		}
 		return null;
 	}
