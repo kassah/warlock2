@@ -147,6 +147,8 @@ public class WarlockWSLScript extends AbstractScript implements Runnable {
 			curLine.execute();
 			curLine = nextLine;
 		}
+		
+		stop();
 	}
 	
 	private void checkState() {
