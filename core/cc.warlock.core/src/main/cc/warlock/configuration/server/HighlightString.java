@@ -6,13 +6,13 @@ public class HighlightString extends Preset {
 
 	public static final String KEY_TEXT = "text";
 	
-	public static final String STORMFRONT_STRINGS_MARKUP_PREFIX = "<strings>";
-	public static final String STORMFRONT_STRINGS_MARKUP_SUFFIX = "</strings>";
-	public static final String STORMFRONT_NAMES_MARKUP_PREFIX = "<names>";
-	public static final String STORMFRONT_NAMES_MARKUP_SUFFIX = "</names>";
+	public static final String STRINGS_PREFIX = "<strings>";
+	public static final String STRINGS_SUFFIX = "</strings>";
+	public static final String NAMES_PREFIX = "<names>";
+	public static final String NAMES_SUFFIX = "</names>";
 	
 	protected String text;
-	protected boolean isName;
+	protected boolean isName, isNew = false;
 	protected HighlightString originalString;
 	
 	protected HighlightString (ServerSettings serverSettings)
@@ -26,6 +26,7 @@ public class HighlightString extends Preset {
 		
 		this.text = other.text == null ? null : new String(other.text);
 		this.isName = other.isName;
+		this.isNew = other.isNew;
 		this.originalString = other;
 	}
 	
@@ -73,6 +74,30 @@ public class HighlightString extends Preset {
 			(fillEntireLine ? (" " + KEY_FILL_ENTIRE_LINE + "=\"y\"/>") : "/>");
 	}
 	
+	protected String toStormfrontAddMarkup ()
+	{
+		String aPrefix = (isName ? NAMES_PREFIX : STRINGS_PREFIX) + ADD_PREFIX;
+		String aSuffix = ADD_SUFFIX + (isName ? NAMES_SUFFIX : STRINGS_SUFFIX);	
+		String mPrefix = (isName ? NAMES_PREFIX : STRINGS_PREFIX) + UPDATE_PREFIX;
+		String mSuffix = UPDATE_SUFFIX + (isName ? NAMES_SUFFIX : STRINGS_SUFFIX);
+		
+		String emptyTag = "<h";
+		String justTextTag = emptyTag + " text=\"" + getText() + "\"";
+		String textAndColorTag = justTextTag + " " + KEY_FGCOLOR + "=\"" + foregroundColor + "\"";
+		String textAndColorsTag = textAndColorTag + " " + KEY_BGCOLOR + "=\"" + (backgroundColor == null ? "" : backgroundColor) + "\"";
+		String allAttribsTag = textAndColorsTag + (fillEntireLine ? (" " + KEY_FILL_ENTIRE_LINE + "=\"y\"/>") : "/>");
+		
+		emptyTag += "/>"; justTextTag += "/>"; textAndColorTag += "/>"; textAndColorsTag += "/>";
+		
+		return 
+			aPrefix + emptyTag + aSuffix +
+			mPrefix + emptyTag + justTextTag + mSuffix +
+			mPrefix + justTextTag + textAndColorTag + mSuffix +
+			mPrefix + textAndColorTag + textAndColorsTag + mSuffix +
+			(fillEntireLine ?
+				mPrefix + textAndColorsTag + allAttribsTag + mSuffix : "");
+	}
+	
 	public static HighlightString createHighlightStringFromParent (ServerSettings serverSettings, Element parent)
 	{
 		Element element = parent.addElement("h");
@@ -107,5 +132,13 @@ public class HighlightString extends Preset {
 	@Override
 	public String toString() {
 		return (isName ? "name: " : "string: ") + text;
+	}
+
+	public boolean isNew() {
+		return isNew;
+	}
+
+	public void setNew(boolean isNew) {
+		this.isNew = isNew;
 	}
 }

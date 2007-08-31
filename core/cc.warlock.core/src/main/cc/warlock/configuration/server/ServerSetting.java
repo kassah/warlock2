@@ -8,6 +8,8 @@ public abstract class ServerSetting {
 	public static final String UPDATE_SUFFIX = "</<m>";
 	public static final String DELETE_PREFIX = "<<d>";
 	public static final String DELETE_SUFFIX = "</<d>";
+	public static final String ADD_PREFIX = "<<a>";
+	public static final String ADD_SUFFIX = "</<a>";
 	
 	protected Element element;
 	protected ServerSettings serverSettings;

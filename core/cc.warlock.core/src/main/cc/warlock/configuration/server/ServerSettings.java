@@ -335,6 +335,10 @@ public class ServerSettings implements Comparable<ServerSettings>
 	
 	public void updateHighlightString (HighlightString string)
 	{
+		if (!highlightStrings.containsKey(string.getText()))
+		{
+			string.setNew(true);
+		}
 		highlightStrings.put(string.getText(), string);
 	}
 	
@@ -349,6 +353,7 @@ public class ServerSettings implements Comparable<ServerSettings>
 	
 	protected void saveHighlights(boolean saveNames)
 	{
+		StringBuffer stringsAddMarkup = new StringBuffer();
 		StringBuffer stringsUpdateMarkup = new StringBuffer();
 		StringBuffer stringsDeleteMarkup = new StringBuffer();
 		
@@ -357,23 +362,33 @@ public class ServerSettings implements Comparable<ServerSettings>
 			if (saveNames && string.isName()) {
 				if (string.needsUpdate())
 				{
-					if (string.getOriginalHighlightString() != null)
-						stringsUpdateMarkup.append(string.getOriginalHighlightString().toStormfrontMarkup());
-					
-					stringsUpdateMarkup.append(string.toStormfrontMarkup());
-					string.saveToDOM();
-					string.setNeedsUpdate(false);
+					if (!string.isNew())
+					{
+						if (string.getOriginalHighlightString() != null)
+							stringsUpdateMarkup.append(string.getOriginalHighlightString().toStormfrontMarkup());
+						
+						stringsUpdateMarkup.append(string.toStormfrontMarkup());
+						string.saveToDOM();
+						string.setNeedsUpdate(false);
+					} else {
+						stringsAddMarkup.append(string.toStormfrontAddMarkup());
+					}
 				}
 			}
 			else if (!saveNames && !string.isName()) {
 				if (string.needsUpdate())
 				{
-					if (string.getOriginalHighlightString() != null)
-						stringsUpdateMarkup.append(string.getOriginalHighlightString().toStormfrontMarkup());
-					
-					stringsUpdateMarkup.append(string.toStormfrontMarkup());
-					string.saveToDOM();
-					string.setNeedsUpdate(false);
+					if (!string.isNew())
+					{
+						if (string.getOriginalHighlightString() != null)
+							stringsUpdateMarkup.append(string.getOriginalHighlightString().toStormfrontMarkup());
+						
+						stringsUpdateMarkup.append(string.toStormfrontMarkup());
+						string.saveToDOM();
+						string.setNeedsUpdate(false);
+					} else {
+						stringsAddMarkup.append(string.toStormfrontAddMarkup());
+					}
 				}
 			}
 		}
@@ -406,18 +421,23 @@ public class ServerSettings implements Comparable<ServerSettings>
 			sendSettingsUpdate(
 				PRESET_OR_STRING_SETTING_UPDATE_PREFIX +
 				(saveNames ?
-					HighlightString.STORMFRONT_NAMES_MARKUP_PREFIX :
-					HighlightString.STORMFRONT_STRINGS_MARKUP_PREFIX)
+					HighlightString.NAMES_PREFIX :
+					HighlightString.STRINGS_PREFIX)
 				+ ServerSetting.DELETE_PREFIX,
 				stringsDeleteMarkup,
 				ServerSetting.DELETE_SUFFIX +
 				(saveNames ?
-					HighlightString.STORMFRONT_NAMES_MARKUP_SUFFIX :
-					HighlightString.STORMFRONT_STRINGS_MARKUP_SUFFIX) +
+					HighlightString.NAMES_SUFFIX :
+					HighlightString.STRINGS_SUFFIX) +
 				IGNORES_TEXT +
 				paletteMarkup);
 			
 			deletedHighlightStrings.clear();
+		}
+		
+		if (stringsAddMarkup.length() > 0)
+		{
+			sendSettingsUpdate(PRESET_OR_STRING_SETTING_UPDATE_PREFIX, stringsAddMarkup, IGNORES_TEXT + paletteMarkup);
 		}
 		
 		if (stringsUpdateMarkup.length() > 0)
@@ -425,14 +445,14 @@ public class ServerSettings implements Comparable<ServerSettings>
 			sendSettingsUpdate(
 				PRESET_OR_STRING_SETTING_UPDATE_PREFIX +
 				(saveNames ? 
-					HighlightString.STORMFRONT_NAMES_MARKUP_PREFIX :
-					HighlightString.STORMFRONT_STRINGS_MARKUP_PREFIX)
+					HighlightString.NAMES_PREFIX :
+					HighlightString.STRINGS_PREFIX)
 				+ ServerSetting.UPDATE_PREFIX,
 				stringsUpdateMarkup,
 				ServerSetting.UPDATE_SUFFIX +
 				(saveNames ?
-					HighlightString.STORMFRONT_NAMES_MARKUP_SUFFIX :
-					HighlightString.STORMFRONT_STRINGS_MARKUP_SUFFIX) +
+					HighlightString.NAMES_SUFFIX :
+					HighlightString.STRINGS_SUFFIX) +
 				IGNORES_TEXT +
 				paletteMarkup);
 		}
