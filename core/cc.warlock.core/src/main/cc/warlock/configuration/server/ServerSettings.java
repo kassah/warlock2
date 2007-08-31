@@ -6,6 +6,7 @@ import java.io.FileWriter;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Date;
 import java.util.Hashtable;
 
 import org.dom4j.Document;
@@ -13,7 +14,9 @@ import org.dom4j.DocumentException;
 import org.dom4j.Element;
 import org.dom4j.io.SAXReader;
 
+import cc.warlock.client.ICommand;
 import cc.warlock.client.IWarlockClientViewer;
+import cc.warlock.client.internal.Command;
 import cc.warlock.client.stormfront.IStormFrontClient;
 import cc.warlock.client.stormfront.IStormFrontClientViewer;
 import cc.warlock.client.stormfront.WarlockColor;
@@ -31,7 +34,8 @@ public class ServerSettings implements Comparable<ServerSettings>
 	public static final String IGNORES_TEXT = "<<m><ignores disable=\"n\"></ignores><ignores disable=\"n\"></ignores></<m>";
 	
 	private IStormFrontClient client;
-	private String playerId;
+	private String playerId, clientVersion;
+	private int majorVersion;
 	private Document document;
 	protected Palette palette;
 	protected Hashtable<String, Preset> presets = new Hashtable<String,Preset>();
@@ -122,6 +126,7 @@ public class ServerSettings implements Comparable<ServerSettings>
 			}
 			
 			stream.close();
+			incrementMajorVersion();
 		} catch (FileNotFoundException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
@@ -236,6 +241,21 @@ public class ServerSettings implements Comparable<ServerSettings>
 				}
 			}
 		}
+	}
+	
+	protected void incrementMajorVersion ()
+	{
+		// Needed so our settings are validated by other Stormfront clients
+		
+		ICommand command = new Command(
+			PRESET_OR_STRING_SETTING_UPDATE_PREFIX +
+			ServerSetting.UPDATE_PREFIX +
+			"<settings client=\"" + clientVersion + "\" major=\"" + majorVersion + "\"></settings>" +
+			"<settings client=\"" + clientVersion + "\" major=\"" + (++majorVersion) + "\"></settings>" +
+			ServerSetting.UPDATE_SUFFIX, new Date());
+		command.setInHistory(true);
+		
+		client.send(command);
 	}
 	
 	public String getFontFaceSetting (FontFaceType settingType)
@@ -357,33 +377,33 @@ public class ServerSettings implements Comparable<ServerSettings>
 		StringBuffer stringsUpdateMarkup = new StringBuffer();
 		StringBuffer stringsDeleteMarkup = new StringBuffer();
 		
+		String paletteMarkup = "";
+		if (palette.needsUpdate())
+		{
+			paletteMarkup = palette.toStormfrontMarkup();
+		}
+		
 		for (HighlightString string : highlightStrings.values())
 		{
-			if (saveNames && string.isName()) {
+			if (string.isName() == saveNames) {
 				if (string.needsUpdate())
 				{
 					if (!string.isNew())
 					{
+						stringsUpdateMarkup.append(saveNames ?
+								HighlightString.NAMES_PREFIX :
+									HighlightString.STRINGS_PREFIX);
+						stringsUpdateMarkup.append(ServerSetting.UPDATE_PREFIX);
+						
 						if (string.getOriginalHighlightString() != null)
 							stringsUpdateMarkup.append(string.getOriginalHighlightString().toStormfrontMarkup());
 						
 						stringsUpdateMarkup.append(string.toStormfrontMarkup());
-						string.saveToDOM();
-						string.setNeedsUpdate(false);
-					} else {
-						stringsAddMarkup.append(string.toStormfrontAddMarkup());
-					}
-				}
-			}
-			else if (!saveNames && !string.isName()) {
-				if (string.needsUpdate())
-				{
-					if (!string.isNew())
-					{
-						if (string.getOriginalHighlightString() != null)
-							stringsUpdateMarkup.append(string.getOriginalHighlightString().toStormfrontMarkup());
+						stringsUpdateMarkup.append(ServerSetting.UPDATE_SUFFIX);
+						stringsUpdateMarkup.append(saveNames ?
+								HighlightString.NAMES_SUFFIX :
+									HighlightString.STRINGS_SUFFIX);
 						
-						stringsUpdateMarkup.append(string.toStormfrontMarkup());
 						string.saveToDOM();
 						string.setNeedsUpdate(false);
 					} else {
@@ -398,39 +418,24 @@ public class ServerSettings implements Comparable<ServerSettings>
 			// don't send the delete command if it was re-added after it was marked for deletion
 			if (highlightStrings.containsKey(string.getText())) continue;
 			
-			if (saveNames && string.isName()) {
+			if (saveNames == string.isName()) {
+				stringsDeleteMarkup.append(saveNames ?
+						HighlightString.NAMES_PREFIX :
+							HighlightString.STRINGS_PREFIX);
+				stringsDeleteMarkup.append(ServerSetting.DELETE_PREFIX);
 				stringsDeleteMarkup.append(string.toStormfrontMarkup());
+				stringsDeleteMarkup.append(ServerSetting.DELETE_SUFFIX);
+				stringsDeleteMarkup.append(saveNames ?
+						HighlightString.NAMES_SUFFIX :
+							HighlightString.STRINGS_SUFFIX);
+				
 				string.deleteFromDOM();
 			}
-			else if (!saveNames && !string.isName())
-			{
-				stringsDeleteMarkup.append(string.toStormfrontMarkup());
-				string.deleteFromDOM();
-			}
-		}
-		
-		// Palette changes are appended onto the end of highlight strings
-		String paletteMarkup = "";
-		if (palette.needsUpdate())
-		{
-			paletteMarkup = palette.toStormfrontMarkup();
 		}
 		
 		if (stringsDeleteMarkup.length() > 0)
 		{
-			sendSettingsUpdate(
-				PRESET_OR_STRING_SETTING_UPDATE_PREFIX +
-				(saveNames ?
-					HighlightString.NAMES_PREFIX :
-					HighlightString.STRINGS_PREFIX)
-				+ ServerSetting.DELETE_PREFIX,
-				stringsDeleteMarkup,
-				ServerSetting.DELETE_SUFFIX +
-				(saveNames ?
-					HighlightString.NAMES_SUFFIX :
-					HighlightString.STRINGS_SUFFIX) +
-				IGNORES_TEXT +
-				paletteMarkup);
+			sendSettingsUpdate(PRESET_OR_STRING_SETTING_UPDATE_PREFIX, stringsDeleteMarkup, IGNORES_TEXT + paletteMarkup);
 			
 			deletedHighlightStrings.clear();
 		}
@@ -442,22 +447,8 @@ public class ServerSettings implements Comparable<ServerSettings>
 		
 		if (stringsUpdateMarkup.length() > 0)
 		{
-			sendSettingsUpdate(
-				PRESET_OR_STRING_SETTING_UPDATE_PREFIX +
-				(saveNames ? 
-					HighlightString.NAMES_PREFIX :
-					HighlightString.STRINGS_PREFIX)
-				+ ServerSetting.UPDATE_PREFIX,
-				stringsUpdateMarkup,
-				ServerSetting.UPDATE_SUFFIX +
-				(saveNames ?
-					HighlightString.NAMES_SUFFIX :
-					HighlightString.STRINGS_SUFFIX) +
-				IGNORES_TEXT +
-				paletteMarkup);
+			sendSettingsUpdate(PRESET_OR_STRING_SETTING_UPDATE_PREFIX, stringsUpdateMarkup, IGNORES_TEXT + paletteMarkup);
 		}
-		
-
 		
 		saveLocalXml();
 	}
@@ -585,5 +576,21 @@ public class ServerSettings implements Comparable<ServerSettings>
 	public ServerScript getServerScript (String scriptName)
 	{
 		return scripts.get(scriptName);
+	}
+
+	public int getMajorVersion() {
+		return majorVersion;
+	}
+
+	public void setMajorVersion(int majorVersion) {
+		this.majorVersion = majorVersion;
+	}
+
+	public String getClientVersion() {
+		return clientVersion;
+	}
+
+	public void setClientVersion(String clientVersion) {
+		this.clientVersion = clientVersion;
 	}
 }

@@ -10,7 +10,8 @@ import cc.warlock.stormfront.IStormFrontProtocolHandler;
 
 public class SettingsInfoTagHandler extends DefaultTagHandler {
 
-	protected String crc;
+	protected String crc, clientVersion;
+	protected int majorVersion;
 	
 	public SettingsInfoTagHandler(IStormFrontProtocolHandler handler) {
 		super (handler);
@@ -24,6 +25,11 @@ public class SettingsInfoTagHandler extends DefaultTagHandler {
 	@Override
 	public void handleStart(Map<String, String> attributes) {
 		crc = attributes.get("crc");
+		majorVersion = Integer.parseInt(attributes.get("major"));
+		clientVersion = attributes.get("client");
+		
+		handler.getClient().getServerSettings().setMajorVersion(majorVersion);
+		handler.getClient().getServerSettings().setClientVersion(clientVersion);
 	}
 	
 	@Override
