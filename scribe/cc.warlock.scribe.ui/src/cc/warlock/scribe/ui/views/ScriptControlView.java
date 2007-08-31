@@ -150,7 +150,7 @@ public class ScriptControlView extends ViewPart implements IScriptListener {
 		stop.setEnabled(true);
 		durationLabel.setEnabled(true);
 		
-		durationLabel.setText("running: 0s      ");
+		durationLabel.setText("running: 00h 00m 00s");
 		
 		final Timer timer = new Timer();
 		timer.schedule(new TimerTask () {
