@@ -28,4 +28,6 @@ public interface IScriptCommands {
 	public IStormFrontClient getClient();
 	
 	public void movedToRoom();
+	
+	public void stop();
 }

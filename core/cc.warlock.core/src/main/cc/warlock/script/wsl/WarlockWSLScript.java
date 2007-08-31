@@ -148,7 +148,8 @@ public class WarlockWSLScript extends AbstractScript implements Runnable {
 			curLine = nextLine;
 		}
 		
-		stop();
+		if(!stopped)
+			stop();
 	}
 	
 	private void checkState() {
@@ -181,6 +182,7 @@ public class WarlockWSLScript extends AbstractScript implements Runnable {
 	public void stop() {
 		running = false;
 		stopped = true;
+		commands.stop();
 		
 		commands.echo("[script stopped: " + scriptName + "]");
 		super.stop();
@@ -585,6 +587,9 @@ public class WarlockWSLScript extends AbstractScript implements Runnable {
 		public void execute (String arguments) {
 			running = false;
 			stopped = true;
+			
+			// TODO figure out if we should make this call here or elsewhere
+			stop();
 		}
 	}
 	

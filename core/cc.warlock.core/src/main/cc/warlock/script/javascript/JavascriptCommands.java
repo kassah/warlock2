@@ -96,4 +96,8 @@ public class JavascriptCommands implements IScriptCommands {
 		
 		return m;
 	}
+	
+	public void stop() {
+		commands.stop();
+	}
 }

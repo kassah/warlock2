@@ -1,7 +1,6 @@
 package cc.warlock.script.internal;
 
 import java.util.Date;
-import java.util.Timer;
 import java.util.concurrent.locks.Condition;
 import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReentrantLock;
@@ -24,17 +23,22 @@ public class ScriptCommands implements IScriptCommands, IStreamListener, IProper
 	protected IStormFrontClient client;
 	protected Match[] matches;
 	protected Match waitForMatch;
-	protected Timer timer = new Timer();
 	private final Lock lock = new ReentrantLock();
 	
-	private final Condition gotText = lock.newCondition();
+	private final Condition gotTextCond = lock.newCondition();
 	private String text;
 	private int textWaiters = 0;
 	
 	private final Condition nextRoom = lock.newCondition();
+	private boolean roomWaiting = false;
 	
-	private final Condition gotPrompt = lock.newCondition();
+	private final Condition gotPromptCond = lock.newCondition();
 	private int promptWaiters = 0;
+	private boolean gotPrompt = false;
+	
+	private boolean stopped = false;
+	
+	private Thread pausedThread;
 	
 	public ScriptCommands (IStormFrontClient client)
 	{
@@ -69,13 +73,12 @@ public class ScriptCommands implements IScriptCommands, IStreamListener, IProper
 		lock.lock();
 		try {
 			textWaiters++;
-			while(true) {
+			while(!stopped) {
 				System.out.println("Waiting for text");
-				gotText.await();
-				if(text == null) {
-					System.out.println("No text!!");
-					continue;
+				while(text == null && !stopped) {
+					gotTextCond.await();
 				}
+				if(stopped) break;
 				System.out.println("Got line: " + text);
 				for(Match match : matches) {
 					System.out.println("Trying a match");
@@ -84,12 +87,17 @@ public class ScriptCommands implements IScriptCommands, IStreamListener, IProper
 						return match;
 					}
 				}
+				// FIXME this won't work if we have multiple text waiters.
+				text = null;
 			}
 		} catch(Exception e) {
 			e.printStackTrace();
 		} finally {
 			System.out.println("Done with matchwait");
 			textWaiters--;
+			if(textWaiters == 0) {
+				text = null;
+			}
 			lock.unlock();
 		}
 		return null;
@@ -104,10 +112,13 @@ public class ScriptCommands implements IScriptCommands, IStreamListener, IProper
 	public void nextRoom () {
 		lock.lock();
 		try {
-			nextRoom.await();
+			while (!stopped && roomWaiting) {
+				nextRoom.await();
+			}
 		} catch(Exception e) {
 			e.printStackTrace();
 		} finally {
+			roomWaiting = false;
 			lock.unlock();
 			waitForRoundtime();
 		}
@@ -115,9 +126,13 @@ public class ScriptCommands implements IScriptCommands, IStreamListener, IProper
 
 	public void pause (int seconds) {
 		try {
+			// FIXME need to make this work for multiple users
+			pausedThread = Thread.currentThread();
 			Thread.sleep(seconds * 1000);
-		} catch(Exception e) {
+		} catch(InterruptedException e) {
 			e.printStackTrace();
+		} finally {
+			pausedThread = null;
 		}
 		
 		waitForRoundtime();
@@ -149,15 +164,21 @@ public class ScriptCommands implements IScriptCommands, IStreamListener, IProper
 		try {
 			textWaiters++;
 			while(true) {
-				gotText.await();
+				while(text == null)
+					gotTextCond.await();
 				if(waitForMatch.matches(text)) {
 					break;
 				}
 			}
+			// FIXME need to make this work for multiple users
+			text = null;
 		} catch(Exception e) {
 			e.printStackTrace();
 		} finally {
 			textWaiters--;
+			if(textWaiters == 0) {
+				text = null;
+			}
 			lock.unlock();
 			waitForRoundtime();
 		}
@@ -167,11 +188,16 @@ public class ScriptCommands implements IScriptCommands, IStreamListener, IProper
 		lock.lock();
 		try {
 			promptWaiters++;
-			gotPrompt.await();
+			while(!stopped && !gotPrompt) {
+				gotPromptCond.await();
+			}
 		} catch(Exception e) {
 			e.printStackTrace();
 		} finally {
 			promptWaiters--;
+			if(promptWaiters == 0) {
+				gotPrompt = false;
+			}
 			lock.unlock();
 			waitForRoundtime();
 		}
@@ -188,7 +214,8 @@ public class ScriptCommands implements IScriptCommands, IStreamListener, IProper
 		if(promptWaiters > 0) {
 			lock.lock();
 			try {
-				gotPrompt.signalAll();
+				gotPrompt = true;
+				gotPromptCond.signalAll();
 			} catch(Exception e) {
 				e.printStackTrace();
 			} finally {
@@ -205,7 +232,7 @@ public class ScriptCommands implements IScriptCommands, IStreamListener, IProper
 			text = string.getBuffer().toString();
 			if(textWaiters > 0) {
 				System.out.println("Signaling waiters");
-				gotText.signalAll();
+				gotTextCond.signalAll();
 			}
 		} finally {
 			lock.unlock();
@@ -252,6 +279,7 @@ public class ScriptCommands implements IScriptCommands, IStreamListener, IProper
 	public void movedToRoom() {
 		lock.lock();
 		try {
+			roomWaiting = true;
 			nextRoom.notifyAll();
 		} finally {
 			lock.unlock();
@@ -261,13 +289,15 @@ public class ScriptCommands implements IScriptCommands, IStreamListener, IProper
 	protected boolean waitingForRoundtime;
 	public void waitForRoundtime ()
 	{
-		assertPrompt();
-		try {
-			while(client.getRoundtime().get() > 0) {
-				Thread.sleep(client.getRoundtime().get() * 1000);
+		if(!stopped) {
+			assertPrompt();
+			try {
+				while(client.getRoundtime().get() > 0 && !stopped) {
+					Thread.sleep(client.getRoundtime().get() * 1000);
+				}
+			} catch(Exception e) {
+				e.printStackTrace();
 			}
-		} catch(Exception e) {
-			e.printStackTrace();
 		}
 	}
 	
@@ -280,4 +310,20 @@ public class ScriptCommands implements IScriptCommands, IStreamListener, IProper
 	}
 	
 	public void propertyCleared(IProperty<Integer> property, Integer oldValue) {}
+	
+	public void stop() {
+		lock.lock();
+		stopped = true;
+		try {
+			gotTextCond.signalAll();
+			gotPromptCond.signalAll();
+			nextRoom.signalAll();
+			if(pausedThread != null)
+				pausedThread.interrupt();
+		} catch(Exception e) {
+			e.printStackTrace();
+		} finally {
+			lock.unlock();
+		}
+	}
 }
