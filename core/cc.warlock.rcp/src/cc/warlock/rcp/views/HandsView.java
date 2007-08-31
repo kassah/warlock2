@@ -1,13 +1,19 @@
 package cc.warlock.rcp.views;
 
+import org.eclipse.jface.resource.JFaceResources;
 import org.eclipse.swt.SWT;
+import org.eclipse.swt.events.PaintEvent;
+import org.eclipse.swt.events.PaintListener;
 import org.eclipse.swt.graphics.Color;
+import org.eclipse.swt.graphics.Font;
 import org.eclipse.swt.graphics.Image;
+import org.eclipse.swt.graphics.Point;
+import org.eclipse.swt.graphics.Rectangle;
 import org.eclipse.swt.layout.FillLayout;
 import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.layout.GridLayout;
+import org.eclipse.swt.widgets.Canvas;
 import org.eclipse.swt.widgets.Composite;
-import org.eclipse.swt.widgets.Label;
 import org.eclipse.ui.part.ViewPart;
 
 import cc.warlock.client.IProperty;
@@ -16,7 +22,6 @@ import cc.warlock.client.stormfront.IStormFrontClient;
 import cc.warlock.configuration.server.ServerSettings;
 import cc.warlock.configuration.skin.IWarlockSkin;
 import cc.warlock.rcp.ui.WarlockSharedImages;
-import cc.warlock.rcp.ui.WarlockText;
 import cc.warlock.rcp.ui.client.SWTPropertyListener;
 import cc.warlock.rcp.util.ColorUtil;
 
@@ -25,13 +30,88 @@ public class HandsView extends ViewPart implements IPropertyListener<String>
 	public static final String VIEW_ID = "cc.warlock.rcp.views.HandsView";
 	protected static HandsView _instance;
 	
-	protected Label leftHandImage, rightHandImage, spellImage;
-	protected WarlockText leftHandText, rightHandText, spellText;
+	protected GradientInfo leftHandInfo, rightHandInfo, spellInfo;
 	protected IStormFrontClient client;
 	
 	public HandsView ()
 	{
 		_instance = this;
+	}
+	
+	private class GradientInfo extends Canvas implements PaintListener
+	{
+		protected String text;
+		protected Image image;
+		protected Color background, foreground, gradientColor, tabColor;
+		protected Font textFont;
+		
+		public GradientInfo (Composite parent, Image image)
+		{
+			super(parent, SWT.NONE);
+			
+			this.image = image;
+			
+			addPaintListener(this);
+			this.textFont = new Font(getDisplay(), JFaceResources.getHeaderFont().getFontData()[0].getName(), 10, SWT.NONE);
+			this.foreground = new Color(getDisplay(), 255, 255, 255);
+			this.background = new Color(getDisplay(), 0, 0, 0);
+			this.gradientColor = getGradientColor(50, true);
+		}
+		
+		private Color getGradientColor (int factor, boolean lighter)
+		{
+			int red = 0;
+			int green = 0;
+			int blue = 0;
+			
+			if (lighter) 
+			{
+				red = background.getRed() < (255 - factor) ? background.getRed() + factor : 255;
+				green = background.getGreen() < (255 - factor) ? background.getGreen() + factor : 255;
+				blue = background.getBlue() < (255 - factor) ? background.getBlue() + factor : 255;
+			}
+			else {
+				red = background.getRed() > factor ? background.getRed() - factor : 0;
+				green = background.getRed() > factor ? background.getRed() - factor : 0;
+				blue = background.getRed() > factor ? background.getRed() - factor : 0;
+			}
+			
+			return new Color(getShell().getDisplay(), red, green, blue);
+		}
+		
+		@Override
+		public void setForeground(Color color) {
+			this.foreground = color;
+			redraw();
+		}
+		
+		@Override
+		public void setBackground(Color color) {
+			this.background = color;
+			this.gradientColor = getGradientColor(125, true);
+			
+			redraw();
+		}
+		
+		public void paintControl(PaintEvent e) {
+			Rectangle bounds = getBounds();
+			Rectangle imageBounds = image.getBounds();
+			int tabPadding = 4;
+			
+			e.gc.setBackground(background);
+			e.gc.setForeground(gradientColor);
+			e.gc.fillRectangle(0, 0, bounds.width, bounds.height);
+			e.gc.fillGradientRectangle(tabPadding/2, tabPadding/2, bounds.width - tabPadding/2, e.gc.textExtent(text).y, true);
+			
+			e.gc.setForeground(foreground);
+			e.gc.drawImage(image, tabPadding/2, tabPadding/2);
+			e.gc.drawText(text, imageBounds.width + tabPadding, tabPadding, true);
+		}
+		
+		public void setText(String text) {
+			this.text = text;
+			redraw();
+		}
 	}
 	
 	@Override
@@ -40,7 +120,7 @@ public class HandsView extends ViewPart implements IPropertyListener<String>
 		parent.setLayoutData(new GridData(GridData.FILL, GridData.FILL, true, true));
 		
 		Composite main = new Composite(parent, SWT.NONE);
-		GridLayout layout = new GridLayout(6, false);
+		GridLayout layout = new GridLayout(3, false);
 		layout.horizontalSpacing = 0;
 		layout.verticalSpacing = 0;
 		layout.marginHeight = 0;
@@ -48,41 +128,26 @@ public class HandsView extends ViewPart implements IPropertyListener<String>
 		main.setLayout(layout);
 		main.setLayoutData(new GridData(GridData.FILL, GridData.FILL, true, true));
 		
-		leftHandImage = createImageLabel(main, WarlockSharedImages.getImage(WarlockSharedImages.IMG_LEFT_HAND_SMALL));
-		leftHandText = createText(main, "Empty");
+		leftHandInfo = new GradientInfo(main, WarlockSharedImages.getImage(WarlockSharedImages.IMG_LEFT_HAND_SMALL));
 		
-		rightHandImage = createImageLabel(main, WarlockSharedImages.getImage(WarlockSharedImages.IMG_RIGHT_HAND_SMALL));
-		rightHandText = createText(main, "Empty");
+		leftHandInfo.setForeground(new Color(main.getDisplay(), 240, 240, 255));
+		leftHandInfo.setBackground(new Color(main.getDisplay(), 25, 25, 50));
+		leftHandInfo.setText("Empty");
+		leftHandInfo.setLayoutData(new GridData(GridData.FILL, GridData.FILL, true, true));
 		
-		spellImage = createImageLabel(main, WarlockSharedImages.getImage(WarlockSharedImages.IMG_SPELL_HAND_SMALL));
-		spellText = createText(main, "None");
+		rightHandInfo = new GradientInfo(main, WarlockSharedImages.getImage(WarlockSharedImages.IMG_RIGHT_HAND_SMALL));
+			
+		rightHandInfo.setForeground(new Color(main.getDisplay(), 240, 240, 255));
+		rightHandInfo.setBackground(new Color(main.getDisplay(), 25, 25, 50));
+		rightHandInfo.setText("Empty");
+		rightHandInfo.setLayoutData(new GridData(GridData.FILL, GridData.FILL, true, true));
 		
-		setColors(new Color(main.getDisplay(), 240, 240, 255), new Color(main.getDisplay(), 25, 25, 50));
-	}
-
-	private Label createImageLabel(Composite main, Image image)
-	{
-		Label label = new Label(main, SWT.NONE);
-		label.setImage(image);
-		GridData data = new GridData(GridData.FILL, GridData.FILL, false, false);
-		data.minimumHeight = 32;
-		label.setLayoutData(data);
-		
-		return label;
-	}
-	
-	private WarlockText createText (Composite main, String label)
-	{
-		WarlockText text = new WarlockText(main, SWT.NONE);
-		text.setText(label);
-		GridData data = new GridData(GridData.FILL, GridData.FILL, true, true);
-		data.minimumHeight = 30;
-		data.minimumWidth = 30;
-		text.setLayoutData(data);
-		text.setLineSpacing(5);
-		text.setIndent(5);
-		
-		return text;
+		spellInfo = new GradientInfo(main, WarlockSharedImages.getImage(WarlockSharedImages.IMG_SPELL_HAND_SMALL));
+			
+		spellInfo.setForeground(new Color(main.getDisplay(), 240, 240, 255));
+		spellInfo.setBackground(new Color(main.getDisplay(), 25, 25, 50));
+		spellInfo.setText("None");
+		spellInfo.setLayoutData(new GridData(GridData.FILL, GridData.FILL, true, true));
 	}
 	
 	@Override
@@ -102,20 +167,14 @@ public class HandsView extends ViewPart implements IPropertyListener<String>
 
 	protected void setColors (Color fg, Color bg)
 	{
-		leftHandImage.setBackground(bg);
-		leftHandImage.setForeground(fg);
-		leftHandText.setBackground(bg);
-		leftHandText.setForeground(fg);
+		leftHandInfo.setBackground(bg);
+		leftHandInfo.setForeground(fg);
 		
-		rightHandImage.setBackground(bg);
-		rightHandImage.setForeground(fg);
-		rightHandText.setBackground(bg);
-		rightHandText.setForeground(fg);
+		rightHandInfo.setBackground(bg);
+		rightHandInfo.setForeground(fg);
 		
-		spellImage.setBackground(bg);
-		spellImage.setForeground(fg);
-		spellText.setBackground(bg);
-		spellText.setForeground(fg);
+		spellInfo.setBackground(bg);
+		spellInfo.setForeground(fg);
 	}
 	
 	public void loadServerSettings (ServerSettings settings)
@@ -132,13 +191,13 @@ public class HandsView extends ViewPart implements IPropertyListener<String>
 		if (property != null)
 		{
 			if (property.getName().equals("leftHand")) {
-				leftHandText.setText(property.get());
+				leftHandInfo.setText(property.get());
 			}
 			else if (property.getName().equals("rightHand")) {
-				rightHandText.setText(property.get());
+				rightHandInfo.setText(property.get());
 			}
 			else if (property.getName().equals("currentSpell")) {
-				spellText.setText(property.get());
+				spellInfo.setText(property.get());
 			}
 		}
 	}
@@ -147,11 +206,11 @@ public class HandsView extends ViewPart implements IPropertyListener<String>
 		if (property != null)
 		{
 			if (property.getName().equals("leftHand"))
-				leftHandText.setText("<Empty>");
+				leftHandInfo.setText("<Empty>");
 			else if (property.getName().equals("rightHand"))
-				rightHandText.setText("<Empty>");
+				rightHandInfo.setText("<Empty>");
 			else if (property.getName().equals("currentSpell"))
-				spellText.setText("<None>");
+				spellInfo.setText("<None>");
 		}
 	}
 	
