@@ -49,7 +49,6 @@ public class PromptTagHandler extends DefaultTagHandler {
 	
 	@Override
 	public void handleEnd() {
-		if (prompt != null)
-			client.getDefaultStream().prompt(prompt);
+		client.getDefaultStream().prompt(prompt);
 	}
 }
