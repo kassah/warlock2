@@ -164,13 +164,15 @@ public class GameView extends StreamView implements KeyListener, IStormFrontClie
 		
 		text.setLineLimit(2000);
 		text.setScrollDirection(SWT.DOWN);
-		text.addFocusListener(new FocusListener () { 
-			public void focusGained(FocusEvent e) {
-				entry.setFocus();
-			}
-			
-			public void focusLost(FocusEvent e) {}
-		});
+		text.addKeyListener(this);
+		
+//		text.addFocusListener(new FocusListener () { 
+//			public void focusGained(FocusEvent e) {
+//				entry.setFocus();
+//			}
+//			
+//			public void focusLost(FocusEvent e) {}
+//		});
 		
 		text.append(
 			"Hello, and welcome to Warlock 2!\n" + 
