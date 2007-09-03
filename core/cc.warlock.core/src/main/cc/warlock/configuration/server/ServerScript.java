@@ -55,6 +55,8 @@ public class ServerScript extends ServerSetting {
 		}
 		
 		tokScript = tokScript.replaceAll("\\\\\\.", "\n");
+		tokScript = tokScript.replaceAll("\\&apos\\;", "'");
+		tokScript = tokScript.replaceAll("\\&quot\\;", "\"");
 		
 		Pattern pattern = Pattern.compile("([A-L]*)\\\\");
 		
