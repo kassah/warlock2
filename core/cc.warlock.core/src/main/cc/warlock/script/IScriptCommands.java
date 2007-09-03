@@ -1,5 +1,7 @@
 package cc.warlock.script;
 
+import java.util.List;
+
 import cc.warlock.client.stormfront.IStormFrontClient;
 
 public interface IScriptCommands {
@@ -19,7 +21,7 @@ public interface IScriptCommands {
 	
 	public void waitForRoundtime ();
 	
-	public Match matchWait (Match[] matches);
+	public Match matchWait (List<Match> matches);
 	
 	public void pause (int seconds);
 	

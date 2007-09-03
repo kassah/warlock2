@@ -22,7 +22,7 @@ import cc.warlock.script.IScriptCommands;
 import cc.warlock.script.IScriptListener;
 import cc.warlock.script.Match;
 
-public class WarlockWSLScript extends AbstractScript implements Runnable {
+public class WarlockWSLScript extends AbstractScript {
 	
 	protected String script, scriptName;
 	protected boolean running, stopped;
@@ -104,6 +104,23 @@ public class WarlockWSLScript extends AbstractScript implements Runnable {
 		return running;
 	}
 	
+	private class ScriptRunner  implements Runnable {
+		public void run() {
+			doStart();
+			
+			while(curLine != null && !stopped) {
+				checkState();
+				nextLine = curLine.getNext();
+				
+				curLine.execute();
+				curLine = nextLine;
+			}
+			
+			if(!stopped)
+				stop();
+		}
+	}
+	
 	public void start (ArrayList<String> arguments)
 	{
 		for (int i = 0; i < arguments.size(); i++) {
@@ -115,7 +132,7 @@ public class WarlockWSLScript extends AbstractScript implements Runnable {
 			variables.put(varName, commands.getClient().getServerSettings().getVariable(varName));
 		}
 		
-		scriptThread = new Thread(this);
+		scriptThread = new Thread(new ScriptRunner());
 		scriptThread.setName("Wizard Script: " + scriptName);
 		scriptThread.start();
 		
@@ -140,21 +157,6 @@ public class WarlockWSLScript extends AbstractScript implements Runnable {
 		commands.echo("[script started: " + scriptName + "]");
 		running = true;
 		stopped = false;
-	}
-	
-	public void run() {
-		doStart();
-		
-		while(curLine != null && !stopped) {
-			checkState();
-			nextLine = curLine.getNext();
-			
-			curLine.execute();
-			curLine = nextLine;
-		}
-		
-		if(!stopped)
-			stop();
 	}
 	
 	private void checkState() {
@@ -380,7 +382,7 @@ public class WarlockWSLScript extends AbstractScript implements Runnable {
 		public void execute (String arguments) {
 			// mode = Mode.waiting;
 			
-			Match match = commands.matchWait(matchset.toArray(new Match[matchset.size()]));
+			Match match = commands.matchWait(matchset);
 			
 			if (match != null)
 			{

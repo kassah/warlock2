@@ -1,5 +1,7 @@
 package cc.warlock.script.javascript;
 
+import java.util.List;
+
 import org.mozilla.javascript.Function;
 
 import cc.warlock.client.stormfront.IStormFrontClient;
@@ -33,7 +35,7 @@ public class JavascriptCommands implements IScriptCommands {
 		return commands.getClient();
 	}
 
-	public Match matchWait(Match[] matches) {
+	public Match matchWait(List<Match> matches) {
 		return commands.matchWait(matches);
 		/*Match match = (Match)event.data.get(CallbackEvent.DATA_MATCH);
 		Function function = (Function)match.getAttribute("callback");

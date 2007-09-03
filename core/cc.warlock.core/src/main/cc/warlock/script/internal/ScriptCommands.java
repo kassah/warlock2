@@ -1,6 +1,7 @@
 package cc.warlock.script.internal;
 
 import java.util.Date;
+import java.util.List;
 import java.util.concurrent.locks.Condition;
 import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReentrantLock;
@@ -21,7 +22,6 @@ public class ScriptCommands implements IScriptCommands, IStreamListener, IProper
 {
 
 	protected IStormFrontClient client;
-	protected Match[] matches;
 	protected Match waitForMatch;
 	private final Lock lock = new ReentrantLock();
 	
@@ -69,7 +69,7 @@ public class ScriptCommands implements IScriptCommands, IStreamListener, IProper
 		}
 	}
 	
-	public Match matchWait (Match[] matches) {
+	public Match matchWait (List<Match> matches) {
 		lock.lock();
 		try {
 			// clear out the previous line sent
