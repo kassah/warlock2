@@ -110,6 +110,11 @@ public class WarlockWSLScript extends AbstractScript implements Runnable {
 			variables.put(Integer.toString(i + 1), arguments.get(i));
 		}
 		
+		for (String varName : commands.getClient().getServerSettings().getVariableNames())
+		{
+			variables.put(varName, commands.getClient().getServerSettings().getVariable(varName));
+		}
+		
 		scriptThread = new Thread(this);
 		scriptThread.setName("Wizard Script: " + scriptName);
 		scriptThread.start();
