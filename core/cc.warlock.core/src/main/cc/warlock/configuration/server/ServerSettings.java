@@ -47,6 +47,7 @@ public class ServerSettings implements Comparable<ServerSettings>
 	
 	protected ArrayList<HighlightString> deletedHighlightStrings = new ArrayList<HighlightString>();
 	protected ArrayList<String> deletedVariables = new ArrayList<String>();
+	protected ArrayList<IServerSettingsListener> listeners = new ArrayList<IServerSettingsListener>();
 	
 	private Element mainWindowElement, mainWindowFontElement,
 		mainWindowColumnFontElement, commandLineElement, paletteElement, presetsElement, stringsElement, namesElement;
@@ -95,6 +96,17 @@ public class ServerSettings implements Comparable<ServerSettings>
 		return null;
 	}
 	
+	public void addServerSettingsListener (IServerSettingsListener listener)
+	{
+		listeners.add(listener);
+	}
+	
+	public void removeServerSettingsListener (IServerSettingsListener listener)
+	{
+		if (listeners.contains(listener))
+			listeners.remove(listener);
+	}
+	
 	public void load (String playerId)
 	{
 		this.playerId = playerId;
@@ -127,6 +139,12 @@ public class ServerSettings implements Comparable<ServerSettings>
 			
 			stream.close();
 			incrementMajorVersion();
+			
+			for (IServerSettingsListener listener : listeners) {
+				try {
+					listener.serverSettingsLoaded(this);
+				} catch (Throwable t) { }
+			}
 		} catch (FileNotFoundException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
@@ -576,6 +594,11 @@ public class ServerSettings implements Comparable<ServerSettings>
 	public ServerScript getServerScript (String scriptName)
 	{
 		return scripts.get(scriptName);
+	}
+	
+	public Collection<ServerScript> getAllServerScripts ()
+	{
+		return scripts.values();
 	}
 
 	public int getMajorVersion() {
