@@ -29,4 +29,6 @@ public interface IScript {
 	public void addScriptListener (IScriptListener listener);
 	
 	public void removeScriptListener (IScriptListener listener);
+	
+	public IScriptCommands getScriptCommands();
 }

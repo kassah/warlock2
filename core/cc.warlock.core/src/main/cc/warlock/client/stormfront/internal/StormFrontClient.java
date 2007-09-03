@@ -28,7 +28,6 @@ import cc.warlock.configuration.server.ServerScript;
 import cc.warlock.configuration.server.ServerSettings;
 import cc.warlock.network.StormFrontConnection;
 import cc.warlock.script.IScript;
-import cc.warlock.script.IScriptCommands;
 import cc.warlock.script.IScriptEngine;
 import cc.warlock.script.IScriptListener;
 import cc.warlock.script.internal.ScriptCommands;
@@ -60,7 +59,6 @@ public class StormFrontClient extends WarlockClient implements IStormFrontClient
 	protected IWarlockStyle currentStyle = WarlockStyle.EMPTY_STYLE;
 	protected ServerSettings serverSettings;
 	protected RoundtimeRunnable rtRunnable;
-	protected ScriptCommands scriptCommands;
 	protected ArrayList<IScript> runningScripts;
 	protected ArrayList<IScriptListener> scriptListeners;
 	
@@ -80,7 +78,6 @@ public class StormFrontClient extends WarlockClient implements IStormFrontClient
 		characterName = new ClientProperty<String>(this, "characterName", null);
 		serverSettings = new ServerSettings(this);
 		rtRunnable = new RoundtimeRunnable();
-		scriptCommands = new ScriptCommands(this);
 		runningScripts = new ArrayList<IScript>();
 		scriptListeners = new ArrayList<IScriptListener>();
 		
@@ -117,11 +114,11 @@ public class StormFrontClient extends WarlockClient implements IStormFrontClient
 			StringReader reader = new StringReader(serverScript.getScriptContents());
 			
 			IScriptEngine engine = ScriptEngineRegistry.getScriptEngine(WarlockWSLEngine.ENGINE_ID);
-			script = engine.startScript(scriptCommands, scriptName, reader, arguments);
+			script = engine.startScript(new ScriptCommands(this), scriptName, reader, arguments);
 		}
 		else {
 			File scriptDirectory = WarlockConfiguration.getConfigurationDirectory("scripts", true);
-			script = ScriptRunner.runScriptFromFile(scriptCommands, scriptDirectory, scriptName, arguments);
+			script = ScriptRunner.runScriptFromFile(new ScriptCommands(this), scriptDirectory, scriptName, arguments);
 		}
 		
 		if (script != null)
@@ -257,10 +254,6 @@ public class StormFrontClient extends WarlockClient implements IStormFrontClient
 	
 	public ServerSettings getServerSettings() {
 		return serverSettings;
-	}
-	
-	public IScriptCommands getScriptCommands() {
-		return scriptCommands;
 	}
 	
 	public IProperty<String> getCharacterName() {

@@ -1,5 +1,6 @@
 package cc.warlock.stormfront.internal;
 
+import cc.warlock.script.IScript;
 import cc.warlock.stormfront.IStormFrontProtocolHandler;
 
 
@@ -17,7 +18,10 @@ public class CompassTagHandler extends DefaultTagHandler {
 	
 	@Override
 	public void handleEnd() {
-		handler.getClient().getScriptCommands().movedToRoom();
+		for (IScript script : handler.getClient().getRunningScripts())
+		{
+			script.getScriptCommands().movedToRoom();
+		}
 	}
 
 }

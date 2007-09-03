@@ -15,7 +15,6 @@ import cc.warlock.client.IWarlockClient;
 import cc.warlock.client.IWarlockStyle;
 import cc.warlock.configuration.server.ServerSettings;
 import cc.warlock.script.IScript;
-import cc.warlock.script.IScriptCommands;
 import cc.warlock.script.IScriptListener;
 
 /**
@@ -108,11 +107,6 @@ public interface IStormFrontClient extends IWarlockClient {
 	 * @return The current style of the storm front client
 	 */
 	public IWarlockStyle getCurrentStyle();
-
-	/**
-	 * @return The script commands interface that corresponds to this client
-	 */
-	public IScriptCommands getScriptCommands ();
 	
 	/**
 	 * @return The name of the character associated with this client.

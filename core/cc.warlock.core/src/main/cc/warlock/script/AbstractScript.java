@@ -43,4 +43,7 @@ public abstract class AbstractScript implements IScript {
 			listeners.remove(listener);
 	}
 
+	public IScriptCommands getScriptCommands() {
+		return commands;
+	}
 }
