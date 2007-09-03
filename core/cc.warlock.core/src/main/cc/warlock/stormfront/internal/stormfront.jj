@@ -81,6 +81,7 @@ String Entity(): { }
 	| <ENTITY_APOS> { return "'"; }
 	| <ENTITY_AMP> { return "&"; }
 	| <ENTITY_169> { return "©"; }
+	| <ENTITY_QUOT> { return "\""; }
 	)
 }
 
@@ -93,6 +94,7 @@ TOKEN: {
 	<ENTITY_APOS: "&apos;"> |
 	<ENTITY_AMP: "&amp;"> |
 	<ENTITY_169: "&#169;"> |
+	<ENTITY_QUOT: "&quot;"> |
 	<PCDATA: (~["<","\r","\n","&"])+ | "&" | (["\r","\n"])+> |
 	 <NAMECHAR: (<LETTER> | <DIGIT> | "." | "-" | "_" | ":")> |
 	 <DIGIT: (["0"-"9"])> |
