@@ -72,14 +72,22 @@ public class ScriptCommands implements IScriptCommands, IStreamListener, IProper
 	public Match matchWait (Match[] matches) {
 		lock.lock();
 		try {
+			// clear out the previous line sent
+			text = null;
+			// let everyone know we're listening
 			textWaiters++;
-			while(!stopped) {
+			
+			// run until we get a match or are told to stop
+			matchWaitLoop: while(true) {
 				System.out.println("Waiting for text");
-				while(text == null && !stopped) {
+				// wait for some text
+				while(text == null) {
 					gotTextCond.await();
+					if(stopped)
+						break matchWaitLoop;
 				}
-				if(stopped) break;
 				System.out.println("Got line: " + text);
+				// try all of our matches
 				for(Match match : matches) {
 					System.out.println("Trying a match");
 					if(match.matches(text)) {
@@ -88,13 +96,16 @@ public class ScriptCommands implements IScriptCommands, IStreamListener, IProper
 					}
 				}
 				// FIXME this won't work if we have multiple text waiters.
+				// clear the line in preparation for the next one
 				text = null;
 			}
 		} catch(Exception e) {
 			e.printStackTrace();
 		} finally {
 			System.out.println("Done with matchwait");
+			// tell everyone we aren't listening
 			textWaiters--;
+			// if we were the only listener, set the line to null
 			if(textWaiters == 0) {
 				text = null;
 			}
