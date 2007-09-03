@@ -13,7 +13,8 @@ import org.osgi.framework.Bundle;
  * Window - Preferences - Java - Code Style - Code Templates
  */
 public class ScribeSharedImages {
-	
+
+	public static final String IMG_SCRIPT = "/icons/script.gif";
 	public static final String IMG_START = "/icons/run_exc.gif";
 	public static final String IMG_RESUME = "/icons/resume_co.gif";
 	public static final String IMG_SUSPEND = "/icons/suspend_co.gif";
