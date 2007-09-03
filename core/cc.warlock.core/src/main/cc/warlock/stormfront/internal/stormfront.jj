@@ -78,6 +78,9 @@ String Entity(): { }
 {
 	( <ENTITY_GT>	{ return ">"; }
 	| <ENTITY_LT>	{ return "<"; }
+	| <ENTITY_APOS> { return "'"; }
+	| <ENTITY_AMP> { return "&"; }
+	| <ENTITY_169> { return "©"; }
 	)
 }
 
@@ -87,6 +90,9 @@ TOKEN: {
 	
 	<ENTITY_GT: "&gt;"> |
 	<ENTITY_LT: "&lt;"> |
+	<ENTITY_APOS: "&apos;"> |
+	<ENTITY_AMP: "&amp;"> |
+	<ENTITY_169: "&#169;"> |
 	<PCDATA: (~["<","\r","\n","&"])+ | "&" | (["\r","\n"])+> |
 	 <NAMECHAR: (<LETTER> | <DIGIT> | "." | "-" | "_" | ":")> |
 	 <DIGIT: (["0"-"9"])> |
