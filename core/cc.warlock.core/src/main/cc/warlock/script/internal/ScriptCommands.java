@@ -169,6 +169,7 @@ public class ScriptCommands implements IScriptCommands, IStreamListener, IProper
 				if(waitForMatch.matches(text)) {
 					break;
 				}
+				text = null;
 			}
 			// FIXME need to make this work for multiple users
 			text = null;
