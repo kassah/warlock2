@@ -375,5 +375,29 @@ public class GameView extends StreamView implements KeyListener, IStormFrontClie
 		}
 	}
 	
-	public void keyReleased(KeyEvent e) {	}
+	private static final char[] entryChars = new char[] {
+		'.', '/', '{', '}', '<', '>', ',', '?', '\'', '"', ':', ';', '[', ']', '|', '\\', '-', '_', '+', '=',
+		'~', '`', '!', '@', '#', '$', '%', '^', '&', '*', '(', ')'
+	};
+	private static final ArrayList<Character> entryCharacters = new ArrayList<Character>();
+	static {
+		for (char c : entryChars) {
+			entryCharacters.add(c);
+		}
+	}
+	
+	public void keyReleased(KeyEvent e) {
+		
+		if (!entry.isFocusControl()) {
+			
+			if ((e.character >= 'a' && e.character <= 'z') || (e.character >= 'A' && e.character <= 'Z')
+				|| (e.character >= '0' && e.character <= '9')
+				|| entryCharacters.contains(e.character))
+			{
+				entry.append(e.character+"");
+				entry.setFocus();
+				entry.setCaretOffset(entry.getText().length());
+			}
+		}
+	}
 }
