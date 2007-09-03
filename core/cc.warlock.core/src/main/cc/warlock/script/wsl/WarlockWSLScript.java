@@ -171,7 +171,7 @@ public class WarlockWSLScript extends AbstractScript implements Runnable {
 	}
 	
 	public void addLabel(String label, WarlockWSLScriptLine line) {
-		labels.put(label, line);
+		labels.put(label.toLowerCase(), line);
 	}
 	
 	public void addLine(WarlockWSLScriptLine line) {
@@ -335,7 +335,7 @@ public class WarlockWSLScript extends AbstractScript implements Runnable {
 	{
 		// System.out.println("going to label: \"" + label + "\"");
 		
-		WarlockWSLScriptLine command = labels.get(label);
+		WarlockWSLScriptLine command = labels.get(label.toLowerCase());
 		
 		if (command != null)
 		{
