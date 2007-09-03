@@ -38,16 +38,6 @@
                standalone="true"
                visible="true">
          </view>
-         <view
-               closeable="true"
-               id="cc.warlock.scribe.ui.views.ScriptsView"
-               moveable="true"
-               relationship="stack"
-               relative="cc.warlock.rightFolder"
-               showTitle="true"
-               standalone="false"
-               visible="true">
-         </view>
       </perspectiveExtension>
    </extension>
    <extension
