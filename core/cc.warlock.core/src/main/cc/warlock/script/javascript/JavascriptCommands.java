@@ -1,5 +1,6 @@
 package cc.warlock.script.javascript;
 
+import java.io.Serializable;
 import java.util.List;
 
 import org.mozilla.javascript.Function;
@@ -14,8 +15,8 @@ public class JavascriptCommands implements IScriptCommands {
 	private IScriptCommands commands;
 	private JavascriptScript script;
 	
-	public class JavascriptStopException extends Exception {
-		static final long serialVersionUID = 1L; // FIXME right?
+	public class JavascriptStopException extends Exception implements Serializable {
+		private static final long serialVersionUID = 7226391328268718796L;
 	}
 	
 	public JavascriptCommands(IScriptCommands commands, JavascriptScript script) {
