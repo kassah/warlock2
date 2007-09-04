@@ -86,13 +86,16 @@ public class ScriptCommands implements IScriptCommands, IStreamListener, IProper
 					if(stopped)
 						break matchWaitLoop;
 				}
-				System.out.println("Got line: " + text);
-				// try all of our matches
-				for(Match match : matches) {
-					System.out.println("Trying a match");
-					if(match.matches(text)) {
-						System.out.println("matched a line");
-						return match;
+				System.out.println("Got text: " + text);
+				String[] lines = text.split("\\n");
+				for(String line : lines) {
+					// try all of our matches
+					for(Match match : matches) {
+						// System.out.println("Trying a match");
+						if(match.matches(line)) {
+							// System.out.println("matched a line");
+							return match;
+						}
 					}
 				}
 				// FIXME this won't work if we have multiple text waiters.
