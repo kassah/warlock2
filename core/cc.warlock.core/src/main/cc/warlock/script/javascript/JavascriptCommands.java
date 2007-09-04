@@ -15,7 +15,7 @@ public class JavascriptCommands implements IScriptCommands {
 	private JavascriptScript script;
 	
 	public class JavascriptStopException extends Exception {
-		
+		static final long serialVersionUID = 1L; // FIXME right?
 	}
 	
 	public JavascriptCommands(IScriptCommands commands, JavascriptScript script) {
