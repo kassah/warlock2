@@ -43,10 +43,14 @@ public class JavascriptEngine implements IScriptEngine {
 	
 	public IScript startScript(final IScriptCommands commands, final String scriptName, final Reader scriptReader, final String[] arguments) {
 		final JavascriptScript script = new JavascriptScript (commands, scriptName, this);
+		script.start();
+		
 		new Thread(new Runnable() {
 			public void run () {
 				Context context = Context.enter();
 				try {
+					script.setContext(context);
+					
 					scope = context.initStandardObjects();
 					scope.put("script", scope, script.getCommands());
 					scope.put("arguments", scope, arguments);

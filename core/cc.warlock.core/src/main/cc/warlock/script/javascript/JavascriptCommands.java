@@ -4,6 +4,7 @@ import java.io.Serializable;
 import java.util.List;
 
 import org.mozilla.javascript.Function;
+import org.mozilla.javascript.Scriptable;
 
 import cc.warlock.client.stormfront.IStormFrontClient;
 import cc.warlock.script.IScript;
@@ -15,6 +16,9 @@ public class JavascriptCommands implements IScriptCommands {
 	private IScriptCommands commands;
 	private JavascriptScript script;
 	
+	private static final String CALLBACK = "callback";
+	private static final String USER_OBJECT = "userobject";
+	
 	public class JavascriptStopException extends Exception implements Serializable {
 		private static final long serialVersionUID = 7226391328268718796L;
 	}
@@ -25,7 +29,7 @@ public class JavascriptCommands implements IScriptCommands {
 	}
 
 	public void echo(String text) {
-		commands.echo(text);
+		commands.echo(script, text);
 	}
 
 	public void echo(IScript script, String text) {
@@ -37,19 +41,15 @@ public class JavascriptCommands implements IScriptCommands {
 	}
 
 	public Match matchWait(List<Match> matches) {
-		return commands.matchWait(matches);
-		/*Match match = (Match)event.data.get(CallbackEvent.DATA_MATCH);
-		Function function = (Function)match.getAttribute("callback");
-		Context cx = Context.enter();
+		Match match = commands.matchWait(matches);
+		Function function = (Function)match.getAttribute(CALLBACK);
 		try {
-			function.call(cx, script.getScope(), null, new Object[] {});
+			function.call(script.getContext(), script.getScope(), null, new Object[] {match.getAttribute(USER_OBJECT)});
 		}
 		catch (Exception e) {
 			e.printStackTrace();
 		}
-		finally {
-			Context.exit();
-		}*/
+		return match;
 	}
 
 	public void move(String direction) {
@@ -89,13 +89,16 @@ public class JavascriptCommands implements IScriptCommands {
 	}
 
 	public void exit() throws JavascriptStopException {
+		script.stop();
+		
 		throw new JavascriptStopException();
 	}
 	
-	public Match match(String text, Function function) {
+	public Match match(String text, Function function, Scriptable object) {
 		Match m = new Match();
 		m.setMatchText(text);
-		m.setAttribute("callback", function);
+		m.setAttribute(CALLBACK, function);
+		m.setAttribute(USER_OBJECT, object);
 		
 		return m;
 	}
