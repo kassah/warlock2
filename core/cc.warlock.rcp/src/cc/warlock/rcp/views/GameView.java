@@ -354,7 +354,20 @@ public class GameView extends StreamView implements KeyListener, IStormFrontClie
 		return client;
 	}
 
+	protected boolean isKeypadKey (int code) {
+		return (code == SWT.KEYPAD_0 || code == SWT.KEYPAD_1 || code == SWT.KEYPAD_2
+				|| code == SWT.KEYPAD_3 || code == SWT.KEYPAD_4 || code == SWT.KEYPAD_5
+				|| code == SWT.KEYPAD_6 || code == SWT.KEYPAD_7 || code == SWT.KEYPAD_8
+				|| code == SWT.KEYPAD_9 || code == SWT.KEYPAD_ADD || code == SWT.KEYPAD_CR
+				|| code == SWT.KEYPAD_DECIMAL || code == SWT.KEYPAD_DIVIDE || code == SWT.KEYPAD_EQUAL
+				|| code == SWT.KEYPAD_EQUAL || code == SWT.KEYPAD_MULTIPLY || code == SWT.KEYPAD_SUBTRACT);
+	}
+	
+	protected boolean keyHandled = false;
 	public void keyPressed(KeyEvent e) {
+		keyHandled = false;
+		if (e.stateMask == 0 && entryCharacters.contains(e.character) && !isKeypadKey(e.keyCode)) return;
+		
 		Collection<IMacro> macros = MacroRegistry.instance().getMacros();
 		e.doit = true;
 		
@@ -364,6 +377,7 @@ public class GameView extends StreamView implements KeyListener, IStormFrontClie
 			{
 				 try {
 					macro.execute(wrapper);
+					keyHandled = true;
 				} catch (Exception ex) {
 					// TODO Auto-generated catch block
 					ex.printStackTrace();
@@ -376,6 +390,9 @@ public class GameView extends StreamView implements KeyListener, IStormFrontClie
 	}
 	
 	private static final char[] entryChars = new char[] {
+		'a', 'b', 'c', 'd', 'e', 'f', 'g', 'h', 'i', 'j', 'k', 'l', 'm', 'n', 'o', 'p', 'q', 'r', 's', 't', 'u', 'v', 'w', 'x', 'y', 'z',
+		'A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 'K', 'L', 'M', 'N', 'O', 'P', 'Q', 'R', 'S', 'T', 'U', 'V', 'W', 'X', 'Y', 'Z',
+		'0', '1', '2', '3', '4', '5', '6', '7', '8', '9',
 		'.', '/', '{', '}', '<', '>', ',', '?', '\'', '"', ':', ';', '[', ']', '|', '\\', '-', '_', '+', '=',
 		'~', '`', '!', '@', '#', '$', '%', '^', '&', '*', '(', ')'
 	};
@@ -387,16 +404,13 @@ public class GameView extends StreamView implements KeyListener, IStormFrontClie
 	}
 	
 	public void keyReleased(KeyEvent e) {
-		
-		if (!entry.isFocusControl()) {
+		if (!entry.isFocusControl() && !keyHandled) {
 			
-			if ((e.character >= 'a' && e.character <= 'z') || (e.character >= 'A' && e.character <= 'Z')
-				|| (e.character >= '0' && e.character <= '9')
-				|| entryCharacters.contains(e.character))
+			if (entryCharacters.contains(e.character))
 			{
 				entry.append(e.character+"");
-				entry.setFocus();
 				entry.setCaretOffset(entry.getText().length());
+				entry.setFocus();
 			}
 		}
 	}
