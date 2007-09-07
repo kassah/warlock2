@@ -117,8 +117,11 @@ public class ServerSettings implements Comparable<ServerSettings>
 			document = reader.read(stream);
 			
 			mainWindowElement = (Element) document.selectSingleNode("/settings/stream/w[@id=\"smain\"]");
-			mainWindowFontElement = (Element) mainWindowElement.selectSingleNode("font");
-			mainWindowColumnFontElement = (Element) mainWindowElement.selectSingleNode("columnFont");
+			if (mainWindowElement != null) {
+				mainWindowFontElement = (Element) mainWindowElement.selectSingleNode("font");
+				mainWindowColumnFontElement = (Element) mainWindowElement.selectSingleNode("columnFont");
+			}
+			
 			commandLineElement = (Element) document.selectSingleNode("/settings/cmdline");
 			
 			loadPalette();
@@ -306,8 +309,8 @@ public class ServerSettings implements Comparable<ServerSettings>
 		
 		switch (settingType)
 		{
-			case MainWindow_Background: color = mainWindowElement.attributeValue("bgcolor"); break;
-			case MainWindow_Foreground: color = mainWindowElement.attributeValue("fgcolor"); break;
+			case MainWindow_Background: color = mainWindowElement == null ? null : mainWindowElement.attributeValue("bgcolor"); break;
+			case MainWindow_Foreground: color = mainWindowElement == null ? null : mainWindowElement.attributeValue("fgcolor"); break;
 			case CommandLine_Background: color = commandLineElement.attributeValue("bgcolor"); break;
 			case CommandLine_Foreground: color = commandLineElement.attributeValue("fgcolor"); break;
 			case CommandLine_BarColor: color = commandLineElement.attributeValue("barcolor"); break;
