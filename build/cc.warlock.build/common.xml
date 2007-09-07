@@ -23,11 +23,11 @@
 			<if>
 				<not><isset property="@{property}"/></not>
 				<then>
-					<svn javahl="false">
-						<wcVersion path="../../core"/>
+					<svn javahl="true">
+						<wcVersion path="../../core/cc.warlock.core"/>
 					</svn>
 					
-					<property name="@{property}" value="${warlock2-version-prefix}.${revision.max}.${warlock2-version-suffix}"/>
+					<property name="@{property}" value="${warlock2-version-prefix}.${revision.max}_${warlock2-version-suffix}"/>
 				</then>
 			</if>
 		</sequential>
