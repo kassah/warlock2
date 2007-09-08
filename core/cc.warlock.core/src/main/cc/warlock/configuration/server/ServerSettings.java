@@ -6,8 +6,10 @@ import java.io.FileWriter;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Collections;
 import java.util.Date;
 import java.util.Hashtable;
+import java.util.List;
 
 import org.dom4j.Document;
 import org.dom4j.DocumentException;
@@ -584,9 +586,14 @@ public class ServerSettings implements Comparable<ServerSettings>
 		return variables.keySet();
 	}
 	
-	public ArrayList<MacroKey> getMacroSet (int set)
+	public List<MacroKey> getMacroSet (int set)
 	{
-		return macroSets.get(set);
+		if (macroSets.size() < set) {
+			return macroSets.get(set);
+		} else {
+			List<MacroKey> macros = Collections.emptyList();
+			return macros;
+		}
 	}
 	
 	public boolean containsServerScript (String scriptName)
