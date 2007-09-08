@@ -1,6 +1,10 @@
 package cc.warlock.configuration.skin;
 
+import java.util.Map;
+
 import cc.warlock.client.stormfront.WarlockColor;
+import cc.warlock.configuration.server.Preset;
+import cc.warlock.configuration.server.ServerSettings;
 
 public interface IWarlockSkin {
 
@@ -21,4 +25,6 @@ public interface IWarlockSkin {
 	public WarlockColor getColor (ColorType type);
 	
 	public String getFontFace (FontFaceType type);
+	
+	public void loadDefaultPresets (ServerSettings settings, Map<String, Preset> presets);
 }

@@ -1,8 +1,10 @@
 package cc.warlock.configuration.skin;
 
 import java.util.Hashtable;
+import java.util.Map;
 
 import cc.warlock.client.stormfront.WarlockColor;
+import cc.warlock.configuration.server.Preset;
 import cc.warlock.configuration.server.ServerSettings;
 
 /**
@@ -115,4 +117,26 @@ public class DefaultSkin implements IWarlockSkin {
 		return color;
 	}
 
+	protected Preset getPresetForId(ServerSettings settings, String id, boolean fillEntireLine)
+	{
+		Preset p = new Preset(settings);
+		p.setName(id);
+		p.setForegroundColor(fgColors.get(id));
+		p.setBackgroundColor(bgColors.get(id));
+		p.setFillEntireLine(fillEntireLine);
+		p.setPalette(settings.getPalette());
+		
+		return p;
+	}
+	
+	public void loadDefaultPresets(ServerSettings settings, Map<String, Preset> presets) {
+		presets.put(Preset.PRESET_ROOM_NAME, getPresetForId(settings, Preset.PRESET_ROOM_NAME, true));
+		presets.put(Preset.PRESET_COMMAND, getPresetForId(settings, Preset.PRESET_COMMAND, false));
+		presets.put(Preset.PRESET_LINK, getPresetForId(settings, Preset.PRESET_LINK, false));
+		presets.put(Preset.PRESET_SELECTED_LINK, getPresetForId(settings, Preset.PRESET_SELECTED_LINK, false));
+		presets.put(Preset.PRESET_SPEECH, getPresetForId(settings, Preset.PRESET_SPEECH, false));
+		presets.put(Preset.PRESET_THOUGHT, getPresetForId(settings, Preset.PRESET_THOUGHT, false));
+		presets.put(Preset.PRESET_WATCHING, getPresetForId(settings, Preset.PRESET_WATCHING, false));
+		presets.put(Preset.PRESET_WHISPER, getPresetForId(settings, Preset.PRESET_WHISPER, false));
+	}
 }

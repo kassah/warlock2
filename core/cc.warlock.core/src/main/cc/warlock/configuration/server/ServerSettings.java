@@ -169,6 +169,8 @@ public class ServerSettings implements Comparable<ServerSettings>
 	
 	private void loadPresets ()
 	{
+		defaultSkin.loadDefaultPresets(this, presets);
+		
 		presetsElement = (Element) document.selectSingleNode("/settings/presets");
 		if (presetsElement != null)
 		{

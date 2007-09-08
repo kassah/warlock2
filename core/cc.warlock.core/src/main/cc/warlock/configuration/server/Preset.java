@@ -66,11 +66,11 @@ public class Preset extends ServerSetting implements Comparable<Preset> {
 		return new WarlockColor(color);
 	}
 	
-	protected Preset (ServerSettings serverSettings)
+	public Preset (ServerSettings serverSettings)
 	{
 		super(serverSettings);
 	}
-	
+		
 	public Preset (Preset other)
 	{
 		super(other.serverSettings, other.element);
@@ -211,5 +211,13 @@ public class Preset extends ServerSetting implements Comparable<Preset> {
 	public Preset getOriginalPreset ()
 	{
 		return originalPreset;
+	}
+
+	public Palette getPalette() {
+		return palette;
+	}
+
+	public void setPalette(Palette palette) {
+		this.palette = palette;
 	}
 }
