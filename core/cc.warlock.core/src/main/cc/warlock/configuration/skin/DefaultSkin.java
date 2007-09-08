@@ -120,11 +120,11 @@ public class DefaultSkin implements IWarlockSkin {
 	protected Preset getPresetForId(ServerSettings settings, String id, boolean fillEntireLine)
 	{
 		Preset p = new Preset(settings);
+		p.setPalette(settings.getPalette());
 		p.setName(id);
 		p.setForegroundColor(fgColors.get(id));
 		p.setBackgroundColor(bgColors.get(id));
 		p.setFillEntireLine(fillEntireLine);
-		p.setPalette(settings.getPalette());
 		
 		return p;
 	}
