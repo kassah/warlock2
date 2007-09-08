@@ -138,6 +138,7 @@ public class DefaultSkin implements IWarlockSkin {
 	
 	public void loadDefaultPresets(ServerSettings settings, Map<String, Preset> presets) {
 		addDefaultPreset(Preset.PRESET_ROOM_NAME, true, settings, presets);
+		addDefaultPreset(Preset.PRESET_BOLD, false, settings, presets);
 		addDefaultPreset(Preset.PRESET_COMMAND, false, settings, presets);
 		addDefaultPreset(Preset.PRESET_LINK, false, settings, presets);
 		addDefaultPreset(Preset.PRESET_SELECTED_LINK, false, settings, presets);

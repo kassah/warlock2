@@ -7,6 +7,7 @@ import cc.warlock.configuration.skin.IWarlockSkin;
 
 public class Preset extends ServerSetting implements Comparable<Preset> {
 
+	public static final String PRESET_BOLD = "bold";
 	public static final String PRESET_ROOM_NAME = "roomName";
 	public static final String PRESET_SPEECH = "speech";
 	public static final String PRESET_WHISPER = "whisper";
