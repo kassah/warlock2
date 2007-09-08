@@ -589,7 +589,7 @@ public class ServerSettings implements Comparable<ServerSettings>
 	
 	public List<MacroKey> getMacroSet (int set)
 	{
-		if (macroSets.size() < set) {
+		if (macroSets.size() > set) {
 			return macroSets.get(set);
 		} else {
 			List<MacroKey> macros = Collections.emptyList();
