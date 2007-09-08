@@ -135,6 +135,7 @@ public class ServerSettings implements Comparable<ServerSettings>
 			
 			// initalize before we call the viewers
 			defaultSkin = new DefaultSkin(this);
+			defaultSkin.loadDefaultPresets(this, presets);
 			
 			for (IWarlockClientViewer v : client.getViewers())
 			{
@@ -169,8 +170,6 @@ public class ServerSettings implements Comparable<ServerSettings>
 	
 	private void loadPresets ()
 	{
-		defaultSkin.loadDefaultPresets(this, presets);
-		
 		presetsElement = (Element) document.selectSingleNode("/settings/presets");
 		if (presetsElement != null)
 		{

@@ -129,14 +129,21 @@ public class DefaultSkin implements IWarlockSkin {
 		return p;
 	}
 	
+	protected void addDefaultPreset(String name, boolean fillEntireLine, ServerSettings settings, Map<String, Preset> presets)
+	{
+		if (!presets.containsKey(name)) {
+			presets.put(name, getPresetForId(settings, name, fillEntireLine));
+		}
+	}
+	
 	public void loadDefaultPresets(ServerSettings settings, Map<String, Preset> presets) {
-		presets.put(Preset.PRESET_ROOM_NAME, getPresetForId(settings, Preset.PRESET_ROOM_NAME, true));
-		presets.put(Preset.PRESET_COMMAND, getPresetForId(settings, Preset.PRESET_COMMAND, false));
-		presets.put(Preset.PRESET_LINK, getPresetForId(settings, Preset.PRESET_LINK, false));
-		presets.put(Preset.PRESET_SELECTED_LINK, getPresetForId(settings, Preset.PRESET_SELECTED_LINK, false));
-		presets.put(Preset.PRESET_SPEECH, getPresetForId(settings, Preset.PRESET_SPEECH, false));
-		presets.put(Preset.PRESET_THOUGHT, getPresetForId(settings, Preset.PRESET_THOUGHT, false));
-		presets.put(Preset.PRESET_WATCHING, getPresetForId(settings, Preset.PRESET_WATCHING, false));
-		presets.put(Preset.PRESET_WHISPER, getPresetForId(settings, Preset.PRESET_WHISPER, false));
+		addDefaultPreset(Preset.PRESET_ROOM_NAME, true, settings, presets);
+		addDefaultPreset(Preset.PRESET_COMMAND, false, settings, presets);
+		addDefaultPreset(Preset.PRESET_LINK, false, settings, presets);
+		addDefaultPreset(Preset.PRESET_SELECTED_LINK, false, settings, presets);
+		addDefaultPreset(Preset.PRESET_SPEECH, false, settings, presets);
+		addDefaultPreset(Preset.PRESET_THOUGHT, false, settings, presets);
+		addDefaultPreset(Preset.PRESET_WATCHING, false, settings, presets);
+		addDefaultPreset(Preset.PRESET_WHISPER, false, settings, presets);
 	}
 }
