@@ -24,7 +24,7 @@
 				<not><isset property="@{property}"/></not>
 				<then>
 					<svn javahl="true">
-						<wcVersion path="../../core/cc.warlock.core"/>
+						<wcVersion path="../.."/>
 					</svn>
 					
 					<property name="@{property}" value="${warlock2-version-prefix}.${revision.max}_${warlock2-version-suffix}"/>
