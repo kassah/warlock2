@@ -48,7 +48,8 @@ public class AccountWizardPage extends WizardPageWithNotification {
 	
 	public AccountWizardPage (SGEConnection connection)
 	{
-		super ("Account Information", "Please enter your account information.", WarlockSharedImages.getImageDescriptor(WarlockSharedImages.IMG_WIZBAN_WARLOCK));
+		super (WizardMessages.AccountWizardPage_title, WizardMessages.AccountWizardPage_description,
+			WarlockSharedImages.getImageDescriptor(WarlockSharedImages.IMG_WIZBAN_WARLOCK));
 		
 		this.connection = connection;
 		listener = new Listener();
@@ -61,11 +62,11 @@ public class AccountWizardPage extends WizardPageWithNotification {
 		Composite controls = new Composite(parent, SWT.NONE);
 		controls.setLayout(new GridLayout(1, false));
 		
-		new Label(controls, SWT.NONE).setText("Account Name");
+		new Label(controls, SWT.NONE).setText(WizardMessages.AccountWizardPage_label_accountName);
 		account = new ComboField(controls, SWT.BORDER | SWT.DROP_DOWN);
 		account.getCombo().setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
 		
-		new Label(controls, SWT.NONE).setText("Password");
+		new Label(controls, SWT.NONE).setText(WizardMessages.AccountWizardPage_label_password);
 		password = new TextField(controls, SWT.BORDER);
 		password.getTextControl().setEchoChar('*');
 		password.getTextControl().setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
@@ -93,15 +94,18 @@ public class AccountWizardPage extends WizardPageWithNotification {
 		}
 	}
 	
+	protected String accountName;
+	
 	@Override
 	public void pageExited(int button) {
 		if (button == WizardWithNotification.NEXT)
 		{
+			accountName = account.getText();
 			savedAccount = SavedProfiles.getAccount(account.getText());
 			if (savedAccount == null)
 			{
 				boolean save = MessageDialog.openQuestion(Display.getDefault().getActiveShell(),
-					"Save Account?", "Would you like to save this account information?");
+					WizardMessages.AccountWizardPage_saveAccount_title, WizardMessages.AccountWizardPage_saveAccount_description);
 				
 				if (save)
 				{
@@ -110,13 +114,13 @@ public class AccountWizardPage extends WizardPageWithNotification {
 			}
 			
 			try {
-				getContainer().run(true, true, new IRunnableWithProgress() {
+				getContainer().run(false, true, new IRunnableWithProgress() {
 					public void run(IProgressMonitor monitor)
 						throws InvocationTargetException, InterruptedException
 					{
 						listener.setProgressMonitor(monitor);
 						
-						monitor.beginTask("Authorizing account \"" + account.getText() + "\"...", 3);
+						monitor.beginTask(WizardMessages.bind(WizardMessages.AccountWizardPage_progressMessage, account.getText()), 3);
 						connection.login(account.getText(), password.getText());
 						monitor.worked(1);
 					}
@@ -140,6 +144,21 @@ public class AccountWizardPage extends WizardPageWithNotification {
 			{
 				monitor.worked(1);
 			}
+			
+			if (status != SGEConnection.LOGIN_SUCCESS) {
+				String message = "Unknown error";
+				switch (status) {
+					case SGEConnection.ACCOUNT_REJECTED:	message = WizardMessages.AccountWizardPage_loginError_accountRejected; break;
+					case SGEConnection.INVALID_ACCOUNT: message = WizardMessages.AccountWizardPage_loginError_accountInvalid; break;
+					case SGEConnection.INVALID_PASSWORD: message = WizardMessages.AccountWizardPage_loginError_passwordInvalid; break;
+				}
+				
+				MessageDialog.openError(Display.getDefault().getActiveShell(),
+					WizardMessages.AccountWizardPage_loginError_title, WizardMessages.bind(message, accountName));
+				
+				getContainer().showPage(AccountWizardPage.this);
+			}
+			
 		}
 		
 		public void gamesReady(SGEConnection connection, Map games) {

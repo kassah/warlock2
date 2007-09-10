@@ -183,14 +183,14 @@ public class SGEConnection extends Connection implements IConnectionListener {
 						loginStatus = INVALID_ACCOUNT;
 					}
 					else loginStatus = LOGIN_SUCCESS;
-					
-					if (loginStatus != LOGIN_SUCCESS) {
-						System.out.println("Login Failed!");
-					}
-					
+
 					fireEvent (LOGIN_FINISHED);
-					sendLine("M");
-					state = SGE_GAME;
+					
+					if (loginStatus == LOGIN_SUCCESS) {
+						sendLine("M");
+						state = SGE_GAME;
+					}
+
 				} break;
 				
 				case 'M':
