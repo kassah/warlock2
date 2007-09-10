@@ -139,7 +139,7 @@ public class GameSelectWizardPage extends WizardPage {
 	public void setVisible (boolean visible) {
 		super.setVisible(visible);
 		
-		if (!visible && gameMap != null) {
+		if (!visible && gameMap != null && !gameMap.isEmpty()) {
 			try {
 				getContainer().run(true, true, new IRunnableWithProgress() {
 					public void run(IProgressMonitor monitor)

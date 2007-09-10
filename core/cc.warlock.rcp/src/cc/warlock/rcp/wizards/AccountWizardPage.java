@@ -54,7 +54,6 @@ public class AccountWizardPage extends WizardPageWithNotification {
 		this.connection = connection;
 		listener = new Listener();
 		connection.addSGEConnectionListener(new SWTSGEConnectionListenerAdapter(listener));
-		connection.connect();
 	}
 	
 	public void createControl(Composite parent) {
@@ -98,8 +97,22 @@ public class AccountWizardPage extends WizardPageWithNotification {
 	
 	@Override
 	public void pageExited(int button) {
-		if (button == WizardWithNotification.NEXT)
-		{
+//		if (button == WizardWithNotification.NEXT)
+//		{
+			if (!connection.isConnected())
+			{
+				connection.connect();
+				while (!connection.isConnected()) {
+					Display.getDefault().readAndDispatch();
+					try {
+						Thread.sleep((long) 200);
+					} catch (InterruptedException e) {
+						// TODO Auto-generated catch block
+						e.printStackTrace();
+					}
+				}
+			}
+			
 			accountName = account.getText();
 			savedAccount = SavedProfiles.getAccount(account.getText());
 			if (savedAccount == null)
@@ -128,7 +141,7 @@ public class AccountWizardPage extends WizardPageWithNotification {
 			} catch (Exception e) {
 				e.printStackTrace();
 			}
-		}
+//		}
 	}
 	
 	private class Listener extends SGEConnectionListener
