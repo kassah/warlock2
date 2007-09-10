@@ -572,7 +572,7 @@ public class WarlockText implements LineBackgroundListener, Drawable {
 		return textWidget.getContent();
 	}
 
-	public void internal_dispose_GC(int handle, GCData data) {
+	public void internal_dispose_GC(long handle, GCData data) {
 		textWidget.internal_dispose_GC(handle, data);
 	}
 
