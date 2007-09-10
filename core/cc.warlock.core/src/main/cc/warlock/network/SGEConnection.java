@@ -52,6 +52,7 @@ public class SGEConnection extends Connection implements IConnectionListener {
 	{
 		super();
 		addConnectionListener(this);
+		
 		state = SGE_NONE;
 		sgeListeners = new ArrayList<ISGEConnectionListener>();
 		games = new HashMap<String, String>();
@@ -59,9 +60,18 @@ public class SGEConnection extends Connection implements IConnectionListener {
 		loginProperties = new HashMap<String, String>();
 	}
 	
+	protected void resetState () {
+		state = SGE_NONE;
+		passwordHash = null;
+		games.clear();
+		characters.clear();
+		loginProperties.clear();
+	}
+	
 	public void connect ()
 	{
 		try {
+			resetState();
 			connect (SGE_SERVER, SGE_PORT);
 		} catch (IOException e) {
 			e.printStackTrace();
@@ -148,7 +158,6 @@ public class SGEConnection extends Connection implements IConnectionListener {
 		try {
 			connection.sendLine("K");
 			state = SGE_INITIAL;
-			
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
@@ -189,6 +198,9 @@ public class SGEConnection extends Connection implements IConnectionListener {
 					if (loginStatus == LOGIN_SUCCESS) {
 						sendLine("M");
 						state = SGE_GAME;
+					}
+					else {
+						disconnect();
 					}
 
 				} break;

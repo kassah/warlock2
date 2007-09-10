@@ -3,7 +3,6 @@
  */
 package cc.warlock.network;
 
-import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.net.Socket;
@@ -28,6 +27,7 @@ public class StormFrontConnection implements IConnection
 	protected int port;
 	protected ArrayList<IConnectionListener> listeners = new ArrayList<IConnectionListener>();
 	protected Socket socket;
+	protected boolean connected = false;
 	
 	public StormFrontConnection (IStormFrontClient client, String key) {
 		super();
@@ -42,7 +42,12 @@ public class StormFrontConnection implements IConnection
 		this.port = port;
 		
 		this.socket = new Socket(host, port);
+		connected = true;
 		new Thread(new SFParser()).start();
+	}
+	
+	public boolean isConnected() {
+		return connected;
 	}
 	
 	public void addConnectionListener(IConnectionListener listener) {

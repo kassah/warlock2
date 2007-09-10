@@ -22,6 +22,7 @@ public class Connection implements IConnection {
 	protected BufferedReader reader;
 	protected String host = null;
 	protected int port = -1;
+	
 	public Connection (String host, int port)
 		throws IOException
 	{
@@ -42,6 +43,10 @@ public class Connection implements IConnection {
 		reader = new BufferedReader(new InputStreamReader(socket.getInputStream()));
 		
 		new Thread(new EventPollThread()).start();
+	}
+	
+	public boolean isConnected() {
+		return connected;
 	}
 	
 	public String getHost() {
