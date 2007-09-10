@@ -17,6 +17,7 @@ import org.eclipse.swt.custom.StyledTextContent;
 import org.eclipse.swt.events.ControlEvent;
 import org.eclipse.swt.events.ControlListener;
 import org.eclipse.swt.events.FocusListener;
+import org.eclipse.swt.events.KeyListener;
 import org.eclipse.swt.events.MouseEvent;
 import org.eclipse.swt.events.MouseListener;
 import org.eclipse.swt.events.MouseMoveListener;
@@ -251,6 +252,10 @@ public class WarlockText implements LineBackgroundListener, Drawable {
 	
 	public void addFocusListener(FocusListener listener) {
 		textWidget.addFocusListener(listener);
+	}
+	
+	public void addKeyListener(KeyListener listener) {
+		textWidget.addKeyListener(listener);
 	}
 	
 	public Rectangle getBounds() {
