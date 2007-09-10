@@ -27,11 +27,9 @@ import org.eclipse.swt.events.VerifyEvent;
 import org.eclipse.swt.events.VerifyListener;
 import org.eclipse.swt.graphics.Color;
 import org.eclipse.swt.graphics.Cursor;
-import org.eclipse.swt.graphics.Drawable;
 import org.eclipse.swt.graphics.Font;
 import org.eclipse.swt.graphics.FontMetrics;
 import org.eclipse.swt.graphics.GC;
-import org.eclipse.swt.graphics.GCData;
 import org.eclipse.swt.graphics.GlyphMetrics;
 import org.eclipse.swt.graphics.Image;
 import org.eclipse.swt.graphics.PaletteData;
@@ -57,7 +55,7 @@ import cc.warlock.rcp.ui.style.StyleMappings;
  * 
  * @author Marshall
  */
-public class WarlockText implements LineBackgroundListener, Drawable {
+public class WarlockText implements LineBackgroundListener {
 
 	public static final char OBJECT_HOLDER = '\uFFFc';
 	
@@ -570,13 +568,5 @@ public class WarlockText implements LineBackgroundListener, Drawable {
 	
 	public StyledTextContent getContent() {
 		return textWidget.getContent();
-	}
-
-	public void internal_dispose_GC(int handle, GCData data) {
-		textWidget.internal_dispose_GC(handle, data);
-	}
-
-	public int internal_new_GC(GCData data) {
-		return textWidget.internal_new_GC(data);
 	}
 }
