@@ -2,19 +2,21 @@ package cc.warlock.rcp.ui;
 
 import java.net.MalformedURLException;
 import java.net.URL;
-import java.util.ArrayList;
 import java.util.Hashtable;
 import java.util.Iterator;
 
 import org.eclipse.swt.SWT;
+import org.eclipse.swt.custom.ExtendedModifyListener;
 import org.eclipse.swt.custom.LineBackgroundEvent;
 import org.eclipse.swt.custom.LineBackgroundListener;
 import org.eclipse.swt.custom.PaintObjectEvent;
 import org.eclipse.swt.custom.PaintObjectListener;
 import org.eclipse.swt.custom.StyleRange;
 import org.eclipse.swt.custom.StyledText;
+import org.eclipse.swt.custom.StyledTextContent;
 import org.eclipse.swt.events.ControlEvent;
 import org.eclipse.swt.events.ControlListener;
+import org.eclipse.swt.events.FocusListener;
 import org.eclipse.swt.events.MouseEvent;
 import org.eclipse.swt.events.MouseListener;
 import org.eclipse.swt.events.MouseMoveListener;
@@ -24,14 +26,18 @@ import org.eclipse.swt.events.VerifyEvent;
 import org.eclipse.swt.events.VerifyListener;
 import org.eclipse.swt.graphics.Color;
 import org.eclipse.swt.graphics.Cursor;
+import org.eclipse.swt.graphics.Drawable;
+import org.eclipse.swt.graphics.Font;
 import org.eclipse.swt.graphics.FontMetrics;
 import org.eclipse.swt.graphics.GC;
+import org.eclipse.swt.graphics.GCData;
 import org.eclipse.swt.graphics.GlyphMetrics;
 import org.eclipse.swt.graphics.Image;
 import org.eclipse.swt.graphics.PaletteData;
 import org.eclipse.swt.graphics.Point;
 import org.eclipse.swt.graphics.RGB;
 import org.eclipse.swt.graphics.Rectangle;
+import org.eclipse.swt.widgets.Caret;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Control;
 import org.eclipse.swt.widgets.Display;
@@ -50,10 +56,11 @@ import cc.warlock.rcp.ui.style.StyleMappings;
  * 
  * @author Marshall
  */
-public class WarlockText extends StyledText implements LineBackgroundListener {
+public class WarlockText implements LineBackgroundListener, Drawable {
 
 	public static final char OBJECT_HOLDER = '\uFFFc';
 	
+	private StyledText textWidget;
 	private Hashtable<Object, StyleRangeWithData> objects = new Hashtable<Object, StyleRangeWithData>();
 	private Hashtable<Control, Rectangle> anchoredControls = new Hashtable<Control, Rectangle>();
 	private Color linkColor;
@@ -67,7 +74,7 @@ public class WarlockText extends StyledText implements LineBackgroundListener {
 	protected Hashtable<Integer, Color> lineForegrounds = new Hashtable<Integer,Color>();
 	
 	public WarlockText(Composite parent, int style) {
-		super(parent, style);
+		textWidget = new StyledText(parent, style);
 		
 		Display display = parent.getDisplay();
 		linkColor = new Color(display, 0xF0, 0x80, 0);
@@ -210,15 +217,155 @@ public class WarlockText extends StyledText implements LineBackgroundListener {
 		});
 	}
 	
+	public void addLineBackgroundListener(LineBackgroundListener listener) {
+		textWidget.addLineBackgroundListener(listener);
+	}
+	
+	public void addControlListener(ControlListener listener) {
+		textWidget.addControlListener(listener);
+	}
+	
+	public void addPaintListener(PaintListener listener) {
+		textWidget.addPaintListener(listener);
+	}
+	
+	public void addMouseListener(MouseListener listener) {
+		textWidget.addMouseListener(listener);
+	}
+	
+	public void addMouseMoveListener(MouseMoveListener listener) {
+		textWidget.addMouseMoveListener(listener);
+	}
+	
+	public void addPaintObjectListener(PaintObjectListener listener) {
+		textWidget.addPaintObjectListener(listener);
+	}
+	
+	public void addVerifyListener(VerifyListener verifyListener) {
+		textWidget.addVerifyListener(verifyListener);
+	}
+	
+	public void addExtendedModifyListener(ExtendedModifyListener extendedModifyListener) {
+		textWidget.addExtendedModifyListener(extendedModifyListener);
+	}
+	
+	public void addFocusListener(FocusListener listener) {
+		textWidget.addFocusListener(listener);
+	}
+	
+	public Rectangle getBounds() {
+		return textWidget.getBounds();
+	}
+	
+	public Display getDisplay() {
+		return textWidget.getDisplay();
+	}
+	
+	public ScrollBar getVerticalBar() {
+		return textWidget.getVerticalBar();
+	}
+	
+	public boolean isDisposed() {
+		return textWidget.isDisposed();
+	}
+	
+	public boolean isVisible() {
+		return textWidget.isVisible();
+	}
+	
+	public void setBackgroundMode(int mode) {
+		textWidget.setBackgroundMode(mode);
+	}
+	
+	public void setCursor(Cursor cursor) {
+		textWidget.setCursor(cursor);
+	}
+	
+	public int getOffsetAtLocation(Point point) {
+		return textWidget.getOffsetAtLocation(point);
+	}
+	
+	public StyleRange getStyleRangeAtOffset(int offset) {
+		return textWidget.getStyleRangeAtOffset(offset);
+	}
+	
+	public void redraw() {
+		textWidget.redraw();
+	}
+	
+	public void redraw(int x, int y, int width, int height, boolean all) {
+		textWidget.redraw(x, y, width, height, all);
+	}
+	
+	public void selectAll() {
+		textWidget.selectAll();
+	}
+	
+	public void copy() {
+		textWidget.copy();
+	}
+	
+	public void setFocus() {
+		textWidget.setFocus();
+	}
+	
+	public Rectangle getClientArea() {
+		return textWidget.getClientArea();
+	}
+	
+	public void setLayoutData(Object layoutData) {
+		textWidget.setLayoutData(layoutData);
+	}
+	
+	public void setEditable(boolean editable) {
+		textWidget.setEditable(editable);
+	}
+	
+	public void setWordWrap(boolean wrap) {
+		textWidget.setWordWrap(wrap);
+	}
+	
+	public void setBackground(Color color) {
+		textWidget.setBackground(color);
+	}
+	
+	public void setForeground(Color color) {
+		textWidget.setForeground(color);
+	}
+	
+	public void setText(String text) {
+		textWidget.setText(text);
+	}
+	
+	public Font getFont() {
+		return textWidget.getFont();
+	}
+	
+	public void setFont(Font font) {
+		textWidget.setFont(font);
+	}
+	
+	public int getCharCount() {
+		return textWidget.getCharCount();
+	}
+	
 	private int getCurrentHolderOffset ()
 	{
 		return getHolderOffset(objects.keySet().size());
+	}
+	
+	public String getText() {
+		return textWidget.getText();
 	}
 	
 	private int getHolderOffset (int nHolder)
 	{
 		String text = getText();
 		return text.indexOf(OBJECT_HOLDER);
+	}
+	
+	public void update() {
+		textWidget.update();
 	}
 	
 	public void addAnchoredControl (Control control, Rectangle dimensions)
@@ -247,7 +394,7 @@ public class WarlockText extends StyledText implements LineBackgroundListener {
 	}
 	
 	public void addImage (Image image) {
-		Label label = new Label(this, SWT.NONE);
+		Label label = new Label(textWidget, SWT.NONE);
 		label.setImage(image);
 		label.setSize(image.getBounds().width, image.getBounds().width);
 		
@@ -289,9 +436,21 @@ public class WarlockText extends StyledText implements LineBackgroundListener {
 	public void append(String string) {
 		boolean atbottom = isScrolledToBottom(); 
 		constrainLineLimit();
-		super.append(string);
+		textWidget.append(string);
 		if (atbottom) 
 			scrollToBottom();
+	}
+	
+	public void replaceTextRange(int start, int length, String text) {
+		textWidget.replaceTextRange(start, length, text);
+	}
+	
+	public int getLineCount() {
+		return textWidget.getLineCount();
+	}
+	
+	public int getOffsetAtLine(int lineIndex) {
+		return textWidget.getOffsetAtLine(lineIndex);
 	}
 	
 	private void constrainLineLimit() {
@@ -342,10 +501,13 @@ public class WarlockText extends StyledText implements LineBackgroundListener {
 		lineBackgrounds.put(line, background);
 	}
 	
-	@Override
+	public int getLineAtOffset(int offset) {
+		return textWidget.getLineAtOffset(offset);
+	}
+	
 	public void setStyleRange(StyleRange range) {
 		int lineIndex = getLineAtOffset(range.start);
-		super.setStyleRange(range);
+		textWidget.setStyleRange(range);
 		if (range instanceof StyleRangeWithData)
 		{
 			StyleRangeWithData range2 = (StyleRangeWithData) range;
@@ -383,5 +545,33 @@ public class WarlockText extends StyledText implements LineBackgroundListener {
 		if (dir == SWT.DOWN || dir == SWT.UP)
 			doScrollDirection = dir;
 		// TODO: Else throw an error
+	}
+	
+	public int getCaretOffset() {
+		return textWidget.getCaretOffset();
+	}
+	
+	public void setCaretOffset(Caret caret) {
+		textWidget.setCaret(caret);
+	}
+	
+	public void setCaretOffset(int offset) {
+		textWidget.setCaretOffset(offset);
+	}
+	
+	public void showSelection() {
+		textWidget.showSelection();
+	}
+	
+	public StyledTextContent getContent() {
+		return textWidget.getContent();
+	}
+
+	public void internal_dispose_GC(int handle, GCData data) {
+		textWidget.internal_dispose_GC(handle, data);
+	}
+
+	public int internal_new_GC(GCData data) {
+		return textWidget.internal_new_GC(data);
 	}
 }
