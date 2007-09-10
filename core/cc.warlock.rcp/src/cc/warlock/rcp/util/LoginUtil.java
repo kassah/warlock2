@@ -8,6 +8,8 @@ import org.eclipse.swt.widgets.Display;
 import org.eclipse.ui.PartInitException;
 import org.eclipse.ui.PlatformUI;
 
+import cc.warlock.client.IWarlockStyle;
+import cc.warlock.client.internal.WarlockStyle;
 import cc.warlock.client.stormfront.IStormFrontClient;
 import cc.warlock.network.SGEConnection;
 import cc.warlock.rcp.application.WarlockApplication;
@@ -42,8 +44,16 @@ public class LoginUtil {
 			}
 			
 		} catch (IOException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
+			String errorConnectMessage =
+			"******************************************************************\n" +
+			"* The connection was refused, possibly meaning the server is currently down,\n" +
+			"* or your internet connection is not active\n" +
+			"******************************************************************\n";
+			
+			IWarlockStyle style = WarlockStyle.createCustomStyle("mono", 0, errorConnectMessage.length());
+			style.addStyleType(IWarlockStyle.StyleType.MONOSPACE);
+			
+			client.getDefaultStream().send(errorConnectMessage, style);
 		} catch (PartInitException e) {
 			e.printStackTrace();
 		}

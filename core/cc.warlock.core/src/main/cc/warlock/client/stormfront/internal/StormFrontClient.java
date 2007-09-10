@@ -209,14 +209,10 @@ public class StormFrontClient extends WarlockClient implements IStormFrontClient
 	}
 	
 	public void connect(String server, int port, String key) throws IOException {
-		try {
-			connection = new StormFrontConnection(this, key);
-			connection.connect(server, port);
-			
-			WarlockClientRegistry.clientConnected(this);
-		} catch (IOException e) {
-			e.printStackTrace();
-		}
+		connection = new StormFrontConnection(this, key);
+		connection.connect(server, port);
+		
+		WarlockClientRegistry.clientConnected(this);
 	}
 	
 	public void streamCleared() {
