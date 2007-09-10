@@ -45,7 +45,7 @@ public class ServerSettings implements Comparable<ServerSettings>
 	protected Hashtable<String, String> variables = new Hashtable<String, String>();
 	protected ArrayList<ArrayList<MacroKey>> macroSets = new ArrayList<ArrayList<MacroKey>>();
 	protected Hashtable<String, ServerScript> scripts = new Hashtable<String, ServerScript>();
-	protected DefaultSkin defaultSkin;
+	protected DefaultSkin defaultSkin = new DefaultSkin(this);
 	
 	protected ArrayList<HighlightString> deletedHighlightStrings = new ArrayList<HighlightString>();
 	protected ArrayList<String> deletedVariables = new ArrayList<String>();
@@ -134,7 +134,6 @@ public class ServerSettings implements Comparable<ServerSettings>
 			loadScripts();
 			
 			// initalize before we call the viewers
-			defaultSkin = new DefaultSkin(this);
 			defaultSkin.loadDefaultPresets(this, presets);
 			
 			for (IWarlockClientViewer v : client.getViewers())

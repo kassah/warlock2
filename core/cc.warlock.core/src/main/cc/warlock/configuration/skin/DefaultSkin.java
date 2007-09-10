@@ -14,10 +14,12 @@ import cc.warlock.configuration.server.ServerSettings;
 public class DefaultSkin implements IWarlockSkin {
 
 	public static final int DEFAULT_FONT_SIZE = 12;
+	public static final WarlockColor MAIN_COLOR = new WarlockColor(-1, -1, -1);
 	
 	protected Hashtable<String, WarlockColor> fgColors = new Hashtable<String, WarlockColor>();
 	protected Hashtable<String, WarlockColor> bgColors = new Hashtable<String, WarlockColor>();
 	protected WarlockColor commandLineBarColor;
+	protected ServerSettings settings;
 	
 	protected static WarlockColor skinColor (String color)
 	{
@@ -28,6 +30,8 @@ public class DefaultSkin implements IWarlockSkin {
 	
 	public DefaultSkin (ServerSettings settings)
 	{
+		this.settings = settings;
+		
 		fgColors.put("bold", skinColor("#FFFF00"));
 		fgColors.put("roomName", skinColor("#FFFFFF"));
 		fgColors.put("speech", skinColor("#80FF80"));
@@ -39,28 +43,34 @@ public class DefaultSkin implements IWarlockSkin {
 		fgColors.put("selectedLink", skinColor("#000000"));
 		fgColors.put("command", skinColor("#FFFFFF"));
 		
-		WarlockColor mainFG = settings.getColorSetting(ColorType.MainWindow_Foreground, false);
-		mainFG = mainFG.equals(WarlockColor.DEFAULT_COLOR) ? skinColor("#F0F0FF") : mainFG;
-		
-		WarlockColor mainBG = settings.getColorSetting(ColorType.MainWindow_Background, false);
-		mainBG = mainBG.equals(WarlockColor.DEFAULT_COLOR) ? skinColor("#191932") : mainBG;
-		
-		fgColors.put("main", mainFG);
-		bgColors.put("main", mainBG);
+		fgColors.put("main", MAIN_COLOR);
+		bgColors.put("main", MAIN_COLOR);
 		
 		bgColors.put("roomName", skinColor("#0000FF"));
-		bgColors.put("bold", mainBG);
-		bgColors.put("speech", mainBG);
-		bgColors.put("whisper", mainBG);
-		bgColors.put("thought", mainBG);
-		bgColors.put("watching", mainBG);
-		bgColors.put("link", mainBG);
-		bgColors.put("main", mainBG);
+		bgColors.put("bold", MAIN_COLOR);
+		bgColors.put("speech", MAIN_COLOR);
+		bgColors.put("whisper", MAIN_COLOR);
+		bgColors.put("thought", MAIN_COLOR);
+		bgColors.put("watching", MAIN_COLOR);
+		bgColors.put("link", MAIN_COLOR);
+		bgColors.put("main", MAIN_COLOR);
 		bgColors.put("cmdline", skinColor("#000000"));
 		bgColors.put("selectedLink", skinColor("#62B0FF"));
 		bgColors.put("command", skinColor("#404040"));
 		
 		commandLineBarColor = skinColor("#FFFFFF");
+	}
+	
+	protected WarlockColor getMainForeground () {
+		WarlockColor mainFG = settings.getColorSetting(ColorType.MainWindow_Foreground, false);
+		mainFG = mainFG.equals(WarlockColor.DEFAULT_COLOR) ? skinColor("#F0F0FF") : mainFG;
+		return mainFG;
+	}
+	
+	protected WarlockColor getMainBackground () {
+		WarlockColor mainBG = settings.getColorSetting(ColorType.MainWindow_Background, false);
+		mainBG = mainBG.equals(WarlockColor.DEFAULT_COLOR) ? skinColor("#191932") : mainBG;
+		return mainBG;
 	}
 	
 	public WarlockColor getColor(ColorType type) {
@@ -102,6 +112,11 @@ public class DefaultSkin implements IWarlockSkin {
 			color = fgColors.get(presetId);
 		}
 		
+		if (color == MAIN_COLOR)
+		{
+			color = getMainForeground();
+		}
+		
 		return color;
 	}
 	
@@ -112,6 +127,11 @@ public class DefaultSkin implements IWarlockSkin {
 		if (bgColors.containsKey(presetId))
 		{
 			color = bgColors.get(presetId);
+		}
+		
+		if (color == MAIN_COLOR)
+		{
+			color = getMainBackground();
 		}
 		
 		return color;
