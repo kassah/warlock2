@@ -6,6 +6,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Stack;
 import java.util.concurrent.locks.Condition;
 import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReentrantLock;
@@ -31,6 +32,7 @@ public class WarlockWSLScript extends AbstractScript {
 	protected WarlockWSLScriptLine curLine;
 	protected WarlockWSLScriptLine endLine;
 	protected HashMap<String, String> variables = new HashMap<String, String>();
+	protected Stack<WarlockWSLScriptLine> callstack = new Stack<WarlockWSLScriptLine>();
 	protected HashMap<String, WarlockWSLCommand> wslCommands = new HashMap<String, WarlockWSLCommand>();
 	protected int pauseLine;
 	protected Thread scriptThread;
@@ -56,6 +58,8 @@ public class WarlockWSLScript extends AbstractScript {
 		addCommand(new WarlockWSLDeleteVariable());
 		addCommand(new WarlockWSLSetVariable());
 		addCommand(new WarlockWSLGoto());
+		addCommand(new WarlockWSLCall());
+		addCommand(new WarlockWSLReturn());
 		addCommand(new WarlockWSLMatchWait());
 		addCommand(new WarlockWSLMatchRe());
 		addCommand(new WarlockWSLMatch());
@@ -351,7 +355,7 @@ public class WarlockWSLScript extends AbstractScript {
 			{
 				curLine = nextLine = command;
 			}
-			else {
+			else { // TODO: Fix gotoLabel to throw an exception instead of outputting to user
 				commands.echo ("***********");
 				commands.echo ("*** WARNING: Label \"" + label + "\" doesn't exist, skipping goto statement ***");
 				commands.echo ("***********");
@@ -371,6 +375,47 @@ public class WarlockWSLScript extends AbstractScript {
 				String label = args[0];
 				gotoLabel(label);
 			} else { /*throw error*/ }
+		}
+	}
+	
+	protected void callLabel (String label)
+	{
+		callstack.push(nextLine);
+		gotoLabel(label);
+	}
+	
+	protected class WarlockWSLCall extends WarlockWSLCommand {
+		public String getName() {
+			return "call";
+		}
+		
+		public void execute (String arguments) {
+			String[] args = arguments.split(argSeparator);
+			if (args.length >= 1)
+			{
+				String label = args[0];
+				callLabel(label);
+			} else { /*throw error*/ }
+		}
+	}
+	
+	protected void callReturn () {
+		if (callstack.empty()) {
+			commands.echo ("***********");
+			commands.echo ("*** WARNING: No outstanding calls were executed, skipping return statement ***");
+			commands.echo ("***********");
+		} else {
+			curLine = nextLine = callstack.pop();
+		}
+	}
+	
+	protected class WarlockWSLReturn extends WarlockWSLCommand {
+		public String getName() {
+			return "return";
+		}
+		
+		public void execute (String arguments) {
+			callReturn();
 		}
 	}
 
