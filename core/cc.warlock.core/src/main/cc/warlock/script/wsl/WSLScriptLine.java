@@ -10,7 +10,7 @@ public class WSLScriptLine {
 	private WSLScript script;
 	private int lineNumber;
 	private WSLScriptLine next;
-	private ArrayList<IWSLValue> args = new ArrayList<IWSLValue>();
+	private IWSLValue value;
 	private IWSLValue condition;
 	
 	private Pattern commandPattern;
@@ -23,20 +23,12 @@ public class WSLScriptLine {
 	
 	
 	public void execute() {
-		if(args == null) return; // in a label
+		if(value == null) return; // in a label
 		
 		// Skip the line if the condition is false
 		if(condition != null && !condition.getBoolean()) return;
 		
-		StringBuffer buffer = new StringBuffer();
-		
-		for(IWSLValue arg : args) {
-			// System.out.print("appending arg \"" + arg.getString(vars) + "\"\n");
-			
-			buffer.append(arg.getString());
-		}
-		
-		String line = buffer.toString();
+		String line = value.getString();
 		System.out.print("script line: " + line + "\n");
 		
 		Matcher m = commandPattern.matcher(line);
@@ -68,14 +60,8 @@ public class WSLScriptLine {
 		return next;
 	}
 	
-	public void addArg(IWSLValue arg) {
-		args.add(arg);
-	}
-	
-	public void addArgs(ArrayList<IWSLValue> args) {
-		for(IWSLValue arg : args) {
-			addArg(arg);
-		}
+	public void setValue(IWSLValue value) {
+		this.value = value;
 	}
 	
 	public void setCondition(IWSLValue cond) {

@@ -19,7 +19,7 @@ grammar WSL;
 }
 
 @lexer::members {
-	private enum State { base, command, condition }
+	private enum State { base, command, condition, nq_string, nqq_string }
 	private boolean atStart = true;
 	private State state = State.base;
 }
@@ -49,31 +49,36 @@ expr returns [WSLScriptLine line]
 			script.addLabel($label.text, line);
 		}
 	| (IF cond=conditionalExpression THEN)?
-		args=arg_list
+		args=value_list
 			{
 				line = new WSLScriptLine(script, lineNum);
-				line.addArgs(args);
+				line.setValue(args);
 				if(cond != null)
 					line.setCondition(cond);
 			}
 	;
 
-arg_list returns [ArrayList<IWSLValue> list]
-	: ( data=script_data				{ list = new ArrayList<IWSLValue>(); list.add(data); } )
-	| ( data=script_data l=arg_list		{ list = l; list.add(0, data); } )
+value_list returns [IWSLValue value]
+	: l=value_list_helper
+			{
+				if(l.size() > 1)
+					value = new WSLList(l);
+				else
+					value = l.get(0);
+			}
 	;
 
-script_data returns [IWSLValue arg]
-	: str=STRING
-		{
-			arg = new WSLString($str.text);
-			System.out.println("STRING: \"" + $str.text + "\"");
-		}
-	| var=VARIABLE
-		{
-			arg = new WSLVariable($var.text, script);
-			System.out.println("VARIABLE: \"" + $var.text + "\"");
-		}
+value_list_helper returns [ArrayList<IWSLValue> list]
+	: ( data=script_value						{ list = new ArrayList<IWSLValue>(); list.add(data); } )
+	| ( data=script_value l=value_list_helper	{ list = l; list.add(0, data); } )
+	;
+
+script_value returns [IWSLValue value]
+	: v=STRING	{ value = new WSLString($v.text); }
+	| v=VARIABLE { value = new WSLVariable($v.text, script); }
+	| v=NUMBER		{ value = new WSLNumber($v.text); }
+	| TRUE			{ value = new WSLBoolean(true); }
+	| FALSE			{ value = new WSLBoolean(false); }
 	;
 	
 conditionalExpression returns [IWSLValue cond]
@@ -192,19 +197,13 @@ parenExpression returns [IWSLValue cond]
 
 primaryExpression returns [IWSLValue cond]
 	: arg=parenExpression	{ cond = arg; }
-	| arg=condition_value	{ cond = arg; }
+	| l=value_list			{ cond = l; }
 	;
 
-condition_value returns [IWSLValue value]
-	: v=NUMBER		{ value = new WSLNumber($v.text); }
-	| TRUE			{ value = new WSLBoolean(true); }
-	| FALSE			{ value = new WSLBoolean(false); }
-	| v=STRING		{ value = new WSLString($v.text); }
-	| v=VARIABLE	{ value = new WSLVariable($v.text, script); }
-	;
+
 
 WHITESPACE
-	: { state != State.command }?=>
+	: { state == State.base || state == State.condition }?=>
 		WS+			{ channel = HIDDEN; }
 	;
 EOL
@@ -241,8 +240,14 @@ STRING
 		{
 			if(state == State.base) state = State.command;
 		}
-	| { state == State.condition }?=> '"' str=NQQ_STRING '"' { setText($str.text); }
-	| { state == State.condition }?=> '\'' str=NQ_STRING '\'' { setText($str.text); }
+	| { state == State.nqq_string }?=> (~('"'|'%'|'\n'|'\r'))+
+	| { state == State.nq_string }?=> (~('\''|'%'|'\n'|'\r'))+
+	;
+QUOTE
+	: { state == State.condition }?=> '"'	{ state = State.nqq_string; channel = HIDDEN; }
+	| { state == State.condition }?=> '\''	{ state = State.nq_string; channel = HIDDEN; }
+	| { state == State.nqq_string }?=> '"'	{ state = State.condition; channel = HIDDEN; }
+	| { state == State.nq_string }?=> '\''	{ state = State.condition; channel = HIDDEN; }
 	;
 NUMBER
 	: { state == State.condition }?=> (DIGIT)+ ('.' (DIGIT)+)?
@@ -265,10 +270,4 @@ fragment NORMAL_CHAR
 	;
 fragment NORMAL_STRING
 	: NORMAL_CHAR+
-	;
-fragment NQQ_STRING
-	: (~('"'))+
-	;
-fragment NQ_STRING
-	: (~('\''))+
 	;
