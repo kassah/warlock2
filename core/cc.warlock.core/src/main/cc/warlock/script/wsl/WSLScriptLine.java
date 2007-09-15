@@ -1,33 +1,23 @@
 package cc.warlock.script.wsl;
 
-import java.util.ArrayList;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
-
-import cc.warlock.script.wsl.WSLScript.WSLCommand;
-
 public class WSLScriptLine {
-	private WSLScript script;
 	private int lineNumber;
 	private WSLScriptLine next;
 	private IWSLValue value;
 	private IWSLValue condition;
 	
-	public WSLScriptLine(WSLScript script, int lineNumber) {
-		this.script = script;
+	public WSLScriptLine(int lineNumber) {
 		this.lineNumber = lineNumber;
 	}
 	
 	
-	public void execute() {
-		if(value == null) return; // in a label
+	public String get() {
+		if(value == null) return null; // in a label
 		
 		// Skip the line if the condition is false
-		if(condition != null && !condition.getBoolean()) return;
+		if(condition != null && !condition.getBoolean()) return null;
 		
-		String line = value.getString();
-		System.out.print("script line: " + line + "\n");
-		script.execute(line);
+		return value.getString();
 	}
 	
 	public int getLineNumber() {

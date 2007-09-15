@@ -41,7 +41,7 @@ expr returns [WSLScriptLine line]
 	: label=LABEL (l=expr)?
 		{
 			if (l == null) {
-				line = new WSLScriptLine(script, lineNum);
+				line = new WSLScriptLine(lineNum);
 			} else {
 				line = l;
 			}
@@ -51,7 +51,7 @@ expr returns [WSLScriptLine line]
 	| (IF cond=conditionalExpression THEN)?
 		args=value_list
 			{
-				line = new WSLScriptLine(script, lineNum);
+				line = new WSLScriptLine(lineNum);
 				line.setValue(args);
 				if(cond != null)
 					line.setCondition(cond);

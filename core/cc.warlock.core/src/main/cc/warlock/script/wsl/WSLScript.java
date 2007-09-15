@@ -114,7 +114,12 @@ public class WSLScript extends AbstractScript {
 				checkState();
 				nextLine = curLine.getNext();
 				
-				curLine.execute();
+				String line = curLine.get();
+				if(line != null) {
+					System.out.print("script line: " + line + "\n");
+					execute(line);
+				}
+				
 				curLine = nextLine;
 			}
 			
@@ -188,7 +193,7 @@ public class WSLScript extends AbstractScript {
 		endLine = line;
 	}
 	
-	public void execute(String line) {
+	private void execute(String line) {
 		Matcher m = commandPattern.matcher(line);
 		
 		if (!m.find()) {
