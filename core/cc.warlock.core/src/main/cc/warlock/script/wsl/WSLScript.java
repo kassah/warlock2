@@ -38,6 +38,8 @@ public class WSLScript extends AbstractScript {
 	protected int pauseLine;
 	protected Thread scriptThread;
 	private ArrayList<Match> matchset = new ArrayList<Match>();
+	private Pattern commandPattern = Pattern.compile("^([\\w_]+)(\\s+(.*))?");
+	private WSLCommand if_ = new WSLIf_();
 	
 	private final Lock lock = new ReentrantLock();
 	private final Condition gotResume = lock.newCondition();
@@ -73,11 +75,6 @@ public class WSLScript extends AbstractScript {
 		addCommand("move", new WSLMove());
 		addCommand("nextroom", new WSLNextRoom());
 		addCommand("exit", new WSLExit());
-		// TODO change these to be added/removed as variables are set/deleted
-		for(int i = 1; i <= 9; i++) {
-			String var = Integer.toString(i);
-			addCommand("if_" + var, new WSLIf_(var));
-		}
 		
 		this.scriptName = scriptName;
 		
@@ -105,10 +102,6 @@ public class WSLScript extends AbstractScript {
 		return variables;
 	}
 	
-	public Map<String, WSLCommand> getCommands() {
-		return wslCommands;
-	}
-	
 	public boolean isRunning() {
 		return running;
 	}
@@ -133,12 +126,12 @@ public class WSLScript extends AbstractScript {
 	public void start (ArrayList<String> arguments)
 	{
 		for (int i = 0; i < arguments.size(); i++) {
-			variables.put(Integer.toString(i + 1), arguments.get(i));
+			setVariable(Integer.toString(i + 1), arguments.get(i));
 		}
 		
 		for (String varName : commands.getClient().getServerSettings().getVariableNames())
 		{
-			variables.put(varName, commands.getClient().getServerSettings().getVariable(varName));
+			setVariable(varName, commands.getClient().getServerSettings().getVariable(varName));
 		}
 		
 		scriptThread = new Thread(new ScriptRunner());
@@ -195,6 +188,24 @@ public class WSLScript extends AbstractScript {
 		endLine = line;
 	}
 	
+	public void execute(String line) {
+		Matcher m = commandPattern.matcher(line);
+		
+		if (!m.find()) {
+			System.out.println("Couldn't find the command");
+			return;
+		}
+		
+		String commandName = m.group(1).toLowerCase();
+		// System.out.print("command \"" + commandName + "\"\n");
+		String arguments = m.group(3);
+		if(arguments == null) arguments = "";
+		// System.out.print("arguments \"" + arguments + "\"\n");
+		
+		WSLCommand command = wslCommands.get(commandName);
+		if(command != null) command.execute(arguments);
+	}
+	
 	public void stop() {
 		running = false;
 		stopped = true;
@@ -244,7 +255,7 @@ public class WSLScript extends AbstractScript {
 	protected class WSLSave extends WSLCommand {
 		
 		public void execute(String arguments) {
-			variables.put("s", arguments);
+			setVariable("s", arguments);
 		}
 	}
 
@@ -254,10 +265,10 @@ public class WSLScript extends AbstractScript {
 			for (int i = 0; ; i++) {
 				String arg = variables.get(Integer.toString(i + 1));
 				if (arg == null) {
-					variables.remove(Integer.toString(i));
+					deleteVariable(Integer.toString(i));
 					break;
 				}
-				variables.put(Integer.toString(i), arg);
+				setVariable(Integer.toString(i), arg);
 			}
 		}
 	}
@@ -273,27 +284,27 @@ public class WSLScript extends AbstractScript {
 
 				if ("set".equalsIgnoreCase(counterFunction))
 				{
-					variables.put("c", args[1]);
+					setVariable("c", args[1]);
 				}
 				else if ("add".equalsIgnoreCase(counterFunction))
 				{	
 					int newValue = value + Integer.parseInt(args[1]);
-					variables.put("c", "" + newValue);
+					setVariable("c", "" + newValue);
 				}
 				else if ("subtract".equalsIgnoreCase(counterFunction))
 				{
 					int newValue = value - Integer.parseInt(args[1]);
-					variables.put("c", "" + newValue);
+					setVariable("c", "" + newValue);
 				}
 				else if ("multiply".equalsIgnoreCase(counterFunction))
 				{
 					int newValue = value * Integer.parseInt(args[1]);
-					variables.put("c", "" + newValue);
+					setVariable("c", "" + newValue);
 				}
 				else if ("divide".equalsIgnoreCase(counterFunction))
 				{
 					int newValue = value / Integer.parseInt(args[1]);
-					variables.put("c", "" + newValue);
+					setVariable("c", "" + newValue);
 				}
 			} else { /*throw error */ }
 		}
@@ -303,12 +314,21 @@ public class WSLScript extends AbstractScript {
 		
 		public void execute (String arguments) {
 			String var = arguments.split(argSeparator)[0];
-			variables.remove(var);
+			deleteVariable(var);
 		}
 	}
 
 	private void setVariable(String name, String value) {
 		variables.put(name, value);
+		String command = "if_" + name;
+		if(!wslCommands.containsKey(command)) {
+			wslCommands.put(command, if_);
+		}
+	}
+	
+	private void deleteVariable(String name) {
+		wslCommands.remove(name);
+		variables.remove(name);
 	}
 	
 	protected class WSLSetVariable extends WSLCommand {
@@ -592,27 +612,8 @@ public class WSLScript extends AbstractScript {
 	
 	protected class WSLIf_ extends WSLCommand {
 		
-		protected String variableName;
-		private Pattern format = Pattern.compile("^([\\w_]+)\\s+(.*)");
-		
-		public WSLIf_ (String variableName) {
-			this.variableName = variableName;
-		}
-		
 		public void execute (String arguments) {
-			if (variables.containsKey(variableName)) {
-				Matcher m = format.matcher(arguments);
-				
-				if(m.matches()) {
-					String curCommandName = m.group(1).toLowerCase();
-				
-					WSLCommand command = wslCommands.get(curCommandName);
-					if(command != null) {
-						command.execute(m.group(2));
-					}
-					// else this acts as a comment
-				}
-			}
+			WSLScript.this.execute(arguments);
 		}
 	}
 	

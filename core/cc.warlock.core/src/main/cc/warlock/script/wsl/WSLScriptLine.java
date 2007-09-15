@@ -13,12 +13,9 @@ public class WSLScriptLine {
 	private IWSLValue value;
 	private IWSLValue condition;
 	
-	private Pattern commandPattern;
-	
 	public WSLScriptLine(WSLScript script, int lineNumber) {
 		this.script = script;
 		this.lineNumber = lineNumber;
-		commandPattern = Pattern.compile("^([\\w_]+)(\\s+(.*))?");
 	}
 	
 	
@@ -30,22 +27,7 @@ public class WSLScriptLine {
 		
 		String line = value.getString();
 		System.out.print("script line: " + line + "\n");
-		
-		Matcher m = commandPattern.matcher(line);
-		
-		if (!m.find()) {
-			System.out.println("Couldn't find the command");
-			return;
-		}
-		
-		String commandName = m.group(1).toLowerCase();
-		// System.out.print("command \"" + commandName + "\"\n");
-		String arguments = m.group(3);
-		if(arguments == null) arguments = "";
-		// System.out.print("arguments \"" + arguments + "\"\n");
-		
-		WSLCommand command = script.getCommands().get(commandName);
-		if(command != null) command.execute(arguments);
+		script.execute(line);
 	}
 	
 	public int getLineNumber() {
