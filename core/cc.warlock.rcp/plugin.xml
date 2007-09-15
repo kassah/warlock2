@@ -93,7 +93,7 @@
          point="cc.warlock.rcp.scriptEngines">
       <scriptEngine classname="cc.warlock.script.javascript.JavascriptEngine"/>
       <scriptEngine
-            classname="cc.warlock.script.wsl.WarlockWSLEngine">
+            classname="cc.warlock.script.wsl.WSLEngine">
       </scriptEngine>
    </extension>
    <extension
