@@ -123,7 +123,7 @@ public class SGEConnection extends Connection implements IConnectionListener {
 			encrypted[i] = (char) ((hash.charAt(i)  ^ (password.charAt(i) - 32)) + 32);
 		}
 		
-		String encryptedString = new String();
+		String encryptedString = "";
 		for (int i = 0; i < password.length()+1; i++)
 		{
 			encryptedString += encrypted[i];
@@ -257,7 +257,7 @@ public class SGEConnection extends Connection implements IConnectionListener {
 			switch (event) {
 			case LOGIN_READY: listener.loginReady(SGEConnection.this); break;
 			case LOGIN_FINISHED: listener.loginFinished(SGEConnection.this, loginStatus); break;
-			case GAMES_READY: listener.gamesReady(SGEConnection.this, games);
+			case GAMES_READY: listener.gamesReady(SGEConnection.this, games); break;
 			case CHARACTERS_READY: listener.charactersReady(SGEConnection.this, characters); break;
 			case READY_TO_PLAY: listener.readyToPlay(SGEConnection.this, loginProperties); break;
 			default: break;

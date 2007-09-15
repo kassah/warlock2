@@ -25,11 +25,16 @@ public class SettingsInfoTagHandler extends DefaultTagHandler {
 	@Override
 	public void handleStart(Map<String, String> attributes) {
 		crc = attributes.get("crc");
-		majorVersion = Integer.parseInt(attributes.get("major"));
-		clientVersion = attributes.get("client");
 		
-		handler.getClient().getServerSettings().setMajorVersion(majorVersion);
-		handler.getClient().getServerSettings().setClientVersion(clientVersion);
+		String major = attributes.get("major");
+		if(major != null) {
+			majorVersion = Integer.parseInt(attributes.get("major"));
+			handler.getClient().getServerSettings().setMajorVersion(majorVersion);
+		}
+		
+		clientVersion = attributes.get("client");
+		if(clientVersion != null)
+			handler.getClient().getServerSettings().setClientVersion(clientVersion);
 	}
 	
 	@Override

@@ -14,7 +14,7 @@ import cc.warlock.stormfront.IStormFrontProtocolHandler;
 public class PushBoldTagHandler extends DefaultTagHandler {
 
 	protected IWarlockStyle style;
-	protected static Pattern linkPattern = Pattern.compile("(www\\.|http://).+");
+	protected static final Pattern linkPattern = Pattern.compile("(www\\.|http://).+");
 	
 	public PushBoldTagHandler (IStormFrontProtocolHandler handler)
 	{
@@ -40,7 +40,7 @@ public class PushBoldTagHandler extends DefaultTagHandler {
 			style.setLength(buffer.getBuffer().length());
 			buffer.addStyle(style);
 			
-			String matchText = new String(buffer.getBuffer().toString());
+			String matchText = buffer.getBuffer().toString();
 			
 			Matcher linkMatcher = linkPattern.matcher(matchText.trim());
 			if (linkMatcher.matches())

@@ -227,9 +227,9 @@ public class StormFrontProtocolHandler implements IStormFrontProtocolHandler {
 		{
 			String startTag = "<" + name;
 			if (attributes != null) {
-	            for (String aName : attributes.keySet())
+	            for (Map.Entry<String, String> entry : attributes.entrySet())
 	            {
-	                startTag += " " + aName + "=\"" + attributes.get(aName) + "\"";
+	                startTag += " " + entry.getKey() + "=\"" + entry.getValue() + "\"";
 	                // System.out.print(" " + aName + "=\"" + attributes.get(aName) + "\"");
 	            }
 	        }

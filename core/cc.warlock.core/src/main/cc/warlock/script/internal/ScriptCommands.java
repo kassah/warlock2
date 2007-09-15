@@ -142,7 +142,7 @@ public class ScriptCommands implements IScriptCommands, IStreamListener, IProper
 		try {
 			// FIXME need to make this work for multiple users
 			pausedThread = Thread.currentThread();
-			Thread.sleep(seconds * 1000);
+			Thread.sleep((long)seconds * 1000L);
 		} catch(InterruptedException e) {
 			e.printStackTrace();
 		} finally {
@@ -328,8 +328,8 @@ public class ScriptCommands implements IScriptCommands, IStreamListener, IProper
 	
 	public void stop() {
 		lock.lock();
-		stopped = true;
 		try {
+			stopped = true;
 			gotTextCond.signalAll();
 			gotPromptCond.signalAll();
 			nextRoom.signalAll();

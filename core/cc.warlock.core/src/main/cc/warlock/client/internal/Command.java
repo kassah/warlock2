@@ -22,11 +22,11 @@ public class Command implements ICommand, Serializable {
 	protected Date timestamp;
 	protected boolean first, last, inHistory;
 	
-	// TODO make the following line work for all locales.
-	protected static DateFormat dateFormat = DateFormat.getTimeInstance();
-	
 	public Command(String string) {
 		first = last = inHistory = false;
+		
+		// TODO make the following line work for all locales.
+		DateFormat dateFormat = DateFormat.getTimeInstance();
 		
 		String[] strs = string.split(",", 2);
 		command = strs[0];
@@ -42,7 +42,7 @@ public class Command implements ICommand, Serializable {
 		first = last = inHistory = false;
 		
 		this.command = command;
-		this.timestamp = timestamp;
+		this.timestamp = (Date)timestamp.clone();
 	}
 	
 	public void setCommand(String command) {
@@ -54,7 +54,7 @@ public class Command implements ICommand, Serializable {
 	}
 
 	public Date getTimestamp() {
-		return timestamp;
+		return (Date)timestamp.clone();
 	}
 
 	public String toString() {

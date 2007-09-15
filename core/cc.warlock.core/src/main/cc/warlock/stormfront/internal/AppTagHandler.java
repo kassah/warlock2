@@ -26,6 +26,6 @@ public class AppTagHandler extends DefaultTagHandler {
 		String gameName = attributes.get("game");
 		
 		handler.getClient().getDefaultStream().getTitle().set("[" + gameName + "] " + characterName);
-		handler.getClient().getCharacterName().set(new String(characterName));
+		handler.getClient().getCharacterName().set(characterName);
 	}
 }

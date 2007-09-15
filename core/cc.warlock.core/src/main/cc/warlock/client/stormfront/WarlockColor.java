@@ -135,6 +135,11 @@ public class WarlockColor {
 		return super.equals(obj);
 	}
 	
+	public int hashCode() {
+		assert false : "hashCode not designed";
+		return 42;
+	}
+	
 	public int getPaletteReferenceCount ()
 	{
 		return paletteReferences.size();

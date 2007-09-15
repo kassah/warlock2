@@ -19,7 +19,7 @@ public class JavascriptCommands implements IScriptCommands {
 	private static final String CALLBACK = "callback";
 	private static final String USER_OBJECT = "userobject";
 	
-	public class JavascriptStopException extends Exception implements Serializable {
+	public static class JavascriptStopException extends Exception implements Serializable {
 		private static final long serialVersionUID = 7226391328268718796L;
 	}
 	

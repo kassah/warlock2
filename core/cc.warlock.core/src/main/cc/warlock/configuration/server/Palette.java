@@ -29,7 +29,7 @@ public class Palette extends ServerSetting {
 		}
 	}
 	
-	protected class PaletteEntry {
+	protected static class PaletteEntry {
 		protected String id;
 		protected WarlockColor originalColor, color;
 		protected boolean needsUpdate = false;
@@ -133,7 +133,7 @@ public class Palette extends ServerSetting {
 	}
 	
 	protected String toStormfrontMarkup() {
-		String markup = new String(STORMFRONT_MARKUP_PREFIX);
+		String markup = STORMFRONT_MARKUP_PREFIX;
 		
 		for (String id : palette.keySet())
 		{

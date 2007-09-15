@@ -12,8 +12,8 @@ import java.util.List;
  */
 public class WarlockClientRegistry {
 
-	protected static ArrayList<IWarlockClient> clients = new ArrayList<IWarlockClient>();
-	protected static ArrayList<IWarlockClientListener> listeners = new ArrayList<IWarlockClientListener>();
+	protected static final ArrayList<IWarlockClient> clients = new ArrayList<IWarlockClient>();
+	protected static final ArrayList<IWarlockClientListener> listeners = new ArrayList<IWarlockClientListener>();
 	
 	public static void addWarlockClientListener (IWarlockClientListener listener)
 	{

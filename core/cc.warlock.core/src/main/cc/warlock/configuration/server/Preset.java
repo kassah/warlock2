@@ -76,9 +76,9 @@ public class Preset extends ServerSetting implements Comparable<Preset> {
 	{
 		super(other.serverSettings, other.element);
 		this.palette = other.palette;
-		this.name = other.name == null ? null : new String(other.name);
-		this.foregroundColor = other.foregroundColor == null ? null : new String(other.foregroundColor);
-		this.backgroundColor = other.backgroundColor == null ? null : new String(other.backgroundColor);
+		this.name = other.name;
+		this.foregroundColor = other.foregroundColor;
+		this.backgroundColor = other.backgroundColor;
 		this.fillEntireLine = other.fillEntireLine;
 		
 		this.originalPreset = other;

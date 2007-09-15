@@ -344,8 +344,12 @@ public class ServerSettings implements Comparable<ServerSettings>
 		
 		switch (settingType)
 		{
-			case MainWindow_FontSize: fontElement = mainWindowFontElement;
-			case MainWindow_MonoFontSize: fontElement = mainWindowColumnFontElement;
+			case MainWindow_FontSize:
+				fontElement = mainWindowFontElement;
+				break;
+			case MainWindow_MonoFontSize:
+				fontElement = mainWindowColumnFontElement;
+				break;
 		}
 		
 		if (fontElement != null)

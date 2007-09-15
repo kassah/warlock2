@@ -37,7 +37,7 @@ public class WarlockStyle implements IWarlockStyle {
 			e.printStackTrace();
 		}
 		
-		this.styleName = other.getStyleName() == null ? null : new String(other.getStyleName());
+		this.styleName = other.getStyleName();
 		this.styleTypes  = new ArrayList<StyleType>();
 		if (other.getStyleTypes() != null) styleTypes.addAll(other.getStyleTypes());
 		this.start = other.getStart();

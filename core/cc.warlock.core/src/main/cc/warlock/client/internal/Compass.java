@@ -18,7 +18,7 @@ import cc.warlock.client.IWarlockClient;
 public class Compass extends ClientProperty<String> implements ICompass {
 	
 	protected Map<DirectionType, Boolean> compass;
-	protected static HashMap<String, DirectionType> directions = new HashMap<String, DirectionType>();
+	protected static final HashMap<String, DirectionType> directions = new HashMap<String, DirectionType>();
 	
 	static {
 		for (DirectionType direction : DirectionType.values())

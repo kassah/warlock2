@@ -24,7 +24,7 @@ public class HighlightString extends Preset {
 	{
 		super(other);
 		
-		this.text = other.text == null ? null : new String(other.text);
+		this.text = other.text;
 		this.isName = other.isName;
 		this.isNew = other.isNew;
 		this.originalString = other;
