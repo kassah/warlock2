@@ -253,42 +253,6 @@ public class ScriptCommands implements IScriptCommands, IStreamListener, IProper
 			lock.unlock();
 		}
 		
-		/*
-		if (waitingForMatches)
-		{
-			Match foundMatch = null;
-			for (Match match : matches)
-			{
-				if (match.matches(text))
-				{
-					foundMatch = match;
-					break;
-				}
-			}
-			
-			if (foundMatch != null)
-			{
-				CallbackEvent event = new CallbackEvent(IScriptCallback.CallbackType.Matched);
-				event.data.put(CallbackEvent.DATA_MATCH, foundMatch);
-				sendEvent(event);
-				
-				clearCallbacks();
-				waitingForMatches = false;
-			}
-		}
-		else if (waitingForText)
-		{
-			if (!regex)
-			{
-				if (text.toUpperCase().contains(waitForText.toUpperCase()))
-				{
-					sendEvent(new CallbackEvent(IScriptCallback.CallbackType.FinishedWaiting));
-					clearCallbacks();
-					waitingForText = false;
-				}
-			}
-		}
-		*/
 	}
 	
 	public void movedToRoom() {
@@ -308,7 +272,7 @@ public class ScriptCommands implements IScriptCommands, IStreamListener, IProper
 			assertPrompt();
 			try {
 				while(client.getRoundtime().get() > 0 && !stopped) {
-					Thread.sleep(client.getRoundtime().get() * 1000);
+					Thread.sleep((client.getRoundtime().get() + 1) * 1000);
 				}
 			} catch(Exception e) {
 				e.printStackTrace();
