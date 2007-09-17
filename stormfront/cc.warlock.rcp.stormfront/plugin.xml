@@ -1,0 +1,135 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?eclipse version="3.2"?>
+<plugin>
+   <extension
+         point="org.eclipse.ui.views">
+      <view
+            allowMultiple="true"
+            class="cc.warlock.rcp.stormfront.ui.views.StormFrontGameView"
+            icon="images/character.gif"
+            id="cc.warlock.rcp.stormfront.ui.views.StormFrontGameView"
+            name="Warlock">
+      </view>
+      <view
+            allowMultiple="false"
+            class="cc.warlock.rcp.stormfront.ui.views.BarsView"
+            id="cc.warlock.rcp.stormfront.ui.views.BarsView"
+            name="Bars">
+      </view>
+      <view
+            allowMultiple="false"
+            class="cc.warlock.rcp.views.StreamView"
+            id="cc.warlock.rcp.views.topStream.death"
+            name="Deaths">
+      </view>
+      <view
+            allowMultiple="false"
+            class="cc.warlock.rcp.views.StreamView"
+            id="cc.warlock.rcp.views.rightStream.inv"
+            name="Inventory">
+      </view>
+      <view
+            class="cc.warlock.rcp.views.StreamView"
+            id="cc.warlock.rcp.views.topStream.thoughts"
+            name="Thoughts">
+      </view>
+      <view
+            allowMultiple="false"
+            class="cc.warlock.rcp.stormfront.ui.views.HandsView"
+            icon="images/left_hand.gif"
+            id="cc.warlock.rcp.stormfront.ui.views.HandsView"
+            name="Hands">
+      </view>
+      <view
+            class="cc.warlock.rcp.stormfront.ui.views.StatusView"
+            id="cc.warlock.rcp.stormfront.ui.views.StatusView"
+            name="Status">
+      </view>
+   </extension>
+   <extension
+         point="org.eclipse.ui.commands">
+      <command
+            defaultHandler="cc.warlock.rcp.stormfront.ui.menu.SGEConnectionHandler"
+            description="Connect to  your Simutronics account (Dragonrealms, Gemstone, etc)"
+            id="cc.warlock.rcp.stormfront.sgeConnectCommand"
+            name="Simutronics Games">
+      </command>
+   </extension>
+   <extension
+         point="org.eclipse.ui.commandImages">
+      <image
+            commandId="cc.warlock.rcp.stormfront.sgeConnectCommand"
+            icon="images/game.gif">
+      </image>
+   </extension>
+   <extension
+         point="org.eclipse.ui.menus">
+      <menuContribution
+            locationURI="menu:cc.warlock.rcp.menu.connect?after=cc.warlock.rcp.menu.newConnection">
+         <separator
+               name="cc.warlock.rcp.stormfront.separator1"
+               visible="true">
+         </separator>
+         <dynamic
+               class="cc.warlock.rcp.stormfront.ui.menu.ProfileConnectContributionItem"
+               id="cc.warlock.rcp.stormfront.dynamicProfiles">
+         </dynamic>
+      </menuContribution>
+   </extension>
+   <extension
+         point="org.eclipse.ui.propertyPages">
+      <page
+            class="cc.warlock.rcp.stormfront.ui.prefs.CharacterPreferencesPage"
+            id="cc.warlock.rcp.stormfront.ui.prefs.characterPrefs"
+            name="Character Preferences">
+         <enabledWhen>
+            <instanceof
+                  value="cc.warlock.rcp.views.GameView">
+            </instanceof>
+         </enabledWhen>
+      </page>
+      <page
+            category="cc.warlock.rcp.prefs.lookAndFeel"
+            class="cc.warlock.rcp.stormfront.ui.prefs.HighlightStringsPreferencePage"
+            id="cc.warlock.rcp.stormfront.ui.prefs.highlightStrings"
+            name="Highlight Strings">
+         <enabledWhen>
+            <instanceof
+                  value="cc.warlock.rcp.views.GameView">
+            </instanceof>
+         </enabledWhen>
+      </page>
+      <page
+            category="cc.warlock.rcp.prefs.lookAndFeel"
+            class="cc.warlock.rcp.stormfront.ui.prefs.HighlightNamesPreferencePage"
+            id="cc.warlock.rcp.stormfront.ui.prefs.highlightNames"
+            name="Highlight Names">
+         <enabledWhen>
+            <instanceof
+                  value="cc.warlock.rcp.views.GameView">
+            </instanceof>
+         </enabledWhen>
+      </page>
+   </extension>
+   <extension
+         point="cc.warlock.rcp.connectionCommands">
+      <connectionCommand
+            commandId="cc.warlock.rcp.stormfront.sgeConnectCommand"
+            groupName="Create a New Connection"
+            weight="100">
+      </connectionCommand>
+      <dynamic
+            classname="cc.warlock.rcp.stormfront.ui.menu.ProfileConnectContributionItem"
+            groupName="Simutronics Characters">
+      </dynamic>
+   </extension>
+   <extension
+         point="org.eclipse.ui.perspectives">
+      <perspective
+            class="cc.warlock.rcp.stormfront.ui.StormFrontPerspectiveFactory"
+            id="cc.warlock.stormfrontPerspective"
+            name="Stormfront Perspective">
+      </perspective>
+   </extension>
+
+</plugin>

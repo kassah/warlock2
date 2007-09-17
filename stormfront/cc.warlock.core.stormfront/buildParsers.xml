@@ -1,0 +1,20 @@
+<project default="build-parsers">
+	
+	<target name="build-parsers">
+		<mkdir dir="src/javacc/cc/warlock/core/stormfront/internal"/>
+		<antcall target="javacc">
+			<param name="arguments" value="-OUTPUT_DIRECTORY:src/javacc/cc/warlock/core/stormfront/internal -STATIC:false"/>
+			<param name="grammar-file" value="src/main/cc/warlock/core/stormfront/internal/stormfront.jj"/>
+		</antcall>
+	</target>
+	
+	<target name="javacc">
+		<java classname="javacc">
+			<classpath>
+				<fileset file="lib/javacc.jar"/>
+			</classpath>
+			<arg line="${arguments}"/>
+			<arg line="${grammar-file}"/>
+		</java>
+	</target>
+</project>

@@ -1,0 +1,14 @@
+Manifest-Version: 1.0
+Bundle-ManifestVersion: 2
+Bundle-Name: Stormfront UI Plug-in
+Bundle-SymbolicName: cc.warlock.rcp.stormfront; singleton:=true
+Bundle-Version: 2.0.0
+Bundle-Activator: cc.warlock.rcp.stormfront.StormFrontRCPPlugin
+Require-Bundle: org.eclipse.ui,
+ org.eclipse.core.runtime,
+ cc.warlock.core,
+ cc.warlock.core.script,
+ cc.warlock.core.stormfront,
+ cc.warlock.core.stormfront.script,
+ cc.warlock.rcp
+Eclipse-LazyStart: true
