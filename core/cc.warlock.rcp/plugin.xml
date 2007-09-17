@@ -1,0 +1,153 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?eclipse version="3.0"?>
+<plugin>
+   <extension-point id="connectionCommands" name="connectionCommands" schema="schema/connectionCommands.exsd"/>
+   <extension-point id="macroVariables" name="macroVariables" schema="schema/macroVariables.exsd"/>
+   <extension-point id="macroCommands" name="macroCommands" schema="schema/macroCommands.exsd"/>
+   
+   <extension
+         point="org.eclipse.ui.views">
+      <view
+            allowMultiple="false"
+            class="cc.warlock.rcp.views.DebugView"
+            icon="images/console.gif"
+            id="cc.warlock.rcp.views.DebugView"
+            name="Debug Console">
+      </view>
+      <view
+            class="cc.warlock.rcp.views.ConnectionView"
+            icon="images/connect.png"
+            id="cc.warlock.rcp.views.ConnectionView"
+            name="Connections">
+      </view>
+   </extension>
+   <extension
+         id="warlock"
+         point="org.eclipse.core.runtime.applications">
+      <application>
+         <run class="cc.warlock.rcp.application.WarlockApplication"/>
+      </application>
+   </extension>
+   <extension
+         point="org.eclipse.ui.perspectives">
+      <perspective
+            class="cc.warlock.rcp.application.WarlockPerspectiveFactory"
+            name="Warlock Perspective"
+            id="cc.warlock.warlockPerspective"/>
+   </extension>
+   <extension
+         point="org.eclipse.ui.commands">
+      <command
+            name="Connect"
+            id="cc.warlock.commands.connectCommand"/>
+      <keyConfiguration
+            name="Warlock Key Configuration"
+            parent="org.eclipse.ui.defaultAcceleratorConfiguration"
+            id="cc.warlock.keyConfiguration"/>
+      <keyBinding
+            contextId="org.eclipse.ui.globalScope"
+            command="cc.warlock.commands.connectCommand"
+            string="Ctrl+Shift+C"
+            commandId="cc.warlock.commands.connectCommand"
+            configuration="cc.warlock.keyConfiguration"/>
+   </extension>
+   <extension
+         point="cc.warlock.rcp.macroVariables">
+      <macroVariable classname="cc.warlock.rcp.ui.macros.internal.variables.CurrentCommandMacroVariable"/>
+      <macroVariable classname="cc.warlock.rcp.ui.macros.internal.variables.LastCommandMacroVariable"/>
+      <macroVariable classname="cc.warlock.rcp.ui.macros.internal.variables.NextCommandMacroVariable"/>
+   </extension>
+   <extension
+         point="cc.warlock.rcp.macroCommands">
+      <macroCommand classname="cc.warlock.rcp.ui.macros.internal.commands.SendMacroCommand"/>
+      <macroCommand classname="cc.warlock.rcp.ui.macros.internal.commands.ClearMacroCommand"/>
+   </extension>
+   <extension
+         id="product"
+         point="org.eclipse.core.runtime.products">
+      <product
+            application="cc.warlock.rcp.warlock"
+            description="Warlock: A Simutronics Game Client"
+            name="Warlock 2">
+         <property
+               name="appName"
+               value="Warlock 2">
+         </property>
+         <property
+               name="windowImages"
+               value="images/character.gif">
+         </property>
+         <property
+               name="startupProgressRect"
+               value="0,79,444,19">
+         </property>
+      </product>
+   </extension>
+   <extension
+         point="org.eclipse.ui.menus">
+      <menuContribution
+            locationURI="menu:org.eclipse.ui.main.menu">
+         <menu
+               id="cc.warlock.rcp.menu.connect"
+               label="Connect"
+               mnemonic="C"
+               tooltip="Connect to a game">
+			  <command
+           commandId="cc.warlock.rcp.command.newConnection"
+           icon="images/connect.png"
+           id="cc.warlock.rcp.menu.newConnection"
+           label="New Connection..."
+           mnemonic="N"
+           style="push">
+               </command>
+         </menu>
+         <menu
+               label="Preferences"
+               mnemonic="P">
+            <dynamic
+                  class="cc.warlock.rcp.menu.StreamWindowContributionItem"
+                  id="cc.warlock.rcp.dynamicViews">
+            </dynamic>
+            <separator
+                  name="cc.warlock.rcp.separator2"
+                  visible="true">
+            </separator>
+            <command
+                  commandId="cc.warlock.rcp.command.preferences"
+                  icon="images/preferences.png"
+                  label="Preferences"
+                  mnemonic="P"
+                  style="push">
+            </command>
+         </menu>
+     </menuContribution>
+   </extension>
+   <extension
+         point="org.eclipse.ui.commands">
+      <command
+            defaultHandler="cc.warlock.rcp.menu.NewConnectionHandler"
+            id="cc.warlock.rcp.command.newConnection"
+            name="New Connection...">
+      </command>
+      <command
+            defaultHandler="cc.warlock.rcp.menu.PreferencesHandler"
+            id="cc.warlock.rcp.command.preferences"
+            name="Preferences">
+      </command>
+   </extension>
+   <extension
+         point="org.eclipse.ui.propertyPages">
+      <page
+            category="cc.warlock.rcp.prefs.characterPrefs"
+            class="cc.warlock.rcp.prefs.LookAndFeelPreferencePage"
+            id="cc.warlock.rcp.prefs.lookAndFeel"
+            name="Look and Feel">
+         <enabledWhen>
+            <instanceof
+                  value="cc.warlock.rcp.views.GameView">
+            </instanceof>
+         </enabledWhen>
+      </page>
+   </extension>
+
+</plugin>
