@@ -32,6 +32,7 @@ public class FilesystemScriptProvider implements IScriptProvider, Runnable {
 		instance().addScriptDirectory(WarlockConfiguration.getUserDirectory("warlock-scripts", true));
 		instance().addScriptDirectory(WarlockConfiguration.getUserDirectory("scripts", true));
 		instance().addScriptDirectory(WarlockConfiguration.getConfigurationDirectory("scripts", false));
+		instance().start();
 	}
 	
 	public static FilesystemScriptProvider instance()
@@ -68,8 +69,9 @@ public class FilesystemScriptProvider implements IScriptProvider, Runnable {
 		}
 	}
 	
-	FilesystemScriptProvider ()
-	{
+	FilesystemScriptProvider () { }
+	
+	protected void start () {
 		new Thread(this).start();
 	}
 	
