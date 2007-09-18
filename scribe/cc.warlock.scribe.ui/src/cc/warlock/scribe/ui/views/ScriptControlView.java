@@ -14,21 +14,19 @@ import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.Label;
 import org.eclipse.swt.widgets.ToolBar;
 import org.eclipse.swt.widgets.ToolItem;
-import org.eclipse.ui.PlatformUI;
 import org.eclipse.ui.part.ViewPart;
 
-import cc.warlock.client.IWarlockClient;
-import cc.warlock.client.IWarlockClientListener;
-import cc.warlock.client.WarlockClientRegistry;
-import cc.warlock.client.stormfront.IStormFrontClient;
+import cc.warlock.core.client.IWarlockClient;
+import cc.warlock.core.client.IWarlockClientListener;
+import cc.warlock.core.client.WarlockClientRegistry;
+import cc.warlock.core.script.IScript;
+import cc.warlock.core.script.IScriptListener;
+import cc.warlock.core.stormfront.client.IStormFrontClient;
 import cc.warlock.rcp.ui.client.SWTScriptListener;
 import cc.warlock.rcp.ui.client.SWTWarlockClientListener;
 import cc.warlock.scribe.ui.ScribeSharedImages;
-import cc.warlock.script.IScript;
-import cc.warlock.script.IScriptListener;
 
 public class ScriptControlView extends ViewPart implements IScriptListener {
-
 	protected IStormFrontClient client;
 	protected SWTScriptListener wrapper = new SWTScriptListener(this);
 	protected Composite main, scriptComposite;
@@ -224,5 +222,17 @@ public class ScriptControlView extends ViewPart implements IScriptListener {
 		resetControls();
 		
 		if (create) main.layout();
+	}
+	
+	@Override
+	public void scriptAdded(IScript script) {
+		// TODO Auto-generated method stub
+		
+	}
+
+	@Override
+	public void scriptRemoved(IScript script) {
+		// TODO Auto-generated method stub
+		
 	}
 }
