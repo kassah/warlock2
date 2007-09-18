@@ -1,5 +1,7 @@
 package cc.warlock.rcp.stormfront.ui.views;
 
+import java.util.ArrayList;
+
 import org.eclipse.jface.resource.JFaceResources;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.PaintEvent;
@@ -22,11 +24,14 @@ import cc.warlock.core.client.IWarlockClient;
 import cc.warlock.core.client.IWarlockSkin;
 import cc.warlock.core.client.WarlockClientAdapter;
 import cc.warlock.core.client.WarlockClientRegistry;
+import cc.warlock.core.client.internal.ClientProperty;
 import cc.warlock.core.stormfront.client.IStormFrontClient;
 import cc.warlock.core.stormfront.serversettings.server.ServerSettings;
 import cc.warlock.rcp.stormfront.ui.StormFrontSharedImages;
 import cc.warlock.rcp.ui.client.SWTPropertyListener;
 import cc.warlock.rcp.util.ColorUtil;
+import cc.warlock.rcp.views.GameView;
+import cc.warlock.rcp.views.IGameViewFocusListener;
 
 public class HandsView extends ViewPart implements IPropertyListener<String> 
 {
@@ -34,7 +39,8 @@ public class HandsView extends ViewPart implements IPropertyListener<String>
 	protected static HandsView _instance;
 	
 	protected GradientInfo leftHandInfo, rightHandInfo, spellInfo;
-	protected IStormFrontClient client;
+	protected IStormFrontClient activeClient;
+	protected ArrayList<IStormFrontClient> clients = new ArrayList<IStormFrontClient>();
 	
 	public HandsView ()
 	{
@@ -46,9 +52,17 @@ public class HandsView extends ViewPart implements IPropertyListener<String>
 				{
 					Display.getDefault().syncExec(new Runnable() {
 						public void run () {
-							setClient((IStormFrontClient)client);
+							setActiveClient((IStormFrontClient)client);
 						}
 					});
+				}
+			}
+		});
+		GameView.addGameViewFocusListener(new IGameViewFocusListener() {
+			public void gameViewFocused(GameView gameView) {
+				if (gameView instanceof StormFrontGameView)
+				{
+					HandsView.this.gameViewFocused((StormFrontGameView)gameView);
 				}
 			}
 		});
@@ -148,22 +162,25 @@ public class HandsView extends ViewPart implements IPropertyListener<String>
 		
 		leftHandInfo.setForeground(new Color(main.getDisplay(), 240, 240, 255));
 		leftHandInfo.setBackground(new Color(main.getDisplay(), 25, 25, 50));
-		leftHandInfo.setText("Empty");
 		leftHandInfo.setLayoutData(new GridData(GridData.FILL, GridData.FILL, true, true));
 		
 		rightHandInfo = new GradientInfo(main, StormFrontSharedImages.getImage(StormFrontSharedImages.IMG_RIGHT_HAND_SMALL));
 			
 		rightHandInfo.setForeground(new Color(main.getDisplay(), 240, 240, 255));
 		rightHandInfo.setBackground(new Color(main.getDisplay(), 25, 25, 50));
-		rightHandInfo.setText("Empty");
 		rightHandInfo.setLayoutData(new GridData(GridData.FILL, GridData.FILL, true, true));
 		
 		spellInfo = new GradientInfo(main, StormFrontSharedImages.getImage(StormFrontSharedImages.IMG_SPELL_HAND_SMALL));
 			
 		spellInfo.setForeground(new Color(main.getDisplay(), 240, 240, 255));
 		spellInfo.setBackground(new Color(main.getDisplay(), 25, 25, 50));
-		spellInfo.setText("None");
 		spellInfo.setLayoutData(new GridData(GridData.FILL, GridData.FILL, true, true));
+		clear();
+	}
+	
+	protected void gameViewFocused (StormFrontGameView gameView)
+	{
+		setActiveClient(gameView.getStormFrontClient());
 	}
 	
 	@Override
@@ -172,13 +189,26 @@ public class HandsView extends ViewPart implements IPropertyListener<String>
 
 	}
 
-	public void setClient (IStormFrontClient client)
+	public void setActiveClient (IStormFrontClient client)
 	{
-		this.client = client;
+		if (client == null) return;
 		
-		client.getLeftHand().addListener(new SWTPropertyListener<String>(this));
-		client.getRightHand().addListener(new SWTPropertyListener<String>(this));
-		client.getCurrentSpell().addListener(new SWTPropertyListener<String>(this));
+		this.activeClient = client;
+		
+		if (!clients.contains(client))
+		{
+			clear();
+			client.getLeftHand().addListener(new SWTPropertyListener<String>(this));
+			client.getRightHand().addListener(new SWTPropertyListener<String>(this));
+			client.getCurrentSpell().addListener(new SWTPropertyListener<String>(this));
+			
+			clients.add(client);
+		} else {
+			propertyChanged(client.getLeftHand(), null);
+			propertyChanged(client.getRightHand(), null);
+			propertyChanged(client.getCurrentSpell(), null);
+			loadServerSettings(client.getServerSettings());
+		}
 	}
 
 	protected void setColors (Color fg, Color bg)
@@ -204,30 +234,45 @@ public class HandsView extends ViewPart implements IPropertyListener<String>
 	public void propertyActivated(IProperty<String> property) {}
 
 	public void propertyChanged(IProperty<String> property, String oldValue) {
-		if (property != null)
+		if (property != null && property instanceof ClientProperty)
 		{
-			if (property.getName().equals("leftHand")) {
-				leftHandInfo.setText(property.get());
-			}
-			else if (property.getName().equals("rightHand")) {
-				rightHandInfo.setText(property.get());
-			}
-			else if (property.getName().equals("currentSpell")) {
-				spellInfo.setText(property.get());
+			ClientProperty clientProperty = (ClientProperty) property;
+			if (clientProperty.getClient() == activeClient)
+			{
+				if (property.getName().equals("leftHand")) {
+					leftHandInfo.setText(property.get());
+				}
+				else if (property.getName().equals("rightHand")) {
+					rightHandInfo.setText(property.get());
+				}
+				else if (property.getName().equals("currentSpell")) {
+					spellInfo.setText(property.get());
+				}
 			}
 		}
 	}
 
 	public void propertyCleared(IProperty<String> property, String oldValue) {
-		if (property != null)
+		if (property != null && property instanceof ClientProperty)
 		{
-			if (property.getName().equals("leftHand"))
-				leftHandInfo.setText("<Empty>");
-			else if (property.getName().equals("rightHand"))
-				rightHandInfo.setText("<Empty>");
-			else if (property.getName().equals("currentSpell"))
-				spellInfo.setText("<None>");
+			ClientProperty clientProperty = (ClientProperty) property;
+			if (clientProperty.getClient() == activeClient)
+			{
+				if (property.getName().equals("leftHand"))
+					leftHandInfo.setText("Empty");
+				else if (property.getName().equals("rightHand"))
+					rightHandInfo.setText("Empty");
+				else if (property.getName().equals("currentSpell"))
+					spellInfo.setText("None");
+			}
 		}
+	}
+	
+	protected void clear ()
+	{
+		leftHandInfo.setText("Empty");
+		rightHandInfo.setText("Empty");
+		spellInfo.setText("None");
 	}
 	
 	public static HandsView getDefault ()
