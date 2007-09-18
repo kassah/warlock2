@@ -57,9 +57,9 @@ public class StormFrontConnection implements IConnection
 	}
 	
 	public void disconnect() throws IOException {
-		// TODO Auto-generated method stub
-		
+		sendLine("quit");
 	}
+	
 	public void send(byte[] bytes) throws IOException {
 		socket.getOutputStream().write(bytes);
 	}
