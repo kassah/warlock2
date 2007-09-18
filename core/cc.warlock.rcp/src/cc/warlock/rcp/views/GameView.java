@@ -3,6 +3,7 @@
  */
 package cc.warlock.rcp.views;
 
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Date;
@@ -211,7 +212,7 @@ public abstract class GameView extends StreamView implements KeyListener, IWarlo
 		
 		for (StreamView streamView : StreamView.getOpenViews())
 		{
-			if (streamView != this) {
+			if (!(streamView instanceof GameView)) {
 				streamView.setClient(client);
 			}
 		}
@@ -280,5 +281,20 @@ public abstract class GameView extends StreamView implements KeyListener, IWarlo
 				entry.setFocus();
 			}
 		}
+	}
+	
+	@Override
+	public void dispose() {
+		if (client != null && client.getConnection() != null && client.getConnection().isConnected())
+		{
+			try {
+				client.getConnection().disconnect();
+			} catch (IOException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
+		}
+		
+		super.dispose();
 	}
 }
