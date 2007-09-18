@@ -38,36 +38,6 @@ public class StormFrontGameView extends GameView implements IStormFrontClientVie
 		wrapper = new SWTStormFrontClientViewer(this);
 	}
 	
-	@Override
-	public void init(IViewSite site) throws PartInitException {
-		super.init(site);
-		
-		if (WarlockApplication.instance().getStartWithProfile() != null)
-		{
-			autoConnect();
-		}
-	}
-	
-	protected void autoConnect ()
-	{
-		Profile connectToProfile = null;
-		
-		for (Profile profile : SavedProfiles.getAllProfiles())
-		{
-			if (WarlockApplication.instance().getStartWithProfile().equals(profile.getCharacterName()))
-			{
-				connectToProfile = profile;
-			}
-		}
-		
-		if (connectToProfile == null) /* TODO show a warning */ return;
-		
-		ProfileConnectAction action = new ProfileConnectAction(connectToProfile);
-		action.setGameView(this);
-		
-		action.run();
-	}
-	
 	private ProgressMonitorDialog settingsProgressDialog;
 	public void startDownloadingServerSettings() {
 		settingsProgressDialog = new ProgressMonitorDialog(getSite().getShell());

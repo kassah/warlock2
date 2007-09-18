@@ -3,8 +3,12 @@ package cc.warlock.rcp.stormfront;
 import org.eclipse.ui.plugin.AbstractUIPlugin;
 import org.osgi.framework.BundleContext;
 
+import cc.warlock.core.configuration.Profile;
+import cc.warlock.core.configuration.SavedProfiles;
 import cc.warlock.core.stormfront.client.internal.StormFrontClient;
+import cc.warlock.rcp.application.WarlockApplication;
 import cc.warlock.rcp.plugin.Warlock2Plugin;
+import cc.warlock.rcp.stormfront.ui.actions.ProfileConnectAction;
 
 /**
  * The activator class controls the plug-in life cycle
@@ -33,6 +37,23 @@ public class StormFrontRCPPlugin extends AbstractUIPlugin {
 		
 		// force-load our initial client so we can do offline scripting
 		Warlock2Plugin.getDefault().addClient(new StormFrontClient());
+		
+		if (WarlockApplication.instance().getStartWithProfile() != null) {
+			Profile connectToProfile = null;
+			
+			for (Profile profile : SavedProfiles.getAllProfiles())
+			{
+				if (WarlockApplication.instance().getStartWithProfile().equals(profile.getCharacterName()))
+				{
+					connectToProfile = profile;
+				}
+			}
+			
+			if (connectToProfile == null) /* TODO show a warning */ return;
+			
+			ProfileConnectAction action = new ProfileConnectAction(connectToProfile);
+			action.run();
+		}
 	}
 
 	/*
