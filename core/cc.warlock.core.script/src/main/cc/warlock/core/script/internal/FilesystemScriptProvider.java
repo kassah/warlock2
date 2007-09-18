@@ -28,7 +28,10 @@ public class FilesystemScriptProvider implements IScriptProvider, Runnable {
 	
 	static {
 		ScriptEngineRegistry.addScriptProvider(instance());
+		
 		instance().addScriptDirectory(WarlockConfiguration.getUserDirectory("warlock-scripts", true));
+		instance().addScriptDirectory(WarlockConfiguration.getUserDirectory("scripts", true));
+		instance().addScriptDirectory(WarlockConfiguration.getConfigurationDirectory("scripts", false));
 	}
 	
 	public static FilesystemScriptProvider instance()
