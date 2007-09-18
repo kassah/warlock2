@@ -16,7 +16,7 @@ import cc.warlock.core.client.IStreamListener;
  *
  */
 public class UserStream extends StreamView implements IWarlockClientListener {
-	@Override
+	
 	public void clientActivated(IWarlockClient client) {
 		// TODO Auto-generated method stub
 		
@@ -26,20 +26,20 @@ public class UserStream extends StreamView implements IWarlockClientListener {
 		super.streamReceivedText(stream, text);
 	}
 
-	@Override
+	
 	public void clientConnected(IWarlockClient client) {
 		//mainStream = client.getDefaultStream();
 		client.getDefaultStream().addStreamListener(this);
 		this.addStream(client.getDefaultStream());
 	}
 
-	@Override
+	
 	public void clientDisconnected(IWarlockClient client) {
 		//mainStream = null;
 		client.getDefaultStream().removeStreamListener(this);
 	}
 
-	@Override
+	
 	public void clientRemoved(IWarlockClient client) {
 		// TODO Auto-generated method stub
 		
