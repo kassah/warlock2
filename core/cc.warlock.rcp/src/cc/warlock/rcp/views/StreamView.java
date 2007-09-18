@@ -96,11 +96,11 @@ public class StreamView extends ViewPart implements IStreamListener {
 		text.setForeground(new Color(text.getDisplay(), 240, 240, 255));
 		text.setScrollDirection(SWT.DOWN);
 		
-		GameView currentGameView = GameView.getViewInFocus();
-		if (currentGameView != null && currentGameView.getWarlockClient() != null)
-		{
-			setPartName(currentGameView.getWarlockClient().getStream(mainStreamName).getTitle().get());
-		}
+//		GameView currentGameView = GameView.getViewInFocus();
+//		if (currentGameView != null && currentGameView.getWarlockClient() != null)
+//		{
+//			setPartName(currentGameView.getWarlockClient().getStream(mainStreamName).getTitle().get());
+//		}
 	}
 
 	@Override

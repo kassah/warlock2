@@ -49,6 +49,7 @@ public abstract class GameView extends StreamView implements KeyListener, IWarlo
 	protected static GameView firstInstance;
 	protected static boolean firstInstanceIsUsed = false;
 	protected static ArrayList<GameView> openViews = new ArrayList<GameView>();
+	protected static ArrayList<IGameViewFocusListener> focusListeners = new ArrayList<IGameViewFocusListener>();
 	protected static GameView viewInFocus;
 	
 	protected StyledText entry;
@@ -66,6 +67,17 @@ public abstract class GameView extends StreamView implements KeyListener, IWarlo
 		wrapper = new SWTWarlockClientViewer(this);
 		
 		setStreamName(IWarlockClient.DEFAULT_STREAM_NAME);
+	}
+	
+	public static void addGameViewFocusListener (IGameViewFocusListener listener)
+	{
+		focusListeners.add(listener);
+	}
+	
+	public static void removeGameViewFocusListener (IGameViewFocusListener listener)
+	{
+		if (focusListeners.contains(listener))
+			focusListeners.remove(listener);
 	}
 	
 	public static Collection<GameView> getOpenGameViews ()
@@ -152,6 +164,10 @@ public abstract class GameView extends StreamView implements KeyListener, IWarlo
 		entry.setFocus();
 		
 		viewInFocus = this;
+		for (IGameViewFocusListener listener : focusListeners)
+		{
+			listener.gameViewFocused(this);
+		}
 	}
 	
 	protected Image createCaretImage (int width, Color foreground)
