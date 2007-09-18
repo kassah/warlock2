@@ -224,13 +224,11 @@ public class ScriptControlView extends ViewPart implements IScriptListener {
 		if (create) main.layout();
 	}
 	
-	@Override
 	public void scriptAdded(IScript script) {
 		// TODO Auto-generated method stub
 		
 	}
 
-	@Override
 	public void scriptRemoved(IScript script) {
 		// TODO Auto-generated method stub
 		

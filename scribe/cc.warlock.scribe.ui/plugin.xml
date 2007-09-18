@@ -26,13 +26,12 @@
    <extension
          point="org.eclipse.ui.perspectiveExtensions">
       <perspectiveExtension
-            targetID="cc.warlock.warlockPerspective">
+            targetID="cc.warlock.stormfrontPerspective">
          <view
                closeable="true"
                id="cc.warlock.scribe.ui.ScriptControlView"
                moveable="true"
-               ratio=".95"
-               relationship="fast"
+               relationship="top"
                relative="cc.warlock.bottomFolder"
                showTitle="false"
                standalone="true"
