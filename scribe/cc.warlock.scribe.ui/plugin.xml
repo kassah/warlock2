@@ -32,8 +32,8 @@
                id="cc.warlock.scribe.ui.ScriptControlView"
                moveable="true"
                ratio=".95"
-               relationship="bottom"
-               relative="cc.warlock.rcp.views.gameView"
+               relationship="fast"
+               relative="cc.warlock.bottomFolder"
                showTitle="false"
                standalone="true"
                visible="true">
