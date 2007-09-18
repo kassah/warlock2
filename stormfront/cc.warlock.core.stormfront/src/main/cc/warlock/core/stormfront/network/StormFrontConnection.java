@@ -97,6 +97,7 @@ public class StormFrontConnection implements IConnection
 				parser.setHandler(handler);
 				parser.Document();
 				
+				connected = false;
 				client.getDefaultStream().echo(
 						"**************************\n"+
 						"* Disconnected from the game\n" +
