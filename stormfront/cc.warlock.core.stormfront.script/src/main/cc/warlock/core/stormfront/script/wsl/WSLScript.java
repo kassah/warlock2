@@ -101,10 +101,6 @@ public class WSLScript extends AbstractScript {
 		
 		this.script = script.toString();
 	}
-	
-	public String getName() {
-		return scriptName;
-	}
 
 	public Map<String, String> getVariables() {
 		return variables;
