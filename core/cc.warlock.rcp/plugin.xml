@@ -102,19 +102,13 @@
                </command>
          </menu>
          <menu
+               id="cc.warlock.rcp.menu.prefs"
                label="Preferences"
                mnemonic="P">
-            <dynamic
-                  class="cc.warlock.rcp.menu.StreamWindowContributionItem"
-                  id="cc.warlock.rcp.dynamicViews">
-            </dynamic>
-            <separator
-                  name="cc.warlock.rcp.separator2"
-                  visible="true">
-            </separator>
             <command
                   commandId="cc.warlock.rcp.command.preferences"
                   icon="images/preferences.png"
+                  id="cc.warlock.rcp.menu.preferences"
                   label="Preferences"
                   mnemonic="P"
                   style="push">
