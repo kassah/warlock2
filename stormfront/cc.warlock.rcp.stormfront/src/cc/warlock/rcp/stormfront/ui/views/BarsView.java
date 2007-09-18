@@ -6,6 +6,8 @@
  */
 package cc.warlock.rcp.stormfront.ui.views;
 
+import java.util.ArrayList;
+
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.graphics.Color;
 import org.eclipse.swt.layout.GridData;
@@ -19,9 +21,12 @@ import cc.warlock.core.client.IPropertyListener;
 import cc.warlock.core.client.IWarlockClient;
 import cc.warlock.core.client.WarlockClientAdapter;
 import cc.warlock.core.client.WarlockClientRegistry;
+import cc.warlock.core.client.internal.ClientProperty;
 import cc.warlock.core.stormfront.client.IStormFrontClient;
 import cc.warlock.rcp.ui.WarlockProgressBar;
 import cc.warlock.rcp.ui.client.SWTPropertyListener;
+import cc.warlock.rcp.views.GameView;
+import cc.warlock.rcp.views.IGameViewFocusListener;
 
 /**
  * @author Marshall
@@ -43,6 +48,8 @@ public class BarsView extends ViewPart implements IPropertyListener<Integer> {
 	protected WarlockProgressBar health, fatigue, spirit, mana, roundtime;
 	
 	protected SWTPropertyListener<Integer> listenerWrapper;
+	protected IStormFrontClient activeClient;
+	protected ArrayList<IStormFrontClient> clients = new ArrayList<IStormFrontClient>();
 	
 	public BarsView() {
 		instance = this;
@@ -54,21 +61,46 @@ public class BarsView extends ViewPart implements IPropertyListener<Integer> {
 				{
 					Display.getDefault().syncExec(new Runnable() {
 						public void run () {
-							init((IStormFrontClient)client);
+							setActiveClient((IStormFrontClient)client);
 						}
 					});
 				}
 			}
 		});
+		
+		GameView.addGameViewFocusListener(new IGameViewFocusListener () {
+			public void gameViewFocused(GameView gameView) {
+				if (gameView instanceof StormFrontGameView)
+				{
+					BarsView.this.gameViewFocused((StormFrontGameView)gameView);
+				}
+			}
+		});
 	}
 
-	public void init (IStormFrontClient client)
-	{		
-		client.getHealth().addListener(listenerWrapper);
-		client.getMana().addListener(listenerWrapper);
-		client.getSpirit().addListener(listenerWrapper);
-		client.getFatigue().addListener(listenerWrapper);
-		client.getRoundtime().addListener(listenerWrapper);
+	protected void setActiveClient (IStormFrontClient client)
+	{
+		if (client == null) return;
+		
+		this.activeClient = client;
+		
+		if (!clients.contains(client))
+		{
+			client.getHealth().addListener(listenerWrapper);
+			client.getMana().addListener(listenerWrapper);
+			client.getSpirit().addListener(listenerWrapper);
+			client.getFatigue().addListener(listenerWrapper);
+			client.getRoundtime().addListener(listenerWrapper);
+			clients.add(client);
+			
+		} else {
+			activateRoundtime = true;
+			propertyChanged(client.getHealth(), null);
+			propertyChanged(client.getMana(), null);
+			propertyChanged(client.getSpirit(), null);
+			propertyChanged(client.getFatigue(), null);
+			propertyChanged(client.getRoundtime(), null);
+		}
 	}
 	
 	/* (non-Javadoc)
@@ -148,6 +180,11 @@ public class BarsView extends ViewPart implements IPropertyListener<Integer> {
 		roundtimeBorder = new Color(display, 151, 130, 130);
 	}
 	
+	protected void gameViewFocused (StormFrontGameView gameView)
+	{
+		setActiveClient(gameView.getStormFrontClient());
+	}
+	
 	/* (non-Javadoc)
 	 * @see org.eclipse.ui.IWorkbenchPart#setFocus()
 	 */
@@ -170,36 +207,44 @@ public class BarsView extends ViewPart implements IPropertyListener<Integer> {
 	public void propertyChanged(IProperty<Integer> property, Integer oldValue) {
 		if (property == null || property.getName() == null) return;
 		
-		if (property.getName().equals("health"))
+		if (property instanceof ClientProperty)
 		{
-			health.setSelection(property.get());
-			health.setLabel("health: " + property.get() + "%");
-		}
-		else if (property.getName().equals("mana"))
-		{
-			mana.setSelection(property.get());
-			mana.setLabel("mana: " + property.get() + "%");
-		}
-		else if (property.getName().equals("spirit"))
-		{
-			spirit.setSelection(property.get());
-			spirit.setLabel("spirit: " + property.get() + "%");
-		}
-		else if (property.getName().equals("fatigue"))
-		{
-			fatigue.setSelection(property.get());
-			fatigue.setLabel("fatigue: " + property.get() + "%");
-		}
-		else if (property.getName().equals("roundtime"))
-		{
-			if (activateRoundtime)
+			ClientProperty clientProperty = (ClientProperty) property;
+			if (clientProperty.getClient() == activeClient)
 			{
-				roundtime.setMaximum(property.get() * 1000);
-				roundtime.setMinimum(0);
-				activateRoundtime = false;
+			
+				if (property.getName().equals("health"))
+				{
+					health.setSelection(property.get());
+					health.setLabel("health: " + property.get() + "%");
+				}
+				else if (property.getName().equals("mana"))
+				{
+					mana.setSelection(property.get());
+					mana.setLabel("mana: " + property.get() + "%");
+				}
+				else if (property.getName().equals("spirit"))
+				{
+					spirit.setSelection(property.get());
+					spirit.setLabel("spirit: " + property.get() + "%");
+				}
+				else if (property.getName().equals("fatigue"))
+				{
+					fatigue.setSelection(property.get());
+					fatigue.setLabel("fatigue: " + property.get() + "%");
+				}
+				else if (property.getName().equals("roundtime"))
+				{
+					if (activateRoundtime)
+					{
+						roundtime.setMaximum(property.get() * 1000);
+						roundtime.setMinimum(0);
+						activateRoundtime = false;
+					}
+					roundtime.setSelection(property.get() * 1000);
+					roundtime.setLabel("roundtime: " + property.get() + " seconds");
+				}
 			}
-			roundtime.setSelection(property.get() * 1000);
-			roundtime.setLabel("roundtime: " + property.get() + " seconds");
 		}
 	}
 	
