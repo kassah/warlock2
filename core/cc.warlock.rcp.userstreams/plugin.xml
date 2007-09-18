@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?eclipse version="3.2"?>
+<plugin>
+   <extension
+         point="org.eclipse.ui.views">
+      <view
+            allowMultiple="true"
+            class="cc.warlock.rcp.userstreams.UserStream"
+            id="cc.warlock.rcp.userstreams.userStream"
+            name="Stream">
+      </view>
+   </extension>
+   <extension
+         point="org.eclipse.ui.perspectiveExtensions">
+      <perspectiveExtension
+            targetID="cc.warlock.stormfrontPerspective">
+         <view
+               id="cc.warlock.rcp.userstreams.userStream"
+               relationship="stack"
+               relative="cc.warlock.rightFolder">
+         </view>
+      </perspectiveExtension>
+   </extension>
+
+</plugin>
