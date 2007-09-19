@@ -369,6 +369,11 @@ public class ServerSettings implements Comparable<ServerSettings>
 		return palette;
 	}
 	
+	public Collection<Preset> getPresets()
+	{
+		return presets.values();
+	}
+	
 	public Preset getPreset (String presetId)
 	{
 		return presets.get(presetId);
