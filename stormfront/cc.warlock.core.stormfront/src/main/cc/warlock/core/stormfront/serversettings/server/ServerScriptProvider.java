@@ -71,6 +71,11 @@ public class ServerScriptProvider implements IServerScriptProvider
 			
 			infos.put(script.getName(), info);
 		}
-		scripts.put(script.getName(), createScript(infos.get(script.getName())));
+		
+		IScript newScript = createScript(infos.get(script.getName()));
+		if (newScript != null)
+		{
+			scripts.put(script.getName(), newScript);
+		}
 	}
 }
