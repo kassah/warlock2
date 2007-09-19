@@ -7,6 +7,7 @@ import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.EmptyStackException;
 import java.util.Stack;
@@ -14,6 +15,7 @@ import java.util.prefs.Preferences;
 
 import cc.warlock.core.client.ICommand;
 import cc.warlock.core.client.ICommandHistory;
+import cc.warlock.core.client.ICommandHistoryListener;
 
 
 /**
@@ -25,6 +27,7 @@ public class CommandHistory implements ICommandHistory {
 
 	protected int position = 0;
 	protected Stack<ICommand> commands = new Stack<ICommand>();
+	protected ArrayList<ICommandHistoryListener> listeners = new ArrayList<ICommandHistoryListener>();
 	static Preferences prefs = Preferences.userNodeForPackage(Command.class);
 	
 	public CommandHistory () {
@@ -56,7 +59,8 @@ public class CommandHistory implements ICommandHistory {
 				position--;
 			
 			ICommand command = commands.get(position);
-
+			for (ICommandHistoryListener listener : listeners) listener.historyPrevious(command);
+			
 			return command;
 		} catch(ArrayIndexOutOfBoundsException e) {
 			e.printStackTrace();
@@ -71,6 +75,8 @@ public class CommandHistory implements ICommandHistory {
 				position++;
 			
 			ICommand command = commands.get(position);
+			for (ICommandHistoryListener listener : listeners) listener.historyNext(command);
+			
 			return command;
 		} catch(ArrayIndexOutOfBoundsException e) {
 			e.printStackTrace();
@@ -99,6 +105,8 @@ public class CommandHistory implements ICommandHistory {
 	
 	public void resetPosition() {
 		position = commands.size() - 1;
+		
+		for (ICommandHistoryListener listener : listeners) listener.historyReset(current());
 	}
 	
 	public void addCommand (String string)
@@ -120,6 +128,7 @@ public class CommandHistory implements ICommandHistory {
 		commands.push(command);
 		
 		resetPosition();
+		for (ICommandHistoryListener listener : listeners) listener.commandAdded(command);
 	}
 	
 	public void save () {
@@ -133,5 +142,14 @@ public class CommandHistory implements ICommandHistory {
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
+	}
+	
+	public void addCommandHistoryListener(ICommandHistoryListener listener) {
+		listeners.add(listener);
+	}
+	
+	public void removeCommandHistoryListener(ICommandHistoryListener listener) {
+		if (listeners.contains(listener))
+			listeners.remove(listener);
 	}
 }

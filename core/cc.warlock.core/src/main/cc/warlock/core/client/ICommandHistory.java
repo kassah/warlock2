@@ -64,4 +64,16 @@ public interface ICommandHistory {
 	 * Save this command history
 	 */
 	public void save ();
+	
+	/**
+	 * Add a command history listener
+	 * @param listener
+	 */
+	public void addCommandHistoryListener (ICommandHistoryListener listener);
+	
+	/**
+	 * Remove a command history listener
+	 * @param listener
+	 */
+	public void removeCommandHistoryListener (ICommandHistoryListener listener);
 }
