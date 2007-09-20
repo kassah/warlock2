@@ -22,6 +22,7 @@ import org.antlr.runtime.RecognitionException;
 import cc.warlock.core.script.AbstractScript;
 import cc.warlock.core.script.IScriptCommands;
 import cc.warlock.core.script.IScriptEngine;
+import cc.warlock.core.script.IScriptInfo;
 import cc.warlock.core.script.IScriptListener;
 import cc.warlock.core.script.Match;
 import cc.warlock.core.stormfront.client.IStormFrontClient;
@@ -29,7 +30,7 @@ import cc.warlock.core.stormfront.script.IStormFrontScriptCommands;
 
 public class WSLScript extends AbstractScript {
 	
-	protected String script, scriptName;
+	protected String script;
 	protected boolean running, stopped;
 	protected HashMap<String, WSLScriptLine> labels = new HashMap<String, WSLScriptLine>();
 	protected WSLScriptLine nextLine;
@@ -53,10 +54,10 @@ public class WSLScript extends AbstractScript {
 	
 	private static final String argSeparator = "\\s+";
 	
-	public WSLScript (WSLEngine engine, String scriptName, Reader scriptReader)
+	public WSLScript (WSLEngine engine, IScriptInfo info)
 		throws IOException
 	{
-		super(scriptName, scriptReader);
+		super(info);
 		this.engine = engine;
 		
 		// add command handlers
@@ -84,10 +85,9 @@ public class WSLScript extends AbstractScript {
 		addCommand("nextroom", new WSLNextRoom());
 		addCommand("exit", new WSLExit());
 		
-		this.scriptName = scriptName;
-		
 		StringBuffer script = new StringBuffer();
 		
+		Reader scriptReader = info.openReader();
 		char[] bytes = new char[1024];
 		int size = 0;
 		

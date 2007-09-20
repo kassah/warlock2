@@ -1,7 +1,6 @@
 package cc.warlock.core.stormfront.script.wsl;
 
 import java.io.IOException;
-import java.io.Reader;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
@@ -55,10 +54,10 @@ public class WSLEngine implements IScriptEngine {
 		return false;
 	}
 	
-	public IScript createScript(String scriptName, Reader scriptReader)
+	public IScript createScript(IScriptInfo info)
 	{
 		try {
-			return new WSLScript(this, scriptName, scriptReader);
+			return new WSLScript(this, info);
 		} catch (IOException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
