@@ -36,6 +36,10 @@ public class ServerScriptProvider implements IServerScriptProvider
 		public Reader openReader() {
 			return new StringReader(script.getScriptContents());
 		}
+		
+		public IStormFrontClient getClient() {
+			return ServerScriptProvider.this.client;
+		}
 	}
 	
 	public ServerScriptProvider (IStormFrontClient client)
