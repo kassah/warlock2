@@ -28,7 +28,7 @@ public class Stream implements IStream {
 	protected boolean isPrompting = false;
 	protected StyledString buffer = null;
 	
-	private Stream (String streamName) {
+	protected Stream (String streamName) {
 		this.streamName = new Property<String>("streamName", null);
 		this.streamName.set(streamName);
 		this.streamTitle = new Property<String>("streamTitle", null);
