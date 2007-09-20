@@ -14,6 +14,7 @@ import org.mozilla.javascript.Scriptable;
 import cc.warlock.core.script.AbstractScript;
 import cc.warlock.core.script.IScriptCommands;
 import cc.warlock.core.script.IScriptEngine;
+import cc.warlock.core.script.IScriptInfo;
 import cc.warlock.core.script.IScriptListener;
 
 /**
@@ -28,11 +29,10 @@ public class JavascriptScript extends AbstractScript {
 	private boolean stopped;
 	private Context context;
 	private JavascriptCommands jsCommands;
-	private Reader reader;
 	
-	public JavascriptScript (String name, JavascriptEngine engine, Reader reader)
+	public JavascriptScript (JavascriptEngine engine, IScriptInfo info)
 	{
-		super(name, reader);
+		super(info);
 		this.engine = engine;
 	}
 	

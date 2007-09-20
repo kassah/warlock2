@@ -6,7 +6,6 @@
  */
 package cc.warlock.core.script;
 
-import java.io.Reader;
 import java.util.List;
 
 import cc.warlock.core.client.IWarlockClient;
@@ -22,11 +21,10 @@ public interface IScriptEngine {
 	/**
 	 * Create a script (but do not start it).
 	 * 
-	 * @param scriptName The name of the script including the extension
-	 * @param scriptReader A java.io.Reader that contains the content of this script
+	 * @param info The information needed to create this script
 	 * @return A script object
 	 */
-	public IScript createScript (String scriptName, Reader scriptReader);
+	public IScript createScript (IScriptInfo info);
 	
 	/**
 	 * This method will run the script at the given path. Note that this should return immediately, so the engine

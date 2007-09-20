@@ -77,9 +77,9 @@ public class JavascriptEngine implements IScriptEngine {
 		return false;
 	}
 	
-	public IScript createScript(String scriptName, Reader scriptReader)
+	public IScript createScript(IScriptInfo info)
 	{
-		return new JavascriptScript(scriptName, this, scriptReader);
+		return new JavascriptScript(this, info);
 	}
 	
 	public void startScript(IScript script, IWarlockClient client, final String[] arguments) {
@@ -103,8 +103,10 @@ public class JavascriptEngine implements IScriptEngine {
 						provider.loadVariables(jscript, scope);
 					}
 					
-					Object result = context.evaluateReader(scope, jscript.getReader(), jscript.getName(), 1, null);
+					Reader reader = jscript.getScriptInfo().openReader();
+					Object result = context.evaluateReader(scope, reader, jscript.getName(), 1, null);
 					System.out.println("script result: " + Context.toString(result));
+					reader.close();
 				}
 				catch (WrappedException e) {
 					

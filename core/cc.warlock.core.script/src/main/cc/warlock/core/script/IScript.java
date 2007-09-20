@@ -32,4 +32,6 @@ public interface IScript {
 	
 	public IScriptCommands getScriptCommands();
 	public IScriptEngine getScriptEngine();
+	
+	public IScriptInfo getScriptInfo();
 }

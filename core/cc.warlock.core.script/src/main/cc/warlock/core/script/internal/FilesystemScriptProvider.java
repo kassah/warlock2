@@ -3,7 +3,7 @@ package cc.warlock.core.script.internal;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.FileReader;
-import java.io.IOException;
+import java.io.Reader;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Hashtable;
@@ -47,6 +47,7 @@ public class FilesystemScriptProvider implements IScriptProvider, Runnable {
 	{
 		public String scriptName;
 		public File scriptFile;
+		public String contents;
 		
 		public File getScriptFile() {
 			return scriptFile;
@@ -66,6 +67,14 @@ public class FilesystemScriptProvider implements IScriptProvider, Runnable {
 				return scriptFile.getName().substring(scriptFile.getName().lastIndexOf('.') + 1);
 			}
 			return null;
+		}
+		
+		public Reader openReader() {
+			try {
+				return new FileReader(scriptFile);
+			} catch (FileNotFoundException e) {
+				return null;
+			}
 		}
 	}
 	
@@ -115,18 +124,8 @@ public class FilesystemScriptProvider implements IScriptProvider, Runnable {
 		{
 			if (engine.supports(info))
 			{
-				try {
-					FileReader reader = new FileReader(info.scriptFile);
-					script = engine.createScript(info.scriptName, reader);
-					reader.close();
-					break;
-				} catch (FileNotFoundException e) {
-					// TODO Auto-generated catch block
-					e.printStackTrace();
-				} catch (IOException e) {
-					// TODO Auto-generated catch block
-					e.printStackTrace();
-				}
+				script = engine.createScript(info);
+				break;
 			}
 		}
 		return script;

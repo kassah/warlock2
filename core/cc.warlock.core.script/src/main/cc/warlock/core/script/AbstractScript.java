@@ -10,13 +10,14 @@ public abstract class AbstractScript implements IScript {
 	protected boolean suspended;
 	protected String scriptName;
 	protected Reader reader;
+	protected IScriptInfo info;
 	
-	public AbstractScript (String scriptName, Reader reader)
+	public AbstractScript (IScriptInfo info)
 	{
 		this.listeners = new ArrayList<IScriptListener>();
 		
-		this.scriptName = scriptName;
-		this.reader = reader;
+		this.scriptName = info.getScriptName();
+		this.info = info;
 	}
 	
 	public void resume() {
@@ -63,5 +64,9 @@ public abstract class AbstractScript implements IScript {
 		}
 		
 		return scriptName;
+	}
+	
+	public IScriptInfo getScriptInfo() {
+		return info;
 	}
 }
