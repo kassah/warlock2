@@ -1,0 +1,13 @@
+Manifest-Version: 1.0
+Bundle-ManifestVersion: 2
+Bundle-Name: Warlock Core Test Plug-in
+Bundle-SymbolicName: cc.warlock.core.test
+Bundle-Version: 2.0.0
+Bundle-Activator: cc.warlock.core.test.Activator
+Require-Bundle: org.eclipse.core.runtime,
+ cc.warlock.core,
+ cc.warlock.core.script,
+ cc.warlock.core.stormfront,
+ cc.warlock.core.stormfront.script,
+ org.junit4
+Eclipse-LazyStart: true
