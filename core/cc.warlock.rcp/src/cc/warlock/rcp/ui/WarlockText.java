@@ -567,4 +567,8 @@ public class WarlockText implements LineBackgroundListener {
 	public StyledTextContent getContent() {
 		return textWidget.getContent();
 	}
+
+	public StyledText getTextWidget() {
+		return textWidget;
+	}
 }
