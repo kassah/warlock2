@@ -1,35 +1,29 @@
 package cc.warlock.rcp.stormfront.ui.menu;
 
-import java.util.Hashtable;
-
 import org.eclipse.jface.action.ActionContributionItem;
 import org.eclipse.jface.action.IContributionItem;
 import org.eclipse.ui.actions.CompoundContributionItem;
 
 import cc.warlock.core.stormfront.client.IStormFrontClient;
 import cc.warlock.rcp.actions.OpenStreamWindowAction;
+import cc.warlock.rcp.views.StreamView;
 
 
 public class StreamWindowContributionItem extends CompoundContributionItem {
 
 	@Override
 	protected IContributionItem[] getContributionItems() {	
-		Hashtable <String, String> streams = new Hashtable<String,String>();
-		streams.put(IStormFrontClient.THOUGHTS_STREAM_NAME, "Thoughts");
-		streams.put(IStormFrontClient.INVENTORY_STREAM_NAME, "Inventory");
-		streams.put(IStormFrontClient.DEATH_STREAM_NAME, "Deaths");
+		IContributionItem[] items = new IContributionItem[3];
+		items[0] = streamContribution("Thoughts", IStormFrontClient.THOUGHTS_STREAM_NAME, StreamView.TOP_STREAM_PREFIX);
+		items[1] = streamContribution("Inventory", IStormFrontClient.INVENTORY_STREAM_NAME, StreamView.RIGHT_STREAM_PREFIX);
+		items[2] = streamContribution("Deaths", IStormFrontClient.DEATH_STREAM_NAME, StreamView.TOP_STREAM_PREFIX);
 		
-		IContributionItem[] items = new IContributionItem[streams.keySet().size()];
-		int i = 0;
-		
-		for (String streamName : streams.keySet())
-		{
-			OpenStreamWindowAction action = new OpenStreamWindowAction(streams.get(streamName), streamName);
-			items[i] = new ActionContributionItem(action);
-			i++;
-		}
-
 		return items;
+	}
+	
+	protected IContributionItem streamContribution(String label, String streamName, String prefix)
+	{
+		return new ActionContributionItem(new OpenStreamWindowAction(label, streamName, prefix));
 	}
 
 }

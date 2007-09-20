@@ -19,18 +19,18 @@
       <view
             allowMultiple="false"
             class="cc.warlock.rcp.views.StreamView"
-            id="cc.warlock.rcp.views.topStream.death"
+            id="cc.warlock.rcp.views.stream.topStream.death"
             name="Deaths">
       </view>
       <view
             allowMultiple="false"
             class="cc.warlock.rcp.views.StreamView"
-            id="cc.warlock.rcp.views.rightStream.inv"
+            id="cc.warlock.rcp.views.stream.rightStream.inv"
             name="Inventory">
       </view>
       <view
             class="cc.warlock.rcp.views.StreamView"
-            id="cc.warlock.rcp.views.topStream.thoughts"
+            id="cc.warlock.rcp.views.stream.topStream.thoughts"
             name="Thoughts">
       </view>
       <view
