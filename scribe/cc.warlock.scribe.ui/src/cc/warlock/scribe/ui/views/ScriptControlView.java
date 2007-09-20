@@ -1,5 +1,6 @@
 package cc.warlock.scribe.ui.views;
 
+import java.util.ArrayList;
 import java.util.Timer;
 import java.util.TimerTask;
 
@@ -27,7 +28,7 @@ import cc.warlock.rcp.ui.client.SWTWarlockClientListener;
 import cc.warlock.scribe.ui.ScribeSharedImages;
 
 public class ScriptControlView extends ViewPart implements IScriptListener {
-	protected IStormFrontClient client;
+	protected ArrayList<IStormFrontClient> clients = new ArrayList<IStormFrontClient>();
 	protected SWTScriptListener wrapper = new SWTScriptListener(this);
 	protected Composite main, scriptComposite;
 	protected ToolBar buttonsToolbar;
@@ -36,20 +37,24 @@ public class ScriptControlView extends ViewPart implements IScriptListener {
 	protected int duration = 0;
 	protected IScript currentScript;
 
-	protected void setClient (IStormFrontClient client)
+	protected void listenToClient (IStormFrontClient client)
 	{
-		this.client = client;
-		client.addScriptListener(wrapper);
+		if (!clients.contains(client)) {
+			client.addScriptListener(wrapper);
+			clients.add(client);
+		}
 	}
 	
 	protected void updateCurrentClient ()
 	{
 		if (WarlockClientRegistry.getActiveClients().size() > 0)
 		{
-			IWarlockClient client = WarlockClientRegistry.getActiveClients().get(0);
-			if (client instanceof IStormFrontClient)
+			for (IWarlockClient client : WarlockClientRegistry.getActiveClients())
 			{
-				setClient((IStormFrontClient) client);
+				if (client instanceof IStormFrontClient)
+				{
+					listenToClient((IStormFrontClient) client);
+				}
 			}
 		} else {
 			WarlockClientRegistry.addWarlockClientListener(new SWTWarlockClientListener(
@@ -57,7 +62,7 @@ public class ScriptControlView extends ViewPart implements IScriptListener {
 				public void clientActivated(IWarlockClient client) {
 					if (client instanceof IStormFrontClient)
 					{
-						setClient((IStormFrontClient) client);
+						listenToClient((IStormFrontClient) client);
 					}
 				}
 				public void clientConnected(IWarlockClient client) {}
