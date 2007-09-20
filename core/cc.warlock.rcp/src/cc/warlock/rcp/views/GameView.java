@@ -36,6 +36,7 @@ import cc.warlock.core.client.IWarlockClientViewer;
 import cc.warlock.core.client.internal.Command;
 import cc.warlock.rcp.plugin.Warlock2Plugin;
 import cc.warlock.rcp.ui.WarlockCompass;
+import cc.warlock.rcp.ui.WarlockText;
 import cc.warlock.rcp.ui.client.SWTWarlockClientViewer;
 import cc.warlock.rcp.ui.macros.IMacro;
 import cc.warlock.rcp.ui.macros.MacroRegistry;
@@ -52,6 +53,7 @@ public abstract class GameView extends StreamView implements KeyListener, IWarlo
 	protected static ArrayList<IGameViewFocusListener> focusListeners = new ArrayList<IGameViewFocusListener>();
 	protected static GameView viewInFocus;
 	
+	protected WarlockText text;
 	protected StyledText entry;
 	protected WarlockCompass compass;
 	protected ICommand currentCommand;
@@ -136,6 +138,10 @@ public abstract class GameView extends StreamView implements KeyListener, IWarlo
 	
 	public void createPartControl(Composite parent) {
 		super.createPartControl(parent);
+
+		this.client = Warlock2Plugin.getDefault().getCurrentClient();
+		this.text = getTextForClient(this.client);
+		book.showPage(this.text.getTextWidget());
 		
 		text.setLineLimit(2000);
 		text.setScrollDirection(SWT.DOWN);
@@ -157,7 +163,6 @@ public abstract class GameView extends StreamView implements KeyListener, IWarlo
 		});
 		entry.addKeyListener(this);
 		
-		this.client = Warlock2Plugin.getDefault().getCurrentClient();
 	}
 	
 	public void setFocus() {
@@ -222,16 +227,17 @@ public abstract class GameView extends StreamView implements KeyListener, IWarlo
 	
 	public void setClient(IWarlockClient client) {
 		this.client = client;
+		book.showPage(getTextForClient(client).getTextWidget());
 		
 		setMainStream(client.getDefaultStream());
 		client.addViewer(wrapper);
 		
-		for (StreamView streamView : StreamView.getOpenViews())
-		{
-			if (!(streamView instanceof GameView)) {
-				streamView.setClient(client);
-			}
-		}
+//		for (StreamView streamView : StreamView.getOpenViews())
+//		{
+//			if (!(streamView instanceof GameView)) {
+//				streamView.setClient(client);
+//			}
+//		}
 	}
 	
 	public IWarlockClient getWarlockClient() {

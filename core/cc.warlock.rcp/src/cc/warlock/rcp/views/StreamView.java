@@ -2,6 +2,7 @@ package cc.warlock.rcp.views;
 
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Hashtable;
 
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.custom.StyleRange;
@@ -12,6 +13,7 @@ import org.eclipse.swt.widgets.Composite;
 import org.eclipse.ui.IWorkbenchPage;
 import org.eclipse.ui.PartInitException;
 import org.eclipse.ui.PlatformUI;
+import org.eclipse.ui.part.PageBook;
 import org.eclipse.ui.part.ViewPart;
 
 import cc.warlock.core.client.IProperty;
@@ -28,17 +30,22 @@ import cc.warlock.rcp.ui.client.SWTPropertyListener;
 import cc.warlock.rcp.ui.client.SWTStreamListener;
 import cc.warlock.rcp.ui.style.DefaultStyleProvider;
 
-public class StreamView extends ViewPart implements IStreamListener {
+public class StreamView extends ViewPart implements IStreamListener, IGameViewFocusListener {
 	
 	public static final String STREAM_VIEW_PREFIX = "cc.warlock.rcp.views.stream.";
+	
+	public static final String RIGHT_STREAM_PREFIX = "rightStream.";
+	public static final String TOP_STREAM_PREFIX = "rightStream.";
 	
 	protected static ArrayList<StreamView> openViews = new ArrayList<StreamView>();
 	
 	protected IStream mainStream;
 	protected ArrayList<IStream> streams;
 	protected IWarlockClient client;
-	protected WarlockText text;
 	protected Composite mainComposite;
+	protected PageBook book;
+	protected Hashtable<IWarlockClient, WarlockText> clientStreams = new Hashtable<IWarlockClient, WarlockText>();
+	
 	// This name is the 'suffix' part of the stream... so we will install listeners for each client
 	protected String mainStreamName;
 	protected SWTStreamListener streamListenerWrapper;
@@ -46,15 +53,27 @@ public class StreamView extends ViewPart implements IStreamListener {
 	protected boolean appendNewlines = false;
 	protected boolean isPrompting = false;
 	protected IStyleProvider styleProvider;
+	protected boolean multiClient = false;
 	
 	public StreamView() {
 		openViews.add(this);
 		streamListenerWrapper = new SWTStreamListener(this);
 		styleProvider = new DefaultStyleProvider();
 		streams = new ArrayList<IStream>();
+		
+		if (!(this instanceof GameView))
+		{
+			GameView.addGameViewFocusListener(this);
+			this.multiClient = true;
+		}
+	}
+	
+	protected void setMultiClient (boolean multiClient)
+	{
+		this.multiClient = multiClient;
 	}
 
-	public static StreamView getViewForStream (String streamName) {
+	public static StreamView getViewForStream (String prefix, String streamName) {
 		IWorkbenchPage page = PlatformUI.getWorkbench().getActiveWorkbenchWindow().getActivePage();
 		
 		for (StreamView view : openViews)
@@ -68,8 +87,9 @@ public class StreamView extends ViewPart implements IStreamListener {
 		
 		// none of the already created views match, create a new one
 		try {
-			StreamView nextInstance = (StreamView) page.showView(STREAM_VIEW_PREFIX + streamName);
+			StreamView nextInstance = (StreamView) page.showView(STREAM_VIEW_PREFIX + prefix + streamName);
 			nextInstance.setStreamName(streamName);
+			nextInstance.setMultiClient(true);
 			
 			return nextInstance;
 		} catch (PartInitException e) {
@@ -88,13 +108,8 @@ public class StreamView extends ViewPart implements IStreamListener {
 		layout.verticalSpacing = 0;
 		mainComposite.setLayout(layout);
 		
-		text = new WarlockText(mainComposite, SWT.V_SCROLL);
-		text.setLayoutData(new GridData(GridData.FILL, GridData.FILL, true, true));
-		text.setEditable(false);
-		text.setWordWrap(true);
-		text.setBackground(new Color(text.getDisplay(), 25, 25, 50));
-		text.setForeground(new Color(text.getDisplay(), 240, 240, 255));
-		text.setScrollDirection(SWT.DOWN);
+		book = new PageBook(mainComposite, SWT.NONE);
+		book.setLayoutData(new GridData(GridData.FILL, GridData.FILL, true, true));
 		
 //		GameView currentGameView = GameView.getViewInFocus();
 //		if (currentGameView != null && currentGameView.getWarlockClient() != null)
@@ -102,7 +117,32 @@ public class StreamView extends ViewPart implements IStreamListener {
 //			setPartName(currentGameView.getWarlockClient().getStream(mainStreamName).getTitle().get());
 //		}
 	}
+	
+	protected WarlockText getTextForClient (IWarlockClient client)
+	{
+		if (!clientStreams.containsKey(client))
+		{
+			WarlockText text = new WarlockText(book, SWT.V_SCROLL);
+			text.setLayoutData(new GridData(GridData.FILL, GridData.FILL, true, true));
+			text.setEditable(false);
+			text.setWordWrap(true);
+			text.setBackground(new Color(text.getDisplay(), 25, 25, 50));
+			text.setForeground(new Color(text.getDisplay(), 240, 240, 255));
+			text.setScrollDirection(SWT.DOWN);
+			
+			clientStreams.put(client, text);
+			return text;
+		}
+		else return clientStreams.get(client);
+	}
 
+	public void gameViewFocused(GameView gameView) {
+		if (multiClient)
+		{
+			setClient(gameView.getWarlockClient());
+		}
+	}
+	
 	@Override
 	public void setFocus() {
 		// TODO Auto-generated method stub
@@ -135,15 +175,19 @@ public class StreamView extends ViewPart implements IStreamListener {
 	}
 	
 	public void streamCleared(IStream stream) {
-		if (this.mainStream.equals(stream))
-			text.setText("");
+		if (this.mainStream.equals(stream) || streams.contains(stream))
+		{
+			clientStreams.get(client).setText("");
+		}
 	}
 	
 	public void streamReceivedText(IStream stream, IStyledString string) {
 		if (this.mainStream.equals(stream) || this.streams.contains(stream))
 		{
+			WarlockText text = clientStreams.get(client);
+			
 			if (isPrompting) {
-				this.text.append("\n");
+				text.append("\n");
 				isPrompting = false;
 			}
 			
@@ -152,9 +196,9 @@ public class StreamView extends ViewPart implements IStreamListener {
 			if (appendNewlines)
 				streamText += "\n";
 			
-			this.text.append(streamText);
+			text.append(streamText);
 			
-			int charCount = this.text.getCharCount() - streamText.length();
+			int charCount = text.getCharCount() - streamText.length();
 			StyleRangeWithData ranges[] = new StyleRangeWithData[string.getStyles().size()];
 			int i = 0;
 			for (IWarlockStyle style : string.getStyles())
@@ -176,16 +220,16 @@ public class StreamView extends ViewPart implements IStreamListener {
 			for (StyleRangeWithData range : ranges)
 			{
 				if (range != null) {
-					int lineIndex = this.text.getLineAtOffset(range.start);
-					this.text.setStyleRange(range);
+					int lineIndex = text.getLineAtOffset(range.start);
+					text.setStyleRange(range);
 					
-					styleProvider.applyStyles(this.text, range, streamText, range.start, lineIndex);
+					styleProvider.applyStyles(text, range, streamText, range.start, lineIndex);
 					userHighlightsApplied = true;
 				}
 			}
 			
 			if (!userHighlightsApplied) {
-				styleProvider.applyStyles(this.text, null, streamText, charCount, this.text.getLineAtOffset(charCount));
+				styleProvider.applyStyles(text, null, streamText, charCount, text.getLineAtOffset(charCount));
 			}
 		}
 	}
@@ -193,12 +237,13 @@ public class StreamView extends ViewPart implements IStreamListener {
 	public void streamEchoed(IStream stream, String text) {
 		if (this.mainStream.equals(stream) || this.streams.contains(stream))
 		{
+			WarlockText textWidget = clientStreams.get(client);
 			isPrompting = false;
 			
-			this.text.append(text + "\n");
+			textWidget.append(text + "\n");
 			
-			StyleRange echoStyle = styleProvider.getEchoStyle(this.text.getCharCount() - text.length() - 1, text.length());
-			this.text.setStyleRange(echoStyle);
+			StyleRange echoStyle = styleProvider.getEchoStyle(textWidget.getCharCount() - text.length() - 1, text.length());
+			textWidget.setStyleRange(echoStyle);
 		}
 	}
 	
@@ -206,7 +251,7 @@ public class StreamView extends ViewPart implements IStreamListener {
 		if (!isPrompting && (this.mainStream.equals(stream) || this.streams.contains(stream)))
 		{
 			isPrompting = true;
-			this.text.append(prompt);
+			clientStreams.get(client).append(prompt);
 		}
 	}
 	
@@ -222,6 +267,7 @@ public class StreamView extends ViewPart implements IStreamListener {
 	public void setClient (IWarlockClient client)
 	{
 		this.client = client;
+		book.showPage(getTextForClient(client).getTextWidget());
 		
 		setMainStream(client.getStream(mainStreamName));
 	}
@@ -236,6 +282,10 @@ public class StreamView extends ViewPart implements IStreamListener {
 		for (IStream stream : streams)
 		{
 			stream.removeStreamListener(streamListenerWrapper);
+		}
+		
+		if (openViews.contains(this)) {
+			openViews.remove(this);
 		}
 		
 		super.dispose();
