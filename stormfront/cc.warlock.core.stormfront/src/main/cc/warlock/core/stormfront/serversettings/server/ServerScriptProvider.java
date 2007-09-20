@@ -1,5 +1,6 @@
 package cc.warlock.core.stormfront.serversettings.server;
 
+import java.io.Reader;
 import java.io.StringReader;
 import java.util.Arrays;
 import java.util.Hashtable;
@@ -31,6 +32,10 @@ public class ServerScriptProvider implements IServerScriptProvider
 		public String getComment () {
 			return script.getComment();
 		}
+		
+		public Reader openReader() {
+			return new StringReader(script.getScriptContents());
+		}
 	}
 	
 	public ServerScriptProvider (IStormFrontClient client)
@@ -53,9 +58,7 @@ public class ServerScriptProvider implements IServerScriptProvider
 		{
 			if (engine.supports(info))
 			{
-				StringReader reader = new StringReader(info.script.getScriptContents());
-				script = engine.createScript(info.script.getName(), reader);
-				reader.close();
+				script = engine.createScript(info);
 				break;
 			}
 		}
