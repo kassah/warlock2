@@ -284,6 +284,9 @@ public class StreamView extends ViewPart implements IStreamListener, IGameViewFo
 			stream.removeStreamListener(streamListenerWrapper);
 		}
 		
+		clientStreams.clear();
+		GameView.removeGameViewFocusListener(this);
+		
 		if (openViews.contains(this)) {
 			openViews.remove(this);
 		}
