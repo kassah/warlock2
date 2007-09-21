@@ -19,11 +19,13 @@
 	<target name="copy-code">
 		<mkdir dir="${buildDirectory}"/>
 
+		<copy todir="${buildDirectory}/features">
+			<fileset dir="../../features" includes="cc.*.feature/**/*"/>
+		</copy>
+			
 		<copy todir="${buildDirectory}/plugins">
-			<fileset dir="../../core">
-				<include name="cc.warlock.core/**/*"/>
-				<include name="cc.warlock.rcp/**/*"/>
-			</fileset>
+			<fileset dir="../../core" includes="**/*"/>
+			<fileset dir="../../stormfront" includes="**/*"/>
 		</copy>
 	</target>
 
@@ -51,7 +53,7 @@
 		</antRunner>
 		
 		<antcall target="rename-binaries"/>
-		<ant antfile="buildInstallers.xml"/>
+		<!--ant antfile="buildInstallers.xml"/-->
 		<if>
 			<equals arg1="${publish-build}" arg2="true" casesensitive="false"/>
 			<then>
@@ -90,7 +92,18 @@
 
 				<move file="@{binary}"  tofile="${new-binary-name}"/>
 				<move file="${new-binary-name}" todir="${buildDirectory}/${buildLabel}/${warlock-version}"/>
-				
+			</sequential>
+		</for>
+
+		<!-- manually update zips w/ features -->
+		<for param="zip">
+			<fileset dir="${buildDirectory}/${buildLabel}/${warlock-version}">
+				<include name="*.zip"/>
+			</fileset>
+			<sequential>
+				<zip update="true" destfile="@{zip}">
+					<zipfileset dir="${buildDirectory}/features" prefix="warlock2/features"/>
+				</zip>
 			</sequential>
 		</for>
 	</target>
