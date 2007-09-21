@@ -1,0 +1,60 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<feature
+      id="cc.warlock.rcp.feature"
+      label="Warlock RCP Feature"
+      version="2.0.0"
+      provider-name="Warlock Team"
+      plugin="cc.warlock.rcp">
+
+   <description url="http://www.warlock.cc">
+      The base feature of Warlock
+   </description>
+
+   <copyright>
+      Copyright 2001-2007 Warlock LLC
+   </copyright>
+
+   <license url="http://www.example.com/license">
+      [Enter License Description here.]
+   </license>
+
+   <url>
+      <update label="Warlock Update Site" url="http://www.warlock.cc/updates"/>
+      <discovery label="Warlock Update Site" url="http://www.warlock.cc/updates"/>
+   </url>
+
+   <requires>
+      <import plugin="org.eclipse.core.runtime"/>
+      <import plugin="org.eclipse.swt"/>
+      <import plugin="org.eclipse.jface"/>
+      <import plugin="org.eclipse.ui"/>
+      <import plugin="org.eclipse.ui.forms"/>
+      <import plugin="org.eclipse.update.core"/>
+   </requires>
+
+   <plugin
+         id="cc.warlock.core"
+         download-size="0"
+         install-size="0"
+         version="0.0.0"/>
+
+   <plugin
+         id="cc.warlock.core.script"
+         download-size="0"
+         install-size="0"
+         version="0.0.0"/>
+
+   <plugin
+         id="cc.warlock.rcp"
+         download-size="0"
+         install-size="0"
+         version="0.0.0"/>
+
+   <plugin
+         id="cc.warlock.rcp.userstreams"
+         download-size="0"
+         install-size="0"
+         version="0.0.0"
+         unpack="false"/>
+
+</feature>
