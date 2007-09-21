@@ -22,6 +22,9 @@ import cc.warlock.rcp.plugin.Warlock2Plugin;
  */
 public class WarlockSharedImages {
 	
+	public static final String IMG_UPDATES = "/images/updates_obj.gif";
+	public static final String IMG_FEATURE = "/images/feature_obj.gif";
+	
 	public static final String IMG_WIZBAN_WARLOCK = "/images/warlock-wizard-icon.png";
 	public static final String IMG_CHARACTER = "/images/character.gif";
 	

@@ -34,6 +34,7 @@
       <plugin id="cc.warlock.core.stormfront.script"/>
       <plugin id="cc.warlock.rcp"/>
       <plugin id="cc.warlock.rcp.stormfront"/>
+      <plugin id="cc.warlock.rcp.userstreams"/>
       <plugin id="com.ibm.icu"/>
       <plugin id="com.ibm.icu.base"/>
       <plugin id="javax.servlet"/>
@@ -42,6 +43,7 @@
       <plugin id="org.eclipse.core.databinding"/>
       <plugin id="org.eclipse.core.expressions"/>
       <plugin id="org.eclipse.core.jobs"/>
+      <plugin id="org.eclipse.core.net"/>
       <plugin id="org.eclipse.core.runtime"/>
       <plugin id="org.eclipse.core.runtime.compatibility.auth"/>
       <plugin id="org.eclipse.core.runtime.compatibility.registry" fragment="true"/>
@@ -67,6 +69,9 @@
       <plugin id="org.eclipse.ui.carbon"/>
       <plugin id="org.eclipse.ui.forms"/>
       <plugin id="org.eclipse.ui.workbench"/>
+      <plugin id="org.eclipse.update.configurator"/>
+      <plugin id="org.eclipse.update.core"/>
+      <plugin id="org.eclipse.update.core.win32" fragment="true"/>
    </plugins>
 
    <features>

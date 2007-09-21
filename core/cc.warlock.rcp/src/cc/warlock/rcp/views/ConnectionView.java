@@ -35,6 +35,7 @@ import org.eclipse.ui.forms.widgets.Section;
 import org.eclipse.ui.internal.commands.ICommandImageService;
 import org.eclipse.ui.part.ViewPart;
 
+import cc.warlock.rcp.application.WarlockUpdates;
 import cc.warlock.rcp.plugin.Warlock2Plugin;
 import cc.warlock.rcp.ui.ConnectionCommand;
 import cc.warlock.rcp.ui.IConnectionCommand;
@@ -63,9 +64,7 @@ public class ConnectionView extends ViewPart {
 		}
 	}
 	
-	public ConnectionView() {
-		// TODO Auto-generated constructor stub
-	}
+	public ConnectionView() {	}
 
 	@Override
 	public void createPartControl(Composite parent) {
@@ -217,10 +216,14 @@ public class ConnectionView extends ViewPart {
 		return section;
 	}
 
+	protected static boolean checkedForUpdates = false;
 	@Override
 	public void setFocus() {
-		// TODO Auto-generated method stub
-
+		if (!checkedForUpdates)
+		{
+			WarlockUpdates.checkForUpdates();
+			checkedForUpdates = true;
+		}
 	}
 	
 	@Override
