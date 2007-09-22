@@ -121,6 +121,7 @@ public class ScriptCommands implements IScriptCommands, IStreamListener
 	public void nextRoom () {
 		lock.lock();
 		try {
+			roomWaiting = true;
 			while (!stopped && roomWaiting) {
 				nextRoom.await();
 			}
@@ -247,7 +248,7 @@ public class ScriptCommands implements IScriptCommands, IStreamListener
 	public void movedToRoom() {
 		lock.lock();
 		try {
-			roomWaiting = true;
+			roomWaiting = false;
 			nextRoom.notifyAll();
 		} finally {
 			lock.unlock();
