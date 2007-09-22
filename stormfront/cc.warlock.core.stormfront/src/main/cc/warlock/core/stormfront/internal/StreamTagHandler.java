@@ -29,6 +29,8 @@ public class StreamTagHandler extends DefaultTagHandler {
 	 
 	 @Override
 	public void handleEnd() {
-		handler.popStream();
+		 // force append a new-line.. most of the use of <stream>xxx</stream> doesn't have newlines, so the buffer won't flush
+		 handler.characters(new char[] { '\n' }, 0, 1);
+		 handler.popStream();
 	}
 }
