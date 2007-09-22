@@ -6,22 +6,17 @@ import org.eclipse.jface.resource.JFaceResources;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.graphics.Font;
 import org.eclipse.swt.widgets.Caret;
-import org.eclipse.ui.IViewSite;
-import org.eclipse.ui.PartInitException;
 
 import cc.warlock.core.client.IWarlockClient;
 import cc.warlock.core.client.IWarlockSkin;
 import cc.warlock.core.client.WarlockColor;
-import cc.warlock.core.configuration.Profile;
-import cc.warlock.core.configuration.SavedProfiles;
 import cc.warlock.core.stormfront.client.IStormFrontClient;
 import cc.warlock.core.stormfront.client.IStormFrontClientViewer;
 import cc.warlock.core.stormfront.serversettings.server.ServerSettings;
-import cc.warlock.rcp.application.WarlockApplication;
 import cc.warlock.rcp.stormfront.adapters.SWTStormFrontClientViewer;
 import cc.warlock.rcp.stormfront.ui.StormFrontMacros;
-import cc.warlock.rcp.stormfront.ui.actions.ProfileConnectAction;
 import cc.warlock.rcp.stormfront.ui.style.StormFrontStyleProvider;
+import cc.warlock.rcp.ui.style.StyleProviders;
 import cc.warlock.rcp.util.ColorUtil;
 import cc.warlock.rcp.views.GameView;
 
@@ -71,7 +66,7 @@ public class StormFrontGameView extends GameView implements IStormFrontClientVie
 			addStream(client.getStream(IStormFrontClient.DEATH_STREAM_NAME));
 			sfClient = (IStormFrontClient) client;
 
-			styleProvider = new StormFrontStyleProvider(sfClient.getServerSettings());
+			StyleProviders.setStyleProvider(client, new StormFrontStyleProvider(sfClient.getServerSettings()));
 			
 			compass.setCompass(sfClient.getCompass());
 		}

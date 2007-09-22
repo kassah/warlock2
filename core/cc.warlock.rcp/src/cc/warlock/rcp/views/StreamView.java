@@ -29,6 +29,7 @@ import cc.warlock.rcp.ui.WarlockText;
 import cc.warlock.rcp.ui.client.SWTPropertyListener;
 import cc.warlock.rcp.ui.client.SWTStreamListener;
 import cc.warlock.rcp.ui.style.DefaultStyleProvider;
+import cc.warlock.rcp.ui.style.StyleProviders;
 
 public class StreamView extends ViewPart implements IStreamListener, IGameViewFocusListener {
 	
@@ -52,13 +53,11 @@ public class StreamView extends ViewPart implements IStreamListener, IGameViewFo
 	protected SWTPropertyListener<String> propertyListenerWrapper;
 	protected boolean appendNewlines = false;
 	protected boolean isPrompting = false;
-	protected IStyleProvider styleProvider;
 	protected boolean multiClient = false;
 	
 	public StreamView() {
 		openViews.add(this);
 		streamListenerWrapper = new SWTStreamListener(this);
-		styleProvider = new DefaultStyleProvider();
 		streams = new ArrayList<IStream>();
 		
 		if (!(this instanceof GameView))
@@ -181,6 +180,11 @@ public class StreamView extends ViewPart implements IStreamListener, IGameViewFo
 		}
 	}
 	
+	protected IStyleProvider getStyleProvider ()
+	{
+		return StyleProviders.getStyleProvider(client);
+	}
+	
 	public void streamReceivedText(IStream stream, IStyledString string) {
 		if (this.mainStream.equals(stream) || this.streams.contains(stream))
 		{
@@ -203,7 +207,7 @@ public class StreamView extends ViewPart implements IStreamListener, IGameViewFo
 			int i = 0;
 			for (IWarlockStyle style : string.getStyles())
 			{
-				ranges[i] = styleProvider.getStyleRange(style, charCount + style.getStart(), style.getLength());
+				ranges[i] = getStyleProvider().getStyleRange(style, charCount + style.getStart(), style.getLength());
 				if (style.getStyleTypes().contains(IWarlockStyle.StyleType.LINK))
 				{
 					ranges[i].data.put("link.url", style.getLinkAddress().toString());
@@ -223,13 +227,13 @@ public class StreamView extends ViewPart implements IStreamListener, IGameViewFo
 					int lineIndex = text.getLineAtOffset(range.start);
 					text.setStyleRange(range);
 					
-					styleProvider.applyStyles(text, range, streamText, range.start, lineIndex);
+					getStyleProvider().applyStyles(text, range, streamText, range.start, lineIndex);
 					userHighlightsApplied = true;
 				}
 			}
 			
 			if (!userHighlightsApplied) {
-				styleProvider.applyStyles(text, null, streamText, charCount, text.getLineAtOffset(charCount));
+				getStyleProvider().applyStyles(text, null, streamText, charCount, text.getLineAtOffset(charCount));
 			}
 		}
 	}
@@ -242,7 +246,7 @@ public class StreamView extends ViewPart implements IStreamListener, IGameViewFo
 			
 			textWidget.append(text + "\n");
 			
-			StyleRange echoStyle = styleProvider.getEchoStyle(textWidget.getCharCount() - text.length() - 1, text.length());
+			StyleRange echoStyle = getStyleProvider().getEchoStyle(textWidget.getCharCount() - text.length() - 1, text.length());
 			textWidget.setStyleRange(echoStyle);
 		}
 	}
@@ -270,6 +274,9 @@ public class StreamView extends ViewPart implements IStreamListener, IGameViewFo
 		book.showPage(getTextForClient(client).getTextWidget());
 		
 		setMainStream(client.getStream(mainStreamName));
+
+		if (StyleProviders.getStyleProvider(client) == null)
+			StyleProviders.setStyleProvider(client, DefaultStyleProvider.instance());
 	}
 	
 	@Override
@@ -309,10 +316,5 @@ public class StreamView extends ViewPart implements IStreamListener, IGameViewFo
 	public void setViewTitle (String title)
 	{
 		setPartName(title);
-	}
-	
-	public void setStyleProvider (IStyleProvider provider)
-	{
-		this.styleProvider = provider;
 	}
 }

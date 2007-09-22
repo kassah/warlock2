@@ -12,6 +12,17 @@ import cc.warlock.rcp.ui.WarlockText;
 
 public class DefaultStyleProvider implements IStyleProvider {
 	
+	protected static DefaultStyleProvider _instance;
+	protected DefaultStyleProvider () { }
+	
+	public static DefaultStyleProvider instance()
+	{
+		if (_instance == null) {
+			_instance = new DefaultStyleProvider();
+		}
+		return _instance;
+	}
+	
 	public StyleRangeWithData getStyleRange (IWarlockStyle style, int start, int length)
 	{
 		if (style.getStyleTypes().contains(IWarlockStyle.StyleType.EMPTY))
