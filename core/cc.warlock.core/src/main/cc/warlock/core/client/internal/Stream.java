@@ -39,11 +39,13 @@ public class Stream implements IStream {
 	}
 
 	public void addStreamListener(IStreamListener listener) {
-		listeners.add(listener);
+		if (!listeners.contains(listener))
+			listeners.add(listener);
 	}
 	
 	public void removeStreamListener(IStreamListener listener) {
-		listeners.remove(listener);
+		if (listeners.contains(listener))
+			listeners.remove(listener);
 	}
 
 	public void clear() {
