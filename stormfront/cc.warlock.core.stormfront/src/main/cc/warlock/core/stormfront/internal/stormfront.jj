@@ -107,7 +107,7 @@ TOKEN: {
 	
 		
 	<ATTR_EQ: "="> |
-	<ATTR_VALUE: ( "\"" (~["\""])* ("\"" (~["\"", "=", ">"])* "\"" (~["\""])*)* "\"" | "'" (~["'"])* ("'" (~["'", "=", ">"])* "'" (~["'"])*)* "'")> { matchedToken.image = matchedToken.image.substring(1, matchedToken.image.length() - 1); }|
+	<ATTR_VALUE: ( "\"" (~["\""])* ("\"" (~["\"", "=", ">"])*)* "\"" | "'" (~["'"])* ("'" (~["'", "=", ">"])*)* "'")> { matchedToken.image = matchedToken.image.substring(1, matchedToken.image.length() - 1); }|
 	
 	<GENERIC_ID: (<LETTER> | "_" | ":" ) (<NAMECHAR>)*> 
 }
