@@ -80,7 +80,7 @@ String Entity(): { }
 	| <ENTITY_LT>	{ return "<"; }
 	| <ENTITY_APOS> { return "'"; }
 	| <ENTITY_AMP> { return "&"; }
-	| <ENTITY_169> { return "©"; }
+	| <ENTITY_169> { return "ï¿½"; }
 	| <ENTITY_QUOT> { return "\""; }
 	)
 }
@@ -107,9 +107,9 @@ TOKEN: {
 	
 		
 	<ATTR_EQ: "="> |
-	<ATTR_VALUE: ("\"" (~["\""])* "\"" | "'" (~["'"])* "'")> { matchedToken.image = matchedToken.image.substring(1, matchedToken.image.length() - 1); }|
+	<ATTR_VALUE: ( "\"" (~["\""])* "\"" | "'" (~["'"])* "'")> { matchedToken.image = matchedToken.image.substring(1, matchedToken.image.length() - 1); }|
 	
-	<GENERIC_ID: (<LETTER> | "_" | ":") (<NAMECHAR>)*> 
+	<GENERIC_ID: (<LETTER> | "_" | ":" ) (<NAMECHAR>)* ("\"" "\"")?> 
 }
 
 <IN_TAG_MODE> SKIP: {
