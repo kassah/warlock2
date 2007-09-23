@@ -9,6 +9,8 @@ public class StreamTagHandler extends DefaultTagHandler {
 
 	public StreamTagHandler(IStormFrontProtocolHandler handler) {
 		super(handler);
+
+		addTagHandler("preset", new PresetTagHandler(handler));
 	}
 
 	@Override
