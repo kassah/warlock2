@@ -11,6 +11,8 @@ import java.util.List;
 import cc.warlock.core.client.ICharacterStatus;
 import cc.warlock.core.client.ICompass;
 import cc.warlock.core.client.IProperty;
+import cc.warlock.core.client.IStream;
+import cc.warlock.core.client.IStyledString;
 import cc.warlock.core.client.IWarlockClient;
 import cc.warlock.core.client.IWarlockStyle;
 import cc.warlock.core.script.IScript;
@@ -131,4 +133,10 @@ public interface IStormFrontClient extends IWarlockClient {
 	 * @return The stormfront skin
 	 */
 	public IStormFrontSkin getStormFrontSkin();
+	
+	public IStream getThoughtsStream();
+	
+	public IStream getDeathsStream();
+	
+	public IStream getInventoryStream();
 }

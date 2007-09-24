@@ -8,11 +8,15 @@ package cc.warlock.core.stormfront.client.internal;
 
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collection;
+import java.util.Collections;
 import java.util.List;
 
 import cc.warlock.core.client.ICharacterStatus;
 import cc.warlock.core.client.ICompass;
 import cc.warlock.core.client.IProperty;
+import cc.warlock.core.client.IStream;
 import cc.warlock.core.client.IWarlockSkin;
 import cc.warlock.core.client.IWarlockStyle;
 import cc.warlock.core.client.WarlockClientRegistry;
@@ -59,6 +63,7 @@ public class StormFrontClient extends WarlockClient implements IStormFrontClient
 	protected DefaultSkin skin;
 	
 	public StormFrontClient() {
+		super();
 		compass = new Compass(this);
 		status = new CharacterStatus(this);
 		leftHand = new ClientProperty<String>(this, "leftHand", null);
@@ -80,7 +85,12 @@ public class StormFrontClient extends WarlockClient implements IStormFrontClient
 		
 		WarlockClientRegistry.activateClient(this);
 	}
-
+	
+	@Override
+	protected Collection<IStream> getStreamsToBuffer() {
+		return Arrays.asList(new IStream[] { getThoughtsStream(), getInventoryStream(), getDeathsStream() });
+	}
+	
 	@Override
 	public void send(String command) {
 		if (command.startsWith(".")){
@@ -286,6 +296,18 @@ public class StormFrontClient extends WarlockClient implements IStormFrontClient
 	
 	public IStormFrontSkin getStormFrontSkin() {
 		return skin;
+	}
+	
+	public IStream getThoughtsStream() {
+		return getStream(THOUGHTS_STREAM_NAME);
+	}
+	
+	public IStream getInventoryStream() {
+		return getStream(INVENTORY_STREAM_NAME);
+	}
+	
+	public IStream getDeathsStream() {
+		return getStream(DEATH_STREAM_NAME);
 	}
 	
 	@Override
