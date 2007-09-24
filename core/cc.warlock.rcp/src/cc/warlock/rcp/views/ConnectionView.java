@@ -41,6 +41,7 @@ import cc.warlock.rcp.ui.ConnectionCommand;
 import cc.warlock.rcp.ui.IConnectionCommand;
 import cc.warlock.rcp.ui.IConnectionCommandProvider;
 import cc.warlock.rcp.ui.WarlockSharedImages;
+import cc.warlock.rcp.util.RCPUtil;
 
 public class ConnectionView extends ViewPart {
 
@@ -84,7 +85,15 @@ public class ConnectionView extends ViewPart {
 		form.getBody().setLayout(new GridLayout(1, false));
 		
 		FormText text = toolkit.createFormText(form.getBody(), true);
-		text.setText(ViewMessages.ConnectionView_welcomeMessage, true, false);
+		text.setText(ViewMessages.ConnectionView_welcomeMessage, true, true);
+		text.addHyperlinkListener(new HyperlinkAdapter() {
+			@Override
+			public void linkActivated(HyperlinkEvent e) {
+				if ("warlock_webpage".equals(e.getHref())) {
+					RCPUtil.openURL("http://www.warlock.cc");
+				}
+			}
+		});
 		
 		closeButton = toolkit.createButton(form.getBody(), ViewMessages.ConnectionView_closeWindowButton, SWT.CHECK);
 		closeButton.setSelection(closeAfterConnect);

@@ -1,7 +1,5 @@
 package cc.warlock.rcp.ui;
 
-import java.net.MalformedURLException;
-import java.net.URL;
 import java.util.Hashtable;
 import java.util.Iterator;
 
@@ -42,8 +40,8 @@ import org.eclipse.swt.widgets.Control;
 import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.Label;
 import org.eclipse.swt.widgets.ScrollBar;
-import org.eclipse.ui.PartInitException;
-import org.eclipse.ui.PlatformUI;
+
+import cc.warlock.rcp.util.RCPUtil;
 
 /**
  * This is an extension of the StyledText widget which has special support for embedding of arbitrary Controls/Links
@@ -170,7 +168,7 @@ public class WarlockText implements LineBackgroundListener {
 						StyleRangeWithData range2 = (StyleRangeWithData) range;
 						if (range2.data.containsKey("link.url"))
 						{
-							openURL(range2.data.get("link.url"));
+							RCPUtil.openURL(range2.data.get("link.url"));
 						}
 					}
 				} catch (IllegalArgumentException ex) {
@@ -414,20 +412,6 @@ public class WarlockText implements LineBackgroundListener {
 		range.length = description.length();
 		setStyleRange(range);
 		range.data.put("link.url", url);
-	}
-	
-	private void openURL (String url)
-	{
-		System.out.println("open  url: " + url);
-		try {
-			PlatformUI.getWorkbench().getBrowserSupport().getExternalBrowser().openURL(new URL(url));
-		} catch (PartInitException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		} catch (MalformedURLException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
 	}
 	
 	public void setLineLimit(int limit) {
