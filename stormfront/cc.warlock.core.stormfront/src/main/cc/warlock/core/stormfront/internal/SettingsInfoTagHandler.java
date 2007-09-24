@@ -44,7 +44,6 @@ public class SettingsInfoTagHandler extends DefaultTagHandler {
 		File serverSettings = WarlockConfiguration.getConfigurationFile("serverSettings_" + playerId + ".xml", false);
 		if (!serverSettings.exists())
 		{
-			new SettingsTagHandler(handler, this);
 			handler.getClient().send("<sendSettings/>");
 		} else {
 			// check against crc to see if we're up to date

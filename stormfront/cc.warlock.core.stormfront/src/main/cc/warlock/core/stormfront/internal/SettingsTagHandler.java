@@ -100,8 +100,6 @@ public class SettingsTagHandler extends DefaultTagHandler {
 					viewer.finishedDownloadingServerSettings();
 				}
 			});
-			
-			handler.removeHandler(this);
 		}
 		else 
 		{
