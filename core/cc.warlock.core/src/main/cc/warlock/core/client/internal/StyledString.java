@@ -27,6 +27,13 @@ public class StyledString implements IStyledString {
 		styles.add(position, style);
 	}
 	
+	public void append (String string) {
+		StyledString styledString = new StyledString();
+		styledString.getBuffer().append(string);
+		
+		append(styledString);
+	}
+	
 	public void append(IStyledString string) {
 		if (!string.equals(this))
 		{
@@ -43,5 +50,11 @@ public class StyledString implements IStyledString {
 	
 	public boolean readyToFlush() {
 		return buffer.indexOf("\n") > -1;
+	}
+	
+	public void clear()
+	{
+		buffer.setLength(0);
+		styles.clear();
 	}
 }

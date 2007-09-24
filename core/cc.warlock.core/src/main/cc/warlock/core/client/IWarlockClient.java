@@ -69,6 +69,13 @@ public interface IWarlockClient {
 	public IStream getStream(String streamName);
 	
 	/**
+	 * Get the current buffer for the passed-in stream name
+	 * @param stream
+	 * @return
+	 */
+	public IStyledString getStreamBuffer(IStream stream);
+	
+	/**
 	 * Get the connection associated with this client.
 	 * @@WARNING@@ 
 	 * Do not use the raw connection unless you know what you are doing!

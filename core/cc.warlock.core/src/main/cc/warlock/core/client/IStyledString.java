@@ -11,7 +11,10 @@ public interface IStyledString {
 	public void addStyle (IWarlockStyle style);
 	public void addStyle (IWarlockStyle style, int position);
 	
+	public void append (String string);
 	public void append (IStyledString string);
 	
 	public boolean readyToFlush();
+	
+	public void clear();
 }
