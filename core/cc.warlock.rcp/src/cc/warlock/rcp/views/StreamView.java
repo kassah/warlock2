@@ -166,11 +166,24 @@ public class StreamView extends ViewPart implements IStreamListener, IGameViewFo
 			}
 		});
 		stream.getTitle().addListener(propertyListenerWrapper);
+		IStyledString string = client.getStreamBuffer(stream);
+		
+		if (string != null && string.getBuffer().length() > 0)
+		{
+			streamReceivedText(stream, string);
+		}
 	}
 	
 	public void addStream (IStream stream) {
 		stream.addStreamListener(streamListenerWrapper);
 		streams.add(stream);
+		
+		IStyledString string = client.getStreamBuffer(stream);
+		
+		if (string != null && string.getBuffer().length() > 0)
+		{
+			streamReceivedText(stream, string);
+		}
 	}
 	
 	public void streamCleared(IStream stream) {
@@ -273,7 +286,8 @@ public class StreamView extends ViewPart implements IStreamListener, IGameViewFo
 		this.client = client;
 		book.showPage(getTextForClient(client).getTextWidget());
 		
-		setMainStream(client.getStream(mainStreamName));
+		if (mainStream == null)
+			setMainStream(client.getStream(mainStreamName));
 
 		if (StyleProviders.getStyleProvider(client) == null)
 			StyleProviders.setStyleProvider(client, DefaultStyleProvider.instance());
