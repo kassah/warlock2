@@ -1,9 +1,12 @@
 package cc.warlock.rcp.stormfront.ui.macros;
 
+import java.util.Date;
+
 import org.eclipse.swt.SWT;
 
 import cc.warlock.core.client.ICharacterStatus;
 import cc.warlock.core.client.IWarlockClientViewer;
+import cc.warlock.core.client.internal.Command;
 import cc.warlock.core.stormfront.client.IStormFrontClient;
 import cc.warlock.rcp.ui.macros.IMacro;
 import cc.warlock.rcp.ui.macros.IMacroHandler;
@@ -86,6 +89,7 @@ public class CompassMacroHandler implements IMacroHandler {
 			{
 				viewer.getWarlockClient().send(command);
 				viewer.getWarlockClient().getDefaultStream().echo(command);
+				viewer.setCurrentCommand(new Command("", new Date()));
 				return true;
 			}
 		}
