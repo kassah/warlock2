@@ -7,6 +7,7 @@ import org.eclipse.swt.SWT;
 
 import cc.warlock.core.stormfront.serversettings.server.MacroKey;
 import cc.warlock.core.stormfront.serversettings.server.ServerSettings;
+import cc.warlock.rcp.stormfront.ui.macros.CompassMacroHandler;
 import cc.warlock.rcp.ui.macros.MacroRegistry;
 
 public class StormFrontMacros {
@@ -77,6 +78,8 @@ public class StormFrontMacros {
 	
 	public static void addMacrosFromServerSettings (ServerSettings settings)
 	{
+		CompassMacroHandler.instance();
+		
 		for (MacroKey key : settings.getMacroSet(0))
 		{
 			if (keys.containsKey(key.getKey()))
