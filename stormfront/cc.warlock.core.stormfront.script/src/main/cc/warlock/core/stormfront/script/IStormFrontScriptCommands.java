@@ -9,4 +9,10 @@ public interface IStormFrontScriptCommands extends IScriptCommands {
 	
 	public void waitForRoundtime();
 	
+	public void addAction(String action, String text);
+	
+	public void clearActions();
+	
+	public void removeAction(String text);
+	
 }

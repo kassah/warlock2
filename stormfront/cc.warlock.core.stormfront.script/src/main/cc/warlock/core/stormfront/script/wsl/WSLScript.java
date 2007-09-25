@@ -356,6 +356,29 @@ public class WSLScript extends AbstractScript {
 		}
 	}
 	
+	protected class WSLAction extends WSLCommand {
+		
+		private Pattern clearFormat = Pattern.compile("^clear");
+		private Pattern removeFormat = Pattern.compile("^remove\\s+(.*)");
+		private Pattern addFormat = Pattern.compile("^(.*)\\s+when\\s+(.*)");
+		
+		public void execute(String arguments) {
+			Matcher clearMatcher = clearFormat.matcher(arguments);
+			Matcher removeMatcher = removeFormat.matcher(arguments);
+			Matcher addMatcher = addFormat.matcher(arguments);
+			
+			if(clearMatcher.matches()) {
+				sfCommands.clearActions();
+			} else if(removeMatcher.matches()) {
+				sfCommands.removeAction(removeMatcher.group(1));
+			} else if(addMatcher.matches()) {
+				sfCommands.addAction(addMatcher.group(1), addMatcher.group(2));
+			} else {
+				// TODO print some error message about a poorly formed action
+			}
+		}
+	}
+	
 	protected void gotoLabel (String label)
 	{
 		// System.out.println("going to label: \"" + label + "\"");
