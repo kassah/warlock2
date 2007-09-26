@@ -23,7 +23,6 @@ public class ScriptCommands implements IScriptCommands, IStreamListener
 {
 
 	protected IWarlockClient client;
-	protected Match waitForMatch;
 	protected final Lock lock = new ReentrantLock();
 	
 	protected List<LinkedBlockingQueue<String>> textWaiters = Collections.synchronizedList(new ArrayList<LinkedBlockingQueue<String>>());
@@ -159,27 +158,26 @@ public class ScriptCommands implements IScriptCommands, IStreamListener
 	}
 
 	public void waitFor (Match match) {
-		waitForMatch = match;
 		LinkedBlockingQueue<String> queue = new LinkedBlockingQueue<String>();
-			String text = null;
-			
-			textWaiters.add(queue);
-			while(true) {
-				while(text == null) {
-					try {
-						text = queue.poll(100L, TimeUnit.MICROSECONDS);
-					} catch(Exception e) {
-						e.printStackTrace();
-					}
+		String text = null;
+
+		textWaiters.add(queue);
+		waitForLoop: while(true) {
+			while(text == null) {
+				try {
+					text = queue.poll(100L, TimeUnit.MILLISECONDS);
+				} catch(Exception e) {
+					e.printStackTrace();
 				}
-				if(waitForMatch.matches(text)) {
-					break;
-				}
-				text = null;
+				if(stopped)
+					break waitForLoop;
 			}
-			// FIXME need to make this work for multiple users
+			if(match.matches(text)) {
+				break;
+			}
 			text = null;
-			textWaiters.remove(queue);
+		}
+		textWaiters.remove(queue);
 	}
 
 	public void waitForPrompt () {
