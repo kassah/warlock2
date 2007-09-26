@@ -113,7 +113,9 @@ public class StormFrontScriptCommands extends ScriptCommands implements IStormFr
 		
 		boolean match(String text) {
 			Matcher m = regex.matcher(text);
+			System.out.println("ACTION: matching \"" + name + "\" with \"" + text + "\"");
 			if(m.matches()) {
+				System.out.println("action matched");
 				script.execute(action);
 				return true;
 			}
@@ -127,22 +129,24 @@ public class StormFrontScriptCommands extends ScriptCommands implements IStormFr
 	
 	protected  class ScriptActionThread implements Runnable {
 		public void run() {
+			System.out.println("Starting action thread");
 			LinkedBlockingQueue<String> queue = new LinkedBlockingQueue<String>();
 			textWaiters.add(queue);
-			actionLoop: while(actions != null) {
+			actionLoop: while(true) {
 				String text = null;
 
-				while(text == null && actions != null) {
+				while(text == null) {
 					try {
 						text = queue.poll(100L, TimeUnit.MILLISECONDS);
+						if(actions == null || stopped) {
+							break actionLoop;
+						}
 					} catch(Exception e) {
 						e.printStackTrace();
 					}
 				}
 				for(ScriptAction action : actions) {
-					if(action.match(text)) {
-						break actionLoop;
-					}
+					action.match(text);
 				}
 			}
 			textWaiters.remove(queue);

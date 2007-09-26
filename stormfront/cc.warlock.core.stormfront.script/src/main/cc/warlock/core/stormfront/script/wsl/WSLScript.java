@@ -69,6 +69,7 @@ public class WSLScript extends AbstractScript {
 		addCommand("pause", new WSLPause());
 		addCommand("shift", new WSLShift());
 		addCommand("save", new WSLSave());
+		addCommand("action", new WSLAction());
 		addCommand("counter", new WSLCounter());
 		addCommand("deletevariable", new WSLDeleteVariable());
 		addCommand("setvariable", new WSLSetVariable());
