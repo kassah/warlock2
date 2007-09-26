@@ -6,20 +6,23 @@ import java.io.FileReader;
 import java.io.Reader;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.HashMap;
 import java.util.Hashtable;
 import java.util.Iterator;
 import java.util.List;
 
+import cc.warlock.core.client.IWarlockClient;
 import cc.warlock.core.configuration.WarlockConfiguration;
 import cc.warlock.core.script.IScript;
 import cc.warlock.core.script.IScriptEngine;
 import cc.warlock.core.script.IScriptFileInfo;
+import cc.warlock.core.script.IScriptInfo;
 import cc.warlock.core.script.IScriptProvider;
 import cc.warlock.core.script.ScriptEngineRegistry;
 
 public class FilesystemScriptProvider implements IScriptProvider, Runnable {
 
-	protected Hashtable<String, IScript> scripts = new Hashtable<String, IScript>();
+	protected HashMap<String, IScriptFileInfo> scripts = new HashMap<String, IScriptFileInfo>();
 	protected Hashtable<ScriptFileInfo, Long> infos = new Hashtable<ScriptFileInfo, Long>();
 	protected ArrayList<File> scriptDirs = new ArrayList<File>();
 	protected long scanTimeout = 500;
@@ -101,8 +104,8 @@ public class FilesystemScriptProvider implements IScriptProvider, Runnable {
 		return scriptDirs;
 	}
 	
-	public List<IScript> getScripts() {
-		return Arrays.asList(scripts.values().toArray(new IScript[scripts.values().size()]));
+	public List<String> getScriptNames() {
+		return Arrays.asList(scripts.keySet().toArray(new String[scripts.keySet().size()]));
 	}
 	
 	protected ScriptFileInfo getScriptInfo (File file)
@@ -117,14 +120,15 @@ public class FilesystemScriptProvider implements IScriptProvider, Runnable {
 		return null;
 	}
 
-	protected IScript createScript (ScriptFileInfo info)
+	public IScript startScript (String scriptName, IWarlockClient client, String[] arguments)
 	{
 		IScript script = null;
+		IScriptInfo info = scripts.get(scriptName);
 		for (IScriptEngine engine : ScriptEngineRegistry.getScriptEngines())
 		{
 			if (engine.supports(info))
 			{
-				script = engine.createScript(info);
+				script = engine.startScript(info, client, arguments);
 				break;
 			}
 		}
@@ -147,12 +151,9 @@ public class FilesystemScriptProvider implements IScriptProvider, Runnable {
 				
 				if (infos.get(info) < file.lastModified())
 				{
-					IScript script = createScript(info);
-					if (script != null) {
-						System.out.println("adding script: " + script.getName());
-						scripts.put(script.getName(), script);
-						infos.put(info, file.lastModified());
-					}
+					System.out.println("adding script: " + info.getScriptName());
+					scripts.put(info.getScriptName(), info);
+					infos.put(info, file.lastModified());
 				}
 			}
 		}

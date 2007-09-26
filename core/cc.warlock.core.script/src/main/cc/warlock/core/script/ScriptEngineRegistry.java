@@ -3,6 +3,7 @@ package cc.warlock.core.script;
 import java.util.ArrayList;
 import java.util.List;
 
+import cc.warlock.core.client.IWarlockClient;
 import cc.warlock.core.script.internal.FilesystemScriptProvider;
 
 
@@ -58,14 +59,14 @@ public class ScriptEngineRegistry {
 		return null;
 	}
 	
-	public static IScript getScriptForName (String scriptName)
+	public static IScript startScript (String scriptName, IWarlockClient client, String[] arguments)
 	{
 		for (IScriptProvider provider : providers)
 		{
-			for (IScript script : provider.getScripts())
+			for (String script : provider.getScriptNames())
 			{
-				if (script.getName().equals(scriptName)) {
-					return script;
+				if (script.equals(scriptName)) {
+					return provider.startScript(scriptName, client, arguments);
 				}
 			}
 		}

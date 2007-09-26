@@ -11,11 +11,13 @@ import java.io.Reader;
 import org.mozilla.javascript.Context;
 import org.mozilla.javascript.Scriptable;
 
+import cc.warlock.core.client.IWarlockClient;
 import cc.warlock.core.script.AbstractScript;
 import cc.warlock.core.script.IScriptCommands;
 import cc.warlock.core.script.IScriptEngine;
 import cc.warlock.core.script.IScriptInfo;
 import cc.warlock.core.script.IScriptListener;
+import cc.warlock.core.script.internal.ScriptCommands;
 
 /**
  * @author Marshall
@@ -29,17 +31,16 @@ public class JavascriptScript extends AbstractScript {
 	private boolean stopped;
 	private Context context;
 	private JavascriptCommands jsCommands;
+	private IScriptCommands commands;
+	IWarlockClient client;
 	
-	public JavascriptScript (JavascriptEngine engine, IScriptInfo info)
+	public JavascriptScript (JavascriptEngine engine, IScriptInfo info, IWarlockClient client)
 	{
 		super(info);
-		this.engine = engine;
-	}
-	
-	 @Override
-	public void setScriptCommands(IScriptCommands commands) {
-		super.setScriptCommands(commands);
 		
+		this.engine = engine;
+		this.client = client;
+		this.commands = new ScriptCommands(client);
 		this.jsCommands = new JavascriptCommands(commands, this);
 	}
 
@@ -70,7 +71,7 @@ public class JavascriptScript extends AbstractScript {
 	}
 
 	public JavascriptCommands getCommands() {
-		return (JavascriptCommands) commands;
+		return jsCommands;
 	}
 	
 	public Scriptable getScope() {
@@ -91,5 +92,13 @@ public class JavascriptScript extends AbstractScript {
 	
 	public Reader getReader() {
 		return reader;
+	}
+	
+	public void movedToRoom() {
+		commands.movedToRoom();
+	}
+	
+	public IWarlockClient getClient() {
+		return client;
 	}
 }

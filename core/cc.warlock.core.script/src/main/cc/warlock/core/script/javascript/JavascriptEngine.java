@@ -77,34 +77,28 @@ public class JavascriptEngine implements IScriptEngine {
 		return false;
 	}
 	
-	public IScript createScript(IScriptInfo info)
-	{
-		return new JavascriptScript(this, info);
-	}
-	
-	public void startScript(IScript script, IWarlockClient client, final String[] arguments) {
-		final JavascriptScript jscript = (JavascriptScript) script;
-		jscript.setScriptCommands(new ScriptCommands(client));
+	public IScript startScript(IScriptInfo info, IWarlockClient client, final String[] arguments) {
+		final JavascriptScript script = new JavascriptScript(this, info, client);
 		
-		jscript.start();
-		runningScripts.add(jscript);
+		script.start();
+		runningScripts.add(script);
 		
 		new Thread(new Runnable() {
 			public void run () {
 				Context context = Context.enter();
 				try {
-					jscript.setContext(context);
+					script.setContext(context);
 					
 					scope = context.initStandardObjects();
-					scope.put("script", scope, jscript.getCommands());
+					scope.put("script", scope, script.getCommands());
 					scope.put("arguments", scope, arguments);
 					
 					for (IJavascriptVariableProvider provider : varProviders) {
-						provider.loadVariables(jscript, scope);
+						provider.loadVariables(script, scope);
 					}
 					
-					Reader reader = jscript.getScriptInfo().openReader();
-					Object result = context.evaluateReader(scope, reader, jscript.getName(), 1, null);
+					Reader reader = script.getScriptInfo().openReader();
+					Object result = context.evaluateReader(scope, reader, script.getName(), 1, null);
 					System.out.println("script result: " + Context.toString(result));
 					reader.close();
 				}
@@ -116,10 +110,11 @@ public class JavascriptEngine implements IScriptEngine {
 				}
 				finally {
 					Context.exit();
-					runningScripts.remove(jscript);
+					runningScripts.remove(script);
 				}
 			}
 		}).start();
+		return script;
 	}
 
 	public static void loadString (String content)

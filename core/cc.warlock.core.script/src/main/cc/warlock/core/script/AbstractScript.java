@@ -5,7 +5,6 @@ import java.util.ArrayList;
 
 public abstract class AbstractScript implements IScript {
 
-	protected IScriptCommands commands;
 	protected ArrayList<IScriptListener> listeners;
 	protected boolean suspended;
 	protected String scriptName;
@@ -47,14 +46,6 @@ public abstract class AbstractScript implements IScript {
 	public void removeScriptListener(IScriptListener listener) {
 		if (listeners.contains(listener))
 			listeners.remove(listener);
-	}
-
-	public IScriptCommands getScriptCommands() {
-		return commands;
-	}
-	
-	public void setScriptCommands (IScriptCommands commands) {
-		this.commands = commands;
 	}
 	
 	public String getName() {

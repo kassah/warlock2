@@ -20,13 +20,13 @@ import org.antlr.runtime.CommonTokenStream;
 import org.antlr.runtime.RecognitionException;
 
 import cc.warlock.core.script.AbstractScript;
-import cc.warlock.core.script.IScriptCommands;
 import cc.warlock.core.script.IScriptEngine;
 import cc.warlock.core.script.IScriptInfo;
 import cc.warlock.core.script.IScriptListener;
 import cc.warlock.core.script.Match;
 import cc.warlock.core.stormfront.client.IStormFrontClient;
 import cc.warlock.core.stormfront.script.IStormFrontScriptCommands;
+import cc.warlock.core.stormfront.script.internal.StormFrontScriptCommands;
 
 public class WSLScript extends AbstractScript {
 	
@@ -46,7 +46,7 @@ public class WSLScript extends AbstractScript {
 	private WSLCommand if_ = new WSLIf_();
 	
 	protected WSLEngine engine;
-	protected IStormFrontScriptCommands sfCommands;
+	protected IStormFrontScriptCommands commands;
 	protected IStormFrontClient client;
 	
 	private final Lock lock = new ReentrantLock();
@@ -54,11 +54,14 @@ public class WSLScript extends AbstractScript {
 	
 	private static final String argSeparator = "\\s+";
 	
-	public WSLScript (WSLEngine engine, IScriptInfo info)
+	public WSLScript (WSLEngine engine, IScriptInfo info, IStormFrontClient client)
 		throws IOException
 	{
 		super(info);
 		this.engine = engine;
+		this.client = client;
+		
+		commands = new StormFrontScriptCommands(client);
 		
 		// add command handlers
 		addCommand("put", new WSLPut());
@@ -132,15 +135,15 @@ public class WSLScript extends AbstractScript {
 		}
 	}
 	
-	public void start (ArrayList<String> arguments)
+	public void start (List<String> arguments)
 	{
 		for (int i = 0; i < arguments.size(); i++) {
 			setVariable(Integer.toString(i + 1), arguments.get(i));
 		}
 		
-		for (String varName : sfCommands.getStormFrontClient().getServerSettings().getVariableNames())
+		for (String varName : commands.getStormFrontClient().getServerSettings().getVariableNames())
 		{
-			setVariable(varName, sfCommands.getStormFrontClient().getServerSettings().getVariable(varName));
+			setVariable(varName, commands.getStormFrontClient().getServerSettings().getVariable(varName));
 		}
 		
 		scriptThread = new Thread(new ScriptRunner());
@@ -368,11 +371,11 @@ public class WSLScript extends AbstractScript {
 			Matcher addMatcher = addFormat.matcher(arguments);
 			
 			if(clearMatcher.matches()) {
-				sfCommands.clearActions();
+				commands.clearActions();
 			} else if(removeMatcher.matches()) {
-				sfCommands.removeAction(removeMatcher.group(1));
+				commands.removeAction(removeMatcher.group(1));
 			} else if(addMatcher.matches()) {
-				sfCommands.addAction(addMatcher.group(1), addMatcher.group(2));
+				commands.addAction(addMatcher.group(1), addMatcher.group(2));
 			} else {
 				// TODO print some error message about a poorly formed action
 			}
@@ -479,7 +482,7 @@ public class WSLScript extends AbstractScript {
 				matchset.clear();
 				gotoLabel((String)match.getAttribute("label"));
 				commands.waitForPrompt();
-				sfCommands.waitForRoundtime();
+				commands.waitForRoundtime();
 			} else {
 				if(!stopped)
 					commands.echo("*** Internal error, no match was found!! ***\n");
@@ -690,11 +693,8 @@ public class WSLScript extends AbstractScript {
 		return engine;
 	}
 	
-	@Override
-	public void setScriptCommands(IScriptCommands commands) {
-		super.setScriptCommands(commands);
-		
-		this.sfCommands = (IStormFrontScriptCommands) commands;
-		this.client = (IStormFrontClient) commands.getClient();
+	public void movedToRoom() {
+		commands.movedToRoom();
 	}
+	
 }

@@ -20,7 +20,7 @@ public class CompassTagHandler extends DefaultTagHandler {
 	public void handleEnd() {
 		for (IScript script : handler.getClient().getRunningScripts())
 		{
-			script.getScriptCommands().movedToRoom();
+			script.movedToRoom();
 		}
 	}
 

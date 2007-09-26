@@ -13,7 +13,6 @@ import cc.warlock.core.script.IScriptEngine;
 import cc.warlock.core.script.IScriptFileInfo;
 import cc.warlock.core.script.IScriptInfo;
 import cc.warlock.core.stormfront.client.IStormFrontClient;
-import cc.warlock.core.stormfront.script.internal.StormFrontScriptCommands;
 import cc.warlock.core.stormfront.serversettings.server.IServerScriptInfo;
 
 
@@ -54,27 +53,18 @@ public class WSLEngine implements IScriptEngine {
 		return false;
 	}
 	
-	public IScript createScript(IScriptInfo info)
-	{
+	public IScript startScript(IScriptInfo info, IWarlockClient client, String[] arguments) {
 		try {
-			return new WSLScript(this, info);
+			WSLScript wslScript = new WSLScript(this, info, (IStormFrontClient)client);
+
+			runningScripts.add(wslScript);
+			wslScript.start(Arrays.asList(arguments));
+			return wslScript;
 		} catch (IOException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
+			return null;
 		}
-		return null;
-	}
-	
-	public void startScript(IScript script, IWarlockClient client, String[] arguments) {
-		WSLScript wslScript = (WSLScript) script;
-		wslScript.setScriptCommands(new StormFrontScriptCommands((IStormFrontClient)client));
-		
-		ArrayList<String> args = new ArrayList<String>();
-		args.addAll(Arrays.asList(arguments));
-		
-
-		runningScripts.add(wslScript);
-		wslScript.start(args);
 	}
 	
 	public List<IScript> getRunningScripts() {

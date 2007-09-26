@@ -17,14 +17,6 @@ import cc.warlock.core.client.IWarlockClient;
  * Window - Preferences - Java - Code Style - Code Templates
  */
 public interface IScriptEngine {
-
-	/**
-	 * Create a script (but do not start it).
-	 * 
-	 * @param info The information needed to create this script
-	 * @return A script object
-	 */
-	public IScript createScript (IScriptInfo info);
 	
 	/**
 	 * This method will run the script at the given path. Note that this should return immediately, so the engine
@@ -34,7 +26,7 @@ public interface IScriptEngine {
 	 * @param client the client to start the script on
 	 * @param argumetns The arguments passed to the script
 	 */
-	public void startScript(IScript script, IWarlockClient client, String[] arguments);
+	public IScript startScript(IScriptInfo info, IWarlockClient client, String[] arguments);
 	
 	public boolean supports (IScriptInfo scriptInfo);
 	

@@ -35,9 +35,9 @@ public class StormFrontJavascriptVars implements IJavascriptVariableProvider {
 	}
 	
 	public void loadVariables(JavascriptScript script, Scriptable scope) {
-		if (script.getScriptCommands().getClient() instanceof IStormFrontClient)
+		if (script.getClient() instanceof IStormFrontClient)
 		{
-			IStormFrontClient sfClient = (IStormFrontClient) script.getScriptCommands().getClient();
+			IStormFrontClient sfClient = (IStormFrontClient) script.getClient();
 			
 			scope.put("compass", scope, sfClient.getCompass());
 			scope.put("commandHistory", scope, sfClient.getCommandHistory());

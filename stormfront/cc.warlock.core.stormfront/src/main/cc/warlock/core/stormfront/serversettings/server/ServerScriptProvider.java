@@ -3,18 +3,19 @@ package cc.warlock.core.stormfront.serversettings.server;
 import java.io.Reader;
 import java.io.StringReader;
 import java.util.Arrays;
-import java.util.Hashtable;
+import java.util.HashMap;
 import java.util.List;
 
+import cc.warlock.core.client.IWarlockClient;
 import cc.warlock.core.script.IScript;
 import cc.warlock.core.script.IScriptEngine;
+import cc.warlock.core.script.IScriptInfo;
 import cc.warlock.core.script.ScriptEngineRegistry;
 import cc.warlock.core.stormfront.client.IStormFrontClient;
 
 public class ServerScriptProvider implements IServerScriptProvider
 {
-	protected Hashtable<String, IScript> scripts = new Hashtable<String, IScript>();
-	protected Hashtable<String, ServerScriptInfo> infos = new Hashtable<String, ServerScriptInfo>();
+	protected HashMap<String, ServerScriptInfo> scripts = new HashMap<String, ServerScriptInfo>();
 	protected IStormFrontClient client;
 	
 	protected class ServerScriptInfo implements IServerScriptInfo
@@ -51,38 +52,31 @@ public class ServerScriptProvider implements IServerScriptProvider
 		return client;
 	}
 	
-	public List<IScript> getScripts() {
-		return Arrays.asList(scripts.values().toArray(new IScript[scripts.values().size()]));
+	public List<String> getScriptNames() {
+		return Arrays.asList(scripts.keySet().toArray(new String[scripts.keySet().size()]));
 	}
 	
-	protected IScript createScript (ServerScriptInfo info)
+	public IScript startScript (String scriptName, IWarlockClient client, String[] arguments)
 	{
-		IScript script = null;
+		IScriptInfo info = scripts.get(scriptName);
 		for (IScriptEngine engine : ScriptEngineRegistry.getScriptEngines())
 		{
 			if (engine.supports(info))
 			{
-				script = engine.createScript(info);
-				break;
+				return engine.startScript(info, client, arguments);
 			}
 		}
-		return script;
+		return null;
 	}
 	
 	public void scriptContentsUpdated (ServerScript script)
 	{
-		if (! infos.containsKey(script.getName()))
+		if (!scripts.containsKey(script.getName()))
 		{
 			ServerScriptInfo info = new ServerScriptInfo();
 			info.script = script;
 			
-			infos.put(script.getName(), info);
-		}
-		
-		IScript newScript = createScript(infos.get(script.getName()));
-		if (newScript != null)
-		{
-			scripts.put(script.getName(), newScript);
+			scripts.put(script.getName(), info);
 		}
 	}
 }

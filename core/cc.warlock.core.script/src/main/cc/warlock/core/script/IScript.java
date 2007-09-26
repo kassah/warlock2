@@ -26,12 +26,14 @@ public interface IScript {
 	
 	public void resume();
 	
+	public void movedToRoom();
+	
 	public void addScriptListener (IScriptListener listener);
 	
 	public void removeScriptListener (IScriptListener listener);
 	
-	public IScriptCommands getScriptCommands();
 	public IScriptEngine getScriptEngine();
 	
 	public IScriptInfo getScriptInfo();
+	
 }
