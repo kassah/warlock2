@@ -101,4 +101,6 @@ public class JavascriptScript extends AbstractScript {
 	public IWarlockClient getClient() {
 		return client;
 	}
+	
+	public void execute(String command) { }
 }

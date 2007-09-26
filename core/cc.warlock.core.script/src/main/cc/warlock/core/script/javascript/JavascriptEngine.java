@@ -20,7 +20,6 @@ import cc.warlock.core.script.IScript;
 import cc.warlock.core.script.IScriptEngine;
 import cc.warlock.core.script.IScriptFileInfo;
 import cc.warlock.core.script.IScriptInfo;
-import cc.warlock.core.script.internal.ScriptCommands;
 
 
 /**

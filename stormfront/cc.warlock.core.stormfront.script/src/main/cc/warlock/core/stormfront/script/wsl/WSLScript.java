@@ -61,7 +61,7 @@ public class WSLScript extends AbstractScript {
 		this.engine = engine;
 		this.client = client;
 		
-		commands = new StormFrontScriptCommands(client);
+		commands = new StormFrontScriptCommands(client, this);
 		
 		// add command handlers
 		addCommand("put", new WSLPut());
@@ -200,7 +200,7 @@ public class WSLScript extends AbstractScript {
 		endLine = line;
 	}
 	
-	private void execute(String line) {
+	public void execute(String line) {
 		Matcher m = commandPattern.matcher(line);
 		
 		if (!m.find()) {
@@ -669,20 +669,6 @@ public class WSLScript extends AbstractScript {
 				// print an error?
 			}
 		}
-	}
-	
-	private void handleDeleteFromHighlightNames(List<String> arguments) {
-		// TODO Auto-generated method stub
-		
-	}
-
-	private void handleDeleteFromHighlightStrings(List<String> arguments) {
-		// TODO Auto-generated method stub
-		
-	}
-
-	private void handleAddToHighlightStrings(List<String> arguments) {
-		// TODO Auto-generated method stub
 	}
 	
 	public void stopScript() {

@@ -1,12 +1,17 @@
 package cc.warlock.core.stormfront.script.internal;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.Iterator;
+import java.util.List;
+import java.util.concurrent.LinkedBlockingQueue;
+import java.util.concurrent.TimeUnit;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 import cc.warlock.core.client.IProperty;
 import cc.warlock.core.client.IPropertyListener;
+import cc.warlock.core.script.IScript;
 import cc.warlock.core.script.Match;
 import cc.warlock.core.script.internal.ScriptCommands;
 import cc.warlock.core.stormfront.client.IStormFrontClient;
@@ -15,13 +20,15 @@ import cc.warlock.core.stormfront.script.IStormFrontScriptCommands;
 public class StormFrontScriptCommands extends ScriptCommands implements IStormFrontScriptCommands, IPropertyListener<Integer> {
 
 	protected IStormFrontClient sfClient;
-	protected ArrayList<WSLAction> actions;
+	protected IScript script;
+	protected List<ScriptAction> actions;
 	
-	public StormFrontScriptCommands (IStormFrontClient client)
+	public StormFrontScriptCommands (IStormFrontClient client, IScript script)
 	{
 		super(client);
 		this.sfClient = client;
 		waitingForRoundtime = false;
+		this.script = script;
 		
 		client.getRoundtime().addListener(this);
 	}
@@ -92,23 +99,25 @@ public class StormFrontScriptCommands extends ScriptCommands implements IStormFr
 	
 	public void propertyCleared(IProperty<Integer> property, Integer oldValue) {}
 	
-	protected class WSLAction {
+	protected class ScriptAction {
 		
 		private String action;
 		private Pattern regex;
 		private String name;
 		
-		WSLAction(String action, String regex) {
+		ScriptAction(String action, String regex) {
 			this.regex = Pattern.compile(regex);
 			this.name = regex;
 			this.action = action;
 		}
 		
-		void match(String text) {
+		boolean match(String text) {
 			Matcher m = regex.matcher(text);
 			if(m.matches()) {
-				// TODO script.execute(action);
+				script.execute(action);
+				return true;
 			}
+			return false;
 		}
 		
 		String getName() {
@@ -116,11 +125,36 @@ public class StormFrontScriptCommands extends ScriptCommands implements IStormFr
 		}
 	}
 	
+	protected  class ScriptActionThread implements Runnable {
+		public void run() {
+			LinkedBlockingQueue<String> queue = new LinkedBlockingQueue<String>();
+			textWaiters.add(queue);
+			actionLoop: while(actions != null) {
+				String text = null;
+
+				while(text == null && actions != null) {
+					try {
+						text = queue.poll(100L, TimeUnit.MILLISECONDS);
+					} catch(Exception e) {
+						e.printStackTrace();
+					}
+				}
+				for(ScriptAction action : actions) {
+					if(action.match(text)) {
+						break actionLoop;
+					}
+				}
+			}
+			textWaiters.remove(queue);
+		}
+	}
+	
 	public void addAction(String action, String text) {
 		if(actions == null) {
-			actions = new ArrayList<WSLAction>();
+			actions = Collections.synchronizedList(new ArrayList<ScriptAction>());
+			new Thread(new ScriptActionThread()).start();
 		}
-		actions.add(new WSLAction(action, text));
+		actions.add(new ScriptAction(action, text));
 	}
 	
 	public void clearActions() {
@@ -128,12 +162,16 @@ public class StormFrontScriptCommands extends ScriptCommands implements IStormFr
 	}
 	
 	public void removeAction(String text) {
-		Iterator<WSLAction> iter = actions.iterator();
+		Iterator<ScriptAction> iter = actions.iterator();
 		while(iter.hasNext()) {
 			// remove the element with the same name as text
 			if(iter.next().getName().equals(text)) {
 				iter.remove();
 			}
 		}
+		if(actions.size() == 0) {
+			actions = null;
+		}
 	}
+	
 }

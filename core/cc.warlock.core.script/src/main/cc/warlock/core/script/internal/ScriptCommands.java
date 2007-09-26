@@ -1,7 +1,11 @@
 package cc.warlock.core.script.internal;
 
+import java.util.ArrayList;
+import java.util.Collections;
 import java.util.Date;
 import java.util.List;
+import java.util.concurrent.LinkedBlockingQueue;
+import java.util.concurrent.TimeUnit;
 import java.util.concurrent.locks.Condition;
 import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReentrantLock;
@@ -22,9 +26,7 @@ public class ScriptCommands implements IScriptCommands, IStreamListener
 	protected Match waitForMatch;
 	protected final Lock lock = new ReentrantLock();
 	
-	protected final Condition gotTextCond = lock.newCondition();
-	protected String text;
-	protected int textWaiters = 0;
+	protected List<LinkedBlockingQueue<String>> textWaiters = Collections.synchronizedList(new ArrayList<LinkedBlockingQueue<String>>());
 	
 	protected final Condition nextRoom = lock.newCondition();
 	protected boolean roomWaiting = false;
@@ -65,50 +67,41 @@ public class ScriptCommands implements IScriptCommands, IStreamListener
 	}
 	
 	public Match matchWait (List<Match> matches) {
-		lock.lock();
-		try {
-			// clear out the previous line sent
-			text = null;
-			// let everyone know we're listening
-			textWaiters++;
-			
-			// run until we get a match or are told to stop
-			matchWaitLoop: while(true) {
-				System.out.println("Waiting for text");
-				// wait for some text
-				while(text == null) {
-					gotTextCond.await();
-					if(stopped)
-						break matchWaitLoop;
+		LinkedBlockingQueue<String> queue = new LinkedBlockingQueue<String>();
+		textWaiters.add(queue);
+		String text = null;
+
+		// run until we get a match or are told to stop
+		matchWaitLoop: while(true) {
+			System.out.println("Waiting for text");
+			// wait for some text
+			while(text == null) {
+				try {
+					text = queue.poll(100L, TimeUnit.MILLISECONDS);
+				} catch(Exception e) {
+					e.printStackTrace();
 				}
-				System.out.println("Got text: " + text);
-				String[] lines = text.split("\\n");
-				for(String line : lines) {
-					// try all of our matches
-					for(Match match : matches) {
-						// System.out.println("Trying a match");
-						if(match.matches(line)) {
-							// System.out.println("matched a line");
-							return match;
-						}
+				if(stopped)
+					break matchWaitLoop;
+			}
+			System.out.println("Got text: " + text);
+			String[] lines = text.split("\\n");
+			for(String line : lines) {
+				// try all of our matches
+				for(Match match : matches) {
+					// System.out.println("Trying a match");
+					if(match.matches(line)) {
+						// System.out.println("matched a line");
+						return match;
 					}
 				}
-				// FIXME this won't work if we have multiple text waiters.
-				// clear the line in preparation for the next one
-				text = null;
 			}
-		} catch(Exception e) {
-			e.printStackTrace();
-		} finally {
-			System.out.println("Done with matchwait");
-			// tell everyone we aren't listening
-			textWaiters--;
-			// if we were the only listener, set the line to null
-			if(textWaiters == 0) {
-				text = null;
-			}
-			lock.unlock();
+			text = null;
 		}
+
+		System.out.println("Done with matchwait");
+		textWaiters.remove(queue);
+
 		return null;
 	}
 
@@ -167,12 +160,18 @@ public class ScriptCommands implements IScriptCommands, IStreamListener
 
 	public void waitFor (Match match) {
 		waitForMatch = match;
-		lock.lock();
-		try {
-			textWaiters++;
+		LinkedBlockingQueue<String> queue = new LinkedBlockingQueue<String>();
+			String text = null;
+			
+			textWaiters.add(queue);
 			while(true) {
-				while(text == null)
-					gotTextCond.await();
+				while(text == null) {
+					try {
+						text = queue.poll(100L, TimeUnit.MICROSECONDS);
+					} catch(Exception e) {
+						e.printStackTrace();
+					}
+				}
 				if(waitForMatch.matches(text)) {
 					break;
 				}
@@ -180,15 +179,7 @@ public class ScriptCommands implements IScriptCommands, IStreamListener
 			}
 			// FIXME need to make this work for multiple users
 			text = null;
-		} catch(Exception e) {
-			e.printStackTrace();
-		} finally {
-			textWaiters--;
-			if(textWaiters == 0) {
-				text = null;
-			}
-			lock.unlock();
-		}
+			textWaiters.remove(queue);
 	}
 
 	public void waitForPrompt () {
@@ -233,15 +224,14 @@ public class ScriptCommands implements IScriptCommands, IStreamListener
 	public void streamDonePrompting (IStream stream) { }
 	
 	public void streamReceivedText(IStream stream, IStyledString string) {
-		lock.lock();
-		try {
-			text = string.getBuffer().toString();
-			if(textWaiters > 0) {
-				System.out.println("Signaling waiters");
-				gotTextCond.signalAll();
+		String text = string.getBuffer().toString();
+		for(LinkedBlockingQueue<String>  queue : textWaiters) {
+			System.out.println("Signaling a waiter");
+			try {
+				queue.put(text);
+			} catch(Exception e) {
+				e.printStackTrace();
 			}
-		} finally {
-			lock.unlock();
 		}
 	}
 	
@@ -260,7 +250,7 @@ public class ScriptCommands implements IScriptCommands, IStreamListener
 		lock.lock();
 		stopped = true;
 		try {
-			gotTextCond.signalAll();
+			// gotTextCond.signalAll(); perhaps signal everyone here?
 			gotPromptCond.signalAll();
 			nextRoom.signalAll();
 			if(pausedThread != null)
