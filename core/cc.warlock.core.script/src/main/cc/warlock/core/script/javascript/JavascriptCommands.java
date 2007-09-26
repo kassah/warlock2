@@ -1,17 +1,15 @@
 package cc.warlock.core.script.javascript;
 
 import java.io.Serializable;
-import java.util.List;
+import java.util.Arrays;
 
 import org.mozilla.javascript.Function;
 import org.mozilla.javascript.Scriptable;
 
-import cc.warlock.core.client.IWarlockClient;
-import cc.warlock.core.script.IScript;
 import cc.warlock.core.script.IScriptCommands;
 import cc.warlock.core.script.Match;
 
-public class JavascriptCommands implements IScriptCommands {
+public class JavascriptCommands {
 
 	protected IScriptCommands commands;
 	protected JavascriptScript script;
@@ -31,13 +29,9 @@ public class JavascriptCommands implements IScriptCommands {
 	public void echo(String text) {
 		commands.echo(script, text);
 	}
-	
-	public void echo(IScript script, String text) {
-		commands.echo(script, text);
-	}
 
-	public Match matchWait(List<Match> matches) {
-		Match match = commands.matchWait(matches);
+	public Match matchWait(Match[] matches) {
+		Match match = commands.matchWait(Arrays.asList(matches));
 		Function function = (Function)match.getAttribute(CALLBACK);
 		try {
 			function.call(script.getContext(), script.getScope(), null, new Object[] {match.getAttribute(USER_OBJECT)});
@@ -52,23 +46,11 @@ public class JavascriptCommands implements IScriptCommands {
 		commands.move(direction);
 	}
 
-	public void movedToRoom() {
-		commands.movedToRoom();
-	}
-
-	public void nextRoom() {
-		commands.nextRoom();
-	}
-
 	public void pause(int seconds) {
 		commands.pause(seconds);
 	}
 
 	public void put(String text) {
-		commands.put(script, text);
-	}
-	
-	public void put(IScript script, String text) {
 		commands.put(script, text);
 	}
 
@@ -97,9 +79,5 @@ public class JavascriptCommands implements IScriptCommands {
 	
 	public void stop() {
 		commands.stop();
-	}
-	
-	public IWarlockClient getClient() {
-		return commands.getClient();
 	}
 }
