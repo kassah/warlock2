@@ -11,6 +11,7 @@ public class Match
 {
 	private String matchText;
 	private Pattern regex;
+	private String regexText;
 	private boolean ignoreCase = true;
 	private HashMap<String, Object> data = new HashMap<String, Object>();
 	
@@ -33,6 +34,8 @@ public class Match
 	}
 	
 	public void setRegex(String text, boolean ignoreCase) {
+		regexText = text;
+		
 		int flags = 0;
 		if(ignoreCase) flags |= Pattern.CASE_INSENSITIVE;
 		
@@ -69,9 +72,13 @@ public class Match
 		
 		if(regex != null) {
 			Matcher m = regex.matcher(text);
-			if(m.matches()) {
+			if(m.find()) {
 				rv = true;
+				System.out.println("matched text: \"" + text + "\" with \"" + regexText + "\"");
+			} else {
+				System.out.println("Didn't match text: \"" + text + "\" with \"" + regexText + "\"");
 			}
+			
 			// TODO should set some variables for the groups here
 		}
 		

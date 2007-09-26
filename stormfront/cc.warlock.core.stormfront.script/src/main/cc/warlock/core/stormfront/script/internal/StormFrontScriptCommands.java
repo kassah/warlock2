@@ -21,7 +21,7 @@ public class StormFrontScriptCommands extends ScriptCommands implements IStormFr
 
 	protected IStormFrontClient sfClient;
 	protected IScript script;
-	protected List<ScriptAction> actions;
+	protected List<Match> actions;
 	
 	public StormFrontScriptCommands (IStormFrontClient client, IScript script)
 	{
@@ -99,34 +99,6 @@ public class StormFrontScriptCommands extends ScriptCommands implements IStormFr
 	
 	public void propertyCleared(IProperty<Integer> property, Integer oldValue) {}
 	
-	protected class ScriptAction {
-		
-		private String action;
-		private Pattern regex;
-		private String name;
-		
-		ScriptAction(String action, String regex) {
-			this.regex = Pattern.compile(regex);
-			this.name = regex;
-			this.action = action;
-		}
-		
-		boolean match(String text) {
-			Matcher m = regex.matcher(text);
-			System.out.println("ACTION: matching \"" + name + "\" with \"" + text + "\"");
-			if(m.matches()) {
-				System.out.println("action matched");
-				script.execute(action);
-				return true;
-			}
-			return false;
-		}
-		
-		String getName() {
-			return name;
-		}
-	}
-	
 	protected  class ScriptActionThread implements Runnable {
 		public void run() {
 			System.out.println("Starting action thread");
@@ -145,8 +117,13 @@ public class StormFrontScriptCommands extends ScriptCommands implements IStormFr
 						e.printStackTrace();
 					}
 				}
-				for(ScriptAction action : actions) {
-					action.match(text);
+				System.out.println("ACTION: matching with \"" + text + "\"");
+				for(Match action : actions) {
+					if(action.matches(text)) {
+						String command = (String)action.getAttribute("action");
+						script.execute(command);
+						break;
+					}
 				}
 			}
 			textWaiters.remove(queue);
@@ -155,10 +132,14 @@ public class StormFrontScriptCommands extends ScriptCommands implements IStormFr
 	
 	public void addAction(String action, String text) {
 		if(actions == null) {
-			actions = Collections.synchronizedList(new ArrayList<ScriptAction>());
+			actions = Collections.synchronizedList(new ArrayList<Match>());
 			new Thread(new ScriptActionThread()).start();
 		}
-		actions.add(new ScriptAction(action, text));
+		Match m = new Match();
+		m.setRegex(text);
+		m.setAttribute("action", action);
+		m.setAttribute("name", text);
+		actions.add(m);
 	}
 	
 	public void clearActions() {
@@ -166,10 +147,10 @@ public class StormFrontScriptCommands extends ScriptCommands implements IStormFr
 	}
 	
 	public void removeAction(String text) {
-		Iterator<ScriptAction> iter = actions.iterator();
+		Iterator<Match> iter = actions.iterator();
 		while(iter.hasNext()) {
 			// remove the element with the same name as text
-			if(iter.next().getName().equals(text)) {
+			if(iter.next().getAttribute("name").equals(text)) {
 				iter.remove();
 			}
 		}

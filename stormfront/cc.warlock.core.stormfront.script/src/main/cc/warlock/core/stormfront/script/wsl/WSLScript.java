@@ -346,11 +346,11 @@ public class WSLScript extends AbstractScript {
 	
 	protected class WSLSetVariable extends WSLCommand {
 		
-		private Pattern format = Pattern.compile("^([\\w_]+)\\s+(.*)");
+		private Pattern format = Pattern.compile("^([\\w_]+)\\s+(.*)$");
 		
 		public void execute (String arguments) {
 			Matcher m = format.matcher(arguments);
-			if (m.matches())
+			if (m.find())
 			{
 				// System.out.print("variable: \"" + m.group(1) + "\" value: \"" + m.group(2) + "\"\n");
 				setVariable(m.group(1), m.group(2));
@@ -363,19 +363,19 @@ public class WSLScript extends AbstractScript {
 	protected class WSLAction extends WSLCommand {
 		
 		private Pattern clearFormat = Pattern.compile("^clear");
-		private Pattern removeFormat = Pattern.compile("^remove\\s+(.*)");
-		private Pattern addFormat = Pattern.compile("^(.*)\\s+when\\s+(.*)");
+		private Pattern removeFormat = Pattern.compile("^remove\\s+(.*)$");
+		private Pattern addFormat = Pattern.compile("^(.*)\\s+when\\s+(.*)$");
 		
 		public void execute(String arguments) {
 			Matcher clearMatcher = clearFormat.matcher(arguments);
 			Matcher removeMatcher = removeFormat.matcher(arguments);
 			Matcher addMatcher = addFormat.matcher(arguments);
 			
-			if(clearMatcher.matches()) {
+			if(clearMatcher.find()) {
 				commands.clearActions();
-			} else if(removeMatcher.matches()) {
+			} else if(removeMatcher.find()) {
 				commands.removeAction(removeMatcher.group(1));
-			} else if(addMatcher.matches()) {
+			} else if(addMatcher.find()) {
 				commands.addAction(addMatcher.group(1), addMatcher.group(2));
 			} else {
 				// TODO print some error message about a poorly formed action
@@ -437,12 +437,12 @@ public class WSLScript extends AbstractScript {
 	
 	protected class WSLCall extends WSLCommand {
 		
-		private Pattern format = Pattern.compile("^([\\w_]+)\\s*(.*)?");
+		private Pattern format = Pattern.compile("^([\\w_]+)\\s*(.*)?$");
 		
 		public void execute (String arguments) {
 			Matcher m = format.matcher(arguments);
 			
-			if (m.matches())
+			if (m.find())
 			{
 				System.out.println("calling label " + m.group(1));
 				callLabel(m.group(1), m.group(2));
@@ -498,7 +498,7 @@ public class WSLScript extends AbstractScript {
 		public void execute (String arguments) {
 			Matcher m = format.matcher(arguments);
 			
-			if (m.matches())
+			if (m.find())
 			{
 				String regex = m.group(2);
 				Match match = new Match();
@@ -520,12 +520,12 @@ public class WSLScript extends AbstractScript {
 
 	protected class WSLMatch extends WSLCommand {
 		
-		private Pattern format = Pattern.compile("^([\\w_]+)\\s+(.*)");
+		private Pattern format = Pattern.compile("^([\\w_]+)\\s+(.*)$");
 		
 		public void execute (String arguments) {
 			Matcher m = format.matcher(arguments);
 			
-			if (m.matches())
+			if (m.find())
 			{
 				Match match = new Match();
 				match.setAttribute("label", m.group(1));
@@ -545,7 +545,7 @@ public class WSLScript extends AbstractScript {
 		public void execute (String arguments) {
 			Matcher m = format.matcher(arguments);
 			
-			if (m.matches())
+			if (m.find())
 			{
 				String flags = m.group(2);
 				boolean ignoreCase = false;
@@ -660,7 +660,7 @@ public class WSLScript extends AbstractScript {
 		public void execute(String arguments) {
 			Matcher m = format.matcher(arguments);
 			
-			if(m.matches()) {
+			if(m.find()) {
 				int min = Integer.parseInt(m.group(1));
 				int max = Integer.parseInt(m.group(2));
 				int r = min + new Random().nextInt(max - min + 1);
