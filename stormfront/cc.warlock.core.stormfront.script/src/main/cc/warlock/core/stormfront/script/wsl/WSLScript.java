@@ -24,6 +24,8 @@ import cc.warlock.core.script.IScriptEngine;
 import cc.warlock.core.script.IScriptInfo;
 import cc.warlock.core.script.IScriptListener;
 import cc.warlock.core.script.Match;
+import cc.warlock.core.script.internal.RegexMatch;
+import cc.warlock.core.script.internal.TextMatch;
 import cc.warlock.core.stormfront.client.IStormFrontClient;
 import cc.warlock.core.stormfront.script.IStormFrontScriptCommands;
 import cc.warlock.core.stormfront.script.internal.StormFrontScriptCommands;
@@ -501,14 +503,8 @@ public class WSLScript extends AbstractScript {
 			if (m.find())
 			{
 				String regex = m.group(2);
-				Match match = new Match();
-				
-				if (m.group(3).contains("i"))
-				{
-					match.setRegex(regex, true);
-				} else {
-					match.setRegex(regex, false);
-				}
+				boolean caseInsensitive = m.group(3).contains("i");
+				Match match = new RegexMatch(regex, caseInsensitive);
 				
 				match.setAttribute("label", m.group(1));
 				
@@ -527,9 +523,8 @@ public class WSLScript extends AbstractScript {
 			
 			if (m.find())
 			{
-				Match match = new Match();
+				Match match = new TextMatch(m.group(2));
 				match.setAttribute("label", m.group(1));
-				match.setMatchText(m.group(2));
 				
 				// System.out.println("adding match \"" + m.group(1) + "\": \"" + m.group(2) + "\"");
 				
@@ -555,8 +550,7 @@ public class WSLScript extends AbstractScript {
 					ignoreCase = true;
 				}
 				
-				Match match = new Match();
-				match.setRegex(m.group(1), ignoreCase);
+				Match match = new RegexMatch(m.group(1), ignoreCase);
 				
 				commands.waitFor(match);
 			} else { /* TODO throw error */ }
@@ -568,8 +562,7 @@ public class WSLScript extends AbstractScript {
 		public void execute (String arguments) {
 			if (arguments.length() >= 1)
 			{
-				Match match = new Match();
-				match.setMatchText(arguments);
+				Match match = new TextMatch(arguments);
 				commands.waitFor(match);
 				
 			} else { /* TODO throw error */ }

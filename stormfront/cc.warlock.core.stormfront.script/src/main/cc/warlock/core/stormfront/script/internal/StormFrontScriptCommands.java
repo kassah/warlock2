@@ -6,13 +6,12 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.concurrent.LinkedBlockingQueue;
 import java.util.concurrent.TimeUnit;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
 
 import cc.warlock.core.client.IProperty;
 import cc.warlock.core.client.IPropertyListener;
 import cc.warlock.core.script.IScript;
 import cc.warlock.core.script.Match;
+import cc.warlock.core.script.internal.RegexMatch;
 import cc.warlock.core.script.internal.ScriptCommands;
 import cc.warlock.core.stormfront.client.IStormFrontClient;
 import cc.warlock.core.stormfront.script.IStormFrontScriptCommands;
@@ -135,8 +134,7 @@ public class StormFrontScriptCommands extends ScriptCommands implements IStormFr
 			actions = Collections.synchronizedList(new ArrayList<Match>());
 			new Thread(new ScriptActionThread()).start();
 		}
-		Match m = new Match();
-		m.setRegex(text);
+		Match m = new RegexMatch(text);
 		m.setAttribute("action", action);
 		m.setAttribute("name", text);
 		actions.add(m);

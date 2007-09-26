@@ -8,6 +8,7 @@ import org.mozilla.javascript.Scriptable;
 
 import cc.warlock.core.script.IScriptCommands;
 import cc.warlock.core.script.Match;
+import cc.warlock.core.script.internal.TextMatch;
 
 public class JavascriptCommands {
 
@@ -69,8 +70,7 @@ public class JavascriptCommands {
 	}
 	
 	public Match match(String text, Function function, Scriptable object) {
-		Match m = new Match();
-		m.setMatchText(text);
+		Match m = new TextMatch(text);
 		m.setAttribute(CALLBACK, function);
 		m.setAttribute(USER_OBJECT, object);
 		
