@@ -57,6 +57,10 @@ public class FilesystemScriptProvider implements IScriptProvider, Runnable {
 		}
 		
 		public String getScriptName() {
+			if (scriptName.lastIndexOf('.') > 0)
+			{
+				return scriptName.substring(0, scriptName.lastIndexOf('.'));
+			}
 			return scriptName;
 		}
 		

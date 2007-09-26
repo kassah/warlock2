@@ -150,7 +150,7 @@ public class WSLScript extends AbstractScript {
 		}
 		
 		scriptThread = new Thread(new ScriptRunner());
-		scriptThread.setName("Wizard Script: " + scriptName);
+		scriptThread.setName("Wizard Script: " + getName());
 		scriptThread.start();
 		
 		for (IScriptListener listener : listeners) listener.scriptStarted(this);
@@ -171,7 +171,7 @@ public class WSLScript extends AbstractScript {
 			// TODO handle the exception
 		}
 
-		commands.echo("[script started: " + scriptName + "]");
+		commands.echo("[script started: " + getName() + "]");
 		running = true;
 		stopped = false;
 	}
@@ -226,7 +226,7 @@ public class WSLScript extends AbstractScript {
 		stopped = true;
 		commands.stop();
 		
-		commands.echo("[script stopped: " + scriptName + "]");
+		commands.echo("[script stopped: " + getName() + "]");
 		super.stop();
 	}
 
@@ -234,7 +234,7 @@ public class WSLScript extends AbstractScript {
 		running = false;
 		//pauseLine = nextLine;
 		
-		commands.echo("[script paused: " + scriptName + "]");
+		commands.echo("[script paused: " + getName() + "]");
 		super.suspend();
 	}
 	
@@ -243,7 +243,7 @@ public class WSLScript extends AbstractScript {
 		//nextLine = pauseLine;
 		running = true;
 		
-		commands.echo("[script resumed: " + scriptName + "]");
+		commands.echo("[script resumed: " + getName() + "]");
 
 		super.resume();
 		

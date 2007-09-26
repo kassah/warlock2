@@ -7,7 +7,6 @@ public abstract class AbstractScript implements IScript {
 
 	protected ArrayList<IScriptListener> listeners;
 	protected boolean suspended;
-	protected String scriptName;
 	protected Reader reader;
 	protected IScriptInfo info;
 	
@@ -15,7 +14,6 @@ public abstract class AbstractScript implements IScript {
 	{
 		this.listeners = new ArrayList<IScriptListener>();
 		
-		this.scriptName = info.getScriptName();
 		this.info = info;
 	}
 	
@@ -49,12 +47,8 @@ public abstract class AbstractScript implements IScript {
 	}
 	
 	public String getName() {
-		if (scriptName.lastIndexOf('.') > 0)
-		{
-			return scriptName.substring(0, scriptName.lastIndexOf('.'));
-		}
 		
-		return scriptName;
+		return info.getScriptName();
 	}
 	
 	public IScriptInfo getScriptInfo() {
