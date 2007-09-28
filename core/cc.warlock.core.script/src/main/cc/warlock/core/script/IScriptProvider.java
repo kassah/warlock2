@@ -6,8 +6,8 @@ import cc.warlock.core.client.IWarlockClient;
 
 public interface IScriptProvider {
 
-	public List<String> getScriptNames();
+	public List<IScriptInfo> getScriptInfos();
 	
-	public IScript startScript (String scriptName, IWarlockClient client, String[] arguments);
+	public IScript startScript (IScriptInfo scriptInfo, IWarlockClient client, String[] arguments);
 	
 }

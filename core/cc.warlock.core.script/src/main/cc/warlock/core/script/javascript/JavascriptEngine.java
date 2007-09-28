@@ -8,7 +8,6 @@ package cc.warlock.core.script.javascript;
 
 import java.io.Reader;
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.List;
 
 import org.mozilla.javascript.Context;
@@ -20,6 +19,7 @@ import cc.warlock.core.script.IScript;
 import cc.warlock.core.script.IScriptEngine;
 import cc.warlock.core.script.IScriptFileInfo;
 import cc.warlock.core.script.IScriptInfo;
+import cc.warlock.core.script.configuration.ScriptConfiguration;
 
 
 /**
@@ -56,18 +56,14 @@ public class JavascriptEngine implements IScriptEngine {
 			varProviders.remove(provider);
 	}
 	
-	protected static ArrayList<String> extensions = new ArrayList<String>();
-	static {
-		Collections.addAll(extensions, "js");
-	}
-	
 	public boolean supports(IScriptInfo scriptInfo) {
 		if (scriptInfo instanceof IScriptFileInfo)
 		{
 			IScriptFileInfo info = (IScriptFileInfo) scriptInfo;
 			if (info.getExtension() != null)
 			{
-				if (extensions.contains(info.getExtension().toLowerCase())) {
+				List<String> extensions = ScriptConfiguration.instance().getEngineExtensions(ENGINE_ID);
+				if (extensions != null && extensions.contains(info.getExtension().toLowerCase())) {
 					return true;
 				}
 			}

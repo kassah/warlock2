@@ -63,10 +63,10 @@ public class ScriptEngineRegistry {
 	{
 		for (IScriptProvider provider : providers)
 		{
-			for (String script : provider.getScriptNames())
+			for (IScriptInfo script : provider.getScriptInfos())
 			{
-				if (script.equals(scriptName)) {
-					return provider.startScript(scriptName, client, arguments);
+				if (script.getScriptName().equals(scriptName)) {
+					return provider.startScript(script, client, arguments);
 				}
 			}
 		}

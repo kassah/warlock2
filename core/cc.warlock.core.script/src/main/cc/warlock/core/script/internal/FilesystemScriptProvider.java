@@ -4,9 +4,7 @@ import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.FileReader;
 import java.io.Reader;
-import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.HashMap;
 import java.util.Hashtable;
 import java.util.Iterator;
 import java.util.List;
@@ -19,23 +17,19 @@ import cc.warlock.core.script.IScriptFileInfo;
 import cc.warlock.core.script.IScriptInfo;
 import cc.warlock.core.script.IScriptProvider;
 import cc.warlock.core.script.ScriptEngineRegistry;
+import cc.warlock.core.script.configuration.ScriptConfiguration;
 
 public class FilesystemScriptProvider implements IScriptProvider, Runnable {
 
-	protected HashMap<String, IScriptFileInfo> scripts = new HashMap<String, IScriptFileInfo>();
 	protected Hashtable<ScriptFileInfo, Long> infos = new Hashtable<ScriptFileInfo, Long>();
-	protected ArrayList<File> scriptDirs = new ArrayList<File>();
-	protected long scanTimeout = 500;
-	protected boolean scanning = true;
+	
+	protected boolean scanning = false;
 	protected static FilesystemScriptProvider _instance;
 	
 	static {
 		ScriptEngineRegistry.addScriptProvider(instance());
-		
-		instance().addScriptDirectory(WarlockConfiguration.getUserDirectory("warlock-scripts", true));
-		instance().addScriptDirectory(WarlockConfiguration.getUserDirectory("scripts", true));
-		instance().addScriptDirectory(WarlockConfiguration.getConfigurationDirectory("scripts", false));
-		instance().start();
+		WarlockConfiguration.instance().addConfigurationProvider(ScriptConfiguration.instance());
+		instance().scan();
 	}
 	
 	public static FilesystemScriptProvider instance()
@@ -57,10 +51,6 @@ public class FilesystemScriptProvider implements IScriptProvider, Runnable {
 		}
 		
 		public String getScriptName() {
-			if (scriptName.lastIndexOf('.') > 0)
-			{
-				return scriptName.substring(0, scriptName.lastIndexOf('.'));
-			}
 			return scriptName;
 		}
 		
@@ -88,28 +78,35 @@ public class FilesystemScriptProvider implements IScriptProvider, Runnable {
 	FilesystemScriptProvider () { }
 	
 	protected void start () {
+		scanning = true;
+		
 		new Thread(this).start();
 	}
 	
 	public void addScriptDirectory (File directory)
 	{
+		List<File> scriptDirs =
+			ScriptConfiguration.instance().getScriptDirectories();
+		
 		if (!scriptDirs.contains(directory))
 			scriptDirs.add(directory);
 	}
 	
 	public void removeScriptDirectory (File directory)
 	{
+		List<File> scriptDirs =
+			ScriptConfiguration.instance().getScriptDirectories();
+		
 		if (scriptDirs.contains(directory))
 			scriptDirs.remove(directory);
 	}
 	
-	public List<File> getScriptDirectories()
-	{
-		return scriptDirs;
-	}
-	
-	public List<String> getScriptNames() {
-		return Arrays.asList(scripts.keySet().toArray(new String[scripts.keySet().size()]));
+	public List<IScriptInfo> getScriptInfos() {
+		if (!scanning && ScriptConfiguration.instance().getAutoScan().get()) {
+			start();
+		}
+		
+		return Arrays.asList(infos.keySet().toArray(new IScriptInfo[infos.keySet().size()]));
 	}
 	
 	protected ScriptFileInfo getScriptInfo (File file)
@@ -124,15 +121,13 @@ public class FilesystemScriptProvider implements IScriptProvider, Runnable {
 		return null;
 	}
 
-	public IScript startScript (String scriptName, IWarlockClient client, String[] arguments)
-	{
+	public IScript startScript(IScriptInfo scriptInfo, IWarlockClient client, String[] arguments) {
 		IScript script = null;
-		IScriptInfo info = scripts.get(scriptName);
 		for (IScriptEngine engine : ScriptEngineRegistry.getScriptEngines())
 		{
-			if (engine.supports(info))
+			if (engine.supports(scriptInfo))
 			{
-				script = engine.startScript(info, client, arguments);
+				script = engine.startScript(scriptInfo, client, arguments);
 				break;
 			}
 		}
@@ -141,6 +136,8 @@ public class FilesystemScriptProvider implements IScriptProvider, Runnable {
 	
 	protected void scanDirectory (File directory)
 	{
+		if (!directory.exists()) return;
+		
 		for (File file : directory.listFiles())
 		{
 			if (file.isFile())
@@ -150,14 +147,12 @@ public class FilesystemScriptProvider implements IScriptProvider, Runnable {
 					info = new ScriptFileInfo();
 					info.scriptFile = file;
 					info.scriptName = file.getName();
+					if (info.scriptName.indexOf('.') > 0)
+					{
+						info.scriptName = info.scriptName.substring(0, info.scriptName.indexOf('.'));
+					}
+					
 					infos.put(info, (long) 0);
-				}
-				
-				if (infos.get(info) < file.lastModified())
-				{
-					System.out.println("adding script: " + info.getScriptName());
-					scripts.put(info.getScriptName(), info);
-					infos.put(info, file.lastModified());
 				}
 			}
 		}
@@ -168,9 +163,18 @@ public class FilesystemScriptProvider implements IScriptProvider, Runnable {
 			
 			if (!info.scriptFile.exists())
 			{
-				if (!scripts.containsKey(info.scriptName))
-					scripts.remove(info.scriptName);
 				iter.remove();
+			}
+		}
+	}
+	
+	protected void scan ()
+	{
+		for (File dir : ScriptConfiguration.instance().getScriptDirectories())
+		{
+			if (dir.exists())
+			{
+				scanDirectory(dir);
 			}
 		}
 	}
@@ -179,16 +183,10 @@ public class FilesystemScriptProvider implements IScriptProvider, Runnable {
 	{
 		while (scanning)
 		{
-			for (File dir : scriptDirs)
-			{
-				if (dir.exists())
-				{
-					scanDirectory(dir);
-				}
-			}
+			scan();
 			
 			try {
-				Thread.sleep(scanTimeout);
+				Thread.sleep(ScriptConfiguration.instance().getScanTimeout().get());
 			} catch (InterruptedException e) {
 				// TODO Auto-generated catch block
 				e.printStackTrace();
