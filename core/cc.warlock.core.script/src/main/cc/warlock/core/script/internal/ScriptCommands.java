@@ -228,6 +228,7 @@ public class ScriptCommands implements IScriptCommands, IStreamListener
 	
 	public void streamReceivedText(IStream stream, IStyledString string) {
 		String text = string.getBuffer().toString();
+		System.out.println("Sending out line: " + text);
 		for(LinkedBlockingQueue<String>  queue : textWaiters) {
 			System.out.println("Signaling a waiter");
 			try {
@@ -262,6 +263,7 @@ public class ScriptCommands implements IScriptCommands, IStreamListener
 			e.printStackTrace();
 		} finally {
 			lock.unlock();
+			client.getDefaultStream().removeStreamListener(this);
 		}
 	}
 }
