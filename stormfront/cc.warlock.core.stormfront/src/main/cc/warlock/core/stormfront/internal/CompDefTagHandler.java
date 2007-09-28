@@ -19,6 +19,9 @@ import cc.warlock.core.stormfront.IStormFrontProtocolHandler;
  */
 public class CompDefTagHandler extends DefaultTagHandler {
 	
+	protected String id;
+	protected StringBuffer buffer = new StringBuffer();
+	
 	public CompDefTagHandler (IStormFrontProtocolHandler handler) {
 		super(handler);
 		
@@ -30,8 +33,28 @@ public class CompDefTagHandler extends DefaultTagHandler {
 	}
 
 	public void handleStart(Map<String,String> attributes) {
+		buffer.setLength(0);
+		this.id = attributes.get("id");
+		
 		if (attributes.get("id").equals("room exits")) {
-			handler.getClient().getCompass().clear();					
+			handler.getClient().getCompass().clear();
+		}
+	}
+	
+	@Override
+	public boolean handleCharacters(char[] ch, int start, int length) {
+		if (id != null && id.equals("room desc")) {
+			buffer.append(ch, start, length);
+		}
+		// let the stream have the text, we just want to store the value in a property
+		return false;
+	}
+	
+	@Override
+	public void handleEnd() {
+		if (id != null && id.equals("room desc"))
+		{
+			handler.getClient().getRoomDescription().set(buffer.toString());
 		}
 	}
 }
