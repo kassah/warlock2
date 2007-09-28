@@ -12,6 +12,8 @@ import org.eclipse.ui.plugin.AbstractUIPlugin;
 import org.osgi.framework.BundleContext;
 
 import cc.warlock.core.client.IWarlockClient;
+import cc.warlock.rcp.ui.client.WarlockClientAdaptable;
+import cc.warlock.rcp.ui.client.WarlockClientAdapterFactory;
 import cc.warlock.rcp.ui.macros.MacroRegistry;
 
 /**
@@ -49,6 +51,8 @@ public class Warlock2Plugin extends AbstractUIPlugin {
 		
 		// force load of the Macro registry
 		MacroRegistry.instance();
+		
+		Platform.getAdapterManager().registerAdapters(new WarlockClientAdapterFactory(), WarlockClientAdaptable.class);
 	}
 	
 	public IWarlockClient getCurrentClient ()
