@@ -1,74 +1,140 @@
 package cc.warlock.core.configuration;
 
 import java.io.File;
+import java.io.FileOutputStream;
 import java.io.IOException;
+import java.io.UnsupportedEncodingException;
+import java.util.ArrayList;
+import java.util.Hashtable;
+import java.util.Iterator;
+import java.util.List;
+import java.util.Map;
+
+import org.dom4j.Document;
+import org.dom4j.DocumentException;
+import org.dom4j.DocumentHelper;
+import org.dom4j.Element;
+import org.dom4j.io.OutputFormat;
+import org.dom4j.io.SAXReader;
+import org.dom4j.io.XMLWriter;
 
 public class WarlockConfiguration {
-
-	public static File getAppConfigDirectory ()
+	protected File configFile;
+	
+	protected Document document;
+	protected Element warlockConfigElement;
+	
+	protected ArrayList<IConfigurationProvider> providers = new ArrayList<IConfigurationProvider>();
+	protected ArrayList<Element> unhandledElements = new ArrayList<Element>();
+	protected Hashtable<Element, IConfigurationProvider> elementProviders = new Hashtable<Element, IConfigurationProvider>();
+	
+	protected static WarlockConfiguration _instance;
+	
+	public static WarlockConfiguration instance()
 	{
-		if (System.getProperty("os.name").contains("Windows"))
-		{
-			return new File(System.getenv("AppData"), "Warlock2");
-		}
-		else {
-			return new File(getUserHomeDirectory(), ".warlock2");
+		if (_instance == null)
+			_instance = new WarlockConfiguration();
+		return _instance;
+	}
+	
+	protected WarlockConfiguration ()
+	{
+		configFile = ConfigurationUtil.getConfigurationFile(ConfigurationUtil.MAIN_CONFIGURATION_FILE, true);
+		
+		loadXML();
+	}
+	
+	protected void loadXML ()
+	{
+		if (configFile.length() == 0)
+			return;
+		
+		try {
+			SAXReader reader = new SAXReader();
+			document = reader.read(configFile);
+			warlockConfigElement = document.getRootElement();
+			
+			for (Element element : (List<Element>)warlockConfigElement.elements())
+			{
+				unhandledElements.add(element);
+			}
+			
+		} catch (DocumentException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
 		}
 	}
 	
-	public static File getUserHomeDirectory ()
-	{	
-		return new File(System.getProperty("user.home"));
-	}
-	
-	public static File getConfigurationDirectory (String directory, boolean lazyCreate)
+	public void addConfigurationProvider (IConfigurationProvider provider)
 	{
-		File dirFile = new File(getAppConfigDirectory(), directory);
-		
-		if (lazyCreate && !dirFile.exists())
+		if (!providers.contains(provider))
 		{
-			dirFile.mkdirs();
+			providers.add(provider);
+			
+			for (Iterator<Element> iter = unhandledElements.iterator(); iter.hasNext(); )
+			{
+				Element element = iter.next();
+				if (provider.supportsElement(element))
+				{
+					provider.parseElement(element);
+					elementProviders.put(element, provider);
+					iter.remove();
+				}
+			}
 		}
-		return dirFile;
 	}
 	
-	public static File getUserDirectory (String directory, boolean lazyCreate)
+	public void removeConfigurationProvider (IConfigurationProvider provider)
 	{
-		File dirFile = new File(getUserHomeDirectory(), directory);
-		
-		if (lazyCreate && !dirFile.exists())
+		if (providers.contains(provider))
 		{
-			dirFile.mkdirs();
+			providers.remove(provider);
+			
+			if (elementProviders.contains(provider)) {
+				for (Iterator<Map.Entry<Element,IConfigurationProvider>> iter = elementProviders.entrySet().iterator(); iter.hasNext(); )
+				{
+					Map.Entry<Element, IConfigurationProvider> entry = iter.next();
+					
+					if (entry.getValue().equals(provider))
+					{
+						iter.remove();
+					}
+				}
+			}
 		}
-		return dirFile;
 	}
 	
-	public static File getConfigurationFile (String fileName)
+	public void save ()
 	{
-		return getConfigurationFile(fileName, true);
-	}
-	
-	public static File getConfigurationFile (String fileName, boolean lazyCreate)
-	{
-		File configDir = getAppConfigDirectory();
+		Document document = DocumentHelper.createDocument();
+		Element warlockConfig = DocumentHelper.createElement("warlock-config");
 		
-		if (!configDir.exists())
+		document.setRootElement(warlockConfig);
+		
+		
+		for (IConfigurationProvider provider : providers)
 		{
-			configDir.mkdirs();
-		}
-		
-		File configFile = new File(configDir, fileName);
-		
-		if (!configFile.exists() && lazyCreate)
-		{
-			try {
-				configFile.createNewFile();
-			} catch (IOException e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
+			List<Element> elements = provider.getTopLevelElements();
+			
+			for (Element element : elements)
+			{
+				warlockConfig.add(element);
 			}
 		}
 		
-		return configFile;
+		try {
+			OutputFormat format = OutputFormat.createPrettyPrint();
+			FileOutputStream stream = new FileOutputStream(configFile);
+			XMLWriter writer = new XMLWriter(stream, format);
+			writer.write(document);
+			stream.close();
+			
+		} catch (UnsupportedEncodingException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		} catch (IOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
 	}
 }
