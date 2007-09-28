@@ -52,18 +52,17 @@ public class ServerScriptProvider implements IServerScriptProvider
 		return client;
 	}
 	
-	public List<String> getScriptNames() {
-		return Arrays.asList(scripts.keySet().toArray(new String[scripts.keySet().size()]));
+	public List<IScriptInfo> getScriptInfos() {
+		return Arrays.asList(scripts.values().toArray(new IScriptInfo[scripts.values().size()]));
 	}
 	
-	public IScript startScript (String scriptName, IWarlockClient client, String[] arguments)
+	public IScript startScript (IScriptInfo scriptInfo, IWarlockClient client, String[] arguments)
 	{
-		IScriptInfo info = scripts.get(scriptName);
 		for (IScriptEngine engine : ScriptEngineRegistry.getScriptEngines())
 		{
-			if (engine.supports(info))
+			if (engine.supports(scriptInfo))
 			{
-				return engine.startScript(info, client, arguments);
+				return engine.startScript(scriptInfo, client, arguments);
 			}
 		}
 		return null;
