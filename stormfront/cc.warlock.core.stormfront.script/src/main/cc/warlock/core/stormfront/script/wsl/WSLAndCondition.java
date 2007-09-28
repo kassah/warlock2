@@ -10,9 +10,10 @@ public class WSLAndCondition extends WSLBoolean {
 		this.args = args;
 	}
 	
-	public boolean getBoolean() {
+	@Override
+	public boolean toBoolean() {
 		for(IWSLValue value : args) {
-			if(!value.getBoolean()) {
+			if(!value.toBoolean()) {
 				return false;
 			}
 		}

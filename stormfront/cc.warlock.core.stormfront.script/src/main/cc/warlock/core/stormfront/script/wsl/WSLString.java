@@ -14,20 +14,20 @@ public class WSLString implements IWSLValue {
 		return Type.String;
 	}
 	
-	public String getString() {
+	public String toString() {
 		return string;
 	}
 
-	public boolean getBoolean() {
-		String str = getString().trim();
+	public boolean toBoolean() {
+		String str = toString().trim();
 		
 		if(str == null || str.equals("") || str.equals("false") || str.equals("0")) return false;
 		else return true;
 	}
 	
-	public double getNumber() {
+	public double toDouble() {
 		try {
-			return Double.parseDouble(getString().trim());
+			return Double.parseDouble(toString().trim());
 		} catch(NumberFormatException e) {
 			return 0.0;
 		}

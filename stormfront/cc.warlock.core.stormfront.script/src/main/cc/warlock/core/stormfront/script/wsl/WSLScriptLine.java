@@ -15,9 +15,9 @@ public class WSLScriptLine {
 		if(value == null) return null; // in a label
 		
 		// Skip the line if the condition is false
-		if(condition != null && !condition.getBoolean()) return null;
+		if(condition != null && !condition.toBoolean()) return null;
 		
-		return value.getString();
+		return value.toString();
 	}
 	
 	public int getLineNumber() {

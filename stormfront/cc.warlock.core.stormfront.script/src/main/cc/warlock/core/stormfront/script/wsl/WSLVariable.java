@@ -10,13 +10,14 @@ public class WSLVariable extends WSLString {
 		this.script = script;
 	}
 	
-	public String getString() {
+	@Override
+	public String toString() {
 		/*for(String name : variables.keySet()) {
 			System.out.println("var: \"" + name + "\"");
 		}
 		System.out.println("variableName: \"" + variableName + "\"");*/
 		
-		String value = script.getVariables().get(variableName);
+		String value = script.getVariable(variableName).toString();
 		if(value == null) return "";
 		return value;
 	}

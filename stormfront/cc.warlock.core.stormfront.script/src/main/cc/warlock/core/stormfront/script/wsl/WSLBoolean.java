@@ -10,17 +10,17 @@ public class WSLBoolean implements IWSLValue {
 	
 	protected WSLBoolean() { }
 	
-	public boolean getBoolean() {
+	public boolean toBoolean() {
 		return value;
 	}
 
-	public double getNumber() {
-		if(getBoolean()) return 1.0;
+	public double toDouble() {
+		if(toBoolean()) return 1.0;
 		else return 0.0;
 	}
 
-	public String getString() {
-		if(getBoolean()) return "true";
+	public String toString() {
+		if(toBoolean()) return "true";
 		else return "false";
 	}
 

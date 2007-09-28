@@ -5,7 +5,6 @@ import java.io.Reader;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 import java.util.Random;
 import java.util.Stack;
 import java.util.concurrent.locks.Condition;
@@ -45,6 +44,8 @@ public class WSLScript extends AbstractScript {
 	private ArrayList<Match> matchset = new ArrayList<Match>();
 	private Pattern commandPattern = Pattern.compile("^([\\w_]+)(\\s+(.*))?");
 	private WSLCommand if_ = new WSLIf_();
+	private long timer = -1L;
+	private long timePast = 0L;
 	
 	protected WSLEngine engine;
 	protected IStormFrontScriptCommands commands;
@@ -88,11 +89,16 @@ public class WSLScript extends AbstractScript {
 		addCommand("move", new WSLMove());
 		addCommand("nextroom", new WSLNextRoom());
 		addCommand("exit", new WSLExit());
+		addCommand("timer", new WSLTimer());
 		
 	}
 
-	public Map<String, String> getVariables() {
-		return variables;
+	public IWSLValue getVariable(String name) {
+		if(name.equals("t")) {
+			if(timer < 0) return new WSLNumber(timePast / 1000);
+			return new WSLNumber((System.currentTimeMillis() - timer) / 1000);
+		}
+		return new WSLString(variables.get(name));
 	}
 	
 	public boolean isRunning() {
@@ -648,6 +654,35 @@ public class WSLScript extends AbstractScript {
 				int r = min + new Random().nextInt(max - min + 1);
 				
 				setVariable("r", Integer.toString(r));
+			} else {
+				// print an error?
+			}
+		}
+	}
+	
+	private class WSLTimer extends WSLCommand {
+		
+		private Pattern format = Pattern.compile("^(\\w+)");
+		
+		public void execute(String arguments) {
+			Matcher m = format.matcher(arguments);
+			
+			if(m.find()) {
+				String command = m.group(1);
+				if(command.equals("start")) {
+					if(timer < 0)
+						timer = System.currentTimeMillis() - timePast;
+				} else if(command.equals("stop")) {
+					if(timer > 0) {
+						timePast = timer - System.currentTimeMillis();
+						timer = -1L;
+					}
+				} else if(command.equals("clear")) {
+					timer = -1L;
+					timePast = 0L;
+				} else {
+					// print an error?
+				}
 			} else {
 				// print an error?
 			}

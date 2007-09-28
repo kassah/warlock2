@@ -12,17 +12,18 @@ public class WSLNumber implements IWSLValue {
 		value = Double.parseDouble(number);
 	}
 	
-	public boolean getBoolean() {
-		if(value == 0.0) return false;
+	public boolean toBoolean() {
+		if(toDouble() == 0.0) return false;
 		else return true;
 	}
 
-	public double getNumber() {
+	public double toDouble() {
 		return value;
 	}
 
-	public String getString() {
-		return Double.toString(value);
+	public String toString() {
+		if(Math.floor(value) == value) return Long.toString((long)value);
+		return Double.toString(toDouble());
 	}
 
 	public Type getType() {

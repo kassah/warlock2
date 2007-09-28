@@ -13,11 +13,11 @@ public class WSLEqualityCondition extends WSLBoolean {
 		
 		public boolean compare(IWSLValue arg1, IWSLValue arg2) {
 			if(arg1.getType() == Type.Boolean || arg2.getType() == Type.Boolean) {
-				return eval(arg1.getBoolean() == arg2.getBoolean());
+				return eval(arg1.toBoolean() == arg2.toBoolean());
 			} else if(arg1.getType() == Type.Number || arg2.getType() == Type.Number) {
-				return eval(arg1.getNumber() == arg2.getNumber());
+				return eval(arg1.toDouble() == arg2.toDouble());
 			} else {
-				return eval(arg1.getString().trim().equals(arg2.getString().trim()));
+				return eval(arg1.toString().trim().equals(arg2.toString().trim()));
 			}
 		}
 	}
@@ -31,7 +31,8 @@ public class WSLEqualityCondition extends WSLBoolean {
 		this.equalityOps = equalityOps;
 	}
 	
-	public boolean getBoolean() {
+	@Override
+	public boolean toBoolean() {
 		IWSLValue value = args.get(0);
 
 		for(int i = 0; i < equalityOps.size(); i++) {

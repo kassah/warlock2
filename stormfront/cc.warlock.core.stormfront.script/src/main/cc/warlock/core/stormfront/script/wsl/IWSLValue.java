@@ -5,7 +5,8 @@ public interface IWSLValue {
 	enum Type { Boolean, String, Number }
 	
 	public Type getType();
-	public String getString();
-	public boolean getBoolean();
-	public double getNumber();
+	public String toString();
+	public boolean toBoolean();
+	public double toDouble();
+	
 }

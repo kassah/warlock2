@@ -10,8 +10,9 @@ public class WSLExistsCondition extends WSLBoolean {
 		this.script = script;
 	}
 	
-	public boolean getBoolean() {
-		String value = script.getVariables().get(name);
+	@Override
+	public boolean toBoolean() {
+		String value = script.getVariable(name).toString();
 		if(value == null) return false;
 		else return true;
 	}

@@ -8,8 +8,9 @@ public class WSLNotCondition extends WSLBoolean {
 		this.value = value;
 	}
 	
-	public boolean getBoolean() {
-		return !value.getBoolean();
+	@Override
+	public boolean toBoolean() {
+		return !value.toBoolean();
 	}
 
 }

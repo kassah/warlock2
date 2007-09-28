@@ -5,10 +5,10 @@ import java.util.List;
 public class WSLRelationalCondition extends WSLBoolean {
 
 	public enum RelationalOperator {
-		GreaterThan			{ boolean compare(IWSLValue arg1, IWSLValue arg2) { return arg1.getNumber() > arg2.getNumber(); } },
-		GreaterThanEqualTo	{ boolean compare(IWSLValue arg1, IWSLValue arg2) { return arg1.getNumber() >= arg2.getNumber(); } },
-		LessThan			{ boolean compare(IWSLValue arg1, IWSLValue arg2) { return arg1.getNumber() < arg2.getNumber(); } },
-		LessThanEqualTo		{ boolean compare(IWSLValue arg1, IWSLValue arg2) { return arg1.getNumber() <= arg2.getNumber(); } };
+		GreaterThan			{ boolean compare(IWSLValue arg1, IWSLValue arg2) { return arg1.toDouble() > arg2.toDouble(); } },
+		GreaterThanEqualTo	{ boolean compare(IWSLValue arg1, IWSLValue arg2) { return arg1.toDouble() >= arg2.toDouble(); } },
+		LessThan			{ boolean compare(IWSLValue arg1, IWSLValue arg2) { return arg1.toDouble() < arg2.toDouble(); } },
+		LessThanEqualTo		{ boolean compare(IWSLValue arg1, IWSLValue arg2) { return arg1.toDouble() <= arg2.toDouble(); } };
 	
 		abstract boolean compare(IWSLValue arg1, IWSLValue arg2);
 	}
@@ -21,7 +21,8 @@ public class WSLRelationalCondition extends WSLBoolean {
 		this.ops = ops;
 	}
 	
-	public boolean getBoolean() {
+	@Override
+	public boolean toBoolean() {
 		IWSLValue value = args.get(0);
 		for(int i = 0; i < ops.size(); i++) {
 			IWSLValue nextValue = args.get(i + 1);

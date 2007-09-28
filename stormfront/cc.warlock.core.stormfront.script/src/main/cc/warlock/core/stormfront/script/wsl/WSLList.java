@@ -10,11 +10,12 @@ public class WSLList extends WSLString {
 		this.list = list;
 	}
 	
-	public String getString() {
+	@Override
+	public String toString() {
 		StringBuffer buffer = new StringBuffer();
 		
 		for(IWSLValue value : list) {
-			buffer.append(value.getString());
+			buffer.append(value.toString());
 		}
 		
 		return buffer.toString();
