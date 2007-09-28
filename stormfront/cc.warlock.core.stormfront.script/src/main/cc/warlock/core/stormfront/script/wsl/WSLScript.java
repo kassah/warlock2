@@ -448,7 +448,7 @@ public class WSLScript extends AbstractScript {
 		}
 	}
 	
-	protected void callReturn () {
+	protected void gosubReturn () {
 		if (callstack.empty()) {
 			commands.echo ("***********");
 			commands.echo ("*** WARNING: No outstanding calls were executed, skipping return statement ***");
@@ -461,7 +461,7 @@ public class WSLScript extends AbstractScript {
 	protected class WSLReturn extends WSLCommand {
 		
 		public void execute (String arguments) {
-			callReturn();
+			gosubReturn();
 		}
 	}
 
