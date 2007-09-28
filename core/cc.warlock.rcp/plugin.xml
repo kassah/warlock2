@@ -133,19 +133,5 @@
             name="Preferences">
       </command>
    </extension>
-   <extension
-         point="org.eclipse.ui.propertyPages">
-      <page
-            category="cc.warlock.rcp.prefs.characterPrefs"
-            class="cc.warlock.rcp.prefs.LookAndFeelPreferencePage"
-            id="cc.warlock.rcp.prefs.lookAndFeel"
-            name="Look and Feel">
-         <enabledWhen>
-            <instanceof
-                  value="cc.warlock.rcp.views.GameView">
-            </instanceof>
-         </enabledWhen>
-      </page>
-   </extension>
 
 </plugin>
