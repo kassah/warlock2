@@ -164,22 +164,25 @@ public class ScriptCommands implements IScriptCommands, IStreamListener
 		String text = null;
 
 		textWaiters.add(queue);
-		waitForLoop: while(true) {
-			while(text == null) {
-				try {
-					text = queue.poll(100L, TimeUnit.MILLISECONDS);
-				} catch(Exception e) {
-					e.printStackTrace();
+		try {
+			waitForLoop: while(true) {
+				while(text == null) {
+					try {
+						text = queue.poll(100L, TimeUnit.MILLISECONDS);
+					} catch(Exception e) {
+						e.printStackTrace();
+					}
+					if(stopped)
+						break waitForLoop;
 				}
-				if(stopped)
-					break waitForLoop;
+				if(match.matches(text)) {
+					break;
+				}
+				text = null;
 			}
-			if(match.matches(text)) {
-				break;
-			}
-			text = null;
+		} finally {
+			textWaiters.remove(queue);
 		}
-		textWaiters.remove(queue);
 	}
 
 	public void waitForPrompt () {
