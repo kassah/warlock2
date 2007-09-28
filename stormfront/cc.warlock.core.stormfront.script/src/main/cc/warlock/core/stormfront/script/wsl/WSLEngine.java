@@ -12,11 +12,12 @@ import cc.warlock.core.script.IScript;
 import cc.warlock.core.script.IScriptEngine;
 import cc.warlock.core.script.IScriptFileInfo;
 import cc.warlock.core.script.IScriptInfo;
+import cc.warlock.core.script.IScriptListener;
 import cc.warlock.core.stormfront.client.IStormFrontClient;
 import cc.warlock.core.stormfront.serversettings.server.IServerScriptInfo;
 
 
-public class WSLEngine implements IScriptEngine {
+public class WSLEngine implements IScriptEngine, IScriptListener {
 
 	public static final String ENGINE_ID = "cc.warlock.script.wsl.WSLEngine";
 	protected ArrayList<IScript> runningScripts = new ArrayList<IScript>();
@@ -58,6 +59,7 @@ public class WSLEngine implements IScriptEngine {
 			WSLScript wslScript = new WSLScript(this, info, (IStormFrontClient)client);
 
 			runningScripts.add(wslScript);
+			wslScript.addScriptListener(this);
 			wslScript.start(Arrays.asList(arguments));
 			return wslScript;
 		} catch (IOException e) {
@@ -65,6 +67,16 @@ public class WSLEngine implements IScriptEngine {
 			e.printStackTrace();
 			return null;
 		}
+	}
+	
+	public void scriptResumed(IScript script) { }
+	public void scriptRemoved(IScript script) { }
+	public void scriptPaused(IScript script) { }
+	public void scriptAdded(IScript script) { }
+	public void scriptStarted(IScript script) { }
+	
+	public void scriptStopped(IScript script, boolean userStopped) {
+		runningScripts.remove(script);
 	}
 	
 	public List<IScript> getRunningScripts() {
