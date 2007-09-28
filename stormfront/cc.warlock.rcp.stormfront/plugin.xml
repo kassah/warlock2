@@ -45,6 +45,11 @@
             id="cc.warlock.rcp.stormfront.ui.views.StatusView"
             name="Status">
       </view>
+      <view
+            class="cc.warlock.rcp.views.StreamView"
+            id="cc.warlock.rcp.views.stream.rightStream.room"
+            name="Current Room">
+      </view>
    </extension>
    <extension
          point="org.eclipse.ui.commands">
@@ -94,9 +99,31 @@
             id="cc.warlock.rcp.stormfront.ui.prefs.characterPrefs"
             name="Character Preferences">
          <enabledWhen>
-            <instanceof
-                  value="cc.warlock.rcp.views.GameView">
-            </instanceof>
+            <adapt
+                  type="cc.warlock.core.stormfront.client.IStormFrontClient">
+            </adapt>
+         </enabledWhen>
+      </page>
+      <page
+            category="cc.warlock.rcp.stormfront.ui.prefs.characterPrefs"
+            class="cc.warlock.rcp.stormfront.ui.prefs.PresetsPreferencePage"
+            id="cc.warlock.rcp.stormfront.ui.prefs.lookAndFeel"
+            name="Look and Feel">
+         <enabledWhen>
+            <adapt
+                  type="cc.warlock.core.stormfront.client.IStormFrontClient">
+            </adapt>
+         </enabledWhen>
+      </page>
+      <page
+            category="cc.warlock.rcp.stormfront.ui.prefs.characterPrefs"
+            class="cc.warlock.rcp.prefs.LookAndFeelPreferencePage"
+            id="cc.warlock.rcp.stormfront.ui.prefs.presets"
+            name="Look and Feel">
+         <enabledWhen>
+            <adapt
+                  type="cc.warlock.core.client.IWarlockClient">
+            </adapt>
          </enabledWhen>
       </page>
       <page
@@ -105,9 +132,9 @@
             id="cc.warlock.rcp.stormfront.ui.prefs.highlightStrings"
             name="Highlight Strings">
          <enabledWhen>
-            <instanceof
-                  value="cc.warlock.rcp.views.GameView">
-            </instanceof>
+            <adapt
+                  type="cc.warlock.core.stormfront.client.IStormFrontClient">
+            </adapt>
          </enabledWhen>
       </page>
       <page
@@ -116,9 +143,9 @@
             id="cc.warlock.rcp.stormfront.ui.prefs.highlightNames"
             name="Highlight Names">
          <enabledWhen>
-            <instanceof
-                  value="cc.warlock.rcp.views.GameView">
-            </instanceof>
+            <adapt
+                  type="cc.warlock.core.stormfront.client.IStormFrontClient">
+            </adapt>
          </enabledWhen>
       </page>
    </extension>
