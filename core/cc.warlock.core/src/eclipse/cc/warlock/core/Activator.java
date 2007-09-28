@@ -3,6 +3,8 @@ package cc.warlock.core;
 import org.eclipse.core.runtime.Plugin;
 import org.osgi.framework.BundleContext;
 
+import cc.warlock.core.configuration.WarlockConfiguration;
+
 /**
  * The activator class controls the plug-in life cycle
  */
@@ -34,6 +36,9 @@ public class Activator extends Plugin {
 	 * @see org.eclipse.core.runtime.Plugin#stop(org.osgi.framework.BundleContext)
 	 */
 	public void stop(BundleContext context) throws Exception {
+		
+		WarlockConfiguration.instance().save();
+		
 		plugin = null;
 		super.stop(context);
 	}
