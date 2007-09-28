@@ -7,7 +7,7 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.Properties;
 
-import cc.warlock.core.configuration.WarlockConfiguration;
+import cc.warlock.core.configuration.ConfigurationUtil;
 
 public class TestProperties {
 
@@ -22,7 +22,7 @@ public class TestProperties {
 			testProperties = new Properties();
 			
 			try {
-				FileInputStream stream = new FileInputStream(new File(WarlockConfiguration.getUserHomeDirectory(), "warlock-tests.properties"));
+				FileInputStream stream = new FileInputStream(new File(ConfigurationUtil.getUserHomeDirectory(), "warlock-tests.properties"));
 				testProperties.load(stream);
 				stream.close();
 			} catch (IOException e) {

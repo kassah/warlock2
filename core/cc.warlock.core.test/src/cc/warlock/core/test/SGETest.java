@@ -13,7 +13,7 @@ import org.junit.Test;
 
 import cc.warlock.core.configuration.Profile;
 import cc.warlock.core.configuration.SavedProfiles;
-import cc.warlock.core.configuration.WarlockConfiguration;
+import cc.warlock.core.configuration.ConfigurationUtil;
 import cc.warlock.core.stormfront.network.ISGEConnectionListener;
 import cc.warlock.core.stormfront.network.SGEConnection;
 
@@ -37,7 +37,7 @@ public class SGETest {
 
 	protected void failProperty (String property)
 	{
-		Assert.fail("The property \"" + property + "\" was not defined in " + WarlockConfiguration.getUserHomeDirectory().getAbsolutePath()+ "/warlock-tests.properties");
+		Assert.fail("The property \"" + property + "\" was not defined in " + ConfigurationUtil.getUserHomeDirectory().getAbsolutePath()+ "/warlock-tests.properties");
 	}
 	
 	protected Hashtable<String,Boolean> success = new Hashtable<String,Boolean>();
