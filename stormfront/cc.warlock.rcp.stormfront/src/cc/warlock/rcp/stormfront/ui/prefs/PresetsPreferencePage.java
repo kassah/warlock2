@@ -1,17 +1,24 @@
 package cc.warlock.rcp.stormfront.ui.prefs;
 
 
+import java.util.HashMap;
+
 import org.eclipse.core.runtime.IAdaptable;
 import org.eclipse.jface.preference.ColorSelector;
-import org.eclipse.jface.resource.JFaceResources;
 import org.eclipse.jface.util.IPropertyChangeListener;
 import org.eclipse.jface.util.PropertyChangeEvent;
+import org.eclipse.jface.viewers.ArrayContentProvider;
+import org.eclipse.jface.viewers.ILabelProviderListener;
+import org.eclipse.jface.viewers.ITableColorProvider;
+import org.eclipse.jface.viewers.ITableLabelProvider;
+import org.eclipse.jface.viewers.TableViewer;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.custom.StyleRange;
 import org.eclipse.swt.custom.StyledText;
 import org.eclipse.swt.graphics.Color;
 import org.eclipse.swt.graphics.Font;
 import org.eclipse.swt.graphics.FontData;
+import org.eclipse.swt.graphics.Image;
 import org.eclipse.swt.graphics.RGB;
 import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.layout.GridLayout;
@@ -19,6 +26,7 @@ import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Control;
 import org.eclipse.swt.widgets.Group;
 import org.eclipse.swt.widgets.Label;
+import org.eclipse.swt.widgets.TableColumn;
 import org.eclipse.ui.IWorkbenchPropertyPage;
 import org.eclipse.ui.dialogs.PropertyPage;
 
@@ -26,6 +34,7 @@ import cc.warlock.core.client.IWarlockSkin;
 import cc.warlock.core.stormfront.client.IStormFrontClient;
 import cc.warlock.core.stormfront.serversettings.server.Preset;
 import cc.warlock.core.stormfront.serversettings.server.ServerSettings;
+import cc.warlock.core.stormfront.serversettings.server.WindowSettings;
 import cc.warlock.rcp.ui.style.SavedStyles;
 import cc.warlock.rcp.ui.style.Style;
 import cc.warlock.rcp.util.ColorUtil;
@@ -35,24 +44,51 @@ import cc.warlock.rcp.util.FontSelector;
 public class PresetsPreferencePage extends PropertyPage implements
 		IWorkbenchPropertyPage {
 
-	public static final String PAGE_ID = "cc.warlock.rcp.prefs.standardPresets";
+	public static final String PAGE_ID = "cc.warlock.rcp.stormfront.ui.prefs.presets";
 	
-	private RGB mainBG, mainFG, roomNameBG, roomNameFG, speechBG, speechFG;
-	private Font mainFont, roomNameFont, speechFont;
-	private ColorSelector mainBGSelector, mainFGSelector, roomNameBGSelector, roomNameFGSelector, speechBGSelector, speechFGSelector;
-	private FontSelector mainFontSelector, roomNameFontSelector, speechFontSelector;
+	private ColorSelector mainBGSelector, mainFGSelector;
+	private FontSelector mainFontSelector;
+	private ColorSelector bgSelector, fgSelector;
 	private StyledText preview;
+	private TableViewer presetsTable;
 	
 	private static String roomNamePreview = "[Riverhaven, Crescent Way]";
+	private static String boldPreview = "You also see a Sir Robyn.";
+	private static String commandPreview = "say Hello.";
 	private static String speechPreview = "You say, \"Hello.\"";
+	private static String whisperPreview = "Someone whispers, \"Hi\"";
+	private static String thoughtPreview = "Your mind hears Someone thinking, \"hello everyone\"";
 	private static String previewText = 
 		roomNamePreview + "\n" +
+		boldPreview + "\n" +
 		"Obvious paths: southeast, west, northwest.\n" +
+		">" + commandPreview + "\n"+
+		speechPreview + "\n"+
 		">\n"+
-		speechPreview;
+		whisperPreview +
+		">\n" +
+		thoughtPreview;
 
-	private StyleRange roomNameStyleRange;
-	private StyleRange speechStyleRange;
+	private StyleRange roomNameStyleRange, boldStyleRange;
+	private StyleRange commandStyleRange, speechStyleRange;
+	private StyleRange whisperStyleRange, thoughtStyleRange;
+	
+	private ServerSettings settings;
+	private WindowSettings mainWindow;
+	private HashMap<String, Preset> presets = new HashMap<String, Preset>();
+	
+	protected static final HashMap<String, String> presetDescriptions = new HashMap<String, String>();
+	static {
+		presetDescriptions.put(Preset.PRESET_BOLD, "Bold text");
+		presetDescriptions.put(Preset.PRESET_COMMAND, "Sent commands");
+		presetDescriptions.put(Preset.PRESET_LINK, "Hyperlinks");
+		presetDescriptions.put(Preset.PRESET_ROOM_NAME, "Room names");
+		presetDescriptions.put(Preset.PRESET_SELECTED_LINK, "Selected Hyperlinks");
+		presetDescriptions.put(Preset.PRESET_SPEECH, "Speech");
+		presetDescriptions.put(Preset.PRESET_THOUGHT, "Thoughts");
+		presetDescriptions.put(Preset.PRESET_WATCHING, "Watching");
+		presetDescriptions.put(Preset.PRESET_WHISPER, "Whispers");
+	}
 	
 	@Override
 	protected Control createContents(Composite parent) {
@@ -64,13 +100,10 @@ public class PresetsPreferencePage extends PropertyPage implements
 		mainFGSelector = colorSelectorWithLabel(main, "Main window foreground color:");
 		mainFontSelector = fontSelectorWithLabel(main, "Main window font:");
 		
-		roomNameBGSelector = colorSelectorWithLabel(main, "Room name background color:");
-		roomNameFGSelector = colorSelectorWithLabel(main, "Room name foreground color:");
-		roomNameFontSelector = fontSelectorWithLabel(main, "Room name font:");
+		createPresetsTable(main);
 		
-		speechBGSelector = colorSelectorWithLabel(main, "Speech background color:");
-		speechFGSelector = colorSelectorWithLabel(main, "Speech foreground color:");
-		speechFontSelector = fontSelectorWithLabel(main, "Speech font:");
+		bgSelector = colorSelectorWithLabel(main, "Background color:");
+		fgSelector = colorSelectorWithLabel(main, "Foreground color:");
 		
 		Group previewGroup = new Group(main, SWT.NONE);
 		previewGroup.setText("Preview");
@@ -88,6 +121,55 @@ public class PresetsPreferencePage extends PropertyPage implements
 		initValues();
 		initPreview();
 		return main;
+	}
+	
+	protected class PresetsLabelProvider implements ITableLabelProvider, ITableColorProvider
+	{
+		public Color getBackground(Object element, int columnIndex) {
+			Preset preset = (Preset) element;
+			return ColorUtil.warlockColorToColor(preset.getBackgroundColor());
+		}
+
+		public Color getForeground(Object element, int columnIndex) {
+			Preset preset = (Preset) element;
+			return ColorUtil.warlockColorToColor(preset.getForegroundColor());
+		}
+
+		public Image getColumnImage(Object element, int columnIndex) {
+			return null;
+		}
+
+		public String getColumnText(Object element, int columnIndex) {
+			Preset preset = (Preset) element;
+			if (presetDescriptions.containsKey(preset.getName()))
+				return presetDescriptions.get(preset.getName());
+			return "";
+		}
+		public void addListener(ILabelProviderListener listener) {}
+		public void dispose() {}
+		public boolean isLabelProperty(Object element, String property) {
+			return true;
+		}
+		public void removeListener(ILabelProviderListener listener) {}
+	}
+	
+	protected void createPresetsTable (Composite main)
+	{
+		Group presetsGroup = new Group(main, SWT.NONE);
+		presetsGroup.setLayout(new GridLayout(2, false));
+		GridData data = new GridData(GridData.FILL, GridData.FILL, true, true);
+		data.horizontalSpan = 3;
+		presetsGroup.setLayoutData(data);
+		presetsGroup.setText("Presets");
+		
+		presetsTable = new TableViewer(presetsGroup, SWT.SINGLE | SWT.BORDER | SWT.V_SCROLL);
+		TableColumn column = new TableColumn(presetsTable.getTable(), SWT.NONE, 0);
+		column.setWidth(400);
+		
+		presetsTable.setUseHashlookup(true);
+		presetsTable.setColumnProperties(new String[] { "preset" });
+		presetsTable.setContentProvider(new ArrayContentProvider());
+		presetsTable.setLabelProvider(new PresetsLabelProvider());
 	}
 
 	private ColorSelector colorSelectorWithLabel (Composite parent, String text)
@@ -161,50 +243,64 @@ public class PresetsPreferencePage extends PropertyPage implements
 		IStormFrontClient client = (IStormFrontClient) element.getAdapter(IStormFrontClient.class);
 		if (client != null)
 		{
-			ServerSettings settings = client.getServerSettings();
-			
-			mainBG = ColorUtil.warlockColorToRGB(settings.getColorSetting(IWarlockSkin.ColorType.MainWindow_Background));
-			mainFG = ColorUtil.warlockColorToRGB(settings.getColorSetting(IWarlockSkin.ColorType.MainWindow_Foreground));
-			mainFont = JFaceResources.getFont(settings.getFontFaceSetting(IWarlockSkin.FontFaceType.MainWindow_FontFace));
-			
-			Preset roomNamePreset = settings.getPreset(Preset.PRESET_ROOM_NAME);
-			roomNameBG = ColorUtil.warlockColorToRGB(roomNamePreset.getBackgroundColor());
-			roomNameFG = ColorUtil.warlockColorToRGB(roomNamePreset.getForegroundColor());
-			roomNameFont = mainFont;
-			
-			Preset speechPreset = client.getServerSettings().getPreset(Preset.PRESET_SPEECH);
-			speechBG = ColorUtil.warlockColorToRGB(speechPreset.getBackgroundColor());
-			speechFG = ColorUtil.warlockColorToRGB(speechPreset.getForegroundColor());
-			speechFont = mainFont;
+			this.settings = client.getServerSettings();
 		}
 	}
 	
 	private void initValues ()
 	{
-		if (mainBG != null)
-			mainBGSelector.setColorValue(mainBG);
-		if (mainFG != null)
-			mainFGSelector.setColorValue(mainFG);
-		if (roomNameBG != null)
-			roomNameBGSelector.setColorValue(roomNameBG);
-		if (roomNameFG != null)
-			roomNameFGSelector.setColorValue(roomNameFG);
-		if (speechBG != null)
-			speechBGSelector.setColorValue(speechBG);
-		if (speechFG != null)
-			speechFGSelector.setColorValue(speechFG);
+		if (settings != null)
+		{
+			mainWindow = settings.getWindowSettings(ServerSettings.WINDOW_MAIN);
+			
+			for (Preset preset : settings.getPresets())
+			{
+				presets.put(preset.getName(), new Preset(preset));
+			}
+			
+			mainBGSelector.setColorValue(
+				ColorUtil.warlockColorToRGB(settings.getColorSetting(IWarlockSkin.ColorType.MainWindow_Background)));
+			
+			mainFGSelector.setColorValue(
+				ColorUtil.warlockColorToRGB(settings.getColorSetting(IWarlockSkin.ColorType.MainWindow_Foreground)));
+			
+			mainFontSelector.setFontData(
+				new FontData(
+					settings.getFontFaceSetting(IWarlockSkin.FontFaceType.MainWindow_FontFace),
+					settings.getFontSizeSetting(IWarlockSkin.FontSizeType.MainWindow_FontSize),
+					0));
+			
+			presetsTable.setInput(presets.values());
+		}
 	}
 	
 	private void initPreview ()
 	{
 		preview.setText(previewText);
+		
 		roomNameStyleRange = new StyleRange();
 		speechStyleRange = new StyleRange();
-
+		boldStyleRange = new StyleRange();
+		commandStyleRange = new StyleRange();
+		whisperStyleRange = new StyleRange();
+		
 		roomNameStyleRange.start = 0;
 		roomNameStyleRange.length = roomNamePreview.length();
-		speechStyleRange.start = previewText.length() - speechPreview.length();
+		
+		speechStyleRange.start = previewText.indexOf(speechPreview);
 		speechStyleRange.length = 7;
+		
+		boldStyleRange.start = previewText.indexOf(boldPreview) + 15;
+		boldStyleRange.length = 9;
+		
+		commandStyleRange.start = previewText.indexOf(commandPreview);
+		commandStyleRange.length = commandPreview.length();
+		
+		whisperStyleRange.start = previewText.indexOf(whisperPreview);
+		whisperStyleRange.length = 16;
+		
+		thoughtStyleRange.start = previewText.indexOf(thoughtPreview);
+		thoughtStyleRange.length = thoughtPreview.length();
 		
 		updatePreview();
 	}
@@ -214,37 +310,41 @@ public class PresetsPreferencePage extends PropertyPage implements
 		return selector.getColorValue() == null ? mainBGSelector.getColorValue() : selector.getColorValue();
 	}
 	
+	private void updatePresetColors (String presetName, StyleRange styleRange)
+	{
+		styleRange.background = ColorUtil.warlockColorToColor(presets.get(presetName).getBackgroundColor());
+		styleRange.foreground = ColorUtil.warlockColorToColor(presets.get(presetName).getForegroundColor());
+	}
+	
 	private void updatePreview ()
 	{
 		preview.setBackground(new Color(getShell().getDisplay(), getColor(mainBGSelector)));
 		preview.setForeground(new Color(getShell().getDisplay(), mainFGSelector.getColorValue()));
+		preview.setFont(mainFontSelector.getFont());
 		
-		roomNameStyleRange.background = new Color(getShell().getDisplay(), getColor(roomNameBGSelector));
-		roomNameStyleRange.foreground = new Color(getShell().getDisplay(), getColor(roomNameFGSelector));
-		roomNameStyleRange.font = roomNameFontSelector.getFont();
+		updatePresetColors(Preset.PRESET_ROOM_NAME, roomNameStyleRange);
+		updatePresetColors(Preset.PRESET_BOLD, boldStyleRange);
+		updatePresetColors(Preset.PRESET_COMMAND, commandStyleRange);
+		updatePresetColors(Preset.PRESET_SPEECH, speechStyleRange);
+		updatePresetColors(Preset.PRESET_WHISPER, whisperStyleRange);
+		updatePresetColors(Preset.PRESET_THOUGHT, thoughtStyleRange);
 		
-		speechStyleRange.background = new Color(getShell().getDisplay(), getColor(speechBGSelector));
-		speechStyleRange.foreground = new Color(getShell().getDisplay(), getColor(speechFGSelector));
-		speechStyleRange.font = speechFontSelector.getFont();
+		roomNameStyleRange.background = ColorUtil.warlockColorToColor(presets.get(Preset.PRESET_ROOM_NAME).getBackgroundColor());
+		roomNameStyleRange.foreground = ColorUtil.warlockColorToColor(presets.get(Preset.PRESET_ROOM_NAME).getForegroundColor());
 		
-		preview.setStyleRanges(new StyleRange[] { roomNameStyleRange, speechStyleRange });
+		preview.setStyleRanges(new StyleRange[] { roomNameStyleRange, speechStyleRange, boldStyleRange, commandStyleRange, whisperStyleRange });
 		preview.update();
 	}
 	
 	@Override
 	public boolean performOk() {
-		setStyleFont(SavedStyles.STYLE_MAIN_WINDOW, mainFontSelector.getFont());
-		setStyleFont(SavedStyles.STYLE_ROOM_NAME, roomNameFontSelector.getFont());
-		setStyleFont(SavedStyles.STYLE_SPEECH, speechFontSelector.getFont());
 		
-		setStyleColor(SavedStyles.STYLE_MAIN_WINDOW, ColorType.BACKGROUND, mainBGSelector.getColorValue());
-		setStyleColor(SavedStyles.STYLE_MAIN_WINDOW, ColorType.FOREGROUND, mainFGSelector.getColorValue());
-		setStyleColor(SavedStyles.STYLE_ROOM_NAME, ColorType.BACKGROUND, roomNameBGSelector.getColorValue());
-		setStyleColor(SavedStyles.STYLE_ROOM_NAME, ColorType.FOREGROUND, roomNameFGSelector.getColorValue());
-		setStyleColor(SavedStyles.STYLE_SPEECH, ColorType.BACKGROUND, speechBGSelector.getColorValue());
-		setStyleColor(SavedStyles.STYLE_SPEECH, ColorType.FOREGROUND, speechFGSelector.getColorValue());
-		SavedStyles.save();
+		for (Preset preset : presets.values())
+		{
+			settings.updatePreset(preset);
+		}
 		
+		settings.savePresets();
 		return true;
 	}
 }
