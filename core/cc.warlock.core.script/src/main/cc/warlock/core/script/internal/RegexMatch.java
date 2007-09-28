@@ -26,13 +26,13 @@ public class RegexMatch extends Match {
 	public boolean matches(String text) {
 		Matcher m = regex.matcher(text);
 		if(m.find()) {
-			System.out.println("matched text: \"" + text + "\" with \"" + matchText + "\"");
+			// System.out.println("matched text: \"" + text + "\" with \"" + matchText + "\"");
 
 			// TODO should set some variables for the groups here
 			
 			return true;
 		} else {
-			System.out.println("Didn't match text: \"" + text + "\" with \"" + matchText + "\"");
+			// System.out.println("Didn't match text: \"" + text + "\" with \"" + matchText + "\"");
 			return false;
 		}
 	}

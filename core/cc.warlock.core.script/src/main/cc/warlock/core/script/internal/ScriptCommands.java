@@ -70,36 +70,38 @@ public class ScriptCommands implements IScriptCommands, IStreamListener
 		textWaiters.add(queue);
 		String text = null;
 
-		// run until we get a match or are told to stop
-		matchWaitLoop: while(true) {
-			System.out.println("Waiting for text");
-			// wait for some text
-			while(text == null) {
-				try {
-					text = queue.poll(100L, TimeUnit.MILLISECONDS);
-				} catch(Exception e) {
-					e.printStackTrace();
+		try {
+			// run until we get a match or are told to stop
+			matchWaitLoop: while(true) {
+				System.out.println("Waiting for text");
+				// wait for some text
+				while(text == null) {
+					try {
+						text = queue.poll(100L, TimeUnit.MILLISECONDS);
+					} catch(Exception e) {
+						e.printStackTrace();
+					}
+					if(stopped)
+						break matchWaitLoop;
 				}
-				if(stopped)
-					break matchWaitLoop;
-			}
-			System.out.println("Got text: " + text);
-			String[] lines = text.split("\\n");
-			for(String line : lines) {
-				// try all of our matches
-				for(Match match : matches) {
-					// System.out.println("Trying a match");
-					if(match.matches(line)) {
-						// System.out.println("matched a line");
-						return match;
+				System.out.println("Got text: " + text);
+				String[] lines = text.split("\\n");
+				for(String line : lines) {
+					// try all of our matches
+					for(Match match : matches) {
+						// System.out.println("Trying a match");
+						if(match.matches(line)) {
+							// System.out.println("matched a line");
+							return match;
+						}
 					}
 				}
+				text = null;
 			}
-			text = null;
+		} finally {
+			System.out.println("Done with matchwait");
+			textWaiters.remove(queue);
 		}
-
-		System.out.println("Done with matchwait");
-		textWaiters.remove(queue);
 
 		return null;
 	}
