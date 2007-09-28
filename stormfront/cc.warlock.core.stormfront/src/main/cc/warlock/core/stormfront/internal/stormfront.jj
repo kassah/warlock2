@@ -74,27 +74,24 @@ void EndTag(): {Token name;}
 	<TAG_END_OPEN> name=<GENERIC_ID> <TAG_CLOSE> { endElement(name.image); }
 }
 
-String Entity(): { }
+String Entity(): { Token entity; }
 {
-	( <ENTITY_GT>	{ return ">"; }
-	| <ENTITY_LT>	{ return "<"; }
-	| <ENTITY_APOS> { return "'"; }
-	| <ENTITY_AMP> { return "&"; }
-	| <ENTITY_169> { return "�"; }
-	| <ENTITY_QUOT> { return "\""; }
-	)
+	entity=<ENTITY>	{
+		if(entity.image.equals("gt")) return ">";
+		if(entity.image.equals("lt")) return "<";
+		if(entity.image.equals("apos")) return "'";
+		if(entity.image.equals("quot")) return "\"";
+		if(entity.image.equals("amp")) return "&";
+		if(entity.image.startsWith("#")) return "?";
+		return "?";
+	}
 }
 
 TOKEN: {
 	<TAG_START_OPEN: "<"> : IN_TAG_MODE |
 	<TAG_END_OPEN: "</"> : IN_TAG_MODE |
 	
-	<ENTITY_GT: "&gt;"> |
-	<ENTITY_LT: "&lt;"> |
-	<ENTITY_APOS: "&apos;"> |
-	<ENTITY_AMP: "&amp;"> |
-	<ENTITY_169: "&#169;"> |
-	<ENTITY_QUOT: "&quot;"> |
+	<ENTITY: "&" ("#")? (<LETTER> | <DIGIT>)+ ";"> { matchedToken.image = matchedToken.image.substring(1, matchedToken.image.length() - 1); } |
 	<PCDATA: (~["<","\r","\n","&"])+ | "&" | (["\r","\n"])+> |
 	 <NAMECHAR: (<LETTER> | <DIGIT> | "." | "-" | "_" | ":")> |
 	 <DIGIT: (["0"-"9"])> |
@@ -107,7 +104,7 @@ TOKEN: {
 	
 		
 	<ATTR_EQ: "="> |
-	<ATTR_VALUE: ( "\"" (~["\""])* ("\"" (~["\"", "=", ">"])*)* "\"" | "'" (~["'"])* ("'" (~["'", "=", ">"])*)* "'")> { matchedToken.image = matchedToken.image.substring(1, matchedToken.image.length() - 1); }|
+	<ATTR_VALUE: ( "\"" (~["\""])* ("\"" (~["\"", "=", ">"])*)* "\"" | "'" (~["'"])* ("'" (~["'", "=", ">"])*)* "'")> { matchedToken.image = matchedToken.image.substring(1, matchedToken.image.length() - 1); } |
 	
 	<GENERIC_ID: (<LETTER> | "_" | ":" ) (<NAMECHAR>)*> 
 }
