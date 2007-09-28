@@ -5,7 +5,7 @@ import java.io.FileOutputStream;
 import java.util.Map;
 
 import cc.warlock.core.client.IWarlockClientViewer;
-import cc.warlock.core.configuration.WarlockConfiguration;
+import cc.warlock.core.configuration.ConfigurationUtil;
 import cc.warlock.core.stormfront.IStormFrontProtocolHandler;
 import cc.warlock.core.stormfront.client.IStormFrontClientViewer;
 
@@ -81,7 +81,7 @@ public class SettingsTagHandler extends DefaultTagHandler {
 			buffer = buffer.replace(index, index+settings.length(), "<settings crc=\"" + infoTagHandler.getCRC() + "\">");
 			
 			String playerId = handler.getClient().getPlayerId().get();
-			File serverSettings = WarlockConfiguration.getConfigurationFile("serverSettings_" + playerId + ".xml");
+			File serverSettings = ConfigurationUtil.getConfigurationFile("serverSettings_" + playerId + ".xml");
 			
 			try {
 	

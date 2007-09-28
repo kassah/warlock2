@@ -3,7 +3,7 @@ package cc.warlock.core.stormfront.internal;
 import java.io.File;
 import java.util.Map;
 
-import cc.warlock.core.configuration.WarlockConfiguration;
+import cc.warlock.core.configuration.ConfigurationUtil;
 import cc.warlock.core.stormfront.IStormFrontProtocolHandler;
 import cc.warlock.core.stormfront.serversettings.server.ServerSettings;
 
@@ -41,7 +41,7 @@ public class SettingsInfoTagHandler extends DefaultTagHandler {
 	public void handleEnd() {
 		String playerId = handler.getClient().getPlayerId().get();
 		
-		File serverSettings = WarlockConfiguration.getConfigurationFile("serverSettings_" + playerId + ".xml", false);
+		File serverSettings = ConfigurationUtil.getConfigurationFile("serverSettings_" + playerId + ".xml", false);
 		if (!serverSettings.exists())
 		{
 			handler.getClient().send("<sendSettings/>");
