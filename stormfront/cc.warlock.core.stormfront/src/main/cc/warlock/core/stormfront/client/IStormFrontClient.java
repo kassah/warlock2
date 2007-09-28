@@ -30,6 +30,8 @@ public interface IStormFrontClient extends IWarlockClient {
 	
 	public static final String THOUGHTS_STREAM_NAME = "thoughts";
 	
+	public static final String ROOM_STREAM_NAME = "room";
+	
 	/**
 	 * The server settings for this client
 	 * @return
@@ -133,9 +135,28 @@ public interface IStormFrontClient extends IWarlockClient {
 	 */
 	public IStormFrontSkin getStormFrontSkin();
 	
+	/**
+	 * @return The stream for thoughts
+	 */
 	public IStream getThoughtsStream();
 	
+	/**
+	 * @return The stream for deaths
+	 */
 	public IStream getDeathsStream();
 	
+	/**
+	 * @return The stream for inventory
+	 */
 	public IStream getInventoryStream();
+	
+	/**
+	 * @return The stream for room description/exits/etc.
+	 */
+	public IStream getRoomStream();
+	
+	/**
+	 * @return The description of the current room
+	 */
+	public IProperty<String> getRoomDescription();
 }

@@ -53,7 +53,7 @@ public class StormFrontClient extends WarlockClient implements IStormFrontClient
 	protected StringBuffer buffer = new StringBuffer();
 	protected IStormFrontProtocolHandler handler;
 	protected boolean isBold;
-	protected ClientProperty<String> playerId, characterName;
+	protected ClientProperty<String> playerId, characterName, roomDescription;
 	protected IWarlockStyle currentStyle = WarlockStyle.EMPTY_STYLE;
 	protected ServerSettings serverSettings;
 	protected RoundtimeRunnable rtRunnable;
@@ -76,6 +76,7 @@ public class StormFrontClient extends WarlockClient implements IStormFrontClient
 		spirit = new ClientProperty<Integer>(this, "spirit", 0);
 		playerId = new ClientProperty<String>(this, "playerId", null);
 		characterName = new ClientProperty<String>(this, "characterName", null);
+		roomDescription = new ClientProperty<String>(this, "roomDescription", null);
 		serverSettings = new ServerSettings(this);
 		skin = new DefaultSkin(serverSettings);
 		rtRunnable = new RoundtimeRunnable();
@@ -87,7 +88,7 @@ public class StormFrontClient extends WarlockClient implements IStormFrontClient
 	
 	@Override
 	protected Collection<IStream> getStreamsToBuffer() {
-		return Arrays.asList(new IStream[] { getThoughtsStream(), getInventoryStream(), getDeathsStream() });
+		return Arrays.asList(new IStream[] { getThoughtsStream(), getInventoryStream(), getDeathsStream(), getRoomStream()});
 	}
 	
 	@Override
@@ -305,6 +306,14 @@ public class StormFrontClient extends WarlockClient implements IStormFrontClient
 	
 	public IStream getDeathsStream() {
 		return getStream(DEATH_STREAM_NAME);
+	}
+	
+	public IStream getRoomStream() {
+		return getStream(ROOM_STREAM_NAME);
+	}
+
+	public IProperty<String> getRoomDescription() {
+		return roomDescription;
 	}
 	
 	@Override

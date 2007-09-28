@@ -11,6 +11,10 @@ public abstract class ServerSetting {
 	public static final String ADD_PREFIX = "<<a>";
 	public static final String ADD_SUFFIX = "</<a>";
 	
+	/// what the hell does R stand for?
+	public static final String R_PREFIX = "<<r>";
+	public static final String R_SUFFIX = "</<r>";
+	
 	protected Element element;
 	protected ServerSettings serverSettings;
 	
