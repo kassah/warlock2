@@ -14,7 +14,7 @@ import java.util.concurrent.locks.ReentrantLock;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-import org.antlr.runtime.ANTLRStringStream;
+import org.antlr.runtime.ANTLRReaderStream;
 import org.antlr.runtime.CharStream;
 import org.antlr.runtime.CommonTokenStream;
 import org.antlr.runtime.RecognitionException;
@@ -32,7 +32,6 @@ import cc.warlock.core.stormfront.script.internal.StormFrontScriptCommands;
 
 public class WSLScript extends AbstractScript {
 	
-	protected String script;
 	protected boolean running, stopped;
 	protected HashMap<String, WSLScriptLine> labels = new HashMap<String, WSLScriptLine>();
 	protected WSLScriptLine nextLine;
@@ -57,7 +56,6 @@ public class WSLScript extends AbstractScript {
 	private static final String argSeparator = "\\s+";
 	
 	public WSLScript (WSLEngine engine, IScriptInfo info, IStormFrontClient client)
-		throws IOException
 	{
 		super(info);
 		this.engine = engine;
@@ -91,21 +89,6 @@ public class WSLScript extends AbstractScript {
 		addCommand("nextroom", new WSLNextRoom());
 		addCommand("exit", new WSLExit());
 		
-		StringBuffer script = new StringBuffer();
-		
-		Reader scriptReader = info.openReader();
-		char[] bytes = new char[1024];
-		int size = 0;
-		
-		while (size != -1)
-		{	
-			size = scriptReader.read(bytes);
-			if (size != -1)
-				script.append(bytes, 0, size);
-		}
-		scriptReader.close();
-		
-		this.script = script.toString();
 	}
 
 	public Map<String, String> getVariables() {
@@ -158,16 +141,22 @@ public class WSLScript extends AbstractScript {
 	
 	protected void doStart ()
 	{
-		CharStream input = new ANTLRStringStream(script + "\n");
-		WSLLexer lex = new WSLLexer(input);
-		CommonTokenStream tokens = new CommonTokenStream(lex);
-		WSLParser parser = new WSLParser(tokens);
-		
-		parser.setScript(this);
-		
 		try {
+			Reader scriptReader = info.openReader();
+			
+			CharStream input = new ANTLRReaderStream(scriptReader);
+			WSLLexer lex = new WSLLexer(input);
+			CommonTokenStream tokens = new CommonTokenStream(lex);
+			WSLParser parser = new WSLParser(tokens);
+
+			parser.setScript(this);
+
 			parser.script();
+		} catch(IOException e) {
+			e.printStackTrace();
+			return;
 		} catch (RecognitionException e) {
+			e.printStackTrace();
 			// TODO handle the exception
 		}
 

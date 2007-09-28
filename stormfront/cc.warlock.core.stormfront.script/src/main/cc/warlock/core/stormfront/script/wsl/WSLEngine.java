@@ -55,18 +55,13 @@ public class WSLEngine implements IScriptEngine, IScriptListener {
 	}
 	
 	public IScript startScript(IScriptInfo info, IWarlockClient client, String[] arguments) {
-		try {
-			WSLScript wslScript = new WSLScript(this, info, (IStormFrontClient)client);
 
-			runningScripts.add(wslScript);
-			wslScript.addScriptListener(this);
-			wslScript.start(Arrays.asList(arguments));
-			return wslScript;
-		} catch (IOException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-			return null;
-		}
+		WSLScript wslScript = new WSLScript(this, info, (IStormFrontClient)client);
+
+		runningScripts.add(wslScript);
+		wslScript.addScriptListener(this);
+		wslScript.start(Arrays.asList(arguments));
+		return wslScript;
 	}
 	
 	public void scriptResumed(IScript script) { }
