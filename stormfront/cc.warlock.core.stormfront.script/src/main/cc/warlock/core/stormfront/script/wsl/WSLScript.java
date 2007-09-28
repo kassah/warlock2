@@ -75,9 +75,7 @@ public class WSLScript extends AbstractScript {
 		addCommand("deletevariable", new WSLDeleteVariable());
 		addCommand("setvariable", new WSLSetVariable());
 		addCommand("goto", new WSLGoto());
-		WSLCall call = new WSLCall();
-		addCommand("call", call);
-		addCommand("gosub", call);
+		addCommand("gosub", new WSLGosub());
 		addCommand("random", new WSLRandom());
 		addCommand("return", new WSLReturn());
 		addCommand("matchwait", new WSLMatchWait());
@@ -418,7 +416,7 @@ public class WSLScript extends AbstractScript {
 		}
 	}
 	
-	protected void callLabel (String label, String arguments)
+	protected void gosub (String label, String arguments)
 	{
 		String[] args = arguments.split(argSeparator);
 		
@@ -432,7 +430,7 @@ public class WSLScript extends AbstractScript {
 		gotoLabel(label);
 	}
 	
-	protected class WSLCall extends WSLCommand {
+	protected class WSLGosub extends WSLCommand {
 		
 		private Pattern format = Pattern.compile("^([\\w_]+)\\s*(.*)?$");
 		
@@ -442,7 +440,7 @@ public class WSLScript extends AbstractScript {
 			if (m.find())
 			{
 				System.out.println("calling label " + m.group(1));
-				callLabel(m.group(1), m.group(2));
+				gosub(m.group(1), m.group(2));
 			} else {
 				System.out.println("label not found");
 				/*throw error*/ 

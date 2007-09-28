@@ -231,17 +231,17 @@ THEN
 	: { state == State.condition }?=> ('t' | 'T') ('h' | 'H') ('e' | 'E') ('n' | 'N') { state = State.base; }
 	;
 STRING
-	: { state == State.command }?=> (~('%'|'\n'|'\r'))+
+	: { state == State.command }?=> (~('%'|'$'|'\n'|'\r'))+
 	| { state == State.base }?=> NORMAL_STRING (~(':'))=>
 		{
 			if(state == State.base) state = State.command;
 		}
-	| '%' (~(NORMAL_CHAR))=>
+	| ('%'|'$') (~(NORMAL_CHAR))=>
 		{
 			if(state == State.base) state = State.command;
 		}
-	| { state == State.nqq_string }?=> (~('"'|'%'|'\n'|'\r'))+
-	| { state == State.nq_string }?=> (~('\''|'%'|'\n'|'\r'))+
+	| { state == State.nqq_string }?=> (~('"'|'%'|'$'|'\n'|'\r'))+
+	| { state == State.nq_string }?=> (~('\''|'%'|'$'|'\n'|'\r'))+
 	;
 QUOTE
 	: { state == State.condition }?=> '"'	{ state = State.nqq_string; channel = HIDDEN; }

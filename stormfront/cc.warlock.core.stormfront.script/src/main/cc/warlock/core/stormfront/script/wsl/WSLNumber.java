@@ -22,8 +22,9 @@ public class WSLNumber implements IWSLValue {
 	}
 
 	public String toString() {
-		if(Math.floor(value) == value) return Long.toString((long)value);
-		return Double.toString(toDouble());
+		double v = toDouble();
+		if(Math.floor(v) == v) return Long.toString((long)v);
+		return Double.toString(v);
 	}
 
 	public Type getType() {
