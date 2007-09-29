@@ -34,7 +34,7 @@ public class ScriptCommands implements IScriptCommands, IStreamListener
 	protected int promptWaiters = 0;
 	protected boolean gotPrompt = false;
 	
-	protected boolean stopped = false;
+	protected boolean interrupted = false;
 	
 	protected Thread pausedThread;
 	
@@ -81,7 +81,7 @@ public class ScriptCommands implements IScriptCommands, IStreamListener
 					} catch(Exception e) {
 						e.printStackTrace();
 					}
-					if(stopped)
+					if(interrupted)
 						break matchWaitLoop;
 				}
 				System.out.println("Got text: " + text);
@@ -116,7 +116,7 @@ public class ScriptCommands implements IScriptCommands, IStreamListener
 		lock.lock();
 		try {
 			roomWaiting = true;
-			while (!stopped && roomWaiting) {
+			while (!interrupted && roomWaiting) {
 				nextRoom.await();
 			}
 		} catch(Exception e) {
@@ -172,7 +172,7 @@ public class ScriptCommands implements IScriptCommands, IStreamListener
 					} catch(Exception e) {
 						e.printStackTrace();
 					}
-					if(stopped)
+					if(interrupted)
 						break waitForLoop;
 				}
 				if(match.matches(text)) {
@@ -189,7 +189,7 @@ public class ScriptCommands implements IScriptCommands, IStreamListener
 		lock.lock();
 		try {
 			promptWaiters++;
-			while(!stopped && !gotPrompt) {
+			while(!interrupted && !gotPrompt) {
 				gotPromptCond.await();
 			}
 		} catch(Exception e) {
@@ -253,10 +253,15 @@ public class ScriptCommands implements IScriptCommands, IStreamListener
 
 	
 	public void stop() {
+		interrupt();
+
+		client.getDefaultStream().removeStreamListener(this);
+	}
+	
+	public void interrupt() {
 		lock.lock();
-		stopped = true;
 		try {
-			// gotTextCond.signalAll(); perhaps signal everyone here?
+			interrupted = true;
 			gotPromptCond.signalAll();
 			nextRoom.signalAll();
 			if(pausedThread != null)
@@ -265,7 +270,10 @@ public class ScriptCommands implements IScriptCommands, IStreamListener
 			e.printStackTrace();
 		} finally {
 			lock.unlock();
-			client.getDefaultStream().removeStreamListener(this);
 		}
+	}
+	
+	public void clearInterrupt() {
+		interrupted = false;
 	}
 }

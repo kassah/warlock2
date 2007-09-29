@@ -118,6 +118,7 @@ public class WSLScript extends AbstractScript {
 				}
 				
 				curLine = nextLine;
+				commands.clearInterrupt();
 			}
 			
 			if(!stopped)
@@ -395,6 +396,11 @@ public class WSLScript extends AbstractScript {
 			if (command != null)
 			{
 				curLine = nextLine = command;
+				
+				// if we're in an action, interrupt execution on the main thread
+				if(Thread.currentThread() != scriptThread) {
+					commands.interrupt();
+				}
 			}
 			else { // TODO: Fix gotoLabel to throw an exception instead of outputting to user
 				commands.echo ("***********");

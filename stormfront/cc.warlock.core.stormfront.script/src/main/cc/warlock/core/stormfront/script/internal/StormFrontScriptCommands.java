@@ -39,10 +39,10 @@ public class StormFrontScriptCommands extends ScriptCommands implements IStormFr
 	protected boolean waitingForRoundtime;
 	public void waitForRoundtime ()
 	{
-		if(!stopped) {
+		if(!interrupted) {
 			assertPrompt();
 			try {
-				while(sfClient.getRoundtime().get() > 0 && !stopped) {
+				while(sfClient.getRoundtime().get() > 0 && !interrupted) {
 					Thread.sleep((sfClient.getRoundtime().get() + 1) * 1000);
 				}
 			} catch(Exception e) {
@@ -109,7 +109,7 @@ public class StormFrontScriptCommands extends ScriptCommands implements IStormFr
 				while(text == null) {
 					try {
 						text = queue.poll(100L, TimeUnit.MILLISECONDS);
-						if(actions == null || stopped) {
+						if(actions == null || interrupted) {
 							break actionLoop;
 						}
 					} catch(Exception e) {

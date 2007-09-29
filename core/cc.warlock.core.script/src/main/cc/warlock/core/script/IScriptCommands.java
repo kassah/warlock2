@@ -30,4 +30,8 @@ public interface IScriptCommands {
 	public void movedToRoom();
 	
 	public void stop();
+	
+	public void interrupt();
+	
+	public void clearInterrupt();
 }
