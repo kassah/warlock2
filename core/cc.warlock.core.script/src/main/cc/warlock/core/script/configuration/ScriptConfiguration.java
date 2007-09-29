@@ -20,6 +20,7 @@ public class ScriptConfiguration implements IConfigurationProvider {
 	protected ArrayList<File> scriptDirectories = new ArrayList<File>();
 	protected Property<Boolean> autoScan;
 	protected Property<Long> scanTimeout;
+	protected String scriptPrefix;
 	
 	protected HashMap<String, ArrayList<String>> engineExtensions = new HashMap<String, ArrayList<String>>();
 	
@@ -36,6 +37,7 @@ public class ScriptConfiguration implements IConfigurationProvider {
 	{
 		autoScan = new Property<Boolean>("autoScan", true);
 		scanTimeout = new Property<Long>("scanTimeout", (long)500);
+		scriptPrefix = ".";
 		
 		addEngineExtension(JavascriptEngine.ENGINE_ID, "js");
 		
@@ -50,6 +52,7 @@ public class ScriptConfiguration implements IConfigurationProvider {
 		autoScan.set(true);
 		scanTimeout.set((long)500);
 		engineExtensions.clear();
+		scriptPrefix = ".";
 	}
 	
 	public List<Element> getTopLevelElements() {
@@ -77,6 +80,10 @@ public class ScriptConfiguration implements IConfigurationProvider {
 		autoScanElement.addAttribute("timeout", ""+scanTimeout.get());
 		autoScanElement.setText(autoScan.get()+"");
 		scriptConfig.add(autoScanElement);
+		
+		Element scriptPrefixElement = DocumentHelper.createElement("script-prefix");
+		scriptPrefixElement.setText(scriptPrefix);
+		scriptConfig.add(scriptPrefixElement);
 		
 		addEngineExtensionsConfig(scriptConfig);
 	}
@@ -136,6 +143,10 @@ public class ScriptConfiguration implements IConfigurationProvider {
 				scanTimeout.set(Long.parseLong(element.attributeValue("timeout")));
 				autoScan.set(Boolean.parseBoolean(element.getTextTrim()));
 			}
+			else if ("script-prefix".equals(element.getName()))
+			{
+				scriptPrefix = element.getTextTrim();
+			}
 			else if ("engine-file-extensions".equals(element.getName()))
 			{
 				for (Element extElement : (List<Element>)element.elements())
@@ -170,5 +181,13 @@ public class ScriptConfiguration implements IConfigurationProvider {
 	public List<File> getScriptDirectories ()
 	{
 		return scriptDirectories;
+	}
+
+	public String getScriptPrefix() {
+		return scriptPrefix;
+	}
+
+	public void setScriptPrefix(String scriptPrefix) {
+		this.scriptPrefix = scriptPrefix;
 	}
 }
