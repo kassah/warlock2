@@ -9,6 +9,7 @@ Require-Bundle: org.eclipse.core.runtime,
 Eclipse-LazyStart: true
 Export-Package: .,
  cc.warlock.core.script,
+ cc.warlock.core.script.configuration,
  cc.warlock.core.script.internal,
  cc.warlock.core.script.javascript,
  org.mozilla.classfile,
@@ -29,7 +30,9 @@ Export-Package: .,
  org.mozilla.javascript.tools.jsc,
  org.mozilla.javascript.tools.resources,
  org.mozilla.javascript.tools.shell,
- org.mozilla.javascript.xml
+ org.mozilla.javascript.xml,
+ org.mozilla.javascript.xml.impl.xmlbeans,
+ org.mozilla.javascript.xmlimpl
 Bundle-ClassPath: lib/js.jar,
  warlock2-script-core.jar,
  warlock2-script-core-eclipse.jar
