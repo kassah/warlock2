@@ -2,6 +2,7 @@ package cc.warlock.core.script.configuration;
 
 import java.io.File;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -88,7 +89,7 @@ public class ScriptConfiguration implements IConfigurationProvider {
 		addEngineExtensionsConfig(scriptConfig);
 	}
 	
-	protected void addEngineExtension (String engineId, String extension)
+	public void addEngineExtension (String engineId, String extension)
 	{
 		ArrayList<String> extensions;
 		if (engineExtensions.containsKey(engineId))
@@ -175,7 +176,9 @@ public class ScriptConfiguration implements IConfigurationProvider {
 
 	public List<String> getEngineExtensions (String engineId)
 	{
-		return engineExtensions.get(engineId);
+		if (engineExtensions.containsKey(engineId))
+			return engineExtensions.get(engineId);
+		return Collections.emptyList();
 	}
 	
 	public List<File> getScriptDirectories ()
