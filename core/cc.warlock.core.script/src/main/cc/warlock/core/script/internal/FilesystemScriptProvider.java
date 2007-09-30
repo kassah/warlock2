@@ -28,7 +28,7 @@ public class FilesystemScriptProvider implements IScriptProvider, Runnable {
 	
 	static {
 		ScriptEngineRegistry.addScriptProvider(instance());
-		WarlockConfiguration.instance().addConfigurationProvider(ScriptConfiguration.instance());
+		WarlockConfiguration.getMainConfiguration().addConfigurationProvider(ScriptConfiguration.instance());
 		instance().scan();
 	}
 	
