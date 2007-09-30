@@ -28,18 +28,34 @@ public class WarlockConfiguration {
 	protected ArrayList<Element> unhandledElements = new ArrayList<Element>();
 	protected Hashtable<Element, IConfigurationProvider> elementProviders = new Hashtable<Element, IConfigurationProvider>();
 	
-	protected static WarlockConfiguration _instance;
+	protected static Hashtable<String, WarlockConfiguration> configurations  = new Hashtable<String, WarlockConfiguration>();
 	
-	public static WarlockConfiguration instance()
+	public static WarlockConfiguration getWarlockConfiguration(String configFilename)
 	{
-		if (_instance == null)
-			_instance = new WarlockConfiguration();
-		return _instance;
+		if (!configurations.containsKey(configFilename))
+		{
+			WarlockConfiguration config = new WarlockConfiguration(configFilename);
+			configurations.put(configFilename, config);
+		}
+		return configurations.get(configFilename);
 	}
 	
-	protected WarlockConfiguration ()
+	public static WarlockConfiguration getMainConfiguration ()
 	{
-		configFile = ConfigurationUtil.getConfigurationFile(ConfigurationUtil.MAIN_CONFIGURATION_FILE, true);
+		return getWarlockConfiguration(ConfigurationUtil.MAIN_CONFIGURATION_FILE);
+	}
+	
+	public static void saveAll ()
+	{
+		for (WarlockConfiguration config : configurations.values())
+		{
+			config.save();
+		}
+	}
+	
+	protected WarlockConfiguration (String filename)
+	{
+		configFile = ConfigurationUtil.getConfigurationFile(filename, true);
 		
 		loadXML();
 	}
