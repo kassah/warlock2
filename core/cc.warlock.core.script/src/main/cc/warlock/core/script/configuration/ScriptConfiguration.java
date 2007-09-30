@@ -102,7 +102,9 @@ public class ScriptConfiguration implements IConfigurationProvider {
 			engineExtensions.put(engineId, extensions);
 		}
 		
-		extensions.add(extension);
+		// If we already have the extension, don't add it
+		if(!extensions.contains(extension))
+			extensions.add(extension);
 	}
 	
 	protected void addEngineExtensionsConfig (Element scriptConfig)
@@ -131,7 +133,7 @@ public class ScriptConfiguration implements IConfigurationProvider {
 	
 	public void parseScriptConfig (Element scriptConfig)
 	{
-		clear();
+		// clear();
 		
 		for (Element element : (List<Element>)scriptConfig.elements())
 		{
