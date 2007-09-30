@@ -119,6 +119,7 @@ public class StormFrontScriptCommands extends ScriptCommands implements IStormFr
 				System.out.println("ACTION: matching with \"" + text + "\"");
 				for(Match action : actions) {
 					if(action.matches(text)) {
+						System.out.println("ACTION: matched");
 						String command = (String)action.getAttribute("action");
 						script.execute(command);
 						break;

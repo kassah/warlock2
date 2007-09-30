@@ -113,7 +113,6 @@ public class WSLScript extends AbstractScript {
 				
 				String line = curLine.get();
 				if(line != null) {
-					System.out.print("script line: " + line + "\n");
 					execute(line);
 				}
 				
@@ -198,6 +197,8 @@ public class WSLScript extends AbstractScript {
 	}
 	
 	public void execute(String line) {
+		System.out.print("script line: " + line + "\n");
+		
 		Matcher m = commandPattern.matcher(line);
 		
 		if (!m.find()) {
@@ -379,6 +380,15 @@ public class WSLScript extends AbstractScript {
 		}
 	}
 	
+	protected void gotoLine(WSLScriptLine command) {
+		curLine = nextLine = command;
+		
+		// if we're in an action, interrupt execution on the main thread
+		if(Thread.currentThread() != scriptThread) {
+			commands.interrupt();
+		}
+	}
+	
 	protected void gotoLabel (String label)
 	{
 		// System.out.println("going to label: \"" + label + "\"");
@@ -388,19 +398,14 @@ public class WSLScript extends AbstractScript {
 		if (command != null)
 		{
 			// System.out.println("found label");
-			curLine = nextLine = command;
+			gotoLine(command);
 		}
 		else {
 			// System.out.println("label not found");
 			command = labels.get("labelerror");
 			if (command != null)
 			{
-				curLine = nextLine = command;
-				
-				// if we're in an action, interrupt execution on the main thread
-				if(Thread.currentThread() != scriptThread) {
-					commands.interrupt();
-				}
+				gotoLine(command);
 			}
 			else { // TODO: Fix gotoLabel to throw an exception instead of outputting to user
 				commands.echo ("***********");
