@@ -34,6 +34,7 @@ import cc.warlock.core.client.ICommand;
 import cc.warlock.core.client.IWarlockClient;
 import cc.warlock.core.client.IWarlockClientViewer;
 import cc.warlock.core.client.internal.Command;
+import cc.warlock.rcp.configuration.GameViewConfiguration;
 import cc.warlock.rcp.plugin.Warlock2Plugin;
 import cc.warlock.rcp.ui.WarlockCompass;
 import cc.warlock.rcp.ui.WarlockText;
@@ -143,7 +144,7 @@ public abstract class GameView extends StreamView implements KeyListener, IWarlo
 		this.text = getTextForClient(this.client);
 		book.showPage(this.text.getTextWidget());
 		
-		text.setLineLimit(2000);
+		text.setLineLimit(GameViewConfiguration.instance().getBufferLines());
 		text.setScrollDirection(SWT.DOWN);
 		text.addKeyListener(this);
 		

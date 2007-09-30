@@ -7,9 +7,11 @@ import java.util.Hashtable;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.custom.StyleRange;
 import org.eclipse.swt.graphics.Color;
+import org.eclipse.swt.graphics.Font;
 import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.widgets.Composite;
+import org.eclipse.swt.widgets.Display;
 import org.eclipse.ui.IWorkbenchPage;
 import org.eclipse.ui.PartInitException;
 import org.eclipse.ui.PlatformUI;
@@ -23,6 +25,7 @@ import cc.warlock.core.client.IStyledString;
 import cc.warlock.core.client.IWarlockClient;
 import cc.warlock.core.client.IWarlockStyle;
 import cc.warlock.core.client.PropertyListener;
+import cc.warlock.rcp.configuration.GameViewConfiguration;
 import cc.warlock.rcp.ui.IStyleProvider;
 import cc.warlock.rcp.ui.StyleRangeWithData;
 import cc.warlock.rcp.ui.WarlockText;
@@ -30,6 +33,7 @@ import cc.warlock.rcp.ui.client.SWTPropertyListener;
 import cc.warlock.rcp.ui.client.SWTStreamListener;
 import cc.warlock.rcp.ui.style.DefaultStyleProvider;
 import cc.warlock.rcp.ui.style.StyleProviders;
+import cc.warlock.rcp.util.ColorUtil;
 
 public class StreamView extends ViewPart implements IStreamListener, IGameViewFocusListener {
 	
@@ -125,8 +129,17 @@ public class StreamView extends ViewPart implements IStreamListener, IGameViewFo
 			text.setLayoutData(new GridData(GridData.FILL, GridData.FILL, true, true));
 			text.setEditable(false);
 			text.setWordWrap(true);
-			text.setBackground(new Color(text.getDisplay(), 25, 25, 50));
-			text.setForeground(new Color(text.getDisplay(), 240, 240, 255));
+			
+			Color background = ColorUtil.warlockColorToColor(GameViewConfiguration.instance().getDefaultBackground());
+			Color foreground = ColorUtil.warlockColorToColor(GameViewConfiguration.instance().getDefaultForeground());
+			
+			text.setBackground(background);
+			text.setForeground(foreground);
+			
+			String fontFace = GameViewConfiguration.instance().getDefaultFontFace();
+			int fontSize = GameViewConfiguration.instance().getDefaultFontSize();
+			
+			text.setFont(new Font(Display.getDefault(), fontFace, fontSize, SWT.NORMAL));
 			text.setScrollDirection(SWT.DOWN);
 			
 			clientStreams.put(client, text);

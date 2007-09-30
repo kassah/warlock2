@@ -12,6 +12,8 @@ import org.eclipse.ui.PlatformUI;
 import org.eclipse.ui.application.IWorkbenchWindowConfigurer;
 import org.eclipse.ui.application.WorkbenchAdvisor;
 
+import cc.warlock.core.configuration.WarlockConfiguration;
+
 import com.martiansoftware.jsap.FlaggedOption;
 import com.martiansoftware.jsap.JSAP;
 import com.martiansoftware.jsap.JSAPException;
@@ -91,6 +93,10 @@ public class WarlockApplication extends WorkbenchAdvisor implements IApplication
 		
 		Display display = PlatformUI.createDisplay();
 		int ret = PlatformUI.createAndRunWorkbench(display, this);
+		
+		//save configuration
+		WarlockConfiguration.instance().save();
+		
 		if (ret == PlatformUI.RETURN_RESTART)
 			return EXIT_RESTART;
 		
