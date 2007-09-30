@@ -35,7 +35,7 @@ public class GameViewConfiguration implements IConfigurationProvider {
 		defaultEchoBackground = new WarlockColor(64, 64, 64);
 		defaultEchoForeground = new WarlockColor(255, 255, 255);
 		
-		WarlockConfiguration.instance().addConfigurationProvider(this);
+		WarlockConfiguration.getMainConfiguration().addConfigurationProvider(this);
 	}
 	
 	public List<Element> getTopLevelElements() {

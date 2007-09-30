@@ -95,7 +95,7 @@ public class WarlockApplication extends WorkbenchAdvisor implements IApplication
 		int ret = PlatformUI.createAndRunWorkbench(display, this);
 		
 		//save configuration
-		WarlockConfiguration.instance().save();
+		WarlockConfiguration.saveAll();
 		
 		if (ret == PlatformUI.RETURN_RESTART)
 			return EXIT_RESTART;

@@ -34,7 +34,7 @@ public class LoggingConfiguration implements IConfigurationProvider {
 		enableLogging = true;
 		logDirectory = ConfigurationUtil.getConfigurationDirectory("logs", false);
 		
-		WarlockConfiguration.instance().addConfigurationProvider(this);
+		WarlockConfiguration.getMainConfiguration().addConfigurationProvider(this);
 	}
 	
 	public List<Element> getTopLevelElements() {
