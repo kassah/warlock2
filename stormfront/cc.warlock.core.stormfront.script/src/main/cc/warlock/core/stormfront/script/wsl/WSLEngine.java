@@ -2,8 +2,6 @@ package cc.warlock.core.stormfront.script.wsl;
 
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Collection;
-import java.util.Collections;
 import java.util.List;
 
 import cc.warlock.core.client.IWarlockClient;
@@ -12,6 +10,7 @@ import cc.warlock.core.script.IScriptEngine;
 import cc.warlock.core.script.IScriptFileInfo;
 import cc.warlock.core.script.IScriptInfo;
 import cc.warlock.core.script.IScriptListener;
+import cc.warlock.core.script.configuration.ScriptConfiguration;
 import cc.warlock.core.stormfront.client.IStormFrontClient;
 import cc.warlock.core.stormfront.serversettings.server.IServerScriptInfo;
 
@@ -21,6 +20,17 @@ public class WSLEngine implements IScriptEngine, IScriptListener {
 	public static final String ENGINE_ID = "cc.warlock.script.wsl.WSLEngine";
 	protected ArrayList<IScript> runningScripts = new ArrayList<IScript>();
 	
+	public WSLEngine ()
+	{
+		List<String> fileExtensions = ScriptConfiguration.instance().getEngineExtensions(ENGINE_ID);
+		if (fileExtensions.size() == 0)
+		{
+			ScriptConfiguration.instance().addEngineExtension(ENGINE_ID, "wiz");
+			ScriptConfiguration.instance().addEngineExtension(ENGINE_ID, "cmd");
+			ScriptConfiguration.instance().addEngineExtension(ENGINE_ID, "wsl");
+		}
+	}
+	
 	public String getScriptEngineId() {
 		return ENGINE_ID;
 	}
@@ -29,17 +39,13 @@ public class WSLEngine implements IScriptEngine, IScriptListener {
 		return "Standard Wizard Scripting Language Engine (c) 2002-2007 Warlock Team";
 	}
 	
-	protected static Collection<String> extensions = new ArrayList<String>();
-	static {
-		Collections.addAll(extensions, "wiz", "cmd", "wsl");
-	}
-	
 	public boolean supports(IScriptInfo scriptInfo) {
 		if (scriptInfo instanceof IScriptFileInfo)
 		{
 			IScriptFileInfo info = (IScriptFileInfo) scriptInfo;
 			if (info.getExtension() != null)
 			{
+				List<String> extensions = ScriptConfiguration.instance().getEngineExtensions(ENGINE_ID);
 				if (extensions.contains(info.getExtension().toLowerCase())) {
 					return true;
 				}
