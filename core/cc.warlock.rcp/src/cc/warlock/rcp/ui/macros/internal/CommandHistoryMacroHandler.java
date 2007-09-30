@@ -92,8 +92,8 @@ public class CommandHistoryMacroHandler implements IMacroHandler {
 		String command = viewer.getCurrentCommand().getCommand();
 		if (!command.equals(""))
 		{
-			viewer.getWarlockClient().send(command);
 			viewer.getWarlockClient().getDefaultStream().echo(command);
+			viewer.getWarlockClient().send(command);
 			
 			viewer.setCurrentCommand(new Command("", new Date()));
 		}

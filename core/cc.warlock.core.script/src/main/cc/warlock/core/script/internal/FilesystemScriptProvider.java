@@ -122,16 +122,14 @@ public class FilesystemScriptProvider implements IScriptProvider, Runnable {
 	}
 
 	public IScript startScript(IScriptInfo scriptInfo, IWarlockClient client, String[] arguments) {
-		IScript script = null;
 		for (IScriptEngine engine : ScriptEngineRegistry.getScriptEngines())
 		{
 			if (engine.supports(scriptInfo))
 			{
-				script = engine.startScript(scriptInfo, client, arguments);
-				break;
+				return engine.startScript(scriptInfo, client, arguments);
 			}
 		}
-		return script;
+		return null;
 	}
 	
 	protected void scanDirectory (File directory)

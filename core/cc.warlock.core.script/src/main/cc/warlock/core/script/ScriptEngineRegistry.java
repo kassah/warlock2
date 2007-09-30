@@ -63,13 +63,16 @@ public class ScriptEngineRegistry {
 	{
 		for (IScriptProvider provider : providers)
 		{
-			for (IScriptInfo script : provider.getScriptInfos())
+			for (IScriptInfo scriptInfo : provider.getScriptInfos())
 			{
-				if (script.getScriptName().equals(scriptName)) {
-					return provider.startScript(script, client, arguments);
+				if (scriptInfo.getScriptName().equals(scriptName)) {
+					IScript script = provider.startScript(scriptInfo, client, arguments);
+					if(script != null)
+						return script;
 				}
 			}
 		}
+		client.getDefaultStream().echo("Could not find script \"" + scriptName + "\"");
 		return null;
 	}
 	
