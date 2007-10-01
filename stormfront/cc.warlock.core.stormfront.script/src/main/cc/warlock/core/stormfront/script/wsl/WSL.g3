@@ -25,7 +25,7 @@ grammar WSL;
 }
 
 script
-	: (line)* EOF { script.stopScript(); }
+	: line (EOL line)* EOF { script.stopScript(); }
 	;
 
 line
@@ -34,7 +34,7 @@ line
 			script.addLine(l); 
 			System.out.print("added line " + Integer.toString(lineNum) + "\n");
 		}
-		)? EOL { lineNum++; }
+		)? { lineNum++; }
 	;
 
 expr returns [WSLScriptLine line]
