@@ -283,6 +283,7 @@ public class PresetsPreferencePage extends PropertyPage implements
 		boldStyleRange = new StyleRange();
 		commandStyleRange = new StyleRange();
 		whisperStyleRange = new StyleRange();
+		thoughtStyleRange = new StyleRange();
 		
 		roomNameStyleRange.start = 0;
 		roomNameStyleRange.length = roomNamePreview.length();
@@ -332,7 +333,7 @@ public class PresetsPreferencePage extends PropertyPage implements
 		roomNameStyleRange.background = ColorUtil.warlockColorToColor(presets.get(Preset.PRESET_ROOM_NAME).getBackgroundColor());
 		roomNameStyleRange.foreground = ColorUtil.warlockColorToColor(presets.get(Preset.PRESET_ROOM_NAME).getForegroundColor());
 		
-		preview.setStyleRanges(new StyleRange[] { roomNameStyleRange, speechStyleRange, boldStyleRange, commandStyleRange, whisperStyleRange });
+		preview.setStyleRanges(new StyleRange[] { roomNameStyleRange, boldStyleRange, commandStyleRange, speechStyleRange, whisperStyleRange, thoughtStyleRange });
 		preview.update();
 	}
 	
