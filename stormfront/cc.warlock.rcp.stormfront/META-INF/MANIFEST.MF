@@ -10,5 +10,6 @@ Require-Bundle: org.eclipse.ui,
  cc.warlock.core.script,
  cc.warlock.core.stormfront,
  cc.warlock.core.stormfront.script,
- cc.warlock.rcp
+ cc.warlock.rcp,
+ org.eclipse.core.expressions
 Eclipse-LazyStart: true

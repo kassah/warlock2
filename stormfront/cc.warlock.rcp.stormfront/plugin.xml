@@ -95,57 +95,67 @@
    <extension
          point="org.eclipse.ui.propertyPages">
       <page
+            category="cc.warlock.rcp.warlockPrefs"
             class="cc.warlock.rcp.stormfront.ui.prefs.CharacterPreferencesPage"
             id="cc.warlock.rcp.stormfront.ui.prefs.characterPrefs"
             name="Character Preferences">
          <enabledWhen>
-            <adapt
-                  type="cc.warlock.core.stormfront.client.IStormFrontClient">
-            </adapt>
+            <and>
+               <adapt
+                     type="cc.warlock.core.stormfront.client.IStormFrontClient">
+               </adapt>
+               <test
+                     property="cc.warlock.rcp.stormfront.clientConnected">
+               </test>
+            </and>
          </enabledWhen>
       </page>
       <page
             category="cc.warlock.rcp.stormfront.ui.prefs.characterPrefs"
             class="cc.warlock.rcp.stormfront.ui.prefs.PresetsPreferencePage"
-            id="cc.warlock.rcp.stormfront.ui.prefs.lookAndFeel"
-            name="Look and Feel">
+            id="cc.warlock.rcp.stormfront.ui.prefs.presets"
+            name="Colors and Presets">
          <enabledWhen>
-            <adapt
-                  type="cc.warlock.core.stormfront.client.IStormFrontClient">
-            </adapt>
+            <and>
+               <adapt
+                     type="cc.warlock.core.stormfront.client.IStormFrontClient">
+               </adapt>
+               <test
+                     property="cc.warlock.rcp.stormfront.clientConnected">
+               </test>
+            </and>
          </enabledWhen>
       </page>
       <page
             category="cc.warlock.rcp.stormfront.ui.prefs.characterPrefs"
-            class="cc.warlock.rcp.prefs.LookAndFeelPreferencePage"
-            id="cc.warlock.rcp.stormfront.ui.prefs.presets"
-            name="Look and Feel">
-         <enabledWhen>
-            <adapt
-                  type="cc.warlock.core.client.IWarlockClient">
-            </adapt>
-         </enabledWhen>
-      </page>
-      <page
-            category="cc.warlock.rcp.prefs.lookAndFeel"
             class="cc.warlock.rcp.stormfront.ui.prefs.HighlightStringsPreferencePage"
             id="cc.warlock.rcp.stormfront.ui.prefs.highlightStrings"
             name="Highlight Strings">
          <enabledWhen>
-            <adapt
-                  type="cc.warlock.core.stormfront.client.IStormFrontClient">
-            </adapt>
+            <and>
+               <adapt
+                     type="cc.warlock.core.stormfront.client.IStormFrontClient">
+               </adapt>
+               <test
+                     property="cc.warlock.rcp.stormfront.clientConnected">
+               </test>
+            </and>
          </enabledWhen>
       </page>
       <page
-            category="cc.warlock.rcp.prefs.lookAndFeel"
+            category="cc.warlock.rcp.stormfront.ui.prefs.characterPrefs"
             class="cc.warlock.rcp.stormfront.ui.prefs.HighlightNamesPreferencePage"
             id="cc.warlock.rcp.stormfront.ui.prefs.highlightNames"
             name="Highlight Names">
          <enabledWhen>
-            <adapt
-                  type="cc.warlock.core.stormfront.client.IStormFrontClient">
-            </adapt>
+            <and>
+               <adapt
+                     type="cc.warlock.core.stormfront.client.IStormFrontClient">
+               </adapt>
+               <test
+                     property="cc.warlock.rcp.stormfront.clientConnected">
+               </test>
+            </and>
          </enabledWhen>
       </page>
    </extension>
@@ -168,6 +178,16 @@
             id="cc.warlock.stormfrontPerspective"
             name="Stormfront Perspective">
       </perspective>
+   </extension>
+   <extension
+         point="org.eclipse.core.expressions.propertyTesters">
+      <propertyTester
+            class="cc.warlock.rcp.stormfront.StormFrontClientPropertyTester"
+            id="cc.warlock.rcp.stormfront.tester"
+            namespace="cc.warlock.rcp.stormfront"
+            properties="clientConnected,settingsLoaded"
+            type="cc.warlock.rcp.ui.client.WarlockClientAdaptable">
+      </propertyTester>
    </extension>
 
 </plugin>
