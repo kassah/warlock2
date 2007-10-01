@@ -133,5 +133,18 @@
             name="Preferences">
       </command>
    </extension>
+   <extension
+         point="org.eclipse.ui.propertyPages">
+      <page
+            class="cc.warlock.rcp.prefs.ScriptingPreferencePage"
+            id="cc.warlock.rcp.prefs.scriptingPrefs"
+            name="Scripting">
+         <enabledWhen>
+            <adapt
+                  type="cc.warlock.core.client.IWarlockClient">
+            </adapt>
+         </enabledWhen>
+      </page>
+   </extension>
 
 </plugin>
