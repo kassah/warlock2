@@ -138,6 +138,12 @@ public class WarlockConfiguration {
 			}
 		}
 		
+		for (Element unhandled : unhandledElements)
+		{
+			// Make sure to resave unhandled elements, just in case the corresponding handler wasn't instantiated
+			warlockConfig.add(unhandled.createCopy());
+		}
+		
 		try {
 			OutputFormat format = OutputFormat.createPrettyPrint();
 			FileOutputStream stream = new FileOutputStream(configFile);
