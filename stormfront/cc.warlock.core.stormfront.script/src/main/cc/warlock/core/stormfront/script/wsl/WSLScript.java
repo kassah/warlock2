@@ -299,22 +299,27 @@ public class WSLScript extends AbstractScript {
 				else if ("add".equalsIgnoreCase(counterFunction))
 				{	
 					int newValue = value + Integer.parseInt(args[1]);
-					setVariable("c", "" + newValue);
+					setVariable("c", Integer.toString(newValue));
 				}
 				else if ("subtract".equalsIgnoreCase(counterFunction))
 				{
 					int newValue = value - Integer.parseInt(args[1]);
-					setVariable("c", "" + newValue);
+					setVariable("c", Integer.toString(newValue));
 				}
 				else if ("multiply".equalsIgnoreCase(counterFunction))
 				{
 					int newValue = value * Integer.parseInt(args[1]);
-					setVariable("c", "" + newValue);
+					setVariable("c", Integer.toString(newValue));
 				}
 				else if ("divide".equalsIgnoreCase(counterFunction))
 				{
 					int newValue = value / Integer.parseInt(args[1]);
-					setVariable("c", "" + newValue);
+					setVariable("c", Integer.toString(newValue));
+				}
+				else if ("modulus".equalsIgnoreCase(counterFunction))
+				{
+					int newValue = value % Integer.parseInt(args[1]);
+					setVariable("c", Integer.toString(newValue));
 				}
 			} else { /*throw error */ }
 		}
