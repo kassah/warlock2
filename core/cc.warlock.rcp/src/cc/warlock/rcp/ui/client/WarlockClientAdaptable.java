@@ -5,6 +5,7 @@ import org.eclipse.jface.resource.ImageDescriptor;
 import org.eclipse.ui.model.IWorkbenchAdapter;
 
 import cc.warlock.core.client.IWarlockClient;
+import cc.warlock.rcp.ui.WarlockSharedImages;
 
 public class WarlockClientAdaptable implements IAdaptable, IWorkbenchAdapter {
 
@@ -16,7 +17,7 @@ public class WarlockClientAdaptable implements IAdaptable, IWorkbenchAdapter {
 	}
 	
 	public Object getAdapter(Class adapter) {
-		if (adapter.isAssignableFrom(IWarlockClient.class))
+		if (IWarlockClient.class.isAssignableFrom(adapter))
 		{
 			return this.client;
 		}
@@ -29,7 +30,7 @@ public class WarlockClientAdaptable implements IAdaptable, IWorkbenchAdapter {
 	}
 	
 	public ImageDescriptor getImageDescriptor(Object object) {
-		return null;
+		return WarlockSharedImages.getImageDescriptor(WarlockSharedImages.IMG_CHARACTER);
 	}
 	
 	public String getLabel(Object o) {
