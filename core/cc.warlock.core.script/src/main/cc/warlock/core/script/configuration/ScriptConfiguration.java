@@ -6,6 +6,8 @@ import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
+import java.util.TreeSet;
 
 import org.dom4j.DocumentHelper;
 import org.dom4j.Element;
@@ -18,7 +20,7 @@ import cc.warlock.core.script.javascript.JavascriptEngine;
 
 public class ScriptConfiguration implements IConfigurationProvider {
 
-	protected ArrayList<File> scriptDirectories = new ArrayList<File>();
+	protected TreeSet<File> scriptDirectories = new TreeSet<File>();
 	protected Property<Boolean> autoScan;
 	protected Property<Long> scanTimeout;
 	protected String scriptPrefix;
@@ -183,7 +185,7 @@ public class ScriptConfiguration implements IConfigurationProvider {
 		return Collections.emptyList();
 	}
 	
-	public List<File> getScriptDirectories ()
+	public Set<File> getScriptDirectories ()
 	{
 		return scriptDirectories;
 	}

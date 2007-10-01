@@ -8,6 +8,7 @@ import java.util.Arrays;
 import java.util.Hashtable;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Set;
 
 import cc.warlock.core.client.IWarlockClient;
 import cc.warlock.core.configuration.WarlockConfiguration;
@@ -85,7 +86,7 @@ public class FilesystemScriptProvider implements IScriptProvider, Runnable {
 	
 	public void addScriptDirectory (File directory)
 	{
-		List<File> scriptDirs =
+		Set<File> scriptDirs =
 			ScriptConfiguration.instance().getScriptDirectories();
 		
 		if (!scriptDirs.contains(directory))
@@ -94,7 +95,7 @@ public class FilesystemScriptProvider implements IScriptProvider, Runnable {
 	
 	public void removeScriptDirectory (File directory)
 	{
-		List<File> scriptDirs =
+		Set<File> scriptDirs =
 			ScriptConfiguration.instance().getScriptDirectories();
 		
 		if (scriptDirs.contains(directory))
