@@ -44,8 +44,7 @@ public class WSLScript extends AbstractScript {
 	private ArrayList<Match> matchset = new ArrayList<Match>();
 	private Pattern commandPattern = Pattern.compile("^([\\w_]+)(\\s+(.*))?");
 	private WSLCommand if_ = new WSLIf_();
-	private long timer = -1L;
-	private long timePast = 0L;
+	private ScriptTimer timer = new ScriptTimer();
 	
 	protected WSLEngine engine;
 	protected IStormFrontScriptCommands commands;
@@ -92,10 +91,8 @@ public class WSLScript extends AbstractScript {
 	}
 
 	public IWSLValue getVariable(String name) {
-		if(name.equals("t")) {
-			if(timer < 0) return new WSLNumber(timePast / 1000);
-			return new WSLNumber((System.currentTimeMillis() - timer) / 1000);
-		}
+		if(name.equals("t")) return new WSLNumber(timer.get());
+			
 		return new WSLString(variables.get(name));
 	}
 	
@@ -254,6 +251,33 @@ public class WSLScript extends AbstractScript {
 	
 	protected void addCommand (String name, WSLCommand command) {
 		wslCommands.put(name, command);
+	}
+	
+	protected class ScriptTimer {
+		private long timerStart = -1L;
+		private long timePast = 0L;
+		
+		public long get() {
+			if(timerStart < 0) return timePast / 1000;
+			return (System.currentTimeMillis() - timerStart) / 1000;
+		}
+		
+		public void start() {
+			if(timerStart < 0)
+				timerStart = System.currentTimeMillis() - timePast;
+		}
+		
+		public void stop() {
+			if(timerStart >= 0) {
+				timePast = timerStart - System.currentTimeMillis();
+				timerStart = -1L;
+			}
+		}
+		
+		public void clear() {
+			timerStart = -1L;
+			timePast = 0L;
+		}
 	}
 	
 	abstract protected class WSLCommand {
@@ -683,18 +707,10 @@ public class WSLScript extends AbstractScript {
 			
 			if(m.find()) {
 				String command = m.group(1);
-				if(command.equals("start")) {
-					if(timer < 0)
-						timer = System.currentTimeMillis() - timePast;
-				} else if(command.equals("stop")) {
-					if(timer > 0) {
-						timePast = timer - System.currentTimeMillis();
-						timer = -1L;
-					}
-				} else if(command.equals("clear")) {
-					timer = -1L;
-					timePast = 0L;
-				} else {
+				if(command.equals("start"))			timer.start();
+				else if(command.equals("stop"))		timer.stop();
+				else if(command.equals("clear"))	timer.clear();
+				else {
 					// print an error?
 				}
 			} else {
