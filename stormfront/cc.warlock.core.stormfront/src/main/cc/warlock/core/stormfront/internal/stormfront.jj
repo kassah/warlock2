@@ -25,6 +25,7 @@ public class StormFrontProtocolParser {
 		// System.out.println("startElement: " + name.image);
 		
 		handler.startElement(name, currentAttributes);
+		currentAttributes.clear();
 	}
 	
 	protected void addAttribute (String name, String value)
