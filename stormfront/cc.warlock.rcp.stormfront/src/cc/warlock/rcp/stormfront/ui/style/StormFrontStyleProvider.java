@@ -34,8 +34,8 @@ public class StormFrontStyleProvider extends DefaultStyleProvider {
 		
 		if (style.getStyleTypes().contains(IWarlockStyle.StyleType.MONOSPACE))
 		{
-			String monoFontFace = settings.getFontFaceSetting(IWarlockSkin.FontFaceType.MainWindow_MonoFontFace);
-			int monoFontSize = settings.getFontSizeSetting(IWarlockSkin.FontSizeType.MainWindow_MonoFontSize);
+			String monoFontFace = settings.getMainWindowSettings().getColumnFontFace();
+			int monoFontSize = settings.getMainWindowSettings().getColumnFontSizeInPoints();
 			if (monoFontFace != null)
 			{
 				if (JFaceResources.getFontRegistry().hasValueFor(monoFontFace))

@@ -21,7 +21,6 @@ import cc.warlock.rcp.stormfront.ui.StormFrontPerspectiveFactory;
 import cc.warlock.rcp.stormfront.ui.views.BarsView;
 import cc.warlock.rcp.stormfront.ui.views.HandsView;
 import cc.warlock.rcp.stormfront.ui.views.StormFrontGameView;
-import cc.warlock.rcp.ui.network.SWTConnectionListenerAdapter;
 import cc.warlock.rcp.views.DebugView;
 import cc.warlock.rcp.views.GameView;
 
@@ -56,9 +55,10 @@ public class LoginUtil {
 			
 			if (WarlockApplication.instance().inDebugMode())
 			{
-				PlatformUI.getWorkbench().getActiveWorkbenchWindow().getActivePage().showView(DebugView.VIEW_ID);
+				DebugView view = (DebugView)
+					PlatformUI.getWorkbench().getActiveWorkbenchWindow().getActivePage().showView(DebugView.VIEW_ID, key, IWorkbenchPage.VIEW_VISIBLE);
 				
-				client.getConnection().addConnectionListener(new SWTConnectionListenerAdapter(DebugView.instance()));
+				view.setConnection(client.getConnection());
 			}
 			
 		} catch (IOException e) {

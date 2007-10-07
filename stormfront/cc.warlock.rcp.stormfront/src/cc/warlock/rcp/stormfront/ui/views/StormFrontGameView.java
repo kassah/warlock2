@@ -8,10 +8,10 @@ import org.eclipse.swt.graphics.Font;
 import org.eclipse.swt.widgets.Caret;
 
 import cc.warlock.core.client.IWarlockClient;
-import cc.warlock.core.client.IWarlockSkin;
 import cc.warlock.core.client.WarlockColor;
 import cc.warlock.core.stormfront.client.IStormFrontClient;
 import cc.warlock.core.stormfront.client.IStormFrontClientViewer;
+import cc.warlock.core.stormfront.client.StormFrontColor;
 import cc.warlock.core.stormfront.serversettings.server.ServerSettings;
 import cc.warlock.rcp.stormfront.adapters.SWTStormFrontClientViewer;
 import cc.warlock.rcp.stormfront.ui.StormFrontMacros;
@@ -78,21 +78,23 @@ public class StormFrontGameView extends GameView implements IStormFrontClientVie
 	
 	public void loadServerSettings (ServerSettings settings)
 	{
-		WarlockColor bg = settings.getColorSetting(IWarlockSkin.ColorType.MainWindow_Background);
-		WarlockColor fg = settings.getColorSetting(IWarlockSkin.ColorType.MainWindow_Foreground);
+		WarlockColor bg = settings.getMainWindowSettings().getBackgroundColor();
+		WarlockColor fg = settings.getMainWindowSettings().getForegroundColor();
 		
-		String fontFace = settings.getFontFaceSetting(IWarlockSkin.FontFaceType.MainWindow_FontFace);
-		int fontSize = settings.getFontSizeSetting(IWarlockSkin.FontSizeType.MainWindow_FontSize);
+		String fontFace = settings.getMainWindowSettings().getFontFace();
+		int fontSize = settings.getMainWindowSettings().getFontSizeInPoints();
 		
 		normalFont = fontFace == null ? JFaceResources.getDefaultFont() : new Font(getSite().getShell().getDisplay(), fontFace, fontSize, SWT.NONE);
 		text.setFont(normalFont);
 		
-		WarlockColor entryBG = settings.getColorSetting(IWarlockSkin.ColorType.CommandLine_Background);
-		WarlockColor entryFG = settings.getColorSetting(IWarlockSkin.ColorType.CommandLine_Foreground);
-		entry.setForeground(ColorUtil.warlockColorToColor(entryFG.equals(WarlockColor.DEFAULT_COLOR) ? fg  : entryFG));
-		entry.setBackground(ColorUtil.warlockColorToColor(entryBG.equals(WarlockColor.DEFAULT_COLOR) ? bg : entryBG));
+		WarlockColor entryBG = settings.getCommandLineSettings().getBackgroundColor();
+		WarlockColor entryFG = settings.getCommandLineSettings().getForegroundColor();
+		WarlockColor entryBarColor = settings.getCommandLineSettings().getBarColor();
 		
-		Caret newCaret = createCaret(1, ColorUtil.warlockColorToColor(settings.getColorSetting(IWarlockSkin.ColorType.CommandLine_BarColor)));
+		entry.setForeground(ColorUtil.warlockColorToColor(entryFG.equals(StormFrontColor.DEFAULT_COLOR) ? fg  : entryFG));
+		entry.setBackground(ColorUtil.warlockColorToColor(entryBG.equals(StormFrontColor.DEFAULT_COLOR) ? bg : entryBG));
+		
+		Caret newCaret = createCaret(1, ColorUtil.warlockColorToColor(entryBarColor));
 		entry.setCaret(newCaret);
 		
 		text.setBackground(ColorUtil.warlockColorToColor(bg));

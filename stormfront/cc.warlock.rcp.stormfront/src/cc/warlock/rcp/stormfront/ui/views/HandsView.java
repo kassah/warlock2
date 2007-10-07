@@ -225,8 +225,8 @@ public class HandsView extends ViewPart implements IPropertyListener<String>
 	
 	public void loadServerSettings (ServerSettings settings)
 	{
-		Color bg = ColorUtil.warlockColorToColor(settings.getColorSetting(IWarlockSkin.ColorType.MainWindow_Background));
-		Color fg = ColorUtil.warlockColorToColor(settings.getColorSetting(IWarlockSkin.ColorType.MainWindow_Foreground));
+		Color bg = ColorUtil.warlockColorToColor(settings.getMainWindowSettings().getBackgroundColor());
+		Color fg = ColorUtil.warlockColorToColor(settings.getMainWindowSettings().getForegroundColor());
 		
 		setColors(fg, bg);
 	}
