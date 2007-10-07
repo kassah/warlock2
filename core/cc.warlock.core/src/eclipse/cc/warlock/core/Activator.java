@@ -3,8 +3,6 @@ package cc.warlock.core;
 import org.eclipse.core.runtime.Plugin;
 import org.osgi.framework.BundleContext;
 
-import cc.warlock.core.configuration.WarlockConfiguration;
-
 /**
  * The activator class controls the plug-in life cycle
  */
