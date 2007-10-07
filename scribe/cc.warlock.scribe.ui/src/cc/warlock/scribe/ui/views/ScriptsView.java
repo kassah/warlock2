@@ -26,8 +26,7 @@ import org.eclipse.ui.part.ViewPart;
 import cc.warlock.core.client.IWarlockClient;
 import cc.warlock.core.client.WarlockClientAdapter;
 import cc.warlock.core.client.WarlockClientRegistry;
-import cc.warlock.core.client.IWarlockSkin.ColorType;
-import cc.warlock.core.script.IScript;
+import cc.warlock.core.script.IScriptInfo;
 import cc.warlock.core.script.IScriptProvider;
 import cc.warlock.core.script.ScriptEngineRegistry;
 import cc.warlock.core.stormfront.client.IStormFrontClient;
@@ -64,7 +63,7 @@ public class ScriptsView extends ViewPart implements IServerSettingsListener {
 			
 			public String getColumnText(Object element, int columnIndex) {
 				if (columnIndex == 1) {
-					return ((IScript)element).getName();
+					return ((IScriptInfo)element).getScriptName();
 				}
 				return "";
 			}
@@ -80,7 +79,7 @@ public class ScriptsView extends ViewPart implements IServerSettingsListener {
 		scriptList.setSorter(new ViewerSorter() {
 			@Override
 			public int compare(Viewer viewer, Object e1, Object e2) {
-				return ((IScript)e1).getName().compareTo(((IScript)e2).getName());
+				return ((IScriptInfo)e1).getScriptName().compareTo(((IScriptInfo)e2).getScriptName());
 			}
 		});
 		
@@ -113,10 +112,10 @@ public class ScriptsView extends ViewPart implements IServerSettingsListener {
 	public void serverSettingsLoaded(final ServerSettings settings) {
 		Display.getDefault().syncExec(new Runnable() {
 			public void run() {
-				ArrayList<IScript> scripts = new ArrayList<IScript>();
+				ArrayList<IScriptInfo> scripts = new ArrayList<IScriptInfo>();
 				for (IScriptProvider provider : ScriptEngineRegistry.getScriptProviders())
 				{
-					scripts.addAll(provider.getScripts());
+					scripts.addAll(provider.getScriptInfos());
 				}
 				scriptList.setInput(scripts);
 			}
@@ -149,10 +148,10 @@ public class ScriptsView extends ViewPart implements IServerSettingsListener {
 	
 	protected void openScript (IStructuredSelection selection)
 	{
-		IScript script = (IScript) selection.getFirstElement();
+		IScriptInfo scriptInfo = (IScriptInfo) selection.getFirstElement();
 		
 		Shell shell = new Shell();
-		shell.setText(script.getName());
+		shell.setText(scriptInfo.getScriptName());
 		shell.setImage(ScribeSharedImages.getImage(ScribeSharedImages.IMG_SCRIPT));
 		shell.setLayout(new GridLayout());
 		
@@ -160,16 +159,25 @@ public class ScriptsView extends ViewPart implements IServerSettingsListener {
 		
 		StyledText text = new StyledText(main, SWT.READ_ONLY | SWT.MULTI | SWT.V_SCROLL | SWT.H_SCROLL);
 		
-		if (script.getScriptInfo() instanceof IServerScriptInfo)
+		if (scriptInfo instanceof IServerScriptInfo)
 		{
-			IServerScriptInfo info = (IServerScriptInfo) script.getScriptInfo();
+			IServerScriptInfo info = (IServerScriptInfo) scriptInfo;
 			IStormFrontClient client = info.getClient();
 
-			text.setBackground(ColorUtil.warlockColorToColor(client.getServerSettings().getColorSetting(ColorType.MainWindow_Background)));
-			text.setForeground(ColorUtil.warlockColorToColor(client.getServerSettings().getColorSetting(ColorType.MainWindow_Foreground)));
+			text.setBackground(ColorUtil.warlockColorToColor(client.getServerSettings().getMainWindowSettings().getBackgroundColor()));
+			text.setForeground(ColorUtil.warlockColorToColor(client.getServerSettings().getMainWindowSettings().getForegroundColor()));
 		}
 		
-		text.setText(readerToString(script.getScriptInfo().openReader()));
+		Reader reader = scriptInfo.openReader();
+		text.setText(readerToString(reader));
+		
+		try {
+			reader.close();
+		} catch (IOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		
 		text.setSize(640, 480);
 		
 		shell.pack();
