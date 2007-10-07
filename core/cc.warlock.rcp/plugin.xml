@@ -8,7 +8,7 @@
    <extension
          point="org.eclipse.ui.views">
       <view
-            allowMultiple="false"
+            allowMultiple="true"
             class="cc.warlock.rcp.views.DebugView"
             icon="images/console.gif"
             id="cc.warlock.rcp.views.DebugView"
