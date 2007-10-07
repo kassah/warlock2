@@ -2,6 +2,8 @@ package cc.warlock.core.stormfront.serversettings.server;
 
 import org.dom4j.Element;
 
+import cc.warlock.core.stormfront.xml.StormFrontElement;
+
 public class HighlightString extends Preset {
 
 	public static final String KEY_TEXT = "text";
@@ -15,9 +17,9 @@ public class HighlightString extends Preset {
 	protected boolean isName, isNew = false;
 	protected HighlightString originalString;
 	
-	protected HighlightString (ServerSettings serverSettings)
+	protected HighlightString (ServerSettings serverSettings, Palette palette)
 	{
-		super(serverSettings);
+		super(serverSettings, palette);
 	}
 	
 	public HighlightString (HighlightString other)
@@ -30,7 +32,7 @@ public class HighlightString extends Preset {
 		this.originalString = other;
 	}
 	
-	public HighlightString (ServerSettings serverSettings, Element highlightElement, Palette palette)
+	public HighlightString (ServerSettings serverSettings, StormFrontElement highlightElement, Palette palette)
 	{
 		super(serverSettings, highlightElement, palette);
 		
@@ -98,9 +100,10 @@ public class HighlightString extends Preset {
 				mPrefix + textAndColorsTag + allAttribsTag + mSuffix : "");
 	}
 	
-	public static HighlightString createHighlightStringFromParent (ServerSettings serverSettings, Element parent)
+	public static HighlightString createHighlightStringFromParent (ServerSettings serverSettings, StormFrontElement parent)
 	{
-		Element element = parent.addElement("h");
+		StormFrontElement element = new StormFrontElement("h");
+		parent.addElement(element);
 		
 		HighlightString string = new HighlightString(serverSettings, element, serverSettings.getPalette());
 		string.needsUpdate = true;
@@ -108,7 +111,7 @@ public class HighlightString extends Preset {
 	}
 	
 	@Override
-	public int compareTo(Preset o) {
+	public int compareTo(ColorSetting o) {
 		if (o instanceof HighlightString)
 		{
 			HighlightString other = (HighlightString) o;

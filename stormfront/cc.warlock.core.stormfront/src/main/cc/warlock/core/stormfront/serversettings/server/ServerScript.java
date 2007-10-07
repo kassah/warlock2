@@ -4,14 +4,14 @@ import java.util.HashMap;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-import org.dom4j.Element;
+import cc.warlock.core.stormfront.xml.StormFrontElement;
 
 public class ServerScript extends ServerSetting {
 
 	protected String name, comment, format;
 	protected String scriptContents;
 	
-	public ServerScript (ServerSettings settings, Element scriptElement)
+	public ServerScript (ServerSettings settings, StormFrontElement scriptElement)
 	{
 		super(settings);
 		
@@ -19,7 +19,7 @@ public class ServerScript extends ServerSetting {
 	}
 	
 	
-	protected void loadScript (Element scriptElement)
+	protected void loadScript (StormFrontElement scriptElement)
 	{
 		this.name = scriptElement.attributeValue("name");
 		this.comment = scriptElement.attributeValue("comment");
@@ -27,7 +27,7 @@ public class ServerScript extends ServerSetting {
 		
 		if ("tok".equals(format))
 		{
-			convertTokScript(scriptElement.getTextTrim());
+			convertTokScript(scriptElement.getText());
 		}
 	}
 	

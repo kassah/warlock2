@@ -2,9 +2,8 @@ package cc.warlock.core.stormfront.serversettings.server;
 
 import java.util.Hashtable;
 
-import org.dom4j.Element;
-
 import cc.warlock.core.stormfront.client.StormFrontColor;
+import cc.warlock.core.stormfront.xml.StormFrontElement;
 
 public class Palette extends ServerSetting {
 
@@ -12,15 +11,13 @@ public class Palette extends ServerSetting {
 	public static final String STORMFRONT_MARKUP_SUFFIX = "</<m></palette>";
 	
 	protected Hashtable<String, PaletteEntry> palette = new Hashtable<String, PaletteEntry>();
-	protected Element element;
 	
-	public Palette (ServerSettings serverSettings, Element paletteElement)
+	public Palette (ServerSettings serverSettings, StormFrontElement paletteElement)
 	{
 		super(serverSettings, paletteElement);
 		
-		for (Object o : paletteElement.elements())
+		for (StormFrontElement iElement : paletteElement.elements())
 		{
-			Element iElement = (Element) o;
 			String paletteId = iElement.attributeValue("id");
 			
 			PaletteEntry entry = new PaletteEntry(paletteId, new StormFrontColor(iElement.attributeValue("color")));
@@ -111,13 +108,24 @@ public class Palette extends ServerSetting {
 		}
 	}
 	
-	protected Element getIElement(String id)
+	protected StormFrontElement getIElement(String id)
 	{
-		Element iElement = (Element) element.selectSingleNode("i[@id='" + id + "']");
+		StormFrontElement iElement = null;
+		
+		for (StormFrontElement el : element.elements())
+		{
+			if (el.attributeValue("id").equals(id))
+			{
+				iElement = el;
+				break;
+			}
+		}
+		
 		if (iElement == null)
 		{
-			iElement = element.addElement("i");
-			iElement.addAttribute("id", id);
+			iElement = new StormFrontElement("i");
+			element.addElement(iElement);
+			iElement.setAttribute("id", id);
 		}
 		return iElement;
 	}
@@ -126,7 +134,7 @@ public class Palette extends ServerSetting {
 	{
 		for (String id : palette.keySet())
 		{
-			Element iElement = getIElement(id);
+			StormFrontElement iElement = getIElement(id);
 			
 			setAttribute(iElement, "color", palette.get(id).getColor().toHexString());
 		}

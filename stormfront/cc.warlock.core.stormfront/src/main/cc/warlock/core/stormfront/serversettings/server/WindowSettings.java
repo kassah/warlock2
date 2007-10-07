@@ -3,24 +3,20 @@ package cc.warlock.core.stormfront.serversettings.server;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 
-import org.dom4j.Attribute;
-import org.dom4j.Element;
+import cc.warlock.core.stormfront.xml.StormFrontAttribute;
+import cc.warlock.core.stormfront.xml.StormFrontElement;
 
-import cc.warlock.core.stormfront.client.StormFrontColor;
+public class WindowSettings extends ColorSetting {
 
-public class WindowSettings extends ServerSetting {
-
-	protected Element windowElement;
+	protected StormFrontElement windowElement;
 	
 	protected HashMap<String, String> windowAttributes = new HashMap<String, String>();
 	protected HashMap<String, String> fontAttributes = new HashMap<String, String>();
 	protected HashMap<String, String> columnFontAttributes = new HashMap<String, String>();
 	
 	protected String id;
-	protected String foregroundColor, backgroundColor;
 	protected String fontFace, columnFontFace;
 	protected int fontSize, columnFontSize;
 	
@@ -28,7 +24,6 @@ public class WindowSettings extends ServerSetting {
 	public static final String EMPTY_FONT_FACE = "";
 	
 	protected static final String KEY_FGCOLOR = "fgcolor";
-	protected static final String KEY_BGCOLOR = "bgcolor";
 	protected static final String KEY_FACE = "face";
 	protected static final String KEY_SIZE = "size";
 	protected static ArrayList<String> skipAttributes = new ArrayList<String>();
@@ -40,18 +35,17 @@ public class WindowSettings extends ServerSetting {
 	protected static final String STORMFRONT_MARKUP_SUFFIX = "</stream>";
 	
 	protected boolean needsUpdate = false;
-	protected Palette palette;
 	protected WindowSettings originalWindowSettings;
 	
-	public WindowSettings (ServerSettings settings, Element windowElement, Palette palette)
+	public WindowSettings (ServerSettings settings, StormFrontElement windowElement, Palette palette)
 	{
-		super(settings, windowElement);
+		super(settings, windowElement, palette);
+		this.foregroundKey = KEY_FGCOLOR;
 		
 		id = windowElement.attributeValue("id");
 		fontFace = columnFontFace = EMPTY_FONT_FACE;
 		fontSize = columnFontSize = EMPTY_FONT_SIZE;
 	
-		this.palette = palette;
 		this.windowElement = windowElement;
 		addAttributes(windowElement, windowAttributes);
 		
@@ -59,8 +53,8 @@ public class WindowSettings extends ServerSetting {
 		backgroundColor = windowElement.attributeValue(KEY_BGCOLOR);
 		
 		
-		Element fontElement = windowElement.element("font");
-		Element columnFontElement = windowElement.element("columnFont");
+		StormFrontElement fontElement = windowElement.element("font");
+		StormFrontElement columnFontElement = windowElement.element("columnFont");
 		
 		if (fontElement != null)
 		{
@@ -78,13 +72,14 @@ public class WindowSettings extends ServerSetting {
 	
 	public WindowSettings (WindowSettings other)
 	{
-		super(other.serverSettings, other.element);
-		this.palette = other.palette;
-		
+		super(other.serverSettings, new StormFrontElement(other.element, true), other.palette);
+		this.foregroundKey = KEY_FGCOLOR;
+		this.windowElement = this.element;
 		this.windowAttributes.putAll(other.windowAttributes);
 		this.fontAttributes.putAll(other.fontAttributes);
 		this.columnFontAttributes.putAll(other.columnFontAttributes);
 		
+		this.id = other.id == null ? null : new String(other.id);
 		this.foregroundColor = other.foregroundColor == null ? null : new String(other.foregroundColor);
 		this.backgroundColor = other.backgroundColor == null ? null : new String(other.backgroundColor);
 		
@@ -96,9 +91,9 @@ public class WindowSettings extends ServerSetting {
 		this.originalWindowSettings = other;
 	}
 	
-	protected void addAttributes (Element element, HashMap<String,String> map)
+	protected void addAttributes (StormFrontElement element, HashMap<String,String> map)
 	{
-		for (Attribute attribute : (List<Attribute>) element.attributes())
+		for (StormFrontAttribute attribute : element.attributes())
 		{
 			if (!skipAttributes.contains(attribute.getName()))
 			{
@@ -109,11 +104,28 @@ public class WindowSettings extends ServerSetting {
 	
 	@Override
 	protected void saveToDOM() {
+		StormFrontElement parent = originalWindowSettings.element.getParent();
+		
+		parent.removeElement(originalWindowSettings.element);
+		parent.addElement(element);
+		
 		setAttribute(KEY_FGCOLOR, foregroundColor);
 		setAttribute(KEY_BGCOLOR, backgroundColor);
 		
-		Element fontElement = windowElement.element("font");
-		Element columnFontElement = windowElement.element("columnFont");
+		StormFrontElement fontElement = element.element("font");
+		StormFrontElement columnFontElement = element.element("columnFont");
+		
+		if (fontElement == null && (fontFace != EMPTY_FONT_FACE || fontSize != EMPTY_FONT_SIZE))
+		{
+			fontElement = new StormFrontElement("font");
+			element.addElement(fontElement);
+		}
+		
+		if (columnFontElement == null && (columnFontFace != EMPTY_FONT_FACE || columnFontSize != EMPTY_FONT_SIZE))
+		{
+			columnFontElement = new StormFrontElement("columnFont");
+			element.addElement(columnFontElement);
+		}
 		
 		if (fontElement != null)
 		{
@@ -126,19 +138,24 @@ public class WindowSettings extends ServerSetting {
 		
 		if (columnFontElement != null)
 		{
-			if (fontFace != EMPTY_FONT_FACE)
+			if (columnFontFace != EMPTY_FONT_FACE)
 				setAttribute(columnFontElement, KEY_FACE, columnFontFace);
 			
-			if (fontSize != EMPTY_FONT_SIZE)
+			if (columnFontSize != EMPTY_FONT_SIZE)
 				setAttribute(columnFontElement, KEY_SIZE, ""+columnFontSize);	
 		}
 	}
 
 	protected void appendAttributes(StringBuffer markup, Map<String,String> attributes)
 	{
-		for (Map.Entry<String,String> entry : attributes.entrySet())
+		//Sorting will ensure they maintain the same order when being saved
+		ArrayList<String> attributeNames = new ArrayList<String>();
+		attributeNames.addAll(attributes.keySet());
+		Collections.sort(attributeNames);
+		
+		for (String attribute : attributeNames)
 		{
-			markup.append(entry.getKey() + "=\"" + entry.getValue() + "\" ");
+			markup.append(attribute + "=\"" + attributes.get(attribute) + "\" ");
 		}
 	}
 	
@@ -169,51 +186,7 @@ public class WindowSettings extends ServerSetting {
 	
 	public String toStormfrontMarkup(boolean includeFonts)
 	{
-		StringBuffer markup = new StringBuffer();
-		
-		markup.append("<w ");
-		appendAttributes(markup, windowAttributes);
-		
-		markup.append(KEY_FGCOLOR + "=\"" + foregroundColor + "\" ");
-		markup.append(KEY_BGCOLOR + "=\"" + foregroundColor + "\" ");
-		markup.append(">");
-		
-		if (includeFonts)
-		{
-			appendFont (markup, "font", fontAttributes, fontFace, fontSize);
-			appendFont (markup, "columnFont", columnFontAttributes, columnFontFace, columnFontSize);
-		}
-			
-		markup.append("</w>");
-		return markup.toString();
-	}
-
-	public String getForegroundColor() {
-		return foregroundColor;
-	}
-
-	public void setForegroundColor(StormFrontColor foregroundColor) {
-		foregroundColor.assignToPalette(palette);
-		String stormfrontString = foregroundColor.toStormfrontString();
-		
-		if (!stormfrontString.equals(this.foregroundColor))
-			needsUpdate = true;
-		
-		this.foregroundColor = stormfrontString;
-	}
-
-	public String getBackgroundColor() {
-		return backgroundColor;
-	}
-
-	public void setBackgroundColor(StormFrontColor backgroundColor) {
-		backgroundColor.assignToPalette(palette);
-		String stormfrontString = backgroundColor.toStormfrontString();
-		
-		if (!stormfrontString.equals(this.backgroundColor))
-			needsUpdate = true;
-		
-		this.backgroundColor = stormfrontString;
+		return windowElement.toXML("", false, includeFonts);
 	}
 
 	public String getFontFace() {
@@ -238,26 +211,42 @@ public class WindowSettings extends ServerSetting {
 		this.columnFontFace = columnFontFace;
 	}
 
-	public int getFontSize() {
+	public int getFontSizeInPixels() {
 		return fontSize;
 	}
+	
+	public int getFontSizeInPoints() {
+		return getPixelSizeInPoints(fontSize);
+	}
 
-	public void setFontSize(int fontSize) {
+	public void setFontSizeInPixels(int fontSize) {
 		if (fontSize != this.fontSize)
 			needsUpdate = true;
 		
 		this.fontSize = fontSize;
 	}
-
-	public int getColumnFontSize() {
-		return columnFontSize;
+	
+	public void setFontSizeInPoints(int fontSize) {
+		setFontSizeInPixels(getPointSizeInPixels(fontSize));
 	}
 
-	public void setColumnFontSize(int columnFontSize) {
+	public int getColumnFontSizeInPixels() {
+		return columnFontSize;
+	}
+	
+	public int getColumnFontSizeInPoints() {
+		return getPixelSizeInPoints(columnFontSize);
+	}
+
+	public void setColumnFontSizeInPixels(int columnFontSize) {
 		if (columnFontSize != this.columnFontSize)
 			needsUpdate = true;
 		
 		this.columnFontSize = columnFontSize;
+	}
+	
+	public void setColumnFontSizeInPoints(int fontSize) {
+		setColumnFontSizeInPixels(getPointSizeInPixels(fontSize));
 	}
 
 	public WindowSettings getOriginalWindowSettings ()
@@ -265,17 +254,18 @@ public class WindowSettings extends ServerSetting {
 		return originalWindowSettings;
 	}
 	
-	public boolean needsUpdate()
-	{
-		return needsUpdate;
-	}
-	
 	public void setNeedsUpdate (boolean needsUpdate)
 	{
-		this.needsUpdate = needsUpdate;
+		super.setNeedsUpdate(needsUpdate);
+		if (!needsUpdate)
+			originalWindowSettings = null;
 	}
 
 	public String getId() {
 		return id;
+	}
+	
+	public int compareTo(WindowSettings o) {
+		return id.compareTo(o.id);
 	}
 }

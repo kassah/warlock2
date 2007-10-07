@@ -1,6 +1,6 @@
 package cc.warlock.core.stormfront.serversettings.server;
 
-import org.dom4j.Element;
+import cc.warlock.core.stormfront.xml.StormFrontElement;
 
 public abstract class ServerSetting {
 
@@ -15,7 +15,7 @@ public abstract class ServerSetting {
 	public static final String R_PREFIX = "<<r>";
 	public static final String R_SUFFIX = "</<r>";
 	
-	protected Element element;
+	protected StormFrontElement element;
 	protected ServerSettings serverSettings;
 	
 	public ServerSetting (ServerSettings serverSettings)
@@ -23,7 +23,7 @@ public abstract class ServerSetting {
 		this.serverSettings = serverSettings;
 	}
 	
-	public ServerSetting (ServerSettings serverSettings, Element element)
+	public ServerSetting (ServerSettings serverSettings, StormFrontElement element)
 	{
 		this.element = element;
 		this.serverSettings = serverSettings;
@@ -40,16 +40,25 @@ public abstract class ServerSetting {
 	
 	protected void deleteFromDOM ()
 	{
-		element.getParent().remove(element);
+		element.getParent().removeElement(element);
 	}
 	
-	protected static void setAttribute (Element element, String attrName, String value)
+	protected static void setAttribute (StormFrontElement element, String attrName, String value)
 	{
-		if (element.attribute(attrName) == null)
-		{
-			element.addAttribute(attrName, value);
-		} else {
-			element.attribute(attrName).setValue(value);
-		}
+		element.setAttribute(attrName, value);
+	}
+
+	// seems like stormfront uses 96 dpi resolution vs. standard 72 dpi
+	protected static int getPixelSizeInPoints (int pixelSize)
+	{
+		double points = pixelSize * (72.0/96.0);
+		return (int) Math.round(points);
+	}
+	
+	protected static int getPointSizeInPixels (int pointSize)
+	{
+		double pixels = pointSize * (96.0/72.0);
+		
+		return (int) Math.round(pixels);
 	}
 }
