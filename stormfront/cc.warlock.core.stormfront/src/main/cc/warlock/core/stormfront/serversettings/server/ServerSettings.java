@@ -11,23 +11,18 @@ import java.util.Date;
 import java.util.Hashtable;
 import java.util.List;
 
-import org.dom4j.Document;
 import org.dom4j.DocumentException;
-import org.dom4j.Element;
-import org.dom4j.io.SAXReader;
 
 import cc.warlock.core.client.ICommand;
 import cc.warlock.core.client.IWarlockClientViewer;
-import cc.warlock.core.client.IWarlockSkin.ColorType;
-import cc.warlock.core.client.IWarlockSkin.FontFaceType;
-import cc.warlock.core.client.IWarlockSkin.FontSizeType;
 import cc.warlock.core.client.internal.Command;
 import cc.warlock.core.configuration.ConfigurationUtil;
 import cc.warlock.core.script.ScriptEngineRegistry;
 import cc.warlock.core.stormfront.client.IStormFrontClient;
 import cc.warlock.core.stormfront.client.IStormFrontClientViewer;
-import cc.warlock.core.stormfront.client.StormFrontColor;
 import cc.warlock.core.stormfront.serversettings.skin.IStormFrontSkin;
+import cc.warlock.core.stormfront.xml.StormFrontDocument;
+import cc.warlock.core.stormfront.xml.StormFrontElement;
 
 
 public class ServerSettings implements Comparable<ServerSettings>
@@ -44,9 +39,11 @@ public class ServerSettings implements Comparable<ServerSettings>
 	private IStormFrontClient client;
 	private String playerId, clientVersion;
 	private int majorVersion;
-	private Document document;
+	private StormFrontDocument document;
 	protected Palette palette;
+	
 	protected Hashtable<String, WindowSettings> windowSettings = new Hashtable<String,WindowSettings>();
+	protected CommandLineSettings commandLineSettings;
 	protected Hashtable<String, Preset> presets = new Hashtable<String,Preset>();
 	protected Hashtable<String, HighlightString> highlightStrings = new Hashtable<String, HighlightString>();
 	protected Hashtable<String, String> variables = new Hashtable<String, String>();
@@ -59,14 +56,7 @@ public class ServerSettings implements Comparable<ServerSettings>
 	
 	protected ServerScriptProvider scriptProvider;
 	
-	private Element streamElement, commandLineElement, paletteElement, presetsElement, stringsElement, namesElement;
-	
-	public static int getPixelSizeInPoints (int pixelSize)
-	{
-		// we'll assume 96 dpi for now
-		double points = pixelSize * (72.0/96.0);
-		return (int) Math.round(points);
-	}
+	private StormFrontElement streamElement, paletteElement, presetsElement, stringsElement, namesElement;
 	
 	public ServerSettings (IStormFrontClient client)
 	{
@@ -87,17 +77,14 @@ public class ServerSettings implements Comparable<ServerSettings>
 	{
 		try {
 			FileInputStream stream = new FileInputStream(ConfigurationUtil.getConfigurationFile("serverSettings_" + playerId + ".xml"));
-			SAXReader reader = new SAXReader();
-			Document document = reader.read(stream);
 			
-			String crc = ((Element)document.selectSingleNode("/settings")).attributeValue("crc");
+			StormFrontDocument document = new StormFrontDocument(stream);
+			
+			String crc = document.getRootElement().attributeValue("crc");
 			
 			stream.close();
 			return crc;
 		} catch (FileNotFoundException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		} catch (DocumentException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		} catch (IOException e) {
@@ -125,12 +112,11 @@ public class ServerSettings implements Comparable<ServerSettings>
 		
 		try {
 			FileInputStream stream = new FileInputStream(ConfigurationUtil.getConfigurationFile("serverSettings_" + playerId + ".xml"));
-			SAXReader reader = new SAXReader();
-			document = reader.read(stream);
-					
-			commandLineElement = (Element) document.selectSingleNode("/settings/cmdline");
-
+			document = new StormFrontDocument(stream);
+			
 			loadPalette();
+			
+			commandLineSettings = new CommandLineSettings(this, document.getRootElement().element("cmdline"), palette);
 			loadWindowSettings();
 			loadPresets();
 			loadHighlightStrings();
@@ -158,9 +144,6 @@ public class ServerSettings implements Comparable<ServerSettings>
 		} catch (FileNotFoundException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
-		} catch (DocumentException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
@@ -168,30 +151,33 @@ public class ServerSettings implements Comparable<ServerSettings>
 	
 	private void loadPalette ()
 	{
-		paletteElement = (Element) document.selectSingleNode("/settings/palette");
+		paletteElement = document.getRootElement().element("palette");
 		palette = new Palette(this, paletteElement);
 	}
 	
 	private void loadWindowSettings()
 	{
-		streamElement = (Element) document.selectSingleNode("/settings/stream");
+		streamElement = document.getRootElement().element("stream");
 		
-		for (Element wElement : (List<Element>)streamElement.elements())
+		for (StormFrontElement wElement : streamElement.elements())
 		{
 			WindowSettings windowSettings = new WindowSettings(this, wElement, palette);
 			
-			this.windowSettings.put(wElement.attributeValue("id"), windowSettings);
+			// we take the first declaration as precedence (same as what stormfront does)
+			if (!this.windowSettings.containsKey(wElement.attributeValue("id")))
+			{
+				this.windowSettings.put(wElement.attributeValue("id"), windowSettings);
+			}
 		}
 	}
 	
 	private void loadPresets ()
 	{
-		presetsElement = (Element) document.selectSingleNode("/settings/presets");
+		presetsElement = document.getRootElement().element("presets");
 		if (presetsElement != null)
 		{
-			for (Object o : presetsElement.elements())
+			for (StormFrontElement pElement : presetsElement.elements())
 			{
-				Element pElement = (Element) o;
 				String presetId = pElement.attributeValue("id");
 				
 				presets.put(presetId, new Preset(this, pElement, palette));
@@ -201,24 +187,22 @@ public class ServerSettings implements Comparable<ServerSettings>
 	
 	private void loadHighlightStrings()
 	{
-		stringsElement = (Element) document.selectSingleNode("/settings/strings");
+		stringsElement = document.getRootElement().element("strings");
 		if (stringsElement != null)
 		{
-			for (Object o : stringsElement.elements())
+			for (StormFrontElement hElement : stringsElement.elements())
 			{
-				Element hElement = (Element) o;
 				String text = hElement.attributeValue("text");
 				
 				highlightStrings.put(text, new HighlightString(this, hElement, palette));
 			}
 		}
 		
-		namesElement = (Element) document.selectSingleNode("/settings/names");
+		namesElement = document.getRootElement().element("names");
 		if (namesElement != null)
 		{
-			for (Object o : namesElement.elements())
+			for (StormFrontElement hElement : namesElement.elements())
 			{
-				Element hElement = (Element) o;
 				String text = hElement.attributeValue("text");
 				
 				highlightStrings.put(text, new HighlightString(this, hElement, palette));
@@ -229,12 +213,11 @@ public class ServerSettings implements Comparable<ServerSettings>
 	
 	private void loadVariables()
 	{
-		Element varsElement = (Element) document.selectSingleNode("/settings/vars");
+		StormFrontElement varsElement = document.getRootElement().element("vars");
 		if (varsElement != null)
 		{
-			for (Object o : varsElement.elements())
+			for (StormFrontElement varElement : varsElement.elements())
 			{
-				Element varElement = (Element) o;
 				variables.put(varElement.attributeValue("name"), varElement.attributeValue("value"));
 			}
 		}
@@ -242,19 +225,16 @@ public class ServerSettings implements Comparable<ServerSettings>
 	
 	private void loadMacros ()
 	{
-		Element macrosElement = (Element) document.selectSingleNode("/settings/macros");
+		StormFrontElement macrosElement = document.getRootElement().element("macros");
 		if (macrosElement != null)
 		{
-			for (Object o : macrosElement.elements())
+			for (StormFrontElement keysElement : macrosElement.elements())
 			{
-				Element keysElement = (Element) o;
 				ArrayList<MacroKey> keys = new ArrayList<MacroKey>();
 				macroSets.add(keys);
 				
-				for (Object k : keysElement.elements())
-				{
-					Element kElement = (Element) k;
-					
+				for (StormFrontElement kElement : keysElement.elements())
+				{	
 					keys.add(new MacroKey(this, kElement.attributeValue("key"), kElement.attributeValue("action")));
 				}
 			}
@@ -263,12 +243,11 @@ public class ServerSettings implements Comparable<ServerSettings>
 	
 	private void loadScripts ()
 	{
-		Element scriptsElement = (Element) document.selectSingleNode("/settings/scripts");
+		StormFrontElement scriptsElement = document.getRootElement().element("scripts");
 		if (scriptsElement != null)
 		{
-			for (Object s : scriptsElement.elements())
+			for (StormFrontElement sElement : scriptsElement.elements())
 			{
-				Element sElement = (Element) s;
 				if(sElement != null) {
 					String name = sElement.attributeValue("name");
 					if(name != null) {
@@ -299,83 +278,6 @@ public class ServerSettings implements Comparable<ServerSettings>
 		command.setInHistory(true);
 		
 		client.send(command);
-	}
-	
-	public String getFontFaceSetting (FontFaceType settingType)
-	{
-		String fontFace = null;
-		WindowSettings main = getWindowSettings(WINDOW_MAIN);
-		
-		switch (settingType)
-		{
-			case MainWindow_FontFace:
-				fontFace = main == null ? null : main.getFontFace(); break;
-			case MainWindow_MonoFontFace:
-				fontFace = main == null ? null : main.getColumnFontFace(); break;
-			case CommandLine_FontFace:
-				fontFace = commandLineElement == null ? null : commandLineElement.attributeValue("face"); break;
-		}
-		
-		return fontFace;
-	}
-	
-	public StormFrontColor getColorSetting (ColorType settingType)
-	{
-		return getColorSetting(settingType, true);
-	}
-	
-	public StormFrontColor getColorSetting (ColorType settingType, boolean skinFallback)
-	{
-		String color = null;
-		
-		WindowSettings main = getWindowSettings(WINDOW_MAIN);
-		
-		switch (settingType)
-		{
-			case MainWindow_Background: color = main == null ? null : main.getBackgroundColor(); break;
-			case MainWindow_Foreground: color = main == null ? null : main.getForegroundColor(); break;
-			case CommandLine_Background: color = commandLineElement.attributeValue("bgcolor"); break;
-			case CommandLine_Foreground: color = commandLineElement.attributeValue("fgcolor"); break;
-			case CommandLine_BarColor: color = commandLineElement.attributeValue("barcolor"); break;
-		}
-		
-		if (color == null) color = "skin";
-		
-		if (color.charAt(0) == '@')
-		{
-			StormFrontColor paletteColor = palette.getPaletteColor(color.substring(1));
-			paletteColor.addPaletteReference(this);
-			return paletteColor;
-		}
-		else if ("skin".equals(color) && skinFallback)
-		{
-			return client.getStormFrontSkin().getStormFrontColor(settingType);
-		}
-		else if (color.charAt(0) == '#') {
-			return new StormFrontColor(color);
-		}
-		
-		else return StormFrontColor.DEFAULT_COLOR;
-	}
-	
-	
-	public int getFontSizeSetting (FontSizeType settingType)
-	{
-		int fontSize = WindowSettings.EMPTY_FONT_SIZE;
-		WindowSettings main = getWindowSettings(WINDOW_MAIN);
-		
-		switch (settingType)
-		{
-			case MainWindow_FontSize: fontSize = main == null ? WindowSettings.EMPTY_FONT_SIZE : main.getFontSize(); break;
-			case MainWindow_MonoFontSize: fontSize = main == null ? WindowSettings.EMPTY_FONT_SIZE : main.getColumnFontSize(); break;
-		}
-		
-		if (fontSize != WindowSettings.EMPTY_FONT_SIZE)
-		{
-			return getPixelSizeInPoints(fontSize);
-		}
-		
-		return client.getStormFrontSkin().getFontSize(settingType);
 	}
 	
 	public Palette getPalette ()
@@ -560,22 +462,34 @@ public class ServerSettings implements Comparable<ServerSettings>
 		{
 			if (settings.needsUpdate())
 			{
-				windowUpdateMarkup.append(settings.getOriginalWindowSettings().toStormfrontMarkup());
-				windowUpdateMarkup.append(settings.toStormfrontMarkup());
 				settings.saveToDOM();
+				windowUpdateMarkup.append(settings.getOriginalWindowSettings().toStormfrontMarkup(false));
+				windowUpdateMarkup.append(settings.toStormfrontMarkup());
 				settings.setNeedsUpdate(false);
 			}
 		}
-				
+		
+		String paletteMarkup = "";
+		if (palette.needsUpdate())
+		{
+//			palette.saveToDOM();
+			paletteMarkup = palette.toStormfrontMarkup();
+		}
+		
 		if (windowUpdateMarkup.length() > 0)
 		{
-			sendSettingsUpdate(
+			String updatePrefix =
 				SETTING_UPDATE_PREFIX +
 				WindowSettings.STORMFRONT_MARKUP_PREFIX +
-				ServerSetting.R_PREFIX,
-				windowUpdateMarkup,
+				ServerSetting.R_PREFIX;
+			
+			String updateSuffix =
 				ServerSetting.R_SUFFIX +
-				WindowSettings.STORMFRONT_MARKUP_SUFFIX);
+				WindowSettings.STORMFRONT_MARKUP_SUFFIX +
+				paletteMarkup;
+			
+//			System.out.println(updatePrefix + windowUpdateMarkup + updateSuffix);
+			sendSettingsUpdate(updatePrefix, windowUpdateMarkup, updateSuffix);
 		}
 		
 		saveLocalXml();
@@ -585,7 +499,7 @@ public class ServerSettings implements Comparable<ServerSettings>
 	{
 		try {
 			FileWriter writer = new FileWriter(ConfigurationUtil.getConfigurationFile("serverSettings_" + playerId + ".xml"));
-			document.write(writer);
+			document.saveTo(writer, true);
 			writer.close();
 			
 		} catch (Exception e) {
@@ -698,5 +612,35 @@ public class ServerSettings implements Comparable<ServerSettings>
 			return windowSettings.get(windowId);
 		}
 		return null;
+	}
+	
+	public WindowSettings getMainWindowSettings ()
+	{
+		return getWindowSettings(WINDOW_MAIN);
+	}
+	
+	public WindowSettings getThoughtsWindowSettings ()
+	{
+		return getWindowSettings(WINDOW_THOUGHTS);
+	}
+	
+	public WindowSettings getDeathsWindowSettings ()
+	{
+		return getWindowSettings(WINDOW_DEATHS);
+	}
+	
+	public WindowSettings getInventoryWindowSettings ()
+	{
+		return getWindowSettings(WINDOW_INVENTORY);
+	}
+	
+	public WindowSettings getSpellsWindowSettings ()
+	{
+		return getWindowSettings(WINDOW_SPELLS);
+	}
+	
+	public CommandLineSettings getCommandLineSettings ()
+	{
+		return commandLineSettings;
 	}
 }
