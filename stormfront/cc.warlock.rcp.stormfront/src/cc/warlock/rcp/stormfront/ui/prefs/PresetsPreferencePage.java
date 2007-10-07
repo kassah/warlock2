@@ -9,8 +9,11 @@ import org.eclipse.jface.util.IPropertyChangeListener;
 import org.eclipse.jface.util.PropertyChangeEvent;
 import org.eclipse.jface.viewers.ArrayContentProvider;
 import org.eclipse.jface.viewers.ILabelProviderListener;
+import org.eclipse.jface.viewers.ISelectionChangedListener;
+import org.eclipse.jface.viewers.IStructuredSelection;
 import org.eclipse.jface.viewers.ITableColorProvider;
 import org.eclipse.jface.viewers.ITableLabelProvider;
+import org.eclipse.jface.viewers.SelectionChangedEvent;
 import org.eclipse.jface.viewers.TableViewer;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.custom.StyleRange;
@@ -32,6 +35,7 @@ import org.eclipse.ui.dialogs.PropertyPage;
 
 import cc.warlock.core.client.IWarlockSkin;
 import cc.warlock.core.stormfront.client.IStormFrontClient;
+import cc.warlock.core.stormfront.client.StormFrontColor;
 import cc.warlock.core.stormfront.serversettings.server.Preset;
 import cc.warlock.core.stormfront.serversettings.server.ServerSettings;
 import cc.warlock.core.stormfront.serversettings.server.WindowSettings;
@@ -102,9 +106,6 @@ public class PresetsPreferencePage extends PropertyPage implements
 		
 		createPresetsTable(main);
 		
-		bgSelector = colorSelectorWithLabel(main, "Background color:");
-		fgSelector = colorSelectorWithLabel(main, "Foreground color:");
-		
 		Group previewGroup = new Group(main, SWT.NONE);
 		previewGroup.setText("Preview");
 		GridData data = new GridData();
@@ -156,13 +157,16 @@ public class PresetsPreferencePage extends PropertyPage implements
 	protected void createPresetsTable (Composite main)
 	{
 		Group presetsGroup = new Group(main, SWT.NONE);
-		presetsGroup.setLayout(new GridLayout(2, false));
+		presetsGroup.setLayout(new GridLayout(6, false));
 		GridData data = new GridData(GridData.FILL, GridData.FILL, true, true);
 		data.horizontalSpan = 3;
 		presetsGroup.setLayoutData(data);
 		presetsGroup.setText("Presets");
 		
-		presetsTable = new TableViewer(presetsGroup, SWT.SINGLE | SWT.BORDER | SWT.V_SCROLL);
+		bgSelector = colorSelectorWithLabel(presetsGroup, "Background color:");
+		fgSelector = colorSelectorWithLabel(presetsGroup, "Foreground color:");
+		
+		presetsTable = new TableViewer(presetsGroup, SWT.SINGLE | SWT.BORDER | SWT.V_SCROLL | SWT.FULL_SELECTION);
 		TableColumn column = new TableColumn(presetsTable.getTable(), SWT.NONE, 0);
 		column.setWidth(400);
 		
@@ -170,6 +174,24 @@ public class PresetsPreferencePage extends PropertyPage implements
 		presetsTable.setColumnProperties(new String[] { "preset" });
 		presetsTable.setContentProvider(new ArrayContentProvider());
 		presetsTable.setLabelProvider(new PresetsLabelProvider());
+		data = new GridData(GridData.FILL, GridData.FILL, true, true);
+		data.horizontalSpan = 6;
+		presetsTable.getTable().setLayoutData(data);
+		
+		presetsTable.addSelectionChangedListener(new ISelectionChangedListener() {
+			public void selectionChanged(SelectionChangedEvent event) {
+				presetSelected((IStructuredSelection)presetsTable.getSelection());
+			}
+		});
+	}
+	
+	protected Preset currentPreset;
+	protected void presetSelected (IStructuredSelection selection)
+	{
+		currentPreset = (Preset) selection.getFirstElement();
+		
+		bgSelector.setColorValue(ColorUtil.warlockColorToRGB(currentPreset.getBackgroundColor()));
+		fgSelector.setColorValue(ColorUtil.warlockColorToRGB(currentPreset.getForegroundColor()));
 	}
 
 	private ColorSelector colorSelectorWithLabel (Composite parent, String text)
@@ -211,6 +233,27 @@ public class PresetsPreferencePage extends PropertyPage implements
 	private void colorChanged (ColorSelector source, RGB newColor)
 	{
 		updatePreview();
+
+		StormFrontColor color = new StormFrontColor(ColorUtil.rgbToWarlockColor(newColor));
+		
+		if (source == bgSelector)
+		{
+			if (currentPreset != null)
+				currentPreset.setBackgroundColor(color);
+		}
+		else if (source == fgSelector)
+		{
+			if (currentPreset != null)
+				currentPreset.setForegroundColor(color);
+		}
+		else if (source == mainBGSelector)
+		{
+			mainWindow.setBackgroundColor(color);
+		}
+		else if (source == mainFGSelector)
+		{
+			mainWindow.setForegroundColor(color);
+		}
 	}
 	
 	private static enum ColorType { BACKGROUND, FOREGROUND };
@@ -251,7 +294,7 @@ public class PresetsPreferencePage extends PropertyPage implements
 	{
 		if (settings != null)
 		{
-			mainWindow = settings.getWindowSettings(ServerSettings.WINDOW_MAIN);
+			mainWindow = new WindowSettings(settings.getMainWindowSettings());
 			
 			for (Preset preset : settings.getPresets())
 			{
@@ -259,18 +302,19 @@ public class PresetsPreferencePage extends PropertyPage implements
 			}
 			
 			mainBGSelector.setColorValue(
-				ColorUtil.warlockColorToRGB(settings.getColorSetting(IWarlockSkin.ColorType.MainWindow_Background)));
+				ColorUtil.warlockColorToRGB(settings.getMainWindowSettings().getBackgroundColor()));
 			
 			mainFGSelector.setColorValue(
-				ColorUtil.warlockColorToRGB(settings.getColorSetting(IWarlockSkin.ColorType.MainWindow_Foreground)));
+				ColorUtil.warlockColorToRGB(settings.getMainWindowSettings().getForegroundColor()));
 			
 			mainFontSelector.setFontData(
 				new FontData(
-					settings.getFontFaceSetting(IWarlockSkin.FontFaceType.MainWindow_FontFace),
-					settings.getFontSizeSetting(IWarlockSkin.FontSizeType.MainWindow_FontSize),
+					settings.getMainWindowSettings().getFontFace(),
+					settings.getMainWindowSettings().getFontSizeInPoints(),
 					0));
 			
 			presetsTable.setInput(presets.values());
+			presetsTable.getTable().setBackground(new Color(getShell().getDisplay(), getColor(mainBGSelector)));
 		}
 	}
 	
@@ -319,6 +363,7 @@ public class PresetsPreferencePage extends PropertyPage implements
 	
 	private void updatePreview ()
 	{
+		presetsTable.getTable().setBackground(new Color(getShell().getDisplay(), getColor(mainBGSelector)));
 		preview.setBackground(new Color(getShell().getDisplay(), getColor(mainBGSelector)));
 		preview.setForeground(new Color(getShell().getDisplay(), mainFGSelector.getColorValue()));
 		preview.setFont(mainFontSelector.getFont());
@@ -346,6 +391,13 @@ public class PresetsPreferencePage extends PropertyPage implements
 		}
 		
 		settings.savePresets();
+		
+		if (mainWindow.needsUpdate())
+		{
+			settings.updateWindowSettings(mainWindow);
+			settings.saveWindowSettings();
+		}
+		
 		return true;
 	}
 }
