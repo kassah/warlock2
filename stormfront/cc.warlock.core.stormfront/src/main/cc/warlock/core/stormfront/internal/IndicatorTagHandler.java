@@ -1,8 +1,7 @@
 package cc.warlock.core.stormfront.internal;
 
-import java.util.Map;
-
 import cc.warlock.core.stormfront.IStormFrontProtocolHandler;
+import cc.warlock.core.stormfront.xml.StormFrontAttributeList;
 
 public class IndicatorTagHandler extends DefaultTagHandler {
 
@@ -17,15 +16,15 @@ public class IndicatorTagHandler extends DefaultTagHandler {
 	}
 	
 	@Override
-	public void handleStart(Map<String, String> attributes) {
-		if (attributes.get("id") != null && attributes.get("visible") != null)
+	public void handleStart(StormFrontAttributeList attributes) {
+		if (attributes.getAttribute("id") != null && attributes.getAttribute("visible") != null)
 		{
-			if ("y".equalsIgnoreCase(attributes.get("visible")))
+			if ("y".equalsIgnoreCase(attributes.getValue("visible")))
 			{
-				handler.getClient().getCharacterStatus().set(attributes.get("id"));
+				handler.getClient().getCharacterStatus().set(attributes.getValue("id"));
 			}
 			else {
-				handler.getClient().getCharacterStatus().unset(attributes.get("id"));
+				handler.getClient().getCharacterStatus().unset(attributes.getValue("id"));
 			}
 		}
 	}

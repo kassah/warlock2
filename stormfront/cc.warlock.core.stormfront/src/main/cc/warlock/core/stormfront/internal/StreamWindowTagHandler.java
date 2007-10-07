@@ -1,8 +1,7 @@
 package cc.warlock.core.stormfront.internal;
 
-import java.util.Map;
-
 import cc.warlock.core.stormfront.IStormFrontProtocolHandler;
+import cc.warlock.core.stormfront.xml.StormFrontAttributeList;
 
 
 public class StreamWindowTagHandler extends DefaultTagHandler {
@@ -18,9 +17,9 @@ public class StreamWindowTagHandler extends DefaultTagHandler {
 	}
 
 	@Override
-	public void handleStart(Map<String,String> attributes) {
-		String title = attributes.get("title");
-		String id = attributes.get("id");
+	public void handleStart(StormFrontAttributeList attributes) {
+		String title = attributes.getValue("title");
+		String id = attributes.getValue("id");
 		
 		if (id != null && title != null)
 		{

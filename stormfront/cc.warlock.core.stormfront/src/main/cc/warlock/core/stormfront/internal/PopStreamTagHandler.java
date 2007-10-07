@@ -1,8 +1,7 @@
 package cc.warlock.core.stormfront.internal;
 
-import java.util.Map;
-
 import cc.warlock.core.stormfront.IStormFrontProtocolHandler;
+import cc.warlock.core.stormfront.xml.StormFrontAttributeList;
 
 
 public class PopStreamTagHandler extends DefaultTagHandler {
@@ -18,7 +17,7 @@ public class PopStreamTagHandler extends DefaultTagHandler {
 		return new String[] { "popStream" };
 	}
 	
-	public void handleStart(Map<String,String> attributes) {
+	public void handleStart(StormFrontAttributeList attributes) {
 		handler.popStream();
 	}
 }

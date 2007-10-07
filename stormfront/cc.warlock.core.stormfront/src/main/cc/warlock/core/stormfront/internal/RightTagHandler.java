@@ -1,8 +1,7 @@
 package cc.warlock.core.stormfront.internal;
 
-import java.util.Map;
-
 import cc.warlock.core.stormfront.IStormFrontProtocolHandler;
+import cc.warlock.core.stormfront.xml.StormFrontAttributeList;
 
 
 public class RightTagHandler extends DefaultTagHandler {
@@ -18,7 +17,7 @@ public class RightTagHandler extends DefaultTagHandler {
 	}
 
 	@Override
-	public void handleStart(Map<String,String> atts) {
+	public void handleStart(StormFrontAttributeList attributes) {
 		rightHandText = new StringBuffer();
 	}
 	

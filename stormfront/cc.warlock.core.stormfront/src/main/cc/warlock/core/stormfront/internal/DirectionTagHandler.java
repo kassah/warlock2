@@ -4,6 +4,7 @@ import java.util.Map;
 
 import cc.warlock.core.stormfront.IStormFrontProtocolHandler;
 import cc.warlock.core.stormfront.IStormFrontTagHandler;
+import cc.warlock.core.stormfront.xml.StormFrontAttributeList;
 
 
 public class DirectionTagHandler implements IStormFrontTagHandler {
@@ -32,7 +33,7 @@ public class DirectionTagHandler implements IStormFrontTagHandler {
 		
 	}
 
-	public void handleStart(Map<String, String> attributes) {
+	public void handleStart(StormFrontAttributeList attributes) {
 		// TODO Auto-generated method stub
 		
 	}

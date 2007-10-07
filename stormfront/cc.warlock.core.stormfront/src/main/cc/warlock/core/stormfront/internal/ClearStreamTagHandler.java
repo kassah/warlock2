@@ -1,8 +1,7 @@
 package cc.warlock.core.stormfront.internal;
 
-import java.util.Map;
-
 import cc.warlock.core.stormfront.IStormFrontProtocolHandler;
+import cc.warlock.core.stormfront.xml.StormFrontAttributeList;
 
 
 public class ClearStreamTagHandler extends DefaultTagHandler {
@@ -18,8 +17,8 @@ public class ClearStreamTagHandler extends DefaultTagHandler {
 		return new String[] { "clearStream"};
 	}
 	
-	public void handleStart(Map<String,String> attributes) {
-		String id = attributes.get("id");
+	public void handleStart(StormFrontAttributeList attributes) {
+		String id = attributes.getValue("id");
 		
 		handler.getClient().getStream(id).clear();
 	}

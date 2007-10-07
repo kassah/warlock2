@@ -6,9 +6,8 @@
  */
 package cc.warlock.core.stormfront.internal;
 
-import java.util.Map;
-
 import cc.warlock.core.stormfront.IStormFrontProtocolHandler;
+import cc.warlock.core.stormfront.xml.StormFrontAttributeList;
 
 
 /**
@@ -31,8 +30,8 @@ public class RoundtimeTagHandler extends DefaultTagHandler {
 		return new String[] { "roundTime" };
 	}
 	
-	public void handleStart(Map<String,String> attributes) {
-		rtEnds = Integer.parseInt(attributes.get("value"));
+	public void handleStart(StormFrontAttributeList attributes) {
+		rtEnds = Integer.parseInt(attributes.getValue("value"));
 		waitingForPrompt = true;
 		roundtimeStarted = false;
 	}

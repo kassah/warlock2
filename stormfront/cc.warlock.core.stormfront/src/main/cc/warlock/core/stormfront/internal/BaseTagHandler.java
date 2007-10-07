@@ -4,6 +4,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 import cc.warlock.core.stormfront.IStormFrontTagHandler;
+import cc.warlock.core.stormfront.xml.StormFrontAttributeList;
 
 abstract public class BaseTagHandler implements IStormFrontTagHandler {
 	protected String currentTag;
@@ -11,7 +12,7 @@ abstract public class BaseTagHandler implements IStormFrontTagHandler {
 	
 	public abstract String[] getTagNames();
 	
-	public void handleStart(Map<String,String> atts) { }
+	public void handleStart(StormFrontAttributeList attributes) { }
 
 	public void handleEnd() { }
 

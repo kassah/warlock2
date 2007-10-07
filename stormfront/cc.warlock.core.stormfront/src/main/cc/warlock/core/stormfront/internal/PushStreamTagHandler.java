@@ -3,9 +3,8 @@
  */
 package cc.warlock.core.stormfront.internal;
 
-import java.util.Map;
-
 import cc.warlock.core.stormfront.IStormFrontProtocolHandler;
+import cc.warlock.core.stormfront.xml.StormFrontAttributeList;
 
 
 /**
@@ -23,8 +22,8 @@ public class PushStreamTagHandler extends DefaultTagHandler {
 		return new String[] { "pushStream" };
 	}
 	
-	public void handleStart(Map<String,String> attributes) {
-		String id = attributes.get("id");
+	public void handleStart(StormFrontAttributeList attributes) {
+		String id = attributes.getValue("id");
 		handler.pushStream(id);
 	}
 }

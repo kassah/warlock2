@@ -1,8 +1,7 @@
 package cc.warlock.core.stormfront.internal;
 
-import java.util.Map;
-
 import cc.warlock.core.stormfront.IStormFrontProtocolHandler;
+import cc.warlock.core.stormfront.xml.StormFrontAttributeList;
 
 
 public class PlayerIDTagHandler extends DefaultTagHandler {
@@ -18,8 +17,8 @@ public class PlayerIDTagHandler extends DefaultTagHandler {
 	}
 	
 	@Override
-	public void handleStart(Map<String,String> attributes) {
-		handler.getClient().getPlayerId().set(attributes.get("id"));
+	public void handleStart(StormFrontAttributeList attributes) {
+		handler.getClient().getPlayerId().set(attributes.getValue("id"));
 	}
 
 }

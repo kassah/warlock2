@@ -6,11 +6,10 @@
  */
 package cc.warlock.core.stormfront.internal;
 
-import java.util.Map;
-
 import cc.warlock.core.client.IWarlockStyle;
 import cc.warlock.core.client.internal.WarlockStyle;
 import cc.warlock.core.stormfront.IStormFrontProtocolHandler;
+import cc.warlock.core.stormfront.xml.StormFrontAttributeList;
 
 
 /**
@@ -32,13 +31,13 @@ public class StyleTagHandler extends DefaultTagHandler {
 		return new String[] { "style", "output" };
 	}
 
-	public void handleStart(Map<String,String> attributes) {
+	public void handleStart(StormFrontAttributeList attributes) {
 		String styleId = null;
 		
 		if ("style".equals(getCurrentTag()))
-			styleId = attributes.get("id");
+			styleId = attributes.getValue("id");
 		else if ("output".equals(getCurrentTag()))
-			styleId = attributes.get("class");
+			styleId = attributes.getValue("class");
 		
 		if (styleId == null || styleId.length() == 0)
 		{

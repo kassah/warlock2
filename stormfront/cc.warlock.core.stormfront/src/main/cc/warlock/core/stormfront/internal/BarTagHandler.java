@@ -3,10 +3,9 @@
  */
 package cc.warlock.core.stormfront.internal;
 
-import java.util.Map;
-
 import cc.warlock.core.stormfront.IStormFrontProtocolHandler;
 import cc.warlock.core.stormfront.client.IStormFrontClient;
+import cc.warlock.core.stormfront.xml.StormFrontAttributeList;
 
 
 /**
@@ -25,8 +24,8 @@ public class BarTagHandler extends BaseTagHandler {
 		return new String[] { "progressBar" };
 	}
 
-	public void handleStart(Map<String,String> attributes) {
-    	handleProgressBar(attributes.get("id"), Integer.parseInt(attributes.get("value")), attributes.get("text"));	
+	public void handleStart(StormFrontAttributeList attributes) {
+    	handleProgressBar(attributes.getValue("id"), Integer.parseInt(attributes.getValue("value")), attributes.getValue("text"));	
 	}
 	
 	private void handleProgressBar (String which, int percentage, String label)

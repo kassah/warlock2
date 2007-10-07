@@ -21,6 +21,8 @@ import cc.warlock.core.client.internal.WarlockStyle;
 import cc.warlock.core.stormfront.IStormFrontProtocolHandler;
 import cc.warlock.core.stormfront.IStormFrontTagHandler;
 import cc.warlock.core.stormfront.client.IStormFrontClient;
+import cc.warlock.core.stormfront.xml.StormFrontAttribute;
+import cc.warlock.core.stormfront.xml.StormFrontAttributeList;
 
 
 /**
@@ -220,17 +222,17 @@ public class StormFrontProtocolHandler implements IStormFrontProtocolHandler {
 	/* (non-Javadoc)
 	 * @see org.xml.sax.ContentHandler#startElement(java.lang.String, java.lang.String, java.lang.String, org.xml.sax.Attributes)
 	 */
-	public void startElement(String name, Map<String,String> attributes) {
+	public void startElement(String name, StormFrontAttributeList attributes) {
 		
 		//System.out.print("<" + name);
 		if (rawXMLBuffer != null)
 		{
 			String startTag = "<" + name;
 			if (attributes != null) {
-	            for (Map.Entry<String, String> entry : attributes.entrySet())
+	            for (StormFrontAttribute attribute : attributes.getList())
 	            {
-	                startTag += " " + entry.getKey() + "=\"" + entry.getValue() + "\"";
-	                // System.out.print(" " + aName + "=\"" + attributes.get(aName) + "\"");
+	                startTag += " " + attribute.getName() + "=" +
+	                	attribute.getQuoteType() + attribute.getValue() + attribute.getQuoteType();
 	            }
 	        }
 			startTag += ">";

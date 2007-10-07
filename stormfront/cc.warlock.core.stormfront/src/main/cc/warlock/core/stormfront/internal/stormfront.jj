@@ -1,15 +1,15 @@
 PARSER_BEGIN(StormFrontProtocolParser)
 package cc.warlock.core.stormfront.internal;
 
-import cc.warlock.core.stormfront.IStormFrontProtocolHandler;
-import java.util.Map;
-import java.util.HashMap;
+import cc.warlock.core.stormfront.IStormFrontXMLHandler;
+import cc.warlock.core.stormfront.StormFrontAttribute;
+import cc.warlock.core.stormfront.StormFrontAttributeList;
 
 public class StormFrontProtocolParser {
-	protected IStormFrontProtocolHandler handler;
-	protected Map<String,String> currentAttributes = new HashMap<String,String>();
+	protected IStormFrontXMLHandler handler;
+	protected StormFrontAttributeList currentAttributes = new StormFrontAttributeList();
 	
-	public void setHandler (IStormFrontProtocolHandler handler)
+	public void setHandler (IStormFrontXMLHandler handler)
 	{
 		this.handler = handler;
 	}
@@ -32,7 +32,12 @@ public class StormFrontProtocolParser {
 	{	
 		// System.out.println("addAttribute name=" + name.image + ",value=" +newValue);
 		
-		currentAttributes.put(name, value);
+		StormFrontAttribute attribute = new StormFrontAttribute();
+		attribute.setName(name);
+		attribute.setValue(value);
+		attribute.setQuoteType(token_source.quoteChar);
+		
+		currentAttributes.addAttribute(attribute);
 	}
 	
 	protected void endElement (String name)
@@ -88,6 +93,11 @@ String Entity(): { Token entity; }
 	}
 }
 
+TOKEN_MGR_DECLS :
+{
+  public char quoteChar;
+}
+
 TOKEN: {
 	<TAG_START_OPEN: "<"> : IN_TAG_MODE |
 	<TAG_END_OPEN: "</"> : IN_TAG_MODE |
@@ -105,7 +115,7 @@ TOKEN: {
 	
 		
 	<ATTR_EQ: "="> |
-	<ATTR_VALUE: ( "\"" (~["\""])* ("\"" (~["\"", "=", ">"])*)* "\"" | "'" (~["'"])* ("'" (~["'", "=", ">"])*)* "'")> { matchedToken.image = matchedToken.image.substring(1, matchedToken.image.length() - 1); } |
+	<ATTR_VALUE: ( "\"" (~["\""])* ("\"" (~["\"", "=", ">"])*)* "\"" | "'" (~["'"])* ("'" (~["'", "=", ">"])*)* "'")> { quoteChar = matchedToken.image.charAt(0); matchedToken.image = matchedToken.image.substring(1, matchedToken.image.length() - 1); } |
 	
 	<GENERIC_ID: (<LETTER> | "_" | ":" ) (<NAMECHAR>)*> 
 }

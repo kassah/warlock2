@@ -1,11 +1,11 @@
 package cc.warlock.core.stormfront.internal;
 
 import java.io.File;
-import java.util.Map;
 
 import cc.warlock.core.configuration.ConfigurationUtil;
 import cc.warlock.core.stormfront.IStormFrontProtocolHandler;
 import cc.warlock.core.stormfront.serversettings.server.ServerSettings;
+import cc.warlock.core.stormfront.xml.StormFrontAttributeList;
 
 
 public class SettingsInfoTagHandler extends DefaultTagHandler {
@@ -23,16 +23,16 @@ public class SettingsInfoTagHandler extends DefaultTagHandler {
 	}
 	
 	@Override
-	public void handleStart(Map<String, String> attributes) {
-		crc = attributes.get("crc");
+	public void handleStart(StormFrontAttributeList attributes) {
+		crc = attributes.getValue("crc");
 		
-		String major = attributes.get("major");
+		String major = attributes.getValue("major");
 		if(major != null) {
-			majorVersion = Integer.parseInt(attributes.get("major"));
+			majorVersion = Integer.parseInt(attributes.getValue("major"));
 			handler.getClient().getServerSettings().setMajorVersion(majorVersion);
 		}
 		
-		clientVersion = attributes.get("client");
+		clientVersion = attributes.getValue("client");
 		if(clientVersion != null)
 			handler.getClient().getServerSettings().setClientVersion(clientVersion);
 	}

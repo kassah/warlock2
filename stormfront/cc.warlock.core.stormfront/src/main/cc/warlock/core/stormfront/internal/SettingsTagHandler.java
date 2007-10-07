@@ -2,12 +2,12 @@ package cc.warlock.core.stormfront.internal;
 
 import java.io.File;
 import java.io.FileOutputStream;
-import java.util.Map;
 
 import cc.warlock.core.client.IWarlockClientViewer;
 import cc.warlock.core.configuration.ConfigurationUtil;
 import cc.warlock.core.stormfront.IStormFrontProtocolHandler;
 import cc.warlock.core.stormfront.client.IStormFrontClientViewer;
+import cc.warlock.core.stormfront.xml.StormFrontAttributeList;
 
 
 public class SettingsTagHandler extends DefaultTagHandler {
@@ -55,7 +55,7 @@ public class SettingsTagHandler extends DefaultTagHandler {
 	}
 	
 	@Override
-	public void handleStart(Map<String,String> atts) {
+	public void handleStart(StormFrontAttributeList attributes) {
 		if ("settings".equals(getCurrentTag()))
 		{	
 			buffer.setLength(0);	
@@ -73,7 +73,7 @@ public class SettingsTagHandler extends DefaultTagHandler {
 		if ("settings".equals(getCurrentTag()))
 		{
 			handler.stopSavingRawXML();
-			buffer.insert(0, "<?xml version=\"1.0\" encoding=\"ISO-8859-1\"?>\n<settings>\n");
+			buffer.insert(0, "<settings>\n");
 			buffer.append("</settings>");
 			
 			String settings = "<settings>";

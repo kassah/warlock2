@@ -3,10 +3,9 @@
  */
 package cc.warlock.core.stormfront.internal;
 
-import java.util.Map;
-
 import cc.warlock.core.stormfront.IStormFrontProtocolHandler;
 import cc.warlock.core.stormfront.client.IStormFrontClient;
+import cc.warlock.core.stormfront.xml.StormFrontAttributeList;
 
 
 /**
@@ -29,13 +28,13 @@ public class PromptTagHandler extends DefaultTagHandler {
 		return new String[] { "prompt" };
 	}
 	
-	public void handleStart(Map<String,String> attributes) {
+	public void handleStart(StormFrontAttributeList attributes) {
 		//System.out.println("got prompt");
 		prompt = "";
 		
-		if (attributes.get("time") != null)
+		if (attributes.getValue("time") != null)
 		{
-			currentTime = Integer.parseInt(attributes.get("time"));
+			currentTime = Integer.parseInt(attributes.getValue("time"));
 			if (roundtimeHandler.isWaitingForPrompt()) {
 				roundtimeHandler.processFollowingPrompt(currentTime);
 			}

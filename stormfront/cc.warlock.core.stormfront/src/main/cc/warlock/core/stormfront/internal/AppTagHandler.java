@@ -3,9 +3,8 @@
  */
 package cc.warlock.core.stormfront.internal;
 
-import java.util.Map;
-
 import cc.warlock.core.stormfront.IStormFrontProtocolHandler;
+import cc.warlock.core.stormfront.xml.StormFrontAttributeList;
 
 
 /**
@@ -21,9 +20,9 @@ public class AppTagHandler extends DefaultTagHandler {
 		return new String[] { "app" };
 	}
 	
-	public void handleStart(Map<String,String> attributes) {
-		String characterName = attributes.get("char");
-		String gameName = attributes.get("game");
+	public void handleStart(StormFrontAttributeList attributes) {
+		String characterName = attributes.getValue("char");
+		String gameName = attributes.getValue("game");
 		
 		handler.getClient().getDefaultStream().getTitle().set("[" + gameName + "] " + characterName);
 		handler.getClient().getCharacterName().set(characterName);

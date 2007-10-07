@@ -1,9 +1,8 @@
 package cc.warlock.core.stormfront.internal;
 
-import java.util.Map;
-
 import cc.warlock.core.client.internal.WarlockStyle;
 import cc.warlock.core.stormfront.IStormFrontProtocolHandler;
+import cc.warlock.core.stormfront.xml.StormFrontAttributeList;
 
 
 public class PresetTagHandler extends DefaultTagHandler {
@@ -20,8 +19,8 @@ public class PresetTagHandler extends DefaultTagHandler {
 	}
 	
 	@Override
-	public void handleStart(Map<String,String> atts) {
-		this.id = atts.get("id");
+	public void handleStart(StormFrontAttributeList attributes) {
+		this.id = attributes.getValue("id");
 		handler.setCurrentStyle(WarlockStyle.createCustomStyle(id, 0, -1));
 	}
 	

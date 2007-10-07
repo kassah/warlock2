@@ -3,9 +3,8 @@
  */
 package cc.warlock.core.stormfront.internal;
 
-import java.util.Map;
-
 import cc.warlock.core.stormfront.IStormFrontProtocolHandler;
+import cc.warlock.core.stormfront.xml.StormFrontAttributeList;
 
 
 /**
@@ -32,11 +31,11 @@ public class CompDefTagHandler extends DefaultTagHandler {
 		return new String[] { "compDef" };
 	}
 
-	public void handleStart(Map<String,String> attributes) {
+	public void handleStart(StormFrontAttributeList attributes) {
 		buffer.setLength(0);
-		this.id = attributes.get("id");
+		this.id = attributes.getValue("id");
 		
-		if (attributes.get("id").equals("room exits")) {
+		if (attributes.getValue("id").equals("room exits")) {
 			handler.getClient().getCompass().clear();
 		}
 	}
