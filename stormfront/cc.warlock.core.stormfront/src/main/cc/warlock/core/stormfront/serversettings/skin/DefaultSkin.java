@@ -5,8 +5,10 @@ import java.util.Map;
 
 import cc.warlock.core.client.WarlockColor;
 import cc.warlock.core.stormfront.client.StormFrontColor;
+import cc.warlock.core.stormfront.serversettings.server.ColorSetting;
 import cc.warlock.core.stormfront.serversettings.server.Preset;
 import cc.warlock.core.stormfront.serversettings.server.ServerSettings;
+import cc.warlock.core.stormfront.serversettings.server.WindowSettings;
 
 /**
  * The default skin handles any attributes who's values are "skin"
@@ -44,8 +46,8 @@ public class DefaultSkin implements IStormFrontSkin {
 		fgColors.put("selectedLink", skinColor("#000000"));
 		fgColors.put("command", skinColor("#FFFFFF"));
 		
-		fgColors.put("main", MAIN_COLOR);
-		bgColors.put("main", MAIN_COLOR);
+		fgColors.put(ServerSettings.WINDOW_MAIN, MAIN_COLOR);
+		bgColors.put(ServerSettings.WINDOW_MAIN, MAIN_COLOR);
 		
 		bgColors.put("roomName", skinColor("#0000FF"));
 		bgColors.put("bold", MAIN_COLOR);
@@ -54,7 +56,6 @@ public class DefaultSkin implements IStormFrontSkin {
 		bgColors.put("thought", MAIN_COLOR);
 		bgColors.put("watching", MAIN_COLOR);
 		bgColors.put("link", MAIN_COLOR);
-		bgColors.put("main", MAIN_COLOR);
 		bgColors.put("cmdline", skinColor("#000000"));
 		bgColors.put("selectedLink", skinColor("#62B0FF"));
 		bgColors.put("command", skinColor("#404040"));
@@ -63,26 +64,26 @@ public class DefaultSkin implements IStormFrontSkin {
 	}
 	
 	protected StormFrontColor getMainForeground () {
-		StormFrontColor mainFG = settings.getColorSetting(ColorType.MainWindow_Foreground, false);
+		StormFrontColor mainFG = settings.getMainWindowSettings().getForegroundColor(false);
 		mainFG = mainFG.equals(StormFrontColor.DEFAULT_COLOR) ? skinColor("#F0F0FF") : mainFG;
 		return mainFG;
 	}
 	
 	protected StormFrontColor getMainBackground () {
-		StormFrontColor mainBG = settings.getColorSetting(ColorType.MainWindow_Background, false);
+		StormFrontColor mainBG = settings.getMainWindowSettings().getBackgroundColor(false);
 		mainBG = mainBG.equals(StormFrontColor.DEFAULT_COLOR) ? skinColor("#191932") : mainBG;
 		return mainBG;
 	}
 	
 	public WarlockColor getColor(ColorType type) {
 		if (type == ColorType.MainWindow_Background)
-			return getSkinBackgroundColor("main");
+			return getSkinBackgroundColor(settings.getWindowSettings(ServerSettings.WINDOW_MAIN));
 		else if (type == ColorType.MainWindow_Foreground)
-			return getSkinForegroundColor("main");
+			return getSkinForegroundColor(settings.getWindowSettings(ServerSettings.WINDOW_MAIN));
 		else if (type == ColorType.CommandLine_Background)
-			return getSkinBackgroundColor("cmdline");
+			return getSkinBackgroundColor(settings.getCommandLineSettings());
 		else if (type == ColorType.CommandLine_Foreground)
-			return getSkinForegroundColor("cmdline");
+			return getSkinForegroundColor(settings.getCommandLineSettings());
 		else if (type == ColorType.CommandLine_BarColor)
 			return commandLineBarColor;
 		
@@ -108,13 +109,13 @@ public class DefaultSkin implements IStormFrontSkin {
 	// These are hard coded for now, we should either have our own "skin" defined in a configuration somewhere,
 	// or try to pull from stormfront's binary "skn" file somehow?
 	// At any rate -- these look to be the right "default" settings for stormfront..
-	public StormFrontColor getSkinForegroundColor (String presetId)
+	public StormFrontColor getSkinForegroundColor (ColorSetting setting)
 	{
 		StormFrontColor color = StormFrontColor.DEFAULT_COLOR;
 		
-		if (fgColors.containsKey(presetId))
+		if (fgColors.containsKey(setting.getId()))
 		{
-			color = fgColors.get(presetId);
+			color = fgColors.get(setting.getId());
 		}
 		
 		if (color == MAIN_COLOR)
@@ -125,13 +126,13 @@ public class DefaultSkin implements IStormFrontSkin {
 		return color;
 	}
 	
-	public StormFrontColor getSkinBackgroundColor (String presetId)
+	public StormFrontColor getSkinBackgroundColor (ColorSetting setting)
 	{
 		StormFrontColor color = StormFrontColor.DEFAULT_COLOR;
 		
-		if (bgColors.containsKey(presetId))
+		if (bgColors.containsKey(setting.getId()))
 		{
-			color = bgColors.get(presetId);
+			color = bgColors.get(setting.getId());
 		}
 		
 		if (color == MAIN_COLOR)
@@ -144,8 +145,7 @@ public class DefaultSkin implements IStormFrontSkin {
 
 	protected Preset getPresetForId(ServerSettings settings, String id, boolean fillEntireLine)
 	{
-		Preset p = new Preset(settings);
-		p.setPalette(settings.getPalette());
+		Preset p = new Preset(settings, settings.getPalette());
 		p.setName(id);
 		p.setForegroundColor(fgColors.get(id));
 		p.setBackgroundColor(bgColors.get(id));
