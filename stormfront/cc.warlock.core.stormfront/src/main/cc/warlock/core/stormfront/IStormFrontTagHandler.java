@@ -5,6 +5,9 @@ package cc.warlock.core.stormfront;
 
 import java.util.Map;
 
+import cc.warlock.core.stormfront.xml.StormFrontAttributeList;
+
+
 /**
  * @author Marshall
  * 
@@ -28,7 +31,7 @@ public interface IStormFrontTagHandler {
 	 * Handle the start tag 
 	 * @param atts
 	 */
-	public void handleStart(Map<String,String> attributes);
+	public void handleStart(StormFrontAttributeList attributes);
 	
 	/**
 	 * handle the end tag

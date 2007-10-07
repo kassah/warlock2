@@ -6,12 +6,11 @@
  */
 package cc.warlock.core.stormfront;
 
-import java.util.Map;
-
 import cc.warlock.core.client.IStream;
 import cc.warlock.core.client.IStyledString;
 import cc.warlock.core.client.IWarlockStyle;
 import cc.warlock.core.stormfront.client.IStormFrontClient;
+import cc.warlock.core.stormfront.xml.IStormFrontXMLHandler;
 
 /**
  * @author sproctor
@@ -19,7 +18,7 @@ import cc.warlock.core.stormfront.client.IStormFrontClient;
  * TODO To change the template for this generated type comment go to
  * Window - Preferences - Java - Code Style - Code Templates
  */
-public interface IStormFrontProtocolHandler {
+public interface IStormFrontProtocolHandler extends IStormFrontXMLHandler {
 	
 	public void registerHandler(IStormFrontTagHandler tagHandler);
 	
@@ -29,10 +28,6 @@ public interface IStormFrontProtocolHandler {
 	public void popStream();
 	public IStream getCurrentStream();
 	public IWarlockStyle getCurrentStyle();
-	
-	public void characters(char[] ch, int start, int length);
-	public void startElement(String name, Map<String,String> attributes);
-	public void endElement(String name);
 	
 	public void pushBuffer();
 	public IStyledString popBuffer();
