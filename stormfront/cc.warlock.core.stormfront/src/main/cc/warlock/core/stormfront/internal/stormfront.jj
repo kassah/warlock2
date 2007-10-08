@@ -1,9 +1,9 @@
 PARSER_BEGIN(StormFrontProtocolParser)
 package cc.warlock.core.stormfront.internal;
 
-import cc.warlock.core.stormfront.IStormFrontXMLHandler;
-import cc.warlock.core.stormfront.StormFrontAttribute;
-import cc.warlock.core.stormfront.StormFrontAttributeList;
+import cc.warlock.core.stormfront.xml.IStormFrontXMLHandler;
+import cc.warlock.core.stormfront.xml.StormFrontAttribute;
+import cc.warlock.core.stormfront.xml.StormFrontAttributeList;
 
 public class StormFrontProtocolParser {
 	protected IStormFrontXMLHandler handler;
