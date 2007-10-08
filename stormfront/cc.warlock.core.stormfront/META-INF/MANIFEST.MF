@@ -17,4 +17,5 @@ Export-Package: cc.warlock.core.stormfront,
  cc.warlock.core.stormfront.internal,
  cc.warlock.core.stormfront.network,
  cc.warlock.core.stormfront.serversettings.server,
- cc.warlock.core.stormfront.serversettings.skin
+ cc.warlock.core.stormfront.serversettings.skin,
+ cc.warlock.core.stormfront.xml
