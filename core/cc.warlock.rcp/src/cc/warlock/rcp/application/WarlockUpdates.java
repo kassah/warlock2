@@ -32,15 +32,15 @@ public class WarlockUpdates {
 	
 	public static List<IFeatureReference> promptUpgrade (Map<IFeatureReference, VersionedIdentifier> newVersions)
 	{
-		Shell shell = new Shell();
-		WarlockUpdateDialog dialog = new WarlockUpdateDialog(shell, newVersions);
-		shell.setSize(400, 400);
-		int response = dialog.open();
-		
-		if (response == Window.OK)
-		{
-			return dialog.getSelectedFeatures();
-		}
+//		Shell shell = new Shell();
+//		WarlockUpdateDialog dialog = new WarlockUpdateDialog(shell, newVersions);
+//		shell.setSize(400, 400);
+//		int response = dialog.open();
+//		
+//		if (response == Window.OK)
+//		{
+//			return dialog.getSelectedFeatures();
+//		}
 		
 		return Collections.emptyList();
 	}
