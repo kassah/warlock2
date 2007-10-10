@@ -12,6 +12,9 @@ public interface IStormFrontSkin extends IWarlockSkin {
 
 	public void loadDefaultPresets (ServerSettings settings, Map<String, Preset> presets);
 	
+	public StormFrontColor getDefaultWindowBackground();
+	public StormFrontColor getDefaultWindowForeground();
+	
 	public StormFrontColor getSkinForegroundColor (ColorSetting setting);
 	public StormFrontColor getSkinBackgroundColor (ColorSetting setting);
 }

@@ -8,7 +8,6 @@ import cc.warlock.core.stormfront.client.StormFrontColor;
 import cc.warlock.core.stormfront.serversettings.server.ColorSetting;
 import cc.warlock.core.stormfront.serversettings.server.Preset;
 import cc.warlock.core.stormfront.serversettings.server.ServerSettings;
-import cc.warlock.core.stormfront.serversettings.server.WindowSettings;
 
 /**
  * The default skin handles any attributes who's values are "skin"
@@ -23,6 +22,8 @@ public class DefaultSkin implements IStormFrontSkin {
 	protected Hashtable<String, StormFrontColor> bgColors = new Hashtable<String, StormFrontColor>();
 	protected StormFrontColor commandLineBarColor;
 	protected ServerSettings settings;
+	
+	protected StormFrontColor defaultWindowBackground, defaultWindowForeground;
 	
 	protected static StormFrontColor skinColor (String color)
 	{
@@ -61,17 +62,20 @@ public class DefaultSkin implements IStormFrontSkin {
 		bgColors.put("command", skinColor("#404040"));
 		
 		commandLineBarColor = skinColor("#FFFFFF");
+		
+		defaultWindowForeground = skinColor("#F0F0FF");
+		defaultWindowBackground = skinColor("191932");
 	}
 	
 	protected StormFrontColor getMainForeground () {
 		StormFrontColor mainFG = settings.getMainWindowSettings().getForegroundColor(false);
-		mainFG = mainFG.equals(StormFrontColor.DEFAULT_COLOR) ? skinColor("#F0F0FF") : mainFG;
+		mainFG = mainFG.equals(StormFrontColor.DEFAULT_COLOR) ? defaultWindowForeground : mainFG;
 		return mainFG;
 	}
 	
 	protected StormFrontColor getMainBackground () {
 		StormFrontColor mainBG = settings.getMainWindowSettings().getBackgroundColor(false);
-		mainBG = mainBG.equals(StormFrontColor.DEFAULT_COLOR) ? skinColor("#191932") : mainBG;
+		mainBG = mainBG.equals(StormFrontColor.DEFAULT_COLOR) ? defaultWindowBackground: mainBG;
 		return mainBG;
 	}
 	
@@ -171,5 +175,13 @@ public class DefaultSkin implements IStormFrontSkin {
 		addDefaultPreset(Preset.PRESET_THOUGHT, false, settings, presets);
 		addDefaultPreset(Preset.PRESET_WATCHING, false, settings, presets);
 		addDefaultPreset(Preset.PRESET_WHISPER, false, settings, presets);
+	}
+
+	public StormFrontColor getDefaultWindowBackground() {
+		return defaultWindowBackground;
+	}
+
+	public StormFrontColor getDefaultWindowForeground() {
+		return defaultWindowForeground;
 	}
 }
