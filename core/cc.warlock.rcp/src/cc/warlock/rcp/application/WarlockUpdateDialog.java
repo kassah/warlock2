@@ -52,6 +52,7 @@ public class WarlockUpdateDialog extends Dialog {
 		super.configureShell(newShell);
 		
 		newShell.setSize(400, 300);
+		newShell.setActive();
 	}
 		
 	@Override

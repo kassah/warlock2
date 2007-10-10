@@ -230,6 +230,7 @@ public class ConnectionView extends ViewPart {
 	public void setFocus() {
 		if (!checkedForUpdates)
 		{
+			System.out.println("checking for updates...");
 			WarlockUpdates.checkForUpdates();
 			checkedForUpdates = true;
 		}
