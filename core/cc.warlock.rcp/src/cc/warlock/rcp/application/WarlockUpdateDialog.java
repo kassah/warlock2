@@ -32,7 +32,7 @@ public class WarlockUpdateDialog extends Dialog {
 
 	protected TableViewer updateTable;
 	protected HashMap<IFeatureReference, Boolean> features = new HashMap<IFeatureReference, Boolean>();
-	protected Map<IFeatureReference, VersionedIdentifier> newVersions;
+	protected Map<IFeatureReference, VersionedIdentifier> oldVersions;
 	
 	public WarlockUpdateDialog (Shell parent, Map<IFeatureReference, VersionedIdentifier> newVersions)
 	{
@@ -41,7 +41,7 @@ public class WarlockUpdateDialog extends Dialog {
 		for (IFeatureReference ref : newVersions.keySet())
 			this.features.put(ref, false);
 		
-		this.newVersions = newVersions;
+		this.oldVersions = newVersions;
 		
 		parent.setText("Warlock Updates");
 		parent.setImage(WarlockSharedImages.getImage(WarlockSharedImages.IMG_UPDATES));
@@ -104,16 +104,17 @@ public class WarlockUpdateDialog extends Dialog {
 				}
 				else if (columnIndex == 2) //old version
 				{
+					return oldVersions.get(ref).getVersion().toString();
+					
+				}
+				else if (columnIndex == 3) //new version
+				{
 					try {
 						return ref.getVersionedIdentifier().getVersion().toString();
 					} catch (CoreException e) {
 						// TODO Auto-generated catch block
 						e.printStackTrace();
 					}
-				}
-				else if (columnIndex == 3) //new version
-				{
-					return newVersions.get(ref).getVersion().toString();
 				}
 				return "";
 			}
