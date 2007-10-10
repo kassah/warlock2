@@ -1,0 +1,3 @@
+<antlib>
+	<taskdef resource="cc/warlock/build/tasks.properties"/>
+</antlib>
