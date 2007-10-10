@@ -6,20 +6,45 @@
 	<property file="warlock-build.properties"/>
 	<import file="common.xml"/>
 	
+	<taskdef resource="net/sf/antcontrib/antlib.xml">
+	  <classpath>
+	    <pathelement location="lib/ant-contrib-1.0b3.jar"/>
+	  </classpath>
+	</taskdef>
+	<taskdef resource="cc/warlock/build/antlib.xml">
+		<classpath>
+			<pathelement path="bin"/>
+			<fileset dir="lib" includes="**/*"/>
+		</classpath>
+	</taskdef>
+	
+	<macrodef name="replace-versions">
+		<attribute name="id"/>
+		<attribute name="directory" default="plugins"/>
+		<sequential>
+			<progress message="Replacing versions in @{id}..."/>
+			<eclipse.versionReplacer path="${buildDirectory}/@{directory}/@{id}" version="${version}"/>
+			<progress add="1"/>
+		</sequential>
+	</macrodef>
+		
 	<target name="replace-versions">
+		<progressDialog icon="images/character.gif" title="Replacing Plugin Versions">
+			<progressBar min="0" max="8"/>
+		</progressDialog>
+		
+		<progress message="Getting Revision..."/>
+		
 		<getWarlockVersion property="version"/>
-		<echo>Building warlock version ${version}...</echo>
+		<progress add="1"/>
 		
-		<eclipse.versionReplacer path="${buildDirectory}/features/cc.warlock.rcp.feature" version="${version}"/>
-		<eclipse.versionReplacer path="${buildDirectory}/features/cc.warlock.rcp.stormfront.feature" version="${version}"/>
-		<eclipse.versionReplacer path="${buildDirectory}/plugins/cc.warlock.core" version="${version}"/>
-		<eclipse.versionReplacer path="${buildDirectory}/plugins/cc.warlock.core.script" version="${version}"/>
-		<eclipse.versionReplacer path="${buildDirectory}/plugins/cc.warlock.core.stormfront" version="${version}"/>
-		<eclipse.versionReplacer path="${buildDirectory}/plugins/cc.warlock.core.stormfront.script" version="${version}"/>
-		<eclipse.versionReplacer path="${buildDirectory}/plugins/cc.warlock.rcp" version="${version}"/>
-		<eclipse.versionReplacer path="${buildDirectory}/plugins/cc.warlock.rcp.stormfront" version="${version}"/>
-		<eclipse.versionReplacer path="${buildDirectory}/plugins/cc.warlock.rcp.userstreams" version="${version}"/>
-		
+		<replace-versions id="cc.warlock.core"/>
+		<replace-versions id="cc.warlock.core.script"/>
+		<replace-versions id="cc.warlock.core.stormfront"/>
+		<replace-versions id="cc.warlock.core.stormfront.script"/>
+		<replace-versions id="cc.warlock.rcp"/>
+		<replace-versions id="cc.warlock.rcp.stormfront"/>
+		<replace-versions id="cc.warlock.rcp.userstreams"/>
 	</target>
 	
 </project>

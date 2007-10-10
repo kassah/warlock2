@@ -9,6 +9,13 @@
 	  </classpath>
 	</taskdef>
 	
+	<taskdef resource="cc/warlock/build/antlib.xml">
+		<classpath>
+			<pathelement path="bin"/>
+			<fileset dir="lib" includes="**/*"/>
+		</classpath>
+	</taskdef>
+	
 	<target name="clean">
 		<delete includeemptydirs="true" failonerror="false">
 			<fileset dir="${buildDirectory}" includes="**/*"/>
@@ -16,21 +23,32 @@
 		</delete>
 	</target>
 		
-	<target name="copy-code">
+	<target name="copy-code" depends="clean">
 		<mkdir dir="${buildDirectory}"/>
-
-		<copy todir="${buildDirectory}/features">
+		<progressDialog icon="images/character.gif" title="Warlock Build Progress">
+			<progressBar min="0" max="7"/>
+			<progressBar name="copy" min="0" max="100"/>
+		</progressDialog>
+		
+		<progress message="Copying Features..."/>
+		<progressCopy bar="copy" todir="${buildDirectory}/features">
 			<fileset dir="../../features" includes="cc.*.feature/**/*"/>
-		</copy>
-			
-		<copy todir="${buildDirectory}/plugins">
+		</progressCopy>
+		<progress add="1" message="Copying Plugins..."/>
+		
+		<progressCopy bar="copy" todir="${buildDirectory}/plugins">
 			<fileset dir="../../core" includes="**/*"/>
 			<fileset dir="../../stormfront" includes="**/*"/>
-		</copy>
+		</progressCopy>
+		<progress add="1"/>
 	</target>
 
 	<target name="build-product" depends="copy-code">
+		<progress set="0" message="" bar="copy"/>
+		<progress message="Getting Subversion Revision..."/>
+		
 		<getWarlockVersion property="warlock-version"/>
+		<progress add="1" message="Replacing versions in plugins and manifests..."/>
 		
 		<fileset dir="${eclipseDir}/plugins" id="launcher-fileset">
 			<include name="org.eclipse.equinox.launcher_*.jar"/>
@@ -41,8 +59,9 @@
 			<include name="org.eclipse.pde.build_*/scripts/productBuild/productBuild.xml"/>
 		</fileset>
 		<pathconvert pathsep="," property="productBuild-script" refid="productBuild-fileset"/>
-		
+	
 		<antRunner antfile="replaceVersions.xml"/>
+		<progress add="1" message="Building Plugins..."/>
 		
 		<antRunner antfile="${productBuild-script}">
 			<syspropertyset>
@@ -52,7 +71,10 @@
 			<sysproperty key="builder" value="${basedir}"/>
 		</antRunner>
 		
+		<progress add="1" message="Renaming binaries..."/>
 		<antcall target="rename-binaries"/>
+		
+		<progress add="1" message="Building Installers..."/>
 		<!--ant antfile="buildInstallers.xml"/-->
 		<if>
 			<equals arg1="${publish-build}" arg2="true" casesensitive="false"/>
@@ -60,6 +82,8 @@
 				<antcall target="publish-build"/>
 			</then>
 		</if>
+		
+		<progress done="true"/>
 	</target>
 	
 	<target name="rename-binaries">
@@ -96,7 +120,7 @@
 		</for>
 
 		<!-- manually update zips w/ features -->
-		<for param="zip">
+		<!--for param="zip">
 			<fileset dir="${buildDirectory}/${buildLabel}/${warlock-version}">
 				<include name="*.zip"/>
 			</fileset>
@@ -105,7 +129,7 @@
 					<zipfileset dir="${buildDirectory}/features" prefix="warlock2/features"/>
 				</zip>
 			</sequential>
-		</for>
+		</for-->
 	</target>
 	
 	<target name="publish-build">
@@ -147,4 +171,26 @@
 			</java>
 		</sequential>
 	</macrodef>
+	
+	<target name="run" depends="build-product">
+		<condition property="platform" value="win32.win32.x86" else="linux.gtk.x86">
+			<os family="windows"/>
+		</condition>
+		
+		<condition property="executable" value="warlock2.exe" else="warlock2">
+			<os family="windows"/>
+		</condition>
+		
+		<property name="warlock2-dir" value="${user.home}/warlock2-tmp"/>
+		<delete includeemptydirs="true">
+			<fileset dir="${warlock2-dir}" includes="**/*"/>	
+		</delete>
+		<mkdir dir="${warlock2-dir}"/>
+		
+		<unzip src="${buildDirectory}/${buildLabel}/${warlock-version}/${buildId}-${warlock-version}-${platform}.zip" dest="${warlock2-dir}"/>
+		<exec dir="${warlock2-dir}/warlock2" executable="${warlock2-dir}/warlock2/${executable}">
+			<arg line="-debug -consolelog"/>
+			<arg line="-vmargs -Xdebug -Xrunjdwp:transport=dt_socket,address=1044,server=y,suspend=y"/>
+		</exec>
+	</target>
 </project>
