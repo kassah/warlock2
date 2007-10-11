@@ -7,5 +7,11 @@
 		<!--  compile our custom code / tasks -->
 		<mkdir dir="bin"/>
 		<javac srcdir="src" destdir="bin" classpathref="build-classpath" />
+		<copy todir="bin/cc/warlock/build">
+			<fileset dir="src/cc/warlock/build">
+				<include name="**/*"/>
+				<exclude name="**/*.java"/>
+			</fileset>
+		</copy>
 	</target>
 </project>
