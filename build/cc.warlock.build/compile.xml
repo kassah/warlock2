@@ -1,0 +1,11 @@
+<project default="compile">
+	<path id="build-classpath">
+		<fileset dir="lib" includes="**/*"/>
+	</path>
+	
+	<target name="compile">
+		<!--  compile our custom code / tasks -->
+		<mkdir dir="bin"/>
+		<javac srcdir="src" destdir="bin" classpathref="build-classpath" />
+	</target>
+</project>
