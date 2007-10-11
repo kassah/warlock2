@@ -91,7 +91,11 @@ public class WSLScript extends AbstractScript {
 
 	public IWSLValue getVariable(String name) {
 		if(name.equals("t")) return new WSLNumber(timer.get());
-			
+		if(name.equals("mana")) return new WSLNumber(client.getMana().get());
+		if(name.equals("health")) return new WSLNumber(client.getHealth().get());
+		if(name.equals("fatigue")) return new WSLNumber(client.getFatigue().get());
+		if(name.equals("spirit")) return new WSLNumber(client.getSpirit().get());
+		
 		return new WSLString(variables.get(name));
 	}
 	
