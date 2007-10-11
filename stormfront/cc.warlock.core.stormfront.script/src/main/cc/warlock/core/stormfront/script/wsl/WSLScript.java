@@ -41,7 +41,6 @@ public class WSLScript extends AbstractScript {
 	protected HashMap<String, WSLCommand> wslCommands = new HashMap<String, WSLCommand>();
 	protected int pauseLine;
 	protected Thread scriptThread;
-	private ArrayList<Match> matchset = new ArrayList<Match>();
 	private Pattern commandPattern = Pattern.compile("^([\\w_]+)(\\s+(.*))?");
 	private WSLCommand if_ = new WSLIf_();
 	private ScriptTimer timer = new ScriptTimer();
@@ -510,12 +509,11 @@ public class WSLScript extends AbstractScript {
 		public void execute (String arguments) {
 			// mode = Mode.waiting;
 			
-			Match match = commands.matchWait(matchset);
+			Match match = commands.matchWait();
 			
 			if (match != null)
 			{
 				// System.out.println("matched label: \"" + match.getAttribute("label") + "\"");
-				matchset.clear();
 				gotoLabel((String)match.getAttribute("label"));
 				commands.waitForPrompt();
 				commands.waitForRoundtime();
@@ -526,6 +524,11 @@ public class WSLScript extends AbstractScript {
 		}
 	}
 
+	protected void addMatch(String label, Match match) {
+		match.setAttribute("label", label);
+		commands.addMatch(match);
+	}
+	
 	protected class WSLMatchRe extends WSLCommand {
 		
 		private Pattern format = Pattern.compile("^([\\w_]+)\\s+/(.*)/(\\w*)");
@@ -539,9 +542,7 @@ public class WSLScript extends AbstractScript {
 				boolean caseInsensitive = m.group(3).contains("i");
 				Match match = new RegexMatch(regex, caseInsensitive);
 				
-				match.setAttribute("label", m.group(1));
-				
-				matchset.add(match);
+				addMatch(m.group(1), match);
 			} else { /* TODO throw error */ }
 		}
 
@@ -557,11 +558,7 @@ public class WSLScript extends AbstractScript {
 			if (m.find())
 			{
 				Match match = new TextMatch(m.group(2));
-				match.setAttribute("label", m.group(1));
-				
-				// System.out.println("adding match \"" + m.group(1) + "\": \"" + m.group(2) + "\"");
-				
-				matchset.add(match);
+				addMatch(m.group(1), match);
 			} else { /* TODO throw error */ }
 		}
 	}

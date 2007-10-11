@@ -19,7 +19,9 @@ public interface IScriptCommands {
 	
 	public void waitFor (Match match);
 	
-	public Match matchWait (List<Match> matches);
+	public void addMatch(Match match);
+	
+	public Match matchWait ();
 	
 	public void pause (int seconds);
 	

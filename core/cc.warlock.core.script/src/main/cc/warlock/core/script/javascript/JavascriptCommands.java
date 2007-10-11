@@ -32,7 +32,10 @@ public class JavascriptCommands {
 	}
 
 	public Match matchWait(Match[] matches) {
-		Match match = commands.matchWait(Arrays.asList(matches));
+		for(Match m : matches) {
+			commands.addMatch(m);
+		}
+		Match match = commands.matchWait();
 		Function function = (Function)match.getAttribute(CALLBACK);
 		try {
 			function.call(script.getContext(), script.getScope(), null, new Object[] {match.getAttribute(USER_OBJECT)});

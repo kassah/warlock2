@@ -27,6 +27,9 @@ public class ScriptCommands implements IScriptCommands, IStreamListener
 	
 	protected List<LinkedBlockingQueue<String>> textWaiters = Collections.synchronizedList(new ArrayList<LinkedBlockingQueue<String>>());
 	
+	protected List<Match> matches = new ArrayList<Match>();
+	protected LinkedBlockingQueue<String> matchQueue = new LinkedBlockingQueue<String>();
+	
 	protected final Condition nextRoom = lock.newCondition();
 	protected boolean roomWaiting = false;
 	
@@ -65,26 +68,30 @@ public class ScriptCommands implements IScriptCommands, IStreamListener
 		}
 	}
 	
-	public Match matchWait (List<Match> matches) {
-		LinkedBlockingQueue<String> queue = new LinkedBlockingQueue<String>();
-		textWaiters.add(queue);
-		String text = null;
-
+	public void addMatch(Match match) {
+		matches.add(match);
+		if(!textWaiters.contains(matchQueue)) {
+			textWaiters.add(matchQueue);
+		}
+	}
+	
+	public Match matchWait () {
 		try {
 			// run until we get a match or are told to stop
 			matchWaitLoop: while(true) {
+				String text = null;
 				System.out.println("Waiting for text");
 				// wait for some text
 				while(text == null) {
 					try {
-						text = queue.poll(100L, TimeUnit.MILLISECONDS);
+						text = matchQueue.poll(100L, TimeUnit.MILLISECONDS);
 					} catch(Exception e) {
 						e.printStackTrace();
 					}
 					if(interrupted)
 						break matchWaitLoop;
 				}
-				System.out.println("Got text: " + text);
+				System.out.print("matchwait got: " + text);
 				String[] lines = text.split("\\n");
 				for(String line : lines) {
 					// try all of our matches
@@ -96,11 +103,11 @@ public class ScriptCommands implements IScriptCommands, IStreamListener
 						}
 					}
 				}
-				text = null;
 			}
 		} finally {
+			matches.clear();
 			System.out.println("Done with matchwait");
-			textWaiters.remove(queue);
+			textWaiters.remove(matchQueue);
 		}
 
 		return null;
@@ -228,7 +235,7 @@ public class ScriptCommands implements IScriptCommands, IStreamListener
 	
 	public void streamReceivedText(IStream stream, IStyledString string) {
 		String text = string.getBuffer().toString();
-		System.out.println("Sending out line: " + text);
+		System.out.print("Sending out line: " + text);
 		synchronized(textWaiters) {
 			for(LinkedBlockingQueue<String>  queue : textWaiters) {
 				System.out.println("Signaling a waiter");
