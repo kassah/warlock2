@@ -55,6 +55,7 @@ public class CompDefTagHandler extends DefaultTagHandler {
 		{
 			handler.getClient().getRoomDescription().set(buffer.toString());
 		}
+		handler.getCurrentStream().send("\n");
 	}
 }
 

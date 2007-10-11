@@ -21,7 +21,8 @@ public class DirectionTagHandler implements IStormFrontTagHandler {
 
 	public boolean handleCharacters(char[] ch, int start, int length) {
 		protocol.getClient().getCompass().set(String.copyValueOf(ch, start, length));
-		return true;
+		
+		return false;
 	}
 
 	public String getCurrentTag() {
@@ -29,13 +30,9 @@ public class DirectionTagHandler implements IStormFrontTagHandler {
 	}
 
 	public void handleEnd() {
-		// TODO Auto-generated method stub
-		
 	}
 
 	public void handleStart(StormFrontAttributeList attributes) {
-		// TODO Auto-generated method stub
-		
 	}
 
 	public void setCurrentTag(String tagName) {
