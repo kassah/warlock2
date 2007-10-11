@@ -4,8 +4,8 @@
 		<mkdir dir="src/antlr/cc/warlock/core/stormfront/script/wsl"/>
 			
 		<antcall target="build-grammar">
-			<param name="grammar-file" value="${basedir}/cc/warlock/core/stormfront/script/wsl/WSL.g3"/>
-			<param name="lib-dir" value="${basedir}/cc/warlock/core/stormfront/script/wsl"/>
+			<param name="grammar-file" value="cc/warlock/core/stormfront/script/wsl/WSL.g3"/>
+			<param name="lib-dir" value="cc/warlock/core/stormfront/script/wsl"/>
 		</antcall>
 	</target>
 	
