@@ -1,6 +1,7 @@
 package cc.warlock.rcp.stormfront.ui.prefs;
 
 
+import java.util.ArrayList;
 import java.util.HashMap;
 
 import org.eclipse.core.runtime.IAdaptable;
@@ -27,13 +28,13 @@ import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Control;
+import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.Group;
 import org.eclipse.swt.widgets.Label;
 import org.eclipse.swt.widgets.TableColumn;
 import org.eclipse.ui.IWorkbenchPropertyPage;
 import org.eclipse.ui.dialogs.PropertyPage;
 
-import cc.warlock.core.client.IWarlockSkin;
 import cc.warlock.core.stormfront.client.IStormFrontClient;
 import cc.warlock.core.stormfront.client.StormFrontColor;
 import cc.warlock.core.stormfront.serversettings.server.Preset;
@@ -124,16 +125,36 @@ public class PresetsPreferencePage extends PropertyPage implements
 		return main;
 	}
 	
+	protected Color getWorkingBackgroundColor (Preset preset)
+	{
+		StormFrontColor color = preset.getBackgroundColor();
+		if (color.equals(settings.getMainWindowSettings().getBackgroundColor()))
+		{
+			color = mainWindow.getBackgroundColor();
+		}
+		return ColorUtil.warlockColorToColor(color);
+	}
+	
+	protected Color getWorkingForegroundColor (Preset preset)
+	{
+		StormFrontColor color = preset.getForegroundColor();
+		if (color.equals(settings.getMainWindowSettings().getForegroundColor()))
+		{
+			color = mainWindow.getForegroundColor();
+		}
+		return ColorUtil.warlockColorToColor(color);
+	}
+	
 	protected class PresetsLabelProvider implements ITableLabelProvider, ITableColorProvider
 	{
 		public Color getBackground(Object element, int columnIndex) {
 			Preset preset = (Preset) element;
-			return ColorUtil.warlockColorToColor(preset.getBackgroundColor());
+			return getWorkingBackgroundColor(preset);
 		}
 
 		public Color getForeground(Object element, int columnIndex) {
 			Preset preset = (Preset) element;
-			return ColorUtil.warlockColorToColor(preset.getForegroundColor());
+			return getWorkingForegroundColor(preset);
 		}
 
 		public Image getColumnImage(Object element, int columnIndex) {
@@ -232,7 +253,6 @@ public class PresetsPreferencePage extends PropertyPage implements
 	
 	private void colorChanged (ColorSelector source, RGB newColor)
 	{
-		updatePreview();
 
 		StormFrontColor color = new StormFrontColor(ColorUtil.rgbToWarlockColor(newColor));
 		
@@ -254,31 +274,15 @@ public class PresetsPreferencePage extends PropertyPage implements
 		{
 			mainWindow.setForegroundColor(color);
 		}
+
+		updatePreview();
 	}
 	
 	private static enum ColorType { BACKGROUND, FOREGROUND };
 	
-	private void setStyleColor (String styleName, ColorType colorType, RGB color)
-	{
-		Style style = SavedStyles.getStyleFromName(styleName);
-		if (colorType == ColorType.BACKGROUND)
-		{
-			style.setBackground(new Color(getShell().getDisplay(), color));
-		}
-		else
-		{
-			style.setForeground(new Color(getShell().getDisplay(), color));
-		}
-	}
-	
 	private void fontChanged (FontSelector source, FontData fontData)
-	{	
-		updatePreview();
-	}
-	
-	private void setStyleFont (String styleName, Font font)
 	{
-		SavedStyles.getStyleFromName(styleName).setFontName(font.toString());
+		updatePreview();
 	}
 	
 	@Override
@@ -357,13 +361,15 @@ public class PresetsPreferencePage extends PropertyPage implements
 	
 	private void updatePresetColors (String presetName, StyleRange styleRange)
 	{
-		styleRange.background = ColorUtil.warlockColorToColor(presets.get(presetName).getBackgroundColor());
-		styleRange.foreground = ColorUtil.warlockColorToColor(presets.get(presetName).getForegroundColor());
+		styleRange.background = getWorkingBackgroundColor(presets.get(presetName));
+		styleRange.foreground = getWorkingForegroundColor(presets.get(presetName));
 	}
 	
 	private void updatePreview ()
 	{
 		presetsTable.getTable().setBackground(new Color(getShell().getDisplay(), getColor(mainBGSelector)));
+		presetsTable.setInput(presets.values());
+		
 		preview.setBackground(new Color(getShell().getDisplay(), getColor(mainBGSelector)));
 		preview.setForeground(new Color(getShell().getDisplay(), mainFGSelector.getColorValue()));
 		preview.setFont(mainFontSelector.getFont());
@@ -380,6 +386,7 @@ public class PresetsPreferencePage extends PropertyPage implements
 		
 		preview.setStyleRanges(new StyleRange[] { roomNameStyleRange, boldStyleRange, commandStyleRange, speechStyleRange, whisperStyleRange, thoughtStyleRange });
 		preview.update();
+		
 	}
 	
 	@Override
