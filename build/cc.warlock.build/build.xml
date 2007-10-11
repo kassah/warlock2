@@ -22,8 +22,19 @@
 			<fileset dir="installer/binaries" includes="**/*"/>
 		</delete>
 	</target>
+	
+	<target name="generate-parsers">
+		<delete includeemptydirs="true" dir="../../stormfront/cc.warlock.core.stormfront/src/javacc"/>
+		<delete includeemptydirs="true" dir="../../stormfront/cc.warlock.core.stormfront.script/src/antlr"/>
 		
-	<target name="copy-code" depends="clean">
+		<mkdir dir="../../stormfront/cc.warlock.core.stormfront/src/javacc"/>
+		<mkdir dir="../../stormfront/cc.warlock.core.stormfront.script/src/antlr"/>
+		
+		<ant dir="../../stormfront/cc.warlock.core.stormfront" antfile="buildParsers.xml"/>
+		<ant dir="../../stormfront/cc.warlock.core.stormfront.script" antfile="buildParsers.xml"/> 
+	</target>
+	
+	<target name="copy-code" depends="clean,generate-parsers">
 		<mkdir dir="${buildDirectory}"/>
 		<progressDialog icon="images/character.gif" title="Warlock Build Progress">
 			<progressBar min="0" max="7"/>
