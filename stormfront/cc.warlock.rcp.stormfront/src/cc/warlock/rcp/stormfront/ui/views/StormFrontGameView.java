@@ -84,7 +84,8 @@ public class StormFrontGameView extends GameView implements IStormFrontClientVie
 		String fontFace = settings.getMainWindowSettings().getFontFace();
 		int fontSize = settings.getMainWindowSettings().getFontSizeInPoints();
 		
-		normalFont = fontFace == null ? JFaceResources.getDefaultFont() : new Font(getSite().getShell().getDisplay(), fontFace, fontSize, SWT.NONE);
+		boolean fontFaceEmpty = (fontFace == null || fontFace.length() == 0);
+		normalFont = fontFaceEmpty ? JFaceResources.getDefaultFont() : new Font(getSite().getShell().getDisplay(), fontFace, fontSize, SWT.NONE);
 		text.setFont(normalFont);
 		
 		WarlockColor entryBG = settings.getCommandLineSettings().getBackgroundColor();
