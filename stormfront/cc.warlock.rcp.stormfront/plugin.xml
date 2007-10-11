@@ -50,6 +50,11 @@
             id="cc.warlock.rcp.views.stream.rightStream.room"
             name="Current Room">
       </view>
+      <view
+            class="cc.warlock.rcp.views.StreamView"
+            id="cc.warlock.rcp.views.stream.rightStream.familiar"
+            name="Familiar">
+      </view>
    </extension>
    <extension
          point="org.eclipse.ui.commands">
