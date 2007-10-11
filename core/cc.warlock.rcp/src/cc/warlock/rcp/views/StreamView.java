@@ -126,9 +126,11 @@ public class StreamView extends ViewPart implements IStreamListener, IGameViewFo
 		if (!clientStreams.containsKey(client))
 		{
 			WarlockText text = new WarlockText(book, SWT.V_SCROLL);
-			text.setLayoutData(new GridData(GridData.FILL, GridData.FILL, true, true));
+			GridData data = new GridData(GridData.FILL, GridData.FILL, true, true);
+			text.setLayoutData(data);
 			text.setEditable(false);
 			text.setWordWrap(true);
+			text.getTextWidget().setIndent(1);
 			
 			Color background = ColorUtil.warlockColorToColor(GameViewConfiguration.instance().getDefaultBackground());
 			Color foreground = ColorUtil.warlockColorToColor(GameViewConfiguration.instance().getDefaultForeground());
