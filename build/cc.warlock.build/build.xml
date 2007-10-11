@@ -24,11 +24,8 @@
 	</target>
 	
 	<target name="generate-parsers">
-		<delete includeemptydirs="true" dir="../../stormfront/cc.warlock.core.stormfront/src/javacc"/>
-		<delete includeemptydirs="true" dir="../../stormfront/cc.warlock.core.stormfront.script/src/antlr"/>
-		
-		<mkdir dir="../../stormfront/cc.warlock.core.stormfront/src/javacc"/>
-		<mkdir dir="../../stormfront/cc.warlock.core.stormfront.script/src/antlr"/>
+		<delete includeemptydirs="true" dir="../../stormfront/cc.warlock.core.stormfront/src/javacc/cc"/>
+		<delete includeemptydirs="true" dir="../../stormfront/cc.warlock.core.stormfront.script/src/antlr/cc"/>
 		
 		<ant dir="../../stormfront/cc.warlock.core.stormfront" antfile="buildParsers.xml"/>
 		<ant dir="../../stormfront/cc.warlock.core.stormfront.script" antfile="buildParsers.xml"/> 
