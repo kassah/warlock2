@@ -34,7 +34,6 @@
       <plugin id="cc.warlock.core.stormfront.script"/>
       <plugin id="cc.warlock.rcp"/>
       <plugin id="cc.warlock.rcp.stormfront"/>
-      <plugin id="cc.warlock.rcp.userstreams"/>
       <plugin id="com.ibm.icu"/>
       <plugin id="com.ibm.icu.base"/>
       <plugin id="javax.servlet"/>
