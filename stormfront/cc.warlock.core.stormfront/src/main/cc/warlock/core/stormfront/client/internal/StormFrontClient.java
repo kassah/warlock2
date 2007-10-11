@@ -89,7 +89,7 @@ public class StormFrontClient extends WarlockClient implements IStormFrontClient
 	
 	@Override
 	protected Collection<IStream> getStreamsToBuffer() {
-		return Arrays.asList(new IStream[] { getThoughtsStream(), getInventoryStream(), getDeathsStream(), getRoomStream()});
+		return Arrays.asList(new IStream[] { getThoughtsStream(), getInventoryStream(), getDeathsStream(), getRoomStream(), getFamiliarStream() });
 	}
 	
 	@Override
@@ -316,6 +316,10 @@ public class StormFrontClient extends WarlockClient implements IStormFrontClient
 		return getStream(ROOM_STREAM_NAME);
 	}
 
+	public IStream getFamiliarStream() {
+		return getStream(FAMILIAR_STREAM_NAME);
+	}
+	
 	public IProperty<String> getRoomDescription() {
 		return roomDescription;
 	}

@@ -25,12 +25,10 @@ import cc.warlock.core.stormfront.serversettings.skin.IStormFrontSkin;
 public interface IStormFrontClient extends IWarlockClient {
 	
 	public static final String DEATH_STREAM_NAME = "death";
-	
 	public static final String INVENTORY_STREAM_NAME = "inv";
-	
 	public static final String THOUGHTS_STREAM_NAME = "thoughts";
-	
 	public static final String ROOM_STREAM_NAME = "room";
+	public static final String FAMILIAR_STREAM_NAME = "familiar";
 	
 	/**
 	 * The server settings for this client
@@ -154,6 +152,11 @@ public interface IStormFrontClient extends IWarlockClient {
 	 * @return The stream for room description/exits/etc.
 	 */
 	public IStream getRoomStream();
+	
+	/**
+	 * @return The stream for familiars / wounds
+	 */
+	public IStream getFamiliarStream();
 	
 	/**
 	 * @return The description of the current room
