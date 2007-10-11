@@ -10,6 +10,12 @@ public class ProgressCopyTask extends Copy {
 	
 	protected void doFileOperations ()
 	{
+		if (getProject().getProperty("hideProgress") != null)
+		{
+			super.doFileOperations();
+			return;
+		}
+		
 		if (name == null)
 		{
 			throw new BuildException("No name was specified for this progress!");

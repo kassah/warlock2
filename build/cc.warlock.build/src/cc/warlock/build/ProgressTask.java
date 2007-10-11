@@ -14,6 +14,11 @@ public class ProgressTask extends Task {
 	
 	@Override
 	public void execute() throws BuildException {
+		if (getProject().getProperty("hideProgress") != null)
+		{
+			return;
+		}
+		
 		if (name == null)
 		{
 			throw new BuildException("No name was specified for this progress!");

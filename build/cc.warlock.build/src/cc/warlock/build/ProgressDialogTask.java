@@ -35,6 +35,11 @@ public class ProgressDialogTask extends Task {
 	
 	@Override
 	public void execute() throws BuildException {
+		if (getProject().getProperty("hideProgress") != null)
+		{
+			return;
+		}
+		
 		for (ProgressBarTask bar : bars)
 		{
 			barNames.add(bar.getName());
