@@ -252,7 +252,7 @@ public class ScriptCommands implements IScriptCommands, IStreamListener
 		lock.lock();
 		try {
 			roomWaiting = false;
-			nextRoom.notifyAll();
+			nextRoom.signalAll();
 		} finally {
 			lock.unlock();
 		}
