@@ -11,8 +11,6 @@ import java.util.Date;
 import java.util.Hashtable;
 import java.util.List;
 
-import org.dom4j.DocumentException;
-
 import cc.warlock.core.client.ICommand;
 import cc.warlock.core.client.IWarlockClientViewer;
 import cc.warlock.core.client.internal.Command;

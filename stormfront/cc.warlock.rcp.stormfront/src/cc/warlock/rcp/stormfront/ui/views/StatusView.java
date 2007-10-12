@@ -12,7 +12,6 @@ import org.eclipse.ui.part.ViewPart;
 import cc.warlock.core.client.ICharacterStatus;
 import cc.warlock.core.client.IProperty;
 import cc.warlock.core.client.IPropertyListener;
-import cc.warlock.core.client.IWarlockSkin;
 import cc.warlock.core.stormfront.client.IStormFrontClient;
 import cc.warlock.core.stormfront.serversettings.server.ServerSettings;
 import cc.warlock.rcp.plugin.Warlock2Plugin;

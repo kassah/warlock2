@@ -21,7 +21,6 @@ import org.eclipse.ui.part.ViewPart;
 import cc.warlock.core.client.IProperty;
 import cc.warlock.core.client.IPropertyListener;
 import cc.warlock.core.client.IWarlockClient;
-import cc.warlock.core.client.IWarlockSkin;
 import cc.warlock.core.client.WarlockClientAdapter;
 import cc.warlock.core.client.WarlockClientRegistry;
 import cc.warlock.core.client.internal.ClientProperty;
@@ -236,7 +235,7 @@ public class HandsView extends ViewPart implements IPropertyListener<String>
 	public void propertyChanged(IProperty<String> property, String oldValue) {
 		if (property != null && property instanceof ClientProperty)
 		{
-			ClientProperty clientProperty = (ClientProperty) property;
+			ClientProperty<String> clientProperty = (ClientProperty<String>) property;
 			if (clientProperty.getClient() == activeClient)
 			{
 				if (property.getName().equals("leftHand")) {
@@ -255,7 +254,7 @@ public class HandsView extends ViewPart implements IPropertyListener<String>
 	public void propertyCleared(IProperty<String> property, String oldValue) {
 		if (property != null && property instanceof ClientProperty)
 		{
-			ClientProperty clientProperty = (ClientProperty) property;
+			ClientProperty<String> clientProperty = (ClientProperty<String>) property;
 			if (clientProperty.getClient() == activeClient)
 			{
 				if (property.getName().equals("leftHand"))

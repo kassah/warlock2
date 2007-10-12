@@ -209,7 +209,7 @@ public class BarsView extends ViewPart implements IPropertyListener<Integer> {
 		
 		if (property instanceof ClientProperty)
 		{
-			ClientProperty clientProperty = (ClientProperty) property;
+			ClientProperty<Integer> clientProperty = (ClientProperty<Integer>) property;
 			if (clientProperty.getClient() == activeClient)
 			{
 			

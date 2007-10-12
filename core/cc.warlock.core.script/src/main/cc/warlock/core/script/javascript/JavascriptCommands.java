@@ -1,7 +1,6 @@
 package cc.warlock.core.script.javascript;
 
 import java.io.Serializable;
-import java.util.Arrays;
 
 import org.mozilla.javascript.Function;
 import org.mozilla.javascript.Scriptable;

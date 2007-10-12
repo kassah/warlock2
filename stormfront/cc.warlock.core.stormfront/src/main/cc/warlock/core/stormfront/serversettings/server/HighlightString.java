@@ -1,7 +1,5 @@
 package cc.warlock.core.stormfront.serversettings.server;
 
-import org.dom4j.Element;
-
 import cc.warlock.core.stormfront.xml.StormFrontElement;
 
 public class HighlightString extends Preset {

@@ -1,7 +1,6 @@
 package cc.warlock.rcp.stormfront.ui.prefs;
 
 
-import java.util.ArrayList;
 import java.util.HashMap;
 
 import org.eclipse.core.runtime.IAdaptable;
@@ -20,7 +19,6 @@ import org.eclipse.swt.SWT;
 import org.eclipse.swt.custom.StyleRange;
 import org.eclipse.swt.custom.StyledText;
 import org.eclipse.swt.graphics.Color;
-import org.eclipse.swt.graphics.Font;
 import org.eclipse.swt.graphics.FontData;
 import org.eclipse.swt.graphics.Image;
 import org.eclipse.swt.graphics.RGB;
@@ -28,7 +26,6 @@ import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Control;
-import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.Group;
 import org.eclipse.swt.widgets.Label;
 import org.eclipse.swt.widgets.TableColumn;
@@ -40,8 +37,6 @@ import cc.warlock.core.stormfront.client.StormFrontColor;
 import cc.warlock.core.stormfront.serversettings.server.Preset;
 import cc.warlock.core.stormfront.serversettings.server.ServerSettings;
 import cc.warlock.core.stormfront.serversettings.server.WindowSettings;
-import cc.warlock.rcp.ui.style.SavedStyles;
-import cc.warlock.rcp.ui.style.Style;
 import cc.warlock.rcp.util.ColorUtil;
 import cc.warlock.rcp.util.FontSelector;
 
@@ -277,8 +272,6 @@ public class PresetsPreferencePage extends PropertyPage implements
 
 		updatePreview();
 	}
-	
-	private static enum ColorType { BACKGROUND, FOREGROUND };
 	
 	private void fontChanged (FontSelector source, FontData fontData)
 	{

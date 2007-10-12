@@ -7,7 +7,6 @@
 package cc.warlock.rcp.stormfront.ui.wizards;
 
 import java.lang.reflect.InvocationTargetException;
-import java.util.Collection;
 import java.util.Map;
 
 import org.eclipse.core.runtime.IProgressMonitor;
@@ -30,9 +29,6 @@ import org.eclipse.swt.layout.FillLayout;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Table;
 
-import cc.warlock.core.configuration.Account;
-import cc.warlock.core.configuration.Profile;
-import cc.warlock.core.configuration.SavedProfiles;
 import cc.warlock.core.stormfront.network.SGEConnection;
 import cc.warlock.core.stormfront.network.SGEConnectionListener;
 import cc.warlock.rcp.stormfront.adapters.SWTSGEConnectionListenerAdapter;
@@ -103,9 +99,14 @@ public class GameSelectWizardPage extends WizardPage {
 	private class GameContentProvider implements IStructuredContentProvider
 	{
 		
+		@SuppressWarnings("unchecked")
 		public Object[] getElements(Object inputElement) {
-			Map<String,String> gameMap = (Map<String,String>) inputElement;
-			return gameMap.keySet().toArray();
+			if(inputElement instanceof Map) {
+				Map<String,String> gameMap = (Map<String,String>) inputElement;
+				return gameMap.keySet().toArray();
+			} else {
+				return null;
+			}
 		}
 		
 		public void dispose() {
@@ -169,7 +170,7 @@ public class GameSelectWizardPage extends WizardPage {
 			this.monitor = monitor;
 		}
 		
-		public void gamesReady(SGEConnection connection, Map games) {
+		public void gamesReady(SGEConnection connection, Map<String, String> games) {
 			GameSelectWizardPage.this.gameMap = games;
 			
 			for (String gameCode : gameFilterCodes)
@@ -179,15 +180,9 @@ public class GameSelectWizardPage extends WizardPage {
 			
 			GameSelectWizardPage.this.games.setEnabled(true);
 			gamesViewer.setInput(gameMap);
-			
-			Account savedAccount = ((AccountWizardPage)getPreviousPage()).getSavedAccount();
-			if (savedAccount != null)
-			{
-				Collection<Profile> savedProfiles = SavedProfiles.getProfiles(savedAccount);
-			}
 		}
 
-		public void charactersReady(SGEConnection connection, Map characters) {
+		public void charactersReady(SGEConnection connection, Map<String, String> characters) {
 			if (monitor != null)
 			{
 				monitor.worked(1);
