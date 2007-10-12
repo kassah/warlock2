@@ -419,9 +419,9 @@ public class WarlockText implements LineBackgroundListener {
 	}
 	
 	public void append(String string) {
-		boolean atbottom = isScrolledToBottom(); 
-		constrainLineLimit();
+		boolean atbottom = isScrolledToBottom();
 		textWidget.append(string);
+		constrainLineLimit();
 		if (atbottom) 
 			scrollToBottom();
 	}
@@ -438,16 +438,21 @@ public class WarlockText implements LineBackgroundListener {
 		return textWidget.getOffsetAtLine(lineIndex);
 	}
 	
+	public int getTopIndex() {
+		return textWidget.getTopIndex();
+	}
+	
 	private void constrainLineLimit() {
 		if (lineLimit > 0) {
 			int len = getLineCount();
 			if (len > lineLimit) {
-				int x;
-				x = len - lineLimit;
-				x = getOffsetAtLine(x);
+				int top = getTopIndex();
+				int toRemove = len - lineLimit;
+				int offset = getOffsetAtLine(toRemove);
 				
-				replaceTextRange(0,x,"");
-				updateLineBackgrounds(len - lineLimit);
+				replaceTextRange(0,offset,"");
+				updateLineBackgrounds(toRemove);
+				setTopIndex(top - toRemove);
 			}
 		}
 	}
@@ -515,15 +520,13 @@ public class WarlockText implements LineBackgroundListener {
 	
 	private void scrollToBottom ()
 	{
-		//if (1 == 2) {
 		if (doScrollDirection == SWT.DOWN) {
-			//vscroll.setSelection(vscroll.getMaximum());
-			int length = this.getContent().getCharCount();		
-			if (this.getCaretOffset() < length) {
-				this.setCaretOffset(length);
-				this.showSelection();
-			}
+			setTopIndex(getLineCount() - 1);
 		}
+	}
+	
+	public void setTopIndex(int topIndex) {
+		textWidget.setTopIndex(topIndex);
 	}
 	
 	public void setScrollDirection(int dir) {
