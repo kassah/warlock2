@@ -94,7 +94,13 @@ public class WSLScript extends AbstractScript {
 		if(name.equals("health")) return new WSLNumber(client.getHealth().get());
 		if(name.equals("fatigue")) return new WSLNumber(client.getFatigue().get());
 		if(name.equals("spirit")) return new WSLNumber(client.getSpirit().get());
-		
+		if(name.equals("rt")) return new WSLNumber(client.getRoundtime().get());
+		if(name.equals("lefthand")) return new WSLString(client.getLeftHand().get());
+		if(name.equals("righthand")) return new WSLString(client.getRightHand().get());
+		if(name.equals("spell")) return new WSLString(client.getCurrentSpell().get());
+		if(name.equals("roomdesc")) return new WSLString(client.getRoomDescription().get());
+		if(name.equals("roomtitle")) return new WSLString(client.getStream(IStormFrontClient.ROOM_STREAM_NAME).getTitle().get());
+		// if(name.equals("roomexits")) return new WSLString(client.getStream(IStormFrontClient.ROOM_STREAM_NAME).getTitle().get());
 		return new WSLString(variables.get(name));
 	}
 	
