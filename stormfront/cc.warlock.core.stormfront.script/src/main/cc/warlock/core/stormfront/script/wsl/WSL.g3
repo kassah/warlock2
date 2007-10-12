@@ -215,7 +215,7 @@ COMMENT
 	;
 LABEL
 	: { state == State.base }?=>
-		label=NORMAL_STRING ':'			{ setText($label.text); }
+		label=LABEL_STRING ':'			{ setText($label.text); }
 	;
 VARIABLE
 	: ('%' var=NORMAL_STRING { setText($var.text); }
@@ -266,8 +266,11 @@ fragment DIGIT
 	: '0'..'9'
 	;
 fragment NORMAL_CHAR
-	: 'A'..'Z'|'a'..'z'|DIGIT|'_'
+	: ('A'..'Z'|'a'..'z'|DIGIT|'_')
 	;
 fragment NORMAL_STRING
 	: NORMAL_CHAR+
+	;
+fragment LABEL_STRING
+	: NORMAL_CHAR (~(WS|':'|'\n'|'\r'|'%'|'$'))*
 	;

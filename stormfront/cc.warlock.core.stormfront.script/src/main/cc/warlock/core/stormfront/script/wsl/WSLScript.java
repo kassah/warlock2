@@ -553,7 +553,7 @@ public class WSLScript extends AbstractScript {
 
 	protected class WSLMatch extends WSLCommand {
 		
-		private Pattern format = Pattern.compile("^([\\w_]+)\\s+(.*)$");
+		private Pattern format = Pattern.compile("^([^\\s]+)\\s+(.*)$");
 		
 		public void execute (String arguments) {
 			Matcher m = format.matcher(arguments);
@@ -562,7 +562,10 @@ public class WSLScript extends AbstractScript {
 			{
 				Match match = new TextMatch(m.group(2));
 				addMatch(m.group(1), match);
-			} else { /* TODO throw error */ }
+			} else {
+				commands.echo(WSLScript.this, "Bad format for match");
+				stop();
+			}
 		}
 	}
 
