@@ -31,12 +31,26 @@ public abstract class ColorSetting extends ServerSetting implements Comparable<C
 	
 	public StormFrontColor getDefaultForegroundColor ()
 	{
-		return serverSettings.getDefaultSkin().getDefaultWindowForeground();
+		if (this == serverSettings.getMainWindowSettings())
+		{
+			return serverSettings.getDefaultSkin().getDefaultWindowForeground();
+		}
+		else
+		{
+			return serverSettings.getMainWindowSettings().getForegroundColor();
+		}
 	}
 	
 	public StormFrontColor getDefaultBackgroundColor ()
 	{
-		return serverSettings.getDefaultSkin().getDefaultWindowBackground();
+		if (this == serverSettings.getMainWindowSettings())
+		{
+			return serverSettings.getDefaultSkin().getDefaultWindowBackground();
+		}
+		else
+		{
+			return serverSettings.getMainWindowSettings().getBackgroundColor();
+		}
 	}
 	
 	public StormFrontColor getForegroundColor() {
