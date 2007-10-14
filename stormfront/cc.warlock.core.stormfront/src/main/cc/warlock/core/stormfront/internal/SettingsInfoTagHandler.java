@@ -1,6 +1,7 @@
 package cc.warlock.core.stormfront.internal;
 
 import java.io.File;
+import java.io.IOException;
 
 import cc.warlock.core.configuration.ConfigurationUtil;
 import cc.warlock.core.stormfront.IStormFrontProtocolHandler;
@@ -44,7 +45,11 @@ public class SettingsInfoTagHandler extends DefaultTagHandler {
 		File serverSettings = ConfigurationUtil.getConfigurationFile("serverSettings_" + playerId + ".xml", false);
 		if (!serverSettings.exists())
 		{
-			handler.getClient().send("<sendSettings/>");
+			try {
+				handler.getClient().getConnection().sendLine("<sendSettings/>");
+			} catch(IOException e) {
+				e.printStackTrace();
+			}
 		} else {
 			// check against crc to see if we're up to date
 			String currentCRC = ServerSettings.getCRC(playerId);
@@ -52,10 +57,18 @@ public class SettingsInfoTagHandler extends DefaultTagHandler {
 			if (currentCRC != null && crc.equals(currentCRC))
 			{
 				handler.getClient().getServerSettings().load(playerId);
-				handler.getClient().send("");
+				try {
+					handler.getClient().getConnection().sendLine("");
+				} catch(IOException e) {
+					e.printStackTrace();
+				}
 			} else {
 				System.out.println("our crc is: " + currentCRC + ", their crc is: " + crc);
-				handler.getClient().send("<sendSettings/>");
+				try {
+					handler.getClient().getConnection().sendLine("<sendSettings/>");
+				} catch(IOException e) {
+					e.printStackTrace();
+				}
 			}
 		}
 	}

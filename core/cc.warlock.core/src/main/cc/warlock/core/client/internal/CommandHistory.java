@@ -9,8 +9,8 @@ import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.util.ArrayList;
 import java.util.Date;
-import java.util.EmptyStackException;
-import java.util.Stack;
+import java.util.LinkedList;
+import java.util.NoSuchElementException;
 import java.util.prefs.Preferences;
 
 import cc.warlock.core.client.ICommand;
@@ -25,8 +25,8 @@ import cc.warlock.core.client.ICommandHistoryListener;
  */
 public class CommandHistory implements ICommandHistory {
 
-	protected int position = 0;
-	protected Stack<ICommand> commands = new Stack<ICommand>();
+	protected int position = -1;
+	protected LinkedList<ICommand> commands = new LinkedList<ICommand>();
 	protected ArrayList<ICommandHistoryListener> listeners = new ArrayList<ICommandHistoryListener>();
 	static Preferences prefs = Preferences.userNodeForPackage(Command.class);
 	
@@ -37,7 +37,7 @@ public class CommandHistory implements ICommandHistory {
 			ByteArrayInputStream bytes = new ByteArrayInputStream(array);
 			try {
 				ObjectInputStream stream = new ObjectInputStream(bytes);
-				commands = (Stack<ICommand>)stream.readObject();
+				// commands = (LinkedList<ICommand>)stream.readObject();
 				stream.close();
 			} catch(Exception e) {
 				e.printStackTrace();
@@ -47,38 +47,42 @@ public class CommandHistory implements ICommandHistory {
 	
 	public ICommand getLastCommand() {
 		try {
-			return commands.peek();
-		} catch(EmptyStackException e) {
+			return commands.getFirst();
+		} catch(NoSuchElementException e) {
 			return null;
 		}
 	}
 
-	public ICommand prev() {
+	public ICommand next() {
 		try {
-			if (position > 0)
+			ICommand command = null;
+			if (position > 0) {
 				position--;
-			
-			ICommand command = commands.get(position);
-			for (ICommandHistoryListener listener : listeners) listener.historyPrevious(command);
-			
+
+				command = commands.get(position);
+				
+			} else if(position == 0) {
+				position = -1;
+			}
+			for (ICommandHistoryListener listener : listeners) listener.historyNext(command);
 			return command;
-		} catch(ArrayIndexOutOfBoundsException e) {
+		} catch(IndexOutOfBoundsException e) {
 			e.printStackTrace();
 			return null;
 		}
 	}
 	
-	public ICommand next() {
+	public ICommand prev() {
 
 		try {
-			if (position < commands.size() - 1)
+			if(position < size() - 1)
 				position++;
 			
 			ICommand command = commands.get(position);
-			for (ICommandHistoryListener listener : listeners) listener.historyNext(command);
+			for (ICommandHistoryListener listener : listeners) listener.historyPrevious(command);
 			
 			return command;
-		} catch(ArrayIndexOutOfBoundsException e) {
+		} catch(IndexOutOfBoundsException e) {
 			e.printStackTrace();
 			return null;
 		}
@@ -100,11 +104,11 @@ public class CommandHistory implements ICommandHistory {
 	}
 	
 	public ICommand getCommandAt(int position) {
-		return commands.elementAt(position);
+		return commands.get(position);
 	}
 	
 	public void resetPosition() {
-		position = commands.size() - 1;
+		position = -1;
 		
 		for (ICommandHistoryListener listener : listeners) listener.historyReset(current());
 	}
@@ -125,7 +129,7 @@ public class CommandHistory implements ICommandHistory {
 		}
 		
 		command.setInHistory(true);
-		commands.push(command);
+		commands.addFirst(command);
 		
 		resetPosition();
 		for (ICommandHistoryListener listener : listeners) listener.commandAdded(command);

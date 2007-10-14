@@ -221,6 +221,9 @@ public abstract class GameView extends StreamView implements KeyListener, IWarlo
 	}
 	
 	public void setCurrentCommand(ICommand command) {
+		if(command == null) {
+			command = new Command("", new Date());
+		}
 		GameView.this.currentCommand = command;
 		GameView.this.entry.setText(command.getCommand());
 		GameView.this.entry.setSelection(command.getCommand().length());

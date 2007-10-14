@@ -66,11 +66,6 @@ public class CommandHistoryMacroHandler implements IMacroHandler {
 	public void handleUp (IWarlockClientViewer viewer) 
 	{
 		IWarlockClient client = viewer.getWarlockClient();
-		ICommand currentCommand = viewer.getCurrentCommand();
-		if (currentCommand != null && !currentCommand.isInHistory())
-		{
-			client.getCommandHistory().addCommand(currentCommand);
-		}
 		
 		ICommand command = client.getCommandHistory().prev();
 		viewer.setCurrentCommand(command);
@@ -79,12 +74,8 @@ public class CommandHistoryMacroHandler implements IMacroHandler {
 	public void handleDown (IWarlockClientViewer viewer)
 	{
 		IWarlockClient client = viewer.getWarlockClient();
-		ICommand currentCommand = viewer.getCurrentCommand();
-		if (currentCommand != null && !currentCommand.isLast())
-		{
-			ICommand command = client.getCommandHistory().next();
-			viewer.setCurrentCommand(command);
-		}
+		ICommand command = client.getCommandHistory().next();
+		viewer.setCurrentCommand(command);
 	}
 
 	public void handleSend (IWarlockClientViewer viewer)
@@ -112,7 +103,7 @@ public class CommandHistoryMacroHandler implements IMacroHandler {
 		
 		if (history.size() >= 2)
 		{
-			ICommand command = history.getCommandAt(history.size() - 2);
+			ICommand command = history.getCommandAt(1);
 			
 			viewer.getWarlockClient().send(command);
 			viewer.getWarlockClient().getDefaultStream().echo(command.getCommand());
