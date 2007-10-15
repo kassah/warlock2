@@ -179,10 +179,11 @@ relationalExpression returns [IWSLValue cond]
 	;
 
 relationalOp returns [RelationalOperator op]
-	: '>'	{ op = RelationalOperator.GreaterThan; }
-	| '<'	{ op = RelationalOperator.LessThan; }
-	| '>='	{ op = RelationalOperator.GreaterThanEqualTo; }
-	| '<='	{ op = RelationalOperator.LessThanEqualTo; }
+	: '>'			{ op = RelationalOperator.GreaterThan; }
+	| '<'			{ op = RelationalOperator.LessThan; }
+	| '>='			{ op = RelationalOperator.GreaterThanEqualTo; }
+	| '<='			{ op = RelationalOperator.LessThanEqualTo; }
+	| 'contains'	{ op = RelationalOperator.Contains; }
 	;
 
 unaryExpression returns [IWSLValue cond]

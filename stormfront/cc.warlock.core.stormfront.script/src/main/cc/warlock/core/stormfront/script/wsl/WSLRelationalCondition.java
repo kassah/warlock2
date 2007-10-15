@@ -8,7 +8,8 @@ public class WSLRelationalCondition extends WSLBoolean {
 		GreaterThan			{ boolean compare(IWSLValue arg1, IWSLValue arg2) { return arg1.toDouble() > arg2.toDouble(); } },
 		GreaterThanEqualTo	{ boolean compare(IWSLValue arg1, IWSLValue arg2) { return arg1.toDouble() >= arg2.toDouble(); } },
 		LessThan			{ boolean compare(IWSLValue arg1, IWSLValue arg2) { return arg1.toDouble() < arg2.toDouble(); } },
-		LessThanEqualTo		{ boolean compare(IWSLValue arg1, IWSLValue arg2) { return arg1.toDouble() <= arg2.toDouble(); } };
+		LessThanEqualTo		{ boolean compare(IWSLValue arg1, IWSLValue arg2) { return arg1.toDouble() <= arg2.toDouble(); } },
+		Contains			{ boolean compare(IWSLValue arg1, IWSLValue arg2) { return arg1.toString().contains(arg2.toString()); } };
 	
 		abstract boolean compare(IWSLValue arg1, IWSLValue arg2);
 	}
