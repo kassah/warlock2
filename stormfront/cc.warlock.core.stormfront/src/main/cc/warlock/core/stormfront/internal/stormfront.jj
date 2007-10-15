@@ -53,7 +53,7 @@ PARSER_END(StormFrontProtocolParser)
 
 void Document() : {}
 {
-	(Element())*
+	(Element())* <EOF>
 }
 
 void Element() : {Token data; String str; }

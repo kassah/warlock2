@@ -41,11 +41,13 @@ public class StyleTagHandler extends DefaultTagHandler {
 		
 		if (styleId == null || styleId.length() == 0)
 		{
-			currentStyle.setLength(handler.peekBuffer().getBuffer().length());
-			handler.peekBuffer().addStyle(currentStyle, 0);
-			
-			handler.sendAndPopBuffer();
-			handler.clearCurrentStyle();
+			if(currentStyle != null) {
+				currentStyle.setLength(handler.peekBuffer().getBuffer().length());
+				handler.peekBuffer().addStyle(currentStyle, 0);
+				handler.sendAndPopBuffer();
+				handler.clearCurrentStyle();
+				currentStyle = null;
+			}
 		}
 		else
 		{
