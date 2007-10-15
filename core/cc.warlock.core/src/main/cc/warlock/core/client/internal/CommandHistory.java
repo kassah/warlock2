@@ -37,7 +37,7 @@ public class CommandHistory implements ICommandHistory {
 			ByteArrayInputStream bytes = new ByteArrayInputStream(array);
 			try {
 				ObjectInputStream stream = new ObjectInputStream(bytes);
-				// commands = (LinkedList<ICommand>)stream.readObject();
+				commands = (LinkedList<ICommand>)stream.readObject();
 				stream.close();
 			} catch(Exception e) {
 				e.printStackTrace();
@@ -54,57 +54,43 @@ public class CommandHistory implements ICommandHistory {
 	}
 
 	public ICommand next() {
-		try {
-			ICommand command = null;
-			if (position > 0) {
-				position--;
+		if (position >= 0)
+			position--;
 
-				command = commands.get(position);
-				
-			} else if(position == 0) {
-				position = -1;
-			}
-			for (ICommandHistoryListener listener : listeners) listener.historyNext(command);
-			return command;
-		} catch(IndexOutOfBoundsException e) {
-			e.printStackTrace();
-			return null;
-		}
+		ICommand command = current();
+		for (ICommandHistoryListener listener : listeners) listener.historyNext(command);
+		return command;
 	}
 	
 	public ICommand prev() {
+		if(position < size() - 1)
+			position++;
 
-		try {
-			if(position < size() - 1)
-				position++;
-			
-			ICommand command = commands.get(position);
-			for (ICommandHistoryListener listener : listeners) listener.historyPrevious(command);
-			
-			return command;
-		} catch(IndexOutOfBoundsException e) {
-			e.printStackTrace();
-			return null;
-		}
+		ICommand command = current();
+		for (ICommandHistoryListener listener : listeners) listener.historyPrevious(command);
+
+		return command;
 	}
 
 	public ICommand current () {
-		try {
-			ICommand command = commands.get(position);
-			return command;
-		}
-		catch (ArrayIndexOutOfBoundsException e) {
-			e.printStackTrace();
-			return null;
-		}
+		return getCommandAt(position);
 	}
 	
 	public int size() {
 		return commands.size();
 	}
 	
-	public ICommand getCommandAt(int position) {
-		return commands.get(position);
+	public ICommand getCommandAt(int pos) {
+		try {
+			ICommand command;
+			if(pos == -1) command = null;
+			else command = commands.get(pos);
+			return command;
+		}
+		catch (IndexOutOfBoundsException e) {
+			e.printStackTrace();
+			return null;
+		}
 	}
 	
 	public void resetPosition() {
