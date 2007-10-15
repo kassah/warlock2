@@ -3,6 +3,8 @@ package cc.warlock.core.stormfront.script;
 import org.eclipse.core.runtime.Plugin;
 import org.osgi.framework.BundleContext;
 
+import cc.warlock.core.stormfront.script.javascript.StormFrontJavascriptVars;
+
 /**
  * The activator class controls the plug-in life cycle
  */
@@ -27,6 +29,9 @@ public class StormFrontScriptPlugin extends Plugin {
 	public void start(BundleContext context) throws Exception {
 		super.start(context);
 		plugin = this;
+		
+		//register javascript var provider
+		new StormFrontJavascriptVars();
 	}
 
 	/*
