@@ -7,6 +7,7 @@ import org.osgi.framework.BundleContext;
 import cc.warlock.core.configuration.Profile;
 import cc.warlock.core.configuration.SavedProfiles;
 import cc.warlock.core.stormfront.client.internal.StormFrontClient;
+import cc.warlock.core.stormfront.script.javascript.StormFrontJavascriptVars;
 import cc.warlock.rcp.application.WarlockApplication;
 import cc.warlock.rcp.plugin.Warlock2Plugin;
 import cc.warlock.rcp.stormfront.adapters.StormFrontClientAdapterFactory;
@@ -37,6 +38,9 @@ public class StormFrontRCPPlugin extends AbstractUIPlugin {
 	public void start(BundleContext context) throws Exception {
 		super.start(context);
 		plugin = this;
+		
+		// i think this is the best place for this to go?
+		new StormFrontJavascriptVars();
 		
 		// force-load our initial client so we can do offline scripting
 		Warlock2Plugin.getDefault().addClient(new StormFrontClient());
