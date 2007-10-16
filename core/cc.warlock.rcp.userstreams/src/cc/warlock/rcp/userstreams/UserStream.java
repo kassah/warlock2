@@ -3,13 +3,14 @@
  */
 package cc.warlock.rcp.userstreams;
 
+import cc.warlock.rcp.ui.client.SWTWarlockClientListener;
 import cc.warlock.rcp.views.StreamView;
 import cc.warlock.core.client.IStream;
 import cc.warlock.core.client.IStyledString;
 import cc.warlock.core.client.IWarlockClient;
 import cc.warlock.core.client.IWarlockClientListener;
 import cc.warlock.core.client.WarlockClientRegistry;
-import cc.warlock.core.client.IStreamListener;
+//import cc.warlock.core.client.IStreamListener;
 
 /**
  * @author Will Robertson
@@ -26,13 +27,15 @@ public class UserStream extends StreamView implements IWarlockClientListener {
 		super.streamReceivedText(stream, text);
 	}
 
+	public void streamPrompted(IStream stream, String prompt) {
+		super.streamPrompted(stream, prompt);
+	}
 	
 	public void clientConnected(IWarlockClient client) {
 		//mainStream = client.getDefaultStream();
 		client.getDefaultStream().addStreamListener(this);
 		this.addStream(client.getDefaultStream());
 	}
-
 	
 	public void clientDisconnected(IWarlockClient client) {
 		//mainStream = null;
@@ -48,6 +51,6 @@ public class UserStream extends StreamView implements IWarlockClientListener {
 	public UserStream() {
 		// Constructor
 		super();
-		WarlockClientRegistry.addWarlockClientListener(this);
+		WarlockClientRegistry.addWarlockClientListener(new SWTWarlockClientListener(this));
 	}
 }
