@@ -172,6 +172,7 @@ public class WSLScript extends AbstractScript {
 		commands.echo("[script started: " + getName() + "]");
 		running = true;
 		stopped = false;
+		commands.waitForRoundtime();
 	}
 	
 	private void checkState() {
