@@ -29,9 +29,6 @@ public class StormFrontScriptPlugin extends Plugin {
 	public void start(BundleContext context) throws Exception {
 		super.start(context);
 		plugin = this;
-		
-		//register javascript var provider
-		new StormFrontJavascriptVars();
 	}
 
 	/*
@@ -42,7 +39,7 @@ public class StormFrontScriptPlugin extends Plugin {
 		plugin = null;
 		super.stop(context);
 	}
-
+	
 	/**
 	 * Returns the shared instance
 	 *
