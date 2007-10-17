@@ -17,6 +17,7 @@ import cc.warlock.core.client.WarlockClientRegistry;
  *
  */
 public class UserStream extends StreamView implements IWarlockClientListener {
+	private SWTWarlockClientListener clientListenerWrapper;
 	
 	public void clientActivated(IWarlockClient client) {
 		// TODO Auto-generated method stub
@@ -28,7 +29,11 @@ public class UserStream extends StreamView implements IWarlockClientListener {
 	}
 
 	public void streamPrompted(IStream stream, String prompt) {
-		super.streamPrompted(stream, prompt);
+		// super.streamPrompted(stream, prompt);
+	}
+	
+	public void streamEchoed(IStream stream, String text) {
+		// Discard
 	}
 	
 	public void clientConnected(IWarlockClient client) {
@@ -39,7 +44,7 @@ public class UserStream extends StreamView implements IWarlockClientListener {
 	
 	public void clientDisconnected(IWarlockClient client) {
 		//mainStream = null;
-		// 	client.getDefaultStream().removeStreamListener(this);
+		 client.getDefaultStream().removeStreamListener(streamListenerWrapper);
 	}
 
 	
@@ -51,6 +56,7 @@ public class UserStream extends StreamView implements IWarlockClientListener {
 	public UserStream() {
 		// Constructor
 		super();
-		WarlockClientRegistry.addWarlockClientListener(new SWTWarlockClientListener(this));
+		clientListenerWrapper = new SWTWarlockClientListener(this);
+		WarlockClientRegistry.addWarlockClientListener(clientListenerWrapper); // new SWTWarlockClientListener(this));
 	}
 }
