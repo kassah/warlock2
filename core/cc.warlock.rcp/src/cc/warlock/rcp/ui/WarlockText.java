@@ -26,13 +26,9 @@ import org.eclipse.swt.events.VerifyListener;
 import org.eclipse.swt.graphics.Color;
 import org.eclipse.swt.graphics.Cursor;
 import org.eclipse.swt.graphics.Font;
-import org.eclipse.swt.graphics.FontMetrics;
-import org.eclipse.swt.graphics.GC;
 import org.eclipse.swt.graphics.GlyphMetrics;
 import org.eclipse.swt.graphics.Image;
-import org.eclipse.swt.graphics.PaletteData;
 import org.eclipse.swt.graphics.Point;
-import org.eclipse.swt.graphics.RGB;
 import org.eclipse.swt.graphics.Rectangle;
 import org.eclipse.swt.widgets.Caret;
 import org.eclipse.swt.widgets.Composite;
@@ -60,7 +56,6 @@ public class WarlockText implements LineBackgroundListener {
 	private Hashtable<Control, Rectangle> anchoredControls = new Hashtable<Control, Rectangle>();
 	private Color linkColor;
 	private Cursor handCursor, defaultCursor;
-	private PaletteData palette;
 	private ScrollBar vscroll;
 	private int lineLimit = 5000;
 	private int doScrollDirection = SWT.UP;
@@ -76,13 +71,11 @@ public class WarlockText implements LineBackgroundListener {
 		handCursor = new Cursor(display, SWT.CURSOR_HAND);
 		defaultCursor = parent.getCursor();
 		vscroll = getVerticalBar ();
-		palette = new PaletteData(new RGB[] { display.getSystemColor(SWT.COLOR_WHITE).getRGB(), display.getSystemColor(SWT.COLOR_BLACK).getRGB() });
 		
 		addVerifyListener(new VerifyListener()  {
 			public void verifyText(VerifyEvent e) {
 				int start = e.start;
 				int replaceCharCount = e.end - e.start;
-				int newCharCount = e.text.length();
 				int nHolder = 0;
 				for (Iterator<Object> iter = objects.keySet().iterator(); iter.hasNext(); )
 				{
@@ -108,8 +101,6 @@ public class WarlockText implements LineBackgroundListener {
 		
 		addPaintObjectListener(new PaintObjectListener() {
 			public void paintObject(PaintObjectEvent event) {
-				GC gc = event.gc;
-				FontMetrics metrics = gc.getFontMetrics();
 				StyleRange style = event.style;
 				for (Iterator<Object> iter = objects.keySet().iterator(); iter.hasNext(); )
 				{

@@ -12,7 +12,6 @@ import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.jface.dialogs.ProgressMonitorDialog;
 import org.eclipse.jface.operation.IRunnableWithProgress;
-import org.eclipse.jface.window.Window;
 import org.eclipse.swt.widgets.Shell;
 import org.eclipse.ui.PlatformUI;
 import org.eclipse.update.configuration.IConfiguredSite;
@@ -22,7 +21,6 @@ import org.eclipse.update.core.IFeatureReference;
 import org.eclipse.update.core.ISite;
 import org.eclipse.update.core.SiteManager;
 import org.eclipse.update.core.VersionedIdentifier;
-import org.eclipse.update.internal.operations.UpdateUtils;
 import org.eclipse.update.operations.IInstallFeatureOperation;
 import org.eclipse.update.operations.OperationsManager;
 

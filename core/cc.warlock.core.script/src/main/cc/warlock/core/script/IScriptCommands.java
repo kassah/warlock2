@@ -1,7 +1,5 @@
 package cc.warlock.core.script;
 
-import java.util.List;
-
 import cc.warlock.core.client.IWarlockClient;
 
 public interface IScriptCommands {

@@ -12,7 +12,6 @@ import org.eclipse.ui.IPerspectiveFactory;
 import org.eclipse.ui.IPlaceholderFolderLayout;
 
 import cc.warlock.rcp.views.ConnectionView;
-import cc.warlock.rcp.views.DebugView;
 
 /**
  * @author Marshall

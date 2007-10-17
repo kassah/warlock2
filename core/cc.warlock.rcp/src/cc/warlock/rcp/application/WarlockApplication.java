@@ -87,8 +87,8 @@ public class WarlockApplication extends WorkbenchAdvisor implements IApplication
 	}
 	
 	public Object start(IApplicationContext context) throws Exception {
-		Map args = context.getArguments();
-		String arguments[] = (String[]) args.get("application.args");
+		Map<String, String[]> args = context.getArguments();
+		String arguments[] = args.get("application.args");
 		parseArguments(arguments);
 		
 		Display display = PlatformUI.createDisplay();
