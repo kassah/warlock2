@@ -35,6 +35,9 @@ public class PushBoldTagHandler extends DefaultTagHandler {
 		
 		else if (getCurrentTag().equals("popBold"))
 		{
+			if(style == null)
+				return;
+			
 			IStyledString buffer = handler.peekBuffer();
 			
 			style.setLength(buffer.getBuffer().length());
@@ -57,6 +60,7 @@ public class PushBoldTagHandler extends DefaultTagHandler {
 			}
 			
 			handler.sendAndPopBuffer();
+			style = null;
 		}
 	}
 }
