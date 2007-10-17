@@ -56,6 +56,11 @@ public class JavascriptCommands {
 	public void put(String text) {
 		commands.put(script, text);
 	}
+	
+	public void waitFor(String string)
+	{
+		waitFor(new TextMatch(string, true));
+	}
 
 	public void waitFor(Match match) {
 		commands.waitFor(match);
