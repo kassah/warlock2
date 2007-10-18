@@ -300,6 +300,11 @@ public class StormFrontClient extends WarlockClient implements IStormFrontClient
 		return skin;
 	}
 	
+	@Override
+	public IStream getStream(String streamName) {
+		return StormFrontStream.fromNameAndClient(this, streamName);
+	}
+	
 	public IStream getThoughtsStream() {
 		return getStream(THOUGHTS_STREAM_NAME);
 	}
