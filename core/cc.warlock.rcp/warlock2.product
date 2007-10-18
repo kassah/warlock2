@@ -6,8 +6,8 @@
    <configIni use="default"/>
 
    <launcherArgs>
-      <programArgsLin>-data $HOME/.warlock2/workspace</programArgsLin>
-      <programArgsMac>-data $HOME/.warlock2/workspace</programArgsMac>
+      <programArgsLin>-data ~/.warlock2/workspace</programArgsLin>
+      <programArgsMac>-data ~/.warlock2/workspace</programArgsMac>
       <programArgsWin>-data &quot;%AppData%/Warlock2/workspace&quot;</programArgsWin>
       <vmArgsMac>-XstartOnFirstThread -Dorg.eclipse.swt.internal.carbon.smallFonts</vmArgsMac>
    </launcherArgs>
