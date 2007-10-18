@@ -123,6 +123,11 @@ public class StormFrontStream extends Stream {
 				}
 				super.send(text.substring(currentIndex, text.length()));
 			}
+			
+			for (HighlightString string : fullLineStrings)
+			{
+				super.sendStyle(HighlightStringStyle.createEndStyle(string));
+			}
 		}
 		
 	}
