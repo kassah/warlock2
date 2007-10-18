@@ -3,6 +3,8 @@ package cc.warlock.rcp.util;
 import java.net.MalformedURLException;
 import java.net.URL;
 
+import org.eclipse.ui.IPerspectiveDescriptor;
+import org.eclipse.ui.IWorkbenchPage;
 import org.eclipse.ui.PartInitException;
 import org.eclipse.ui.PlatformUI;
 
@@ -19,6 +21,15 @@ public class RCPUtil {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
+	}
+	
+	public static void openPerspective (String perspectiveId)
+	{
+		IWorkbenchPage page = PlatformUI.getWorkbench().getActiveWorkbenchWindow().getActivePage();
+		IPerspectiveDescriptor perspective =
+			PlatformUI.getWorkbench().getPerspectiveRegistry().findPerspectiveWithId(perspectiveId);
+		
+		page.setPerspective(perspective);
 	}
 	
 }

@@ -4,7 +4,6 @@ import org.eclipse.swt.widgets.Display;
 
 import cc.warlock.core.client.IStream;
 import cc.warlock.core.client.IStreamListener;
-import cc.warlock.core.client.IStyledString;
 import cc.warlock.core.client.IWarlockStyle;
 
 public class SWTStreamListener implements IStreamListener {
@@ -25,14 +24,13 @@ public class SWTStreamListener implements IStreamListener {
 	}
 	
 	private static enum EventType {
-		Cleared, ReceivedText, Echoed, Prompted
+		Cleared, ReceivedText, ReceivedStyle, Echoed, Prompted
 	};
 	
 	private class ListenerWrapper implements Runnable
 	{
 		public IStream stream;
 		public String text;
-		public IStyledString string;
 		public IWarlockStyle style;
 		public EventType eventType;
 		
@@ -40,7 +38,8 @@ public class SWTStreamListener implements IStreamListener {
 			switch (eventType)
 			{
 			case Cleared: listener.streamCleared(stream); break;
-			case ReceivedText: listener.streamReceivedText(stream, string); break;
+			case ReceivedText: listener.streamReceivedText(stream, text); break;
+			case ReceivedStyle: listener.streamReceivedStyle(stream, style); break;
 			case Echoed: listener.streamEchoed(stream, text); break;
 			case Prompted: listener.streamPrompted(stream, text); break;
 			}
@@ -67,10 +66,17 @@ public class SWTStreamListener implements IStreamListener {
 		run(wrapper);
 	}
 
-	public void streamReceivedText(IStream stream, IStyledString string) {
+	public void streamReceivedText(IStream stream, String text) {
 		wrapper.stream = stream;
 		wrapper.eventType = EventType.ReceivedText;
-		wrapper.string = string;
+		wrapper.text = text;
+		run(wrapper);
+	}
+	
+	public void streamReceivedStyle(IStream stream, IWarlockStyle style) {
+		wrapper.stream = stream;
+		wrapper.eventType = EventType.ReceivedStyle;
+		wrapper.style = style;
 		run(wrapper);
 	}
 	

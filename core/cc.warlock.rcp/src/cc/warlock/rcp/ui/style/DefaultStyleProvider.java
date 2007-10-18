@@ -23,14 +23,13 @@ public class DefaultStyleProvider implements IStyleProvider {
 		return _instance;
 	}
 	
-	public StyleRangeWithData getStyleRange (IWarlockStyle style, int start, int length)
+	public StyleRangeWithData getStyleRange (IWarlockStyle style, int start)
 	{
 		if (style.getStyleTypes().contains(IWarlockStyle.StyleType.EMPTY))
 			return null;
 		
 		StyleRangeWithData range = new StyleRangeWithData();
 		range.start = start;
-		range.length = length;
 		range.fontStyle = 0;
 		
 		for (IWarlockStyle.StyleType styleType : style.getStyleTypes())
@@ -50,12 +49,8 @@ public class DefaultStyleProvider implements IStyleProvider {
 		return range;
 	}
 	
-	public StyleRangeWithData getEchoStyle (int start, int length)
+	public StyleRangeWithData getEchoStyle (int start)
 	{
-		return getStyleRange(WarlockStyle.createCustomStyle("command", start, length), start, length);
-	}
-	
-	public void applyStyles(WarlockText styledText, StyleRange parentStyle, String text, int start, int lineIndex) {
-		// no-op
+		return getStyleRange(WarlockStyle.createCustomStyle("command"), start);
 	}
 }
