@@ -16,11 +16,13 @@ import cc.warlock.core.client.internal.WarlockStyle;
 import cc.warlock.core.stormfront.client.internal.StormFrontClient;
 import cc.warlock.core.stormfront.network.SGEConnection;
 import cc.warlock.rcp.application.WarlockApplication;
+import cc.warlock.rcp.application.WarlockPerspectiveLayout;
 import cc.warlock.rcp.plugin.Warlock2Plugin;
 import cc.warlock.rcp.stormfront.ui.StormFrontPerspectiveFactory;
 import cc.warlock.rcp.stormfront.ui.views.BarsView;
 import cc.warlock.rcp.stormfront.ui.views.HandsView;
 import cc.warlock.rcp.stormfront.ui.views.StormFrontGameView;
+import cc.warlock.rcp.util.RCPUtil;
 import cc.warlock.rcp.views.DebugView;
 import cc.warlock.rcp.views.GameView;
 
@@ -68,10 +70,12 @@ public class LoginUtil {
 			"* or your internet connection is not active\n" +
 			"******************************************************************\n";
 			
-			IWarlockStyle style = WarlockStyle.createCustomStyle("mono", 0, errorConnectMessage.length());
+			IWarlockStyle style = WarlockStyle.createCustomStyle("mono");
 			style.addStyleType(IWarlockStyle.StyleType.MONOSPACE);
 			
-			client.getDefaultStream().send(errorConnectMessage, style);
+			client.getDefaultStream().sendStyle(style);
+			client.getDefaultStream().send(errorConnectMessage);
+			client.getDefaultStream().sendStyle(WarlockStyle.createEndCustomStyle("mono"));
 		} catch (PartInitException e) {
 			e.printStackTrace();
 		}
@@ -82,10 +86,8 @@ public class LoginUtil {
 		IWorkbenchPage page = PlatformUI.getWorkbench().getActiveWorkbenchWindow().getActivePage();
 		if (!page.getPerspective().getId().equals(StormFrontPerspectiveFactory.PERSPECTIVE_ID))
 		{
-			IPerspectiveDescriptor perspective =
-				PlatformUI.getWorkbench().getPerspectiveRegistry().findPerspectiveWithId(StormFrontPerspectiveFactory.PERSPECTIVE_ID);
-			
-			page.setPerspective(perspective);
+			RCPUtil.openPerspective(StormFrontPerspectiveFactory.PERSPECTIVE_ID);
+			WarlockPerspectiveLayout.instance().loadSavedLayout();
 		}
 		
 		connect (GameView.createNext(StormFrontGameView.VIEW_ID), loginProperties);
