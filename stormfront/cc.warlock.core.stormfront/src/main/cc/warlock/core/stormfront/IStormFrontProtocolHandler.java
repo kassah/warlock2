@@ -7,7 +7,6 @@
 package cc.warlock.core.stormfront;
 
 import cc.warlock.core.client.IStream;
-import cc.warlock.core.client.IStyledString;
 import cc.warlock.core.client.IWarlockStyle;
 import cc.warlock.core.stormfront.client.IStormFrontClient;
 import cc.warlock.core.stormfront.xml.IStormFrontXMLHandler;
@@ -29,10 +28,10 @@ public interface IStormFrontProtocolHandler extends IStormFrontXMLHandler {
 	public IStream getCurrentStream();
 	public IWarlockStyle getCurrentStyle();
 	
-	public void pushBuffer();
-	public IStyledString popBuffer();
-	public IStyledString peekBuffer();
-	public void sendAndPopBuffer();
+//	public void pushBuffer();
+//	public IStyledString popBuffer();
+//	public IStyledString peekBuffer();
+//	public void sendAndPopBuffer();
 	
 	public void startSavingRawXML(StringBuffer buffer, String endOnTag);
 	public void stopSavingRawXML();

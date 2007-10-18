@@ -14,9 +14,7 @@ import java.util.Stack;
 import org.apache.commons.lang.StringEscapeUtils;
 
 import cc.warlock.core.client.IStream;
-import cc.warlock.core.client.IStyledString;
 import cc.warlock.core.client.IWarlockStyle;
-import cc.warlock.core.client.internal.StyledString;
 import cc.warlock.core.client.internal.WarlockStyle;
 import cc.warlock.core.stormfront.IStormFrontProtocolHandler;
 import cc.warlock.core.stormfront.IStormFrontTagHandler;
@@ -37,7 +35,6 @@ public class StormFrontProtocolHandler implements IStormFrontProtocolHandler {
 	protected HashMap<String, IStormFrontTagHandler> defaultTagHandlers = new HashMap<String, IStormFrontTagHandler>();
 	protected Stack<IStream> streamStack = new Stack<IStream>();
 	protected Stack<String> tagStack = new Stack<String>();
-	protected Stack<IStyledString> bufferStack = new Stack<IStyledString>();
 	protected StringBuffer rawXMLBuffer;
 	protected String rawXMLEndOnTag;
 	protected int currentSpacing = 0;
@@ -145,27 +142,15 @@ public class StormFrontProtocolHandler implements IStormFrontProtocolHandler {
 		if(!handleCharacters(defaultTagHandlers, 0, ch, start, length)) {
 			String str = String.copyValueOf(ch, start, length);
 			
-			if (bufferStack.size() > 0)
-			{
-				bufferStack.peek().getBuffer().append(str);
+			IStream stream;
+			try {
+				stream = streamStack.peek();
+			} catch(EmptyStackException e) {
+				stream = client.getDefaultStream();
 			}
-			else
-			{
-				IStream stream;
-				try {
-					stream = streamStack.peek();
-				} catch(EmptyStackException e) {
-					stream = client.getDefaultStream();
-				}
-
-				if (!WarlockStyle.EMPTY_STYLE.equals(currentStyle))
-				{
-					currentStyle.setLength(str.length());
-				}
-				
-				stream.send(str, currentStyle);
-				//streamTable.send(stream, str);
-			}
+			
+			stream.send(str);
+			//streamTable.send(stream, str);
 		}
 	}
 	
@@ -274,19 +259,19 @@ public class StormFrontProtocolHandler implements IStormFrontProtocolHandler {
 		}
 	}
 	
-	public void pushBuffer() {
-		bufferStack.push(new StyledString());
-	}
-	
-	public IStyledString popBuffer() {
-		return bufferStack.pop();
-	}
-	
-	public IStyledString peekBuffer() {
-		if (bufferStack.size() > 0)
-			return bufferStack.peek();
-		else return null;
-	}
+//	public void pushBuffer() {
+//		bufferStack.push(new StyledString());
+//	}
+//	
+//	public IStyledString popBuffer() {
+//		return bufferStack.pop();
+//	}
+//	
+//	public IStyledString peekBuffer() {
+//		if (bufferStack.size() > 0)
+//			return bufferStack.peek();
+//		else return null;
+//	}
 	
 	public void startSavingRawXML(StringBuffer buffer, String endOnTag) {
 		rawXMLBuffer = buffer;
@@ -318,27 +303,27 @@ public class StormFrontProtocolHandler implements IStormFrontProtocolHandler {
 		this.currentStyle = WarlockStyle.EMPTY_STYLE;
 	}
 	
-	public void sendAndPopBuffer() {
-		IStyledString buffer = popBuffer();
-		if (peekBuffer() != null)
-		{
-			IStyledString parentBuffer = peekBuffer();
-			
-			for (IWarlockStyle style : buffer.getStyles())
-			{
-				style.setStart(parentBuffer.getBuffer().length() + style.getStart());
-				if (!WarlockStyle.EMPTY_STYLE.equals(currentStyle))
-				{
-					// the current style in this context will be used for style inheritance
-					style.inheritFrom(currentStyle);
-				}
-				
-				parentBuffer.addStyle(style);
-			}
-			parentBuffer.getBuffer().append(buffer.getBuffer());
-		}
-		else {
-			getCurrentStream().send(buffer);
-		}
-	}
+//	public void sendAndPopBuffer() {
+//		IStyledString buffer = popBuffer();
+//		if (peekBuffer() != null)
+//		{
+//			IStyledString parentBuffer = peekBuffer();
+//			
+//			for (IWarlockStyle style : buffer.getStyles())
+//			{
+//				style.setStart(parentBuffer.getBuffer().length() + style.getStart());
+//				if (!WarlockStyle.EMPTY_STYLE.equals(currentStyle))
+//				{
+//					// the current style in this context will be used for style inheritance
+//					style.inheritFrom(currentStyle);
+//				}
+//				
+//				parentBuffer.addStyle(style);
+//			}
+//			parentBuffer.getBuffer().append(buffer.getBuffer());
+//		}
+//		else {
+//			getCurrentStream().send(buffer);
+//		}
+//	}
 }

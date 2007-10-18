@@ -21,12 +21,13 @@ public class PresetTagHandler extends DefaultTagHandler {
 	@Override
 	public void handleStart(StormFrontAttributeList attributes) {
 		this.id = attributes.getValue("id");
-		handler.setCurrentStyle(WarlockStyle.createCustomStyle(id, 0, -1));
+		
+		handler.getCurrentStream().sendStyle(WarlockStyle.createCustomStyle(id));
 	}
 	
 	@Override
 	public void handleEnd() {
-		handler.clearCurrentStyle();
+		handler.getCurrentStream().sendStyle(WarlockStyle.createEndCustomStyle(id));
 	}
 
 }

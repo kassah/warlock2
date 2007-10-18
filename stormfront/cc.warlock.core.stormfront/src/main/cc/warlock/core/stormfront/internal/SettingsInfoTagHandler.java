@@ -58,7 +58,7 @@ public class SettingsInfoTagHandler extends DefaultTagHandler {
 			{
 				handler.getClient().getServerSettings().load(playerId);
 				try {
-					handler.getClient().getConnection().send("");
+					handler.getClient().getConnection().sendLine("");
 				} catch(IOException e) {
 					e.printStackTrace();
 				}

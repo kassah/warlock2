@@ -41,24 +41,18 @@ public class StyleTagHandler extends DefaultTagHandler {
 		
 		if (styleId == null || styleId.length() == 0)
 		{
-			if(currentStyle != null) {
-				currentStyle.setLength(handler.peekBuffer().getBuffer().length());
-				handler.peekBuffer().addStyle(currentStyle, 0);
-				handler.sendAndPopBuffer();
-				handler.clearCurrentStyle();
-				currentStyle = null;
-			}
+			IWarlockStyle endStyle = WarlockStyle.createEndCustomStyle(currentStyle.getStyleName());
+			handler.getCurrentStream().sendStyle(endStyle);
 		}
 		else
 		{
-			handler.pushBuffer();
-			currentStyle = WarlockStyle.createCustomStyle(styleId, 0, -1);
+			currentStyle = WarlockStyle.createCustomStyle(styleId);
 			
 			if (styleId.equals("mono")) {
 				currentStyle.addStyleType(IWarlockStyle.StyleType.MONOSPACE);
 			}
-			handler.setCurrentStyle(currentStyle);
 			
+			handler.getCurrentStream().sendStyle(currentStyle);
 		}
 	}
 }
