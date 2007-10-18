@@ -3,8 +3,8 @@
 	<target name="build-parsers">
 		<mkdir dir="${basedir}/src/javacc/cc/warlock/core/stormfront/internal"/>
 		<antcall target="javacc">
-			<param name="arguments" value="-OUTPUT_DIRECTORY:${basedir}/src/javacc/cc/warlock/core/stormfront/internal -STATIC:false"/>
-			<param name="grammar-file" value="${basedir}/src/main/cc/warlock/core/stormfront/internal/stormfront.jj"/>
+			<param name="arguments" value="&quot;-OUTPUT_DIRECTORY:${basedir}/src/javacc/cc/warlock/core/stormfront/internal&quot; -STATIC:false"/>
+			<param name="grammar-file" value="&quot;${basedir}/src/main/cc/warlock/core/stormfront/internal/stormfront.jj&quot;"/>
 		</antcall>
 	</target>
 	
