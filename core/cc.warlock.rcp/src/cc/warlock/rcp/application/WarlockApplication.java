@@ -9,8 +9,11 @@ import org.eclipse.equinox.app.IApplication;
 import org.eclipse.equinox.app.IApplicationContext;
 import org.eclipse.swt.widgets.Display;
 import org.eclipse.ui.PlatformUI;
+import org.eclipse.ui.XMLMemento;
 import org.eclipse.ui.application.IWorkbenchWindowConfigurer;
 import org.eclipse.ui.application.WorkbenchAdvisor;
+import org.eclipse.ui.internal.PerspectiveHelper;
+import org.eclipse.ui.internal.WorkbenchPage;
 
 import cc.warlock.core.configuration.WarlockConfiguration;
 
@@ -84,6 +87,17 @@ public class WarlockApplication extends WorkbenchAdvisor implements IApplication
 				
 			}
 		}
+	}
+	
+	@Override
+	public void preStartup() {
+		WarlockConfiguration.getMainConfiguration().addConfigurationProvider(WarlockPerspectiveLayout.instance());
+	}
+	
+	@Override
+	public boolean preShutdown() {
+		WarlockPerspectiveLayout.instance().saveLayout();
+		return true;
 	}
 	
 	public Object start(IApplicationContext context) throws Exception {
