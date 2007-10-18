@@ -7,15 +7,20 @@ import org.eclipse.swt.SWT;
 import org.eclipse.swt.graphics.Font;
 import org.eclipse.swt.widgets.Caret;
 
+import cc.warlock.core.client.IStream;
 import cc.warlock.core.client.IWarlockClient;
+import cc.warlock.core.client.IWarlockStyle;
 import cc.warlock.core.client.WarlockColor;
 import cc.warlock.core.stormfront.client.IStormFrontClient;
 import cc.warlock.core.stormfront.client.IStormFrontClientViewer;
 import cc.warlock.core.stormfront.client.StormFrontColor;
 import cc.warlock.core.stormfront.serversettings.server.ServerSettings;
+import cc.warlock.core.stormfront.style.IHighlightStringStyle;
 import cc.warlock.rcp.stormfront.adapters.SWTStormFrontClientViewer;
 import cc.warlock.rcp.stormfront.ui.StormFrontMacros;
 import cc.warlock.rcp.stormfront.ui.style.StormFrontStyleProvider;
+import cc.warlock.rcp.ui.StyleRangeWithData;
+import cc.warlock.rcp.ui.WarlockText;
 import cc.warlock.rcp.ui.style.StyleProviders;
 import cc.warlock.rcp.util.ColorUtil;
 import cc.warlock.rcp.views.GameView;
@@ -110,6 +115,44 @@ public class StormFrontGameView extends GameView implements IStormFrontClientVie
 		if (StatusView.getDefault() != null)
 		{
 			StatusView.getDefault().loadServerSettings(settings);
+		}
+	}
+	
+	@Override
+	public void streamReceivedStyle(IStream stream, IWarlockStyle style) {
+		if (!(style instanceof IHighlightStringStyle)) {
+			super.streamReceivedStyle(stream, style);
+			return;
+		}
+		
+		IHighlightStringStyle highlightStyle = (IHighlightStringStyle) style;
+		WarlockText text = clientStreams.get(stream.getClient());
+		int charCount = text.getCharCount();
+		
+		if (!highlightStyle.isEndStyle())
+		{	
+			StyleRangeWithData range = new StyleRangeWithData();
+			range.start = charCount;
+			range.background = ColorUtil.warlockColorToColor(highlightStyle.getHighlightString().getBackgroundColor());
+			range.foreground = ColorUtil.warlockColorToColor(highlightStyle.getHighlightString().getForegroundColor());
+			if (highlightStyle.getHighlightString().isFillEntireLine())
+			{
+				int lineIndex = text.getLineAtOffset(charCount);
+				text.setLineBackground(lineIndex, range.background);
+				text.setLineForeground(lineIndex, range.foreground);
+			}
+			unendedRanges.push(range);
+		}
+		else
+		{
+			StyleRangeWithData range = unendedRanges.pop();
+			range.length = charCount - range.start;
+			
+			if (unendedRanges.size() == 0) {
+				text.setStyleRange(range);
+			} else {
+				innerRanges.push(range);
+			}
 		}
 	}
 	
