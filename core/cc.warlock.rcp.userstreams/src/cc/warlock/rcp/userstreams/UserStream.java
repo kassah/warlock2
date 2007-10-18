@@ -6,7 +6,6 @@ package cc.warlock.rcp.userstreams;
 import cc.warlock.rcp.ui.client.SWTWarlockClientListener;
 import cc.warlock.rcp.views.StreamView;
 import cc.warlock.core.client.IStream;
-import cc.warlock.core.client.IStyledString;
 import cc.warlock.core.client.IWarlockClient;
 import cc.warlock.core.client.IWarlockClientListener;
 import cc.warlock.core.client.WarlockClientRegistry;
@@ -24,8 +23,8 @@ public class UserStream extends StreamView implements IWarlockClientListener {
 		
 	}
 	
-	public void streamReceivedText (IStream stream, IStyledString text) {
-		super.streamReceivedText(stream, text);
+	public void streamReceivedText (IStream stream, String string) {
+		super.streamReceivedText(stream, string);
 	}
 
 	public void streamPrompted(IStream stream, String prompt) {
