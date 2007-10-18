@@ -10,8 +10,9 @@ import java.util.Hashtable;
 import cc.warlock.core.client.IProperty;
 import cc.warlock.core.client.IStream;
 import cc.warlock.core.client.IStreamListener;
-import cc.warlock.core.client.IStyledString;
+import cc.warlock.core.client.IWarlockClient;
 import cc.warlock.core.client.IWarlockStyle;
+import cc.warlock.core.client.WarlockClientRegistry;
 
 
 /**
@@ -21,12 +22,11 @@ import cc.warlock.core.client.IWarlockStyle;
  */
 public class Stream implements IStream {
 	
-	private static Hashtable<String, Stream> streams = new Hashtable<String, Stream>();
+	protected static Hashtable<String, Stream> streams = new Hashtable<String, Stream>();
 	
 	protected IProperty<String> streamName, streamTitle;
 	protected ArrayList<IStreamListener> listeners;
 	protected boolean isPrompting = false;
-	protected StyledString buffer = null;
 	
 	protected Stream (String streamName) {
 		this.streamName = new Property<String>("streamName", null);
@@ -54,55 +54,75 @@ public class Stream implements IStream {
 		}
 	}
 	
-	public void send(String text) {
-		send (text, WarlockStyle.EMPTY_STYLE);
-	}
-	
-	public void send(String data, IWarlockStyle style) {
-		
-		if (buffer == null)
-		{
-			buffer = new StyledString();
-		}
-		int currentOffset = buffer.getBuffer().length();
-		
-		buffer.getBuffer().append(data);
-		if (!buffer.getStyles().contains(style))
-		{
-			// allows styles to be relative to the string they're using
-			style.setStart(style.getStart() + currentOffset);
-			buffer.addStyle(style);
-		}
-		
-		sendBuffer();
-	}
-
-	public void send (IStyledString text)
-	{
-		if (buffer == null)
-			buffer = new StyledString();
-		
-		buffer.append(text);
-		sendBuffer();
-	}
-	
-	private void sendBuffer() {
-		if (buffer.readyToFlush())
-		{
-			
-			for(IStreamListener listener : listeners) {
-				try {
-					listener.streamReceivedText(this, buffer);
-				} catch (Throwable t) {
-					// TODO Auto-generated catch block
-					t.printStackTrace();
-				}
+	public void sendStyle(IWarlockStyle style) {
+		for(IStreamListener listener : listeners) {
+			try {
+				listener.streamReceivedStyle(this, style);
+			} catch (Throwable t) {
+				// TODO Auto-generated catch block
+				t.printStackTrace();
 			}
-			
-			isPrompting = false;
-			buffer = null;
 		}
 	}
+	
+	public void send(String text) {
+//		send (text, WarlockStyle.EMPTY_STYLE);
+		for(IStreamListener listener : listeners) {
+			try {
+				listener.streamReceivedText(this, text);
+			} catch (Throwable t) {
+				// TODO Auto-generated catch block
+				t.printStackTrace();
+			}
+		}
+		isPrompting = false;
+	}
+	
+//	public void send(String data, IWarlockStyle style) {
+//		
+//		if (buffer == null)
+//		{
+//			buffer = new StyledString();
+//		}
+//		int currentOffset = buffer.getBuffer().length();
+//		
+//		buffer.getBuffer().append(data);
+//		if (!buffer.getStyles().contains(style))
+//		{
+//			// allows styles to be relative to the string they're using
+//			style.setStart(style.getStart() + currentOffset);
+//			buffer.addStyle(style);
+//		}
+//		
+//		sendBuffer();
+//	}
+//
+//	public void send (IStyledString text)
+//	{
+//		if (buffer == null)
+//			buffer = new StyledString();
+//		
+//		buffer.append(text);
+//		sendBuffer();
+//	}
+	
+//	private void sendBuffer() {
+//		if (buffer.readyToFlush())
+//		{
+//			
+//			for(IStreamListener listener : listeners) {
+//				try {
+//					listener.streamReceivedText(this, buffer);
+//				} catch (Throwable t) {
+//					// TODO Auto-generated catch block
+//					t.printStackTrace();
+//				}
+//			}
+//			
+//			isPrompting = false;
+//			buffer = null;
+//		}
+//	}
 	
 	public void prompt(String prompt) {
 		isPrompting = true;
@@ -156,6 +176,22 @@ public class Stream implements IStream {
 	public static Collection<Stream> getStreams ()
 	{
 		return streams.values();
+	}
+	
+	public IWarlockClient getClient ()
+	{
+		for (IWarlockClient client : WarlockClientRegistry.getActiveClients())
+		{
+			if (client instanceof WarlockClient)
+			{
+				WarlockClient c = (WarlockClient) client;
+				if (getName().get().indexOf(c.streamPrefix) > -1)
+				{
+					return c;
+				}
+			}
+		}
+		return null;
 	}
 
 	public IProperty<String> getTitle() {

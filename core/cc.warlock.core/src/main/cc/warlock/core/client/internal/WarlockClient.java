@@ -8,14 +8,15 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Date;
 import java.util.Hashtable;
+import java.util.List;
 
 import cc.warlock.core.client.ICommand;
 import cc.warlock.core.client.ICommandHistory;
 import cc.warlock.core.client.IStream;
 import cc.warlock.core.client.IStreamListener;
-import cc.warlock.core.client.IStyledString;
 import cc.warlock.core.client.IWarlockClient;
 import cc.warlock.core.client.IWarlockClientViewer;
+import cc.warlock.core.client.IWarlockStyle;
 import cc.warlock.core.network.IConnection;
 
 
@@ -29,7 +30,8 @@ public abstract class WarlockClient implements IWarlockClient {
 	protected ICommandHistory commandHistory = new CommandHistory();
 	protected String streamPrefix;
 
-	protected Hashtable <IStream, IStyledString> streamBuffers = new Hashtable<IStream, IStyledString>();
+	protected Hashtable<IStream, StringBuffer> streamBuffers = new Hashtable<IStream, StringBuffer>();
+	protected Hashtable<IStream, List<IWarlockStyle>> streamStyles = new Hashtable<IStream, List<IWarlockStyle>>();
 	
 	public WarlockClient () {
 		viewers = new ArrayList<IWarlockClientViewer>();
@@ -40,12 +42,13 @@ public abstract class WarlockClient implements IWarlockClient {
 	
 	protected abstract Collection<IStream> getStreamsToBuffer();
 	
+	
 	protected void bufferStreams ()
 	{
 		IStreamListener listener = new IStreamListener () {
 			public void streamCleared(IStream stream) {
 				if (stream != null) {
-					streamBuffers.get(stream).clear();
+					streamBuffers.get(stream).setLength(0);
 				}
 			}
 			public void streamDonePrompting(IStream stream) {}
@@ -55,7 +58,12 @@ public abstract class WarlockClient implements IWarlockClient {
 					streamBuffers.get(stream).append(prompt + "\n");
 				}
 			}
-			public void streamReceivedText(IStream stream, IStyledString text) {
+			public void streamReceivedStyle(IStream stream, IWarlockStyle style) {
+				if (stream != null) {
+					getStreamBufferStyles(stream).add(style);
+				}
+			}
+			public void streamReceivedText(IStream stream, String text) {
 				if (stream != null) {
 					streamBuffers.get(stream).append(text);
 				}
@@ -64,7 +72,7 @@ public abstract class WarlockClient implements IWarlockClient {
 		
 		for (IStream stream : getStreamsToBuffer())
 		{
-			streamBuffers.put(stream, new StyledString());
+			streamBuffers.put(stream, new StringBuffer());
 			stream.addStreamListener(listener);
 		}
 	}
@@ -120,10 +128,19 @@ public abstract class WarlockClient implements IWarlockClient {
 		return Stream.fromName(streamPrefix + streamName);
 	}
 	
-	public IStyledString getStreamBuffer(IStream stream) {
+	public StringBuffer getStreamBuffer(IStream stream) {
 		if (streamBuffers.containsKey(stream))
 			return streamBuffers.get(stream);
 		else return null;
+	}
+	
+	public List<IWarlockStyle> getStreamBufferStyles (IStream stream)
+	{
+		if (!streamStyles.containsKey(stream))
+		{
+			streamStyles.put(stream, new ArrayList<IWarlockStyle>());
+		}
+		return streamStyles.get(stream);
 	}
 	
 	public IConnection getConnection() {

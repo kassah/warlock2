@@ -11,7 +11,8 @@ package cc.warlock.core.client;
  */
 public interface IStreamListener {
 
-	public void streamReceivedText (IStream stream, IStyledString text);
+	public void streamReceivedStyle (IStream stream, IWarlockStyle style);
+	public void streamReceivedText (IStream stream, String text);
 	
 	public void streamPrompted (IStream stream, String prompt);
 	public void streamDonePrompting (IStream stream);

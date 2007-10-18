@@ -14,18 +14,16 @@ public class WarlockStyle implements IWarlockStyle {
 	private URL linkAddress;
 	private String styleName;
 	private Collection<StyleType> styleTypes;
-	private int start, length;
+	protected boolean endStyle = false;
 	
-	public static final WarlockStyle EMPTY_STYLE = new WarlockStyle(new StyleType[] { StyleType.EMPTY }, "empty", null, -1, -1);
+	public static final WarlockStyle EMPTY_STYLE = new WarlockStyle(new StyleType[] { StyleType.EMPTY }, "empty", null);
 	
-	public WarlockStyle (StyleType[] styleTypes, String styleName, URL linkAddress, int start, int length)
+	public WarlockStyle (StyleType[] styleTypes, String styleName, URL linkAddress)
 	{
 		this.linkAddress = linkAddress;
 		this.styleName = styleName;
 		this.styleTypes = new ArrayList<StyleType>();
 		this.styleTypes.addAll(Arrays.asList(styleTypes));
-		this.start = start;
-		this.length = length;
 	}
 	
 	public WarlockStyle (IWarlockStyle other)
@@ -40,18 +38,32 @@ public class WarlockStyle implements IWarlockStyle {
 		this.styleName = other.getStyleName() == null ? null : new String(other.getStyleName());
 		this.styleTypes  = new ArrayList<StyleType>();
 		if (other.getStyleTypes() != null) styleTypes.addAll(other.getStyleTypes());
-		this.start = other.getStart();
-		this.length = other.getLength();
 	}
 	
-	public static WarlockStyle createCustomStyle (String styleName, int start, int length)
+	public static WarlockStyle createCustomStyle (String styleName)
 	{
-		return new WarlockStyle(new StyleType[] { StyleType.CUSTOM }, styleName, null, start, length);
+		return new WarlockStyle(new StyleType[] { StyleType.CUSTOM }, styleName, null);
 	}
 	
-	public static WarlockStyle createBoldStyle (int start, int length)
+	public static WarlockStyle createBoldStyle ()
 	{
-		return new WarlockStyle(new StyleType[] { StyleType.BOLD }, "bold", null, start, length);
+		return new WarlockStyle(new StyleType[] { StyleType.BOLD }, "bold", null);
+	}
+	
+	public static WarlockStyle createEndCustomStyle (String styleName)
+	{
+		WarlockStyle style = createCustomStyle(styleName);
+		style.endStyle = true;
+		
+		return style;
+	}
+	
+	public static WarlockStyle createEndBoldStyle ()
+	{
+		WarlockStyle style = createBoldStyle();
+		style.endStyle = true;
+		
+		return style;
 	}
 	
 	public URL getLinkAddress() {
@@ -78,22 +90,6 @@ public class WarlockStyle implements IWarlockStyle {
 	public void setStyleName(String styleName) {
 		this.styleName = styleName;
 	}
-
-	public int getLength() {
-		return length;
-	}
-	
-	public int getStart() {
-		return start;
-	}
-	
-	public void setLength(int length) {
-		this.length = length;
-	}
-	
-	public void setStart(int start) {
-		this.start = start;
-	}
 	
 	public void inheritFrom(IWarlockStyle style) {
 		// Right now this just deals with inheriting monospace, eventually we should figure out a way to inherit other properties as well
@@ -102,5 +98,9 @@ public class WarlockStyle implements IWarlockStyle {
 		{
 			styleTypes.add(StyleType.MONOSPACE);
 		}
+	}
+	
+	public boolean isEndStyle() {
+		return endStyle;
 	}
 }

@@ -26,11 +26,5 @@ public interface IWarlockStyle {
 
 	public void setStyleName(String styleName);
 	
-	public int getStart();
-	public void setStart (int start);
-	
-	public int getLength();
-	public void setLength(int length);
-	
-	public void inheritFrom(IWarlockStyle style);
+	public boolean isEndStyle();
 }
