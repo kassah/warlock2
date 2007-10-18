@@ -40,16 +40,6 @@
       <command
             name="Connect"
             id="cc.warlock.commands.connectCommand"/>
-      <keyConfiguration
-            name="Warlock Key Configuration"
-            parent="org.eclipse.ui.defaultAcceleratorConfiguration"
-            id="cc.warlock.keyConfiguration"/>
-      <keyBinding
-            contextId="org.eclipse.ui.globalScope"
-            command="cc.warlock.commands.connectCommand"
-            string="Ctrl+Shift+C"
-            commandId="cc.warlock.commands.connectCommand"
-            configuration="cc.warlock.keyConfiguration"/>
    </extension>
    <extension
          point="cc.warlock.rcp.macroVariables">
@@ -100,8 +90,8 @@
            commandId="cc.warlock.rcp.command.newConnection"
            icon="images/connect.png"
            id="cc.warlock.rcp.menu.newConnection"
-           label="New Connection..."
-           mnemonic="N"
+           label="Connect..."
+           mnemonic="C"
            style="push">
                </command>
          </menu>
