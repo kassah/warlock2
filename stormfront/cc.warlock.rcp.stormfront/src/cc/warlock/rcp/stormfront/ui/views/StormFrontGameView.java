@@ -126,7 +126,7 @@ public class StormFrontGameView extends GameView implements IStormFrontClientVie
 		}
 		
 		IHighlightStringStyle highlightStyle = (IHighlightStringStyle) style;
-		WarlockText text = clientStreams.get(stream.getClient());
+		WarlockText text = getTextForClient(client);
 		int charCount = text.getCharCount();
 		
 		if (!highlightStyle.isEndStyle())
