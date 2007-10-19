@@ -1,14 +1,15 @@
 package cc.warlock.core.stormfront.client.internal;
 
 import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collections;
 import java.util.HashMap;
 import java.util.Iterator;
-import java.util.Map;
 import java.util.Stack;
+import java.util.regex.MatchResult;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 import cc.warlock.core.client.IWarlockClient;
+import cc.warlock.core.client.IWarlockStyle;
 import cc.warlock.core.client.internal.Stream;
 import cc.warlock.core.stormfront.client.IStormFrontClient;
 import cc.warlock.core.stormfront.serversettings.server.HighlightString;
@@ -31,105 +32,93 @@ public class StormFrontStream extends Stream {
 	
 	@Override
 	public void send(String text) {
-		// do automatic highlighting -- break up the string into style and text events
+		StreamEvent[] events = getHighlightEvents(text);
 		
-		highlightIndexes.clear();
-		highlightEndIndexes.clear();
-		
-		for (HighlightString string : client.getServerSettings().getHighlightStrings())
+		for (StreamEvent event : events)
 		{
-			int index = text.indexOf(string.getText());
-			if (index > -1)
+			if (event.type == StreamEvent.Type.Text)
 			{
-				highlightIndexes.put(index, string);
-				if (!string.isFillEntireLine())
-				{
-					highlightEndIndexes.put(index + string.getText().length(), string);
-				}
+				super.send(event.text);
+			}
+			else if (event.type == StreamEvent.Type.Style)
+			{
+				super.sendStyle(event.style);
 			}
 		}
+	}
+	
+	protected static class StreamEvent {
+		public String text;
+		public IWarlockStyle style;
 		
-		if (highlightIndexes.keySet().size() == 0) { super.send(text); return; }
-
-		// first send all "fillEntireLine" highlights, remove them from the main list, and cache them so we can send "end styles" after
-		fullLineStrings.clear();
-		for (Iterator<Map.Entry<Integer,HighlightString>> iter = highlightIndexes.entrySet().iterator(); iter.hasNext();)
+		public static enum Type { Text, Style };
+		public Type type;
+		
+		public StreamEvent (String text)
 		{
-			Map.Entry<Integer,HighlightString> entry = iter.next();
-			if (entry.getValue().isFillEntireLine())
-			{
-				super.sendStyle(new HighlightStringStyle(entry.getValue()));
-				fullLineStrings.push(entry.getValue());
-				iter.remove();
-			}
+			this.type = Type.Text;
+			this.text = text;
 		}
 		
-		ArrayList<Integer> indexes = new ArrayList<Integer>();
-		ArrayList<Integer> endIndexes = new ArrayList<Integer>();
-		
-		indexes.addAll(Arrays.asList(highlightIndexes.keySet().toArray(new Integer[highlightIndexes.keySet().size()])));
-		endIndexes.addAll(Arrays.asList(highlightEndIndexes.keySet().toArray(new Integer[highlightEndIndexes.keySet().size()])));
-		Collections.sort(indexes);
-		Collections.sort(endIndexes);
-		
-		if (indexes.size() > 0)
+		public StreamEvent (IWarlockStyle style)
 		{
-			int currentIndex = 0;
-			for (Integer index : indexes)
-			{
-				for (Iterator<Integer> iter = endIndexes.iterator(); iter.hasNext(); )
-				{
-					Integer endIndex = iter.next();
-					if (endIndex <= currentIndex + index)
-					{
-						if (endIndex > currentIndex)
-						{
-							super.send(text.substring(currentIndex, endIndex));
-							currentIndex = endIndex;
-						}
-						super.sendStyle(HighlightStringStyle.createEndStyle(highlightEndIndexes.get(endIndex)));
-						iter.remove();
-					}
-				}
-				
-				// send the text "before" this highlight
-				if (index > currentIndex)
-				{
-					super.send(text.substring(currentIndex, index));
-					
-					currentIndex = index;
-				}
-				
-				// send the highlight itself
-				super.sendStyle(new HighlightStringStyle(highlightIndexes.get(index)));
-			}
+			this.type = Type.Style;
+			this.style = style;
+		}
+	}
+	
+	protected StreamEvent[] getHighlightEvents (String text)
+	{
+		if (client.getServerSettings().getHighlightStrings().size() == 0)
+		{
+			return new StreamEvent[] { new StreamEvent(text) };
+		}
+		
+		StringBuffer regex = new StringBuffer();
+		for (Iterator<HighlightString> iter = client.getServerSettings().getHighlightStrings().iterator(); iter.hasNext(); )
+		{
+			HighlightString string = iter.next();
 			
-			if (currentIndex < text.length() - 1)
+			regex.append(string.getText());
+			if (iter.hasNext())
 			{
-				// send the remainder text
-				for (Iterator<Integer> iter = endIndexes.iterator(); iter.hasNext(); )
-				{
-					Integer endIndex = iter.next();
-					if (endIndex <= text.length() - 1)
-					{
-						if (endIndex < text.length())
-						{
-							super.send(text.substring(currentIndex, endIndex));
-							currentIndex = endIndex;
-						}
-						super.sendStyle(HighlightStringStyle.createEndStyle(highlightEndIndexes.get(endIndex)));
-						iter.remove();
-					}
-				}
-				super.send(text.substring(currentIndex, text.length()));
-			}
-			
-			for (HighlightString string : fullLineStrings)
-			{
-				super.sendStyle(HighlightStringStyle.createEndStyle(string));
+				regex.append("|");
 			}
 		}
 		
+		ArrayList<StreamEvent> events = new ArrayList<StreamEvent>();
+		getHighlightEvents(text, regex.toString(), events);
+		
+		return events.toArray(new StreamEvent[events.size()]);
+	}
+	
+	protected void getHighlightEvents (String text, String regex, ArrayList<StreamEvent> events)
+	{
+		Pattern pattern = Pattern.compile(regex);
+		Matcher matcher = pattern.matcher(text);
+		String outsideTokens[] = text.split(regex);
+		int surroundingIndex = 0;
+		
+		while (matcher.find())
+		{
+			if (outsideTokens.length > surroundingIndex)
+				events.add(new StreamEvent(outsideTokens[surroundingIndex++]));
+			
+			MatchResult result = matcher.toMatchResult();
+			String match = result.group();
+			
+			HighlightString string = client.getServerSettings().getHighlightString(match);
+			events.add(new StreamEvent(new HighlightStringStyle(string)));
+			
+			String newRegex = regex.replaceAll("\\|" + match, "");
+			newRegex = newRegex.replaceAll(match +"\\|", "");
+			getHighlightEvents(match, newRegex, events);
+			
+			events.add(new StreamEvent(HighlightStringStyle.createEndStyle(string)));
+		}
+		
+		if (outsideTokens.length > surroundingIndex)
+			events.add(new StreamEvent(outsideTokens[surroundingIndex]));
 	}
 	
 	protected static Stream fromNameAndClient (IStormFrontClient client, String name)

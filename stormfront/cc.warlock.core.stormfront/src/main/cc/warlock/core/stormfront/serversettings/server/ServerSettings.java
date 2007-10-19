@@ -292,7 +292,15 @@ public class ServerSettings implements Comparable<ServerSettings>
 	{
 		return presets.get(presetId);
 	}
+	
+	public HighlightString getHighlightString (String text)
+	{
+		if (highlightStrings == null) return null;
 		
+		if (!highlightStrings.containsKey(text)) return null;
+		
+		return highlightStrings.get(text);
+	}
 	public Collection<HighlightString> getHighlightStrings ()
 	{	
 		return highlightStrings == null ? null : highlightStrings.values();
