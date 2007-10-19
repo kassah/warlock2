@@ -5,7 +5,7 @@
          point="org.eclipse.ui.views">
       <view
             allowMultiple="true"
-            class="cc.warlock.rcp.userstreams.UserStream"
+            class="cc.warlock.rcp.userstreams.ui.views.UserStream"
             id="cc.warlock.rcp.userstreams.userStream"
             name="Stream">
       </view>
@@ -15,7 +15,7 @@
       <menuContribution
             locationURI="menu:cc.warlock.rcp.menu.prefs?before=cc.warlock.rcp.menu.preferences">
          <dynamic
-               class="cc.warlock.rcp.userstreams.StreamsContributionItem"
+               class="cc.warlock.rcp.userstreams.ui.menu.StreamsContributionItem"
                id="cc.warlock.rcp.userstreams.dynamicStreams">
          </dynamic>
          <separator

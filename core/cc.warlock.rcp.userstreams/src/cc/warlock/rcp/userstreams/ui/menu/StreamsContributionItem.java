@@ -26,7 +26,7 @@ public class StreamsContributionItem extends CompoundContributionItem  {
 		IContributionItem[] items = new IContributionItem[1]; //profiles.size()];
 		//int i = 0;
 		
-		items[1] = new ActionContributionItem(new StreamShowAction());
+		items[0] = new ActionContributionItem(new StreamShowAction());
 		//for (Profile profile : profiles)
 		//{
 		//	items[i] = new ActionContributionItem(new ProfileConnectAction(profile));

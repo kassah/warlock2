@@ -1,7 +1,7 @@
 /**
  * 
  */
-package cc.warlock.rcp.userstreams;
+package cc.warlock.rcp.userstreams.ui.views;
 
 import cc.warlock.rcp.ui.client.SWTWarlockClientListener;
 import cc.warlock.rcp.views.StreamView;
@@ -17,6 +17,7 @@ import cc.warlock.core.client.WarlockClientRegistry;
  */
 public class UserStream extends StreamView implements IWarlockClientListener {
 	private SWTWarlockClientListener clientListenerWrapper;
+	public static String VIEW_ID = "cc.warlock.rcp.userstreams.userStream";
 	
 	public void clientActivated(IWarlockClient client) {
 		// TODO Auto-generated method stub
