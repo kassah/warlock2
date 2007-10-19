@@ -8,6 +8,8 @@ import java.util.regex.MatchResult;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+import org.apache.commons.lang.StringEscapeUtils;
+
 import cc.warlock.core.client.IWarlockClient;
 import cc.warlock.core.client.IWarlockStyle;
 import cc.warlock.core.client.internal.Stream;
@@ -79,7 +81,7 @@ public class StormFrontStream extends Stream {
 		{
 			HighlightString string = iter.next();
 			
-			regex.append(string.getText());
+			regex.append(escapeRegex(string.getText()));
 			if (iter.hasNext())
 			{
 				regex.append("|");
@@ -90,6 +92,12 @@ public class StormFrontStream extends Stream {
 		getHighlightEvents(text, regex.toString(), events);
 		
 		return events.toArray(new StreamEvent[events.size()]);
+	}
+	
+	protected String escapeRegex (String text)
+	{
+		String escape = text.replaceAll("([\\*\\+\\.\\(\\)\\&\\$])", "\\$1");
+		return escape;
 	}
 	
 	protected void getHighlightEvents (String text, String regex, ArrayList<StreamEvent> events)
@@ -110,8 +118,8 @@ public class StormFrontStream extends Stream {
 			HighlightString string = client.getServerSettings().getHighlightString(match);
 			events.add(new StreamEvent(new HighlightStringStyle(string)));
 			
-			String newRegex = regex.replaceAll("\\|" + match, "");
-			newRegex = newRegex.replaceAll(match +"\\|", "");
+			String newRegex = regex.replaceAll("\\|" + escapeRegex(match), "");
+			newRegex = newRegex.replaceAll(escapeRegex(match) +"\\|", "");
 			getHighlightEvents(match, newRegex, events);
 			
 			events.add(new StreamEvent(HighlightStringStyle.createEndStyle(string)));
