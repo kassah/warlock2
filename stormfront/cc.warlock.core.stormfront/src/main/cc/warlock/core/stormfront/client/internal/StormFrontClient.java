@@ -302,7 +302,7 @@ public class StormFrontClient extends WarlockClient implements IStormFrontClient
 	
 	@Override
 	public IStream getStream(String streamName) {
-		return StormFrontStream.fromNameAndClient(this, streamName);
+		return StormFrontStream.fromNameAndClient(this, streamPrefix + streamName);
 	}
 	
 	public IStream getThoughtsStream() {
@@ -319,6 +319,11 @@ public class StormFrontClient extends WarlockClient implements IStormFrontClient
 	
 	public IStream getRoomStream() {
 		return getStream(ROOM_STREAM_NAME);
+	}
+	
+	@Override
+	public IStream getDefaultStream() {
+		return getStream(DEFAULT_STREAM_NAME);
 	}
 
 	public IStream getFamiliarStream() {
