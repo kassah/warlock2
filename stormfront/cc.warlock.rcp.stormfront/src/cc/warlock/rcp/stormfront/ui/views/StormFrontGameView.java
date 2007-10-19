@@ -135,6 +135,11 @@ public class StormFrontGameView extends GameView implements IStormFrontClientVie
 			range.start = charCount;
 			range.background = ColorUtil.warlockColorToColor(highlightStyle.getHighlightString().getBackgroundColor());
 			range.foreground = ColorUtil.warlockColorToColor(highlightStyle.getHighlightString().getForegroundColor());
+			if (unendedRanges.size() > 0)
+			{
+				range.font = unendedRanges.peek().font;
+			}
+			
 			if (highlightStyle.getHighlightString().isFillEntireLine())
 			{
 				int lineIndex = text.getLineAtOffset(charCount);
