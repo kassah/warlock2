@@ -224,7 +224,7 @@ public class StreamView extends ViewPart implements IStreamListener, IGameViewFo
 	public void streamReceivedStyle(IStream stream, IWarlockStyle style) {
 		if (this.mainStream.equals(stream) || this.streams.contains(stream))
 		{
-			WarlockText text = clientStreams.get(stream.getClient());
+			WarlockText text = getTextForClient(stream.getClient());
 			
 			int charCount = text.getCharCount();
 			
@@ -257,7 +257,7 @@ public class StreamView extends ViewPart implements IStreamListener, IGameViewFo
 	public void streamReceivedText(IStream stream, String string) {
 		if (this.mainStream.equals(stream) || this.streams.contains(stream))
 		{
-			WarlockText text = clientStreams.get(stream.getClient());
+			WarlockText text = getTextForClient(stream.getClient());
 			
 			if (isPrompting) {
 				text.append("\n");
