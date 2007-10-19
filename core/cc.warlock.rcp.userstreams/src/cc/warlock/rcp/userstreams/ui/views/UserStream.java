@@ -17,7 +17,7 @@ import cc.warlock.core.client.WarlockClientRegistry;
  */
 public class UserStream extends StreamView implements IWarlockClientListener {
 	private SWTWarlockClientListener clientListenerWrapper;
-	public static String VIEW_ID = "cc.warlock.rcp.userstreams.userStream";
+	public static final String VIEW_ID = "cc.warlock.rcp.userstreams.rightView.userStream";
 	
 	public void clientActivated(IWarlockClient client) {
 		// TODO Auto-generated method stub
@@ -52,10 +52,16 @@ public class UserStream extends StreamView implements IWarlockClientListener {
 		// TODO Auto-generated method stub
 		
 	}
+	
+	/* public void setStreamName(String streamName) {
+		this.setStreamName(streamName);
+		this.setPartName(streamName);
+	} */
 
 	public UserStream() {
 		// Constructor
 		super();
+		//setStreamName(name);
 		clientListenerWrapper = new SWTWarlockClientListener(this);
 		WarlockClientRegistry.addWarlockClientListener(clientListenerWrapper); // new SWTWarlockClientListener(this));
 	}

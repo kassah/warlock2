@@ -23,10 +23,11 @@ public class StreamsContributionItem extends CompoundContributionItem  {
 		// TODO Auto-generated method stub
 		//return null;
 		//Collection<Profile> profiles = SavedProfiles.getAllProfiles();
-		IContributionItem[] items = new IContributionItem[1]; //profiles.size()];
+		IContributionItem[] items = new IContributionItem[2]; //profiles.size()];
 		//int i = 0;
 		
-		items[0] = new ActionContributionItem(new StreamShowAction());
+		items[0] = new ActionContributionItem(new StreamShowAction("Says"));
+		items[1] = new ActionContributionItem(new StreamShowAction("Emotes"));
 		//for (Profile profile : profiles)
 		//{
 		//	items[i] = new ActionContributionItem(new ProfileConnectAction(profile));

@@ -6,7 +6,7 @@
       <view
             allowMultiple="true"
             class="cc.warlock.rcp.userstreams.ui.views.UserStream"
-            id="cc.warlock.rcp.userstreams.userStream"
+            id="cc.warlock.rcp.userstreams.rightView.userStream"
             name="Stream">
       </view>
    </extension>
