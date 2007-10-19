@@ -46,7 +46,7 @@ public class SettingsInfoTagHandler extends DefaultTagHandler {
 		if (!serverSettings.exists())
 		{
 			try {
-				handler.getClient().getConnection().send("<sendSettings/>");
+				handler.getClient().getConnection().send("<sendSettings/>\n");
 			} catch(IOException e) {
 				e.printStackTrace();
 			}
@@ -65,7 +65,7 @@ public class SettingsInfoTagHandler extends DefaultTagHandler {
 			} else {
 				System.out.println("our crc is: " + currentCRC + ", their crc is: " + crc);
 				try {
-					handler.getClient().getConnection().send("<sendSettings/>");
+					handler.getClient().getConnection().send("<sendSettings/>\n");
 				} catch(IOException e) {
 					e.printStackTrace();
 				}
