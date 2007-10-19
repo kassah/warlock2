@@ -11,15 +11,17 @@
       </view>
    </extension>
    <extension
-         point="org.eclipse.ui.perspectiveExtensions">
-      <perspectiveExtension
-            targetID="cc.warlock.stormfrontPerspective">
-         <view
-               id="cc.warlock.rcp.userstreams.userStream"
-               relationship="stack"
-               relative="cc.warlock.rightFolder">
-         </view>
-      </perspectiveExtension>
+         point="org.eclipse.ui.menus">
+      <menuContribution
+            locationURI="menu:cc.warlock.rcp.menu.prefs?before=cc.warlock.rcp.menu.preferences">
+         <dynamic
+               class="cc.warlock.rcp.userstreams.StreamsContributionItem"
+               id="cc.warlock.rcp.userstreams.dynamicStreams">
+         </dynamic>
+         <separator
+               name="cc.warlock.rcp.userstreams.separator1">
+         </separator>
+      </menuContribution>
    </extension>
 
 </plugin>
