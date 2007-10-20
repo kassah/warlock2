@@ -46,14 +46,13 @@ public class UserStream extends StreamView implements IWarlockClientListener {
 	public void clientConnected(IWarlockClient client) {
 		//mainStream = client.getDefaultStream();
 		//client.getDefaultStream().addStreamListener(this);
-		this.addStream(client.getDefaultStream());
-	}
-	
-	public void clientDisconnected(IWarlockClient client) {
-		//mainStream = null;
-		 client.getDefaultStream().removeStreamListener(streamListenerWrapper);
+		//this.addStream(client.getDefaultStream());
+		setMainStream(client.getDefaultStream());
 	}
 
+	public void clientDisconnected(IWarlockClient client) {
+		
+	}
 	
 	public void clientRemoved(IWarlockClient client) {
 		// TODO Auto-generated method stub
@@ -75,7 +74,7 @@ public class UserStream extends StreamView implements IWarlockClientListener {
 		
 		// none of the already created views match, create a new one
 		try {
-			UserStream nextInstance = (UserStream) page.showView(VIEW_ID , VIEW_ID + '.' + streamName, IWorkbenchPage.VIEW_ACTIVATE);
+			UserStream nextInstance = (UserStream) page.showView(VIEW_ID , streamName, IWorkbenchPage.VIEW_ACTIVATE);
 			nextInstance.setStreamName(streamName);
 			nextInstance.setMultiClient(true);
 			
@@ -97,5 +96,8 @@ public class UserStream extends StreamView implements IWarlockClientListener {
 		//setStreamName(name);
 		clientListenerWrapper = new SWTWarlockClientListener(this);
 		WarlockClientRegistry.addWarlockClientListener(clientListenerWrapper); // new SWTWarlockClientListener(this));
+		for (IWarlockClient client : WarlockClientRegistry.getActiveClients()) {
+			clientConnected(client);
+		}
 	}
 }
