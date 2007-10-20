@@ -25,6 +25,7 @@ public class UserStream extends StreamView implements IWarlockClientListener {
 	private SWTWarlockClientListener clientListenerWrapper;
 	public static final String VIEW_ID = "cc.warlock.rcp.userstreams.rightView.userStream";
 	protected static ArrayList<UserStream> openStreams = new ArrayList<UserStream>();
+	private String name = "Stream";
 	
 	public void clientActivated(IWarlockClient client) {
 		// TODO Auto-generated method stub
@@ -65,7 +66,7 @@ public class UserStream extends StreamView implements IWarlockClientListener {
 		
 		for (UserStream view : openStreams)
 		{
-			if (view.getStreamName().equals(streamName))
+			if (view.getName().equals(streamName))
 			{
 				page.activate(view);
 				return view;
@@ -75,7 +76,8 @@ public class UserStream extends StreamView implements IWarlockClientListener {
 		// none of the already created views match, create a new one
 		try {
 			UserStream nextInstance = (UserStream) page.showView(VIEW_ID , streamName, IWorkbenchPage.VIEW_ACTIVATE);
-			nextInstance.setStreamName(streamName);
+			nextInstance.setName(streamName);
+			nextInstance.setStreamName(IWarlockClient.DEFAULT_STREAM_NAME);
 			nextInstance.setMultiClient(true);
 			nextInstance.scanClients();
 			
@@ -90,6 +92,13 @@ public class UserStream extends StreamView implements IWarlockClientListener {
 		this.setStreamName(streamName);
 		this.setPartName(streamName);
 	} */
+	public void setName(String name) {
+		this.name = name;
+	}
+	
+	public String getName() {
+		return this.name;
+	}
 	
 	public void scanClients() {
 		for (IWarlockClient client : WarlockClientRegistry.getActiveClients()) {
@@ -103,6 +112,6 @@ public class UserStream extends StreamView implements IWarlockClientListener {
 		//setStreamName(name);
 		clientListenerWrapper = new SWTWarlockClientListener(this);
 		WarlockClientRegistry.addWarlockClientListener(clientListenerWrapper); // new SWTWarlockClientListener(this));
-		
+		//WarlockClientRegistry.addWarlockClientListener(new SWTWarlockClientListener(this));
 	}
 }
