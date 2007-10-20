@@ -324,6 +324,9 @@ public class StreamView extends ViewPart implements IStreamListener, IGameViewFo
 		{
 			WarlockText text = getTextForClient(client);
 			isPrompting = true;
+
+			// if there's any unended ranges we can just clear them out here, but there probably shouldn't be any?
+			unendedRanges.clear();
 			
 			if (bufferingStyles)
 			{
