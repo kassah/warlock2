@@ -30,6 +30,13 @@ public interface IStormFrontClient extends IWarlockClient {
 	public static final String ROOM_STREAM_NAME = "room";
 	public static final String FAMILIAR_STREAM_NAME = "familiar";
 	
+	public static final String COMPONENT_ROOM_EXITS = "room exits";
+	public static final String COMPONENT_ROOM_DESCRIPTION = "room desc";
+	
+	public static enum GameMode {
+		Game, CharacterManager
+	};
+	
 	/**
 	 * The server settings for this client
 	 * @return
@@ -162,4 +169,15 @@ public interface IStormFrontClient extends IWarlockClient {
 	 * @return The description of the current room
 	 */
 	public IProperty<String> getRoomDescription();
+	
+	/**
+	 * @param componentName
+	 * @return The component with the passed in name
+	 */
+	public IProperty<String> getComponent(String componentName);
+	
+	/** 
+	 * @return The current game mode
+	 */
+	public IProperty<GameMode> getGameMode();
 }

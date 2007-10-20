@@ -4,6 +4,7 @@
 package cc.warlock.core.stormfront.internal;
 
 import cc.warlock.core.stormfront.IStormFrontProtocolHandler;
+import cc.warlock.core.stormfront.client.internal.StormFrontClient;
 import cc.warlock.core.stormfront.xml.StormFrontAttributeList;
 
 
@@ -56,6 +57,9 @@ public class CompDefTagHandler extends DefaultTagHandler {
 			handler.getClient().getRoomDescription().set(buffer.toString());
 		}
 		handler.getCurrentStream().send("\n");
+
+		StormFrontClient client = (StormFrontClient) handler.getClient();
+		client.setComponent(id, buffer.toString());
 	}
 }
 

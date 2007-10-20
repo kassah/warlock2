@@ -10,6 +10,7 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
+import java.util.Hashtable;
 import java.util.List;
 
 import cc.warlock.core.client.ICharacterStatus;
@@ -61,6 +62,8 @@ public class StormFrontClient extends WarlockClient implements IStormFrontClient
 	protected ArrayList<IScript> runningScripts;
 	protected ArrayList<IScriptListener> scriptListeners;
 	protected DefaultSkin skin;
+	protected Hashtable<String, ClientProperty<String>> components = new Hashtable<String, ClientProperty<String>>();
+	protected ClientProperty<GameMode> mode;
 	
 	public StormFrontClient() {
 		super();
@@ -78,6 +81,7 @@ public class StormFrontClient extends WarlockClient implements IStormFrontClient
 		playerId = new ClientProperty<String>(this, "playerId", null);
 		characterName = new ClientProperty<String>(this, "characterName", null);
 		roomDescription = new ClientProperty<String>(this, "roomDescription", null);
+		mode = new ClientProperty<GameMode>(this, "gameMode", GameMode.Game);
 		serverSettings = new ServerSettings(this);
 		skin = new DefaultSkin(serverSettings);
 		rtRunnable = new RoundtimeRunnable();
@@ -332,6 +336,27 @@ public class StormFrontClient extends WarlockClient implements IStormFrontClient
 	
 	public IProperty<String> getRoomDescription() {
 		return roomDescription;
+	}
+	
+	public void setComponent (String componentName, String value)
+	{
+		if (!components.containsKey(componentName)) {
+			components.put(componentName, new ClientProperty<String>(this, componentName, value));
+		}
+		else {
+			components.get(componentName).set(value);
+		}
+	}
+	
+	public IProperty<String> getComponent(String componentName) {
+		if (components.containsKey(componentName))
+			return components.get(componentName);
+		
+		return null;
+	}
+	
+	public IProperty<GameMode> getGameMode() {
+		return mode;
 	}
 	
 	@Override

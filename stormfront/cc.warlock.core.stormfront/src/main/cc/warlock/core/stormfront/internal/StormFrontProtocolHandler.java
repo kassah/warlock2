@@ -46,6 +46,7 @@ public class StormFrontProtocolHandler implements IStormFrontProtocolHandler {
 		
 		// server settings handlers
 		new PlayerIDTagHandler(this);
+		new ModeTagHandler(this);
 		new SettingsTagHandler(this, new SettingsInfoTagHandler(this));
 		new SentSettingsTagHandler(this);
 		
