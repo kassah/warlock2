@@ -26,6 +26,7 @@ public class UserStream extends StreamView implements IWarlockClientListener {
 	public static final String VIEW_ID = "cc.warlock.rcp.userstreams.rightView.userStream";
 	protected static ArrayList<UserStream> openStreams = new ArrayList<UserStream>();
 	// private ArrayList<IStreamFilter> filters = new ArrayList<IStreamFilter>();
+	private String buffer = "";
 	private IStreamFilter[] filters = null;
 	private String name = "Stream";
 	
@@ -34,22 +35,26 @@ public class UserStream extends StreamView implements IWarlockClientListener {
 	}
 	
 	public void streamReceivedText (IStream stream, String string) {
-		// TODO: We should probably make this go per line instead of per chunk sent to us.
-		for (IStreamFilter filter : this.filters) {
-			if (filter.match(string)) {
-				// If a filter matches, we go ahead and display the chunk
-				super.streamReceivedText(stream, string + "\n");
-				return;
-			}
-		}
+		this.buffer += string;
 	}
 	
 	public void setFilters(IStreamFilter[] filters) {
 		this.filters = filters;
 	}
 
-	public void streamPrompted(IStream stream, String prompt) {
+	public void streamPrompted(IStream stream,	 String prompt) {
 		// Discard Prompts
+		String buffer = this.buffer;
+		this.buffer = "";
+		// TODO: We should probably make this go per line instead of per chunk sent to us.
+		for (IStreamFilter filter : this.filters) {
+			if (filter == null) continue;
+			if (filter.match(buffer)) {
+				// If a filter matches, we go ahead and display the chunk
+				super.streamReceivedText(stream, buffer);
+				return;
+			}
+		}
 	}
 	
 	public void streamEchoed(IStream stream, String text) {
@@ -82,7 +87,7 @@ public class UserStream extends StreamView implements IWarlockClientListener {
 		
 		// none of the already created views match, create a new one
 		try {
-			UserStream nextInstance = (UserStream) page.showView(VIEW_ID , streamName, IWorkbenchPage.VIEW_ACTIVATE);
+			UserStream nextInstance = (UserStream) page.showView(VIEW_ID , "rightFolder."+ streamName, IWorkbenchPage.VIEW_ACTIVATE);
 			nextInstance.setName(streamName);
 			nextInstance.setStreamName(IWarlockClient.DEFAULT_STREAM_NAME);
 			nextInstance.setMultiClient(true);
@@ -97,7 +102,7 @@ public class UserStream extends StreamView implements IWarlockClientListener {
 	
 	public void setName(String name) {
 		this.name = name;
-		this.setPartName(name);
+		this.setViewTitle(name);
 	}
 	
 	public String getName() {
