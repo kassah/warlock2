@@ -3,6 +3,12 @@
  */
 package cc.warlock.rcp.userstreams.ui.views;
 
+import java.util.ArrayList;
+
+import org.eclipse.ui.IWorkbenchPage;
+import org.eclipse.ui.PartInitException;
+import org.eclipse.ui.PlatformUI;
+
 import cc.warlock.rcp.ui.client.SWTWarlockClientListener;
 import cc.warlock.rcp.views.StreamView;
 import cc.warlock.core.client.IStream;
@@ -18,6 +24,7 @@ import cc.warlock.core.client.WarlockClientRegistry;
 public class UserStream extends StreamView implements IWarlockClientListener {
 	private SWTWarlockClientListener clientListenerWrapper;
 	public static final String VIEW_ID = "cc.warlock.rcp.userstreams.rightView.userStream";
+	protected static ArrayList<UserStream> openStreams = new ArrayList<UserStream>();
 	
 	public void clientActivated(IWarlockClient client) {
 		// TODO Auto-generated method stub
@@ -51,6 +58,32 @@ public class UserStream extends StreamView implements IWarlockClientListener {
 	public void clientRemoved(IWarlockClient client) {
 		// TODO Auto-generated method stub
 		
+	}
+	
+
+	public static UserStream getViewForUserStream (String streamName) {
+		IWorkbenchPage page = PlatformUI.getWorkbench().getActiveWorkbenchWindow().getActivePage();
+		
+		for (UserStream view : openStreams)
+		{
+			if (view.getStreamName().equals(streamName))
+			{
+				page.activate(view);
+				return view;
+			}
+		}
+		
+		// none of the already created views match, create a new one
+		try {
+			UserStream nextInstance = (UserStream) page.showView(VIEW_ID , VIEW_ID + '.' + streamName, IWorkbenchPage.VIEW_ACTIVATE);
+			nextInstance.setStreamName(streamName);
+			nextInstance.setMultiClient(true);
+			
+			return nextInstance;
+		} catch (PartInitException e) {
+			e.printStackTrace();
+		}
+		return null;
 	}
 	
 	/* public void setStreamName(String streamName) {

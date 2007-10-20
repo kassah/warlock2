@@ -33,6 +33,8 @@ public class StreamShowAction extends Action {
 	}
 	
 	public void run() {
+		UserStream.getViewForUserStream(this.name);
+		/*
 		IWorkbenchPage page = PlatformUI.getWorkbench().getActiveWorkbenchWindow().getActivePage();
 		try {
 			if (streamView == null)
@@ -50,6 +52,7 @@ public class StreamShowAction extends Action {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
+		*/
 	}
 	
 	protected static String generateUniqueId () {
