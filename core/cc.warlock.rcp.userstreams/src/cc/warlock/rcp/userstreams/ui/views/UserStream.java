@@ -47,7 +47,8 @@ public class UserStream extends StreamView implements IWarlockClientListener {
 		//mainStream = client.getDefaultStream();
 		//client.getDefaultStream().addStreamListener(this);
 		//this.addStream(client.getDefaultStream());
-		setMainStream(client.getDefaultStream());
+		//setMainStream(client.getDefaultStream());
+		setClient(client);
 	}
 
 	public void clientDisconnected(IWarlockClient client) {
