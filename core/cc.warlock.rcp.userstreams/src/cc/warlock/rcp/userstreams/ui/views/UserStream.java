@@ -36,7 +36,7 @@ public class UserStream extends StreamView implements IWarlockClientListener {
 	}
 
 	public void streamPrompted(IStream stream, String prompt) {
-		// super.streamPrompted(stream, prompt);
+		super.streamPrompted(stream, prompt);
 	}
 	
 	public void streamEchoed(IStream stream, String text) {
@@ -59,7 +59,6 @@ public class UserStream extends StreamView implements IWarlockClientListener {
 		// TODO Auto-generated method stub
 		
 	}
-	
 
 	public static UserStream getViewForUserStream (String streamName) {
 		IWorkbenchPage page = PlatformUI.getWorkbench().getActiveWorkbenchWindow().getActivePage();
@@ -78,6 +77,7 @@ public class UserStream extends StreamView implements IWarlockClientListener {
 			UserStream nextInstance = (UserStream) page.showView(VIEW_ID , streamName, IWorkbenchPage.VIEW_ACTIVATE);
 			nextInstance.setStreamName(streamName);
 			nextInstance.setMultiClient(true);
+			nextInstance.scanClients();
 			
 			return nextInstance;
 		} catch (PartInitException e) {
@@ -90,6 +90,12 @@ public class UserStream extends StreamView implements IWarlockClientListener {
 		this.setStreamName(streamName);
 		this.setPartName(streamName);
 	} */
+	
+	public void scanClients() {
+		for (IWarlockClient client : WarlockClientRegistry.getActiveClients()) {
+			clientConnected(client);
+		}
+	}
 
 	public UserStream() {
 		// Constructor
@@ -97,8 +103,6 @@ public class UserStream extends StreamView implements IWarlockClientListener {
 		//setStreamName(name);
 		clientListenerWrapper = new SWTWarlockClientListener(this);
 		WarlockClientRegistry.addWarlockClientListener(clientListenerWrapper); // new SWTWarlockClientListener(this));
-		for (IWarlockClient client : WarlockClientRegistry.getActiveClients()) {
-			clientConnected(client);
-		}
+		
 	}
 }
