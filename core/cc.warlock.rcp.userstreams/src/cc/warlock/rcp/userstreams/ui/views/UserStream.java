@@ -9,27 +9,25 @@ import org.eclipse.ui.IWorkbenchPage;
 import org.eclipse.ui.PartInitException;
 import org.eclipse.ui.PlatformUI;
 
-import cc.warlock.rcp.ui.client.SWTWarlockClientListener;
-import cc.warlock.rcp.views.StreamView;
 import cc.warlock.core.client.IStream;
 import cc.warlock.core.client.IWarlockClient;
 import cc.warlock.core.client.IWarlockClientListener;
 import cc.warlock.core.client.WarlockClientRegistry;
-//import cc.warlock.core.client.IStreamListener;
+import cc.warlock.rcp.ui.client.SWTWarlockClientListener;
+import cc.warlock.rcp.views.StreamView;
 
 /**
  * @author Will Robertson
- *
+ * UserStreams
+ * ViewPart/Stream View Class that shows user configurable content filtered from the main window.
  */
 public class UserStream extends StreamView implements IWarlockClientListener {
-	private SWTWarlockClientListener clientListenerWrapper;
 	public static final String VIEW_ID = "cc.warlock.rcp.userstreams.rightView.userStream";
 	protected static ArrayList<UserStream> openStreams = new ArrayList<UserStream>();
 	private String name = "Stream";
 	
 	public void clientActivated(IWarlockClient client) {
 		// TODO Auto-generated method stub
-		
 	}
 	
 	public void streamReceivedText (IStream stream, String string) {
@@ -37,28 +35,23 @@ public class UserStream extends StreamView implements IWarlockClientListener {
 	}
 
 	public void streamPrompted(IStream stream, String prompt) {
-		super.streamPrompted(stream, prompt);
+		// Discard Prompts
 	}
 	
 	public void streamEchoed(IStream stream, String text) {
-		// Discard
+		// Discard Echos
 	}
 	
 	public void clientConnected(IWarlockClient client) {
-		//mainStream = client.getDefaultStream();
-		//client.getDefaultStream().addStreamListener(this);
-		//this.addStream(client.getDefaultStream());
-		//setMainStream(client.getDefaultStream());
 		setClient(client);
 	}
 
 	public void clientDisconnected(IWarlockClient client) {
-		
+		// TODO Auto-generated method stub
 	}
 	
 	public void clientRemoved(IWarlockClient client) {
 		// TODO Auto-generated method stub
-		
 	}
 
 	public static UserStream getViewForUserStream (String streamName) {
@@ -88,10 +81,6 @@ public class UserStream extends StreamView implements IWarlockClientListener {
 		return null;
 	}
 	
-	/* public void setStreamName(String streamName) {
-		this.setStreamName(streamName);
-		this.setPartName(streamName);
-	} */
 	public void setName(String name) {
 		this.name = name;
 	}
@@ -107,11 +96,7 @@ public class UserStream extends StreamView implements IWarlockClientListener {
 	}
 
 	public UserStream() {
-		// Constructor
 		super();
-		//setStreamName(name);
-		clientListenerWrapper = new SWTWarlockClientListener(this);
-		WarlockClientRegistry.addWarlockClientListener(clientListenerWrapper); // new SWTWarlockClientListener(this));
-		//WarlockClientRegistry.addWarlockClientListener(new SWTWarlockClientListener(this));
+		WarlockClientRegistry.addWarlockClientListener(new SWTWarlockClientListener(this));
 	}
 }

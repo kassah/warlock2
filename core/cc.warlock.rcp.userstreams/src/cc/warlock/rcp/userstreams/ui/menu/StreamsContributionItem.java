@@ -11,7 +11,7 @@ import cc.warlock.rcp.userstreams.ui.actions.StreamShowAction;
 
 /**
  * @author Will Robertson
- *
+ * Streams Menu Contribution - Adds all menu items to preferences.
  */
 public class StreamsContributionItem extends CompoundContributionItem  {
 
@@ -20,19 +20,11 @@ public class StreamsContributionItem extends CompoundContributionItem  {
 	 */
 	@Override
 	protected IContributionItem[] getContributionItems() {
-		// TODO Auto-generated method stub
-		//return null;
-		//Collection<Profile> profiles = SavedProfiles.getAllProfiles();
-		IContributionItem[] items = new IContributionItem[2]; //profiles.size()];
-		//int i = 0;
+		// Add Menu Items
+		IContributionItem[] items = new IContributionItem[2];
 		
 		items[0] = new ActionContributionItem(new StreamShowAction("Says"));
 		items[1] = new ActionContributionItem(new StreamShowAction("Emotes"));
-		//for (Profile profile : profiles)
-		//{
-		//	items[i] = new ActionContributionItem(new ProfileConnectAction(profile));
-		//	i++;
-		//}
 		
 		return items; 
 	}
