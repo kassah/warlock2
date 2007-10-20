@@ -14,6 +14,7 @@ import cc.warlock.core.client.IWarlockClient;
 import cc.warlock.core.client.IWarlockClientListener;
 import cc.warlock.core.client.WarlockClientRegistry;
 import cc.warlock.rcp.ui.client.SWTWarlockClientListener;
+import cc.warlock.rcp.userstreams.IStreamFilter;
 import cc.warlock.rcp.views.StreamView;
 
 /**
@@ -24,6 +25,8 @@ import cc.warlock.rcp.views.StreamView;
 public class UserStream extends StreamView implements IWarlockClientListener {
 	public static final String VIEW_ID = "cc.warlock.rcp.userstreams.rightView.userStream";
 	protected static ArrayList<UserStream> openStreams = new ArrayList<UserStream>();
+	// private ArrayList<IStreamFilter> filters = new ArrayList<IStreamFilter>();
+	private IStreamFilter[] filters = null;
 	private String name = "Stream";
 	
 	public void clientActivated(IWarlockClient client) {
@@ -31,7 +34,18 @@ public class UserStream extends StreamView implements IWarlockClientListener {
 	}
 	
 	public void streamReceivedText (IStream stream, String string) {
-		super.streamReceivedText(stream, string);
+		// TODO: We should probably make this go per line instead of per chunk sent to us.
+		for (IStreamFilter filter : this.filters) {
+			if (filter.match(string)) {
+				// If a filter matches, we go ahead and display the chunk
+				super.streamReceivedText(stream, string + "\n");
+				return;
+			}
+		}
+	}
+	
+	public void setFilters(IStreamFilter[] filters) {
+		this.filters = filters;
 	}
 
 	public void streamPrompted(IStream stream, String prompt) {
@@ -83,6 +97,7 @@ public class UserStream extends StreamView implements IWarlockClientListener {
 	
 	public void setName(String name) {
 		this.name = name;
+		this.setPartName(name);
 	}
 	
 	public String getName() {
