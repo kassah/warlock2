@@ -58,6 +58,7 @@ public class StreamView extends ViewPart implements IStreamListener, IGameViewFo
 	protected boolean appendNewlines = false;
 	protected boolean isPrompting = false;
 	protected boolean multiClient = false;
+	protected boolean bufferingStyles = false;
 	
 	public StreamView() {
 		openViews.add(this);
@@ -113,12 +114,6 @@ public class StreamView extends ViewPart implements IStreamListener, IGameViewFo
 		
 		book = new PageBook(mainComposite, SWT.NONE);
 		book.setLayoutData(new GridData(GridData.FILL, GridData.FILL, true, true));
-		
-//		GameView currentGameView = GameView.getViewInFocus();
-//		if (currentGameView != null && currentGameView.getWarlockClient() != null)
-//		{
-//			setPartName(currentGameView.getWarlockClient().getStream(mainStreamName).getTitle().get());
-//		}
 	}
 	
 	protected WarlockText getTextForClient (IWarlockClient client)
@@ -218,8 +213,34 @@ public class StreamView extends ViewPart implements IStreamListener, IGameViewFo
 		return StyleProviders.getStyleProvider(client);
 	}
 	
+	protected StringBuffer bufferedText = new StringBuffer();
+	protected ArrayList<StyleRangeWithData> bufferedStyles = new ArrayList<StyleRangeWithData>();
 	protected Stack<StyleRangeWithData> unendedRanges = new Stack<StyleRangeWithData>();
 	protected Stack<StyleRangeWithData> innerRanges = new Stack<StyleRangeWithData>();
+	
+	protected void addStyleRange (WarlockText text, StyleRangeWithData range)
+	{
+		if (bufferingStyles)
+		{
+			bufferedStyles.add(range);
+		}
+		else
+		{
+			text.setStyleRange(range);
+		}
+	}
+	
+	protected void appendText (WarlockText text, String string)
+	{
+		if (bufferingStyles)
+		{
+			bufferedText.append(string);
+		}
+		else
+		{
+			text.append(string);
+		}
+	}
 	
 	public void streamReceivedStyle(IStream stream, IWarlockStyle style) {
 		if (this.mainStream.equals(stream) || this.streams.contains(stream))
@@ -227,6 +248,8 @@ public class StreamView extends ViewPart implements IStreamListener, IGameViewFo
 			WarlockText text = getTextForClient(client);
 			
 			int charCount = text.getCharCount();
+			if (bufferingStyles)
+				charCount += bufferedText.length();
 			
 			if (!style.isEndStyle())
 			{
@@ -244,10 +267,10 @@ public class StreamView extends ViewPart implements IStreamListener, IGameViewFo
 					StyleRangeWithData range = unendedRanges.pop();
 					range.length = charCount - range.start;
 					
-					text.setStyleRange(range);
+					addStyleRange(text, range);
 					if (unendedRanges.size() == 0 && innerRanges.size() > 0)
 					{
-						for (StyleRangeWithData innerRange : innerRanges) { text.setStyleRange(innerRange); }
+						for (StyleRangeWithData innerRange : innerRanges) { addStyleRange(text, innerRange); }
 					}
 				}
 			}
@@ -260,9 +283,8 @@ public class StreamView extends ViewPart implements IStreamListener, IGameViewFo
 			WarlockText text = getTextForClient(client);
 			
 			if (isPrompting) {
-				text.append("\n");
+				appendText(text, "\n");
 				isPrompting = false;
-			
 			}
 			
 			String streamText = new String(string);
@@ -270,77 +292,62 @@ public class StreamView extends ViewPart implements IStreamListener, IGameViewFo
 			if (appendNewlines)
 				streamText += "\n";
 			
-			text.append(streamText);
+			appendText(text, streamText);
 		}
 	}
 	
-//	public void streamReceivedText(IStream stream, IStyledString string) {
-//		if (this.mainStream.equals(stream) || this.streams.contains(stream))
-//		{
-//			WarlockText text = clientStreams.get(client);
-//			
-//			
-//			
-//			
-//			
-//			
-//			
-//			int charCount = text.getCharCount() - streamText.length();
-//			StyleRangeWithData ranges[] = new StyleRangeWithData[string.getStyles().size()];
-//			int i = 0;
-//			for (IWarlockStyle style : string.getStyles())
-//			{
-//				ranges[i] = getStyleProvider().getStyleRange(style, charCount + style.getStart(), style.getLength());
-//				if (style.getStyleTypes().contains(IWarlockStyle.StyleType.LINK))
-//				{
-//					ranges[i].data.put("link.url", style.getLinkAddress().toString());
-//					// skip any leading spaces
-//					int j = 0;
-//					while (string.getBuffer().charAt(j) == ' ') j++;
-//					ranges[i].start = ranges[i].start + j;
-//				}
-//				i++;
-//			}
-//			
-//			boolean userHighlightsApplied = false;
-//			
-//			for (StyleRangeWithData range : ranges)
-//			{
-//				if (range != null) {
-//					int lineIndex = text.getLineAtOffset(range.start);
-//					text.setStyleRange(range);
-//					
-//					getStyleProvider().applyStyles(text, range, streamText, range.start, lineIndex);
-//					userHighlightsApplied = true;
-//				}
-//			}
-//			
-//			if (!userHighlightsApplied) {
-//				getStyleProvider().applyStyles(text, null, streamText, charCount, text.getLineAtOffset(charCount));
-//			}
-//		}
-//	}
-		
+	protected String echoBuffer = null;
 	public void streamEchoed(IStream stream, String text) {
 		if (this.mainStream.equals(stream) || this.streams.contains(stream))
 		{
 			WarlockText textWidget = getTextForClient(client);
-			isPrompting = false;
+			if (isPrompting)
+			{
+				isPrompting = false;
 			
-			textWidget.append(text + "\n");
+				textWidget.append(text + "\n");
 			
-			StyleRange echoStyle = getStyleProvider().getEchoStyle(textWidget.getCharCount() - text.length() - 1);
-			echoStyle.length = text.length();
+				StyleRange echoStyle = getStyleProvider().getEchoStyle(textWidget.getCharCount() - text.length() - 1);
+				echoStyle.length = text.length();
 			
-			textWidget.setStyleRange(echoStyle);
+				textWidget.setStyleRange(echoStyle);
+			}
+			else
+			{
+				echoBuffer = text;
+			}
 		}
 	}
 	
 	public void streamPrompted(IStream stream, String prompt) {
 		if (!isPrompting && (this.mainStream.equals(stream) || this.streams.contains(stream)))
 		{
+			WarlockText text = getTextForClient(client);
 			isPrompting = true;
-			getTextForClient(client).append(prompt);
+			
+			if (bufferingStyles)
+			{
+				text.append(bufferedText.toString());
+				bufferedText.setLength(0);
+				
+				for (StyleRangeWithData range : bufferedStyles)
+				{
+					text.setStyleRange(range);
+				}
+				bufferedStyles.clear();
+			}
+			
+			text.append(prompt);
+			if (echoBuffer != null)
+			{
+				text.append(echoBuffer);
+				StyleRange echoStyle = getStyleProvider().getEchoStyle(text.getCharCount() - echoBuffer.length());
+				echoStyle.length = echoBuffer.length();
+			
+				text.setStyleRange(echoStyle);
+				echoBuffer = null;
+			}
+			text.scrollToBottom();
 		}
 	}
 	
@@ -402,5 +409,13 @@ public class StreamView extends ViewPart implements IStreamListener, IGameViewFo
 	public void setViewTitle (String title)
 	{
 		setPartName(title);
+	}
+
+	public boolean isBufferingStyles() {
+		return bufferingStyles;
+	}
+
+	public void setBufferingStyles(boolean bufferStyles) {
+		this.bufferingStyles = bufferStyles;
 	}
 }

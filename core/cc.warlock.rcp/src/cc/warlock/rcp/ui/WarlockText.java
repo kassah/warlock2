@@ -509,7 +509,7 @@ public class WarlockText implements LineBackgroundListener {
 		}
 	}
 	
-	private void scrollToBottom ()
+	public void scrollToBottom ()
 	{
 		if (doScrollDirection == SWT.DOWN) {
 			setTopIndex(getLineCount() - 1);
