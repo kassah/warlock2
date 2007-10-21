@@ -22,6 +22,7 @@ import cc.warlock.core.stormfront.style.IHighlightStringStyle;
 import cc.warlock.rcp.stormfront.adapters.SWTStormFrontClientViewer;
 import cc.warlock.rcp.stormfront.ui.StormFrontMacros;
 import cc.warlock.rcp.stormfront.ui.style.StormFrontStyleProvider;
+import cc.warlock.rcp.ui.IStyleProvider;
 import cc.warlock.rcp.ui.StyleRangeWithData;
 import cc.warlock.rcp.ui.WarlockText;
 import cc.warlock.rcp.ui.style.StyleProviders;
@@ -152,9 +153,7 @@ public class StormFrontGameView extends GameView implements IStormFrontClientVie
 			
 			if (highlightStyle.getHighlightString().isFillEntireLine())
 			{
-				int lineIndex = text.getLineAtOffset(charCount);
-				text.setLineBackground(lineIndex, range.background);
-				text.setLineForeground(lineIndex, range.foreground);
+				range.data.put(IStyleProvider.FILL_ENTIRE_LINE, true+"");
 			}
 			unendedRanges.push(range);
 		}
