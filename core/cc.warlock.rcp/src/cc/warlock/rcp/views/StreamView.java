@@ -336,8 +336,14 @@ public class StreamView extends ViewPart implements IStreamListener, IGameViewFo
 				{
 					if (range.data.containsKey(IStyleProvider.FILL_ENTIRE_LINE))
 					{
-						range.start = text.getCharCount() - bufferedText.length();
-						range.length = bufferedText.length();
+						int lineIndex = text.getLineAtOffset(range.start);
+						range.start = text.getOffsetAtLine(lineIndex);
+						String string = text.getTextWidget().getText(range.start, text.getCharCount()-1);
+						int newlineIndex = string.indexOf('\n');
+						if (newlineIndex > -1)
+							range.length = newlineIndex;
+						else
+							range.length = text.getCharCount() - range.start;
 					}
 					
 					text.setStyleRange(range);
