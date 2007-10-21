@@ -331,12 +331,19 @@ public class StreamView extends ViewPart implements IStreamListener, IGameViewFo
 			if (bufferingStyles)
 			{
 				text.append(bufferedText.toString());
-				bufferedText.setLength(0);
 				
 				for (StyleRangeWithData range : bufferedStyles)
 				{
+					if (range.data.containsKey(IStyleProvider.FILL_ENTIRE_LINE))
+					{
+						range.start = text.getCharCount() - bufferedText.length();
+						range.length = bufferedText.length();
+					}
+					
 					text.setStyleRange(range);
 				}
+
+				bufferedText.setLength(0);
 				bufferedStyles.clear();
 			}
 			
