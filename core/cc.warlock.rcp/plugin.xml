@@ -81,6 +81,10 @@
                name="startupMessageRect"
                value="163,80,280,14">
          </property>
+         <property
+               name="aboutText"
+               value="%aboutText">
+         </property>
       </product>
    </extension>
    <extension
@@ -119,6 +123,22 @@
                label="Help"
                mnemonic="H">
             <command
+                  commandId="cc.warlock.rcp.commands.visitWebpage"
+                  icon="images/website.gif"
+                  id="cc.warlock.rcp.menu.visitWebpage"
+                  label="Visit our webpage">
+            </command>
+            <command
+                  commandId="cc.warlock.rcp.commands.checkForUpdates"
+                  icon="images/updates_obj.gif"
+                  id="cc.warlock.rcp.menu.checkForUpdates"
+                  label="Check for updates">
+            </command>
+            <separator
+                  name="cc.warlock.rcp.aboutSeparator"
+                  visible="true">
+            </separator>
+            <command
                   commandId="org.eclipse.ui.help.aboutAction"
                   id="cc.warlock.rcp.menu.about"
                   label="About Warlock"
@@ -144,6 +164,16 @@
             description="About Warlock"
             id="cc.warlock.rcp.commands.about"
             name="About">
+      </command>
+      <command
+            defaultHandler="cc.warlock.rcp.menu.VisitWarlockWebpageHandler"
+            id="cc.warlock.rcp.commands.visitWebpage"
+            name="Visit Warlock Webpage">
+      </command>
+      <command
+            defaultHandler="cc.warlock.rcp.menu.CheckForUpdatesHandler"
+            id="cc.warlock.rcp.commands.checkForUpdates"
+            name="Check For Updates">
       </command>
    </extension>
    <extension

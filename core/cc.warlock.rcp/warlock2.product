@@ -5,6 +5,9 @@
 
    <aboutInfo>
       <image path="/cc.warlock.rcp/images/warlock-about.gif"/>
+      <text>
+         %aboutText
+      </text>
    </aboutInfo>
 
    <configIni use="default"/>
