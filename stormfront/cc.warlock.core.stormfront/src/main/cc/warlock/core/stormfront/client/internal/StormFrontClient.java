@@ -172,7 +172,7 @@ public class StormFrontClient extends WarlockClient implements IStormFrontClient
 		public synchronized void run () 
 		{
 			running = true;
-			for (int i = 0; i < roundtime; i++)
+			for (; roundtime > 0; roundtime--)
 			{
 				try {
 					Thread.sleep(1000);
