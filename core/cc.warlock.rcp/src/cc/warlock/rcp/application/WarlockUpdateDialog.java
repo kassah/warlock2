@@ -13,8 +13,12 @@ import org.eclipse.jface.viewers.ILabelProviderListener;
 import org.eclipse.jface.viewers.ITableLabelProvider;
 import org.eclipse.jface.viewers.TableViewer;
 import org.eclipse.swt.SWT;
+import org.eclipse.swt.events.SelectionAdapter;
+import org.eclipse.swt.events.SelectionEvent;
 import org.eclipse.swt.graphics.Image;
 import org.eclipse.swt.layout.GridData;
+import org.eclipse.swt.layout.GridLayout;
+import org.eclipse.swt.widgets.Button;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Control;
 import org.eclipse.swt.widgets.Event;
@@ -82,7 +86,7 @@ public class WarlockUpdateDialog extends Dialog {
 		
 		TableColumn newVersion = new TableColumn(updateTable.getTable(), SWT.NONE, 3);
 		newVersion.setText("New Version");
-		newVersion.setWidth(90);
+		newVersion.setWidth(100);
 		
 		updateTable.getTable().setHeaderVisible(true);
 		
@@ -140,6 +144,27 @@ public class WarlockUpdateDialog extends Dialog {
 		});
 		updateTable.setInput(features.keySet());
 		updateTable.getTable().setLayoutData(new GridData(GridData.FILL, GridData.FILL, true, true));
+		
+		for (TableItem item : updateTable.getTable().getItems())
+		{
+			item.setChecked(true);
+		}
+		
+		Composite buttonsComposite = new Composite(main, SWT.NONE);
+		buttonsComposite.setLayoutData(new GridData(GridData.END, GridData.FILL, true, true));
+		buttonsComposite.setLayout(new GridLayout(2, false));
+		
+		Button selectAll = new Button(buttonsComposite, SWT.PUSH);
+		selectAll.setText("Select All");
+		selectAll.addSelectionListener(new SelectionAdapter() {
+			@Override
+			public void widgetSelected(SelectionEvent e) {
+				for (TableItem item : updateTable.getTable().getItems())
+				{
+					item.setChecked(true);
+				}
+			}
+		});
 		
 		return main;
 	}

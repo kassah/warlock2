@@ -96,25 +96,6 @@ public class WarlockApplication extends WorkbenchAdvisor implements IApplication
 	}
 	
 	@Override
-	public void postStartup() {
-		if (WarlockUpdates.autoUpdate())
-		{
-			TimerTask updateTask = new TimerTask() {
-				public void run ()
-				{
-					Display.getDefault().asyncExec(new Runnable() {
-						public void run () {
-							WarlockUpdates.checkForUpdates(new NullProgressMonitor());
-						}
-					});
-				}
-			};
-			// check semi-immediately, then once per hour
-			timer.schedule(updateTask, 5000, 1000 * 60 * 60);
-		}
-	}
-	
-	@Override
 	public boolean preShutdown() {
 		timer.cancel();
 		WarlockPerspectiveLayout.instance().saveLayout();

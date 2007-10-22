@@ -3,11 +3,13 @@ package cc.warlock.rcp.views;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
+import java.util.TimerTask;
 
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IConfigurationElement;
 import org.eclipse.core.runtime.IExtension;
 import org.eclipse.core.runtime.InvalidRegistryObjectException;
+import org.eclipse.core.runtime.NullProgressMonitor;
 import org.eclipse.jface.resource.ImageDescriptor;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.graphics.Color;
@@ -35,6 +37,8 @@ import org.eclipse.ui.forms.widgets.Section;
 import org.eclipse.ui.internal.commands.ICommandImageService;
 import org.eclipse.ui.part.ViewPart;
 
+import cc.warlock.rcp.application.WarlockApplication;
+import cc.warlock.rcp.application.WarlockUpdates;
 import cc.warlock.rcp.plugin.Warlock2Plugin;
 import cc.warlock.rcp.ui.ConnectionCommand;
 import cc.warlock.rcp.ui.IConnectionCommand;
@@ -224,10 +228,25 @@ public class ConnectionView extends ViewPart {
 		return section;
 	}
 	
+	protected static boolean checkedForUpdates = false;
+	
 	@Override
 	public void setFocus() {
-		// TODO Auto-generated method stub
-		
+		if (!checkedForUpdates)
+		{
+			if (WarlockUpdates.autoUpdate())
+			{
+				TimerTask updateTask = new TimerTask() {
+					public void run ()
+					{
+						WarlockUpdates.checkForUpdates(new NullProgressMonitor());
+					}
+				};
+				// check semi-immediately, then once per hour
+				WarlockApplication.instance().getTimer().schedule(updateTask, 5000, 1000 * 60 * 60);
+			}
+			checkedForUpdates = true;
+		}
 	}
 	
 	@Override
