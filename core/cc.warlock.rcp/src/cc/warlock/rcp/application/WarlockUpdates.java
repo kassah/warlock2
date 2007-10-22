@@ -15,6 +15,7 @@ import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.FileLocator;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.Path;
+import org.eclipse.jface.dialogs.MessageDialog;
 import org.eclipse.jface.dialogs.ProgressMonitorDialog;
 import org.eclipse.jface.operation.IRunnableWithProgress;
 import org.eclipse.jface.window.Window;
@@ -120,24 +121,55 @@ public class WarlockUpdates {
 			{
 				Display.getDefault().syncExec(new Runnable() {
 					public void run () {
-						List<IFeatureReference> featuresToUpgrade = promptUpgrade(newVersions);
+						final List<IFeatureReference> featuresToUpgrade = promptUpgrade(newVersions);
+						
+						ProgressMonitorDialog dialog = new ProgressMonitorDialog(PlatformUI.getWorkbench().getActiveWorkbenchWindow().getShell());
+						dialog.setBlockOnOpen(false);
+						dialog.open();
 						try {
-							for (IFeatureReference featureRef : featuresToUpgrade)
-							{
-								IFeature feature = featureRef.getFeature(monitor);
-								
-								IInstallFeatureOperation operation = OperationsManager.getOperationFactory().createInstallOperation(
-									configuredSite, feature, null, null, null);
-								
-								operation.execute(monitor, null);
-							}
-							if (featuresToUpgrade.size() > 0) {
-								localSite.save();
-							}
-						} catch (CoreException e) {
+							dialog.run(true, true, new IRunnableWithProgress () {
+								public void run(IProgressMonitor monitor)
+										throws InvocationTargetException,
+										InterruptedException {
+									try {
+										for (IFeatureReference featureRef : featuresToUpgrade)
+										{
+											IFeature feature = featureRef.getFeature(monitor);
+											
+											IInstallFeatureOperation operation = OperationsManager.getOperationFactory().createInstallOperation(
+												configuredSite, feature, null, null, null);
+											
+											operation.execute(monitor, null);
+										}
+										if (featuresToUpgrade.size() > 0) {
+											localSite.save();
+											
+											IFeatureReference featureRef = featuresToUpgrade.get(0);
+											IFeature feature = featureRef.getFeature(monitor);
+											
+											boolean restart = MessageDialog.openQuestion(PlatformUI.getWorkbench().getActiveWorkbenchWindow().getShell(),
+												"Restart Warlock?", 
+												"Warlock has finished downloading and updating to version " + feature.getVersionedIdentifier().getVersion() + "." +
+												" Would you like to restart Warlock for the changes to take effect?");
+											
+											if (restart)
+											{
+												PlatformUI.getWorkbench().restart();
+											}
+										}
+									} catch (CoreException e) {
+										// TODO Auto-generated catch block
+										e.printStackTrace();
+									} catch (InvocationTargetException e) {
+										// TODO Auto-generated catch block
+										e.printStackTrace();
+									}
+								}
+							});
+						} catch (InvocationTargetException e) {
 							// TODO Auto-generated catch block
 							e.printStackTrace();
-						} catch (InvocationTargetException e) {
+						} catch (InterruptedException e) {
 							// TODO Auto-generated catch block
 							e.printStackTrace();
 						}
