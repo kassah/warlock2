@@ -36,12 +36,6 @@
             id="cc.warlock.warlockPerspective"/>
    </extension>
    <extension
-         point="org.eclipse.ui.commands">
-      <command
-            name="Connect"
-            id="cc.warlock.commands.connectCommand"/>
-   </extension>
-   <extension
          point="cc.warlock.rcp.macroVariables">
       <macroVariable classname="cc.warlock.rcp.ui.macros.internal.variables.CurrentCommandMacroVariable"/>
       <macroVariable classname="cc.warlock.rcp.ui.macros.internal.variables.LastCommandMacroVariable"/>
@@ -69,11 +63,23 @@
          </property>
          <property
                name="startupProgressRect"
-               value="0,79,444,19">
+               value="10,84,149,10">
          </property>
          <property
                name="preferenceCustomization"
                value="plugin_customization.ini">
+         </property>
+         <property
+               name="aboutImage"
+               value="images/warlock-about.gif">
+         </property>
+         <property
+               name="startupForegroundColor"
+               value="000000">
+         </property>
+         <property
+               name="startupMessageRect"
+               value="163,80,280,14">
          </property>
       </product>
    </extension>
@@ -108,6 +114,17 @@
                   style="push">
             </command>
          </menu>
+         <menu
+               id="cc.warlock.rcp.menu.help"
+               label="Help"
+               mnemonic="H">
+            <command
+                  commandId="org.eclipse.ui.help.aboutAction"
+                  id="cc.warlock.rcp.menu.about"
+                  label="About Warlock"
+                  mnemonic="A">
+            </command>
+         </menu>
      </menuContribution>
    </extension>
    <extension
@@ -121,6 +138,12 @@
             defaultHandler="cc.warlock.rcp.menu.PreferencesHandler"
             id="cc.warlock.rcp.command.preferences"
             name="Preferences">
+      </command>
+      <command
+            defaultHandler="cc.warlock.rcp.menu.AboutWarlockHandler"
+            description="About Warlock"
+            id="cc.warlock.rcp.commands.about"
+            name="About">
       </command>
    </extension>
    <extension

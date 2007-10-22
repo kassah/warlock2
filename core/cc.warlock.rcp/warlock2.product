@@ -3,6 +3,10 @@
 
 <product name="Warlock 2" id="cc.warlock.rcp.product" application="cc.warlock.rcp.warlock" useFeatures="false">
 
+   <aboutInfo>
+      <image path="/cc.warlock.rcp/images/warlock-about.gif"/>
+   </aboutInfo>
+
    <configIni use="default"/>
 
    <launcherArgs>
@@ -13,7 +17,9 @@
 
    <splash
       location="cc.warlock.rcp"
-      startupProgressRect="0,79,444,19" />
+      startupProgressRect="10,84,149,10"
+      startupMessageRect="163,80,280,14"
+      startupForegroundColor="000000" />
    <launcher name="warlock2">
       <linux icon="/cc.warlock.rcp/images/warlock-app-icon.xpm"/>
       <solaris/>
@@ -22,6 +28,7 @@
             winSmallLow="/cc.warlock.rcp/images/warlock-app-icon.bmp"/>
       </win>
    </launcher>
+
 
    <vm>
    </vm>
