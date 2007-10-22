@@ -94,10 +94,10 @@
 		</if>
 		
 		<progress done="true"/>
-		<!--post to="http://svn.warlock.cc/page.php">
+		<post to="http://svn.warlock.cc/page.php">
 			<prop name="key" value="dfud7dk3kjwsuujdjej"/>
 			<prop name="message" value="Warlock nightly build succesfully completed: http://www.arcaner.com/warlock2-builds/${warlock-version}"/>
-		</post-->
+		</post>
 	</target>
 	
 	<target name="rename-binaries">
