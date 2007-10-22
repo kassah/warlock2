@@ -18,7 +18,7 @@ import cc.warlock.core.stormfront.xml.StormFrontAttributeList;
  */
 public class RoundtimeTagHandler extends DefaultTagHandler {
 	protected boolean waitingForPrompt, roundtimeStarted;
-	protected int rtEnds;
+	protected long rtEnds;
 	
 	public boolean isWaitingForPrompt() { return waitingForPrompt; }
 	
@@ -31,7 +31,7 @@ public class RoundtimeTagHandler extends DefaultTagHandler {
 	}
 	
 	public void handleStart(StormFrontAttributeList attributes) {
-		rtEnds = Integer.parseInt(attributes.getValue("value"));
+		rtEnds = Long.parseLong(attributes.getValue("value"));
 		waitingForPrompt = true;
 		roundtimeStarted = false;
 	}
@@ -40,10 +40,10 @@ public class RoundtimeTagHandler extends DefaultTagHandler {
 		// TODO investigate whether or not we need to do something here
 	}
 	
-	public void processFollowingPrompt (int currentPromptTime)
+	public void processFollowingPrompt (long currentPromptTime)
 	{
-		int time = rtEnds - currentPromptTime;
-		handler.getClient().startRoundtime(time);
+		long time = rtEnds - currentPromptTime;
+		handler.getClient().startRoundtime((int) time);
 		
 		waitingForPrompt = false;
 	}

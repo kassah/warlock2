@@ -59,6 +59,7 @@ public class StormFrontClient extends WarlockClient implements IStormFrontClient
 	protected IWarlockStyle currentStyle = WarlockStyle.EMPTY_STYLE;
 	protected ServerSettings serverSettings;
 	protected RoundtimeRunnable rtRunnable;
+	protected Thread rtThread;
 	protected ArrayList<IScript> runningScripts;
 	protected ArrayList<IScriptListener> scriptListeners;
 	protected DefaultSkin skin;
@@ -166,9 +167,11 @@ public class StormFrontClient extends WarlockClient implements IStormFrontClient
 	private class RoundtimeRunnable implements Runnable
 	{
 		public int roundtime;
+		public boolean running = false;
 		
 		public synchronized void run () 
 		{
+			running = true;
 			for (int i = 0; i < roundtime; i++)
 			{
 				try {
@@ -178,8 +181,12 @@ public class StormFrontClient extends WarlockClient implements IStormFrontClient
 					e.printStackTrace();
 				}
 				
+//				getDefaultStream().echo("roundtime.set = " + (StormFrontClient.this.roundtime.get() - 1));
+//				getDefaultStream().prompt(">");
+				
 				updateRoundtime(StormFrontClient.this.roundtime.get() - 1);
 			}
+			running = false;
 		}
 	}
 	
@@ -189,7 +196,11 @@ public class StormFrontClient extends WarlockClient implements IStormFrontClient
 		roundtime.set(seconds);
 		rtRunnable.roundtime = seconds;
 		
-		new Thread(rtRunnable).start();
+		if (!rtRunnable.running)
+		{
+			// don't overwrite the current thread
+			new Thread(rtRunnable).start();
+		}
 	}
 	
 	public void updateRoundtime (int currentRoundtime)

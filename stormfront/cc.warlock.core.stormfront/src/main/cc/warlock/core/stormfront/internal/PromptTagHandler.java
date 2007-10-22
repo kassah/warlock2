@@ -13,7 +13,7 @@ import cc.warlock.core.stormfront.xml.StormFrontAttributeList;
  */
 public class PromptTagHandler extends DefaultTagHandler {
 	
-	protected int currentTime = 0;
+	protected long currentTime = 0;
 	protected RoundtimeTagHandler roundtimeHandler;
 	protected IStormFrontClient client;
 	protected String prompt;
@@ -34,7 +34,7 @@ public class PromptTagHandler extends DefaultTagHandler {
 		
 		if (attributes.getValue("time") != null)
 		{
-			currentTime = Integer.parseInt(attributes.getValue("time"));
+			currentTime = Long.parseLong(attributes.getValue("time"));
 			if (roundtimeHandler.isWaitingForPrompt()) {
 				roundtimeHandler.processFollowingPrompt(currentTime);
 			}
