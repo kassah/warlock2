@@ -57,6 +57,15 @@
 		
 		<getWarlockVersion property="warlock-version"/>
 		<progress add="1" message="Replacing versions in plugins and manifests..."/>
+
+		<tstamp/>
+		<property name="build-date" value="${TODAY}"/>
+		
+		<copy file="rcp-plugin.properties" tofile="${buildDirectory}/plugins/cc.warlock.rcp/plugin.properties" overwrite="true">
+			<filterchain>
+				<expandproperties/>
+			</filterchain>
+		</copy>
 		
 		<fileset dir="${eclipseDir}/plugins" id="launcher-fileset">
 			<include name="org.eclipse.equinox.launcher_*.jar"/>
