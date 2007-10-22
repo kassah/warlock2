@@ -1,6 +1,6 @@
 <project name="warlock2-build" default="build-product">
 	<property file="warlock-build.properties"/>
-	<property file="build.properties"/>
+	<property file="mainBuilder/build.properties"/>
 	<import file="common.xml"/>
 	
 	<taskdef resource="net/sf/antcontrib/antlib.xml">
@@ -34,7 +34,7 @@
 	<target name="copy-code" depends="clean,generate-parsers">
 		<mkdir dir="${buildDirectory}"/>
 		<progressDialog icon="images/character.gif" title="Warlock Build Progress">
-			<progressBar min="0" max="7"/>
+			<progressBar min="0" max="8"/>
 			<progressBar name="copy" min="0" max="100"/>
 		</progressDialog>
 		
@@ -72,15 +72,17 @@
 		<progress add="1" message="Building Plugins..."/>
 		
 		<antRunner antfile="${productBuild-script}">
-			<syspropertyset>
-				<propertyref builtin="all"/>
-			</syspropertyset>
-			
-			<sysproperty key="builder" value="${basedir}"/>
+			<sysproperty key="builder" value="${basedir}/mainBuilder"/>
 		</antRunner>
 		
 		<progress add="1" message="Renaming binaries..."/>
 		<antcall target="rename-binaries"/>
+		
+		<progress add="1" message="Building Update Site..."/>
+		<antRunner antfile="${productBuild-script}">
+			<sysproperty key="builder" value="${basedir}/updateSiteBuilder"/>
+		</antRunner>
+		<antcall target="build-site"/>
 		
 		<progress add="1" message="Building Installers..."/>
 		<!--ant antfile="buildInstallers.xml"/-->
@@ -92,10 +94,10 @@
 		</if>
 		
 		<progress done="true"/>
-		<post to="http://svn.warlock.cc/page.php">
+		<!--post to="http://svn.warlock.cc/page.php">
 			<prop name="key" value="dfud7dk3kjwsuujdjej"/>
 			<prop name="message" value="Warlock nightly build succesfully completed: http://www.arcaner.com/warlock2-builds/${warlock-version}"/>
-		</post>
+		</post-->
 	</target>
 	
 	<target name="rename-binaries">
@@ -144,6 +146,33 @@
 		</for-->
 	</target>
 	
+	<target name="build-site">
+		<unzip dest="${buildDirectory}/warlock2-updates">
+			<fileset dir="${buildDirectory}/warlock2-updates">
+				<include name="*.zip"/>
+				<include name="*.tar.gz"/>
+			</fileset>
+		</unzip>
+		
+		<property name="site-dir" value="${buildDirectory}/warlock2-updates/site"/>
+		<mkdir dir="${site-dir}"/>
+		<mkdir dir="${site-dir}/plugins"/>
+		<mkdir dir="${site-dir}/features"/>
+		
+		<copy todir="${site-dir}/plugins">
+			<fileset dir="${buildDirectory}/warlock2-updates/warlock2/plugins" includes="*.jar"/>
+		</copy>
+		<copy todir="${site-dir}/features">
+			<fileset dir="${buildDirectory}/warlock2-updates/warlock2/features" includes="*.jar"/>
+		</copy>
+		<copy file="updateSiteBuilder/site.xml" todir="${site-dir}">
+			<filterchain>
+				<expandproperties/>
+			</filterchain>
+		</copy>
+		
+	</target>
+	
 	<target name="publish-build">
 		<getWarlockVersion property="warlock-version"/>
 		
@@ -179,6 +208,12 @@
 			<java fork="true" jar="${launcher-jar}">
 				<arg line="-application org.eclipse.ant.core.antRunner"/>
 				<arg line="-buildfile @{antfile}"/>
+				<syspropertyset>
+					<propertyref name="buildDirectory"/>
+					<propertyref name="eclipseDir"/>
+					<propertyref name="warlock-version"/>
+				</syspropertyset>
+				
 				<arguments/>
 			</java>
 		</sequential>

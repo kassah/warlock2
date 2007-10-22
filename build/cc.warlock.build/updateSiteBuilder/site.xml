@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<site>
+   <description url="http://www.warlock.cc">
+      The official update site for Warlock
+   </description>
+   <feature url="features/cc.warlock.rcp.feature_${warlock-version}.jar" id="cc.warlock.rcp.feature" version="${warlock-version}"/>
+   <feature url="features/cc.warlock.rcp.stormfront.feature_${warlock-version}.jar" id="cc.warlock.rcp.stormfront.feature" version="${warlock-version}"/>
+</site>

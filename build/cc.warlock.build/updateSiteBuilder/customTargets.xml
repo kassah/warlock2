@@ -1,8 +1,8 @@
 <project name="Build specific targets and properties" default="noDefault">
 	<taskdef resource="cc/warlock/build/antlib.xml">
 		<classpath>
-			<pathelement path="bin"/>
-			<fileset dir="${builder}/lib" includes="**/*"/>
+			<pathelement path="${builder}/../bin"/>
+			<fileset dir="${builder}/../lib" includes="**/*"/>
 		</classpath>
 	</taskdef>
 	
@@ -45,6 +45,7 @@
 	<!-- Steps to do after fetching the build elements -->
 	<!-- ===================================================================== -->
 	<target name="postFetch">
+
 	</target>
 
 	<!-- ===================================================================== -->
@@ -53,6 +54,12 @@
 	<target name="preGenerate">
 		<featureVersionReplacer feature="cc.warlock.rcp.feature" version="${warlock-version}"/>
 		<featureVersionReplacer feature="cc.warlock.rcp.stormfront.feature" version="${warlock-version}"/>
+		
+		<copy file="${builder}/../warlock-updates.properties" todir="${buildDirectory}/plugins/cc.warlock.rcp" overwrite="true">
+			<filterchain>
+				<expandproperties/>
+			</filterchain>
+		</copy>
 	</target>
 
 	<!-- ===================================================================== -->
