@@ -160,12 +160,6 @@
             name="Preferences">
       </command>
       <command
-            defaultHandler="cc.warlock.rcp.menu.AboutWarlockHandler"
-            description="About Warlock"
-            id="cc.warlock.rcp.commands.about"
-            name="About">
-      </command>
-      <command
             defaultHandler="cc.warlock.rcp.menu.VisitWarlockWebpageHandler"
             id="cc.warlock.rcp.commands.visitWebpage"
             name="Visit Warlock Webpage">
