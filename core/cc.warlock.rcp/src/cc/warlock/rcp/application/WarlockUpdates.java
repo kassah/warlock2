@@ -1,5 +1,7 @@
 package cc.warlock.rcp.application;
 
+import java.io.IOException;
+import java.io.InputStream;
 import java.lang.reflect.InvocationTargetException;
 import java.net.MalformedURLException;
 import java.net.URL;
@@ -7,11 +9,16 @@ import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Properties;
 
 import org.eclipse.core.runtime.CoreException;
+import org.eclipse.core.runtime.FileLocator;
 import org.eclipse.core.runtime.IProgressMonitor;
+import org.eclipse.core.runtime.Path;
 import org.eclipse.jface.dialogs.ProgressMonitorDialog;
 import org.eclipse.jface.operation.IRunnableWithProgress;
+import org.eclipse.jface.window.Window;
+import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.Shell;
 import org.eclipse.ui.PlatformUI;
 import org.eclipse.update.configuration.IConfiguredSite;
@@ -24,95 +31,123 @@ import org.eclipse.update.core.VersionedIdentifier;
 import org.eclipse.update.operations.IInstallFeatureOperation;
 import org.eclipse.update.operations.OperationsManager;
 
+import cc.warlock.rcp.plugin.Warlock2Plugin;
+
 public class WarlockUpdates {
 
-	public static final String UPDATE_SITE = "http://www.warlock.cc/updates";
-	
 	public static List<IFeatureReference> promptUpgrade (Map<IFeatureReference, VersionedIdentifier> newVersions)
 	{
-//		Shell shell = new Shell();
-//		WarlockUpdateDialog dialog = new WarlockUpdateDialog(shell, newVersions);
-//		shell.setSize(400, 400);
-//		int response = dialog.open();
-//		
-//		if (response == Window.OK)
-//		{
-//			return dialog.getSelectedFeatures();
-//		}
+		Shell shell = PlatformUI.getWorkbench().getActiveWorkbenchWindow().getShell();
+		WarlockUpdateDialog dialog = new WarlockUpdateDialog(shell, newVersions);
+		int response = dialog.open();
+		
+		if (response == Window.OK)
+		{
+			return dialog.getSelectedFeatures();
+		}
 		
 		return Collections.emptyList();
 	}
 	
-	public static void checkForUpdates ()
+	
+	public static final String UPDATE_SITE = "warlock.updates.url";
+	public static final String AUTO_UPDATE = "warlock.updates.autoupdate";
+	
+	protected static Properties updateProperties;
+	protected static Properties getUpdateProperties ()
 	{
-		IRunnableWithProgress runnable = new IRunnableWithProgress ()
+		if (updateProperties == null)
 		{
-			public void run (IProgressMonitor monitor)
-			{
-				try {
-					ISite updateSite = SiteManager.getSite(new URL(UPDATE_SITE), monitor);
-					IFeatureReference[] featureRefs = updateSite.getFeatureReferences();
-					ILocalSite localSite = SiteManager.getLocalSite();
-					IConfiguredSite configuredSite = localSite.getCurrentConfiguration().getConfiguredSites()[0];
-					IFeatureReference[] localFeatureRefs = configuredSite.getConfiguredFeatures();
-					
-					HashMap<IFeatureReference, VersionedIdentifier> newVersions  = new HashMap<IFeatureReference, VersionedIdentifier>();
+			updateProperties = new Properties();
+			try {
+				InputStream stream = FileLocator.openStream(Warlock2Plugin.getDefault().getBundle(), new Path("warlock-updates.properties"), false);
+				updateProperties.load(stream);
+				stream.close();
+			} catch (IOException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
+		}
 		
-					for (int i = 0; i < featureRefs.length; i++) {
-						for (int j = 0; j < localFeatureRefs.length; j++) {
+		return updateProperties;
+	}
+	
+	public static boolean autoUpdate ()
+	{
+		boolean autoUpdate = false;
+		Properties updateProperties = getUpdateProperties();
 		
-							VersionedIdentifier featureVersion = featureRefs[i].getVersionedIdentifier();
-							VersionedIdentifier localFeatureVersion = localFeatureRefs[j].getVersionedIdentifier();
-		
-							if (featureVersion.getIdentifier().equals(localFeatureVersion.getIdentifier())) {
-		
-								if (featureVersion.getVersion().isGreaterThan(localFeatureVersion.getVersion())) {
-		
-									newVersions.put(featureRefs[i], localFeatureVersion);
-								}
-							}
-						}
-					}
-		
-					if (newVersions.size() > 0)
-					{
-						ProgressMonitorDialog dialog = new ProgressMonitorDialog(new Shell());
-						dialog.setBlockOnOpen(false);
-						dialog.open();
-						
-						List<IFeatureReference> featuresToUpgrade = promptUpgrade(newVersions);
-						for (IFeatureReference featureRef : featuresToUpgrade)
-						{
-							IFeature feature = featureRef.getFeature(monitor);
-							
-							IInstallFeatureOperation operation = OperationsManager.getOperationFactory().createInstallOperation(
-								configuredSite, feature, null, null, null);
-							
-							operation.execute(dialog.getProgressMonitor(),null);
-						}
-						if (featuresToUpgrade.size() > 0) {
-							localSite.save();
-						}
-						
-						dialog.close();
-					}
+		if (updateProperties.containsKey(AUTO_UPDATE))
+		{
+			autoUpdate = Boolean.parseBoolean(updateProperties.getProperty(AUTO_UPDATE));
+		}
+		return autoUpdate;
+	}
+	
+	public static void checkForUpdates (final IProgressMonitor monitor)
+	{
+		try {
+			Properties properties = getUpdateProperties();
+			String url = properties.getProperty(UPDATE_SITE);
+			if (url == null)
+				return;
+			
+			ISite updateSite = SiteManager.getSite(new URL(url), monitor);
+			IFeatureReference[] featureRefs = updateSite.getFeatureReferences();
+			final ILocalSite localSite = SiteManager.getLocalSite();
+			final IConfiguredSite configuredSite = localSite.getCurrentConfiguration().getConfiguredSites()[0];
+			IFeatureReference[] localFeatureRefs = configuredSite.getConfiguredFeatures();
+			
+			final HashMap<IFeatureReference, VersionedIdentifier> newVersions  = new HashMap<IFeatureReference, VersionedIdentifier>();
 
-				} catch (MalformedURLException e) {
-					e.printStackTrace();
-				} catch (CoreException e) {
-					e.printStackTrace();
-				} catch (InvocationTargetException e) {
-					e.printStackTrace();
+			for (int i = 0; i < featureRefs.length; i++) {
+				for (int j = 0; j < localFeatureRefs.length; j++) {
+
+					VersionedIdentifier featureVersion = featureRefs[i].getVersionedIdentifier();
+					VersionedIdentifier localFeatureVersion = localFeatureRefs[j].getVersionedIdentifier();
+
+					if (featureVersion.getIdentifier().equals(localFeatureVersion.getIdentifier())) {
+
+						if (featureVersion.getVersion().isGreaterThan(localFeatureVersion.getVersion())) {
+
+							newVersions.put(featureRefs[i], localFeatureVersion);
+						}
+					}
 				}
 			}
-		};
-			
-		try {
-			PlatformUI.getWorkbench().getProgressService().run(true, true, runnable);
-		} catch (InvocationTargetException e) {
+
+			if (newVersions.size() > 0)
+			{
+				Display.getDefault().syncExec(new Runnable() {
+					public void run () {
+						List<IFeatureReference> featuresToUpgrade = promptUpgrade(newVersions);
+						try {
+							for (IFeatureReference featureRef : featuresToUpgrade)
+							{
+								IFeature feature = featureRef.getFeature(monitor);
+								
+								IInstallFeatureOperation operation = OperationsManager.getOperationFactory().createInstallOperation(
+									configuredSite, feature, null, null, null);
+								
+								operation.execute(monitor, null);
+							}
+							if (featuresToUpgrade.size() > 0) {
+								localSite.save();
+							}
+						} catch (CoreException e) {
+							// TODO Auto-generated catch block
+							e.printStackTrace();
+						} catch (InvocationTargetException e) {
+							// TODO Auto-generated catch block
+							e.printStackTrace();
+						}
+					}
+				});
+			}
+		} catch (MalformedURLException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
-		} catch (InterruptedException e) {
+		} catch (CoreException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}

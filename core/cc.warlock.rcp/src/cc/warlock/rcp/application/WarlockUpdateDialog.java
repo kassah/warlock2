@@ -42,15 +42,14 @@ public class WarlockUpdateDialog extends Dialog {
 			this.features.put(ref, false);
 		
 		this.oldVersions = newVersions;
-		
-		parent.setText("Warlock Updates");
-		parent.setImage(WarlockSharedImages.getImage(WarlockSharedImages.IMG_UPDATES));
 	}
 	
 	@Override
 	protected void configureShell(Shell newShell) {
 		super.configureShell(newShell);
 		
+		newShell.setText("Warlock Updates");
+		newShell.setImage(WarlockSharedImages.getImage(WarlockSharedImages.IMG_UPDATES));
 		newShell.setSize(400, 300);
 		newShell.setActive();
 	}

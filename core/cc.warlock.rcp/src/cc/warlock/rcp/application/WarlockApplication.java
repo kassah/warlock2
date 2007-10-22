@@ -4,16 +4,16 @@
 package cc.warlock.rcp.application;
 
 import java.util.Map;
+import java.util.Timer;
+import java.util.TimerTask;
 
+import org.eclipse.core.runtime.NullProgressMonitor;
 import org.eclipse.equinox.app.IApplication;
 import org.eclipse.equinox.app.IApplicationContext;
 import org.eclipse.swt.widgets.Display;
 import org.eclipse.ui.PlatformUI;
-import org.eclipse.ui.XMLMemento;
 import org.eclipse.ui.application.IWorkbenchWindowConfigurer;
 import org.eclipse.ui.application.WorkbenchAdvisor;
-import org.eclipse.ui.internal.PerspectiveHelper;
-import org.eclipse.ui.internal.WorkbenchPage;
 
 import cc.warlock.core.configuration.WarlockConfiguration;
 
@@ -31,6 +31,7 @@ public class WarlockApplication extends WorkbenchAdvisor implements IApplication
 	private String startWithProfile = null;
 	private static WarlockApplication _instance;
 	private boolean debugMode = false;
+	private Timer timer = new Timer();
 	
 	public WarlockApplication ()
 	{
@@ -95,14 +96,35 @@ public class WarlockApplication extends WorkbenchAdvisor implements IApplication
 	}
 	
 	@Override
+	public void postStartup() {
+		if (WarlockUpdates.autoUpdate())
+		{
+			TimerTask updateTask = new TimerTask() {
+				public void run ()
+				{
+					Display.getDefault().asyncExec(new Runnable() {
+						public void run () {
+							WarlockUpdates.checkForUpdates(new NullProgressMonitor());
+						}
+					});
+				}
+			};
+			// check semi-immediately, then once per hour
+			timer.schedule(updateTask, 5000, 1000 * 60 * 60);
+		}
+	}
+	
+	@Override
 	public boolean preShutdown() {
+		timer.cancel();
 		WarlockPerspectiveLayout.instance().saveLayout();
 		return true;
 	}
 	
 	public Object start(IApplicationContext context) throws Exception {
-		Map<String, String[]> args = context.getArguments();
-		String arguments[] = args.get("application.args");
+		Map args = context.getArguments();
+		String arguments[] = (String[]) args.get(IApplicationContext.APPLICATION_ARGS);
+		
 		parseArguments(arguments);
 		
 		Display display = PlatformUI.createDisplay();
@@ -127,5 +149,10 @@ public class WarlockApplication extends WorkbenchAdvisor implements IApplication
 	
 	public boolean inDebugMode() {
 		return debugMode;
+	}
+	
+	public Timer getTimer ()
+	{
+		return timer;
 	}
 }

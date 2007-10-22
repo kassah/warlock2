@@ -35,7 +35,6 @@ import org.eclipse.ui.forms.widgets.Section;
 import org.eclipse.ui.internal.commands.ICommandImageService;
 import org.eclipse.ui.part.ViewPart;
 
-import cc.warlock.rcp.application.WarlockUpdates;
 import cc.warlock.rcp.plugin.Warlock2Plugin;
 import cc.warlock.rcp.ui.ConnectionCommand;
 import cc.warlock.rcp.ui.IConnectionCommand;
@@ -224,16 +223,11 @@ public class ConnectionView extends ViewPart {
 		section.setTitleBarGradientBackground(new Color(Display.getDefault(), 25, 25, 50));
 		return section;
 	}
-
-	protected static boolean checkedForUpdates = false;
+	
 	@Override
 	public void setFocus() {
-		if (!checkedForUpdates)
-		{
-			System.out.println("checking for updates...");
-			WarlockUpdates.checkForUpdates();
-			checkedForUpdates = true;
-		}
+		// TODO Auto-generated method stub
+		
 	}
 	
 	@Override
