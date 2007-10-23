@@ -242,14 +242,22 @@ public class StreamView extends ViewPart implements IStreamListener, IGameViewFo
 		}
 	}
 	
+	protected int getCharCount (WarlockText text)
+	{
+		int charCount = text.getCharCount();
+		if (bufferingStyles)
+			charCount += bufferedText.length();
+		if (isPrompting) // account for newline
+			charCount++;
+		
+		return charCount;
+	}
+	
 	public void streamReceivedStyle(IStream stream, IWarlockStyle style) {
 		if (this.mainStream.equals(stream) || this.streams.contains(stream))
 		{
 			WarlockText text = getTextForClient(client);
-			
-			int charCount = text.getCharCount();
-			if (bufferingStyles)
-				charCount += bufferedText.length();
+			int charCount = getCharCount(text);
 			
 			if (!style.isEndStyle())
 			{
