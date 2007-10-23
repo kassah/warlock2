@@ -226,9 +226,12 @@ public class StreamView extends ViewPart implements IStreamListener, IGameViewFo
 		}
 		else
 		{
+			range.start += currentCharCount;
 			text.setStyleRange(range);
 		}
 	}
+	
+	protected int currentCharCount = 0;
 	
 	protected void appendText (WarlockText text, String string)
 	{
@@ -238,13 +241,14 @@ public class StreamView extends ViewPart implements IStreamListener, IGameViewFo
 		}
 		else
 		{
+			currentCharCount = text.getCharCount();
 			text.append(string);
 		}
 	}
 	
 	protected int getCharCount (WarlockText text)
 	{
-		int charCount = text.getCharCount();
+		int charCount = 0;
 		if (bufferingStyles)
 			charCount += bufferedText.length();
 		if (isPrompting) // account for newline
@@ -279,6 +283,7 @@ public class StreamView extends ViewPart implements IStreamListener, IGameViewFo
 					if (unendedRanges.size() == 0 && innerRanges.size() > 0)
 					{
 						for (StyleRangeWithData innerRange : innerRanges) { addStyleRange(text, innerRange); }
+						innerRanges.clear();
 					}
 				}
 			}
@@ -339,9 +344,12 @@ public class StreamView extends ViewPart implements IStreamListener, IGameViewFo
 			if (bufferingStyles)
 			{
 				text.append(bufferedText.toString());
+				int startCount = text.getCharCount() - bufferedText.length();
 				
 				for (StyleRangeWithData range : bufferedStyles)
 				{
+					range.start += startCount;
+					
 					if (range.data.containsKey(IStyleProvider.FILL_ENTIRE_LINE))
 					{
 						int lineIndex = text.getLineAtOffset(range.start);
@@ -354,7 +362,12 @@ public class StreamView extends ViewPart implements IStreamListener, IGameViewFo
 							range.length = text.getCharCount() - range.start;
 					}
 					
-					text.setStyleRange(range);
+					try {
+						text.setStyleRange(range);
+					} catch (IllegalArgumentException ex)
+					{
+						ex.printStackTrace();
+					}
 				}
 
 				bufferedText.setLength(0);
