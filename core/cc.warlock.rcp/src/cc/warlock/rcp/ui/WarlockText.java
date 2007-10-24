@@ -59,6 +59,7 @@ public class WarlockText implements LineBackgroundListener {
 	private ScrollBar vscroll;
 	private int lineLimit = 5000;
 	private int doScrollDirection = SWT.UP;
+	private boolean doScroll = false;
 
 	protected Hashtable<Integer, Color> lineBackgrounds = new Hashtable<Integer,Color>();
 	protected Hashtable<Integer, Color> lineForegrounds = new Hashtable<Integer,Color>();
@@ -95,26 +96,6 @@ public class WarlockText implements LineBackgroundListener {
 						}
 					}
 					nHolder++;
-				}
-			}
-		});
-		
-		addPaintObjectListener(new PaintObjectListener() {
-			public void paintObject(PaintObjectEvent event) {
-				StyleRange style = event.style;
-				for (Iterator<Object> iter = objects.keySet().iterator(); iter.hasNext(); )
-				{
-					Object object = iter.next();
-					
-					if (object instanceof Control)
-					{
-						Control control = (Control) object;
-						style.metrics.ascent =  control.getBounds().height;
-
-						int x = event.x;
-						int y = event.y + event.ascent - style.metrics.ascent;
-						control.setLocation(x, y);
-					}
 				}
 			}
 		});
@@ -164,31 +145,6 @@ public class WarlockText implements LineBackgroundListener {
 					}
 				} catch (IllegalArgumentException ex) {
 					// swallow -- see note above
-				}
-			}
-		});
-		
-		addPaintListener(new PaintListener () {
-
-			private boolean updating = false;
-			public void paintControl(PaintEvent e) {
-				for (Control anchoredControl : anchoredControls.keySet())
-				{
-					Rectangle rect = anchoredControls.get(anchoredControl);
-									
-					anchoredControl.setLocation(rect.x, rect.y);
-					anchoredControl.setSize(rect.width, rect.height);
-					
-//					ImageData data = new ImageData(rect.width, rect.height, 24, palette);
-//					
-//					data.transparentPixel = SWT.COLOR_BLUE;
-//					anchoredControl.setBackgroundImage(new Image(getDisplay(), data));
-				}
-				if (!updating)
-				{
-					updating = true;
-					update();
-					updating = false;
 				}
 			}
 		});
@@ -410,17 +366,35 @@ public class WarlockText implements LineBackgroundListener {
 	
 	public void append(String string) {
 		
-		// determine if we are currently at the bottom of the widget
-		boolean atBottom = vscroll.getSelection() >= (vscroll.getMaximum()
-				- (vscroll.getPageIncrement() + 2));
+		// if we're set to scroll to the bottom, we don't need to check if we're there
+		if(!doScroll) {
+			doScroll = atBottom();
+		}
 
+		boolean appendScroll = doScroll;
+		
 		textWidget.append(string);
 		constrainLineLimit();
+
+		scrollToBottom();
 		
-		// Scroll to bottom of widget
-		if (atBottom && doScrollDirection == SWT.DOWN) {
-			setTopIndex(getLineCount() - 1);
+		// hack to make our next output scroll us down if this one didn't finish
+		if(appendScroll)
+			doScroll = true;
+	}
+	
+	public void scrollToBottom() {
+		if(doScroll) {
+			doScroll = false;
+			if (doScrollDirection == SWT.DOWN) {
+				setTopIndex(getLineCount() - 1);
+			}
 		}
+	}
+	
+	private boolean atBottom() {
+		return vscroll.getSelection() >= (vscroll.getMaximum()
+				- (vscroll.getPageIncrement()));
 	}
 	
 	public void replaceTextRange(int start, int length, String text) {
