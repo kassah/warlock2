@@ -197,7 +197,6 @@ public class WarlockText implements LineBackgroundListener {
 		addControlListener(new ControlListener () {
 			public void controlMoved(ControlEvent e) {}
 			public void controlResized(ControlEvent e) {
-				scrollToBottom();
 				redraw();
 			}
 		});
@@ -410,11 +409,18 @@ public class WarlockText implements LineBackgroundListener {
 	}
 	
 	public void append(String string) {
-		boolean atbottom = isScrolledToBottom();
+		
+		// determine if we are currently at the bottom of the widget
+		boolean atBottom = vscroll.getSelection() >= (vscroll.getMaximum()
+				- (vscroll.getPageIncrement() + 2));
+
 		textWidget.append(string);
 		constrainLineLimit();
-		if (atbottom) 
-			scrollToBottom();
+		
+		// Scroll to bottom of widget
+		if (atBottom && doScrollDirection == SWT.DOWN) {
+			setTopIndex(getLineCount() - 1);
+		}
 	}
 	
 	public void replaceTextRange(int start, int length, String text) {
@@ -498,21 +504,6 @@ public class WarlockText implements LineBackgroundListener {
 				if (range.foreground != null)
 					lineForegrounds.put(lineIndex, range.foreground);
 			}
-		}
-	}
-	
-	private boolean isScrolledToBottom() {
-		if (vscroll.getSelection() >= vscroll.getMaximum() - (vscroll.getPageIncrement() * 1.5)) {
-			return true;
-		} else {
-			return false;
-		}
-	}
-	
-	public void scrollToBottom ()
-	{
-		if (doScrollDirection == SWT.DOWN) {
-			setTopIndex(getLineCount() - 1);
 		}
 	}
 	

@@ -384,7 +384,6 @@ public class StreamView extends ViewPart implements IStreamListener, IGameViewFo
 				text.setStyleRange(echoStyle);
 				echoBuffer = null;
 			}
-			text.scrollToBottom();
 		}
 	}
 	
