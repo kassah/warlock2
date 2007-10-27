@@ -12,7 +12,10 @@ import org.eclipse.ui.PlatformUI;
 import cc.warlock.core.client.IStream;
 import cc.warlock.core.client.IWarlockClient;
 import cc.warlock.core.client.IWarlockClientListener;
+import cc.warlock.core.client.IWarlockStyle;
 import cc.warlock.core.client.WarlockClientRegistry;
+import cc.warlock.rcp.ui.StyleRangeWithData;
+import cc.warlock.rcp.ui.WarlockText;
 import cc.warlock.rcp.ui.client.SWTWarlockClientListener;
 import cc.warlock.rcp.userstreams.IStreamFilter;
 import cc.warlock.rcp.views.StreamView;
@@ -59,6 +62,14 @@ public class UserStream extends StreamView implements IWarlockClientListener {
 	
 	public void streamEchoed(IStream stream, String text) {
 		// Discard Echos
+	}
+	
+	protected void addStyleRange (WarlockText text, StyleRangeWithData range) {
+		// Discard Styles for right now
+	}
+	
+	public void streamReceivedStyle(IStream stream, IWarlockStyle style) {
+		// Discard Styles for right now
 	}
 	
 	public void clientConnected(IWarlockClient client) {
