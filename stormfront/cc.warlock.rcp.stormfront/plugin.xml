@@ -86,15 +86,11 @@
          </dynamic>
       </menuContribution>
       <menuContribution
-            locationURI="menu:cc.warlock.rcp.menu.prefs?before=cc.warlock.rcp.menu.preferences">
+            locationURI="menu:cc.warlock.rcp.menu.window">
          <dynamic
                class="cc.warlock.rcp.stormfront.ui.menu.StreamWindowContributionItem"
                id="cc.warlock.rcp.dynamicViews">
          </dynamic>
-         <separator
-               name="cc.warlock.rcp.separator2"
-               visible="true">
-         </separator>
       </menuContribution>
    </extension>
    <extension
