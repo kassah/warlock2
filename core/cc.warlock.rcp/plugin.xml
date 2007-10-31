@@ -119,6 +119,11 @@
             </command>
          </menu>
          <menu
+               id="cc.warlock.rcp.menu.window"
+               label="Window"
+               mnemonic="W">
+         </menu>
+         <menu
                id="cc.warlock.rcp.menu.help"
                label="Help"
                mnemonic="H">
