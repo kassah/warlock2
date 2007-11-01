@@ -81,7 +81,7 @@ public class WarlockString {
 		WarlockString substring = new WarlockString(client, text.substring(start));
 		for(WarlockStringStyleRange style : styles) {
 			if(style.start >= start) {
-				int length = Math.min(style.length, end - style.start)
+				int length = Math.min(style.length, end - style.start);
 				substring.addStyle(style.start - start, length, style.style);
 			}
 		}
