@@ -72,4 +72,19 @@ public class WarlockString {
 	public IWarlockClient getClient() {
 		return client;
 	}
+	
+	public WarlockString substring(int start) {
+		return substring(start, text.length());
+	}
+	
+	public WarlockString substring(int start, int end) {
+		WarlockString substring = new WarlockString(client, text.substring(start));
+		for(WarlockStringStyleRange style : styles) {
+			if(style.start >= start) {
+				int length = Math.min(style.length, end - style.start)
+				substring.addStyle(style.start - start, length, style.style);
+			}
+		}
+		return substring;
+	}
 }
