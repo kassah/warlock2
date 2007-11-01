@@ -108,16 +108,6 @@ public interface IStormFrontClient extends IWarlockClient {
 	public ICharacterStatus getCharacterStatus();
 	
 	/**
-	 * Sets the current style of the storm front client
-	 */
-	public void setCurrentStyle (IWarlockStyle style);
-	
-	/**
-	 * @return The current style of the storm front client
-	 */
-	public IWarlockStyle getCurrentStyle();
-	
-	/**
 	 * @return The name of the character associated with this client.
 	 */
 	public IProperty<String> getCharacterName();
