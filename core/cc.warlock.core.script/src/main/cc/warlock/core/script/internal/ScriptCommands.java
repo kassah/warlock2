@@ -212,11 +212,18 @@ public class ScriptCommands implements IScriptCommands, IStreamListener
 		}
 	}
 	
-	public void streamReceivedCommand (IStream stream, String text) { }
+	public void streamReceivedCommand (IStream stream, String text) {
+		receiveText(text);
+	}
+	
 	public void streamAddedStyle(IStream stream, IWarlockStyle style) {	}
 	public void streamRemovedStyle(IStream stream, IWarlockStyle style) {	}
 	
 	public void streamReceivedText(IStream stream, String text) {
+		receiveText(text);
+	}
+	
+	protected void receiveText(String text) {
 		System.out.print("Sending out line: " + text);
 		synchronized(textWaiters) {
 			for(LinkedBlockingQueue<String>  queue : textWaiters) {
