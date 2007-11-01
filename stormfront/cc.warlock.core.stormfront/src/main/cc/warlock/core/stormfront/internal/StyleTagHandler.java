@@ -32,6 +32,10 @@ public class StyleTagHandler extends DefaultTagHandler {
 	}
 
 	public void handleStart(StormFrontAttributeList attributes) {
+		if(currentStyle != null) {
+			handler.getCurrentStream().removeStyle(currentStyle);
+		}
+		
 		String styleId = null;
 		
 		if ("style".equals(getCurrentTag()))
@@ -39,12 +43,7 @@ public class StyleTagHandler extends DefaultTagHandler {
 		else if ("output".equals(getCurrentTag()))
 			styleId = attributes.getValue("class");
 		
-		if (styleId == null || styleId.length() == 0)
-		{
-			IWarlockStyle endStyle = WarlockStyle.createEndCustomStyle(currentStyle.getStyleName());
-			handler.getCurrentStream().sendStyle(endStyle);
-		}
-		else
+		if (styleId != null && styleId.length() > 0)
 		{
 			currentStyle = WarlockStyle.createCustomStyle(styleId);
 			
@@ -52,7 +51,7 @@ public class StyleTagHandler extends DefaultTagHandler {
 				currentStyle.addStyleType(IWarlockStyle.StyleType.MONOSPACE);
 			}
 			
-			handler.getCurrentStream().sendStyle(currentStyle);
+			handler.getCurrentStream().addStyle(currentStyle);
 		}
 	}
 }

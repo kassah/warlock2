@@ -116,4 +116,7 @@ public class StormFrontConnection implements IConnection
 		return port;
 	}
 
+	public String getKey() {
+		return key;
+	}
 }

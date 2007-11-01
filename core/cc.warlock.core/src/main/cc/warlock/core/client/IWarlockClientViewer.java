@@ -15,7 +15,7 @@ public interface IWarlockClientViewer extends IStreamListener {
 
 	public IWarlockClient getWarlockClient ();
 	
-	public ICommand getCurrentCommand ();
+	public String getCurrentCommand ();
 	
-	public void setCurrentCommand (ICommand command);
+	public void setCurrentCommand (String command);
 }

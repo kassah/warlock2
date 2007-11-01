@@ -57,7 +57,7 @@ public abstract class GameView extends StreamView implements KeyListener, IWarlo
 	protected WarlockText text;
 	protected StyledText entry;
 	protected WarlockCompass compass;
-	protected ICommand currentCommand;
+	protected String currentCommand;
 	protected SWTWarlockClientViewer wrapper;
 	
 	public GameView () {
@@ -65,7 +65,7 @@ public abstract class GameView extends StreamView implements KeyListener, IWarlo
 			firstInstance = this;
 		}
 		
-		currentCommand = new Command("", new Date());
+		currentCommand = "";
 		openViews.add(this);
 		wrapper = new SWTWarlockClientViewer(this);
 		
@@ -159,7 +159,7 @@ public abstract class GameView extends StreamView implements KeyListener, IWarlo
 		
 		entry.addModifyListener(new ModifyListener () {
 			public void modifyText(ModifyEvent e) {
-				((Command)currentCommand).setCommand(entry.getText());
+				currentCommand = entry.getText();
 			}
 		});
 		entry.addKeyListener(this);
@@ -215,18 +215,18 @@ public abstract class GameView extends StreamView implements KeyListener, IWarlo
 		return caret;
 	}
 	
-	public ICommand getCurrentCommand ()
+	public String getCurrentCommand ()
 	{
 		return GameView.this.currentCommand;
 	}
 	
-	public void setCurrentCommand(ICommand command) {
+	public void setCurrentCommand(String command) {
 		if(command == null) {
-			command = new Command("", new Date());
+			command = "";
 		}
 		GameView.this.currentCommand = command;
-		GameView.this.entry.setText(command.getCommand());
-		GameView.this.entry.setSelection(command.getCommand().length());
+		GameView.this.entry.setText(command);
+		GameView.this.entry.setSelection(command.length());
 	}
 	
 	public void setClient(IWarlockClient client) {

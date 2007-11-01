@@ -9,22 +9,16 @@ import org.eclipse.swt.widgets.Caret;
 
 import cc.warlock.core.client.IProperty;
 import cc.warlock.core.client.IPropertyListener;
-import cc.warlock.core.client.IStream;
 import cc.warlock.core.client.IWarlockClient;
-import cc.warlock.core.client.IWarlockStyle;
 import cc.warlock.core.client.WarlockColor;
 import cc.warlock.core.stormfront.client.IStormFrontClient;
 import cc.warlock.core.stormfront.client.IStormFrontClientViewer;
 import cc.warlock.core.stormfront.client.StormFrontColor;
 import cc.warlock.core.stormfront.client.IStormFrontClient.GameMode;
 import cc.warlock.core.stormfront.serversettings.server.ServerSettings;
-import cc.warlock.core.stormfront.style.IHighlightStringStyle;
 import cc.warlock.rcp.stormfront.adapters.SWTStormFrontClientViewer;
 import cc.warlock.rcp.stormfront.ui.StormFrontMacros;
 import cc.warlock.rcp.stormfront.ui.style.StormFrontStyleProvider;
-import cc.warlock.rcp.ui.IStyleProvider;
-import cc.warlock.rcp.ui.StyleRangeWithData;
-import cc.warlock.rcp.ui.WarlockText;
 import cc.warlock.rcp.ui.style.StyleProviders;
 import cc.warlock.rcp.util.ColorUtil;
 import cc.warlock.rcp.views.GameView;
@@ -81,7 +75,7 @@ public class StormFrontGameView extends GameView implements IStormFrontClientVie
 			sfClient.getGameMode().addListener(new IPropertyListener<GameMode>() {
 				public void propertyActivated(IProperty<GameMode> property) {}
 				public void propertyChanged(IProperty<GameMode> property, GameMode oldValue) {
-					setBufferingStyles(property.get() == GameMode.Game);
+					setBuffered(property.get() == GameMode.Game);
 				}
 				public void propertyCleared(IProperty<GameMode> property,	GameMode oldValue) {}
 			});
@@ -127,7 +121,7 @@ public class StormFrontGameView extends GameView implements IStormFrontClientVie
 		}
 	}
 	
-	@Override
+	/*@Override
 	public void streamReceivedStyle(IStream stream, IWarlockStyle style) {
 		if (!(style instanceof IHighlightStringStyle)) {
 			super.streamReceivedStyle(stream, style);
@@ -161,12 +155,12 @@ public class StormFrontGameView extends GameView implements IStormFrontClientVie
 			range.length = charCount - range.start;
 			
 			if (unendedRanges.size() == 0) {
-				addStyleRange(text, range);
+				// addStyleRange(text, range);
 			} else {
 				innerRanges.push(range);
 			}
 		}
-	}
+	}*/
 	
 	@Override
 	public Object getAdapter(Class adapter) {

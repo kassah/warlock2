@@ -88,8 +88,7 @@ public class CompassMacroHandler implements IMacroHandler {
 			if (command != null)
 			{
 				viewer.getWarlockClient().send(command);
-				viewer.getWarlockClient().getDefaultStream().echo(command);
-				viewer.setCurrentCommand(new Command("", new Date()));
+				viewer.setCurrentCommand("");
 				return true;
 			}
 		}

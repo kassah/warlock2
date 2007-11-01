@@ -40,7 +40,7 @@ public class JavascriptScript extends AbstractScript {
 		
 		this.engine = engine;
 		this.client = client;
-		this.commands = new ScriptCommands(client);
+		this.commands = new ScriptCommands(client, getName());
 		this.jsCommands = new JavascriptCommands(commands, this);
 	}
 

@@ -7,8 +7,8 @@ import org.eclipse.swt.SWT;
 import org.eclipse.swt.custom.ExtendedModifyListener;
 import org.eclipse.swt.custom.LineBackgroundEvent;
 import org.eclipse.swt.custom.LineBackgroundListener;
-import org.eclipse.swt.custom.PaintObjectEvent;
 import org.eclipse.swt.custom.PaintObjectListener;
+import org.eclipse.swt.custom.ST;
 import org.eclipse.swt.custom.StyleRange;
 import org.eclipse.swt.custom.StyledText;
 import org.eclipse.swt.custom.StyledTextContent;
@@ -19,7 +19,6 @@ import org.eclipse.swt.events.KeyListener;
 import org.eclipse.swt.events.MouseEvent;
 import org.eclipse.swt.events.MouseListener;
 import org.eclipse.swt.events.MouseMoveListener;
-import org.eclipse.swt.events.PaintEvent;
 import org.eclipse.swt.events.PaintListener;
 import org.eclipse.swt.events.VerifyEvent;
 import org.eclipse.swt.events.VerifyListener;
@@ -37,6 +36,10 @@ import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.Label;
 import org.eclipse.swt.widgets.ScrollBar;
 
+import cc.warlock.core.client.WarlockString;
+import cc.warlock.core.client.WarlockString.WarlockStringStyleRange;
+import cc.warlock.rcp.ui.style.StyleProviders;
+import cc.warlock.rcp.util.ColorUtil;
 import cc.warlock.rcp.util.RCPUtil;
 
 /**
@@ -59,7 +62,6 @@ public class WarlockText implements LineBackgroundListener {
 	private ScrollBar vscroll;
 	private int lineLimit = 5000;
 	private int doScrollDirection = SWT.UP;
-	private boolean doScroll = false;
 
 	protected Hashtable<Integer, Color> lineBackgrounds = new Hashtable<Integer,Color>();
 	protected Hashtable<Integer, Color> lineForegrounds = new Hashtable<Integer,Color>();
@@ -332,7 +334,7 @@ public class WarlockText implements LineBackgroundListener {
 			style.metrics = new GlyphMetrics(rect.height, 0, rect.width);
 			
 			this.objects.put(ctrl, style);
-			setStyleRange(style);
+			textWidget.setStyleRange(style);
 			
 			i++;
 		}
@@ -356,7 +358,7 @@ public class WarlockText implements LineBackgroundListener {
 		range.underline = true;
 		range.start = start;
 		range.length = description.length();
-		setStyleRange(range);
+		textWidget.setStyleRange(range);
 		range.data.put("link.url", url);
 	}
 	
@@ -365,40 +367,51 @@ public class WarlockText implements LineBackgroundListener {
 	}
 	
 	public void append(String string) {
-		
-		// if we're set to scroll to the bottom, we don't need to check if we're there
-		if(!doScroll) {
-			doScroll = atBottom();
-		}
-
-		boolean appendScroll = doScroll;
+		boolean appendScroll = atBottom();
 		
 		textWidget.append(string);
 		constrainLineLimit();
 
-		scrollToBottom();
-		
-		// hack to make our next output scroll us down if this one didn't finish
 		if(appendScroll)
-			doScroll = true;
+			scrollToBottom();
 	}
 	
-	public void scrollToBottom() {
-		if(doScroll) {
-			doScroll = false;
-			if (doScrollDirection == SWT.DOWN) {
-				setTopIndex(getLineCount() - 1);
-			}
+	public void append(WarlockString string) {
+		boolean appendScroll = atBottom();
+		
+		int charCount = textWidget.getCharCount();
+		textWidget.append(string.toString());
+		for(WarlockStringStyleRange range : string.getStyles()) {
+			StyleRangeWithData styleRange = StyleProviders.getStyleProvider(string.getClient()).getStyleRange(range.style, charCount + range.start);
+			styleRange.length = range.length;
+			if(range.style.getFGColor() != null)
+				styleRange.foreground = ColorUtil.warlockColorToColor(range.style.getFGColor());
+			if(range.style.getBGColor() != null)
+				styleRange.background = ColorUtil.warlockColorToColor(range.style.getBGColor());
+			textWidget.setStyleRange(styleRange);
+		}
+		constrainLineLimit();
+
+		if(appendScroll)
+			scrollToBottom();
+	}
+	
+	private void scrollToBottom() {
+		if (doScrollDirection == SWT.DOWN) {
+			textWidget.invokeAction(ST.TEXT_END);
 		}
 	}
 	
 	private boolean atBottom() {
 		return vscroll.getSelection() >= (vscroll.getMaximum()
-				- (vscroll.getPageIncrement()));
+				- (vscroll.getPageIncrement() * 1.5));
 	}
 	
 	public void replaceTextRange(int start, int length, String text) {
+		boolean atBottom = atBottom();
 		textWidget.replaceTextRange(start, length, text);
+		if(atBottom)
+			scrollToBottom();
 	}
 	
 	public int getLineCount() {
@@ -464,21 +477,6 @@ public class WarlockText implements LineBackgroundListener {
 	
 	public int getLineAtOffset(int offset) {
 		return textWidget.getLineAtOffset(offset);
-	}
-	
-	public void setStyleRange(StyleRange range) {
-		int lineIndex = getLineAtOffset(range.start);
-		textWidget.setStyleRange(range);
-		if (range instanceof StyleRangeWithData)
-		{
-			StyleRangeWithData range2 = (StyleRangeWithData) range;
-			if (range2.data.containsKey(IStyleProvider.FILL_ENTIRE_LINE))
-			{
-				lineBackgrounds.put(lineIndex, range.background);
-				if (range.foreground != null)
-					lineForegrounds.put(lineIndex, range.foreground);
-			}
-		}
 	}
 	
 	public void setTopIndex(int topIndex) {

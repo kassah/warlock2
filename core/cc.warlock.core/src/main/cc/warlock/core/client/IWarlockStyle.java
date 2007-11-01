@@ -20,11 +20,15 @@ public interface IWarlockStyle {
 	
 	public URL getLinkAddress();
 	
+	public WarlockColor getFGColor();
+	public WarlockColor getBGColor();
+	
 	public void addStyleType (StyleType styleType);
 
 	public void setLinkAddress(URL linkAddress);
 
 	public void setStyleName(String styleName);
 	
-	public boolean isEndStyle();
+	public void setFGColor(WarlockColor color);
+	public void setBGColor(WarlockColor color);
 }

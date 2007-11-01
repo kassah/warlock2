@@ -20,10 +20,14 @@ public class Command implements ICommand, Serializable {
 
 	protected String command;
 	protected Date timestamp;
-	protected boolean first, last, inHistory;
+	protected boolean boundForHistory;
 	
 	public Command(String string) {
-		first = last = inHistory = false;
+		this(string, true);
+	}
+	
+	public Command(String string, boolean boundForHistory) {
+		this.boundForHistory = boundForHistory;
 		
 		// TODO make the following line work for all locales.
 		DateFormat dateFormat = DateFormat.getTimeInstance();
@@ -37,9 +41,13 @@ public class Command implements ICommand, Serializable {
 		}
 	}
 	
-	public Command(String command, Date timestamp)
+	public Command(String command, Date timestamp) {
+		this(command, timestamp, true);
+	}
+	
+	public Command(String command, Date timestamp, boolean boundForHistory)
 	{
-		first = last = inHistory = false;
+		this.boundForHistory = boundForHistory;
 		
 		this.command = command;
 		this.timestamp = (Date)timestamp.clone();
@@ -47,6 +55,7 @@ public class Command implements ICommand, Serializable {
 	
 	public void setCommand(String command) {
 		this.command = command;
+		this.timestamp = new Date();
 	}
 	
 	public String getCommand() {
@@ -61,27 +70,12 @@ public class Command implements ICommand, Serializable {
 		return "(" + command + "," + timestamp.toString() + ")";
 	}
 	
-	public boolean isFirst() {
-		 return first;
+	
+	public boolean isBoundForHistory() {
+		return boundForHistory;
 	}
 	
-	public boolean isLast() {
-		return last;
-	}
-	
-	public boolean isInHistory() {
-		return inHistory;
-	}
-	
-	public void setFirst (boolean first) {
-		this.first = first;
-	}
-	
-	public void setLast (boolean last) {
-		this.last = last;
-	}
-	
-	public void setInHistory(boolean inHistory) {
-		this.inHistory = inHistory;
+	public void setBoundForHistory(boolean boundForHistory) {
+		this.boundForHistory = boundForHistory;
 	}
 }

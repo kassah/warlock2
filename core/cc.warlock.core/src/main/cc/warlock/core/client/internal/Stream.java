@@ -54,10 +54,21 @@ public class Stream implements IStream {
 		}
 	}
 	
-	public void sendStyle(IWarlockStyle style) {
+	public void addStyle(IWarlockStyle style) {
 		for(IStreamListener listener : listeners) {
 			try {
-				listener.streamReceivedStyle(this, style);
+				listener.streamAddedStyle(this, style);
+			} catch (Throwable t) {
+				// TODO Auto-generated catch block
+				t.printStackTrace();
+			}
+		}
+	}
+	
+	public void removeStyle(IWarlockStyle style) {
+		for(IStreamListener listener : listeners) {
+			try {
+				listener.streamRemovedStyle(this, style);
 			} catch (Throwable t) {
 				// TODO Auto-generated catch block
 				t.printStackTrace();

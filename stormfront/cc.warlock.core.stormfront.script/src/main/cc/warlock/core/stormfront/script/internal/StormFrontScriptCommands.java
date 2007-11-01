@@ -24,7 +24,7 @@ public class StormFrontScriptCommands extends ScriptCommands implements IStormFr
 	
 	public StormFrontScriptCommands (IStormFrontClient client, IScript script)
 	{
-		super(client);
+		super(client, script.getName());
 		this.sfClient = client;
 		waitingForRoundtime = false;
 		this.script = script;

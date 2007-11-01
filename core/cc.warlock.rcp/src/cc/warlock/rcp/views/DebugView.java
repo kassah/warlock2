@@ -44,15 +44,6 @@ public class DebugView extends ViewPart implements IConnectionListener {
 		}
 	}
 	
-	private void scrollToBottom ()
-	{
-		int length = console.getContent().getCharCount();		
-		if (console.getCaretOffset() < length) {
-			console.setCaretOffset(length);
-			console.showSelection();
-		}
-	}
-	
 	@Override
 	public void createPartControl(Composite parent) {
 		Composite main = new Composite(parent, SWT.NONE);

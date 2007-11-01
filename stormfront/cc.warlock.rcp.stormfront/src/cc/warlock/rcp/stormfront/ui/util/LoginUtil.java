@@ -5,7 +5,6 @@ import java.util.Map;
 
 import org.eclipse.jface.dialogs.MessageDialog;
 import org.eclipse.swt.widgets.Display;
-import org.eclipse.ui.IPerspectiveDescriptor;
 import org.eclipse.ui.IWorkbenchPage;
 import org.eclipse.ui.PartInitException;
 import org.eclipse.ui.PlatformUI;
@@ -73,9 +72,9 @@ public class LoginUtil {
 			IWarlockStyle style = WarlockStyle.createCustomStyle("mono");
 			style.addStyleType(IWarlockStyle.StyleType.MONOSPACE);
 			
-			client.getDefaultStream().sendStyle(style);
+			client.getDefaultStream().addStyle(style);
 			client.getDefaultStream().send(errorConnectMessage);
-			client.getDefaultStream().sendStyle(WarlockStyle.createEndCustomStyle("mono"));
+			client.getDefaultStream().removeStyle(style);
 		} catch (PartInitException e) {
 			e.printStackTrace();
 		}

@@ -22,23 +22,9 @@ public interface ICommand {
 	public Date getTimestamp();
 	
 	/**
-	 * @return whether this command is the last command in the command history
+	 * @return whether this command will go into the history. If it's already in the history, this will return false.
 	 */
-	public boolean isLast();
+	public boolean isBoundForHistory();
 	
-	public void setLast (boolean last);
-	
-	/**
-	 * @return whether this command is the first command in the command history
-	 */
-	public boolean isFirst();
-	
-	public void setFirst (boolean first);
-	
-	/**
-	 * @return whether this command is the command history.
-	 */
-	public boolean isInHistory();
-	
-	public void setInHistory (boolean inHistory);
+	public void setBoundForHistory(boolean inHistory);
 }

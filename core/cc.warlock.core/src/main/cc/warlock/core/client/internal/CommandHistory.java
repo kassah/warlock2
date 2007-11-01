@@ -105,16 +105,11 @@ public class CommandHistory implements ICommandHistory {
 	}
 	
 	public void addCommand(ICommand command) {
-		if (commands.size() == 0) {
-			command.setFirst(true);
-			command.setLast(true);
-		}
-		else {
-			commands.get(commands.size()-1).setLast(false);
-			command.setLast(true);
-		}
 		
-		command.setInHistory(true);
+		if(!command.isBoundForHistory() || (commands.size() > 0 && command.getCommand().equals(commands.getFirst())))
+			return;
+		
+		// command.setBoundForHistory(false);
 		commands.addFirst(command);
 		
 		resetPosition();

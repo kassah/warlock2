@@ -33,13 +33,14 @@ public interface IWarlockClient {
 	 * Send command to the game.
 	 * @param command The command to send.
 	 */
-	public void send (ICommand command);
+	public void send(String command);
 	
 	/**
 	 * Send command to the game.
+	 * @param prefix to prepend when we echo the command
 	 * @param command The command to send.
 	 */
-	public void send(String command);
+	public void send(String prefix, String command);
 	
 	/**
 	 * @return This client's command history

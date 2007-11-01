@@ -1,14 +1,11 @@
 package cc.warlock.rcp.ui.macros.internal;
 
-import java.util.Date;
-
 import org.eclipse.swt.SWT;
 
 import cc.warlock.core.client.ICommand;
 import cc.warlock.core.client.ICommandHistory;
 import cc.warlock.core.client.IWarlockClient;
 import cc.warlock.core.client.IWarlockClientViewer;
-import cc.warlock.core.client.internal.Command;
 import cc.warlock.rcp.ui.macros.IMacro;
 import cc.warlock.rcp.ui.macros.IMacroHandler;
 
@@ -68,33 +65,38 @@ public class CommandHistoryMacroHandler implements IMacroHandler {
 		IWarlockClient client = viewer.getWarlockClient();
 		
 		ICommand command = client.getCommandHistory().prev();
-		viewer.setCurrentCommand(command);
+		if(command != null)
+			viewer.setCurrentCommand(command.getCommand());
+		else
+			viewer.setCurrentCommand("");
 	}
 	
 	public void handleDown (IWarlockClientViewer viewer)
 	{
 		IWarlockClient client = viewer.getWarlockClient();
 		ICommand command = client.getCommandHistory().next();
-		viewer.setCurrentCommand(command);
+		if(command != null) {
+			viewer.setCurrentCommand(command.getCommand());
+		} else {
+			viewer.setCurrentCommand("");
+		}
 	}
 
 	public void handleSend (IWarlockClientViewer viewer)
 	{
-		String command = viewer.getCurrentCommand().getCommand();
+		String command = viewer.getCurrentCommand();
 		if (!command.equals(""))
 		{
-			viewer.getWarlockClient().getDefaultStream().echo(command);
 			viewer.getWarlockClient().send(command);
 			
-			viewer.setCurrentCommand(new Command("", new Date()));
+			viewer.setCurrentCommand("");
 		}
 	}
 	
 	public void handleSendLastCommand (IWarlockClientViewer viewer)
 	{
 		ICommand command = viewer.getWarlockClient().getCommandHistory().getLastCommand();
-		viewer.getWarlockClient().send(command);
-		viewer.getWarlockClient().getDefaultStream().echo(command.getCommand());
+		viewer.getWarlockClient().send(command.getCommand());
 	}
 	
 	public void handleSendNextToLastCommand (IWarlockClientViewer viewer)
@@ -105,8 +107,7 @@ public class CommandHistoryMacroHandler implements IMacroHandler {
 		{
 			ICommand command = history.getCommandAt(1);
 			
-			viewer.getWarlockClient().send(command);
-			viewer.getWarlockClient().getDefaultStream().echo(command.getCommand());
+			viewer.getWarlockClient().send(command.getCommand());
 		}
 	}
 }

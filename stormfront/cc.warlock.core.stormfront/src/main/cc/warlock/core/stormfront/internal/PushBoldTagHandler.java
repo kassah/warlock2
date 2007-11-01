@@ -25,12 +25,16 @@ public class PushBoldTagHandler extends DefaultTagHandler {
 	public void handleEnd() {
 		if (getCurrentTag().equals("pushBold"))
 		{
-			handler.getCurrentStream().sendStyle(WarlockStyle.createBoldStyle());
+			style = WarlockStyle.createBoldStyle();
+			handler.getCurrentStream().addStyle(style);
 		}
 		
 		else if (getCurrentTag().equals("popBold"))
 		{
-			handler.getCurrentStream().sendStyle(WarlockStyle.createEndBoldStyle());
+			if(style != null) {
+				handler.getCurrentStream().removeStyle(style);
+				style = null;
+			}
 			// we'll need to figure out another way to auto linkify http links
 //			IStyledString buffer = handler.peekBuffer();
 //			
@@ -54,7 +58,6 @@ public class PushBoldTagHandler extends DefaultTagHandler {
 //			}
 //			
 //			handler.sendAndPopBuffer();
-			style = null;
 		}
 	}
 }

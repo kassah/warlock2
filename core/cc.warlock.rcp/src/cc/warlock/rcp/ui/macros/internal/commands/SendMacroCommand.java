@@ -24,7 +24,6 @@ public class SendMacroCommand implements IMacroCommand {
 		String toSend = currentCommand.substring(0, position);
 		
 		context.getWarlockClient().send(toSend);
-		context.getWarlockClient().getDefaultStream().echo(toSend);
 		
 		return currentCommand.substring(position + 2);
 	}

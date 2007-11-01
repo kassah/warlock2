@@ -5,11 +5,8 @@ import cc.warlock.core.client.IWarlockClient;
 public interface IScriptCommands {
 
 	public void put (String text);
-	public void put (IScript script, String text);
 	
 	public void echo (String text);
-	
-	public void echo (IScript script, String text);
 	
 	public void move (String direction);
 	

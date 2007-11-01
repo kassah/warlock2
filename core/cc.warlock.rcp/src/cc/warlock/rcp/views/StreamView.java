@@ -3,10 +3,8 @@ package cc.warlock.rcp.views;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Hashtable;
-import java.util.Stack;
 
 import org.eclipse.swt.SWT;
-import org.eclipse.swt.custom.StyleRange;
 import org.eclipse.swt.graphics.Color;
 import org.eclipse.swt.graphics.Font;
 import org.eclipse.swt.layout.GridData;
@@ -25,9 +23,10 @@ import cc.warlock.core.client.IStreamListener;
 import cc.warlock.core.client.IWarlockClient;
 import cc.warlock.core.client.IWarlockStyle;
 import cc.warlock.core.client.PropertyListener;
+import cc.warlock.core.client.WarlockString;
+import cc.warlock.core.client.internal.WarlockStyle;
 import cc.warlock.rcp.configuration.GameViewConfiguration;
 import cc.warlock.rcp.ui.IStyleProvider;
-import cc.warlock.rcp.ui.StyleRangeWithData;
 import cc.warlock.rcp.ui.WarlockText;
 import cc.warlock.rcp.ui.client.SWTPropertyListener;
 import cc.warlock.rcp.ui.client.SWTStreamListener;
@@ -58,7 +57,11 @@ public class StreamView extends ViewPart implements IStreamListener, IGameViewFo
 	protected boolean appendNewlines = false;
 	protected boolean isPrompting = false;
 	protected boolean multiClient = false;
-	protected boolean bufferingStyles = false;
+	protected boolean buffering = false;
+	protected WarlockString echoBuffer;
+	protected ArrayList<IWarlockStyle> styles = new ArrayList<IWarlockStyle>();
+	
+	protected WarlockString bufferedText;
 	
 	public StreamView() {
 		openViews.add(this);
@@ -171,7 +174,7 @@ public class StreamView extends ViewPart implements IStreamListener, IGameViewFo
 			streamReceivedText(stream, string.toString());
 			for (IWarlockStyle style : client.getStreamBufferStyles(stream))
 			{
-				streamReceivedStyle(stream, style);
+				streamAddedStyle(stream, style);
 			}
 		}
 	}
@@ -213,53 +216,29 @@ public class StreamView extends ViewPart implements IStreamListener, IGameViewFo
 		return StyleProviders.getStyleProvider(client);
 	}
 	
-	protected StringBuffer bufferedText = new StringBuffer();
-	protected ArrayList<StyleRangeWithData> bufferedStyles = new ArrayList<StyleRangeWithData>();
-	protected Stack<StyleRangeWithData> unendedRanges = new Stack<StyleRangeWithData>();
-	protected Stack<StyleRangeWithData> innerRanges = new Stack<StyleRangeWithData>();
-	
-	protected void addStyleRange (WarlockText text, StyleRangeWithData range)
+	protected void appendText (WarlockString string)
 	{
-		if (bufferingStyles)
+		
+		if (buffering)
 		{
-			bufferedStyles.add(range);
+			if(bufferedText == null)
+				bufferedText = string;
+			else
+				bufferedText.append(string);
 		}
 		else
 		{
-			range.start += currentCharCount;
-			text.setStyleRange(range);
-		}
-	}
-	
-	protected int currentCharCount = 0;
-	
-	protected void appendText (WarlockText text, String string)
-	{
-		if (bufferingStyles)
-		{
-			bufferedText.append(string);
-		}
-		else
-		{
-			currentCharCount = text.getCharCount();
+			WarlockText text = getTextForClient(client);
 			text.append(string);
 		}
 	}
 	
-	protected int getCharCount (WarlockText text)
-	{
-		int charCount = 0;
-		if (bufferingStyles)
-			charCount += bufferedText.length();
-		if (isPrompting) // account for newline
-			charCount++;
-		
-		return charCount;
-	}
-	
-	public void streamReceivedStyle(IStream stream, IWarlockStyle style) {
+	public void streamAddedStyle(IStream stream, IWarlockStyle style) {
 		if (this.mainStream.equals(stream) || this.streams.contains(stream))
 		{
+			styles.add(style);
+			
+			/* TODO: old stuff, clean out
 			WarlockText text = getTextForClient(client);
 			int charCount = getCharCount(text);
 			
@@ -286,48 +265,56 @@ public class StreamView extends ViewPart implements IStreamListener, IGameViewFo
 						innerRanges.clear();
 					}
 				}
-			}
+			}*/
 		}
 	}
 	
-	public void streamReceivedText(IStream stream, String string) {
+	public void streamRemovedStyle(IStream stream, IWarlockStyle style) {
 		if (this.mainStream.equals(stream) || this.streams.contains(stream))
 		{
-			WarlockText text = getTextForClient(client);
-			
-			if (isPrompting) {
-				appendText(text, "\n");
-				isPrompting = false;
-			}
-			
-			String streamText = new String(string);
-			
-			if (appendNewlines)
-				streamText += "\n";
-			
-			appendText(text, streamText);
+			styles.remove(style);
 		}
 	}
 	
-	protected String echoBuffer = null;
+	public void streamReceivedText(IStream stream, String text) {
+		if (this.mainStream.equals(stream) || this.streams.contains(stream))
+		{
+			WarlockString string = new WarlockString(client);
+			
+			if (isPrompting) {
+				string.append("\n");
+				isPrompting = false;
+			}
+			int styleStart = string.length();
+			string.append(text);
+			for(IWarlockStyle style : styles) {
+				string.addStyle(styleStart, string.length(), style);
+			}
+			
+			if (appendNewlines)
+				string.append("\n");
+			
+			appendText(string);
+		}
+	}
+	
 	public void streamEchoed(IStream stream, String text) {
 		if (this.mainStream.equals(stream) || this.streams.contains(stream))
 		{
-			WarlockText textWidget = getTextForClient(client);
+			WarlockString string = new WarlockString(client, text);
+			string.addStyle(0, text.length(), WarlockStyle.createCustomStyle("command"));
+			
 			if (isPrompting)
 			{
+				WarlockText textWidget = getTextForClient(client);
 				isPrompting = false;
-			
-				textWidget.append(text + "\n");
-			
-				StyleRange echoStyle = getStyleProvider().getEchoStyle(textWidget.getCharCount() - text.length() - 1);
-				echoStyle.length = text.length();
-			
-				textWidget.setStyleRange(echoStyle);
+				textWidget.append(string);
 			}
 			else
 			{
-				echoBuffer = text;
+				if(echoBuffer == null)
+					echoBuffer = new WarlockString(client);
+				echoBuffer.append(string);
 			}
 		}
 	}
@@ -335,56 +322,28 @@ public class StreamView extends ViewPart implements IStreamListener, IGameViewFo
 	public void streamPrompted(IStream stream, String prompt) {
 		if (!isPrompting && (this.mainStream.equals(stream) || this.streams.contains(stream)))
 		{
-			WarlockText text = getTextForClient(client);
+			WarlockText textWidget = getTextForClient(client);
 			isPrompting = true;
-
-			// if there's any unended ranges we can just clear them out here, but there probably shouldn't be any?
-			unendedRanges.clear();
+			WarlockString text = new WarlockString(client);
 			
-			if (bufferingStyles)
+			if (buffering && bufferedText != null)
 			{
-				text.append(bufferedText.toString());
-				int startCount = text.getCharCount() - bufferedText.length();
-				
-				for (StyleRangeWithData range : bufferedStyles)
-				{
-					range.start += startCount;
-					
-					if (range.data.containsKey(IStyleProvider.FILL_ENTIRE_LINE))
-					{
-						int lineIndex = text.getLineAtOffset(range.start);
-						range.start = text.getOffsetAtLine(lineIndex);
-						String string = text.getTextWidget().getText(range.start, text.getCharCount()-1);
-						int newlineIndex = string.indexOf('\n');
-						if (newlineIndex > -1)
-							range.length = newlineIndex;
-						else
-							range.length = text.getCharCount() - range.start;
-					}
-					
-					try {
-						text.setStyleRange(range);
-					} catch (IllegalArgumentException ex)
-					{
-						ex.printStackTrace();
-					}
-				}
-
-				bufferedText.setLength(0);
-				bufferedStyles.clear();
+				text.append(bufferedText);
+				bufferedText = null;
 			}
 			
+			styles.clear();
 			text.append(prompt);
+			
 			if (echoBuffer != null)
 			{
 				text.append(echoBuffer);
-				StyleRange echoStyle = getStyleProvider().getEchoStyle(text.getCharCount() - echoBuffer.length());
-				echoStyle.length = echoBuffer.length();
-			
-				text.setStyleRange(echoStyle);
+
 				echoBuffer = null;
+				isPrompting = false;
 			}
-			text.scrollToBottom();
+			
+			textWidget.append(text);
 		}
 	}
 	
@@ -448,11 +407,11 @@ public class StreamView extends ViewPart implements IStreamListener, IGameViewFo
 		setPartName(title);
 	}
 
-	public boolean isBufferingStyles() {
-		return bufferingStyles;
+	public boolean isBuffered() {
+		return buffering;
 	}
 
-	public void setBufferingStyles(boolean bufferStyles) {
-		this.bufferingStyles = bufferStyles;
+	public void setBuffered(boolean buffer) {
+		this.buffering = buffer;
 	}
 }

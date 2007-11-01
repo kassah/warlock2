@@ -22,26 +22,91 @@ public class SWTStreamListener implements IStreamListener {
 		this.asynch = asynch;
 	}
 	
-	private static enum EventType {
-		Cleared, ReceivedText, ReceivedStyle, Echoed, Prompted
-	};
-	
-	private class ListenerWrapper implements Runnable
+	private class ClearedWrapper implements Runnable
 	{
-		public IStream stream;
-		public String text;
-		public IWarlockStyle style;
-		public EventType eventType;
+		private IStream stream;
+		
+		public ClearedWrapper(IStream stream) {
+			this.stream = stream;
+		}
 		
 		public void run() {
-			switch (eventType)
-			{
-			case Cleared: listener.streamCleared(stream); break;
-			case ReceivedText: listener.streamReceivedText(stream, text); break;
-			case ReceivedStyle: listener.streamReceivedStyle(stream, style); break;
-			case Echoed: listener.streamEchoed(stream, text); break;
-			case Prompted: listener.streamPrompted(stream, text); break;
-			}
+			listener.streamCleared(stream);
+		}
+	}
+	
+	private class ReceivedTextWrapper implements Runnable
+	{
+		private IStream stream;
+		private String text;
+		
+		public ReceivedTextWrapper(IStream stream, String text) {
+			this.stream = stream;
+			this.text = text;
+		}
+		
+		public void run() {
+			listener.streamReceivedText(stream, text);
+		}
+	}
+	
+	private class AddedStyleWrapper implements Runnable
+	{
+		private IStream stream;
+		private IWarlockStyle style;
+		
+		public AddedStyleWrapper(IStream stream, IWarlockStyle style) {
+			this.stream = stream;
+			this.style = style;
+		}
+		
+		public void run() {
+			listener.streamAddedStyle(stream, style);
+		}
+	}
+	
+	private class RemovedStyleWrapper implements Runnable
+	{
+		private IStream stream;
+		private IWarlockStyle style;
+		
+		public RemovedStyleWrapper(IStream stream, IWarlockStyle style) {
+			this.stream = stream;
+			this.style = style;
+		}
+		
+		public void run() {
+			listener.streamRemovedStyle(stream, style);
+		}
+	}
+	
+	private class EchoedWrapper implements Runnable
+	{
+		private IStream stream;
+		private String text;
+		
+		public EchoedWrapper(IStream stream, String text) {
+			this.stream = stream;
+			this.text = text;
+		}
+		
+		public void run() {
+			listener.streamEchoed(stream, text);
+		}
+	}
+	
+	private class PromptedWrapper implements Runnable
+	{
+		private IStream stream;
+		private String text;
+		
+		public PromptedWrapper(IStream stream, String text) {
+			this.stream = stream;
+			this.text = text;
+		}
+		
+		public void run() {
+			listener.streamPrompted(stream, text);
 		}
 	}
 	
@@ -56,42 +121,27 @@ public class SWTStreamListener implements IStreamListener {
 	}
 	
 	public void streamCleared(IStream stream) {
-		ListenerWrapper wrapper = new ListenerWrapper();
-		wrapper.eventType = EventType.Cleared;
-		wrapper.stream = stream;
-		run(wrapper);
+		run(new ClearedWrapper(stream));
 	}
 
 	public void streamReceivedText(IStream stream, String text) {
-		ListenerWrapper wrapper = new ListenerWrapper();
-		wrapper.stream = stream;
-		wrapper.eventType = EventType.ReceivedText;
-		wrapper.text = text;
-		run(wrapper);
+		run(new ReceivedTextWrapper(stream, text));
 	}
 	
-	public void streamReceivedStyle(IStream stream, IWarlockStyle style) {
-		ListenerWrapper wrapper = new ListenerWrapper();
-		wrapper.stream = stream;
-		wrapper.eventType = EventType.ReceivedStyle;
-		wrapper.style = style;
-		run(wrapper);
+	public void streamAddedStyle(IStream stream, IWarlockStyle style) {
+		run(new AddedStyleWrapper(stream, style));
+	}
+	
+	public void streamRemovedStyle(IStream stream, IWarlockStyle style) {
+		run(new RemovedStyleWrapper(stream, style));
 	}
 	
 	public void streamEchoed(IStream stream, String text) {
-		ListenerWrapper wrapper = new ListenerWrapper();
-		wrapper.stream = stream;
-		wrapper.text = text;
-		wrapper.eventType = EventType.Echoed;
-		run(wrapper);
+		run(new EchoedWrapper(stream, text));
 	}
 	
 	public void streamPrompted(IStream stream, String prompt) {
-		ListenerWrapper wrapper = new ListenerWrapper();
-		wrapper.stream = stream;
-		wrapper.text = prompt;
-		wrapper.eventType = EventType.Prompted;
-		run(wrapper);
+		run(new PromptedWrapper(stream, prompt));
 	}
 
 	public void streamDonePrompting (IStream stream) { }

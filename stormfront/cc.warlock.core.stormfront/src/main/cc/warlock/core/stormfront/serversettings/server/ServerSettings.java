@@ -267,15 +267,15 @@ public class ServerSettings implements Comparable<ServerSettings>
 	{
 		// Needed so our settings are validated by other Stormfront clients
 		
-		ICommand command = new Command(
-			SETTING_UPDATE_PREFIX +
-			ServerSetting.UPDATE_PREFIX +
-			"<settings client=\"" + clientVersion + "\" major=\"" + majorVersion + "\"></settings>" +
-			"<settings client=\"" + clientVersion + "\" major=\"" + (++majorVersion) + "\"></settings>" +
-			ServerSetting.UPDATE_SUFFIX, new Date());
-		command.setInHistory(true);
-		
-		client.send(command);
+		try {
+			client.getConnection().send(SETTING_UPDATE_PREFIX +
+					ServerSetting.UPDATE_PREFIX +
+					"<settings client=\"" + clientVersion + "\" major=\"" + majorVersion + "\"></settings>" +
+					"<settings client=\"" + clientVersion + "\" major=\"" + (++majorVersion) + "\"></settings>" +
+					ServerSetting.UPDATE_SUFFIX + "\n");
+		} catch(IOException e) {
+			e.printStackTrace();
+		}
 	}
 	
 	public Palette getPalette ()

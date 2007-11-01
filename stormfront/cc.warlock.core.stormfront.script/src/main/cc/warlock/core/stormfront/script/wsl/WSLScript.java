@@ -169,7 +169,7 @@ public class WSLScript extends AbstractScript {
 			// TODO handle the exception
 		}
 
-		commands.echo("[script started: " + getName() + "]");
+		client.getDefaultStream().echo("[script started: " + getName() + "]\n");
 		running = true;
 		stopped = false;
 		commands.waitForRoundtime();
@@ -227,7 +227,7 @@ public class WSLScript extends AbstractScript {
 		stopped = true;
 		commands.stop();
 		
-		commands.echo("[script stopped: " + getName() + "]");
+		client.getDefaultStream().echo("[script stopped: " + getName() + "]\n");
 		super.stop();
 	}
 
@@ -235,7 +235,7 @@ public class WSLScript extends AbstractScript {
 		running = false;
 		//pauseLine = nextLine;
 		
-		commands.echo("[script paused: " + getName() + "]");
+		client.getDefaultStream().echo("[script paused: " + getName() + "]\n");
 		super.suspend();
 	}
 	
@@ -244,7 +244,7 @@ public class WSLScript extends AbstractScript {
 		//nextLine = pauseLine;
 		running = true;
 		
-		commands.echo("[script resumed: " + getName() + "]");
+		client.getDefaultStream().echo("[script resumed: " + getName() + "]\n");
 
 		super.resume();
 		
@@ -446,9 +446,9 @@ public class WSLScript extends AbstractScript {
 				gotoLine(command);
 			}
 			else { // TODO: Fix gotoLabel to throw an exception instead of outputting to user
-				commands.echo ("***********");
-				commands.echo ("*** WARNING: Label \"" + label + "\" doesn't exist, skipping goto statement ***");
-				commands.echo ("***********");
+				client.getDefaultStream().echo ("***********\n");
+				client.getDefaultStream().echo ("*** WARNING: Label \"" + label + "\" doesn't exist, skipping goto statement ***\n");
+				client.getDefaultStream().echo ("***********\n");
 			}
 		}
 	}
@@ -499,9 +499,9 @@ public class WSLScript extends AbstractScript {
 	
 	protected void gosubReturn () {
 		if (callstack.empty()) {
-			commands.echo ("***********");
-			commands.echo ("*** WARNING: No outstanding calls were executed, skipping return statement ***");
-			commands.echo ("***********");
+			client.getDefaultStream().echo ("***********\n");
+			client.getDefaultStream().echo ("*** WARNING: No outstanding calls were executed, skipping return statement ***\n");
+			client.getDefaultStream().echo ("***********\n");
 		} else {
 			curLine = nextLine = callstack.pop();
 		}
@@ -529,7 +529,7 @@ public class WSLScript extends AbstractScript {
 				commands.waitForRoundtime();
 			} else {
 				if(!stopped)
-					commands.echo("*** Internal error, no match was found!! ***\n");
+					client.getDefaultStream().echo("*** Internal error, no match was found!! ***\n");
 			}
 		}
 	}
@@ -570,7 +570,7 @@ public class WSLScript extends AbstractScript {
 				Match match = new TextMatch(m.group(2));
 				addMatch(m.group(1), match);
 			} else {
-				commands.echo(WSLScript.this, "Bad format for match");
+				commands.echo("Bad format for match");
 				stop();
 			}
 		}
@@ -622,7 +622,7 @@ public class WSLScript extends AbstractScript {
 	protected class WSLPut extends WSLCommand {
 		
 		public void execute(String arguments) {
-			commands.put(WSLScript.this, arguments);
+			commands.put(arguments);
 		}
 	}
 	
@@ -630,7 +630,7 @@ public class WSLScript extends AbstractScript {
 		
 		public void execute (String arguments)
 		{
-			commands.echo(WSLScript.this, arguments);
+			commands.echo(arguments);
 		}
 	}
 	

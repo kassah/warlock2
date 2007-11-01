@@ -64,7 +64,7 @@ public class CommandMacroHandler implements IMacroHandler {
 			}
 		}
 		
-		viewer.setCurrentCommand(new Command(newCommand, new Date()));
+		viewer.setCurrentCommand(newCommand);
 		return true;
 	}
 	

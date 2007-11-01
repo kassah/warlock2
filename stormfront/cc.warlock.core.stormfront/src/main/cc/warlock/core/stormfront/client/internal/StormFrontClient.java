@@ -98,13 +98,13 @@ public class StormFrontClient extends WarlockClient implements IStormFrontClient
 	}
 	
 	@Override
-	public void send(String command) {
+	public void send(String prefix, String command) {
 		String scriptPrefix = ScriptConfiguration.instance().getScriptPrefix();
 		
 		if (command.startsWith(scriptPrefix)){
 			runScriptCommand(command);
 		} else {
-			super.send(command);
+			super.send(prefix, command);
 		}
 	}
 	

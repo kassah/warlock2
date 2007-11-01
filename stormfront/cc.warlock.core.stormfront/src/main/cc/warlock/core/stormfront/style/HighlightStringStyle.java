@@ -18,12 +18,4 @@ public class HighlightStringStyle extends WarlockStyle implements
 	public HighlightString getHighlightString() {
 		return string;
 	}
-
-	public static HighlightStringStyle createEndStyle (HighlightString string)
-	{
-		HighlightStringStyle style = new HighlightStringStyle(string);
-		style.endStyle = true;
-		
-		return style;
-	}
 }

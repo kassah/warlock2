@@ -8,8 +8,6 @@ import java.util.regex.MatchResult;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-import org.apache.commons.lang.StringEscapeUtils;
-
 import cc.warlock.core.client.IWarlockClient;
 import cc.warlock.core.client.IWarlockStyle;
 import cc.warlock.core.client.internal.Stream;
@@ -42,9 +40,13 @@ public class StormFrontStream extends Stream {
 			{
 				super.send(event.text);
 			}
-			else if (event.type == StreamEvent.Type.Style)
+			else if (event.type == StreamEvent.Type.AddStyle)
 			{
-				super.sendStyle(event.style);
+				super.addStyle(event.style);
+			}
+			else if (event.type == StreamEvent.Type.RemoveStyle)
+			{
+				super.removeStyle(event.style);
 			}
 		}
 	}
@@ -53,7 +55,7 @@ public class StormFrontStream extends Stream {
 		public String text;
 		public IWarlockStyle style;
 		
-		public static enum Type { Text, Style };
+		public static enum Type { Text, AddStyle, RemoveStyle };
 		public Type type;
 		
 		public StreamEvent (String text)
@@ -62,9 +64,12 @@ public class StormFrontStream extends Stream {
 			this.text = text;
 		}
 		
-		public StreamEvent (IWarlockStyle style)
+		public StreamEvent (IWarlockStyle style, boolean add)
 		{
-			this.type = Type.Style;
+			if(add)
+				this.type = Type.AddStyle;
+			else
+				this.type = Type.RemoveStyle;
 			this.style = style;
 		}
 	}
@@ -116,13 +121,16 @@ public class StormFrontStream extends Stream {
 			String match = result.group();
 			
 			HighlightString string = client.getServerSettings().getHighlightString(match);
-			events.add(new StreamEvent(new HighlightStringStyle(string)));
+			IWarlockStyle style = new HighlightStringStyle(string);
+			style.setFGColor(string.getForegroundColor());
+			style.setBGColor(string.getBackgroundColor());
+			events.add(new StreamEvent(style, true));
 			
 			String newRegex = regex.replaceAll("\\|" + escapeRegex(match), "");
 			newRegex = newRegex.replaceAll(escapeRegex(match) +"\\|", "");
 			getHighlightEvents(match, newRegex, events);
 			
-			events.add(new StreamEvent(HighlightStringStyle.createEndStyle(string)));
+			events.add(new StreamEvent(style, false));
 		}
 		
 		if (outsideTokens.length > surroundingIndex)

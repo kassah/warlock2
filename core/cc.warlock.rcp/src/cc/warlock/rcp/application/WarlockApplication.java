@@ -5,9 +5,7 @@ package cc.warlock.rcp.application;
 
 import java.util.Map;
 import java.util.Timer;
-import java.util.TimerTask;
 
-import org.eclipse.core.runtime.NullProgressMonitor;
 import org.eclipse.equinox.app.IApplication;
 import org.eclipse.equinox.app.IApplicationContext;
 import org.eclipse.swt.widgets.Display;

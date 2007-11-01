@@ -27,7 +27,7 @@ public class JavascriptCommands {
 	}
 
 	public void echo(String text) {
-		commands.echo(script, text);
+		commands.echo(text);
 	}
 
 	public Match matchWait(Match[] matches) {
@@ -54,7 +54,7 @@ public class JavascriptCommands {
 	}
 
 	public void put(String text) {
-		commands.put(script, text);
+		commands.put(text);
 	}
 	
 	public void waitFor(String string)

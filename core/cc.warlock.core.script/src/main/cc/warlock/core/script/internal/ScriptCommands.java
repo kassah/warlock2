@@ -2,7 +2,6 @@ package cc.warlock.core.script.internal;
 
 import java.util.ArrayList;
 import java.util.Collections;
-import java.util.Date;
 import java.util.List;
 import java.util.concurrent.LinkedBlockingQueue;
 import java.util.concurrent.TimeUnit;
@@ -14,8 +13,6 @@ import cc.warlock.core.client.IStream;
 import cc.warlock.core.client.IStreamListener;
 import cc.warlock.core.client.IWarlockClient;
 import cc.warlock.core.client.IWarlockStyle;
-import cc.warlock.core.client.internal.Command;
-import cc.warlock.core.script.IScript;
 import cc.warlock.core.script.IScriptCommands;
 import cc.warlock.core.script.Match;
 
@@ -23,6 +20,8 @@ public class ScriptCommands implements IScriptCommands, IStreamListener
 {
 
 	protected IWarlockClient client;
+	protected String scriptName;
+	
 	protected final Lock lock = new ReentrantLock();
 	
 	protected List<LinkedBlockingQueue<String>> textWaiters = Collections.synchronizedList(new ArrayList<LinkedBlockingQueue<String>>());
@@ -41,19 +40,16 @@ public class ScriptCommands implements IScriptCommands, IStreamListener
 	
 	protected Thread pausedThread;
 	
-	public ScriptCommands (IWarlockClient client)
+	public ScriptCommands (IWarlockClient client, String scriptName)
 	{
 		this.client = client;
+		this.scriptName = scriptName;
 		
 		client.getDefaultStream().addStreamListener(this);
 	}
 	
 	public void echo (String text) {
-		client.getDefaultStream().echo(text);
-	}
-	
-	public void echo (IScript script, String text) {
-		client.getDefaultStream().echo("[" + script.getName() + "]: " + text);
+		client.getDefaultStream().echo("[" + scriptName + "]: " + text + "\n");
 	}
 	
 	protected void assertPrompt() {
@@ -115,7 +111,6 @@ public class ScriptCommands implements IScriptCommands, IStreamListener
 
 	public void move (String direction) {
 		client.send(direction);
-		client.getDefaultStream().echo(direction);
 		nextRoom();
 	}
 
@@ -145,25 +140,11 @@ public class ScriptCommands implements IScriptCommands, IStreamListener
 			pausedThread = null;
 		}
 	}
-
-	public void put (String text) {
-		// false command so it doesn't get added to the command history
-		Command command = new Command(text, new Date());
-		command.setInHistory(true);
-		
-		client.send(command);
-		client.getDefaultStream().echo(text);
-	}
 	
-	public void put (IScript script, String text) {
+	public void put (String text) {
 		assertPrompt();
 		
-		// false command so it doesn't get added to the command history
-		Command command = new Command(text, new Date());
-		command.setInHistory(true);
-		
-		client.send(command);
-		client.getDefaultStream().echo("[" + script.getName() + "]: " + text);
+		client.send("[" + scriptName + "]: ", text);
 	}
 
 	public void waitFor (Match match) {
@@ -232,7 +213,8 @@ public class ScriptCommands implements IScriptCommands, IStreamListener
 	}
 	
 	public void streamDonePrompting (IStream stream) { }
-	public void streamReceivedStyle(IStream stream, IWarlockStyle style) {	}
+	public void streamAddedStyle(IStream stream, IWarlockStyle style) {	}
+	public void streamRemovedStyle(IStream stream, IWarlockStyle style) {	}
 	
 	public void streamReceivedText(IStream stream, String text) {
 		System.out.print("Sending out line: " + text);

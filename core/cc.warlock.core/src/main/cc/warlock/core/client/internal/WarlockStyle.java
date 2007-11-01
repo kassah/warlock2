@@ -7,6 +7,7 @@ import java.util.Arrays;
 import java.util.Collection;
 
 import cc.warlock.core.client.IWarlockStyle;
+import cc.warlock.core.client.WarlockColor;
 
 
 public class WarlockStyle implements IWarlockStyle {
@@ -14,7 +15,8 @@ public class WarlockStyle implements IWarlockStyle {
 	private URL linkAddress;
 	private String styleName;
 	private Collection<StyleType> styleTypes;
-	protected boolean endStyle = false;
+	private WarlockColor FGColor;
+	private WarlockColor BGColor;
 	
 	public static final WarlockStyle EMPTY_STYLE = new WarlockStyle(new StyleType[] { StyleType.EMPTY }, "empty", null);
 	
@@ -50,22 +52,6 @@ public class WarlockStyle implements IWarlockStyle {
 		return new WarlockStyle(new StyleType[] { StyleType.BOLD }, "bold", null);
 	}
 	
-	public static WarlockStyle createEndCustomStyle (String styleName)
-	{
-		WarlockStyle style = createCustomStyle(styleName);
-		style.endStyle = true;
-		
-		return style;
-	}
-	
-	public static WarlockStyle createEndBoldStyle ()
-	{
-		WarlockStyle style = createBoldStyle();
-		style.endStyle = true;
-		
-		return style;
-	}
-	
 	public URL getLinkAddress() {
 		return linkAddress;
 	}
@@ -76,6 +62,14 @@ public class WarlockStyle implements IWarlockStyle {
 
 	public Collection<StyleType> getStyleTypes() {
 		return styleTypes;
+	}
+	
+	public WarlockColor getFGColor() {
+		return FGColor;
+	}
+	
+	public WarlockColor getBGColor() {
+		return BGColor;
 	}
 	
 	public void addStyleType (StyleType styleType)
@@ -100,7 +94,11 @@ public class WarlockStyle implements IWarlockStyle {
 		}
 	}
 	
-	public boolean isEndStyle() {
-		return endStyle;
+	public void setFGColor(WarlockColor color) {
+		FGColor = color;
+	}
+	
+	public void setBGColor(WarlockColor color) {
+		BGColor = color;
 	}
 }
