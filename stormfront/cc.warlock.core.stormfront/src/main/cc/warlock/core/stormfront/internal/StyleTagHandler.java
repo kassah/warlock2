@@ -9,6 +9,7 @@ package cc.warlock.core.stormfront.internal;
 import cc.warlock.core.client.IWarlockStyle;
 import cc.warlock.core.client.internal.WarlockStyle;
 import cc.warlock.core.stormfront.IStormFrontProtocolHandler;
+import cc.warlock.core.stormfront.serversettings.server.Preset;
 import cc.warlock.core.stormfront.xml.StormFrontAttributeList;
 
 
@@ -28,28 +29,24 @@ public class StyleTagHandler extends DefaultTagHandler {
 	}
 	
 	public String[] getTagNames() {
-		return new String[] { "style", "output" };
+		return new String[] { "style" };
 	}
 
 	public void handleStart(StormFrontAttributeList attributes) {
 		if(currentStyle != null) {
 			handler.getCurrentStream().removeStyle(currentStyle);
+			currentStyle = null;
 		}
 		
-		String styleId = null;
-		
-		if ("style".equals(getCurrentTag()))
-			styleId = attributes.getValue("id");
-		else if ("output".equals(getCurrentTag()))
-			styleId = attributes.getValue("class");
+		String styleId = attributes.getValue("id");
 		
 		if (styleId != null && styleId.length() > 0)
 		{
-			currentStyle = WarlockStyle.createCustomStyle(styleId);
-			
-			if (styleId.equals("mono")) {
-				currentStyle.addStyleType(IWarlockStyle.StyleType.MONOSPACE);
-			}
+			Preset preset = handler.getClient().getServerSettings().getPreset(styleId);
+			if(preset != null)
+				currentStyle = preset.getStyle();
+			else
+				currentStyle = new WarlockStyle();
 			
 			handler.getCurrentStream().addStyle(currentStyle);
 		}

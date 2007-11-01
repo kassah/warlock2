@@ -2,13 +2,11 @@ package cc.warlock.rcp.ui.style;
 
 import org.eclipse.jface.resource.JFaceResources;
 import org.eclipse.swt.SWT;
-import org.eclipse.swt.custom.StyleRange;
 
 import cc.warlock.core.client.IWarlockStyle;
 import cc.warlock.core.client.internal.WarlockStyle;
 import cc.warlock.rcp.ui.IStyleProvider;
 import cc.warlock.rcp.ui.StyleRangeWithData;
-import cc.warlock.rcp.ui.WarlockText;
 
 public class DefaultStyleProvider implements IStyleProvider {
 	
@@ -23,13 +21,9 @@ public class DefaultStyleProvider implements IStyleProvider {
 		return _instance;
 	}
 	
-	public StyleRangeWithData getStyleRange (IWarlockStyle style, int start)
-	{
-		if (style.getStyleTypes().contains(IWarlockStyle.StyleType.EMPTY))
-			return null;
-		
+	public StyleRangeWithData getStyleRange (IWarlockStyle style)
+	{	
 		StyleRangeWithData range = new StyleRangeWithData();
-		range.start = start;
 		range.fontStyle = 0;
 		
 		for (IWarlockStyle.StyleType styleType : style.getStyleTypes())
@@ -47,10 +41,5 @@ public class DefaultStyleProvider implements IStyleProvider {
 		}
 		
 		return range;
-	}
-	
-	public StyleRangeWithData getEchoStyle (int start)
-	{
-		return getStyleRange(WarlockStyle.createCustomStyle("command"), start);
 	}
 }

@@ -10,7 +10,7 @@ public class HighlightStringStyle extends WarlockStyle implements
 	
 	public HighlightStringStyle (HighlightString string)
 	{
-		super(new StyleType[] { StyleType.CUSTOM }, "custom", null);
+		super();
 		
 		this.string = string;
 	}

@@ -26,7 +26,6 @@ public interface IStormFrontProtocolHandler extends IStormFrontXMLHandler {
 	public void pushStream(String name);
 	public void popStream();
 	public IStream getCurrentStream();
-	public IWarlockStyle getCurrentStyle();
 	
 //	public void pushBuffer();
 //	public IStyledString popBuffer();
@@ -35,7 +34,4 @@ public interface IStormFrontProtocolHandler extends IStormFrontXMLHandler {
 	
 	public void startSavingRawXML(StringBuffer buffer, String endOnTag);
 	public void stopSavingRawXML();
-	
-	public void setCurrentStyle (IWarlockStyle style);
-	public void clearCurrentStyle ();
 }

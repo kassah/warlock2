@@ -382,12 +382,17 @@ public class WarlockText implements LineBackgroundListener {
 		int charCount = textWidget.getCharCount();
 		textWidget.append(string.toString());
 		for(WarlockStringStyleRange range : string.getStyles()) {
-			StyleRangeWithData styleRange = StyleProviders.getStyleProvider(string.getClient()).getStyleRange(range.style, charCount + range.start);
+			StyleRangeWithData styleRange = (StyleRangeWithData)StyleProviders.getStyleProvider(string.getClient()).getStyleRange(range.style);
+			styleRange.start = charCount + range.start;
 			styleRange.length = range.length;
 			if(range.style.getFGColor() != null)
 				styleRange.foreground = ColorUtil.warlockColorToColor(range.style.getFGColor());
 			if(range.style.getBGColor() != null)
 				styleRange.background = ColorUtil.warlockColorToColor(range.style.getBGColor());
+			if(range.style.isFullLine()) {
+				setLineForeground(textWidget.getLineAtOffset(styleRange.start), styleRange.foreground);
+				setLineBackground(textWidget.getLineAtOffset(styleRange.start), styleRange.background);
+			}
 			textWidget.setStyleRange(styleRange);
 		}
 		constrainLineLimit(atBottom);

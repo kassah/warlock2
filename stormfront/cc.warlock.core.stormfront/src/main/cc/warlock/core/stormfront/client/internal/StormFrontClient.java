@@ -56,7 +56,6 @@ public class StormFrontClient extends WarlockClient implements IStormFrontClient
 	protected IStormFrontProtocolHandler handler;
 	protected boolean isBold;
 	protected ClientProperty<String> playerId, characterName, roomDescription;
-	protected IWarlockStyle currentStyle = WarlockStyle.EMPTY_STYLE;
 	protected ServerSettings serverSettings;
 	protected RoundtimeRunnable rtRunnable;
 	protected Thread rtThread;
@@ -256,14 +255,6 @@ public class StormFrontClient extends WarlockClient implements IStormFrontClient
 		return isBold;
 	}
 
-	public IWarlockStyle getCurrentStyle() {
-		return currentStyle;
-	}
-
-	public void setCurrentStyle(IWarlockStyle currentStyle) {
-		this.currentStyle = currentStyle;
-	}
-
 	public ClientProperty<String> getPlayerId() {
 		return playerId;
 	}
@@ -374,5 +365,9 @@ public class StormFrontClient extends WarlockClient implements IStormFrontClient
 	protected void finalize() throws Throwable {
 		WarlockClientRegistry.removeClient(this);
 		super.finalize();
+	}
+	
+	public IWarlockStyle getCommandStyle() {
+		return serverSettings.getPreset("command").getStyle();
 	}
 }

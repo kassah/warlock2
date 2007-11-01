@@ -96,4 +96,9 @@ public interface IWarlockClient {
 	 * @return The skin for this client
 	 */
 	public IWarlockSkin getSkin();
+	
+	/**
+	 * @return The style for commands output by this client
+	 */
+	public IWarlockStyle getCommandStyle();
 }

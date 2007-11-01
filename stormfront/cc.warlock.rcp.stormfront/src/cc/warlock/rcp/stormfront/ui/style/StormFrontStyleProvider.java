@@ -2,16 +2,15 @@ package cc.warlock.rcp.stormfront.ui.style;
 
 import org.eclipse.jface.resource.JFaceResources;
 import org.eclipse.swt.SWT;
-import org.eclipse.swt.graphics.Color;
 import org.eclipse.swt.graphics.Font;
 import org.eclipse.swt.widgets.Display;
 
 import cc.warlock.core.client.IWarlockStyle;
 import cc.warlock.core.client.WarlockColor;
-import cc.warlock.core.stormfront.serversettings.server.Preset;
 import cc.warlock.core.stormfront.serversettings.server.ServerSettings;
 import cc.warlock.rcp.ui.StyleRangeWithData;
 import cc.warlock.rcp.ui.style.DefaultStyleProvider;
+import cc.warlock.rcp.util.ColorUtil;
 
 public class StormFrontStyleProvider extends DefaultStyleProvider {
 
@@ -22,10 +21,10 @@ public class StormFrontStyleProvider extends DefaultStyleProvider {
 		this.settings = settings;
 	}
 	
-	public StyleRangeWithData getStyleRange (IWarlockStyle style, int start)
+	public StyleRangeWithData getStyleRange (IWarlockStyle style)
 	{
 		Display display = Display.getDefault();
-		StyleRangeWithData range = super.getStyleRange(style, start);
+		StyleRangeWithData range = super.getStyleRange(style);
 		
 		if (style.getStyleTypes().contains(IWarlockStyle.StyleType.MONOSPACE))
 		{
@@ -40,19 +39,13 @@ public class StormFrontStyleProvider extends DefaultStyleProvider {
 			}
 		}
 		
-		Preset stylePreset = settings.getPreset(style.getStyleName());
-		WarlockColor foreground = stylePreset == null ? WarlockColor.DEFAULT_COLOR : stylePreset.getForegroundColor();
-		WarlockColor background = stylePreset == null ? WarlockColor.DEFAULT_COLOR : stylePreset.getBackgroundColor();
+		WarlockColor foreground = style.getFGColor();
+		WarlockColor background = style.getBGColor();
 		
-		if (foreground != WarlockColor.DEFAULT_COLOR)
-			range.foreground = new Color(display, foreground.getRed(), foreground.getGreen(), foreground.getBlue());
-		if (background != WarlockColor.DEFAULT_COLOR)
-			range.background = new Color(display, background.getRed(), background.getGreen(), background.getBlue());
-		
-		if (stylePreset != null && stylePreset.isFillEntireLine())
-		{
-			range.data.put(FILL_ENTIRE_LINE, "true");
-		}
+		if (foreground != null && foreground != WarlockColor.DEFAULT_COLOR)
+			range.foreground = ColorUtil.warlockColorToColor(foreground);
+		if (background != null && background != WarlockColor.DEFAULT_COLOR)
+			range.background = ColorUtil.warlockColorToColor(background);
 		
 		return range;
 	}

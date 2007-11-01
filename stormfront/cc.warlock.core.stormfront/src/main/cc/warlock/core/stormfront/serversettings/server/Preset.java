@@ -1,5 +1,7 @@
 package cc.warlock.core.stormfront.serversettings.server;
 
+import cc.warlock.core.client.IWarlockStyle;
+import cc.warlock.core.client.internal.WarlockStyle;
 import cc.warlock.core.stormfront.xml.StormFrontElement;
 
 public class Preset extends ColorSetting {
@@ -120,5 +122,14 @@ public class Preset extends ColorSetting {
 	public Preset getOriginalPreset ()
 	{
 		return originalPreset;
+	}
+	
+	public IWarlockStyle getStyle() {
+		WarlockStyle style = new WarlockStyle();
+		style.setFGColor(this.getForegroundColor());
+		style.setBGColor(this.getBackgroundColor());
+		style.setFullLine(this.fillEntireLine);
+		
+		return style;
 	}
 }

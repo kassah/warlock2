@@ -69,7 +69,7 @@ public class LoginUtil {
 			"* or your internet connection is not active\n" +
 			"******************************************************************\n";
 			
-			IWarlockStyle style = WarlockStyle.createCustomStyle("mono");
+			IWarlockStyle style = new WarlockStyle();
 			style.addStyleType(IWarlockStyle.StyleType.MONOSPACE);
 			
 			client.getDefaultStream().addStyle(style);

@@ -14,8 +14,6 @@ import java.util.Stack;
 import org.apache.commons.lang.StringEscapeUtils;
 
 import cc.warlock.core.client.IStream;
-import cc.warlock.core.client.IWarlockStyle;
-import cc.warlock.core.client.internal.WarlockStyle;
 import cc.warlock.core.stormfront.IStormFrontProtocolHandler;
 import cc.warlock.core.stormfront.IStormFrontTagHandler;
 import cc.warlock.core.stormfront.client.IStormFrontClient;
@@ -38,7 +36,6 @@ public class StormFrontProtocolHandler implements IStormFrontProtocolHandler {
 	protected StringBuffer rawXMLBuffer;
 	protected String rawXMLEndOnTag;
 	protected int currentSpacing = 0;
-	protected IWarlockStyle currentStyle = WarlockStyle.EMPTY_STYLE;
 	
  	public StormFrontProtocolHandler(IStormFrontClient client) {
 		
@@ -70,6 +67,7 @@ public class StormFrontProtocolHandler implements IStormFrontProtocolHandler {
 		new RightTagHandler(this);
 		new ComponentTagHandler(this);
 		new StyleTagHandler(this);
+		new OutputTagHandler(this);
 		
 		new BoldTagHandler(this);
 		new PushBoldTagHandler(this);
@@ -290,18 +288,6 @@ public class StormFrontProtocolHandler implements IStormFrontProtocolHandler {
 		for (int i = 0; i < times; i++)
 			str += toRepeat;
 		return str;
-	}
-	
-	public void setCurrentStyle(IWarlockStyle style) {
-		this.currentStyle = style;
-	}
-	
-	public IWarlockStyle getCurrentStyle() {
-		return currentStyle;
-	}
-	
-	public void clearCurrentStyle() {
-		this.currentStyle = WarlockStyle.EMPTY_STYLE;
 	}
 	
 //	public void sendAndPopBuffer() {

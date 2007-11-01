@@ -25,7 +25,7 @@ public class PushBoldTagHandler extends DefaultTagHandler {
 	public void handleEnd() {
 		if (getCurrentTag().equals("pushBold"))
 		{
-			style = WarlockStyle.createBoldStyle();
+			style = handler.getClient().getServerSettings().getPreset("bold").getStyle();
 			handler.getCurrentStream().addStyle(style);
 		}
 		

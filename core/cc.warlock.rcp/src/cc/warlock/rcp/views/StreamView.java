@@ -122,6 +122,7 @@ public class StreamView extends ViewPart implements IStreamListener, IGameViewFo
 	{
 		if (!clientStreams.containsKey(client))
 		{
+			// TODO move this section into WarlockText
 			WarlockText text = new WarlockText(book, SWT.V_SCROLL);
 			GridData data = new GridData(GridData.FILL, GridData.FILL, true, true);
 			text.setLayoutData(data);
@@ -306,7 +307,7 @@ public class StreamView extends ViewPart implements IStreamListener, IGameViewFo
 			int styleStart = string.length();
 			string.append(text);
 			// TODO: make a different style for client messages
-			string.addStyle(styleStart, text.length(), WarlockStyle.createCustomStyle("command"));
+			string.addStyle(styleStart, text.length(), client.getCommandStyle());
 			
 			WarlockText textWidget = getTextForClient(client);
 			textWidget.append(string);
@@ -317,7 +318,8 @@ public class StreamView extends ViewPart implements IStreamListener, IGameViewFo
 		if (this.mainStream.equals(stream) || this.streams.contains(stream))
 		{
 			WarlockString string = new WarlockString(client, text);
-			string.addStyle(0, text.length(), WarlockStyle.createCustomStyle("command"));
+			
+			string.addStyle(0, text.length(), client.getCommandStyle());
 			
 			WarlockText textWidget = getTextForClient(client);
 			isPrompting = false;

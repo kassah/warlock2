@@ -11,10 +11,8 @@ import java.util.Collection;
 public interface IWarlockStyle {
 
 	public enum StyleType {
-		BOLD, ITALIC, UNDERLINE, LINK, MONOSPACE, EMPTY, CUSTOM
+		BOLD, ITALIC, UNDERLINE, LINK, MONOSPACE
 	};
-	
-	public String getStyleName();
 	
 	public Collection<StyleType> getStyleTypes();
 	
@@ -22,13 +20,13 @@ public interface IWarlockStyle {
 	
 	public WarlockColor getFGColor();
 	public WarlockColor getBGColor();
+	public boolean isFullLine();
 	
 	public void addStyleType (StyleType styleType);
 
 	public void setLinkAddress(URL linkAddress);
-
-	public void setStyleName(String styleName);
 	
 	public void setFGColor(WarlockColor color);
 	public void setBGColor(WarlockColor color);
+	public void setFullLine(boolean fullLine);
 }
