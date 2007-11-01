@@ -9,7 +9,6 @@ import cc.warlock.core.client.IWarlockStyle;
 public class SWTStreamListener implements IStreamListener {
 	
 	private IStreamListener listener;
-	private ListenerWrapper wrapper = new ListenerWrapper();
 	protected boolean asynch;
 	
 	public SWTStreamListener (IStreamListener listener)
@@ -43,10 +42,6 @@ public class SWTStreamListener implements IStreamListener {
 			case Echoed: listener.streamEchoed(stream, text); break;
 			case Prompted: listener.streamPrompted(stream, text); break;
 			}
-			
-			text = null;
-			style = null;
-			stream = null;
 		}
 	}
 	
@@ -61,12 +56,14 @@ public class SWTStreamListener implements IStreamListener {
 	}
 	
 	public void streamCleared(IStream stream) {
+		ListenerWrapper wrapper = new ListenerWrapper();
 		wrapper.eventType = EventType.Cleared;
 		wrapper.stream = stream;
 		run(wrapper);
 	}
 
 	public void streamReceivedText(IStream stream, String text) {
+		ListenerWrapper wrapper = new ListenerWrapper();
 		wrapper.stream = stream;
 		wrapper.eventType = EventType.ReceivedText;
 		wrapper.text = text;
@@ -74,6 +71,7 @@ public class SWTStreamListener implements IStreamListener {
 	}
 	
 	public void streamReceivedStyle(IStream stream, IWarlockStyle style) {
+		ListenerWrapper wrapper = new ListenerWrapper();
 		wrapper.stream = stream;
 		wrapper.eventType = EventType.ReceivedStyle;
 		wrapper.style = style;
@@ -81,6 +79,7 @@ public class SWTStreamListener implements IStreamListener {
 	}
 	
 	public void streamEchoed(IStream stream, String text) {
+		ListenerWrapper wrapper = new ListenerWrapper();
 		wrapper.stream = stream;
 		wrapper.text = text;
 		wrapper.eventType = EventType.Echoed;
@@ -88,6 +87,7 @@ public class SWTStreamListener implements IStreamListener {
 	}
 	
 	public void streamPrompted(IStream stream, String prompt) {
+		ListenerWrapper wrapper = new ListenerWrapper();
 		wrapper.stream = stream;
 		wrapper.text = prompt;
 		wrapper.eventType = EventType.Prompted;
