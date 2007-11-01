@@ -58,7 +58,6 @@ public class StreamView extends ViewPart implements IStreamListener, IGameViewFo
 	protected boolean isPrompting = false;
 	protected boolean multiClient = false;
 	protected boolean buffering = false;
-	protected WarlockString echoBuffer;
 	protected ArrayList<IWarlockStyle> styles = new ArrayList<IWarlockStyle>();
 	
 	protected WarlockString bufferedText;
@@ -301,21 +300,28 @@ public class StreamView extends ViewPart implements IStreamListener, IGameViewFo
 	public void streamEchoed(IStream stream, String text) {
 		if (this.mainStream.equals(stream) || this.streams.contains(stream))
 		{
+			WarlockString string = new WarlockString(client);
+			if(isPrompting)
+				string.append("\n");
+			int styleStart = string.length();
+			string.append(text);
+			// TODO: make a different style for client messages
+			string.addStyle(styleStart, text.length(), WarlockStyle.createCustomStyle("command"));
+			
+			WarlockText textWidget = getTextForClient(client);
+			textWidget.append(string);
+		}
+	}
+	
+	public void streamReceivedCommand(IStream stream, String text) {
+		if (this.mainStream.equals(stream) || this.streams.contains(stream))
+		{
 			WarlockString string = new WarlockString(client, text);
 			string.addStyle(0, text.length(), WarlockStyle.createCustomStyle("command"));
 			
-			if (isPrompting)
-			{
-				WarlockText textWidget = getTextForClient(client);
-				isPrompting = false;
-				textWidget.append(string);
-			}
-			else
-			{
-				if(echoBuffer == null)
-					echoBuffer = new WarlockString(client);
-				echoBuffer.append(string);
-			}
+			WarlockText textWidget = getTextForClient(client);
+			isPrompting = false;
+			textWidget.append(string);
 		}
 	}
 	
@@ -326,7 +332,7 @@ public class StreamView extends ViewPart implements IStreamListener, IGameViewFo
 			isPrompting = true;
 			WarlockString text = new WarlockString(client);
 			
-			if (buffering && bufferedText != null)
+			if (bufferedText != null)
 			{
 				text.append(bufferedText);
 				bufferedText = null;
@@ -334,14 +340,6 @@ public class StreamView extends ViewPart implements IStreamListener, IGameViewFo
 			
 			styles.clear();
 			text.append(prompt);
-			
-			if (echoBuffer != null)
-			{
-				text.append(echoBuffer);
-
-				echoBuffer = null;
-				isPrompting = false;
-			}
 			
 			textWidget.append(text);
 		}

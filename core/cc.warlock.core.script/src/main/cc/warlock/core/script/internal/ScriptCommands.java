@@ -212,7 +212,7 @@ public class ScriptCommands implements IScriptCommands, IStreamListener
 		}
 	}
 	
-	public void streamDonePrompting (IStream stream) { }
+	public void streamReceivedCommand (IStream stream, String text) { }
 	public void streamAddedStyle(IStream stream, IWarlockStyle style) {	}
 	public void streamRemovedStyle(IStream stream, IWarlockStyle style) {	}
 	

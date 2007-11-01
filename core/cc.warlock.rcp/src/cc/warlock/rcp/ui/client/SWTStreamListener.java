@@ -50,36 +50,6 @@ public class SWTStreamListener implements IStreamListener {
 		}
 	}
 	
-	private class AddedStyleWrapper implements Runnable
-	{
-		private IStream stream;
-		private IWarlockStyle style;
-		
-		public AddedStyleWrapper(IStream stream, IWarlockStyle style) {
-			this.stream = stream;
-			this.style = style;
-		}
-		
-		public void run() {
-			listener.streamAddedStyle(stream, style);
-		}
-	}
-	
-	private class RemovedStyleWrapper implements Runnable
-	{
-		private IStream stream;
-		private IWarlockStyle style;
-		
-		public RemovedStyleWrapper(IStream stream, IWarlockStyle style) {
-			this.stream = stream;
-			this.style = style;
-		}
-		
-		public void run() {
-			listener.streamRemovedStyle(stream, style);
-		}
-	}
-	
 	private class EchoedWrapper implements Runnable
 	{
 		private IStream stream;
@@ -92,6 +62,21 @@ public class SWTStreamListener implements IStreamListener {
 		
 		public void run() {
 			listener.streamEchoed(stream, text);
+		}
+	}
+	
+	private class CommandWrapper implements Runnable
+	{
+		private IStream stream;
+		private String text;
+		
+		public CommandWrapper(IStream stream, String text) {
+			this.stream = stream;
+			this.text = text;
+		}
+		
+		public void run() {
+			listener.streamReceivedCommand(stream, text);
 		}
 	}
 	
@@ -114,7 +99,7 @@ public class SWTStreamListener implements IStreamListener {
 	{
 		if (asynch)
 		{
-			Display.getDefault().asyncExec(runnable);
+			//Display.getDefault().asyncExec(runnable);
 		} else {
 			Display.getDefault().syncExec(runnable);
 		}
@@ -129,11 +114,11 @@ public class SWTStreamListener implements IStreamListener {
 	}
 	
 	public void streamAddedStyle(IStream stream, IWarlockStyle style) {
-		run(new AddedStyleWrapper(stream, style));
+		listener.streamAddedStyle(stream, style);
 	}
 	
 	public void streamRemovedStyle(IStream stream, IWarlockStyle style) {
-		run(new RemovedStyleWrapper(stream, style));
+		listener.streamRemovedStyle(stream, style);
 	}
 	
 	public void streamEchoed(IStream stream, String text) {
@@ -144,5 +129,7 @@ public class SWTStreamListener implements IStreamListener {
 		run(new PromptedWrapper(stream, prompt));
 	}
 
-	public void streamDonePrompting (IStream stream) { }
+	public void streamReceivedCommand (IStream stream, String text) {
+		run(new CommandWrapper(stream, text));
+	}
 }

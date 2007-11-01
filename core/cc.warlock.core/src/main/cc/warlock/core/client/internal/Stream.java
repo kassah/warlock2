@@ -77,7 +77,6 @@ public class Stream implements IStream {
 	}
 	
 	public void send(String text) {
-//		send (text, WarlockStyle.EMPTY_STYLE);
 		for(IStreamListener listener : listeners) {
 			try {
 				listener.streamReceivedText(this, text);
@@ -88,52 +87,6 @@ public class Stream implements IStream {
 		}
 		isPrompting = false;
 	}
-	
-//	public void send(String data, IWarlockStyle style) {
-//		
-//		if (buffer == null)
-//		{
-//			buffer = new StyledString();
-//		}
-//		int currentOffset = buffer.getBuffer().length();
-//		
-//		buffer.getBuffer().append(data);
-//		if (!buffer.getStyles().contains(style))
-//		{
-//			// allows styles to be relative to the string they're using
-//			style.setStart(style.getStart() + currentOffset);
-//			buffer.addStyle(style);
-//		}
-//		
-//		sendBuffer();
-//	}
-//
-//	public void send (IStyledString text)
-//	{
-//		if (buffer == null)
-//			buffer = new StyledString();
-//		
-//		buffer.append(text);
-//		sendBuffer();
-//	}
-	
-//	private void sendBuffer() {
-//		if (buffer.readyToFlush())
-//		{
-//			
-//			for(IStreamListener listener : listeners) {
-//				try {
-//					listener.streamReceivedText(this, buffer);
-//				} catch (Throwable t) {
-//					// TODO Auto-generated catch block
-//					t.printStackTrace();
-//				}
-//			}
-//			
-//			isPrompting = false;
-//			buffer = null;
-//		}
-//	}
 	
 	public void prompt(String prompt) {
 		isPrompting = true;
@@ -148,10 +101,10 @@ public class Stream implements IStream {
 		}
 	}
 	
-	public void donePrompting() {
+	public void sendCommand(String text) {
 		for (IStreamListener listener : listeners)
 		{
-			listener.streamDonePrompting(this);
+			listener.streamReceivedCommand(this, text);
 		}
 		
 		isPrompting = false;
@@ -170,6 +123,8 @@ public class Stream implements IStream {
 				t.printStackTrace();
 			}
 		}
+		
+		isPrompting = false;
 	}
 	
 	public IProperty<String> getName() {

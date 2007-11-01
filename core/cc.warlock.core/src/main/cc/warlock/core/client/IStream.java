@@ -22,7 +22,7 @@ public interface IStream {
 	public void removeStyle (IWarlockStyle style);
 	
 	public void prompt(String prompt);
-	public void donePrompting();
+	public void sendCommand(String text);
 	public boolean isPrompting();
 	
 	public void echo(String text);

@@ -49,7 +49,7 @@ public abstract class WarlockClient implements IWarlockClient {
 					streamBuffers.get(stream).setLength(0);
 				}
 			}
-			public void streamDonePrompting(IStream stream) {}
+			public void streamReceivedCommand(IStream stream, String text) {}
 			public void streamEchoed(IStream stream, String text) {}
 			public void streamPrompted(IStream stream, String prompt) {
 				if (stream != null) {
@@ -101,18 +101,13 @@ public abstract class WarlockClient implements IWarlockClient {
 		
 		commandHistory.addCommand(command);
 		
-		/* FIXME: instead of stopping prompting, we should add a method
-		 * displayCommand() to IStream. a lot of different places send 
-		 * commands, all of them should be updated with that functionality
-		 */
-		getDefaultStream().donePrompting();
+		String text = command + "\n";
+		if(prefix != null)
+			getDefaultStream().sendCommand(prefix + text);
+		else
+			getDefaultStream().sendCommand(text);
 		
 		try {
-			String text = command + "\n";
-			if(prefix != null)
-				getDefaultStream().echo(prefix + text);
-			else
-				getDefaultStream().echo(text);
 			connection.send(text);
 		} catch(IOException e) {
 			e.printStackTrace();
