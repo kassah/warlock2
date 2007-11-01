@@ -367,17 +367,17 @@ public class WarlockText implements LineBackgroundListener {
 	}
 	
 	public void append(String string) {
-		boolean appendScroll = atBottom();
+		boolean atBottom = atBottom();
 		
 		textWidget.append(string);
-		constrainLineLimit();
+		constrainLineLimit(atBottom);
 
-		if(appendScroll)
+		if(atBottom)
 			scrollToBottom();
 	}
 	
 	public void append(WarlockString string) {
-		boolean appendScroll = atBottom();
+		boolean atBottom = atBottom();
 		
 		int charCount = textWidget.getCharCount();
 		textWidget.append(string.toString());
@@ -390,9 +390,9 @@ public class WarlockText implements LineBackgroundListener {
 				styleRange.background = ColorUtil.warlockColorToColor(range.style.getBGColor());
 			textWidget.setStyleRange(styleRange);
 		}
-		constrainLineLimit();
+		constrainLineLimit(atBottom);
 
-		if(appendScroll)
+		if(atBottom)
 			scrollToBottom();
 	}
 	
@@ -426,7 +426,7 @@ public class WarlockText implements LineBackgroundListener {
 		return textWidget.getTopIndex();
 	}
 	
-	private void constrainLineLimit() {
+	private void constrainLineLimit(boolean atBottom) {
 		if (lineLimit > 0) {
 			int len = getLineCount();
 			if (len > lineLimit) {
@@ -436,7 +436,8 @@ public class WarlockText implements LineBackgroundListener {
 				
 				replaceTextRange(0,offset,"");
 				updateLineBackgrounds(toRemove);
-				setTopIndex(top - toRemove);
+				if(!atBottom)
+					setTopIndex(top - toRemove);
 			}
 		}
 	}
