@@ -24,7 +24,6 @@ import cc.warlock.core.client.IWarlockClient;
 import cc.warlock.core.client.IWarlockStyle;
 import cc.warlock.core.client.PropertyListener;
 import cc.warlock.core.client.WarlockString;
-import cc.warlock.core.client.internal.WarlockStyle;
 import cc.warlock.rcp.configuration.GameViewConfiguration;
 import cc.warlock.rcp.ui.IStyleProvider;
 import cc.warlock.rcp.ui.WarlockText;
@@ -302,8 +301,10 @@ public class StreamView extends ViewPart implements IStreamListener, IGameViewFo
 		if (this.mainStream.equals(stream) || this.streams.contains(stream))
 		{
 			WarlockString string = new WarlockString(client);
-			if(isPrompting)
+			if(isPrompting) {
 				string.append("\n");
+				isPrompting = false;
+			}
 			int styleStart = string.length();
 			string.append(text);
 			// TODO: make a different style for client messages
@@ -345,10 +346,6 @@ public class StreamView extends ViewPart implements IStreamListener, IGameViewFo
 			
 			textWidget.append(text);
 		}
-	}
-	
-	public void streamDonePrompting (IStream stream) {
-		isPrompting = false;
 	}
 
 	public static Collection<StreamView> getOpenViews ()

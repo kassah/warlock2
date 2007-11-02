@@ -123,8 +123,6 @@ public class Stream implements IStream {
 				t.printStackTrace();
 			}
 		}
-		
-		isPrompting = false;
 	}
 	
 	public IProperty<String> getName() {

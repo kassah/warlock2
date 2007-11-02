@@ -24,7 +24,6 @@ import cc.warlock.core.client.internal.CharacterStatus;
 import cc.warlock.core.client.internal.ClientProperty;
 import cc.warlock.core.client.internal.Compass;
 import cc.warlock.core.client.internal.WarlockClient;
-import cc.warlock.core.client.internal.WarlockStyle;
 import cc.warlock.core.script.IScript;
 import cc.warlock.core.script.IScriptListener;
 import cc.warlock.core.script.ScriptEngineRegistry;
