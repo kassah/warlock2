@@ -19,7 +19,7 @@
                id="cc.warlock.rcp.userstreams.dynamicStreams">
          </dynamic>
          <separator
-               name="cc.warlock.rcp.userstreams.endingseperator">
+               name="cc.warlock.rcp.userstreams.window.seperator">
          </separator>
       </menuContribution>
    </extension>
