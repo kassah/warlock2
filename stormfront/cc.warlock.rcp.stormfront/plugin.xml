@@ -86,7 +86,7 @@
          </dynamic>
       </menuContribution>
       <menuContribution
-            locationURI="menu:cc.warlock.rcp.menu.window">
+            locationURI="menu:cc.warlock.rcp.menu.window?after=cc.warlock.rcp.userstreams.window.seperator">
          <dynamic
                class="cc.warlock.rcp.stormfront.ui.menu.StreamWindowContributionItem"
                id="cc.warlock.rcp.dynamicViews">
