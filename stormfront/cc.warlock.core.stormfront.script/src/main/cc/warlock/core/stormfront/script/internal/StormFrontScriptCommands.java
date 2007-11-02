@@ -100,7 +100,6 @@ public class StormFrontScriptCommands extends ScriptCommands implements IStormFr
 	
 	protected  class ScriptActionThread implements Runnable {
 		public void run() {
-			System.out.println("Starting action thread");
 			LinkedBlockingQueue<String> queue = new LinkedBlockingQueue<String>();
 			textWaiters.add(queue);
 			actionLoop: while(true) {
@@ -116,10 +115,8 @@ public class StormFrontScriptCommands extends ScriptCommands implements IStormFr
 						e.printStackTrace();
 					}
 				}
-				System.out.println("ACTION: matching with \"" + text + "\"");
 				for(Match action : actions) {
 					if(action.matches(text)) {
-						System.out.println("ACTION: matched");
 						String command = (String)action.getAttribute("action");
 						script.execute(command);
 						break;

@@ -12,11 +12,6 @@ public class WSLVariable extends WSLString {
 	
 	@Override
 	public String toString() {
-		/*for(String name : variables.keySet()) {
-			System.out.println("var: \"" + name + "\"");
-		}
-		System.out.println("variableName: \"" + variableName + "\"");*/
-		
 		String value = script.getVariable(variableName).toString();
 		if(value == null) return "";
 		return value;

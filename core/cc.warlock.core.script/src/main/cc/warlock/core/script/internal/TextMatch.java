@@ -44,13 +44,6 @@ public class TextMatch extends Match {
 				this.matchLine = text;
 			}
 		}
-		/*
-		if(rv) {
-			System.out.println("matched text: \"" + text + "\" with \"" + matchText + "\"");
-		} else {
-			System.out.println("Didn't match text: \"" + text + "\" with \"" + matchText + "\"");
-		}
-		*/
 
 		return rv;
 	}

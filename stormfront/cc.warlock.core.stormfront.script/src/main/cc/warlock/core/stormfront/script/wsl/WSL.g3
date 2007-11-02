@@ -25,14 +25,13 @@ grammar WSL;
 }
 
 script
-	: line (EOL line)* EOF { script.stopScript(); }
+	: line (EOL line)* EOF
 	;
 
 line
 	: (COMMENT | l=expr
 		{
-			script.addLine(l); 
-			System.out.print("added line " + Integer.toString(lineNum) + "\n");
+			script.addLine(l);
 		}
 		)? { lineNum++; }
 	;

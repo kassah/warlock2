@@ -113,7 +113,7 @@ public class WSLScript extends AbstractScript {
 			doStart();
 			
 			while(curLine != null && !stopped) {
-				checkState();
+				waitForResume();
 				nextLine = curLine.getNext();
 				
 				String line = curLine.get();
@@ -175,7 +175,7 @@ public class WSLScript extends AbstractScript {
 		commands.waitForRoundtime();
 	}
 	
-	private void checkState() {
+	private void waitForResume() {
 		while(!running && !stopped) {
 			lock.lock();
 			try {
@@ -203,20 +203,15 @@ public class WSLScript extends AbstractScript {
 	}
 	
 	public void execute(String line) {
-		System.out.print("script line: " + line + "\n");
-		
 		Matcher m = commandPattern.matcher(line);
 		
 		if (!m.find()) {
-			System.out.println("Couldn't find the command");
 			return;
 		}
 		
 		String commandName = m.group(1).toLowerCase();
-		// System.out.print("command \"" + commandName + "\"\n");
 		String arguments = m.group(3);
 		if(arguments == null) arguments = "";
-		// System.out.print("arguments \"" + arguments + "\"\n");
 		
 		WSLCommand command = wslCommands.get(commandName);
 		if(command != null) command.execute(arguments);
@@ -233,15 +228,12 @@ public class WSLScript extends AbstractScript {
 
 	public void suspend() {
 		running = false;
-		//pauseLine = nextLine;
 		
 		client.getDefaultStream().echo("[script paused: " + getName() + "]\n");
 		super.suspend();
 	}
 	
 	public void resume() {
-		
-		//nextLine = pauseLine;
 		running = true;
 		
 		client.getDefaultStream().echo("[script resumed: " + getName() + "]\n");
@@ -260,6 +252,11 @@ public class WSLScript extends AbstractScript {
 	
 	protected void addCommand (String name, WSLCommand command) {
 		wslCommands.put(name, command);
+	}
+	
+	protected void scriptError(String message) {
+		client.getDefaultStream().echo("Script error on line " + curLine.getLineNumber() + ": " + message + "\n");
+		stop();
 	}
 	
 	protected class ScriptTimer {
@@ -354,7 +351,13 @@ public class WSLScript extends AbstractScript {
 					int newValue = value % Integer.parseInt(args[1]);
 					setVariable("c", Integer.toString(newValue));
 				}
-			} else { /*throw error */ }
+				else
+				{
+					scriptError("Unrecognized counter command");
+				}
+			} else {
+				scriptError("Invalid arguments to counter");
+			}
 		}
 	}
 
@@ -387,10 +390,9 @@ public class WSLScript extends AbstractScript {
 			Matcher m = format.matcher(arguments);
 			if (m.find())
 			{
-				// System.out.print("variable: \"" + m.group(1) + "\" value: \"" + m.group(2) + "\"\n");
 				setVariable(m.group(1), m.group(2));
 			} else {
-				// System.out.print("Didn't match \"" + arguments + "\"\n");
+				scriptError("Invalid arguments to setvariable");
 			}
 		}
 	}
@@ -413,7 +415,7 @@ public class WSLScript extends AbstractScript {
 			} else if(addMatcher.find()) {
 				commands.addAction(addMatcher.group(1), addMatcher.group(2));
 			} else {
-				// TODO print some error message about a poorly formed action
+				scriptError("Invalid arguments to action");
 			}
 		}
 	}
@@ -429,26 +431,21 @@ public class WSLScript extends AbstractScript {
 	
 	protected void gotoLabel (String label)
 	{
-		// System.out.println("going to label: \"" + label + "\"");
-		
 		WSLScriptLine command = labels.get(label.toLowerCase());
 		
 		if (command != null)
 		{
-			// System.out.println("found label");
 			gotoLine(command);
 		}
 		else {
-			// System.out.println("label not found");
 			command = labels.get("labelerror");
 			if (command != null)
 			{
 				gotoLine(command);
 			}
-			else { // TODO: Fix gotoLabel to throw an exception instead of outputting to user
-				client.getDefaultStream().echo ("***********\n");
-				client.getDefaultStream().echo ("*** WARNING: Label \"" + label + "\" doesn't exist, skipping goto statement ***\n");
-				client.getDefaultStream().echo ("***********\n");
+			else
+			{
+				scriptError("Invalid goto statement, label \"" + label + "\" does not exist");
 			}
 		}
 	}
@@ -456,12 +453,13 @@ public class WSLScript extends AbstractScript {
 	protected class WSLGoto extends WSLCommand {
 		
 		public void execute (String arguments) {
-			String[] args = arguments.split(argSeparator);
-			if (args.length >= 1)
-			{
+			if(arguments.trim().length() > 0) {
+				String[] args = arguments.split(argSeparator);
 				String label = args[0];
 				gotoLabel(label);
-			} else { /*throw error*/ }
+			} else {
+				scriptError("Invalid arguments to goto");
+			}
 		}
 	}
 	
@@ -476,7 +474,14 @@ public class WSLScript extends AbstractScript {
 		}
 		
 		callstack.push(nextLine);
-		gotoLabel(label);
+		WSLScriptLine command = labels.get(label.toLowerCase());
+		
+		if (command != null)
+		{
+			gotoLine(command);
+		} else {
+			scriptError("Invalid gosub statement, label \"" + label + "\" does not exist");
+		}
 	}
 	
 	protected class WSLGosub extends WSLCommand {
@@ -486,22 +491,17 @@ public class WSLScript extends AbstractScript {
 		public void execute (String arguments) {
 			Matcher m = format.matcher(arguments);
 			
-			if (m.find())
-			{
-				System.out.println("calling label " + m.group(1));
+			if (m.find()) {
 				gosub(m.group(1), m.group(2));
 			} else {
-				System.out.println("label not found");
-				/*throw error*/ 
+				scriptError("Invalid arguments to gosub");
 			}
 		}
 	}
 	
 	protected void gosubReturn () {
 		if (callstack.empty()) {
-			client.getDefaultStream().echo ("***********\n");
-			client.getDefaultStream().echo ("*** WARNING: No outstanding calls were executed, skipping return statement ***\n");
-			client.getDefaultStream().echo ("***********\n");
+			scriptError("Invalid use of return, not in a subroutine");
 		} else {
 			curLine = nextLine = callstack.pop();
 		}
@@ -517,19 +517,16 @@ public class WSLScript extends AbstractScript {
 	protected class WSLMatchWait extends WSLCommand {
 		
 		public void execute (String arguments) {
-			// mode = Mode.waiting;
-			
 			Match match = commands.matchWait();
 			
 			if (match != null)
 			{
-				// System.out.println("matched label: \"" + match.getAttribute("label") + "\"");
 				gotoLabel((String)match.getAttribute("label"));
 				commands.waitForPrompt();
 				commands.waitForRoundtime();
 			} else {
 				if(!stopped)
-					client.getDefaultStream().echo("*** Internal error, no match was found!! ***\n");
+					scriptError("Internal error, no match was found. Please inform Warlock developers.");
 			}
 		}
 	}
@@ -553,7 +550,9 @@ public class WSLScript extends AbstractScript {
 				Match match = new RegexMatch(regex, caseInsensitive);
 				
 				addMatch(m.group(1), match);
-			} else { /* TODO throw error */ }
+			} else {
+				scriptError("Invalid arguments to matchre");
+			}
 		}
 
 	}
@@ -570,8 +569,7 @@ public class WSLScript extends AbstractScript {
 				Match match = new TextMatch(m.group(2));
 				addMatch(m.group(1), match);
 			} else {
-				commands.echo("Bad format for match");
-				stop();
+				scriptError("Invalid arguments to match");
 			}
 		}
 	}
@@ -596,7 +594,9 @@ public class WSLScript extends AbstractScript {
 				Match match = new RegexMatch(m.group(1), ignoreCase);
 				
 				commands.waitFor(match);
-			} else { /* TODO throw error */ }
+			} else {
+				scriptError("Invalid arguments to waitforre");
+			}
 		}
 	}
 	
@@ -608,7 +608,9 @@ public class WSLScript extends AbstractScript {
 				Match match = new TextMatch(arguments);
 				commands.waitFor(match);
 				
-			} else { /* TODO throw error */ }
+			} else {
+				scriptError("Invalid arguments to waitfor");
+			}
 		}
 	}
 
@@ -638,18 +640,19 @@ public class WSLScript extends AbstractScript {
 		
 		public void execute (String arguments)
 		{
-			String[] args = arguments.split(argSeparator);
-			int time = 1;
+			int time;
 			
-			if (args.length >= 1)
-			{
+			if(arguments.trim().length() > 0) {
+				String[] args = arguments.split(argSeparator);
+			
 				try {
 					time = Integer.parseInt(args[0]);
 				} catch(NumberFormatException e) {
-					// time = 1;
+					scriptError("Non-numeral \"" + args[0] + "\" passed to pause");
+					return;
 				}
 			} else {
-				// "empty" pause.. means wait 1 second
+				time = 1;
 			}
 			commands.pause(time);
 		}
@@ -674,9 +677,6 @@ public class WSLScript extends AbstractScript {
 	protected class WSLExit extends WSLCommand {
 		
 		public void execute (String arguments) {
-			running = false;
-			stopped = true;
-			
 			// TODO figure out if we should make this call here or elsewhere
 			stop();
 		}
@@ -703,7 +703,7 @@ public class WSLScript extends AbstractScript {
 				
 				setVariable("r", Integer.toString(r));
 			} else {
-				// print an error?
+				scriptError("Invalid arguments to random");
 			}
 		}
 	}
@@ -721,16 +721,12 @@ public class WSLScript extends AbstractScript {
 				else if(command.equals("stop"))		timer.stop();
 				else if(command.equals("clear"))	timer.clear();
 				else {
-					// print an error?
+					scriptError("Invalid command \"" + command + "\" given to timer");
 				}
 			} else {
-				// print an error?
+				scriptError("Invalid arguments to timer");
 			}
 		}
-	}
-	
-	public void stopScript() {
-		stopped = true;
 	}
 	
 	public IScriptEngine getScriptEngine() {

@@ -76,7 +76,6 @@ public class ScriptCommands implements IScriptCommands, IStreamListener
 			// run until we get a match or are told to stop
 			matchWaitLoop: while(true) {
 				String text = null;
-				System.out.println("Waiting for text");
 				// wait for some text
 				while(text == null) {
 					try {
@@ -87,14 +86,11 @@ public class ScriptCommands implements IScriptCommands, IStreamListener
 					if(interrupted)
 						break matchWaitLoop;
 				}
-				System.out.print("matchwait got: " + text);
 				String[] lines = text.split("\\n");
 				for(String line : lines) {
 					// try all of our matches
 					for(Match match : matches) {
-						// System.out.println("Trying a match");
 						if(match.matches(line)) {
-							// System.out.println("matched a line");
 							return match;
 						}
 					}
@@ -102,7 +98,6 @@ public class ScriptCommands implements IScriptCommands, IStreamListener
 			}
 		} finally {
 			matches.clear();
-			System.out.println("Done with matchwait");
 			textWaiters.remove(matchQueue);
 		}
 
@@ -224,10 +219,8 @@ public class ScriptCommands implements IScriptCommands, IStreamListener
 	}
 	
 	protected void receiveText(String text) {
-		System.out.print("Sending out line: " + text);
 		synchronized(textWaiters) {
 			for(LinkedBlockingQueue<String>  queue : textWaiters) {
-				System.out.println("Signaling a waiter");
 				try {
 					queue.put(text);
 				} catch(Exception e) {
