@@ -126,9 +126,12 @@ public class StormFrontStream extends Stream {
 			style.setBGColor(string.getBackgroundColor());
 			events.add(new StreamEvent(style, true));
 			
-			String newRegex = regex.replaceAll("\\|" + escapeRegex(match), "");
-			newRegex = newRegex.replaceAll(escapeRegex(match) +"\\|", "");
-			getHighlightEvents(match, newRegex, events);
+			if (regex.indexOf('|') > -1)
+			{
+				String newRegex = regex.replaceAll("\\|" + escapeRegex(match), "");
+				newRegex = newRegex.replaceAll(escapeRegex(match) +"\\|", "");
+				getHighlightEvents(match, newRegex, events);
+			}
 			
 			events.add(new StreamEvent(style, false));
 		}
