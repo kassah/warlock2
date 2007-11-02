@@ -18,4 +18,9 @@ public class HighlightStringStyle extends WarlockStyle implements
 	public HighlightString getHighlightString() {
 		return string;
 	}
+	
+	@Override
+	public boolean isFullLine() {
+		return string.isFillEntireLine();
+	}
 }
