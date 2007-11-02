@@ -120,6 +120,13 @@ public class HighlightStringsPreferencePage extends PropertyPage implements
 			}
 		});
 		
+		fillLineButton.addSelectionListener(new SelectionAdapter () {
+			@Override
+			public void widgetSelected(SelectionEvent e) {
+				fillLineClicked();
+			}
+		});
+		
 		return main;
 	}
 	
@@ -335,6 +342,10 @@ public class HighlightStringsPreferencePage extends PropertyPage implements
 		
 		stringTable.add(newString);
 		stringTable.editElement(newString, 0);
+	}
+	
+	private void fillLineClicked () {
+		selectedString.setFillEntireLine(fillLineButton.getSelection());
 	}
 	
 	protected class StringsLabelProvider implements ITableLabelProvider, ITableColorProvider
