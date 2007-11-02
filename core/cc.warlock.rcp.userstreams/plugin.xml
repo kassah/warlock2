@@ -13,13 +13,13 @@
    <extension
          point="org.eclipse.ui.menus">
       <menuContribution
-            locationURI="menu:cc.warlock.rcp.menu.prefs?before=cc.warlock.rcp.menu.preferences">
+            locationURI="menu:cc.warlock.rcp.menu.window">
          <dynamic
                class="cc.warlock.rcp.userstreams.ui.menu.StreamsContributionItem"
                id="cc.warlock.rcp.userstreams.dynamicStreams">
          </dynamic>
          <separator
-               name="cc.warlock.rcp.userstreams.separator1">
+               name="cc.warlock.rcp.userstreams.endingseperator">
          </separator>
       </menuContribution>
    </extension>
