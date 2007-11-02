@@ -7,6 +7,7 @@ import java.util.Random;
 
 import org.eclipse.jface.action.Action;
 
+import cc.warlock.rcp.ui.WarlockSharedImages;
 import cc.warlock.rcp.userstreams.IStreamFilter;
 import cc.warlock.rcp.userstreams.ui.views.UserStream;
 
@@ -23,6 +24,7 @@ public class StreamShowAction extends Action {
 		this.name = name;
 		this.filters = filters;
 		setDescription("Custom output window: " + this.name);
+		setImageDescriptor(WarlockSharedImages.getImageDescriptor(WarlockSharedImages.IMG_WINDOW));
 	}
 	
 	public void run() {
