@@ -144,7 +144,7 @@ public class ScriptCommands implements IScriptCommands, IStreamListener
 	public void put (String text) {
 		assertPrompt();
 		
-		client.send("[" + scriptName + "]: ", text);
+		client.send("[" + scriptName + "]: ", text, false);
 	}
 
 	public void waitFor (Match match) {
