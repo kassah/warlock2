@@ -6,8 +6,10 @@ package cc.warlock.rcp.application;
 import java.util.Map;
 import java.util.Timer;
 
+import org.eclipse.core.runtime.IAdaptable;
 import org.eclipse.equinox.app.IApplication;
 import org.eclipse.equinox.app.IApplicationContext;
+import org.eclipse.swt.graphics.Point;
 import org.eclipse.swt.widgets.Display;
 import org.eclipse.ui.PlatformUI;
 import org.eclipse.ui.application.IWorkbenchWindowConfigurer;
@@ -24,12 +26,15 @@ import com.martiansoftware.jsap.Switch;
 /**
  * @author Marshall
  */
-public class WarlockApplication extends WorkbenchAdvisor implements IApplication {
+public class WarlockApplication extends WorkbenchAdvisor implements IApplication, IAdaptable {
 	
 	private String startWithProfile = null;
 	private static WarlockApplication _instance;
 	private boolean debugMode = false;
 	private Timer timer = new Timer();
+	private boolean showMenus = true;
+	private String windowTitle = null;
+	private Point initialSize = null;
 	
 	public WarlockApplication ()
 	{
@@ -53,7 +58,24 @@ public class WarlockApplication extends WorkbenchAdvisor implements IApplication
 		configurer.setShowFastViewBars(false);
 		configurer.setShowCoolBar(false);
 		configurer.setShowStatusLine(false);
-		configurer.setShowMenuBar(true);
+		configurer.setShowMenuBar(showMenus);
+		if (windowTitle != null)
+			configurer.setTitle(windowTitle);
+		if (initialSize != null)
+			configurer.setInitialSize(initialSize);
+	}
+	
+	@Override
+	public IAdaptable getDefaultPageInput() {
+		return this;
+	}
+	
+	public Object getAdapter(Class adapter) {
+		if (adapter.equals(getClass()))
+		{
+			return this;
+		}
+		return null;
 	}
 	
 	private void parseArguments (String[] arguments)
@@ -133,5 +155,17 @@ public class WarlockApplication extends WorkbenchAdvisor implements IApplication
 	public Timer getTimer ()
 	{
 		return timer;
+	}
+
+	public void setShowMenus(boolean showMenus) {
+		this.showMenus = showMenus;
+	}
+
+	public void setWindowTitle(String windowTitle) {
+		this.windowTitle = windowTitle;
+	}
+
+	public void setInitialSize(Point initialSize) {
+		this.initialSize = initialSize;
 	}
 }
