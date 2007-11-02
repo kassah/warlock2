@@ -64,7 +64,6 @@ public class WarlockText implements LineBackgroundListener {
 	private int doScrollDirection = SWT.UP;
 
 	protected Hashtable<Integer, Color> lineBackgrounds = new Hashtable<Integer,Color>();
-	protected Hashtable<Integer, Color> lineForegrounds = new Hashtable<Integer,Color>();
 	
 	public WarlockText(Composite parent, int style) {
 		textWidget = new StyledText(parent, style);
@@ -383,15 +382,19 @@ public class WarlockText implements LineBackgroundListener {
 		textWidget.append(string.toString());
 		for(WarlockStringStyleRange range : string.getStyles()) {
 			StyleRangeWithData styleRange = (StyleRangeWithData)StyleProviders.getStyleProvider(string.getClient()).getStyleRange(range.style);
-			styleRange.start = charCount + range.start;
-			styleRange.length = range.length;
+			
 			if(range.style.getFGColor() != null)
 				styleRange.foreground = ColorUtil.warlockColorToColor(range.style.getFGColor());
 			if(range.style.getBGColor() != null)
 				styleRange.background = ColorUtil.warlockColorToColor(range.style.getBGColor());
 			if(range.style.isFullLine()) {
-				setLineForeground(textWidget.getLineAtOffset(styleRange.start), styleRange.foreground);
-				setLineBackground(textWidget.getLineAtOffset(styleRange.start), styleRange.background);
+				int lineNum = textWidget.getLineAtOffset(charCount + range.start);
+				styleRange.start = textWidget.getOffsetAtLine(lineNum);
+				styleRange.length = textWidget.getOffsetAtLine(lineNum + 1) - styleRange.start;
+				setLineBackground(lineNum, styleRange.background);
+			} else {
+				styleRange.start = charCount + range.start;
+				styleRange.length = range.length;
 			}
 			textWidget.setStyleRange(styleRange);
 		}
@@ -469,11 +472,6 @@ public class WarlockText implements LineBackgroundListener {
 		{
 			event.lineBackground = lineBackgrounds.get(lineIndex);
 		}
-	}
-	
-	public void setLineForeground (int line, Color foreground)
-	{
-		lineForegrounds.put(line, foreground);
 	}
 	
 	public void setLineBackground (int line, Color background)
