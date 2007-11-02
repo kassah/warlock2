@@ -189,7 +189,8 @@ public class ServerSettings implements Comparable<ServerSettings>
 			{
 				String text = hElement.attributeValue("text");
 				
-				highlightStrings.put(text, new HighlightString(this, hElement, palette));
+				if(text != null)
+					highlightStrings.put(text, new HighlightString(this, hElement, palette));
 			}
 		}
 		
