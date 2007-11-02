@@ -20,6 +20,13 @@
             id="cc.warlock.rcp.views.ConnectionView"
             name="Connections">
       </view>
+      <view
+            allowMultiple="false"
+            class="org.eclipse.ui.navigator.CommonNavigator"
+            icon="images/script.gif"
+            id="cc.warlock.rcp.views.scriptNavigatorView"
+            name="Script Navigator">
+      </view>
    </extension>
    <extension
          id="warlock"
@@ -34,6 +41,11 @@
             class="cc.warlock.rcp.application.WarlockPerspectiveFactory"
             name="Warlock Perspective"
             id="cc.warlock.warlockPerspective"/>
+      <perspective
+            class="cc.warlock.rcp.application.ScriptsPerspectiveFactory"
+            id="cc.warlock.scriptsPerspective"
+            name="Scripts Perspective">
+      </perspective>
    </extension>
    <extension
          point="cc.warlock.rcp.macroVariables">
@@ -110,6 +122,17 @@
                label="Preferences"
                mnemonic="P">
             <command
+                  commandId="cc.warlock.rcp.commands.scriptsWindow"
+                  icon="images/script.gif"
+                  id="cc.warlock.rcp.menu.scripts"
+                  label="Script Manager..."
+                  mnemonic="S">
+            </command>
+            <separator
+                  name="cc.warlock.rcp.prefsSeperator"
+                  visible="true">
+            </separator>
+            <command
                   commandId="cc.warlock.rcp.command.preferences"
                   icon="images/preferences.png"
                   id="cc.warlock.rcp.menu.preferences"
@@ -131,13 +154,13 @@
                   commandId="cc.warlock.rcp.commands.visitWebpage"
                   icon="images/website.gif"
                   id="cc.warlock.rcp.menu.visitWebpage"
-                  label="Visit our webpage">
+                  label="Visit Warlock Webpage">
             </command>
             <command
                   commandId="cc.warlock.rcp.commands.checkForUpdates"
                   icon="images/updates_obj.gif"
                   id="cc.warlock.rcp.menu.checkForUpdates"
-                  label="Check for updates">
+                  label="Check for Updates">
             </command>
             <separator
                   name="cc.warlock.rcp.aboutSeparator"
@@ -174,6 +197,11 @@
             id="cc.warlock.rcp.commands.checkForUpdates"
             name="Check For Updates">
       </command>
+      <command
+            defaultHandler="cc.warlock.rcp.menu.ScriptsWindowHandler"
+            id="cc.warlock.rcp.commands.scriptsWindow"
+            name="Scripts Window">
+      </command>
    </extension>
    <extension
          point="org.eclipse.ui.propertyPages">
@@ -198,6 +226,83 @@
             </adapt>
          </enabledWhen>
       </page>
+   </extension>
+   <extension
+         point="org.eclipse.ui.navigator.navigatorContent">
+      <navigatorContent
+            activeByDefault="true"
+            contentProvider="cc.warlock.rcp.ui.script.ScriptFilesystemContentProvider"
+            icon="images/fldr_obj.gif"
+            id="cc.warlock.rcp.navigator.localScripts"
+            labelProvider="cc.warlock.rcp.ui.script.ScriptFilesystemLabelProvider"
+            name="Local Scripts"
+            priority="normal">
+         <triggerPoints>
+            <or>
+               <instanceof
+                     value="cc.warlock.rcp.application.WarlockApplication">
+               </instanceof>
+               <instanceof
+                     value="cc.warlock.core.script.IScriptInfo">
+               </instanceof>
+            </or>
+         </triggerPoints>
+         <possibleChildren>
+            <or>
+               <instanceof
+                     value="cc.warlock.core.script.IScriptInfo">
+               </instanceof>
+            </or>
+         </possibleChildren>
+         <actionProvider
+               class="cc.warlock.rcp.ui.script.ScriptActionProvider"
+               id="cc.warlock.rcp.navigator.actions.ScriptActionProvider">
+         </actionProvider>
+      </navigatorContent>
+   </extension>
+   <extension
+         point="org.eclipse.ui.navigator.viewer">
+      <viewer
+            viewerId="cc.warlock.rcp.views.scriptNavigatorView">
+         <popupMenu
+                allowsPlatformContributions="true"
+                id="cc.warlock.rcp.views.scriptNavigatorView#PopupMenu">  
+             <insertionPoint name="group.new"/>
+             <insertionPoint
+                   name="group.open"
+                   separator="true"/>
+             <insertionPoint name="group.openWith"/>   
+             <insertionPoint name="group.edit"
+                   separator="true"/>   
+             <insertionPoint name="group.reorganize" />         
+             <insertionPoint
+                   name="group.port"
+                   separator="true"/>     
+             <insertionPoint
+                   name="group.build"
+                   separator="true"/> 
+             <insertionPoint
+                   name="group.generate"
+                   separator="true"/> 
+             <insertionPoint
+                   name="group.search"
+                   separator="true"/>              
+             <insertionPoint
+                   name="additions"
+                   separator="true"/>              
+             <insertionPoint
+                   name="group.properties"
+                   separator="true"/>             
+          </popupMenu>
+      </viewer>
+      <viewerContentBinding
+            viewerId="cc.warlock.rcp.views.scriptNavigatorView">
+         <includes>
+            <contentExtension
+                  pattern="cc.warlock.rcp.navigator.localScripts">
+            </contentExtension>
+         </includes>
+      </viewerContentBinding>
    </extension>
 
 </plugin>

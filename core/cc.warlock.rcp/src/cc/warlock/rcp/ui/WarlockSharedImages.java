@@ -60,6 +60,7 @@ public class WarlockSharedImages {
 	public static final String IMG_WINDOW = "/images/window.png";
 	public static final String IMG_ADD = "/images/add.png";
 	public static final String IMG_REMOVE = "/images/remove.png";
+	public static final String IMG_SCRIPT = "/images/script.gif";
 	
 	private static WarlockSharedImages instance;
 	
