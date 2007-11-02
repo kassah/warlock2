@@ -12,15 +12,15 @@ import java.util.Set;
 
 import cc.warlock.core.client.IWarlockClient;
 import cc.warlock.core.configuration.WarlockConfiguration;
+import cc.warlock.core.script.IFilesystemScriptProvider;
 import cc.warlock.core.script.IScript;
 import cc.warlock.core.script.IScriptEngine;
 import cc.warlock.core.script.IScriptFileInfo;
 import cc.warlock.core.script.IScriptInfo;
-import cc.warlock.core.script.IScriptProvider;
 import cc.warlock.core.script.ScriptEngineRegistry;
 import cc.warlock.core.script.configuration.ScriptConfiguration;
 
-public class FilesystemScriptProvider implements IScriptProvider, Runnable {
+public class FilesystemScriptProvider implements IFilesystemScriptProvider, Runnable {
 
 	protected Hashtable<ScriptFileInfo, Long> infos = new Hashtable<ScriptFileInfo, Long>();
 	
@@ -191,6 +191,12 @@ public class FilesystemScriptProvider implements IScriptProvider, Runnable {
 				e.printStackTrace();
 			}
 		}
+	}
+	
+	public List<File> getScriptDirectories() {
+		Set<File> scriptDirs = ScriptConfiguration.instance().getScriptDirectories();
+		
+		return Arrays.asList(scriptDirs.toArray(new File[scriptDirs.size()]));
 	}
 	
 	@Override
