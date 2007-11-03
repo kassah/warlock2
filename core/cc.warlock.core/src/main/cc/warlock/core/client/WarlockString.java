@@ -2,6 +2,7 @@ package cc.warlock.core.client;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.regex.Matcher;
 
 public class WarlockString {
 
@@ -81,12 +82,11 @@ public class WarlockString {
 	}
 	
 	public WarlockString substring(int start) {
-		return substring(start, text.length() - start);
+		return substring(start, text.length());
 	}
 	
-	public WarlockString substring(int start, int length) {
+	public WarlockString substring(int start, int end) {
 		WarlockString substring = new WarlockString(client, text.substring(start));
-		int end = start + length;
 		for(WarlockStringStyleRange style : styles) {
 			if(style.start >= start) {
 				int stylelength = Math.min(style.length, end - style.start);
