@@ -3,6 +3,7 @@ package cc.warlock.core.client;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 public class WarlockString {
 
@@ -94,5 +95,28 @@ public class WarlockString {
 			}
 		}
 		return substring;
+	}
+	
+	public WarlockString[] split(String regex) {
+		return split(regex,length()); // Limit should be the number of charactors in the string
+	}
+	
+	public WarlockString[] split(String regex, int limit) {
+		Pattern p = Pattern.compile(regex);
+		Matcher m = p.matcher(toString());
+		ArrayList<WarlockString> parts = new ArrayList<WarlockString>();
+		int i = 0;
+		int start = 0;
+		int end = 0;
+		while (m.find() && i < limit) {
+			++i;
+			end = m.start();
+			parts.add(substring(start, end));
+			start = m.end();
+		}
+		if (!m.hitEnd()) {
+			parts.add(substring(start));
+		}
+		return parts.toArray(new WarlockString[parts.size()]);
 	}
 }
