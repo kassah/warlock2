@@ -81,7 +81,7 @@ public class WarlockString {
 	}
 	
 	public WarlockString substring(int start) {
-		return substring(start, text.length());
+		return substring(start, text.length() - start);
 	}
 	
 	public WarlockString substring(int start, int length) {
