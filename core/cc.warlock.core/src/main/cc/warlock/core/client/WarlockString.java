@@ -47,12 +47,19 @@ public class WarlockString {
 		int charCount = text.length();
 		text.append(string.toString());
 		for(WarlockStringStyleRange range : string.getStyles()) {
-			range.start += charCount;
-			styles.add(range);
+			addStyle(charCount + range.start, range.length, range.style);
 		}
 	}
 	
 	public void addStyle(int start, int length, IWarlockStyle style) {
+		for(WarlockStringStyleRange curStyle : styles) {
+			if(curStyle.style.equals(style)) {
+				if(curStyle.start + curStyle.length == start) {
+					curStyle.length += length;
+					return;
+				}
+			}
+		}
 		styles.add(new WarlockStringStyleRange(start, length, style));
 	}
 	

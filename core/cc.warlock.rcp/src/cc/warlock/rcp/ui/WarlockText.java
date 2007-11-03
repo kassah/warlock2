@@ -1,7 +1,9 @@
 package cc.warlock.rcp.ui;
 
+import java.util.ArrayList;
 import java.util.Hashtable;
 import java.util.Iterator;
+import java.util.List;
 
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.custom.ExtendedModifyListener;
@@ -380,9 +382,11 @@ public class WarlockText implements LineBackgroundListener {
 		
 		int charCount = textWidget.getCharCount();
 		textWidget.append(string.toString());
+		ArrayList<StyleRangeWithData> styles = new ArrayList<StyleRangeWithData>();
 		for(WarlockStringStyleRange range : string.getStyles()) {
 			StyleRangeWithData styleRange = (StyleRangeWithData)StyleProviders.getStyleProvider(string.getClient()).getStyleRange(range.style);
-			
+			if(styleRange == null)
+				continue;
 			if(range.style.getFGColor() != null)
 				styleRange.foreground = ColorUtil.warlockColorToColor(range.style.getFGColor());
 			if(range.style.getBGColor() != null)
@@ -396,12 +400,58 @@ public class WarlockText implements LineBackgroundListener {
 				styleRange.start = charCount + range.start;
 				styleRange.length = range.length;
 			}
-			textWidget.setStyleRange(styleRange);
+			styles.add(styleRange);
 		}
+		ArrayList<StyleRangeWithData> intersections = new ArrayList<StyleRangeWithData>();
+		for(int i = 0; i + 1 < styles.size(); i++) {
+			findIntersections(styles.get(i), styles, i + 1, intersections);
+		}
+		
+		if(styles.size() > 0) {
+			StyleRange[] stylesArray = styles.toArray(new StyleRangeWithData[styles.size()]);
+			textWidget.setStyleRanges(stylesArray);
+		}
+		
 		constrainLineLimit(atBottom);
 
 		if(atBottom)
 			scrollToBottom();
+	}
+	
+	private void findIntersections(StyleRangeWithData style,
+			List<StyleRangeWithData> stylesToSearch, int startingPoint,
+			List<StyleRangeWithData> resultList) {
+		for(int i = startingPoint; i < stylesToSearch.size(); i++) {
+			// remove duplicates while we're here
+			while(style.equals(stylesToSearch.get(i))) {
+				stylesToSearch.remove(i);
+				if(i >= stylesToSearch.size())
+					return;
+			}
+			
+			StyleRangeWithData intersection = getIntersection(style, stylesToSearch.get(i));
+			if(intersection != null) {
+				resultList.add(intersection);
+				if(stylesToSearch.size() > i + 1)
+					findIntersections(intersection, stylesToSearch, i + 1, resultList);
+			}
+		}
+	}
+	
+	private StyleRangeWithData getIntersection(StyleRangeWithData style1, StyleRangeWithData style2) {
+		
+		// make sure the first one is the earlier
+		if(style2.start > style1.start)
+			return getIntersection(style2, style1);
+		
+		// check if we intersect
+		if(style1.start + style1.length <= style2.start)
+			return null;
+		
+		StyleRangeWithData intersection = new StyleRangeWithData();
+		intersection.start = style2.start;
+		intersection.length = Math.min(style2.length, style1.length - (style2.start - style1.start));
+		return intersection;
 	}
 	
 	private void scrollToBottom() {

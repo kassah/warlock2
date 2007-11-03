@@ -43,12 +43,10 @@ public class StyleTagHandler extends DefaultTagHandler {
 		if (styleId != null && styleId.length() > 0)
 		{
 			Preset preset = handler.getClient().getServerSettings().getPreset(styleId);
-			if(preset != null)
+			if(preset != null) {
 				currentStyle = preset.getStyle();
-			else
-				currentStyle = new WarlockStyle();
-			
-			handler.getCurrentStream().addStyle(currentStyle);
+				handler.getCurrentStream().addStyle(currentStyle);
+			}
 		}
 	}
 }

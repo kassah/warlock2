@@ -4,7 +4,6 @@ import org.eclipse.jface.resource.JFaceResources;
 import org.eclipse.swt.SWT;
 
 import cc.warlock.core.client.IWarlockStyle;
-import cc.warlock.core.client.internal.WarlockStyle;
 import cc.warlock.rcp.ui.IStyleProvider;
 import cc.warlock.rcp.ui.StyleRangeWithData;
 
