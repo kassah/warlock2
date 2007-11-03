@@ -84,12 +84,13 @@ public class WarlockString {
 		return substring(start, text.length());
 	}
 	
-	public WarlockString substring(int start, int end) {
+	public WarlockString substring(int start, int length) {
 		WarlockString substring = new WarlockString(client, text.substring(start));
+		int end = start + length;
 		for(WarlockStringStyleRange style : styles) {
 			if(style.start >= start) {
-				int length = Math.min(style.length, end - style.start);
-				substring.addStyle(style.start - start, length, style.style);
+				int stylelength = Math.min(style.length, end - style.start);
+				substring.addStyle(style.start - start, stylelength, style.style);
 			}
 		}
 		return substring;
