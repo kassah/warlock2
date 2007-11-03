@@ -407,9 +407,11 @@ public class WarlockText implements LineBackgroundListener {
 			findIntersections(styles.get(i), styles, i + 1, intersections);
 		}
 		
-		if(styles.size() > 0) {
-			StyleRange[] stylesArray = styles.toArray(new StyleRangeWithData[styles.size()]);
-			textWidget.setStyleRanges(stylesArray);
+		for(StyleRangeWithData style : styles) {
+			textWidget.setStyleRange(style);
+		}
+		for(StyleRangeWithData style : intersections) {
+			textWidget.setStyleRange(style);
 		}
 		
 		constrainLineLimit(atBottom);
@@ -439,18 +441,41 @@ public class WarlockText implements LineBackgroundListener {
 	}
 	
 	private StyleRangeWithData getIntersection(StyleRangeWithData style1, StyleRangeWithData style2) {
-		
-		// make sure the first one is the earlier
-		if(style2.start > style1.start)
-			return getIntersection(style2, style1);
+		StyleRangeWithData firstStyle, secondStyle;
+		if(style1.start <= style1.start) {
+			firstStyle = style1;
+			secondStyle = style2;
+		} else {
+			firstStyle = style2;
+			secondStyle = style1;
+		}
 		
 		// check if we intersect
-		if(style1.start + style1.length <= style2.start)
+		if(firstStyle.start + firstStyle.length <= secondStyle.start)
 			return null;
 		
 		StyleRangeWithData intersection = new StyleRangeWithData();
-		intersection.start = style2.start;
-		intersection.length = Math.min(style2.length, style1.length - (style2.start - style1.start));
+		intersection.start = secondStyle.start;
+		intersection.length = Math.min(secondStyle.length, firstStyle.length
+				- (secondStyle.start - firstStyle.start));
+		if(style2.font != null)
+			intersection.font = style2.font;
+		else
+			intersection.font = style1.font;
+		if(style2.background != null)
+			intersection.background = style2.background;
+		else
+			intersection.background = style1.background;
+		if(style2.foreground != null)
+			intersection.foreground = style2.foreground;
+		else
+			intersection.foreground = style1.foreground;
+		if(style2.fontStyle != SWT.NORMAL)
+			intersection.fontStyle = style2.fontStyle;
+		else
+			intersection.fontStyle = style2.fontStyle;
+		if(style2.strikeout || style1.strikeout) intersection.strikeout = true;
+		if(style2.underline || style1.underline) intersection.underline = true;
 		return intersection;
 	}
 	
