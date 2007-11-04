@@ -6,6 +6,7 @@ package cc.warlock.rcp.userstreams.internal;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+import cc.warlock.core.client.WarlockString;
 import cc.warlock.rcp.userstreams.IStreamFilter;
 
 /**
@@ -55,6 +56,10 @@ public class StreamFilter implements IStreamFilter {
 		} else {
 			return text.contains(this.content);
 		}
+	}
+	
+	public boolean match(WarlockString text) {
+		return match(text.toString());
 	}
 
 	/* (non-Javadoc)

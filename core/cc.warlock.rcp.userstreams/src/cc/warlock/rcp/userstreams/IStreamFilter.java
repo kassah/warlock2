@@ -3,6 +3,8 @@
  */
 package cc.warlock.rcp.userstreams;
 
+import cc.warlock.core.client.WarlockString;
+
 /**
  * @author Will Robertson
  * Interface for storing a stream filter
@@ -14,6 +16,7 @@ public interface IStreamFilter {
 	 * Does the text matches this filter?
 	 */
 	public boolean match(String text);
+	public boolean match(WarlockString text);
 	
 	/*
 	 * Sets the type of filter { string, regex }

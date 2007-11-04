@@ -12,10 +12,8 @@ import org.eclipse.ui.PlatformUI;
 import cc.warlock.core.client.IStream;
 import cc.warlock.core.client.IWarlockClient;
 import cc.warlock.core.client.IWarlockClientListener;
-import cc.warlock.core.client.IWarlockStyle;
 import cc.warlock.core.client.WarlockClientRegistry;
-import cc.warlock.rcp.ui.StyleRangeWithData;
-import cc.warlock.rcp.ui.WarlockText;
+import cc.warlock.core.client.WarlockString;
 import cc.warlock.rcp.ui.client.SWTWarlockClientListener;
 import cc.warlock.rcp.userstreams.IStreamFilter;
 import cc.warlock.rcp.views.StreamView;
@@ -28,17 +26,13 @@ import cc.warlock.rcp.views.StreamView;
 public class UserStream extends StreamView implements IWarlockClientListener {
 	public static final String VIEW_ID = "cc.warlock.rcp.userstreams.rightView.userStream";
 	protected static ArrayList<UserStream> openStreams = new ArrayList<UserStream>();
-	// private ArrayList<IStreamFilter> filters = new ArrayList<IStreamFilter>();
-	private String buffer = "";
+	//private ArrayList<IStreamFilter> filters = new ArrayList<IStreamFilter>();
+	//private String buffer = "";
 	private IStreamFilter[] filters = null;
 	private String name = "Stream";
 	
 	public void clientActivated(IWarlockClient client) {
 		// TODO Auto-generated method stub
-	}
-	
-	public void streamReceivedText (IStream stream, String string) {
-		this.buffer += string;
 	}
 	
 	public void setFilters(IStreamFilter[] filters) {
@@ -47,32 +41,39 @@ public class UserStream extends StreamView implements IWarlockClientListener {
 
 	public void streamPrompted(IStream stream,	 String prompt) {
 		// Discard Prompts
-		String buffer = this.buffer;
-		this.buffer = "";
-		// TODO: We should probably make this go per line instead of per chunk sent to us.
-		for (IStreamFilter filter : this.filters) {
-			if (filter == null) continue;
-			if (filter.match(buffer)) {
-				// If a filter matches, we go ahead and display the chunk
-				super.streamReceivedText(stream, buffer);
-				return;
-			}
-		}
+		super.streamPrompted(stream, "");
 	}
 	
 	public void streamEchoed(IStream stream, String text) {
 		// Discard Echos
+		// TODO: This doesn't keep echos away? is it used anymore?
 	}
 	
-	protected void addStyleRange (WarlockText text, StyleRangeWithData range) {
-		// Discard Styles for right now
+	@Override
+	protected void appendText (WarlockString string)
+	{
+		// There doesn't seem to be a better place for this, so we'll do it here (twice none the less)
+		WarlockString ret = new WarlockString(client);
+		for (WarlockString buffer : string.split("\\n")) {
+			//if (buffer == null) continue;
+			System.out.println(buffer.toString());
+			if (this.filters != null)
+				for (IStreamFilter filter : this.filters) {
+					if (filter == null) continue;
+					if (filter.match(buffer)) {
+						// If a filter matches, we go ahead and display the chunk
+						ret.append(buffer);
+						ret.append("\n");
+						return;
+					}
+				}
+		}
+		if (ret.length() > 0) {
+			super.appendText(ret);
+		}
 	}
 	
-	public void streamReceivedStyle(IStream stream, IWarlockStyle style) {
-		// Discard Styles for right now
-	}
-	
-	public void clientConnected(IWarlockClient client) {
+	public void clientConnected(IWarlockClient client) {	
 		setClient(client);
 	}
 
@@ -122,7 +123,9 @@ public class UserStream extends StreamView implements IWarlockClientListener {
 	
 	public void scanClients() {
 		for (IWarlockClient client : WarlockClientRegistry.getActiveClients()) {
-			clientConnected(client);
+			if (client.getConnection() == null) continue;
+			if (client.getConnection().isConnected())
+				clientConnected(client);
 		}
 	}
 
