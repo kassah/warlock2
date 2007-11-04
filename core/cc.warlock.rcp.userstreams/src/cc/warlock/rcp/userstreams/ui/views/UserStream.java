@@ -38,19 +38,6 @@ public class UserStream extends StreamView implements IWarlockClientListener {
 	public void setFilters(IStreamFilter[] filters) {
 		this.filters = filters;
 	}
-
-	public void streamPrompted(IStream stream,	 String prompt) {
-		// Discard Prompts
-		super.streamPrompted(stream, "");
-	}
-	
-	public void streamEchoed(IStream stream, String text) {
-		// Discard Echos
-	}
-	
-	public void streamReceivedCommand(IStream stream, String text) {
-		// Discard Commands
-	}
 	
 	@Override
 	protected void appendText (WarlockString string)
