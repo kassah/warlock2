@@ -46,7 +46,10 @@ public class UserStream extends StreamView implements IWarlockClientListener {
 	
 	public void streamEchoed(IStream stream, String text) {
 		// Discard Echos
-		// TODO: This doesn't keep echos away? is it used anymore?
+	}
+	
+	public void streamReceivedCommand(IStream stream, String text) {
+		// Discard Commands
 	}
 	
 	@Override
@@ -54,19 +57,19 @@ public class UserStream extends StreamView implements IWarlockClientListener {
 	{
 		// There doesn't seem to be a better place for this, so we'll do it here (twice none the less)
 		WarlockString ret = new WarlockString(client);
-		for (WarlockString buffer : string.split("\\n")) {
-			//if (buffer == null) continue;
-			System.out.println(buffer.toString());
-			if (this.filters != null)
-				for (IStreamFilter filter : this.filters) {
-					if (filter == null) continue;
-					if (filter.match(buffer)) {
-						// If a filter matches, we go ahead and display the chunk
-						ret.append(buffer);
-						ret.append("\n");
-						return;
-					}
+		WarlockString[] parts = string.split("\\r?\\n");
+		for (WarlockString buffer : parts) {
+			System.out.println("What we're matching: "+ buffer);
+			for (IStreamFilter filter : this.filters) {
+				if (filter == null) continue;
+				System.out.println("Against ("+ filter.getType() +"): " + filter.getContent());
+				if (filter.match(buffer)) {
+					// If a filter matches, we go ahead and display the chunk
+					ret.append(buffer);
+					ret.append("\n");
+					break;
 				}
+			}
 		}
 		if (ret.length() > 0) {
 			super.appendText(ret);

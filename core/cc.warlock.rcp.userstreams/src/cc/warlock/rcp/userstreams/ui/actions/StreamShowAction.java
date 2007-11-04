@@ -25,13 +25,11 @@ public class StreamShowAction extends Action {
 		this.filters = filters;
 		setDescription("Custom output window: " + this.name);
 		setImageDescriptor(WarlockSharedImages.getImageDescriptor(WarlockSharedImages.IMG_WINDOW));
-		System.out.println("Menu Item Constructed");
 	}
 	
 	public void run() {
 		UserStream stream = UserStream.getViewForUserStream(this.name);
 		stream.setFilters(this.filters);
-		System.out.println("Menu Item Run");
 	}
 	
 	protected static String generateUniqueId () {
