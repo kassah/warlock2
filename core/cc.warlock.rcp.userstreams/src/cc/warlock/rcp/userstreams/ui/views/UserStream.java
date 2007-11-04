@@ -61,12 +61,9 @@ public class UserStream extends StreamView implements IWarlockClientListener {
 		
 		// Process filters on the complete lines
 		WarlockString ret = new WarlockString(client);
-		//WarlockString[] parts = string.split("\\r?\\n");
 		for (WarlockString buffer : string.split("\\r?\\n")) {
-			System.out.println("What we're matching: "+ buffer);
 			for (IStreamFilter filter : this.filters) {
 				if (filter == null) continue;
-				System.out.println("Against ("+ filter.getType() +"): " + filter.getContent());
 				if (filter.match(buffer)) {
 					// If a filter matches, we go ahead and display the chunk
 					ret.append(buffer);
