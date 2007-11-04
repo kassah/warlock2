@@ -87,7 +87,7 @@ public class WarlockString {
 	}
 	
 	public WarlockString substring(int start, int end) {
-		WarlockString substring = new WarlockString(client, text.substring(start));
+		WarlockString substring = new WarlockString(client, text.substring(start, end));
 		for(WarlockStringStyleRange style : styles) {
 			if(style.start >= start) {
 				int stylelength = Math.min(style.length, end - style.start);
@@ -108,14 +108,15 @@ public class WarlockString {
 		int i = 0;
 		int start = 0;
 		int end = 0;
-		while (m.find() && i < limit) {
+
+		while (m.find(start) && i < limit) {
 			++i;
 			end = m.start();
-			parts.add(substring(start, end));
+			parts.add(this.substring(start, end));
 			start = m.end();
 		}
 		if (!m.hitEnd()) {
-			parts.add(substring(start));
+			parts.add(this.substring(start));
 		}
 		return parts.toArray(new WarlockString[parts.size()]);
 	}
