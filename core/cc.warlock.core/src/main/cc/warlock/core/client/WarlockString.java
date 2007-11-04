@@ -112,12 +112,12 @@ public class WarlockString {
 		int start = 0;
 
 		while (m.find(start) && i < limit) {
-			++i;
 			int end = m.start();
 			// make sure that we actually have a substring to add
-			if(end == start)
-				continue;
-			parts.add(this.substring(start, end));
+			if(end != start) {
+				parts.add(this.substring(start, end));
+				++i;
+			}
 			// set the start of the next substring
 			start = m.end();
 		}
