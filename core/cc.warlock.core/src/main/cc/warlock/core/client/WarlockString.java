@@ -56,10 +56,12 @@ public class WarlockString {
 	public void addStyle(int start, int length, IWarlockStyle style) {
 		for(WarlockStringStyleRange curStyle : styles) {
 			if(curStyle.style.equals(style)) {
-				if(curStyle.start + curStyle.length == start) {
-					curStyle.length += length;
+				// check if the new style is contained by an old style, or is overlapping the end of an old style
+				if(start > curStyle.start && curStyle.start + curStyle.length <= start) {
+					curStyle.length = Math.max(curStyle.length, start - curStyle.start + length);
 					return;
 				}
+				//TODO check if the new style is overlapping the beginning of an old style
 			}
 		}
 		styles.add(new WarlockStringStyleRange(start, length, style));
@@ -89,9 +91,10 @@ public class WarlockString {
 	public WarlockString substring(int start, int end) {
 		WarlockString substring = new WarlockString(client, text.substring(start, end));
 		for(WarlockStringStyleRange style : styles) {
-			if(style.start >= start) {
-				int stylelength = Math.min(style.length, end - style.start);
-				substring.addStyle(style.start - start, stylelength, style.style);
+			if(style.start + style.length >= start && style.start < end) {
+				int styleLength = Math.min(style.length, end - style.start);
+				int styleStart = Math.max(0, style.start - start);
+				substring.addStyle(styleStart, styleLength, style.style);
 			}
 		}
 		return substring;
