@@ -101,7 +101,7 @@ public class WarlockString {
 	}
 	
 	public WarlockString[] split(String regex) {
-		return split(regex,length()); // Limit should be the number of charactors in the string
+		return split(regex,length()); // Limit should be the number of characters in the string
 	}
 	
 	public WarlockString[] split(String regex, int limit) {
@@ -110,15 +110,18 @@ public class WarlockString {
 		ArrayList<WarlockString> parts = new ArrayList<WarlockString>();
 		int i = 0;
 		int start = 0;
-		int end = 0;
 
 		while (m.find(start) && i < limit) {
 			++i;
-			end = m.start();
+			int end = m.start();
+			// make sure that we actually have a substring to add
+			if(end == start)
+				continue;
 			parts.add(this.substring(start, end));
+			// set the start of the next substring
 			start = m.end();
 		}
-		if (!m.hitEnd()) {
+		if (!m.hitEnd() && i < limit) {
 			parts.add(this.substring(start));
 		}
 		return parts.toArray(new WarlockString[parts.size()]);
