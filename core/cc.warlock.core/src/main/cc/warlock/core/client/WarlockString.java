@@ -41,6 +41,10 @@ public class WarlockString {
 		return text.toString();
 	}
 	
+	public int lastIndexOf(String str) {
+		return this.text.lastIndexOf(str);
+	}
+	
 	public void append(String text) {
 		this.text.append(text);
 	}
