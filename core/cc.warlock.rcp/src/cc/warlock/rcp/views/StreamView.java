@@ -215,7 +215,7 @@ public class StreamView extends ViewPart implements IStreamListener, IGameViewFo
 		return StyleProviders.getStyleProvider(client);
 	}
 	
-	protected void appendText (WarlockString string)
+	protected void bufferText (WarlockString string)
 	{
 		
 		if (buffering)
@@ -227,9 +227,13 @@ public class StreamView extends ViewPart implements IStreamListener, IGameViewFo
 		}
 		else
 		{
-			WarlockText text = getTextForClient(client);
-			text.append(string);
+			appendText(string);
 		}
+	}
+	
+	protected void appendText(WarlockString string) {
+		WarlockText text = getTextForClient(client);
+		text.append(string);
 	}
 	
 	public void streamAddedStyle(IStream stream, IWarlockStyle style) {
@@ -293,7 +297,7 @@ public class StreamView extends ViewPart implements IStreamListener, IGameViewFo
 			if (appendNewlines)
 				string.append("\n");
 			
-			appendText(string);
+			bufferText(string);
 		}
 	}
 	
@@ -310,8 +314,7 @@ public class StreamView extends ViewPart implements IStreamListener, IGameViewFo
 			// TODO: make a different style for client messages
 			string.addStyle(styleStart, text.length(), client.getCommandStyle());
 			
-			WarlockText textWidget = getTextForClient(client);
-			textWidget.append(string);
+			appendText(string);
 		}
 	}
 	
@@ -322,16 +325,14 @@ public class StreamView extends ViewPart implements IStreamListener, IGameViewFo
 			
 			string.addStyle(0, text.length(), client.getCommandStyle());
 			
-			WarlockText textWidget = getTextForClient(client);
 			isPrompting = false;
-			textWidget.append(string);
+			appendText(string);
 		}
 	}
 	
 	public void streamPrompted(IStream stream, String prompt) {
 		if (!isPrompting && (this.mainStream.equals(stream) || this.streams.contains(stream)))
 		{
-			WarlockText textWidget = getTextForClient(client);
 			isPrompting = true;
 			WarlockString text = new WarlockString(client);
 			
@@ -344,7 +345,7 @@ public class StreamView extends ViewPart implements IStreamListener, IGameViewFo
 			styles.clear();
 			text.append(prompt);
 			
-			textWidget.append(text);
+			appendText(text);
 		}
 	}
 
