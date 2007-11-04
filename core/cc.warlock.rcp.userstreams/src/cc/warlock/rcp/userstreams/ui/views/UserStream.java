@@ -26,8 +26,7 @@ import cc.warlock.rcp.views.StreamView;
 public class UserStream extends StreamView implements IWarlockClientListener {
 	public static final String VIEW_ID = "cc.warlock.rcp.userstreams.rightView.userStream";
 	protected static ArrayList<UserStream> openStreams = new ArrayList<UserStream>();
-	//private ArrayList<IStreamFilter> filters = new ArrayList<IStreamFilter>();
-	//private String buffer = "";
+	private WarlockString lineBuffer = null;
 	private IStreamFilter[] filters = null;
 	private String name = "Stream";
 	
@@ -42,10 +41,28 @@ public class UserStream extends StreamView implements IWarlockClientListener {
 	@Override
 	protected void appendText (WarlockString string)
 	{
-		// There doesn't seem to be a better place for this, so we'll do it here (twice none the less)
+		// Add our buffer to the beginning if we have any.
+		if (this.lineBuffer != null) {
+			this.lineBuffer.append(string);
+			string = this.lineBuffer;
+			this.lineBuffer = null;
+		}
+		// Remove the end of our line if it isn't closed by a "\n"
+		int lastReturn = string.lastIndexOf("\n");
+		if (lastReturn != string.length()) {
+			if (lastReturn > 0) {
+				this.lineBuffer = string.substring(lastReturn);
+			} else {
+				this.lineBuffer = string;
+				// Nothing we can output.. return
+				return;
+			}
+		}
+		
+		// Process filters on the complete lines
 		WarlockString ret = new WarlockString(client);
-		WarlockString[] parts = string.split("\\r?\\n");
-		for (WarlockString buffer : parts) {
+		//WarlockString[] parts = string.split("\\r?\\n");
+		for (WarlockString buffer : string.split("\\r?\\n")) {
 			System.out.println("What we're matching: "+ buffer);
 			for (IStreamFilter filter : this.filters) {
 				if (filter == null) continue;
