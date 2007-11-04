@@ -110,19 +110,25 @@ public class WarlockString {
 		ArrayList<WarlockString> parts = new ArrayList<WarlockString>();
 		int i = 0;
 		int start = 0;
+		int end = 0;
+		WarlockString part = null;
 
 		while (m.find(start) && i < limit) {
-			int end = m.start();
+			end = m.start();
 			// make sure that we actually have a substring to add
 			if(end != start) {
-				parts.add(this.substring(start, end));
+				part = this.substring(start, end);
+				parts.add(part);
 				++i;
 			}
 			// set the start of the next substring
 			start = m.end();
 		}
-		if (!m.hitEnd() && i < limit) {
-			parts.add(this.substring(start));
+		if ((i == 0 || !m.hitEnd()) && i < limit) {
+			if (this.length() - start >= 1) {  // Redundent if... I know. But this looks better than all on one confusing line
+				part = this.substring(start);
+				parts.add(part);
+			}
 		}
 		return parts.toArray(new WarlockString[parts.size()]);
 	}
