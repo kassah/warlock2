@@ -13,7 +13,7 @@ public class MacroKey extends ServerSetting {
 	{
 		super(settings);
 		
-		setKey(keyString);
+		setKeyString(keyString);
 		setAction(action);
 	}
 	
@@ -50,16 +50,8 @@ public class MacroKey extends ServerSetting {
 		return key;
 	}
 
-	public void setKey(String key) {
-		this.key = key;
-	}
-
 	public ArrayList<String> getModifiers() {
 		return modifiers;
-	}
-
-	public void setModifiers(ArrayList<String> modifiers) {
-		this.modifiers = modifiers;
 	}
 
 	public String getKeyString() {
