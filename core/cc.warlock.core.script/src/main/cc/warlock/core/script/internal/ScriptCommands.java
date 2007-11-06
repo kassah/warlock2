@@ -44,7 +44,7 @@ public class ScriptCommands implements IScriptCommands, IStreamListener
 	{
 		this.client = client;
 		this.scriptName = scriptName;
-		
+		this.gotPrompt = client.getDefaultStream().isPrompting();
 		client.getDefaultStream().addStreamListener(this);
 	}
 	
@@ -139,7 +139,7 @@ public class ScriptCommands implements IScriptCommands, IStreamListener
 	public void put (String text) {
 		assertPrompt();
 		
-		client.send("[" + scriptName + "]: ", text, false);
+		client.send("[" + scriptName + "]: ", text);
 	}
 
 	public void waitFor (Match match) {
@@ -179,9 +179,6 @@ public class ScriptCommands implements IScriptCommands, IStreamListener
 			e.printStackTrace();
 		} finally {
 			promptWaiters--;
-			if(promptWaiters == 0) {
-				gotPrompt = false;
-			}
 			lock.unlock();
 		}
 	}
@@ -194,10 +191,10 @@ public class ScriptCommands implements IScriptCommands, IStreamListener
 	public void streamEchoed(IStream stream, String text) {}
 	
 	public void streamPrompted(IStream stream, String prompt) {
+		gotPrompt = true;
 		if(promptWaiters > 0) {
 			lock.lock();
 			try {
-				gotPrompt = true;
 				gotPromptCond.signalAll();
 			} catch(Exception e) {
 				e.printStackTrace();
@@ -208,6 +205,7 @@ public class ScriptCommands implements IScriptCommands, IStreamListener
 	}
 	
 	public void streamReceivedCommand (IStream stream, String text) {
+		gotPrompt = false;
 		receiveText(text);
 	}
 	
@@ -215,6 +213,7 @@ public class ScriptCommands implements IScriptCommands, IStreamListener
 	public void streamRemovedStyle(IStream stream, IWarlockStyle style) {	}
 	
 	public void streamReceivedText(IStream stream, String text) {
+		gotPrompt = false;
 		receiveText(text);
 	}
 	

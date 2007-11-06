@@ -94,18 +94,10 @@ public abstract class WarlockClient implements IWarlockClient {
 	}
 	
 	public void send(String prefix, String command) {
-		send(prefix, command, true);
-	}
-	
-	public void send(String prefix, String command, boolean addToHistory) {
 		if(connection == null) {
 			// Not yet connected to server
 			return;
 		}
-		
-		//TODO: move this into the entry widget
-		if(addToHistory)
-			commandHistory.addCommand(command);
 		
 		String text = command + "\n";
 		if(prefix != null)

@@ -20,15 +20,8 @@ public class Command implements ICommand, Serializable {
 
 	protected String command;
 	protected Date timestamp;
-	protected boolean boundForHistory;
 	
 	public Command(String string) {
-		this(string, true);
-	}
-	
-	public Command(String string, boolean boundForHistory) {
-		this.boundForHistory = boundForHistory;
-		
 		// TODO make the following line work for all locales.
 		DateFormat dateFormat = DateFormat.getTimeInstance();
 		
@@ -41,14 +34,8 @@ public class Command implements ICommand, Serializable {
 		}
 	}
 	
-	public Command(String command, Date timestamp) {
-		this(command, timestamp, true);
-	}
-	
-	public Command(String command, Date timestamp, boolean boundForHistory)
+	public Command(String command, Date timestamp)
 	{
-		this.boundForHistory = boundForHistory;
-		
 		this.command = command;
 		this.timestamp = (Date)timestamp.clone();
 	}
@@ -68,14 +55,5 @@ public class Command implements ICommand, Serializable {
 
 	public String toString() {
 		return "(" + command + "," + timestamp.toString() + ")";
-	}
-	
-	
-	public boolean isBoundForHistory() {
-		return boundForHistory;
-	}
-	
-	public void setBoundForHistory(boolean boundForHistory) {
-		this.boundForHistory = boundForHistory;
 	}
 }

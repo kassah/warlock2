@@ -17,12 +17,6 @@ import cc.warlock.core.client.IWarlockClientViewer;
 public class SWTWarlockClientViewer extends SWTStreamListener implements IWarlockClientViewer  {
 
 	private IWarlockClientViewer viewer;
-	private ListenerWrapper wrapper;
-	
-	private static enum EventType
-	{
-		SetCurrentCommand
-	};
 	
 	public SWTWarlockClientViewer (IWarlockClientViewer viewer)
 	{
@@ -33,21 +27,59 @@ public class SWTWarlockClientViewer extends SWTStreamListener implements IWarloc
 	{
 		super(viewer, asynch);
 		this.viewer = viewer;
-		this.wrapper = new ListenerWrapper();
 	}
 	
-	protected class ListenerWrapper implements Runnable {
+	protected class SetCommandWrapper implements Runnable {
 		public String command;
-		public IWarlockClient client;
-		public EventType eventType;
+		
+		public SetCommandWrapper(String command) {
+			this.command = command;
+		}
 		
 		public void run () {
-			switch (eventType)
-			{
-				case SetCurrentCommand: viewer.setCurrentCommand(command); break;
-			}
-			command = null;
-			client = null;
+			viewer.setCurrentCommand(command);
+		}
+	}
+	
+	protected class NextCommandWrapper implements Runnable {
+		public void run () {
+			viewer.nextCommand();
+		}
+	}
+	
+	protected class PrevCommandWrapper implements Runnable {
+		public void run () {
+			viewer.prevCommand();
+		}
+	}
+	
+	protected class RepeatLastCommandWrapper implements Runnable {
+		public void run () {
+			viewer.repeatLastCommand();
+		}
+	}
+	
+	protected class RepeatSecondToLastCommandWrapper implements Runnable {
+		public void run () {
+			viewer.repeatSecondToLastCommand();
+		}
+	}
+	
+	protected class SubmitWrapper implements Runnable {
+		public void run () {
+			viewer.submit();
+		}
+	}
+	
+	protected class AppendWrapper implements Runnable {
+		public char c;
+		
+		public AppendWrapper(char ch) {
+			this.c = ch;
+		}
+		
+		public void run () {
+			viewer.append(c);
 		}
 	}
 	
@@ -60,8 +92,30 @@ public class SWTWarlockClientViewer extends SWTStreamListener implements IWarloc
 	}
 	
 	public void setCurrentCommand(String command) {
-		wrapper.command = command;
-		wrapper.eventType = EventType.SetCurrentCommand;
-		run(wrapper);
+		run(new SetCommandWrapper(command));
+	}
+	
+	public void append(char ch) {
+		run(new AppendWrapper(ch));
+	}
+	
+	public void nextCommand() {
+		run(new NextCommandWrapper());
+	}
+	
+	public void prevCommand() {
+		run(new PrevCommandWrapper());
+	}
+	
+	public void repeatLastCommand() {
+		run(new RepeatLastCommandWrapper());
+	}
+	
+	public void repeatSecondToLastCommand() {
+		run(new RepeatSecondToLastCommandWrapper());
+	}
+	
+	public void submit() {
+		run(new SubmitWrapper());
 	}
 }

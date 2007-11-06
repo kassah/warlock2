@@ -100,11 +100,11 @@ public class StormFrontGameView extends GameView implements IStormFrontClientVie
 		WarlockColor entryFG = settings.getCommandLineSettings().getForegroundColor();
 		WarlockColor entryBarColor = settings.getCommandLineSettings().getBarColor();
 		
-		entry.setForeground(ColorUtil.warlockColorToColor(entryFG.equals(StormFrontColor.DEFAULT_COLOR) ? fg  : entryFG));
-		entry.setBackground(ColorUtil.warlockColorToColor(entryBG.equals(StormFrontColor.DEFAULT_COLOR) ? bg : entryBG));
+		entry.getWidget().setForeground(ColorUtil.warlockColorToColor(entryFG.equals(StormFrontColor.DEFAULT_COLOR) ? fg  : entryFG));
+		entry.getWidget().setBackground(ColorUtil.warlockColorToColor(entryBG.equals(StormFrontColor.DEFAULT_COLOR) ? bg : entryBG));
 		
 		Caret newCaret = createCaret(1, ColorUtil.warlockColorToColor(entryBarColor));
-		entry.setCaret(newCaret);
+		entry.getWidget().setCaret(newCaret);
 		
 		text.setBackground(ColorUtil.warlockColorToColor(bg));
 		text.setForeground(ColorUtil.warlockColorToColor(fg));
@@ -120,47 +120,6 @@ public class StormFrontGameView extends GameView implements IStormFrontClientVie
 			StatusView.getDefault().loadServerSettings(settings);
 		}
 	}
-	
-	/*@Override
-	public void streamReceivedStyle(IStream stream, IWarlockStyle style) {
-		if (!(style instanceof IHighlightStringStyle)) {
-			super.streamReceivedStyle(stream, style);
-			return;
-		}
-		
-		IHighlightStringStyle highlightStyle = (IHighlightStringStyle) style;
-		WarlockText text = getTextForClient(client);
-		int charCount = getCharCount(text);
-		
-		if (!highlightStyle.isEndStyle())
-		{	
-			StyleRangeWithData range = new StyleRangeWithData();
-			range.start = charCount;
-			range.background = ColorUtil.warlockColorToColor(highlightStyle.getHighlightString().getBackgroundColor());
-			range.foreground = ColorUtil.warlockColorToColor(highlightStyle.getHighlightString().getForegroundColor());
-			if (unendedRanges.size() > 0)
-			{
-				range.font = unendedRanges.peek().font;
-			}
-			
-			if (highlightStyle.getHighlightString().isFillEntireLine())
-			{
-				range.data.put(IStyleProvider.FILL_ENTIRE_LINE, true+"");
-			}
-			unendedRanges.push(range);
-		}
-		else
-		{
-			StyleRangeWithData range = unendedRanges.pop();
-			range.length = charCount - range.start;
-			
-			if (unendedRanges.size() == 0) {
-				// addStyleRange(text, range);
-			} else {
-				innerRanges.push(range);
-			}
-		}
-	}*/
 	
 	@Override
 	public Object getAdapter(Class adapter) {

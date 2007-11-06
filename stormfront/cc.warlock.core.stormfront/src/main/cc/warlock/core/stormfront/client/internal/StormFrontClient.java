@@ -127,9 +127,6 @@ public class StormFrontClient extends WarlockClient implements IStormFrontClient
 			for (IScriptListener listener : scriptListeners) listener.scriptStarted(script);
 			runningScripts.add(script);
 		}
-		
-		String scriptPrefix = ScriptConfiguration.instance().getScriptPrefix();
-		getCommandHistory().addCommand(scriptPrefix + command);
 	}
 	
 	public void scriptAdded(IScript script) {

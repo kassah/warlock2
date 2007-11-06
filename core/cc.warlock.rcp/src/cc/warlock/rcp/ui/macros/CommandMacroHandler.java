@@ -1,13 +1,8 @@
 package cc.warlock.rcp.ui.macros;
 
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.Comparator;
-import java.util.Date;
 import java.util.Map;
 
 import cc.warlock.core.client.IWarlockClientViewer;
-import cc.warlock.core.client.internal.Command;
 
 public class CommandMacroHandler implements IMacroHandler {
 
@@ -21,10 +16,9 @@ public class CommandMacroHandler implements IMacroHandler {
 	public boolean handleMacro(IMacro macro, IWarlockClientViewer viewer)
 	{
 		Map<String, IMacroVariable> variables = MacroRegistry.instance().getMacroVariables();
-		Map<String, IMacroCommand> commands = MacroRegistry.instance().getMacroCommands();
 		
-		//context.getCurrentCommand() + 
 		String newCommand = new String(command);
+		String savedCommand = null;
 		
 		for (String var : variables.keySet())
 		{
@@ -39,32 +33,65 @@ public class CommandMacroHandler implements IMacroHandler {
 			}
 		}
 		
-		ArrayList<IMacroCommand> commandList = new ArrayList<IMacroCommand>();
-		commandList.addAll(commands.values());
-		
-		Collections.sort(commandList, new Comparator<IMacroCommand>() {
-			public int compare(IMacroCommand o1, IMacroCommand o2) {
-				return o1.getPrecedence() - o2.getPrecedence();
-			}
-		});
-		
-		for (IMacroCommand command : commandList)
-		{
-			if (newCommand.contains(command.getIdentifier()))
-			{
-				for ( int i = newCommand.indexOf(command.getIdentifier()); i > -1 && i < newCommand.length(); i = newCommand.indexOf(command.getIdentifier(), i+1))
-				{
-					String result = commands.get(command.getIdentifier()).execute(viewer, newCommand, i);
-					if (result != null)
-					{
-						newCommand = result;
-						i = 0;
+		for (int pos = 0; pos < newCommand.length(); pos++) {
+			char curChar = newCommand.charAt(pos);
+			if(curChar == '\\' && newCommand.length() > pos + 1) {
+				pos++;
+				curChar = newCommand.charAt(pos);
+				switch(curChar) {
+				
+				// submit current text in entry
+				case 'n':
+				case 'r':
+					viewer.submit();
+					break;
+					
+				// pause 1 second
+				case 'p':
+					// not sure how to implement pause
+					break;
+					
+				// clear the entry
+				case 'x':
+					viewer.setCurrentCommand("");
+					break;
+					
+				// display a dialog to get the value
+				case '?':
+					// unimplemented
+					break;
+					
+				// save current text in entry
+				case 'S':
+					savedCommand = viewer.getCurrentCommand();
+					break;
+					
+				// restore saved command
+				case 'R':
+					if(savedCommand != null)
+						viewer.setCurrentCommand(savedCommand);
+					break;
+					
+				default:
+					viewer.append(curChar);
+				}
+			} else if(curChar == '{') {
+				int endPos = newCommand.indexOf('}', pos);
+				if(endPos == -1) {
+					viewer.append(curChar);
+				} else {
+					String commandText = newCommand.substring(pos + 1, endPos);
+					pos = endPos + 1;
+					for(Map.Entry<String, IMacroCommand> macroCommand : MacroRegistry.instance().getMacroCommands().entrySet()) {
+						if(commandText.equals(macroCommand.getKey())) {
+							macroCommand.getValue().execute(viewer);
+						}
 					}
 				}
+			} else {
+				viewer.append(curChar);
 			}
 		}
-		
-		viewer.setCurrentCommand(newCommand);
 		return true;
 	}
 	

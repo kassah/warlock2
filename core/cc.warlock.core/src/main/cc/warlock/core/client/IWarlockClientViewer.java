@@ -18,4 +18,16 @@ public interface IWarlockClientViewer extends IStreamListener {
 	public String getCurrentCommand ();
 	
 	public void setCurrentCommand (String command);
+	
+	public void append(char c);
+	
+	public void submit();
+	
+	public void prevCommand();
+	
+	public void nextCommand();
+	
+	public void repeatLastCommand();
+	
+	public void repeatSecondToLastCommand();
 }

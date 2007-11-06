@@ -20,11 +20,4 @@ public interface ICommand {
 	 * @return The timestamp for this command
 	 */
 	public Date getTimestamp();
-	
-	/**
-	 * @return whether this command will go into the history. If it's already in the history, this will return false.
-	 */
-	public boolean isBoundForHistory();
-	
-	public void setBoundForHistory(boolean inHistory);
 }

@@ -9,18 +9,12 @@ import java.util.Collection;
 import java.util.Random;
 
 import org.eclipse.swt.SWT;
-import org.eclipse.swt.custom.StyledText;
-import org.eclipse.swt.events.KeyEvent;
-import org.eclipse.swt.events.KeyListener;
-import org.eclipse.swt.events.ModifyEvent;
-import org.eclipse.swt.events.ModifyListener;
 import org.eclipse.swt.graphics.Color;
 import org.eclipse.swt.graphics.GC;
 import org.eclipse.swt.graphics.Image;
 import org.eclipse.swt.graphics.ImageData;
 import org.eclipse.swt.graphics.PaletteData;
 import org.eclipse.swt.graphics.RGB;
-import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.widgets.Caret;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Display;
@@ -34,16 +28,15 @@ import cc.warlock.core.client.IWarlockClientViewer;
 import cc.warlock.rcp.configuration.GameViewConfiguration;
 import cc.warlock.rcp.plugin.Warlock2Plugin;
 import cc.warlock.rcp.ui.WarlockCompass;
+import cc.warlock.rcp.ui.WarlockEntry;
 import cc.warlock.rcp.ui.WarlockText;
 import cc.warlock.rcp.ui.client.SWTWarlockClientViewer;
-import cc.warlock.rcp.ui.macros.IMacro;
-import cc.warlock.rcp.ui.macros.MacroRegistry;
 import cc.warlock.rcp.ui.style.CompassThemes;
 
 /**
  * @author marshall
  */
-public abstract class GameView extends StreamView implements KeyListener, IWarlockClientViewer {
+public abstract class GameView extends StreamView implements IWarlockClientViewer {
 
 	protected static GameView firstInstance;
 	protected static boolean firstInstanceIsUsed = false;
@@ -52,9 +45,8 @@ public abstract class GameView extends StreamView implements KeyListener, IWarlo
 	protected static GameView viewInFocus;
 	
 	protected WarlockText text;
-	protected StyledText entry;
+	protected WarlockEntry entry;
 	protected WarlockCompass compass;
-	protected String currentCommand;
 	protected SWTWarlockClientViewer wrapper;
 	
 	public GameView () {
@@ -62,7 +54,7 @@ public abstract class GameView extends StreamView implements KeyListener, IWarlo
 			firstInstance = this;
 		}
 		
-		currentCommand = "";
+		// currentCommand = "";
 		openViews.add(this);
 		wrapper = new SWTWarlockClientViewer(this);
 		
@@ -143,29 +135,19 @@ public abstract class GameView extends StreamView implements KeyListener, IWarlo
 		
 		text.setLineLimit(GameViewConfiguration.instance().getBufferLines());
 		text.setScrollDirection(SWT.DOWN);
-		text.addKeyListener(this);
 		
-		entry = new StyledText(mainComposite, SWT.BORDER | SWT.SINGLE);
-		entry.setLayoutData(new GridData(GridData.FILL, GridData.VERTICAL_ALIGN_END, true, false, 1, 1));
-		entry.setEditable(true);
-		entry.setLineSpacing(5);
-		entry.setIndent(5);
+		
+		entry = new WarlockEntry(mainComposite, wrapper);
 		
 		compass = new WarlockCompass(text, CompassThemes.getCompassTheme("small"));
 		text.setBackgroundMode(SWT.INHERIT_DEFAULT);
 		
-		entry.addModifyListener(new ModifyListener () {
-			public void modifyText(ModifyEvent e) {
-				currentCommand = entry.getText();
-			}
-		});
-		entry.addKeyListener(this);
+		entry.addKeyListener(entry);
+		text.addKeyListener(entry);
 		
 	}
 	
 	public void setFocus() {
-		entry.setFocus();
-		
 		viewInFocus = this;
 		for (IGameViewFocusListener listener : focusListeners)
 		{
@@ -179,9 +161,9 @@ public abstract class GameView extends StreamView implements KeyListener, IWarlo
 				new RGB(0, 0, 0), new RGB(255, 255, 255) });
 		
 		int widthOffset = width - 1;
-		ImageData imageData = new ImageData(4 + widthOffset, entry
-				.getLineHeight(), 1, caretPalette);
-		Display display = entry.getDisplay();
+		ImageData imageData = new ImageData(4 + widthOffset,
+				entry.getWidget().getLineHeight(), 1, caretPalette);
+		Display display = entry.getWidget().getDisplay();
 		Image bracketImage = new Image(display, imageData);
 		GC gc = new GC(bracketImage);
 		gc.setForeground(foreground);
@@ -199,31 +181,54 @@ public abstract class GameView extends StreamView implements KeyListener, IWarlo
 	}
 
 	protected Caret createCaret (int width, Color foreground) {
-		Caret caret = new Caret(entry, SWT.NULL);
+		Caret caret = new Caret(entry.getWidget(), SWT.NULL);
 		Image image = createCaretImage(width, foreground);
 		
 		if (image != null)
 			caret.setImage(image);
 		else
-			caret.setSize(width, entry.getLineHeight());
+			caret.setSize(width, entry.getWidget().getLineHeight());
 
-		caret.setFont(entry.getFont());
+		caret.setFont(entry.getWidget().getFont());
 
 		return caret;
 	}
 	
 	public String getCurrentCommand ()
 	{
-		return GameView.this.currentCommand;
+		return entry.getText();
 	}
 	
 	public void setCurrentCommand(String command) {
 		if(command == null) {
 			command = "";
 		}
-		GameView.this.currentCommand = command;
 		GameView.this.entry.setText(command);
 		GameView.this.entry.setSelection(command.length());
+	}
+	
+	public void append(char c) {
+		entry.append(c);
+	}
+	
+	public void nextCommand() {
+		entry.nextCommand();
+	}
+	
+	public void prevCommand() {
+		entry.prevCommand();
+	}
+	
+	public void submit() {
+		entry.submit();
+	}
+	
+	public void repeatLastCommand() {
+		entry.repeatLastCommand();
+	}
+	
+	public void repeatSecondToLastCommand() {
+		entry.repeatSecondToLastCommand();
 	}
 	
 	public void setClient(IWarlockClient client) {
@@ -243,67 +248,6 @@ public abstract class GameView extends StreamView implements KeyListener, IWarlo
 	
 	public IWarlockClient getWarlockClient() {
 		return client;
-	}
-
-	protected boolean isKeypadKey (int code) {
-		return (code == SWT.KEYPAD_0 || code == SWT.KEYPAD_1 || code == SWT.KEYPAD_2
-				|| code == SWT.KEYPAD_3 || code == SWT.KEYPAD_4 || code == SWT.KEYPAD_5
-				|| code == SWT.KEYPAD_6 || code == SWT.KEYPAD_7 || code == SWT.KEYPAD_8
-				|| code == SWT.KEYPAD_9 || code == SWT.KEYPAD_ADD || code == SWT.KEYPAD_CR
-				|| code == SWT.KEYPAD_DECIMAL || code == SWT.KEYPAD_DIVIDE || code == SWT.KEYPAD_EQUAL
-				|| code == SWT.KEYPAD_EQUAL || code == SWT.KEYPAD_MULTIPLY || code == SWT.KEYPAD_SUBTRACT);
-	}
-	
-	protected boolean keyHandled = false;
-	public void keyPressed(KeyEvent e) {
-		keyHandled = false;
-		if (e.stateMask == 0 && entryCharacters.contains(e.character) && !isKeypadKey(e.keyCode)) return;
-		
-		Collection<IMacro> macros = MacroRegistry.instance().getMacros();
-		e.doit = true;
-		
-		for (IMacro macro : macros)
-		{
-			if (macro.getKeyCode() == e.keyCode && macro.getModifiers() == e.stateMask)
-			{
-				 try {
-					macro.execute(wrapper);
-					keyHandled = true;
-				} catch (Exception ex) {
-					// TODO Auto-generated catch block
-					ex.printStackTrace();
-				}
-				
-				e.doit = false;
-				break;
-			}
-		}
-	}
-	
-	private static final char[] entryChars = new char[] {
-		'a', 'b', 'c', 'd', 'e', 'f', 'g', 'h', 'i', 'j', 'k', 'l', 'm', 'n', 'o', 'p', 'q', 'r', 's', 't', 'u', 'v', 'w', 'x', 'y', 'z',
-		'A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 'K', 'L', 'M', 'N', 'O', 'P', 'Q', 'R', 'S', 'T', 'U', 'V', 'W', 'X', 'Y', 'Z',
-		'0', '1', '2', '3', '4', '5', '6', '7', '8', '9',
-		'.', '/', '{', '}', '<', '>', ',', '?', '\'', '"', ':', ';', '[', ']', '|', '\\', '-', '_', '+', '=',
-		'~', '`', '!', '@', '#', '$', '%', '^', '&', '*', '(', ')'
-	};
-	private static final ArrayList<Character> entryCharacters = new ArrayList<Character>();
-	static {
-		for (char c : entryChars) {
-			entryCharacters.add(c);
-		}
-	}
-	
-	public void keyReleased(KeyEvent e) {
-		if (!entry.isFocusControl() && !keyHandled) {
-			
-			if (entryCharacters.contains(e.character))
-			{
-				entry.append(e.character+"");
-				entry.setCaretOffset(entry.getText().length());
-				entry.setFocus();
-			}
-		}
 	}
 	
 	@Override

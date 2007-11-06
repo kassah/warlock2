@@ -106,7 +106,7 @@ public class CommandHistory implements ICommandHistory {
 	
 	public void addCommand(ICommand command) {
 		
-		if(!command.isBoundForHistory() || (commands.size() > 0 && command.getCommand().equals(commands.getFirst())))
+		if(commands.size() > 0 && command.getCommand().equals(commands.getFirst().getCommand()))
 			return;
 		
 		// command.setBoundForHistory(false);

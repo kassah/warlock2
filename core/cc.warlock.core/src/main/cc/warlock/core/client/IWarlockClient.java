@@ -48,7 +48,7 @@ public interface IWarlockClient {
 	 * @param command The command to send.
 	 * @param add the command to the history
 	 */
-	public void send(String prefix, String command, boolean addToHistory);
+	//public void send(String prefix, String command, boolean addToHistory);
 	
 	/**
 	 * @return This client's command history

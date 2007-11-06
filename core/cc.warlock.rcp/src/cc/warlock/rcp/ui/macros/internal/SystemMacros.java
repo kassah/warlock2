@@ -19,11 +19,6 @@ public class SystemMacros {
 	public static IMacro[] getSystemMacros ()
 	{
 		ArrayList<IMacro> systemMacros = new ArrayList<IMacro>();
-		CommandHistoryMacroHandler commandHistoryMacroHandler = new CommandHistoryMacroHandler();
-		for (IMacro macro : commandHistoryMacroHandler.getMacros())
-		{
-			systemMacros.add(macro);
-		}
 		
 		ScriptMacroHandler scriptMacroHandler = new ScriptMacroHandler();
 		for (IMacro macro : scriptMacroHandler.getMacros())
