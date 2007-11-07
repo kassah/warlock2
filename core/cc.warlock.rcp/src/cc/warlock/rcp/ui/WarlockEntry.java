@@ -3,6 +3,7 @@ package cc.warlock.rcp.ui;
 import java.util.ArrayList;
 
 import org.eclipse.swt.SWT;
+import org.eclipse.swt.custom.ST;
 import org.eclipse.swt.custom.StyledText;
 import org.eclipse.swt.events.KeyEvent;
 import org.eclipse.swt.events.KeyListener;
@@ -28,7 +29,8 @@ public class WarlockEntry implements KeyListener {
 		widget.setEditable(true);
 		widget.setLineSpacing(5);
 		widget.setIndent(5);
-		widget.addKeyListener(this);
+		widget.setEditable(false);
+		//widget.addKeyListener(this);
 		
 		for (IMacro macro : new CommandHistoryMacroHandler().getMacros())
 		{
@@ -67,8 +69,8 @@ public class WarlockEntry implements KeyListener {
 	}
 
 	public void keyPressed(KeyEvent e) {
-		//keyHandled = false;
-		if (e.stateMask == 0 && entryCharacters.contains(e.character) && !isKeypadKey(e.keyCode) && widget.isFocusControl()) return;
+		// 
+		//if (e.stateMask == 0 && entryCharacters.contains(e.character) && !isKeypadKey(e.keyCode)) return;
 		if (!e.doit) return;
 		//e.doit = true;
 		
@@ -108,11 +110,19 @@ public class WarlockEntry implements KeyListener {
 			}
 		}
 		
-		if (!widget.isFocusControl() && entryCharacters.contains(e.character))
-		{
-			append(e.character);
-			e.doit = false;
-		}
+		//if (!widget.isFocusControl()) {
+			// TODO make this a bit more robust
+			if(entryCharacters.contains(e.character))
+			{
+				append(e.character);
+				e.doit = false;
+			} else if(e.character == '\b') {
+				widget.invokeAction(ST.DELETE_PREVIOUS);
+				widget.setCaretOffset(widget.getText().length());
+				widget.setFocus();
+				e.doit = false;
+			}
+		//}
 	}
 	
 	public void append(char ch) {
