@@ -28,7 +28,7 @@ public class WarlockEntry implements KeyListener {
 		widget.setEditable(true);
 		widget.setLineSpacing(5);
 		widget.setIndent(5);
-		//widget.addKeyListener(this);
+		widget.addKeyListener(this);
 		
 		for (IMacro macro : new CommandHistoryMacroHandler().getMacros())
 		{
@@ -68,7 +68,8 @@ public class WarlockEntry implements KeyListener {
 
 	public void keyPressed(KeyEvent e) {
 		//keyHandled = false;
-		if (e.stateMask == 0 && entryCharacters.contains(e.character) && !isKeypadKey(e.keyCode)) return;
+		if (e.stateMask == 0 && entryCharacters.contains(e.character) && !isKeypadKey(e.keyCode) && widget.isFocusControl()) return;
+		if (!e.doit) return;
 		//e.doit = true;
 		
 		if(widget.isFocusControl()) {
@@ -84,7 +85,7 @@ public class WarlockEntry implements KeyListener {
 						ex.printStackTrace();
 					}
 					
-					//e.doit = false;
+					e.doit = false;
 					return;
 				}
 			}
@@ -102,7 +103,7 @@ public class WarlockEntry implements KeyListener {
 					ex.printStackTrace();
 				}
 				
-				//e.doit = false;
+				e.doit = false;
 				return;
 			}
 		}
@@ -110,7 +111,7 @@ public class WarlockEntry implements KeyListener {
 		if (!widget.isFocusControl() && entryCharacters.contains(e.character))
 		{
 			append(e.character);
-			//e.doit = false;
+			e.doit = false;
 		}
 	}
 	
