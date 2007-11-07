@@ -53,15 +53,8 @@ public class ScriptCommands implements IScriptCommands, IStreamListener
 	}
 	
 	protected void assertPrompt() {
-		while (!client.getDefaultStream().isPrompting())
-		{
-			try {
-				Thread.sleep(200);
-			} catch (InterruptedException e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
-			}
-		}
+		if (!gotPrompt)
+			waitForPrompt();
 	}
 	
 	public void addMatch(Match match) {

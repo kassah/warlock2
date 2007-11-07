@@ -40,7 +40,7 @@ public class StormFrontScriptCommands extends ScriptCommands implements IStormFr
 	public void waitForRoundtime ()
 	{
 		if(!interrupted) {
-			//assertPrompt();
+			assertPrompt();
 			try {
 				while(sfClient.getRoundtime().get() > 0 && !interrupted) {
 					Thread.sleep((sfClient.getRoundtime().get() + 1) * 1000);
