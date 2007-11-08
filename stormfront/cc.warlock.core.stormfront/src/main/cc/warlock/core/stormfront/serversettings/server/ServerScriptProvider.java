@@ -41,6 +41,10 @@ public class ServerScriptProvider implements IServerScriptProvider
 		public IStormFrontClient getClient() {
 			return ServerScriptProvider.this.client;
 		}
+		
+		public IServerScriptProvider getProvider() {
+			return ServerScriptProvider.this;
+		}
 	}
 	
 	public ServerScriptProvider (IStormFrontClient client)
