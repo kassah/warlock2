@@ -114,8 +114,8 @@ public class WarlockEntry implements VerifyKeyListener {
 				e.doit = false;
 			} else if(e.character == '\b') {
 				widget.invokeAction(ST.DELETE_PREVIOUS);
-				//widget.setCaretOffset(widget.getText().length());
-				//widget.setFocus();
+				widget.setCaretOffset(widget.getText().length());
+				widget.setFocus();
 				e.doit = false;
 			}
 		}
