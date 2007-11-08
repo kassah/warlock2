@@ -5,8 +5,10 @@ import java.util.ArrayList;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.custom.ST;
 import org.eclipse.swt.custom.StyledText;
+import org.eclipse.swt.custom.VerifyKeyListener;
 import org.eclipse.swt.events.KeyEvent;
 import org.eclipse.swt.events.KeyListener;
+import org.eclipse.swt.events.VerifyEvent;
 import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.widgets.Composite;
 
@@ -16,7 +18,7 @@ import cc.warlock.rcp.ui.macros.IMacro;
 import cc.warlock.rcp.ui.macros.MacroRegistry;
 import cc.warlock.rcp.ui.macros.internal.CommandHistoryMacroHandler;
 
-public class WarlockEntry implements KeyListener {
+public class WarlockEntry implements VerifyKeyListener {
 
 	private StyledText widget;
 	private IWarlockClientViewer viewer;
@@ -29,8 +31,9 @@ public class WarlockEntry implements KeyListener {
 		widget.setEditable(true);
 		widget.setLineSpacing(5);
 		widget.setIndent(5);
-		widget.setEditable(false);
+		//widget.setEditable(false);
 		//widget.addKeyListener(this);
+		widget.addVerifyKeyListener(this);
 		
 		for (IMacro macro : new CommandHistoryMacroHandler().getMacros())
 		{
@@ -68,28 +71,21 @@ public class WarlockEntry implements KeyListener {
 		return widget;
 	}
 
-	public void keyPressed(KeyEvent e) {
-		// 
-		//if (e.stateMask == 0 && entryCharacters.contains(e.character) && !isKeypadKey(e.keyCode)) return;
-		if (!e.doit) return;
-		//e.doit = true;
-		
-		if(widget.isFocusControl()) {
-			for (IMacro macro : entryMacros)
+	public void verifyKey(VerifyEvent e) {
+		for (IMacro macro : entryMacros)
+		{
+			if (macro.getKeyCode() == e.keyCode && macro.getModifiers() == e.stateMask)
 			{
-				if (macro.getKeyCode() == e.keyCode && macro.getModifiers() == e.stateMask)
-				{
-					 try {
-						macro.execute(viewer);
-						//keyHandled = true;
-					} catch (Exception ex) {
-						// TODO Auto-generated catch block
-						ex.printStackTrace();
-					}
-					
-					e.doit = false;
-					return;
+				try {
+					macro.execute(viewer);
+					//keyHandled = true;
+				} catch (Exception ex) {
+					// TODO Auto-generated catch block
+					ex.printStackTrace();
 				}
+
+				e.doit = false;
+				return;
 			}
 		}
 		
@@ -110,7 +106,7 @@ public class WarlockEntry implements KeyListener {
 			}
 		}
 		
-		//if (!widget.isFocusControl()) {
+		if (!widget.isFocusControl()) {
 			// TODO make this a bit more robust
 			if(entryCharacters.contains(e.character))
 			{
@@ -118,11 +114,11 @@ public class WarlockEntry implements KeyListener {
 				e.doit = false;
 			} else if(e.character == '\b') {
 				widget.invokeAction(ST.DELETE_PREVIOUS);
-				widget.setCaretOffset(widget.getText().length());
-				widget.setFocus();
+				//widget.setCaretOffset(widget.getText().length());
+				//widget.setFocus();
 				e.doit = false;
 			}
-		//}
+		}
 	}
 	
 	public void append(char ch) {
@@ -136,7 +132,7 @@ public class WarlockEntry implements KeyListener {
 		'A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 'K', 'L', 'M', 'N', 'O', 'P', 'Q', 'R', 'S', 'T', 'U', 'V', 'W', 'X', 'Y', 'Z',
 		'0', '1', '2', '3', '4', '5', '6', '7', '8', '9',
 		'.', '/', '{', '}', '<', '>', ',', '?', '\'', '"', ':', ';', '[', ']', '|', '\\', '-', '_', '+', '=',
-		'~', '`', '!', '@', '#', '$', '%', '^', '&', '*', '(', ')'
+		'~', '`', '!', '@', '#', '$', '%', '^', '&', '*', '(', ')', ' '
 	};
 	
 	private static final ArrayList<Character> entryCharacters = new ArrayList<Character>();
@@ -144,10 +140,6 @@ public class WarlockEntry implements KeyListener {
 		for (char c : entryChars) {
 			entryCharacters.add(c);
 		}
-	}
-	
-	public void keyReleased(KeyEvent e) {
-
 	}
 	
 	public void prevCommand() {
