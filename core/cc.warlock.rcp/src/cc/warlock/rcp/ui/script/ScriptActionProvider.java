@@ -47,7 +47,7 @@ public class ScriptActionProvider extends CommonActionProvider {
 	
 	@Override
 	public void fillContextMenu(IMenuManager menu) {
-		menu.appendToGroup(ICommonMenuConstants.GROUP_OPEN, openAction);
+//		menu.appendToGroup(ICommonMenuConstants.GROUP_OPEN, openAction);
 	}
 	
 	protected class OpenAction extends Action 
