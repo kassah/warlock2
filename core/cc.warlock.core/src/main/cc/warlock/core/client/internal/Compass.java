@@ -61,6 +61,9 @@ public class Compass extends ClientProperty<String> implements ICompass {
 		// We do not notify on set, only when the compass is finished.
 		DirectionType direction = directions.get(data);
 		
+		if(direction == null)
+			return;
+		
 		compass.put(direction, true);
 		for (IPropertyListener<String> listener : listeners)
 		{
