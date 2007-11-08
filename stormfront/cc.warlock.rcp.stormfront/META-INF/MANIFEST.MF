@@ -11,5 +11,8 @@ Require-Bundle: org.eclipse.ui,
  cc.warlock.core.stormfront,
  cc.warlock.core.stormfront.script,
  cc.warlock.rcp,
- org.eclipse.core.expressions
+ org.eclipse.core.expressions,
+ org.eclipse.ui.navigator,
+ org.eclipse.ui.ide,
+ org.eclipse.core.resources
 Eclipse-LazyStart: true

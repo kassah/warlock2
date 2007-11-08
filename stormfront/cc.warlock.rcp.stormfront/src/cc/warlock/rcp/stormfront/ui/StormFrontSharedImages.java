@@ -29,6 +29,7 @@ public class StormFrontSharedImages {
 	public static final String IMG_LEFT_HAND_SMALL = "/images/left_hand_small.gif";
 	public static final String IMG_RIGHT_HAND_SMALL= "/images/right_hand_small.gif";
 	public static final String IMG_SPELL_HAND_SMALL = "/images/spell_hand_small.gif";
+	public static final String IMG_STORMFRONT_SCRIPTS = "/images/stormfront_scripts.gif";
 	
 	private static StormFrontSharedImages instance;
 	

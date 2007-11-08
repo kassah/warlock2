@@ -190,5 +190,52 @@
             type="cc.warlock.rcp.ui.client.WarlockClientAdaptable">
       </propertyTester>
    </extension>
+   <extension
+         point="org.eclipse.ui.navigator.navigatorContent">
+      <navigatorContent
+            contentProvider="cc.warlock.rcp.stormfront.ui.script.StormfrontScriptContentProvider"
+            icon="images/stormfront_scripts.gif"
+            id="cc.warlock.rcp.stormfront.navigator.stormfrontScripts"
+            labelProvider="cc.warlock.rcp.stormfront.ui.script.StormfrontScriptLabelProvider"
+            name="Stormfront Scripts">
+         <triggerPoints>
+            <or>
+               <instanceof
+                     value="cc.warlock.rcp.application.WarlockApplication">
+               </instanceof>
+               <instanceof
+                     value="cc.warlock.core.stormfront.serversettings.server.IServerScriptInfo">
+               </instanceof>
+            </or>
+         </triggerPoints>
+         <possibleChildren>
+            <or>
+               <instanceof
+                     value="cc.warlock.core.stormfront.serversettings.server.IServerScriptInfo">
+               </instanceof>
+            </or>
+         </possibleChildren>
+         <actionProvider
+               class="cc.warlock.rcp.stormfront.ui.script.StormfrontScriptActionProvider">
+         </actionProvider>
+      </navigatorContent>
+   </extension>
+   <extension
+         point="org.eclipse.ui.navigator.viewer">
+      <viewerContentBinding
+            viewerId="cc.warlock.rcp.views.scriptNavigatorView">
+         <includes>
+            <contentExtension
+                  pattern="cc.warlock.rcp.stormfront.navigator.stormfrontScripts">
+            </contentExtension></includes>
+      </viewerContentBinding>
+   </extension>
+   <extension
+         point="org.eclipse.ui.elementFactories">
+      <factory
+            class="cc.warlock.rcp.stormfront.ui.script.ServerScriptPersistableFactory"
+            id="cc.warlock.rcp.stormfront.serverScriptPersistableFactory">
+      </factory>
+   </extension>
 
 </plugin>
