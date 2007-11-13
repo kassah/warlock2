@@ -89,6 +89,7 @@ public class WSLScript extends AbstractScript {
 	}
 
 	public IWSLValue getVariable(String name) {
+		//TODO make classes for these variables and put them in the variable list
 		if(name.equals("t")) return new WSLNumber(timer.get());
 		if(name.equals("mana")) return new WSLNumber(client.getMana().get());
 		if(name.equals("health")) return new WSLNumber(client.getHealth().get());
@@ -101,7 +102,11 @@ public class WSLScript extends AbstractScript {
 		if(name.equals("roomdesc")) return new WSLString(client.getRoomDescription().get());
 		if(name.equals("roomtitle")) return new WSLString(client.getStream(IStormFrontClient.ROOM_STREAM_NAME).getTitle().get());
 		// if(name.equals("roomexits")) return new WSLString(client.getStream(IStormFrontClient.ROOM_STREAM_NAME).getTitle().get());
-		return new WSLString(variables.get(name));
+		String value = variables.get(name);
+		if(value != null)
+			return new WSLString(value);
+		else
+			return null;
 	}
 	
 	public boolean isRunning() {

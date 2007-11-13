@@ -12,8 +12,12 @@ public class WSLVariable extends WSLString {
 	
 	@Override
 	public String toString() {
-		String value = script.getVariable(variableName).toString();
-		if(value == null) return "";
-		return value;
+		IWSLValue value = script.getVariable(variableName);
+		if(value == null) {
+			if(variableName.startsWith("$"))
+				return variableName;
+			return "%" + variableName;
+		}
+		return value.toString();
 	}
 }
