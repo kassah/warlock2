@@ -12,7 +12,6 @@ import java.util.concurrent.locks.ReentrantLock;
 import cc.warlock.core.client.IStream;
 import cc.warlock.core.client.IStreamListener;
 import cc.warlock.core.client.IWarlockClient;
-import cc.warlock.core.client.IWarlockStyle;
 import cc.warlock.core.client.WarlockString;
 import cc.warlock.core.script.IScriptCommands;
 import cc.warlock.core.script.Match;
@@ -202,9 +201,6 @@ public class ScriptCommands implements IScriptCommands, IStreamListener
 		gotPrompt = false;
 		receiveText(text);
 	}
-	
-	public void streamAddedStyle(IStream stream, IWarlockStyle style) {	}
-	public void streamRemovedStyle(IStream stream, IWarlockStyle style) {	}
 	
 	public void streamReceivedText(IStream stream, WarlockString text) {
 		gotPrompt = false;

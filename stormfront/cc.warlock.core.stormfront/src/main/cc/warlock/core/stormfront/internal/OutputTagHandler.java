@@ -22,7 +22,7 @@ public class OutputTagHandler extends DefaultTagHandler {
 
 	public void handleStart(StormFrontAttributeList attributes) {
 		if(currentStyle != null) {
-			handler.getCurrentStream().removeStyle(currentStyle);
+			handler.removeStyle(currentStyle);
 		}
 	
 		String classId = attributes.getValue("class");
@@ -33,7 +33,7 @@ public class OutputTagHandler extends DefaultTagHandler {
 			if(classId.equals("mono")) {
 				currentStyle.addStyleType(IWarlockStyle.StyleType.MONOSPACE);
 			}
-			handler.getCurrentStream().addStyle(currentStyle);
+			handler.addStyle(currentStyle);
 		}
 	}
 }

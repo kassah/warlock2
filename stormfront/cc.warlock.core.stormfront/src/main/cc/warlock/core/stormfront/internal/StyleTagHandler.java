@@ -34,7 +34,7 @@ public class StyleTagHandler extends DefaultTagHandler {
 
 	public void handleStart(StormFrontAttributeList attributes) {
 		if(currentStyle != null) {
-			handler.getCurrentStream().removeStyle(currentStyle);
+			handler.removeStyle(currentStyle);
 			currentStyle = null;
 		}
 		
@@ -45,7 +45,7 @@ public class StyleTagHandler extends DefaultTagHandler {
 			Preset preset = handler.getClient().getServerSettings().getPreset(styleId);
 			if(preset != null) {
 				currentStyle = preset.getStyle();
-				handler.getCurrentStream().addStyle(currentStyle);
+				handler.addStyle(currentStyle);
 			}
 		}
 	}

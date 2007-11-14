@@ -3,7 +3,6 @@ package cc.warlock.core.stormfront.internal;
 import java.util.regex.Pattern;
 
 import cc.warlock.core.client.IWarlockStyle;
-import cc.warlock.core.client.internal.WarlockStyle;
 import cc.warlock.core.stormfront.IStormFrontProtocolHandler;
 
 
@@ -26,13 +25,13 @@ public class PushBoldTagHandler extends DefaultTagHandler {
 		if (getCurrentTag().equals("pushBold"))
 		{
 			style = handler.getClient().getServerSettings().getPreset("bold").getStyle();
-			handler.getCurrentStream().addStyle(style);
+			handler.addStyle(style);
 		}
 		
 		else if (getCurrentTag().equals("popBold"))
 		{
 			if(style != null) {
-				handler.getCurrentStream().removeStyle(style);
+				handler.removeStyle(style);
 				style = null;
 			}
 			// we'll need to figure out another way to auto linkify http links

@@ -60,7 +60,6 @@ public class StreamView extends ViewPart implements IStreamListener, IGameViewFo
 	protected boolean isPrompting = false;
 	protected boolean multiClient = false;
 	protected boolean buffering = false;
-	protected ArrayList<IWarlockStyle> styles = new ArrayList<IWarlockStyle>();
 	
 	protected WarlockString bufferedText;
 	
@@ -174,10 +173,6 @@ public class StreamView extends ViewPart implements IStreamListener, IGameViewFo
 		if (string != null && string.length() > 0)
 		{
 			streamReceivedText(stream, new WarlockString(client, string));
-			for (IWarlockStyle style : client.getStreamBufferStyles(stream))
-			{
-				streamAddedStyle(stream, style);
-			}
 		}
 	}
 	
@@ -263,49 +258,6 @@ public class StreamView extends ViewPart implements IStreamListener, IGameViewFo
 		}
 	}
 	
-	public void streamAddedStyle(IStream stream, IWarlockStyle style) {
-		if (this.mainStream.equals(stream) || this.streams.contains(stream))
-		{
-			styles.add(style);
-			
-			/* TODO: old stuff, clean out
-			WarlockText text = getTextForClient(client);
-			int charCount = getCharCount(text);
-			
-			if (!style.isEndStyle())
-			{
-				StyleRangeWithData range = getStyleProvider().getStyleRange(style, charCount);
-				if (style.getStyleTypes().contains(IWarlockStyle.StyleType.LINK))
-				{
-					range.data.put("link.url", style.getLinkAddress().toString());
-				}
-				unendedRanges.push(range);
-			}
-			else
-			{
-				if (unendedRanges.size() > 0)
-				{
-					StyleRangeWithData range = unendedRanges.pop();
-					range.length = charCount - range.start;
-					
-					addStyleRange(text, range);
-					if (unendedRanges.size() == 0 && innerRanges.size() > 0)
-					{
-						for (StyleRangeWithData innerRange : innerRanges) { addStyleRange(text, innerRange); }
-						innerRanges.clear();
-					}
-				}
-			}*/
-		}
-	}
-	
-	public void streamRemovedStyle(IStream stream, IWarlockStyle style) {
-		if (this.mainStream.equals(stream) || this.streams.contains(stream))
-		{
-			styles.remove(style);
-		}
-	}
-	
 	public void streamReceivedText(IStream stream, WarlockString text) {
 		if (this.mainStream.equals(stream) || this.streams.contains(stream))
 		{
@@ -315,11 +267,8 @@ public class StreamView extends ViewPart implements IStreamListener, IGameViewFo
 				string.append("\n");
 				isPrompting = false;
 			}
-			int styleStart = string.length();
+			
 			string.append(text);
-			for(IWarlockStyle style : styles) {
-				string.addStyle(styleStart, string.length(), style);
-			}
 			
 			if (appendNewlines)
 				string.append("\n");
@@ -369,7 +318,6 @@ public class StreamView extends ViewPart implements IStreamListener, IGameViewFo
 				bufferedText = null;
 			}
 			
-			styles.clear();
 			text.append(prompt);
 			
 			appendText(text);

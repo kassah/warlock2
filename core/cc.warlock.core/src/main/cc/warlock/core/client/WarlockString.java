@@ -37,6 +37,12 @@ public class WarlockString {
 		this.text.append(text);
 	}
 	
+	public WarlockString(IWarlockClient client, String text, IWarlockStyle style) {
+		this.client = client;
+		this.text.append(text);
+		addStyle(style);
+	}
+	
 	public String toString() {
 		return text.toString();
 	}
@@ -55,6 +61,10 @@ public class WarlockString {
 		for(WarlockStringStyleRange range : string.getStyles()) {
 			addStyle(charCount + range.start, range.length, range.style);
 		}
+	}
+	
+	public void addStyle(IWarlockStyle style) {
+		addStyle(0, text.length(), style);
 	}
 	
 	public void addStyle(int start, int length, IWarlockStyle style) {

@@ -61,16 +61,6 @@ public abstract class WarlockClient implements IWarlockClient {
 					streamBuffers.get(stream).append(prompt + "\n");
 				}
 			}
-			public void streamAddedStyle(IStream stream, IWarlockStyle style) {
-				if (stream != null) {
-					getStreamBufferStyles(stream).add(style);
-				}
-			}
-			public void streamRemovedStyle(IStream stream, IWarlockStyle style) {
-				if (stream != null) {
-					getStreamBufferStyles(stream).remove(style);
-				}
-			}
 			public void streamReceivedText(IStream stream, WarlockString text) {
 				if (stream != null) {
 					streamBuffers.get(stream).append(text);

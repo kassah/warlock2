@@ -27,10 +27,9 @@ public interface IStormFrontProtocolHandler extends IStormFrontXMLHandler {
 	public void popStream();
 	public IStream getCurrentStream();
 	
-//	public void pushBuffer();
-//	public IStyledString popBuffer();
-//	public IStyledString peekBuffer();
-//	public void sendAndPopBuffer();
+	public void addStyle(IWarlockStyle style);
+	public void removeStyle(IWarlockStyle style);
+	public void clearStyles();
 	
 	public void startSavingRawXML(StringBuffer buffer, String endOnTag);
 	public void stopSavingRawXML();

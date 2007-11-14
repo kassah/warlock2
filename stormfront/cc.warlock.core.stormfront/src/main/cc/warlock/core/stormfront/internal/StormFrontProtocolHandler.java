@@ -6,6 +6,7 @@
  */
 package cc.warlock.core.stormfront.internal;
 
+import java.util.ArrayList;
 import java.util.EmptyStackException;
 import java.util.HashMap;
 import java.util.Map;
@@ -14,6 +15,8 @@ import java.util.Stack;
 import org.apache.commons.lang.StringEscapeUtils;
 
 import cc.warlock.core.client.IStream;
+import cc.warlock.core.client.IWarlockStyle;
+import cc.warlock.core.client.WarlockString;
 import cc.warlock.core.stormfront.IStormFrontProtocolHandler;
 import cc.warlock.core.stormfront.IStormFrontTagHandler;
 import cc.warlock.core.stormfront.client.IStormFrontClient;
@@ -33,6 +36,7 @@ public class StormFrontProtocolHandler implements IStormFrontProtocolHandler {
 	protected HashMap<String, IStormFrontTagHandler> defaultTagHandlers = new HashMap<String, IStormFrontTagHandler>();
 	protected Stack<IStream> streamStack = new Stack<IStream>();
 	protected Stack<String> tagStack = new Stack<String>();
+	protected ArrayList<IWarlockStyle> styles = new ArrayList<IWarlockStyle>();
 	protected StringBuffer rawXMLBuffer;
 	protected String rawXMLEndOnTag;
 	protected int currentSpacing = 0;
@@ -139,7 +143,10 @@ public class StormFrontProtocolHandler implements IStormFrontProtocolHandler {
 		// if there was no handler or it couldn't handle the characters,
 		// take a default action
 		if(!handleCharacters(defaultTagHandlers, 0, ch, start, length)) {
-			String str = String.copyValueOf(ch, start, length);
+			WarlockString str = new WarlockString(client, String.copyValueOf(ch, start, length));
+			for(IWarlockStyle style : styles) {
+				str.addStyle(style);
+			}
 			
 			IStream stream;
 			try {
@@ -149,7 +156,6 @@ public class StormFrontProtocolHandler implements IStormFrontProtocolHandler {
 			}
 			
 			stream.send(str);
-			//streamTable.send(stream, str);
 		}
 	}
 	
@@ -258,20 +264,6 @@ public class StormFrontProtocolHandler implements IStormFrontProtocolHandler {
 		}
 	}
 	
-//	public void pushBuffer() {
-//		bufferStack.push(new StyledString());
-//	}
-//	
-//	public IStyledString popBuffer() {
-//		return bufferStack.pop();
-//	}
-//	
-//	public IStyledString peekBuffer() {
-//		if (bufferStack.size() > 0)
-//			return bufferStack.peek();
-//		else return null;
-//	}
-	
 	public void startSavingRawXML(StringBuffer buffer, String endOnTag) {
 		rawXMLBuffer = buffer;
 		rawXMLEndOnTag = endOnTag;
@@ -290,27 +282,15 @@ public class StormFrontProtocolHandler implements IStormFrontProtocolHandler {
 		return str;
 	}
 	
-//	public void sendAndPopBuffer() {
-//		IStyledString buffer = popBuffer();
-//		if (peekBuffer() != null)
-//		{
-//			IStyledString parentBuffer = peekBuffer();
-//			
-//			for (IWarlockStyle style : buffer.getStyles())
-//			{
-//				style.setStart(parentBuffer.getBuffer().length() + style.getStart());
-//				if (!WarlockStyle.EMPTY_STYLE.equals(currentStyle))
-//				{
-//					// the current style in this context will be used for style inheritance
-//					style.inheritFrom(currentStyle);
-//				}
-//				
-//				parentBuffer.addStyle(style);
-//			}
-//			parentBuffer.getBuffer().append(buffer.getBuffer());
-//		}
-//		else {
-//			getCurrentStream().send(buffer);
-//		}
-//	}
+	public void addStyle(IWarlockStyle style) {
+		styles.add(style);
+	}
+	
+	public void removeStyle(IWarlockStyle style) {
+		styles.remove(style);
+	}
+	
+	public void clearStyles() {
+		styles.clear();
+	}
 }

@@ -30,6 +30,7 @@ public class PromptTagHandler extends DefaultTagHandler {
 	
 	public void handleStart(StormFrontAttributeList attributes) {
 		//System.out.println("got prompt");
+		handler.clearStyles();
 		prompt = "";
 		
 		if (attributes.getValue("time") != null)

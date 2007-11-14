@@ -34,13 +34,13 @@ public class PresetTagHandler extends DefaultTagHandler {
 			style = new WarlockStyle();
 
 		styles.push(style);
-		handler.getCurrentStream().addStyle(style);
+		handler.addStyle(style);
 	}
 	
 	@Override
 	public void handleEnd() {
 		IWarlockStyle style = styles.pop();
-		handler.getCurrentStream().removeStyle(style);
+		handler.removeStyle(style);
 	}
 
 }

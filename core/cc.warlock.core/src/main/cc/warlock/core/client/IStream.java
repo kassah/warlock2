@@ -19,8 +19,6 @@ public interface IStream {
 	
 	public void send (String text);
 	public void send (WarlockString text);
-	public void addStyle (IWarlockStyle style);
-	public void removeStyle (IWarlockStyle style);
 	
 	public void prompt(String prompt);
 	public void sendCommand(String text);

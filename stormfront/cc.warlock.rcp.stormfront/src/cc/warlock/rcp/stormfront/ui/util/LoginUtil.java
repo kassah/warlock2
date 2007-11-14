@@ -11,6 +11,7 @@ import org.eclipse.ui.PlatformUI;
 
 import cc.warlock.core.client.IWarlockClient;
 import cc.warlock.core.client.IWarlockStyle;
+import cc.warlock.core.client.WarlockString;
 import cc.warlock.core.client.internal.WarlockStyle;
 import cc.warlock.core.stormfront.client.internal.StormFrontClient;
 import cc.warlock.core.stormfront.network.SGEConnection;
@@ -72,9 +73,7 @@ public class LoginUtil {
 			IWarlockStyle style = new WarlockStyle();
 			style.addStyleType(IWarlockStyle.StyleType.MONOSPACE);
 			
-			client.getDefaultStream().addStyle(style);
-			client.getDefaultStream().send(errorConnectMessage);
-			client.getDefaultStream().removeStyle(style);
+			client.getDefaultStream().send(new WarlockString(client, errorConnectMessage, style));
 		} catch (PartInitException e) {
 			e.printStackTrace();
 		}
