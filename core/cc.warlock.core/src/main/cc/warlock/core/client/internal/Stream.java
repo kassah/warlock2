@@ -13,6 +13,7 @@ import cc.warlock.core.client.IStreamListener;
 import cc.warlock.core.client.IWarlockClient;
 import cc.warlock.core.client.IWarlockStyle;
 import cc.warlock.core.client.WarlockClientRegistry;
+import cc.warlock.core.client.WarlockString;
 
 
 /**
@@ -77,6 +78,10 @@ public class Stream implements IStream {
 	}
 	
 	public void send(String text) {
+		send(new WarlockString(getClient(), text));
+	}
+	
+	public void send(WarlockString text) {
 		for(IStreamListener listener : listeners) {
 			try {
 				listener.streamReceivedText(this, text);

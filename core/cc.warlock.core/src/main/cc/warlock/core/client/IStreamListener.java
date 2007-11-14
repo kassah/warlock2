@@ -13,7 +13,7 @@ public interface IStreamListener {
 
 	public void streamAddedStyle (IStream stream, IWarlockStyle style);
 	public void streamRemovedStyle (IStream stream, IWarlockStyle style);
-	public void streamReceivedText (IStream stream, String text);
+	public void streamReceivedText (IStream stream, WarlockString text);
 	
 	public void streamPrompted (IStream stream, String prompt);
 	public void streamReceivedCommand (IStream stream, String text);

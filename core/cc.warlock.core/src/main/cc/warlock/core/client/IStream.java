@@ -18,6 +18,7 @@ public interface IStream {
 	public IProperty<String> getTitle();
 	
 	public void send (String text);
+	public void send (WarlockString text);
 	public void addStyle (IWarlockStyle style);
 	public void removeStyle (IWarlockStyle style);
 	

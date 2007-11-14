@@ -1,5 +1,7 @@
 package cc.warlock.core.stormfront.serversettings.server;
 
+import java.util.regex.Pattern;
+
 import cc.warlock.core.stormfront.xml.StormFrontElement;
 
 public class HighlightString extends Preset {
@@ -14,6 +16,7 @@ public class HighlightString extends Preset {
 	protected String text;
 	protected boolean isName, isNew = false;
 	protected HighlightString originalString;
+	protected Pattern pattern;
 	
 	protected HighlightString (ServerSettings serverSettings, Palette palette)
 	{
@@ -46,6 +49,7 @@ public class HighlightString extends Preset {
 			needsUpdate = true;
 		
 		this.text = text;
+		this.pattern = null;
 	}
 	
 	public boolean isName() {
@@ -141,5 +145,12 @@ public class HighlightString extends Preset {
 
 	public void setNew(boolean isNew) {
 		this.isNew = isNew;
+	}
+	
+	public Pattern getPattern() {
+		if(pattern == null)
+			pattern = Pattern.compile(text);
+		
+		return pattern;
 	}
 }

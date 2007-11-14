@@ -15,6 +15,7 @@ import cc.warlock.core.client.IStreamListener;
 import cc.warlock.core.client.IWarlockClient;
 import cc.warlock.core.client.IWarlockClientViewer;
 import cc.warlock.core.client.IWarlockStyle;
+import cc.warlock.core.client.WarlockString;
 import cc.warlock.core.network.IConnection;
 
 
@@ -66,7 +67,7 @@ public abstract class WarlockClient implements IWarlockClient {
 					getStreamBufferStyles(stream).remove(style);
 				}
 			}
-			public void streamReceivedText(IStream stream, String text) {
+			public void streamReceivedText(IStream stream, WarlockString text) {
 				if (stream != null) {
 					streamBuffers.get(stream).append(text);
 				}

@@ -1,15 +1,11 @@
 package cc.warlock.core.stormfront.client.internal;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.Iterator;
-import java.util.Stack;
 import java.util.regex.MatchResult;
 import java.util.regex.Matcher;
-import java.util.regex.Pattern;
 
 import cc.warlock.core.client.IWarlockClient;
 import cc.warlock.core.client.IWarlockStyle;
+import cc.warlock.core.client.WarlockString;
 import cc.warlock.core.client.internal.Stream;
 import cc.warlock.core.stormfront.client.IStormFrontClient;
 import cc.warlock.core.stormfront.serversettings.server.HighlightString;
@@ -25,119 +21,36 @@ public class StormFrontStream extends Stream {
 		
 		this.client = client;
 	}
-
-	protected HashMap<Integer, HighlightString> highlightIndexes = new HashMap<Integer, HighlightString>();
-	protected Stack<HighlightString> fullLineStrings = new Stack<HighlightString>();
-	protected HashMap<Integer, HighlightString> highlightEndIndexes = new HashMap<Integer, HighlightString>();
 	
 	@Override
-	public void send(String text) {
-		StreamEvent[] events = getHighlightEvents(text);
-		
-		for (StreamEvent event : events)
+	public void send(WarlockString text) {
+		highlightText(text);
+		super.send(text);
+	}
+	
+	protected void highlightText (WarlockString text)
+	{	
+		for (HighlightString hstring : client.getServerSettings().getHighlightStrings())
 		{
-			if (event.type == StreamEvent.Type.Text)
-			{
-				super.send(event.text);
-			}
-			else if (event.type == StreamEvent.Type.AddStyle)
-			{
-				super.addStyle(event.style);
-			}
-			else if (event.type == StreamEvent.Type.RemoveStyle)
-			{
-				super.removeStyle(event.style);
-			}
+			findHighlight(hstring, text);
 		}
 	}
 	
-	protected static class StreamEvent {
-		public String text;
-		public IWarlockStyle style;
-		
-		public static enum Type { Text, AddStyle, RemoveStyle };
-		public Type type;
-		
-		public StreamEvent (String text)
-		{
-			this.type = Type.Text;
-			this.text = text;
-		}
-		
-		public StreamEvent (IWarlockStyle style, boolean add)
-		{
-			if(add)
-				this.type = Type.AddStyle;
-			else
-				this.type = Type.RemoveStyle;
-			this.style = style;
-		}
-	}
-	
-	protected StreamEvent[] getHighlightEvents (String text)
+	protected void findHighlight (HighlightString highlight, WarlockString text)
 	{
-		if (client.getServerSettings().getHighlightStrings().size() == 0)
-		{
-			return new StreamEvent[] { new StreamEvent(text) };
-		}
-		
-		StringBuffer regex = new StringBuffer();
-		for (Iterator<HighlightString> iter = client.getServerSettings().getHighlightStrings().iterator(); iter.hasNext(); )
-		{
-			HighlightString string = iter.next();
-			
-			regex.append(escapeRegex(string.getText()));
-			if (iter.hasNext())
-			{
-				regex.append("|");
-			}
-		}
-		
-		ArrayList<StreamEvent> events = new ArrayList<StreamEvent>();
-		getHighlightEvents(text, regex.toString(), events);
-		
-		return events.toArray(new StreamEvent[events.size()]);
-	}
-	
-	protected String escapeRegex (String text)
-	{
-		String escape = text.replaceAll("([\\*\\+\\.\\(\\)\\&\\$])", "\\$1");
-		return escape;
-	}
-	
-	protected void getHighlightEvents (String text, String regex, ArrayList<StreamEvent> events)
-	{
-		Pattern pattern = Pattern.compile(regex);
-		Matcher matcher = pattern.matcher(text);
-		String outsideTokens[] = text.split(regex);
-		int surroundingIndex = 0;
+		Matcher matcher = highlight.getPattern().matcher(text.toString());
 		
 		while (matcher.find())
 		{
-			if (outsideTokens.length > surroundingIndex)
-				events.add(new StreamEvent(outsideTokens[surroundingIndex++]));
-			
 			MatchResult result = matcher.toMatchResult();
-			String match = result.group();
+			int start = result.start();
+			int length = result.end() - start;
 			
-			HighlightString string = client.getServerSettings().getHighlightString(match);
-			IWarlockStyle style = new HighlightStringStyle(string);
-			style.setFGColor(string.getForegroundColor());
-			style.setBGColor(string.getBackgroundColor());
-			events.add(new StreamEvent(style, true));
-			
-			if (regex.indexOf('|') > -1)
-			{
-				String newRegex = regex.replaceAll("\\|" + escapeRegex(match), "");
-				newRegex = newRegex.replaceAll(escapeRegex(match) +"\\|", "");
-				getHighlightEvents(match, newRegex, events);
-			}
-			
-			events.add(new StreamEvent(style, false));
+			IWarlockStyle style = new HighlightStringStyle(highlight);
+			style.setFGColor(highlight.getForegroundColor());
+			style.setBGColor(highlight.getBackgroundColor());
+			text.addStyle(start, length, style);
 		}
-		
-		if (outsideTokens.length > surroundingIndex)
-			events.add(new StreamEvent(outsideTokens[surroundingIndex]));
 	}
 	
 	protected static Stream fromNameAndClient (IStormFrontClient client, String name)

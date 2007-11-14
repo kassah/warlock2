@@ -170,7 +170,7 @@ public class StreamView extends ViewPart implements IStreamListener, IGameViewFo
 		
 		if (string != null && string.length() > 0)
 		{
-			streamReceivedText(stream, string.toString());
+			streamReceivedText(stream, new WarlockString(client, string));
 			for (IWarlockStyle style : client.getStreamBufferStyles(stream))
 			{
 				streamAddedStyle(stream, style);
@@ -279,7 +279,7 @@ public class StreamView extends ViewPart implements IStreamListener, IGameViewFo
 		}
 	}
 	
-	public void streamReceivedText(IStream stream, String text) {
+	public void streamReceivedText(IStream stream, WarlockString text) {
 		if (this.mainStream.equals(stream) || this.streams.contains(stream))
 		{
 			WarlockString string = new WarlockString(client);

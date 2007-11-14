@@ -5,6 +5,7 @@ import org.eclipse.swt.widgets.Display;
 import cc.warlock.core.client.IStream;
 import cc.warlock.core.client.IStreamListener;
 import cc.warlock.core.client.IWarlockStyle;
+import cc.warlock.core.client.WarlockString;
 
 public class SWTStreamListener implements IStreamListener {
 	
@@ -38,9 +39,9 @@ public class SWTStreamListener implements IStreamListener {
 	private class ReceivedTextWrapper implements Runnable
 	{
 		private IStream stream;
-		private String text;
+		private WarlockString text;
 		
-		public ReceivedTextWrapper(IStream stream, String text) {
+		public ReceivedTextWrapper(IStream stream, WarlockString text) {
 			this.stream = stream;
 			this.text = text;
 		}
@@ -109,7 +110,7 @@ public class SWTStreamListener implements IStreamListener {
 		run(new ClearedWrapper(stream));
 	}
 
-	public void streamReceivedText(IStream stream, String text) {
+	public void streamReceivedText(IStream stream, WarlockString text) {
 		run(new ReceivedTextWrapper(stream, text));
 	}
 	
