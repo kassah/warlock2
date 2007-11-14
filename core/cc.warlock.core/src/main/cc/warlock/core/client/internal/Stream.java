@@ -85,8 +85,6 @@ public class Stream implements IStream {
 	}
 	
 	public void send(WarlockString text) {
-		highlightText(text);
-		
 		for(IStreamListener listener : listeners) {
 			try {
 				listener.streamReceivedText(this, text);
@@ -96,29 +94,6 @@ public class Stream implements IStream {
 			}
 		}
 		isPrompting = false;
-	}
-	
-	protected void highlightText (WarlockString text)
-	{	
-		for (IHighlightString hstring : getClient().getHighlightStrings())
-		{
-			findHighlight(hstring, text);
-		}
-	}
-	
-	protected void findHighlight (IHighlightString highlight, WarlockString text)
-	{
-		Matcher matcher = highlight.getPattern().matcher(text.toString());
-		
-		while (matcher.find())
-		{
-			MatchResult result = matcher.toMatchResult();
-			int start = result.start();
-			int length = result.end() - start;
-			
-			IWarlockStyle style = highlight.getStyle();
-			text.addStyle(start, length, style);
-		}
 	}
 	
 	public void prompt(String prompt) {

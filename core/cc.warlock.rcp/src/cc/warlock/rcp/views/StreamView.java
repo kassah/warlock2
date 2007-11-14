@@ -3,6 +3,8 @@ package cc.warlock.rcp.views;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Hashtable;
+import java.util.regex.MatchResult;
+import java.util.regex.Matcher;
 
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.graphics.Color;
@@ -17,6 +19,7 @@ import org.eclipse.ui.PlatformUI;
 import org.eclipse.ui.part.PageBook;
 import org.eclipse.ui.part.ViewPart;
 
+import cc.warlock.core.client.IHighlightString;
 import cc.warlock.core.client.IProperty;
 import cc.warlock.core.client.IStream;
 import cc.warlock.core.client.IStreamListener;
@@ -233,7 +236,31 @@ public class StreamView extends ViewPart implements IStreamListener, IGameViewFo
 	
 	protected void appendText(WarlockString string) {
 		WarlockText text = getTextForClient(client);
+		highlightText(string);
 		text.append(string);
+	}
+	
+	protected void highlightText (WarlockString text)
+	{	
+		for (IHighlightString hstring : client.getHighlightStrings())
+		{
+			findHighlight(hstring, text);
+		}
+	}
+	
+	protected void findHighlight (IHighlightString highlight, WarlockString text)
+	{
+		Matcher matcher = highlight.getPattern().matcher(text.toString());
+		
+		while (matcher.find())
+		{
+			MatchResult result = matcher.toMatchResult();
+			int start = result.start();
+			int length = result.end() - start;
+			
+			IWarlockStyle style = highlight.getStyle();
+			text.addStyle(start, length, style);
+		}
 	}
 	
 	public void streamAddedStyle(IStream stream, IWarlockStyle style) {
