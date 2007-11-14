@@ -1,21 +1,21 @@
 package cc.warlock.core.stormfront.style;
 
 import cc.warlock.core.client.internal.WarlockStyle;
-import cc.warlock.core.stormfront.serversettings.server.HighlightString;
+import cc.warlock.core.stormfront.serversettings.server.HighlightPreset;
 
 public class HighlightStringStyle extends WarlockStyle implements
 		IHighlightStringStyle {
 	
-	protected HighlightString string;
+	protected HighlightPreset string;
 	
-	public HighlightStringStyle (HighlightString string)
+	public HighlightStringStyle (HighlightPreset string)
 	{
 		super();
 		
 		this.string = string;
 	}
 
-	public HighlightString getHighlightString() {
+	public HighlightPreset getHighlightString() {
 		return string;
 	}
 	

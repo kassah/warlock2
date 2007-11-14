@@ -2,9 +2,10 @@ package cc.warlock.core.stormfront.serversettings.server;
 
 import java.util.regex.Pattern;
 
+import cc.warlock.core.client.IHighlightString;
 import cc.warlock.core.stormfront.xml.StormFrontElement;
 
-public class HighlightString extends Preset {
+public class HighlightPreset extends Preset implements IHighlightString {
 
 	public static final String KEY_TEXT = "text";
 	
@@ -15,15 +16,15 @@ public class HighlightString extends Preset {
 	
 	protected String text;
 	protected boolean isName, isNew = false;
-	protected HighlightString originalString;
+	protected HighlightPreset originalString;
 	protected Pattern pattern;
 	
-	protected HighlightString (ServerSettings serverSettings, Palette palette)
+	protected HighlightPreset (ServerSettings serverSettings, Palette palette)
 	{
 		super(serverSettings, palette);
 	}
 	
-	public HighlightString (HighlightString other)
+	public HighlightPreset (HighlightPreset other)
 	{
 		super(other);
 		
@@ -33,7 +34,7 @@ public class HighlightString extends Preset {
 		this.originalString = other;
 	}
 	
-	public HighlightString (ServerSettings serverSettings, StormFrontElement highlightElement, Palette palette)
+	public HighlightPreset (ServerSettings serverSettings, StormFrontElement highlightElement, Palette palette)
 	{
 		super(serverSettings, highlightElement, palette);
 		
@@ -102,21 +103,21 @@ public class HighlightString extends Preset {
 				mPrefix + textAndColorsTag + allAttribsTag + mSuffix : "");
 	}
 	
-	public static HighlightString createHighlightStringFromParent (ServerSettings serverSettings, StormFrontElement parent)
+	public static HighlightPreset createHighlightStringFromParent (ServerSettings serverSettings, StormFrontElement parent)
 	{
 		StormFrontElement element = new StormFrontElement("h");
 		parent.addElement(element);
 		
-		HighlightString string = new HighlightString(serverSettings, element, serverSettings.getPalette());
+		HighlightPreset string = new HighlightPreset(serverSettings, element, serverSettings.getPalette());
 		string.needsUpdate = true;
 		return string;
 	}
 	
 	@Override
 	public int compareTo(ColorSetting o) {
-		if (o instanceof HighlightString)
+		if (o instanceof HighlightPreset)
 		{
-			HighlightString other = (HighlightString) o;
+			HighlightPreset other = (HighlightPreset) o;
 			return text.compareTo(other.text);
 		}
 		else return -1;
@@ -129,7 +130,7 @@ public class HighlightString extends Preset {
 			this.originalString = null;
 	}
 	
-	public HighlightString getOriginalHighlightString ()
+	public HighlightPreset getOriginalHighlightString ()
 	{
 		return originalString;
 	}

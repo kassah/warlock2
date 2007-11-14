@@ -43,14 +43,6 @@ public interface IWarlockClient {
 	public void send(String prefix, String command);
 	
 	/**
-	 * Send command to the game.
-	 * @param prefix to prepend when we echo the command
-	 * @param command The command to send.
-	 * @param add the command to the history
-	 */
-	//public void send(String prefix, String command, boolean addToHistory);
-	
-	/**
 	 * @return This client's command history
 	 */
 	public ICommandHistory getCommandHistory();
@@ -109,4 +101,21 @@ public interface IWarlockClient {
 	 * @return The style for commands output by this client
 	 */
 	public IWarlockStyle getCommandStyle();
+	
+	/**
+	 * add a highlight provider
+	 * @param highlightProvider provider to add
+	 */
+	public void addHighlightProvider(IHighlightProvider highlightProvider);
+	
+	/**
+	 * remove a highlight provider
+	 * @param highlightProvider
+	 */
+	public void removeHighlightProvider(IHighlightProvider highlightProvider);
+	
+	/**
+	 * @return combination of highlight strings from all of the highlight providers
+	 */
+	public Collection<IHighlightString> getHighlightStrings();
 }

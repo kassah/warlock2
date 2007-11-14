@@ -3,7 +3,7 @@ package cc.warlock.rcp.stormfront.ui.prefs;
 import org.eclipse.jface.viewers.Viewer;
 import org.eclipse.jface.viewers.ViewerFilter;
 
-import cc.warlock.core.stormfront.serversettings.server.HighlightString;
+import cc.warlock.core.stormfront.serversettings.server.HighlightPreset;
 
 public class HighlightNamesPreferencePage extends
 		HighlightStringsPreferencePage {
@@ -21,15 +21,15 @@ public class HighlightNamesPreferencePage extends
 		{
 			@Override
 			public boolean select(Viewer viewer, Object parentElement, Object element) {
-				return ((HighlightString)element).isName();
+				return ((HighlightPreset)element).isName();
 			}
 		};
 	}
 	
 	@Override
-	protected HighlightString createHighlightString ()
+	protected HighlightPreset createHighlightString ()
 	{
-		 HighlightString newString = client.getServerSettings().createHighlightString(true);
+		 HighlightPreset newString = client.getServerSettings().createHighlightString(true);
 		 newString.setText("<Highlight Name>");
 		 return newString;
 	}

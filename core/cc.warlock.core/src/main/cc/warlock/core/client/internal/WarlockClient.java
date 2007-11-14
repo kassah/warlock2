@@ -6,10 +6,13 @@ package cc.warlock.core.client.internal;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.HashSet;
 import java.util.Hashtable;
 import java.util.List;
 
 import cc.warlock.core.client.ICommandHistory;
+import cc.warlock.core.client.IHighlightProvider;
+import cc.warlock.core.client.IHighlightString;
 import cc.warlock.core.client.IStream;
 import cc.warlock.core.client.IStreamListener;
 import cc.warlock.core.client.IWarlockClient;
@@ -28,6 +31,7 @@ public abstract class WarlockClient implements IWarlockClient {
 	protected ArrayList<IWarlockClientViewer> viewers;
 	protected ICommandHistory commandHistory = new CommandHistory();
 	protected String streamPrefix;
+	protected HashSet<IHighlightProvider> highlightProviders = new HashSet<IHighlightProvider>();
 
 	protected Hashtable<IStream, StringBuffer> streamBuffers = new Hashtable<IStream, StringBuffer>();
 	protected Hashtable<IStream, List<IWarlockStyle>> streamStyles = new Hashtable<IStream, List<IWarlockStyle>>();
@@ -81,7 +85,6 @@ public abstract class WarlockClient implements IWarlockClient {
 		}
 	}
 
-	
 	// IWarlockClient methods
 	
 	public ICommandHistory getCommandHistory() {
@@ -146,5 +149,23 @@ public abstract class WarlockClient implements IWarlockClient {
 	
 	public IConnection getConnection() {
 		return connection;
+	}
+	
+	public void addHighlightProvider(IHighlightProvider highlightProvider) {
+		highlightProviders.add(highlightProvider);
+	}
+	
+	public void removeHighlightProvider(IHighlightProvider highlightProvider) {
+		highlightProviders.remove(highlightProvider);
+	}
+	
+	public Collection<IHighlightString> getHighlightStrings() {
+		ArrayList<IHighlightString> strings = new ArrayList<IHighlightString>();
+		
+		for(IHighlightProvider highlightProvider : highlightProviders) {
+			strings.addAll(highlightProvider.getHighlightStrings());
+		}
+		
+		return strings;
 	}
 }

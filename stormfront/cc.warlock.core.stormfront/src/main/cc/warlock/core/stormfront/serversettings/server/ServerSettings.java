@@ -10,6 +10,8 @@ import java.util.Collections;
 import java.util.Hashtable;
 import java.util.List;
 
+import cc.warlock.core.client.IHighlightProvider;
+import cc.warlock.core.client.IHighlightString;
 import cc.warlock.core.client.IWarlockClientViewer;
 import cc.warlock.core.configuration.ConfigurationUtil;
 import cc.warlock.core.script.ScriptEngineRegistry;
@@ -20,7 +22,7 @@ import cc.warlock.core.stormfront.xml.StormFrontDocument;
 import cc.warlock.core.stormfront.xml.StormFrontElement;
 
 
-public class ServerSettings implements Comparable<ServerSettings>
+public class ServerSettings implements Comparable<ServerSettings>, IHighlightProvider
 {
 	public static final String WINDOW_MAIN = "smain";
 	public static final String WINDOW_INVENTORY = "sinv";
@@ -40,12 +42,12 @@ public class ServerSettings implements Comparable<ServerSettings>
 	protected Hashtable<String, WindowSettings> windowSettings = new Hashtable<String,WindowSettings>();
 	protected CommandLineSettings commandLineSettings;
 	protected Hashtable<String, Preset> presets = new Hashtable<String,Preset>();
-	protected Hashtable<String, HighlightString> highlightStrings = new Hashtable<String, HighlightString>();
+	protected Hashtable<String, HighlightPreset> highlightStrings = new Hashtable<String, HighlightPreset>();
 	protected Hashtable<String, String> variables = new Hashtable<String, String>();
 	protected ArrayList<ArrayList<MacroKey>> macroSets = new ArrayList<ArrayList<MacroKey>>();
 	protected Hashtable<String, ServerScript> scripts = new Hashtable<String, ServerScript>();
 	
-	protected ArrayList<HighlightString> deletedHighlightStrings = new ArrayList<HighlightString>();
+	protected ArrayList<HighlightPreset> deletedHighlightStrings = new ArrayList<HighlightPreset>();
 	protected ArrayList<String> deletedVariables = new ArrayList<String>();
 	protected ArrayList<IServerSettingsListener> listeners = new ArrayList<IServerSettingsListener>();
 	
@@ -56,9 +58,11 @@ public class ServerSettings implements Comparable<ServerSettings>
 	public ServerSettings (IStormFrontClient client)
 	{
 		this.client = client;
-		scriptProvider = new ServerScriptProvider(client);
 		
+		scriptProvider = new ServerScriptProvider(client);
 		ScriptEngineRegistry.addScriptProvider(scriptProvider);
+		
+		client.addHighlightProvider(this);
 	}
 	
 	public ServerSettings (IStormFrontClient client, String playerId)
@@ -190,7 +194,7 @@ public class ServerSettings implements Comparable<ServerSettings>
 				String text = hElement.attributeValue("text");
 				
 				if(text != null)
-					highlightStrings.put(text, new HighlightString(this, hElement, palette));
+					highlightStrings.put(text, new HighlightPreset(this, hElement, palette));
 			}
 		}
 		
@@ -201,7 +205,7 @@ public class ServerSettings implements Comparable<ServerSettings>
 			{
 				String text = hElement.attributeValue("text");
 				
-				highlightStrings.put(text, new HighlightString(this, hElement, palette));
+				highlightStrings.put(text, new HighlightPreset(this, hElement, palette));
 				highlightStrings.get(text).setIsName(true);
 			}
 		}
@@ -291,7 +295,7 @@ public class ServerSettings implements Comparable<ServerSettings>
 		return presets.get(presetId);
 	}
 	
-	public HighlightString getHighlightString (String text)
+	public HighlightPreset getHighlightString (String text)
 	{
 		if (highlightStrings == null) return null;
 		
@@ -300,8 +304,12 @@ public class ServerSettings implements Comparable<ServerSettings>
 		return highlightStrings.get(text);
 	}
 	
-	public Collection<HighlightString> getHighlightStrings ()
+	public Collection<? extends IHighlightString> getHighlightStrings ()
 	{	
+		return highlightStrings == null ? null : highlightStrings.values();
+	}
+	
+	public Collection<HighlightPreset> getHighlightPresets() {
 		return highlightStrings == null ? null : highlightStrings.values();
 	}
 	
@@ -310,7 +318,7 @@ public class ServerSettings implements Comparable<ServerSettings>
 		highlightStrings.clear();
 	}
 	
-	public void updateHighlightString (HighlightString string)
+	public void updateHighlightString (HighlightPreset string)
 	{
 		if (!highlightStrings.containsKey(string.getText()))
 		{
@@ -329,7 +337,7 @@ public class ServerSettings implements Comparable<ServerSettings>
 		windowSettings.put(settings.getId(), settings);
 	}
 	
-	public void deleteHighlightString (HighlightString string)
+	public void deleteHighlightString (HighlightPreset string)
 	{
 		if (highlightStrings.containsKey(string.getText()))
 		{
@@ -350,7 +358,7 @@ public class ServerSettings implements Comparable<ServerSettings>
 			paletteMarkup = palette.toStormfrontMarkup();
 		}
 		
-		for (HighlightString string : highlightStrings.values())
+		for (HighlightPreset string : highlightStrings.values())
 		{
 			if (string.isName() == saveNames) {
 				if (string.needsUpdate())
@@ -358,8 +366,8 @@ public class ServerSettings implements Comparable<ServerSettings>
 					if (!string.isNew())
 					{
 						stringsUpdateMarkup.append(saveNames ?
-								HighlightString.NAMES_PREFIX :
-									HighlightString.STRINGS_PREFIX);
+								HighlightPreset.NAMES_PREFIX :
+									HighlightPreset.STRINGS_PREFIX);
 						stringsUpdateMarkup.append(ServerSetting.UPDATE_PREFIX);
 						
 						if (string.getOriginalHighlightString() != null)
@@ -368,8 +376,8 @@ public class ServerSettings implements Comparable<ServerSettings>
 						stringsUpdateMarkup.append(string.toStormfrontMarkup());
 						stringsUpdateMarkup.append(ServerSetting.UPDATE_SUFFIX);
 						stringsUpdateMarkup.append(saveNames ?
-								HighlightString.NAMES_SUFFIX :
-									HighlightString.STRINGS_SUFFIX);
+								HighlightPreset.NAMES_SUFFIX :
+									HighlightPreset.STRINGS_SUFFIX);
 						
 						string.saveToDOM();
 						string.setNeedsUpdate(false);
@@ -380,21 +388,21 @@ public class ServerSettings implements Comparable<ServerSettings>
 			}
 		}
 		
-		for (HighlightString string : deletedHighlightStrings)
+		for (HighlightPreset string : deletedHighlightStrings)
 		{
 			// don't send the delete command if it was re-added after it was marked for deletion
 			if (highlightStrings.containsKey(string.getText())) continue;
 			
 			if (saveNames == string.isName()) {
 				stringsDeleteMarkup.append(saveNames ?
-						HighlightString.NAMES_PREFIX :
-							HighlightString.STRINGS_PREFIX);
+						HighlightPreset.NAMES_PREFIX :
+							HighlightPreset.STRINGS_PREFIX);
 				stringsDeleteMarkup.append(ServerSetting.DELETE_PREFIX);
 				stringsDeleteMarkup.append(string.toStormfrontMarkup());
 				stringsDeleteMarkup.append(ServerSetting.DELETE_SUFFIX);
 				stringsDeleteMarkup.append(saveNames ?
-						HighlightString.NAMES_SUFFIX :
-							HighlightString.STRINGS_SUFFIX);
+						HighlightPreset.NAMES_SUFFIX :
+							HighlightPreset.STRINGS_SUFFIX);
 				
 				string.deleteFromDOM();
 			}
@@ -534,13 +542,13 @@ public class ServerSettings implements Comparable<ServerSettings>
 		return Preset.createPresetFromParent(this, presetsElement);
 	}
 	
-	public HighlightString createHighlightString (boolean isName)
+	public HighlightPreset createHighlightString (boolean isName)
 	{
-		HighlightString string = null;
+		HighlightPreset string = null;
 		if (isName)
-			string = HighlightString.createHighlightStringFromParent(this, namesElement);
+			string = HighlightPreset.createHighlightStringFromParent(this, namesElement);
 		else
-			string = HighlightString.createHighlightStringFromParent(this, stringsElement);
+			string = HighlightPreset.createHighlightStringFromParent(this, stringsElement);
 		
 		string.setIsName(isName);
 		return string;

@@ -6,7 +6,10 @@ package cc.warlock.core.client.internal;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Hashtable;
+import java.util.regex.MatchResult;
+import java.util.regex.Matcher;
 
+import cc.warlock.core.client.IHighlightString;
 import cc.warlock.core.client.IProperty;
 import cc.warlock.core.client.IStream;
 import cc.warlock.core.client.IStreamListener;
@@ -82,6 +85,8 @@ public class Stream implements IStream {
 	}
 	
 	public void send(WarlockString text) {
+		highlightText(text);
+		
 		for(IStreamListener listener : listeners) {
 			try {
 				listener.streamReceivedText(this, text);
@@ -91,6 +96,29 @@ public class Stream implements IStream {
 			}
 		}
 		isPrompting = false;
+	}
+	
+	protected void highlightText (WarlockString text)
+	{	
+		for (IHighlightString hstring : getClient().getHighlightStrings())
+		{
+			findHighlight(hstring, text);
+		}
+	}
+	
+	protected void findHighlight (IHighlightString highlight, WarlockString text)
+	{
+		Matcher matcher = highlight.getPattern().matcher(text.toString());
+		
+		while (matcher.find())
+		{
+			MatchResult result = matcher.toMatchResult();
+			int start = result.start();
+			int length = result.end() - start;
+			
+			IWarlockStyle style = highlight.getStyle();
+			text.addStyle(start, length, style);
+		}
 	}
 	
 	public void prompt(String prompt) {

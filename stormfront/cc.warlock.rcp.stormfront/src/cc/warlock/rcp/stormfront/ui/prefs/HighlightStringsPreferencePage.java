@@ -40,7 +40,7 @@ import org.eclipse.ui.dialogs.PropertyPage;
 
 import cc.warlock.core.stormfront.client.IStormFrontClient;
 import cc.warlock.core.stormfront.client.StormFrontColor;
-import cc.warlock.core.stormfront.serversettings.server.HighlightString;
+import cc.warlock.core.stormfront.serversettings.server.HighlightPreset;
 import cc.warlock.rcp.ui.WarlockSharedImages;
 import cc.warlock.rcp.util.ColorUtil;
 
@@ -56,15 +56,15 @@ public class HighlightStringsPreferencePage extends PropertyPage implements
 	protected Button defaultBG, customBG, defaultFG, customFG;
 	protected Button addString, removeString;
 	protected IStormFrontClient client;
-	protected HighlightString selectedString;
-	protected ArrayList<HighlightString> highlightStrings = new ArrayList<HighlightString>();
+	protected HighlightPreset selectedString;
+	protected ArrayList<HighlightPreset> highlightStrings = new ArrayList<HighlightPreset>();
 	
 	private void copyHighlightStrings ()
 	{
 		highlightStrings.clear();
-		for (HighlightString string : client.getServerSettings().getHighlightStrings())
+		for (HighlightPreset string : client.getServerSettings().getHighlightPresets())
 		{
-			highlightStrings.add(new HighlightString(string));
+			highlightStrings.add(new HighlightPreset(string));
 		}
 	}
 	
@@ -155,12 +155,12 @@ public class HighlightStringsPreferencePage extends PropertyPage implements
 			}
 
 			public Object getValue(Object element, String property) {
-				return ((HighlightString)element).getText();
+				return ((HighlightPreset)element).getText();
 			}
 
 			public void modify(Object element, String property, Object value) {
 				TableItem item = (TableItem)element;
-				HighlightString string = (HighlightString)item.getData();
+				HighlightPreset string = (HighlightPreset)item.getData();
 				
 				string.setText(((String)value).trim());
 				stringTable.refresh(string);
@@ -181,7 +181,7 @@ public class HighlightStringsPreferencePage extends PropertyPage implements
 		stringTable.addSelectionChangedListener(new ISelectionChangedListener () {
 			public void selectionChanged(SelectionChangedEvent event) {
 				IStructuredSelection selection = (IStructuredSelection) event.getSelection();
-				HighlightString string = (HighlightString) selection.getFirstElement();
+				HighlightPreset string = (HighlightPreset) selection.getFirstElement();
 				
 				if (string != selectedString)
 				{
@@ -257,19 +257,19 @@ public class HighlightStringsPreferencePage extends PropertyPage implements
 		{
 			@Override
 			public boolean select(Viewer viewer, Object parentElement, Object element) {
-				return !((HighlightString)element).isName();
+				return !((HighlightPreset)element).isName();
 			}
 		};
 	}
 	
-	protected HighlightString createHighlightString ()
+	protected HighlightPreset createHighlightString ()
 	{
-		 HighlightString newString = client.getServerSettings().createHighlightString(false);
+		 HighlightPreset newString = client.getServerSettings().createHighlightString(false);
 		 newString.setText("<Highlight Text>");
 		 return newString;
 	}
 	
-	private void highlightStringSelected (HighlightString string)
+	private void highlightStringSelected (HighlightPreset string)
 	{
 		selectedString = string;
 		if (string == null) return;
@@ -326,7 +326,7 @@ public class HighlightStringsPreferencePage extends PropertyPage implements
 	}
 	
 	private void removeStringClicked() {
-		HighlightString string = selectedString;
+		HighlightPreset string = selectedString;
 		
 		client.getServerSettings().deleteHighlightString(string);
 		
@@ -335,7 +335,7 @@ public class HighlightStringsPreferencePage extends PropertyPage implements
 	}
 
 	private void addStringClicked() {
-		HighlightString newString = createHighlightString();
+		HighlightPreset newString = createHighlightString();
 		highlightStrings.add(newString);
 		
 		selectedString = newString;
@@ -357,7 +357,7 @@ public class HighlightStringsPreferencePage extends PropertyPage implements
 		}
 
 		public String getColumnText(Object element, int columnIndex) {
-			return ((HighlightString)element).getText();
+			return ((HighlightPreset)element).getText();
 		}
 
 		public void addListener(ILabelProviderListener listener) {	}
@@ -372,14 +372,14 @@ public class HighlightStringsPreferencePage extends PropertyPage implements
 
 		public Color getBackground(Object element, int columnIndex) {
 			Color c = new Color(HighlightStringsPreferencePage.this.getShell().getDisplay(),
-					ColorUtil.warlockColorToRGB(((HighlightString)element).getBackgroundColor()));
+					ColorUtil.warlockColorToRGB(((HighlightPreset)element).getBackgroundColor()));
 			
 			return c;
 		}
 
 		public Color getForeground(Object element, int columnIndex) {
 			Color c = new Color(HighlightStringsPreferencePage.this.getShell().getDisplay(),
-					ColorUtil.warlockColorToRGB(((HighlightString)element).getForegroundColor()));
+					ColorUtil.warlockColorToRGB(((HighlightPreset)element).getForegroundColor()));
 			
 			return c;
 		}
@@ -403,7 +403,7 @@ public class HighlightStringsPreferencePage extends PropertyPage implements
 	public boolean performOk() {
 //		client.getServerSettings().clearHighlightStrings();
 		
-		for (HighlightString string : highlightStrings) {
+		for (HighlightPreset string : highlightStrings) {
 			if (string.needsUpdate()) {
 				client.getServerSettings().updateHighlightString(string);
 			}
