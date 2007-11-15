@@ -401,7 +401,10 @@ public class WSLScript extends AbstractScript {
 			Matcher m = format.matcher(arguments);
 			if (m.find())
 			{
-				setVariable(m.group(1), m.group(2));
+				String name = m.group(1);
+				String value = m.group(2);
+				commands.echo("setVariable: " + name + "=" + value);
+				setVariable(name, value);
 			} else {
 				scriptError("Invalid arguments to setvariable");
 			}
