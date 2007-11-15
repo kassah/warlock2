@@ -322,46 +322,52 @@ public class WSLScript extends AbstractScript {
 		
 		public void execute (String arguments) {
 			String[] args = arguments.split(argSeparator);
-			if (args.length >= 2)
-			{
-				String counterFunction = args[0];
-				int value = variables.containsKey("c") ? Integer.parseInt(variables.get("c")) : 0;
-
-				if ("set".equalsIgnoreCase(counterFunction))
-				{
-					setVariable("c", args[1]);
-				}
-				else if ("add".equalsIgnoreCase(counterFunction))
-				{	
-					int newValue = value + Integer.parseInt(args[1]);
-					setVariable("c", Integer.toString(newValue));
-				}
-				else if ("subtract".equalsIgnoreCase(counterFunction))
-				{
-					int newValue = value - Integer.parseInt(args[1]);
-					setVariable("c", Integer.toString(newValue));
-				}
-				else if ("multiply".equalsIgnoreCase(counterFunction))
-				{
-					int newValue = value * Integer.parseInt(args[1]);
-					setVariable("c", Integer.toString(newValue));
-				}
-				else if ("divide".equalsIgnoreCase(counterFunction))
-				{
-					int newValue = value / Integer.parseInt(args[1]);
-					setVariable("c", Integer.toString(newValue));
-				}
-				else if ("modulus".equalsIgnoreCase(counterFunction))
-				{
-					int newValue = value % Integer.parseInt(args[1]);
-					setVariable("c", Integer.toString(newValue));
-				}
-				else
-				{
-					scriptError("Unrecognized counter command");
-				}
-			} else {
+			if (args.length < 1) {
 				scriptError("Invalid arguments to counter");
+				return;
+			}
+			
+			int operand;
+			if (args.length > 1)
+				operand = Integer.parseInt(args[1]);
+			else
+				operand = 1;
+
+			String counterFunction = args[0];
+			int value = variables.containsKey("c") ? Integer.parseInt(variables.get("c")) : 0;
+
+			if ("set".equalsIgnoreCase(counterFunction))
+			{
+				setVariable("c", Integer.toString(operand));
+			}
+			else if ("add".equalsIgnoreCase(counterFunction))
+			{	
+				int newValue = value + operand;
+				setVariable("c", Integer.toString(newValue));
+			}
+			else if ("subtract".equalsIgnoreCase(counterFunction))
+			{
+				int newValue = value - operand;
+				setVariable("c", Integer.toString(newValue));
+			}
+			else if ("multiply".equalsIgnoreCase(counterFunction))
+			{
+				int newValue = value * operand;
+				setVariable("c", Integer.toString(newValue));
+			}
+			else if ("divide".equalsIgnoreCase(counterFunction))
+			{
+				int newValue = value / operand;
+				setVariable("c", Integer.toString(newValue));
+			}
+			else if ("modulus".equalsIgnoreCase(counterFunction))
+			{
+				int newValue = value % operand;
+				setVariable("c", Integer.toString(newValue));
+			}
+			else
+			{
+				scriptError("Unrecognized counter command");
 			}
 		}
 	}
