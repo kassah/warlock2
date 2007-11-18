@@ -311,12 +311,23 @@ public class StreamView extends ViewPart implements IStreamListener, IGameViewFo
 		{
 			isPrompting = true;
 			WarlockString text = new WarlockString(client);
+			WarlockText textWidget = getTextForClient(client);
+			
+			int lastIndex = textWidget.getCharCount();
+			char lastChar = ' ';
+			if (lastIndex > 0)
+				textWidget.getTextWidget().getText(lastIndex-2, lastIndex-1).charAt(0);
 			
 			if (bufferedText != null)
 			{
 				text.append(bufferedText);
+				lastChar = bufferedText.toString().charAt(bufferedText.length()-1);
+				
 				bufferedText = null;
 			}
+			
+			if (lastChar != '\n')
+				text.append("\n");
 			
 			text.append(prompt);
 			
