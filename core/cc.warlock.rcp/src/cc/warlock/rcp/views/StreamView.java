@@ -316,7 +316,7 @@ public class StreamView extends ViewPart implements IStreamListener, IGameViewFo
 			int lastIndex = textWidget.getCharCount();
 			char lastChar = ' ';
 			if (lastIndex > 0)
-				textWidget.getTextWidget().getText(lastIndex-2, lastIndex-1).charAt(0);
+				textWidget.getTextWidget().getTextRange(lastIndex - 1, 1).charAt(0);
 			
 			if (bufferedText != null)
 			{
