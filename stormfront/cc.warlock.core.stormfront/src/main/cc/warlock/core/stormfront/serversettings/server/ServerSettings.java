@@ -72,17 +72,15 @@ public class ServerSettings implements Comparable<ServerSettings>, IHighlightPro
 		load(playerId);
 	}
 	
-	public static String getCRC (String playerId)
+	public static StormFrontDocument getDocument (String playerId)
 	{
 		try {
 			FileInputStream stream = new FileInputStream(ConfigurationUtil.getConfigurationFile("serverSettings_" + playerId + ".xml"));
 			
 			StormFrontDocument document = new StormFrontDocument(stream);
 			
-			String crc = document.getRootElement().attributeValue("crc");
-			
 			stream.close();
-			return crc;
+			return document;
 		} catch (FileNotFoundException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
@@ -90,7 +88,28 @@ public class ServerSettings implements Comparable<ServerSettings>, IHighlightPro
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
-		
+		return null;
+	}
+	
+	public static String getCRC (StormFrontDocument document)
+	{
+		if (document != null)
+		{
+			return document.getRootElement().attributeValue("crc");
+		}
+		return null;
+	}
+	
+	public static Integer getMajorVersion (StormFrontDocument document)
+	{
+		if (document != null)
+		{
+			String value = document.getRootElement().attributeValue("major");
+			if (value != null)
+			{
+				return Integer.parseInt(value);
+			}
+		}
 		return null;
 	}
 	
@@ -504,6 +523,19 @@ public class ServerSettings implements Comparable<ServerSettings>, IHighlightPro
 //			System.out.println(updatePrefix + windowUpdateMarkup + updateSuffix);
 			sendSettingsUpdate(updatePrefix, windowUpdateMarkup, updateSuffix);
 		}
+		
+		saveLocalXml();
+	}
+	
+	public void saveScript (ServerScript script)
+	{
+		// Just save locally and increment major version, forcing a server settings push to Simu on next connection
+		
+		StormFrontElement scriptElement = script.getElement();
+		scriptElement.setText(ServerScript.convertScriptToTokens(script.getScriptContents()));
+		
+		majorVersion++;
+		document.getRootElement().setAttribute("major", ""+majorVersion);
 		
 		saveLocalXml();
 	}
