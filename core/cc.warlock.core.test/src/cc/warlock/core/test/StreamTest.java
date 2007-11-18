@@ -7,10 +7,9 @@ import org.junit.Test;
 
 import cc.warlock.core.client.IStream;
 import cc.warlock.core.client.IStreamListener;
-import cc.warlock.core.client.IStyledString;
+import cc.warlock.core.client.WarlockString;
 import cc.warlock.core.client.IWarlockStyle.StyleType;
 import cc.warlock.core.client.internal.Stream;
-import cc.warlock.core.client.internal.StyledString;
 import cc.warlock.core.client.internal.WarlockStyle;
 
 public class StreamTest {
@@ -21,14 +20,28 @@ public class StreamTest {
 	}
 	
 	protected static class Listener implements IStreamListener {
-		public boolean cleared, receivedText, prompted, echoed, donePrompting;
-		public String echo, prompt;
-		public IStyledString text;
+		public boolean cleared, receivedText, receivedCommand, prompted, echoed, donePrompting;
+		public String echo, prompt, command;
+		public WarlockString text;
 		
 		protected void handleEvent() {
-			cleared = receivedText = prompted = echoed = donePrompting = false;
+			cleared = receivedText = receivedCommand = prompted = echoed = donePrompting = false;
 			text = null;
 			echo = prompt = null;
+		}
+		
+		@Override
+		public void streamReceivedCommand(IStream stream, String text) {
+			handleEvent();
+			this.receivedCommand = true;
+			this.command = text;
+		}
+		
+		@Override
+		public void streamReceivedText(IStream stream, WarlockString text) {
+			handleEvent();
+			receivedText = true;
+			this.text = text;
 		}
 		
 		public void streamCleared(IStream stream) {
@@ -52,18 +65,12 @@ public class StreamTest {
 			prompted = true;
 			this.prompt = prompt;
 		}
-
-		public void streamReceivedText(IStream stream, IStyledString text) {
-			handleEvent();
-			receivedText = true;
-			this.text = text;
-		}
 	}
 	
 	protected static Stream stream;
 	protected static final String STREAM_NAME = "testStream";
 	protected static final String TEST_STRING= "testing stream send--\n";
-	protected static final WarlockStyle TEST_STYLE = new WarlockStyle(new StyleType[] { StyleType.BOLD }, "testStyle", null, 0, 0);
+	protected static final WarlockStyle TEST_STYLE = new WarlockStyle(new StyleType[] { StyleType.BOLD });
 	protected static Listener listener;
 	
 	@BeforeClass
@@ -89,31 +96,22 @@ public class StreamTest {
 	public void testSendString() {
 		stream.send(TEST_STRING);
 		Assert.assertTrue(listener.receivedText);
-		Assert.assertEquals(listener.text.getBuffer().toString(), TEST_STRING);
-		Assert.assertEquals(listener.text.getStyles().size(), 1);
+		Assert.assertEquals(listener.text.toString(), TEST_STRING);
+		Assert.assertEquals(listener.text.getStyles().size(), 0);
 	}
 
 	@Test
-	public void testSendStringIWarlockStyle() {
-		stream.send(TEST_STRING, TEST_STYLE);
-		Assert.assertTrue(listener.receivedText);
-		Assert.assertEquals(listener.text.getBuffer().toString(), TEST_STRING);
-		Assert.assertEquals(listener.text.getStyles().size(), 1);
-		Assert.assertEquals(listener.text.getStyles().toArray()[0], TEST_STYLE);
-	}
-
-	@Test
-	public void testSendIStyledString() {
-		StyledString string = new StyledString();
+	public void testSendWarlockString() {
+		WarlockString string = new WarlockString(null);
 		string.addStyle(TEST_STYLE);
-		string.getBuffer().append(TEST_STRING);
+		string.append(TEST_STRING);
 		
 		stream.send(string);
 		Assert.assertTrue(listener.receivedText);
-		Assert.assertEquals(listener.text.getBuffer().toString(), string.getBuffer().toString());
-		Assert.assertEquals(listener.text.getBuffer().toString(), TEST_STRING);
+		Assert.assertEquals(listener.text.toString(), string.toString());
+		Assert.assertEquals(listener.text.toString(), TEST_STRING);
 		Assert.assertEquals(listener.text.getStyles().size(), 1);
-		Assert.assertEquals(listener.text.getStyles().toArray()[0], TEST_STYLE);
+		Assert.assertEquals(listener.text.getStyles().get(0).style, TEST_STYLE);
 	}
 
 	@Test
@@ -124,21 +122,10 @@ public class StreamTest {
 	}
 
 	@Test
-	public void testDonePrompting() {
-		stream.donePrompting();
-		
-		Assert.assertTrue(listener.donePrompting);
-	}
-
-	@Test
 	public void testIsPrompting() {
 		stream.prompt(">");
 		
 		Assert.assertTrue(stream.isPrompting());
-		
-		stream.donePrompting();
-		
-		Assert.assertFalse(stream.isPrompting());
 	}
 
 	@Test

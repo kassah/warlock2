@@ -7,6 +7,8 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.Properties;
 
+import org.junit.Assert;
+
 import cc.warlock.core.configuration.ConfigurationUtil;
 
 public class TestProperties {
@@ -14,6 +16,8 @@ public class TestProperties {
 	protected static Properties testProperties;
 	
 	public static final String PROFILE_NAMES = "profileNames";
+	public static final String DEFAULT_PROFILE = "defaultProfile";
+	public static final String DO_CONNECTED_TESTS = "doConnectedTests";
 	
 	public static Properties getTestProperties ()
 	{
@@ -34,6 +38,14 @@ public class TestProperties {
 		return testProperties;
 	}
 	
+	public static boolean getBoolean (String property)
+	{
+		String str = getString(property);
+		if (str == null) return false;
+		
+		return Boolean.parseBoolean(str);
+	}
+	
 	public static String getString(String property)
 	{
 		return getTestProperties().getProperty(property);
@@ -48,5 +60,10 @@ public class TestProperties {
 		}
 		
 		return null;
+	}
+	
+	public static void failProperty (String property)
+	{
+		Assert.fail("The property \"" + property + "\" was not defined in " + ConfigurationUtil.getUserHomeDirectory().getAbsolutePath()+ "/warlock-tests.properties");
 	}
 }
