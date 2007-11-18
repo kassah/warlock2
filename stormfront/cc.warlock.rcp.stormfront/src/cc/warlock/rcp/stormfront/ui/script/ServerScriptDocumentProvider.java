@@ -11,6 +11,8 @@ import cc.warlock.core.stormfront.serversettings.server.IServerScriptInfo;
 
 public class ServerScriptDocumentProvider extends ForwardingDocumentProvider {
 
+	protected TextFileDocumentProvider docProvider;
+	
 	protected static class SetupParticipant implements IDocumentSetupParticipant
 	{
 		public void setup(IDocument document) {
@@ -21,15 +23,25 @@ public class ServerScriptDocumentProvider extends ForwardingDocumentProvider {
 	
 	public ServerScriptDocumentProvider ()
 	{
-		super(null, new SetupParticipant(), new TextFileDocumentProvider());
+		super(null, new SetupParticipant());
+
+		docProvider = new TextFileDocumentProvider();
+		setParentProvider(docProvider);
 	}
-	
 	
 	@Override
 	public boolean canSaveDocument(Object element) {
 		if (element instanceof ServerScriptEditorInput)
 		{
-			return true;
+			ServerScriptEditorInput input = (ServerScriptEditorInput)element;
+			IServerScriptInfo info = input.getScriptInfo();
+			
+			IDocument document = docProvider.getDocument(element);
+			
+			String docText = document.get();
+			String contents = info.getContents();
+			
+			return !docText.equals(contents);
 		}
 		return super.canSaveDocument(element);
 	}
