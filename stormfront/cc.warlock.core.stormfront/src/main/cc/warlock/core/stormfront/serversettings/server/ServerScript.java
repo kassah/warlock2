@@ -1,6 +1,7 @@
 package cc.warlock.core.stormfront.serversettings.server;
 
 import java.util.HashMap;
+import java.util.Map;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -9,11 +10,11 @@ import cc.warlock.core.stormfront.xml.StormFrontElement;
 public class ServerScript extends ServerSetting {
 
 	protected String name, comment, format;
-	protected String scriptContents;
+	protected String scriptContents, tokens;
 	
 	public ServerScript (ServerSettings settings, StormFrontElement scriptElement)
 	{
-		super(settings);
+		super(settings, scriptElement);
 		
 		loadScript(scriptElement);
 	}
@@ -27,7 +28,8 @@ public class ServerScript extends ServerSetting {
 		
 		if ("tok".equals(format))
 		{
-			convertTokScript(scriptElement.getText());
+			tokens = scriptElement.getText();
+			setScriptContents(convertTokensToScript(tokens));
 		}
 	}
 	
@@ -47,38 +49,112 @@ public class ServerScript extends ServerSetting {
 		shortCommands.put("L", "put ");
 	}
 	
-	protected void convertTokScript(String tokScript)
+	public static String convertScriptToTokens (String script)
 	{
-		if (tokScript.startsWith("\\"))				
+		return convertScriptToTokens(script, true);
+	}
+	
+	public static String convertScriptToTokens (String script, boolean escape)
+	{
+		StringBuffer tokens = new StringBuffer();
+		String lines[] = script.split("\\n", -1);
+		boolean startNewSeparator = false;
+		
+		mainLoop:
+		for (int i = 0; i < lines.length; i++)
 		{
-			tokScript = tokScript.substring(1);
-		}
-		
-		tokScript = tokScript.replaceAll("\\\\\\.", "\n");
-		tokScript = tokScript.replaceAll("\\&apos\\;", "'");
-		tokScript = tokScript.replaceAll("\\&quot\\;", "\"");
-		
-		Pattern pattern = Pattern.compile("([A-L]*)\\\\");
-		
-		Matcher matcher = pattern.matcher(tokScript);
-		StringBuffer buffer = new StringBuffer();
-		
-		while (matcher.find())
-		{
-			String replacement = "";
-			if (matcher.groupCount() == 1)
+			String line = lines[i];
+			
+			if (startNewSeparator)
+				tokens.append("\\.");
+			
+			if (escape)
 			{
-				String commands = matcher.group(1);
-				for (char command : commands.toCharArray())
+				line = line.replaceAll("'", "&apos;");
+				line = line.replaceAll("\"", "&quot;");
+			}
+			
+			for (Map.Entry<String,String> entry : shortCommands.entrySet())
+			{
+				String shortCommand = entry.getKey();
+				String command = entry.getValue();
+				
+				if (command.indexOf('\n') > 0)
 				{
-					replacement += shortCommands.get("" + command);
+					command = command.substring(0, command.length()-1);
+					
+					if (line.matches("^" + command + "$"))
+					{
+						tokens.append(shortCommand);
+						startNewSeparator = false;
+						continue mainLoop;
+					}
 				}
 			}
 			
-			matcher.appendReplacement(buffer, replacement);
+			int putIndex = line.indexOf("put ");
+			while (putIndex == 0)
+			{
+				tokens.append('L');
+				line = line.substring(4);
+				
+				putIndex = line.indexOf("put ");
+			}
+
+			if (i < lines.length - 1)
+				tokens.append("\\");
+			tokens.append(line);
+			startNewSeparator = true;
 		}
-		matcher.appendTail(buffer);
-		scriptContents = buffer.toString();
+		
+		return tokens.toString();
+	}
+	
+	public static String convertTokensToScript (String tokens)
+	{
+		if (tokens.startsWith("\\"))				
+		{
+			tokens = tokens.substring(1);
+		}
+		
+		tokens = tokens.replaceAll("\\&apos\\;", "'");
+		tokens = tokens.replaceAll("\\&quot\\;", "\"");
+
+		StringBuffer buffer = new StringBuffer();
+		String lines[] = tokens.split("\\\\\\.");
+		for (int i = 0; i < lines.length; i++)
+		{
+			String line = lines[i];
+			
+			Pattern pattern = Pattern.compile("^([A-L]*)(\\\\|$)");
+			Matcher matcher = pattern.matcher(line);
+			
+			while (matcher.find())
+			{
+				String replacement = "";
+				if (matcher.groupCount() >= 1)
+				{
+					String commands = matcher.group(1);
+					
+					for (char command : commands.toCharArray())
+					{
+						replacement += shortCommands.get("" + command);
+					}
+				}
+				
+				matcher.appendReplacement(buffer, replacement);
+			}
+			matcher.appendTail(buffer);
+			
+			if (i < lines.length - 1)
+				buffer.append("\n");
+		}
+		if (tokens.lastIndexOf("\\.") == tokens.length() - 2)
+		{
+			buffer.append("\n");
+		}
+		
+		return buffer.toString();
 	}
 	
 	@Override
@@ -133,4 +209,7 @@ public class ServerScript extends ServerSetting {
 		this.scriptContents = scriptContents;
 	}
 
+	public String getTokens() {
+		return tokens;
+	}
 }
