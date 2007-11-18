@@ -7,6 +7,7 @@ import cc.warlock.core.configuration.ConfigurationUtil;
 import cc.warlock.core.stormfront.IStormFrontProtocolHandler;
 import cc.warlock.core.stormfront.serversettings.server.ServerSettings;
 import cc.warlock.core.stormfront.xml.StormFrontAttributeList;
+import cc.warlock.core.stormfront.xml.StormFrontDocument;
 
 
 public class SettingsInfoTagHandler extends DefaultTagHandler {
@@ -30,7 +31,6 @@ public class SettingsInfoTagHandler extends DefaultTagHandler {
 		String major = attributes.getValue("major");
 		if(major != null) {
 			majorVersion = Integer.parseInt(attributes.getValue("major"));
-			handler.getClient().getServerSettings().setMajorVersion(majorVersion);
 		}
 		
 		clientVersion = attributes.getValue("client");
@@ -52,15 +52,37 @@ public class SettingsInfoTagHandler extends DefaultTagHandler {
 			}
 		} else {
 			// check against crc to see if we're up to date
-			String currentCRC = ServerSettings.getCRC(playerId);
+			StormFrontDocument document = ServerSettings.getDocument(playerId);
+			String currentCRC = ServerSettings.getCRC(document);
+			Integer currentMajorVersion = ServerSettings.getMajorVersion(document);
+			if (currentMajorVersion == null) currentMajorVersion = 0;
 			
 			if (currentCRC != null && crc.equals(currentCRC))
 			{
+				boolean sendBlankLine = true;
+				// crcs match, if we have the bigger major version, override with our settings
+				if (currentMajorVersion > majorVersion)
+				{
+					String settingsDoc = document.getRootElement().toXML("", false, true);
+					settingsDoc = "\n<c>\n\n<db>" + settingsDoc + "\n";
+					
+					try {
+						handler.getClient().getConnection().send(settingsDoc);
+						sendBlankLine = false;
+					} catch (IOException e) {
+						// TODO Auto-generated catch block
+						e.printStackTrace();
+					}
+				}
+				
 				handler.getClient().getServerSettings().load(playerId);
-				try {
-					handler.getClient().getConnection().sendLine("");
-				} catch(IOException e) {
-					e.printStackTrace();
+				if (sendBlankLine)
+				{
+					try {
+						handler.getClient().getConnection().sendLine("");
+					} catch(IOException e) {
+						e.printStackTrace();
+					}
 				}
 			} else {
 				System.out.println("our crc is: " + currentCRC + ", their crc is: " + crc);
@@ -75,6 +97,10 @@ public class SettingsInfoTagHandler extends DefaultTagHandler {
 	
 	public String getCRC () {
 		return crc;
+	}
+	
+	public Integer getMajorVersion () {
+		return majorVersion;
 	}
 
 }
