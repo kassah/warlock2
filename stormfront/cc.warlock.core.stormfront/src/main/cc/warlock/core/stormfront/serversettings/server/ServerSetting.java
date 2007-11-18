@@ -43,6 +43,11 @@ public abstract class ServerSetting {
 		element.getParent().removeElement(element);
 	}
 	
+	protected StormFrontElement getElement ()
+	{
+		return element;
+	}
+	
 	protected static void setAttribute (StormFrontElement element, String attrName, String value)
 	{
 		element.setAttribute(attrName, value);
