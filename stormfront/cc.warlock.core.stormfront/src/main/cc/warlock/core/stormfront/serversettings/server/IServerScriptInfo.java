@@ -12,4 +12,6 @@ public interface IServerScriptInfo extends IScriptInfo {
 	public IStormFrontClient getClient();
 	
 	public IServerScriptProvider getProvider();
+	
+	public ServerScript getServerScript();
 }

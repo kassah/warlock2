@@ -34,6 +34,11 @@ public class ServerScriptProvider implements IServerScriptProvider
 			return script.getComment();
 		}
 		
+		@Override
+		public ServerScript getServerScript() {
+			return script;
+		}
+		
 		public Reader openReader() {
 			return new StringReader(script.getScriptContents());
 		}
