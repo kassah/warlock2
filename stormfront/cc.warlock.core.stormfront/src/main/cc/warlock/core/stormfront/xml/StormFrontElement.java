@@ -147,6 +147,12 @@ public class StormFrontElement {
 		this.text.append(text);
 	}
 	
+	public void setText (String text)
+	{
+		this.text.setLength(0);
+		this.text.append(text);
+	}
+	
 	public String toXML (String prefix, boolean prettyPrint, boolean includeChildren)
 	{
 		StringBuffer xml = new StringBuffer();
