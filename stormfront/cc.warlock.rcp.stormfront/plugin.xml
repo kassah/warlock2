@@ -237,5 +237,14 @@
             id="cc.warlock.rcp.stormfront.serverScriptPersistableFactory">
       </factory>
    </extension>
+   <extension
+         point="org.eclipse.ui.editors.documentProviders">
+      <provider
+            class="cc.warlock.rcp.stormfront.ui.script.ServerScriptDocumentProvider"
+            extensions="cmd,wiz"
+            id="cc.warlock.rcp.stormfront.ui.script.ServerScriptDocumentProvider"
+            inputTypes="cc.warlock.rcp.stormfront.ui.script.ServerScriptEditorInput">
+      </provider>
+   </extension>
 
 </plugin>
