@@ -15,8 +15,8 @@ public class DirectionTagHandler extends DefaultTagHandler {
 	}
 
 	@Override
-	public boolean handleCharacters(char[] ch, int start, int length) {
-		handler.getClient().getCompass().set(String.copyValueOf(ch, start, length));
+	public boolean handleCharacters(String characters) {
+		handler.getClient().getCompass().set(characters);
 		
 		return false;
 	}

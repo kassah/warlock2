@@ -133,7 +133,7 @@ public class SettingsTagHandler extends DefaultTagHandler {
 	}
 	
 	@Override
-	public boolean handleCharacters(char[] ch, int start, int length) {
+	public boolean handleCharacters(String characters) {
 		return true;
 	}
 }

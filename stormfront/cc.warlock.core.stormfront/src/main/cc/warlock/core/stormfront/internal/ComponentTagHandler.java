@@ -9,11 +9,13 @@ public class ComponentTagHandler extends DefaultTagHandler {
 		super(handler);
 	}
 	
+	@Override
 	public String[] getTagNames() {
 		return new String[] { "component" };
 	}
 	
-	public boolean handleCharacters(char[] ch, int start, int end) {
+	@Override
+	public boolean handleCharacters(String characters) {
 		return true;
 	}
 

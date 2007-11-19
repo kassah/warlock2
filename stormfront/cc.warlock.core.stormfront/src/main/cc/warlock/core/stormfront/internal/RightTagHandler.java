@@ -22,8 +22,8 @@ public class RightTagHandler extends DefaultTagHandler {
 	}
 	
 	@Override
-	public boolean handleCharacters(char[] ch, int start, int length) {
-		rightHandText.append(ch, start, length);
+	public boolean handleCharacters(String characters) {
+		rightHandText.append(characters);
 		
 		return true;
 	}

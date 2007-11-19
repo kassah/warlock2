@@ -9,11 +9,13 @@ public class InvTagHandler extends DefaultTagHandler {
 		super(handler);
 	}
 	
+	@Override
 	public String[] getTagNames() {
 		return new String[] { "inv" };
 	}
 
-	public boolean handleCharacters(char[] ch, int start, int length) {
+	@Override
+	public boolean handleCharacters(String characters) {
 		return true;
 	}
 }

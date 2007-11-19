@@ -43,9 +43,9 @@ public class CompDefTagHandler extends DefaultTagHandler {
 	}
 	
 	@Override
-	public boolean handleCharacters(char[] ch, int start, int length) {
+	public boolean handleCharacters(String characters) {
 		if (id != null && id.equals("room desc")) {
-			buffer.append(ch, start, length);
+			buffer.append(characters);
 		}
 		// let the stream have the text, we just want to store the value in a property
 		return false;

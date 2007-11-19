@@ -52,10 +52,10 @@ public class StormFrontDocument implements IStormFrontXMLHandler {
 		elementStack.push(currentElement);
 	}
 	
-	public void characters(char[] ch, int start, int length) {
+	public void characters(String characters) {
 		StormFrontElement element = elementStack.peek();
 		
-		element.appendText(new String(ch, start, length));
+		element.appendText(characters);
 	}
 	
 	public void endElement(String name, String newLine) {

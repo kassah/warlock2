@@ -4,11 +4,9 @@ public interface IStormFrontXMLHandler {
 	
 	/**
 	 * Handle characters received in the current element
-	 * @param ch The characters received
-	 * @param start The start index
-	 * @param length The length
+	 * @param characters
 	 */
-	public void characters(char[] ch, int start, int length);
+	public void characters(String characters);
 	
 	/**
 	 * Start parsing an element and it's attributes

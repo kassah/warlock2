@@ -12,6 +12,7 @@ public class SpellTagHandler extends DefaultTagHandler {
 		super(handler);
 	}
 	
+	@Override
 	public String[] getTagNames() {
 		return new String[] { "spell" };
 	}
@@ -21,8 +22,9 @@ public class SpellTagHandler extends DefaultTagHandler {
 		spellText = new StringBuffer();
 	}
 
-	public boolean handleCharacters(char[] ch, int start, int length) {
-		spellText.append(ch, start, length);
+	@Override
+	public boolean handleCharacters(String characters) {
+		spellText.append(characters);
 		return true;
 	}
 	

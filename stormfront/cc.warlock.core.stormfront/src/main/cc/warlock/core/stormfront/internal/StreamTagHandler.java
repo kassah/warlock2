@@ -32,7 +32,7 @@ public class StreamTagHandler extends DefaultTagHandler {
 	public void handleEnd(String newLine) {
 		 // TODO flush the buffer here manually
 		 // force append a new-line.. most of the use of <stream>xxx</stream> doesn't have newlines, so the buffer won't flush
-		 handler.characters(new char[] { '\n' }, 0, 1);
+		 handler.characters("\n");
 		 handler.popStream();
 	}
 }

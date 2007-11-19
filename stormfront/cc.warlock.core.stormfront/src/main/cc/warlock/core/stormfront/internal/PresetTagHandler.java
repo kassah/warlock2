@@ -37,9 +37,7 @@ public class PresetTagHandler extends DefaultTagHandler {
 		handler.addStyle(style);
 		
 		if(newLine != null && newLine.length() > 0) {
-			char[] chars = new char[newLine.length()];
-			newLine.getChars(0, newLine.length(), chars, 0);
-			handler.characters(chars, 0, newLine.length());
+			handler.characters(newLine);
 		}
 	}
 	
@@ -49,9 +47,7 @@ public class PresetTagHandler extends DefaultTagHandler {
 		handler.removeStyle(style);
 		
 		if(newLine != null && newLine.length() > 0) {
-			char[] chars = new char[newLine.length()];
-			newLine.getChars(0, newLine.length(), chars, 0);
-			handler.characters(chars, 0, newLine.length());
+			handler.characters(newLine);
 		}
 	}
 

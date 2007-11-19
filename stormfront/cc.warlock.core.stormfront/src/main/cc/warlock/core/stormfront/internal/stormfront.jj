@@ -17,7 +17,7 @@ public class StormFrontProtocolParser {
 	protected void characters (String characters)
 	{
 		// System.out.println("characters: " + string);
-		handler.characters(characters.toCharArray(), 0, characters.length());
+		handler.characters(characters);
 	}
 	
 	protected void startElement (String name, String newLine)

@@ -12,6 +12,7 @@ public class LeftTagHandler extends DefaultTagHandler {
 		super(handler);
 	}
 	
+	@Override
 	public String[] getTagNames() {
 		return new String[] { "left" };
 	}
@@ -21,8 +22,9 @@ public class LeftTagHandler extends DefaultTagHandler {
 		leftHandText = new StringBuffer();
 	}
 	
-	public boolean handleCharacters(char[] ch, int start, int length) {
-		leftHandText.append(ch, start, length);
+	@Override
+	public boolean handleCharacters(String characters) {
+		leftHandText.append(characters);
 		
 		return true;
 	}

@@ -131,19 +131,19 @@ public class StormFrontProtocolHandler implements IStormFrontProtocolHandler {
 	/* (non-Javadoc)
 	 * @see org.xml.sax.ContentHandler#characters(char[], int, int)
 	 */
-	public void characters(char[] ch, int start, int length) {
+	public void characters(String characters) {
 		/*String str = String.copyValueOf(ch, start, length);
 		System.out.print(str);*/
 		
 		if (rawXMLBuffer != null)
 		{
-			rawXMLBuffer.append(StringEscapeUtils.escapeXml(String.copyValueOf(ch, start, length)));
+			rawXMLBuffer.append(StringEscapeUtils.escapeXml(characters));
 		}
 		
 		// if there was no handler or it couldn't handle the characters,
 		// take a default action
-		if(!handleCharacters(defaultTagHandlers, 0, ch, start, length)) {
-			WarlockString str = new WarlockString(client, String.copyValueOf(ch, start, length));
+		if(!handleCharacters(defaultTagHandlers, 0, characters)) {
+			WarlockString str = new WarlockString(client, characters);
 			for(IWarlockStyle style : styles) {
 				str.addStyle(style);
 			}
@@ -160,7 +160,7 @@ public class StormFrontProtocolHandler implements IStormFrontProtocolHandler {
 	}
 	
 	private boolean handleCharacters(Map<String, IStormFrontTagHandler> handlers,
-			int stackPosition, char[] ch, int start, int length) {
+			int stackPosition, String characters) {
 		if(stackPosition >= tagStack.size()) return false; // reached the end of the stack
 		String tagName = tagStack.get(stackPosition);
 		
@@ -170,11 +170,11 @@ public class StormFrontProtocolHandler implements IStormFrontProtocolHandler {
 		IStormFrontTagHandler tagHandler = handlers.get(tagName);
 		if(tagHandler == null) return false;
 		
-		if(handleCharacters(tagHandler.getTagHandlers(), stackPosition + 1, ch, start, length))
+		if(handleCharacters(tagHandler.getTagHandlers(), stackPosition + 1, characters))
 			return true;
 		
 		tagHandler.setCurrentTag(tagName);
-		return tagHandler.handleCharacters(ch, start, length); 
+		return tagHandler.handleCharacters(characters); 
 	}
 	
 	/* (non-Javadoc)

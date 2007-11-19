@@ -41,7 +41,7 @@ public interface IStormFrontTagHandler {
 	
 	/**
 	 * handle contents of the tag
-	 * @param ch, start, length
+	 * @param characters
 	 */
-	public boolean handleCharacters(char[] ch, int start, int length);
+	public boolean handleCharacters(String characters);
 }
