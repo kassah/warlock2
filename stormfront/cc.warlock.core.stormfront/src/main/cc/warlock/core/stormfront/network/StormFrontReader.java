@@ -27,7 +27,8 @@ public class StormFrontReader extends InputStreamReader {
 	@Override
 	public int read(char[] cbuf) throws IOException {
 		int bytesRead = super.read(cbuf);
-		connection.dataReady(String.valueOf(cbuf));
+		if(bytesRead != -1)
+			connection.dataReady(String.valueOf(cbuf));
 		
 		return bytesRead;
 	}
