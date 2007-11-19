@@ -1,17 +1,17 @@
 package cc.warlock.core.stormfront.network;
 
-import java.io.BufferedReader;
 import java.io.IOException;
-import java.io.Reader;
+import java.io.InputStream;
+import java.io.InputStreamReader;
 import java.nio.CharBuffer;
 
-public class StormFrontReader extends BufferedReader {
+public class StormFrontReader extends InputStreamReader {
 
 	protected StormFrontConnection connection;
 	
-	public StormFrontReader (StormFrontConnection connection, Reader reader)
+	public StormFrontReader (StormFrontConnection connection, InputStream stream)
 	{
-		super(reader);
+		super(stream);
 		this.connection = connection;
 	}
 
@@ -35,7 +35,8 @@ public class StormFrontReader extends BufferedReader {
 	@Override
 	public int read(char[] cbuf, int off, int len) throws IOException {
 		int bytesRead = super.read(cbuf, off, len);
-		connection.dataReady(String.valueOf(cbuf, off, bytesRead));
+		if(bytesRead != -1)
+			connection.dataReady(String.valueOf(cbuf, off, bytesRead));
 		
 		return bytesRead;
 	}
@@ -43,7 +44,8 @@ public class StormFrontReader extends BufferedReader {
 	@Override
 	public int read(CharBuffer target) throws IOException {
 		int bytesRead = super.read(target);
-		connection.dataReady(target.toString());
+		if(bytesRead != -1)
+			connection.dataReady(target.toString());
 		
 		return bytesRead;
 	}

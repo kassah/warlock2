@@ -4,7 +4,6 @@
 package cc.warlock.core.stormfront.network;
 
 import java.io.IOException;
-import java.io.InputStreamReader;
 import java.net.Socket;
 import java.util.ArrayList;
 
@@ -91,7 +90,7 @@ public class StormFrontConnection implements IConnection
 				sendLine(key);
 				sendLine("/FE:WARLOCK /VERSION:1.0.1.22 /XML\n");
 				
-				StormFrontReader reader = new StormFrontReader(StormFrontConnection.this, new InputStreamReader(socket.getInputStream()));
+				StormFrontReader reader = new StormFrontReader(StormFrontConnection.this, socket.getInputStream());
 				StormFrontProtocolParser parser = new StormFrontProtocolParser(reader);
 				parser.setHandler(handler);
 				parser.Document();
@@ -100,7 +99,7 @@ public class StormFrontConnection implements IConnection
 				client.getDefaultStream().echo(
 						"******************************\n"+
 						"* Disconnected from the game *\n" +
-						"******************************");
+						"******************************\n");
 			
 			} catch (Throwable t) {
 				t.printStackTrace();
