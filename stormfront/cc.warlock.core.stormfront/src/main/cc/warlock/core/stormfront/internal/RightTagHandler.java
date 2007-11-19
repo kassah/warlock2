@@ -12,6 +12,7 @@ public class RightTagHandler extends DefaultTagHandler {
 		super(handler);
 	}
 	
+	@Override
 	public String[] getTagNames() {
 		return new String[] { "right" };
 	}

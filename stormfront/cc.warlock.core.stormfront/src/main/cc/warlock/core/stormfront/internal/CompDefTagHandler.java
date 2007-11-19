@@ -28,6 +28,7 @@ public class CompDefTagHandler extends DefaultTagHandler {
 		addTagHandler("d", new DirectionTagHandler(handler));
 	}
 	
+	@Override
 	public String[] getTagNames() {
 		return new String[] { "compDef" };
 	}

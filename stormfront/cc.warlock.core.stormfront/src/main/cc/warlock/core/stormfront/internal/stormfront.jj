@@ -103,7 +103,7 @@ TOKEN: {
 	<TAG_END_OPEN: "</"> : IN_TAG_MODE |
 	
 	<ENTITY: "&" ("#")? (<LETTER> | <DIGIT>)+ ";"> { matchedToken.image = matchedToken.image.substring(1, matchedToken.image.length() - 1); } |
-	<PCDATA: (~["<","\r","\n","&"])+ | "&" | (["\r","\n"])+> |
+	<PCDATA: (~["<","&"])+ | "&" > |
 	 <NAMECHAR: (<LETTER> | <DIGIT> | "." | "-" | "_" | ":")> |
 	 <DIGIT: (["0"-"9"])> |
 	 <LETTER: (["A"-"Z","a"-"z"])>
