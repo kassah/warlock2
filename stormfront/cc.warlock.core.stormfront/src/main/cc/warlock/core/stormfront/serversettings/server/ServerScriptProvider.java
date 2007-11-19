@@ -34,7 +34,6 @@ public class ServerScriptProvider implements IServerScriptProvider
 			return script.getComment();
 		}
 		
-		@Override
 		public ServerScript getServerScript() {
 			return script;
 		}
