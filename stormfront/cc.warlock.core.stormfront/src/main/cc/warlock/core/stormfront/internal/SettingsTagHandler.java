@@ -55,7 +55,7 @@ public class SettingsTagHandler extends DefaultTagHandler {
 	}
 	
 	@Override
-	public void handleStart(StormFrontAttributeList attributes) {
+	public void handleStart(StormFrontAttributeList attributes, String newLine) {
 		if ("settings".equals(getCurrentTag()))
 		{	
 			buffer.setLength(0);	
@@ -69,7 +69,7 @@ public class SettingsTagHandler extends DefaultTagHandler {
 	}
 
 	@Override
-	public void handleEnd() {
+	public void handleEnd(String newLine) {
 		if ("settings".equals(getCurrentTag()))
 		{
 			handler.stopSavingRawXML();

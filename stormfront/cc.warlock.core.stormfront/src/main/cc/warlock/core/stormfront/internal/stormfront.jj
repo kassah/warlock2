@@ -20,11 +20,11 @@ public class StormFrontProtocolParser {
 		handler.characters(characters.toCharArray(), 0, characters.length());
 	}
 	
-	protected void startElement (String name)
+	protected void startElement (String name, String newLine)
 	{
 		// System.out.println("startElement: " + name.image);
 		
-		handler.startElement(name, currentAttributes);
+		handler.startElement(name, currentAttributes, newLine);
 		currentAttributes.clear();
 	}
 	
@@ -40,11 +40,11 @@ public class StormFrontProtocolParser {
 		currentAttributes.addAttribute(attribute);
 	}
 	
-	protected void endElement (String name)
+	protected void endElement (String name, String newLine)
 	{
 		// System.out.println("end element: " + name.image);
 		
-		handler.endElement(name);
+		handler.endElement(name, newLine);
 		currentAttributes.clear();
 	}
 }
@@ -65,9 +65,9 @@ void Element() : {Token data; String str; }
 	)
 }
 
-void Tag() : {Token name;}
+void Tag() : {Token name, newLine; }
 {
-	<TAG_START_OPEN> name=<GENERIC_ID> (Attribute())* {  startElement(name.image); } ((<TAG_CLOSE> (Element())* EndTag()) | <TAG_EMPTY_CLOSE> { endElement(name.image); })
+	<TAG_START_OPEN> name=<GENERIC_ID> (Attribute())* ((newLine=<TAG_CLOSE> { startElement(name.image, newLine.image); } (Element())* EndTag()) | newLine=<TAG_EMPTY_CLOSE> { startElement(name.image, null); endElement(name.image, newLine.image); })
 }
 
 void Attribute(): {Token name, value;}
@@ -75,9 +75,9 @@ void Attribute(): {Token name, value;}
 	name=<GENERIC_ID> { value = name; } (<ATTR_EQ> value=<ATTR_VALUE>)?	{ addAttribute(name.image,value.image); }
 }
 
-void EndTag(): {Token name;}
+void EndTag(): {Token name, newLine;}
 {
-	<TAG_END_OPEN> name=<GENERIC_ID> <TAG_CLOSE> { endElement(name.image); }
+	<TAG_END_OPEN> name=<GENERIC_ID> newLine=<TAG_CLOSE> { endElement(name.image, newLine.image); }
 }
 
 String Entity(): { Token entity; }
@@ -110,8 +110,8 @@ TOKEN: {
 }
 
 <IN_TAG_MODE> TOKEN: {
-	<TAG_CLOSE: ">" (("\r")? "\n")?> : DEFAULT |
-	<TAG_EMPTY_CLOSE: "/>"> : DEFAULT |
+	<TAG_CLOSE: ">" (("\r")? "\n")?> {matchedToken.image = matchedToken.image.substring(1, matchedToken.image.length());}: DEFAULT |
+	<TAG_EMPTY_CLOSE: "/>" (("\r")? "\n")?> {matchedToken.image = matchedToken.image.substring(2, matchedToken.image.length());}: DEFAULT |
 	
 		
 	<ATTR_EQ: "="> |

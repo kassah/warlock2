@@ -13,11 +13,13 @@ public class ClearStreamTagHandler extends DefaultTagHandler {
 		super(handler);
 	}
 
+	@Override
 	public String[] getTagNames() {
 		return new String[] { "clearStream"};
 	}
 	
-	public void handleStart(StormFrontAttributeList attributes) {
+	@Override
+	public void handleStart(StormFrontAttributeList attributes, String newLine) {
 		String id = attributes.getValue("id");
 		
 		handler.getClient().getStream(id).clear();

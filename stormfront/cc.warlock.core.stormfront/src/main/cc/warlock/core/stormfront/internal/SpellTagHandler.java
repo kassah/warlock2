@@ -17,7 +17,7 @@ public class SpellTagHandler extends DefaultTagHandler {
 	}
 	
 	@Override
-	public void handleStart(StormFrontAttributeList atts) {
+	public void handleStart(StormFrontAttributeList atts, String newLine) {
 		spellText = new StringBuffer();
 	}
 
@@ -27,7 +27,7 @@ public class SpellTagHandler extends DefaultTagHandler {
 	}
 	
 	@Override
-	public void handleEnd() {
+	public void handleEnd(String newLine) {
 		handler.getClient().getCurrentSpell().set(spellText.toString());
 		
 		spellText = null;

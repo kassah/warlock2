@@ -12,11 +12,11 @@ abstract public class BaseTagHandler implements IStormFrontTagHandler {
 	
 	public abstract String[] getTagNames();
 	
-	public void handleStart(StormFrontAttributeList attributes) { }
+	public void handleStart(StormFrontAttributeList attributes, String newLine) { }
 
-	public void handleEnd() { }
+	public void handleEnd(String newLine) { }
 
-	public boolean handleCharacters(char[] ch, int start, int length) {
+	public boolean handleCharacters(char ch[], int start, int length) {
 		return false;
 	}
 	

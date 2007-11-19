@@ -25,7 +25,7 @@ public class SettingsInfoTagHandler extends DefaultTagHandler {
 	}
 	
 	@Override
-	public void handleStart(StormFrontAttributeList attributes) {
+	public void handleStart(StormFrontAttributeList attributes, String newLine) {
 		crc = attributes.getValue("crc");
 		
 		String major = attributes.getValue("major");
@@ -39,7 +39,7 @@ public class SettingsInfoTagHandler extends DefaultTagHandler {
 	}
 	
 	@Override
-	public void handleEnd() {
+	public void handleEnd(String newLine) {
 		String playerId = handler.getClient().getPlayerId().get();
 		
 		File serverSettings = ConfigurationUtil.getConfigurationFile("serverSettings_" + playerId + ".xml", false);

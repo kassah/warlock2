@@ -28,7 +28,8 @@ public class PromptTagHandler extends DefaultTagHandler {
 		return new String[] { "prompt" };
 	}
 	
-	public void handleStart(StormFrontAttributeList attributes) {
+	@Override
+	public void handleStart(StormFrontAttributeList attributes, String newLine) {
 		//System.out.println("got prompt");
 		handler.clearStyles();
 		prompt = "";
@@ -48,7 +49,7 @@ public class PromptTagHandler extends DefaultTagHandler {
 	}
 	
 	@Override
-	public void handleEnd() {
+	public void handleEnd(String newLine) {
 		client.getDefaultStream().prompt(prompt);
 	}
 }

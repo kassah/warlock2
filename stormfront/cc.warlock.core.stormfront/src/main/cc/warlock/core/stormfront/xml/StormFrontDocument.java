@@ -30,7 +30,7 @@ public class StormFrontDocument implements IStormFrontXMLHandler {
 		}
 	}
 	
-	public void startElement(String name, StormFrontAttributeList attributes) {
+	public void startElement(String name, StormFrontAttributeList attributes, String newLine) {
 		StormFrontElement currentElement = new StormFrontElement(name);
 		for (StormFrontAttribute attribute : attributes.getList())
 		{
@@ -58,7 +58,7 @@ public class StormFrontDocument implements IStormFrontXMLHandler {
 		element.appendText(new String(ch, start, length));
 	}
 	
-	public void endElement(String name) {
+	public void endElement(String name, String newLine) {
 		elementStack.pop();
 	}
 	

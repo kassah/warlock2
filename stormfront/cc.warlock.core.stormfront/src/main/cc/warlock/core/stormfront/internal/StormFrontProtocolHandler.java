@@ -180,7 +180,7 @@ public class StormFrontProtocolHandler implements IStormFrontProtocolHandler {
 	/* (non-Javadoc)
 	 * @see org.xml.sax.ContentHandler#endElement(java.lang.String, java.lang.String, java.lang.String)
 	 */
-	public void endElement(String name) {
+	public void endElement(String name, String newLine) {
 		
 		if (rawXMLBuffer != null)
 		{
@@ -204,7 +204,7 @@ public class StormFrontProtocolHandler implements IStormFrontProtocolHandler {
 		IStormFrontTagHandler tagHandler = getTagHandlerForElement(name, defaultTagHandlers, 0);
 		if(tagHandler != null) {
 			tagHandler.setCurrentTag(name);
-			tagHandler.handleEnd();
+			tagHandler.handleEnd(newLine);
 		} else {
 			// System.out.println("Didn't handle end element for \"" + name + "\"");
 		}
@@ -213,7 +213,7 @@ public class StormFrontProtocolHandler implements IStormFrontProtocolHandler {
 	/* (non-Javadoc)
 	 * @see org.xml.sax.ContentHandler#startElement(java.lang.String, java.lang.String, java.lang.String, org.xml.sax.Attributes)
 	 */
-	public void startElement(String name, StormFrontAttributeList attributes) {
+	public void startElement(String name, StormFrontAttributeList attributes, String newLine) {
 		
 		//System.out.print("<" + name);
 		if (rawXMLBuffer != null)
@@ -240,7 +240,7 @@ public class StormFrontProtocolHandler implements IStormFrontProtocolHandler {
 		
 		if(tagHandler != null) {
 			tagHandler.setCurrentTag(name);
-			tagHandler.handleStart(attributes);
+			tagHandler.handleStart(attributes, newLine);
 		} else {
 			// System.out.println("didn't handle start element for \"" + name + "\"");
 		}

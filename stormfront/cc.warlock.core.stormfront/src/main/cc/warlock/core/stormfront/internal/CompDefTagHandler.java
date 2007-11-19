@@ -32,7 +32,8 @@ public class CompDefTagHandler extends DefaultTagHandler {
 		return new String[] { "compDef" };
 	}
 
-	public void handleStart(StormFrontAttributeList attributes) {
+	@Override
+	public void handleStart(StormFrontAttributeList attributes, String newLine) {
 		buffer.setLength(0);
 		this.id = attributes.getValue("id");
 		
@@ -51,7 +52,7 @@ public class CompDefTagHandler extends DefaultTagHandler {
 	}
 	
 	@Override
-	public void handleEnd() {
+	public void handleEnd(String newLine) {
 		if (id != null && id.equals("room desc"))
 		{
 			handler.getClient().getRoomDescription().set(buffer.toString());

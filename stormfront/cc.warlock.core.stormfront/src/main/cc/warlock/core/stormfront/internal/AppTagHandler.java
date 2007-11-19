@@ -16,11 +16,13 @@ public class AppTagHandler extends DefaultTagHandler {
 		super(handler);
 	}
 	
+	@Override
 	public String[] getTagNames() {
 		return new String[] { "app" };
 	}
 	
-	public void handleStart(StormFrontAttributeList attributes) {
+	@Override
+	public void handleStart(StormFrontAttributeList attributes, String newLine) {
 		String characterName = attributes.getValue("char");
 		String gameName = attributes.getValue("game");
 		

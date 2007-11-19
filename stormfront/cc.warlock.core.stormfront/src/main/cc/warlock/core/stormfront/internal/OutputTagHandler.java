@@ -20,7 +20,8 @@ public class OutputTagHandler extends DefaultTagHandler {
 		return new String[] {"output"};
 	}
 
-	public void handleStart(StormFrontAttributeList attributes) {
+	@Override
+	public void handleStart(StormFrontAttributeList attributes, String newLine) {
 		if(currentStyle != null) {
 			handler.removeStyle(currentStyle);
 		}
@@ -35,5 +36,6 @@ public class OutputTagHandler extends DefaultTagHandler {
 			}
 			handler.addStyle(currentStyle);
 		}
+		//TODO decide if we should output newLine here
 	}
 }

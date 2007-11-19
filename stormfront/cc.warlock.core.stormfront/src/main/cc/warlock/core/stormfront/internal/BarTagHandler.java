@@ -20,11 +20,13 @@ public class BarTagHandler extends BaseTagHandler {
 		this.handler = handler;
 	}
 	
+	@Override
 	public String[] getTagNames() {
 		return new String[] { "progressBar" };
 	}
 
-	public void handleStart(StormFrontAttributeList attributes) {
+	@Override
+	public void handleStart(StormFrontAttributeList attributes, String newLine) {
     	handleProgressBar(attributes.getValue("id"), Integer.parseInt(attributes.getValue("value")), attributes.getValue("text"));	
 	}
 	

@@ -17,7 +17,7 @@ public class CompassTagHandler extends DefaultTagHandler {
 	}
 	
 	@Override
-	public void handleEnd() {
+	public void handleEnd(String newLine) {
 		for (IScript script : handler.getClient().getRunningScripts())
 		{
 			script.movedToRoom();

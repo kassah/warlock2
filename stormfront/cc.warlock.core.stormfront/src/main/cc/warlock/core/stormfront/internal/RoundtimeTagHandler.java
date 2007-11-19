@@ -26,18 +26,16 @@ public class RoundtimeTagHandler extends DefaultTagHandler {
 		super(handler);
 	}
 	
+	@Override
 	public String[] getTagNames() {
 		return new String[] { "roundTime" };
 	}
 	
-	public void handleStart(StormFrontAttributeList attributes) {
+	@Override
+	public void handleStart(StormFrontAttributeList attributes, String newLine) {
 		rtEnds = Long.parseLong(attributes.getValue("value"));
 		waitingForPrompt = true;
 		roundtimeStarted = false;
-	}
-
-	public void handleEnd() {
-		// TODO investigate whether or not we need to do something here
 	}
 	
 	public void processFollowingPrompt (long currentPromptTime)

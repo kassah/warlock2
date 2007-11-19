@@ -21,7 +21,8 @@ public class PushBoldTagHandler extends DefaultTagHandler {
 		return new String[] { "pushBold", "popBold" };
 	}
 	
-	public void handleEnd() {
+	@Override
+	public void handleEnd(String newLine) {
 		if (getCurrentTag().equals("pushBold"))
 		{
 			style = handler.getClient().getServerSettings().getPreset("bold").getStyle();

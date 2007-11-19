@@ -16,7 +16,7 @@ public class IndicatorTagHandler extends DefaultTagHandler {
 	}
 	
 	@Override
-	public void handleStart(StormFrontAttributeList attributes) {
+	public void handleStart(StormFrontAttributeList attributes, String newLine) {
 		if (attributes.getAttribute("id") != null && attributes.getAttribute("visible") != null)
 		{
 			if ("y".equalsIgnoreCase(attributes.getValue("visible")))

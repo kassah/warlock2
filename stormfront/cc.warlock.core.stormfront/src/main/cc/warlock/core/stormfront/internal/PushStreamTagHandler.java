@@ -18,11 +18,13 @@ public class PushStreamTagHandler extends DefaultTagHandler {
 		super(handler);
 	}
 
+	@Override
 	public String[] getTagNames() {
 		return new String[] { "pushStream" };
 	}
 	
-	public void handleStart(StormFrontAttributeList attributes) {
+	@Override
+	public void handleStart(StormFrontAttributeList attributes, String newLine) {
 		String id = attributes.getValue("id");
 		handler.pushStream(id);
 	}

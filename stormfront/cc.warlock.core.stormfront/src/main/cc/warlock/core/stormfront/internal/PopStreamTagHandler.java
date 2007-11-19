@@ -13,11 +13,13 @@ public class PopStreamTagHandler extends DefaultTagHandler {
 		super(handler);
 	}
 
+	@Override
 	public String[] getTagNames() {
 		return new String[] { "popStream" };
 	}
 	
-	public void handleStart(StormFrontAttributeList attributes) {
+	@Override
+	public void handleStart(StormFrontAttributeList attributes, String newLine) {
 		handler.popStream();
 	}
 }

@@ -17,10 +17,11 @@ public class RightTagHandler extends DefaultTagHandler {
 	}
 
 	@Override
-	public void handleStart(StormFrontAttributeList attributes) {
+	public void handleStart(StormFrontAttributeList attributes, String newLine) {
 		rightHandText = new StringBuffer();
 	}
 	
+	@Override
 	public boolean handleCharacters(char[] ch, int start, int length) {
 		rightHandText.append(ch, start, length);
 		
@@ -28,7 +29,7 @@ public class RightTagHandler extends DefaultTagHandler {
 	}
 	
 	@Override
-	public void handleEnd() {
+	public void handleEnd(String newLine) {
 		handler.getClient().getRightHand().set(rightHandText.toString());
 		
 		rightHandText = null;

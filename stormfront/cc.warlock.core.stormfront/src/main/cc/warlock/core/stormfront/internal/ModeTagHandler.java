@@ -18,7 +18,7 @@ public class ModeTagHandler extends DefaultTagHandler {
 	}
 
 	@Override
-	public void handleStart(StormFrontAttributeList attributes) {
+	public void handleStart(StormFrontAttributeList attributes, String newLine) {
 		if (attributes.getValue("id") != null)
 		{
 			StormFrontClient client = (StormFrontClient) handler.getClient();
