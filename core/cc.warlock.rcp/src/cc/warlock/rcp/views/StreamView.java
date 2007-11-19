@@ -60,6 +60,7 @@ public class StreamView extends ViewPart implements IStreamListener, IGameViewFo
 	protected boolean isPrompting = false;
 	protected boolean multiClient = false;
 	protected boolean buffering = false;
+	protected String lastPrompt;
 	
 	protected WarlockString bufferedText;
 	
@@ -281,14 +282,14 @@ public class StreamView extends ViewPart implements IStreamListener, IGameViewFo
 		if (this.mainStream.equals(stream) || this.streams.contains(stream))
 		{
 			WarlockString string = new WarlockString(client);
-			if(isPrompting) {
+			if(isPrompting)
 				string.append("\n");
-				isPrompting = false;
-			}
 			int styleStart = string.length();
 			string.append(text);
 			// TODO: make a different style for client messages
 			string.addStyle(styleStart, text.length(), client.getCommandStyle());
+			if(isPrompting && lastPrompt != null)
+				string.append(lastPrompt);
 			
 			appendText(string);
 		}
@@ -307,9 +308,9 @@ public class StreamView extends ViewPart implements IStreamListener, IGameViewFo
 	}
 	
 	public void streamPrompted(IStream stream, String prompt) {
-		if (!isPrompting && (this.mainStream.equals(stream) || this.streams.contains(stream)))
+		if ((!isPrompting || !prompt.equals(lastPrompt)) &&
+				(this.mainStream.equals(stream) || this.streams.contains(stream)))
 		{
-			isPrompting = true;
 			WarlockString text = new WarlockString(client);
 			
 			if (bufferedText != null)
@@ -317,6 +318,14 @@ public class StreamView extends ViewPart implements IStreamListener, IGameViewFo
 				text.append(bufferedText);
 				bufferedText = null;
 			}
+			
+			if(isPrompting) {
+				text.append("\n");
+			} else {
+				isPrompting = true;
+			}
+				
+			lastPrompt = prompt;
 			
 			text.append(prompt);
 			
