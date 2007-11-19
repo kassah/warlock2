@@ -1,0 +1,279 @@
+options { IGNORE_CASE=true; }
+
+PARSER_BEGIN(WSLParser)
+package cc.warlock.core.stormfront.script.wsl;
+
+import java.util.ArrayList;
+import cc.warlock.core.stormfront.script.wsl.WSLEqualityCondition.EqualityOperator;
+import cc.warlock.core.stormfront.script.wsl.WSLRelationalCondition.RelationalOperator;
+
+public class WSLParser {
+	private WSLScript script;
+	private int lineNum = 1;
+	public void setScript(WSLScript s) { script = s; }
+}
+
+PARSER_END(WSLParser)
+
+void script() : {}
+{
+	line() (<EOL> line())* <EOF>
+}
+
+void line() : {}
+{
+	(<COMMENT> | l=expr() { script.addLine(l); })? { lineNum++; }
+}
+
+WSLScriptLine expr() : { WSLScriptLine line; }
+{
+	label=<LABEL> (l=expr())?
+		{
+			if (l == null) {
+				line = new WSLScriptLine(lineNum);
+			} else {
+				line = l;
+			}
+		
+			script.addLabel(label.image, line);
+		}
+	| (<IF> cond=conditionalExpression() <THEN>)?
+		args=value_list()
+			{
+				line = new WSLScriptLine(lineNum);
+				line.setValue(args);
+				if(cond != null)
+					line.setCondition(cond);
+			}
+}
+
+IWSLValue value_list(): {}
+{
+	l=value_list_helper()
+		{
+			if(l.size() > 1)
+				return new WSLList(l);
+			else
+				return l.get(0);
+		}
+}
+
+ArrayList<IWSLValue> value_list_helper(): { ArrayList<IWSLValue> list = null; }
+{
+	data=script_value()	(list=value_list_helper())?	{
+			if(list == null) list = new ArrayList<IWSLValue>();
+			list.add(0, data);
+			return list; }
+}
+
+IWSLValue script_value(): { IWSLValue val; Token t; }
+{
+	val=string()		{ return val; }
+	| val=variable()	{ return val; }
+	| t=<NUMBER>		{ return new WSLNumber(t.image); }
+	| <TRUE>			{ return new WSLBoolean(true); }
+	| <FALSE>			{ return new WSLBoolean(false); }
+}
+
+IWSLValue string(): { IWSLValue v; }
+{
+	(v=<STRING1> | v=<STRING2> | v=<STRING3> | v=<STRING4>) { return new WSLString(v.image); }
+}
+
+IWSLValue variable(): { IWSLValue v; }
+{
+	(v=<VARIABLE1> | v=<VARIABLE2>) { return new WSLVariable(v.image, script); }
+}
+	
+IWSLValue conditionalExpression(): {}
+{
+	arg=conditionalAndExpression()  { ArrayList<IWSLValue> args = null; }
+		(("||" | "or") argNext=conditionalAndExpression()
+			{
+				if(args == null) {
+					args = new ArrayList<IWSLValue>();
+					args.add(arg);
+				}
+				args.add(argNext);
+			}
+		)*
+			{
+				if(args == null)
+					return arg;
+				else
+					return new WSLOrCondition(args);
+			}
+}
+
+IWSLValue conditionalAndExpression(): {}
+{
+	arg=equalityExpression() { ArrayList<IWSLValue> args = null; }
+		(("&&" | "and") argNext=equalityExpression()
+			{
+				if(args == null) {
+					args = new ArrayList<IWSLValue>();
+					args.add(arg);
+				}
+				args.add(argNext);
+			}
+		)*
+			{
+				if(args == null)
+					return arg;
+				else
+					return new WSLAndCondition(args);
+			}
+}
+
+IWSLValue equalityExpression(): {}
+{
+	arg=relationalExpression()
+			{
+				ArrayList<IWSLValue> args = null;
+				ArrayList<EqualityOperator> ops = null;
+			}
+		(op=equalityOp() argNext=relationalExpression()
+			{
+				if(args == null) {
+					args = new ArrayList<IWSLValue>();
+					args.add(arg);
+				}
+				args.add(argNext);
+				if(ops == null) {
+					ops = new ArrayList<EqualityOperator>();
+				}
+				ops.add(op);
+			}
+		)*
+			{
+				if(args == null)
+					return arg;
+				else
+					return new WSLEqualityCondition(args, ops);
+			}
+}
+
+EqualityOperator equalityOp(): {}
+{
+	("==" | "=")		{ return EqualityOperator.equals; }
+	| ("!=" | "<>")		{ return EqualityOperator.notequals; }
+}
+	
+IWSLValue relationalExpression(): {}
+{
+	arg=unaryExpression()
+			{
+				ArrayList<IWSLValue> args = null;
+				ArrayList<RelationalOperator> ops = null;
+			}
+		(op=relationalOp() argNext=unaryExpression()
+			{
+				if(args == null) {
+					args = new ArrayList<IWSLValue>();
+					args.add(arg);
+				}
+				args.add(argNext);
+				if(ops == null) {
+					ops = new ArrayList<RelationalOperator>();
+				}
+				ops.add(op);
+			}
+		)*
+			{
+				if(args == null || ops == null)
+					return arg;
+				else
+					return new WSLRelationalCondition(args, ops);
+			}
+}
+
+RelationalOperator relationalOp(): {}
+{
+	  ">"			{ return RelationalOperator.GreaterThan; }
+	| "<"			{ return RelationalOperator.LessThan; }
+	| ">="			{ return RelationalOperator.GreaterThanEqualTo; }
+	| "<="			{ return RelationalOperator.LessThanEqualTo; }
+	| "contains"	{ return RelationalOperator.Contains; }
+}
+
+IWSLValue unaryExpression(): {}
+{
+	  ("!" | "not") arg=unaryExpression()	{ return new WSLNotCondition(arg); }
+	| ("exist" | "exists") name=variable()	{ return new WSLExistsCondition($name.text, script); }
+	| arg=primaryExpression()				{ return arg; }
+}
+
+IWSLValue parenExpression(): {}
+{
+	"(" arg=conditionalExpression() ")"		{ return arg; }
+}
+
+IWSLValue primaryExpression(): {}
+{
+	  arg=parenExpression()		{ return arg; }
+	| l=value_list()			{ return l; }
+}
+
+<DEFAULT> SKIP: {
+	<WS: ([" ","\t","\u000C"])>
+}
+
+TOKEN: {
+	<EOL: ("\r")? "\n"> : DEFAULT
+}
+
+TOKEN: {
+	<COMMENT: ~["A"-"Z", "a"-"z", "0"-"9", "_", "%", " ","\t","\u000C", "\n", "\r"] (~["\n", "\r"])* >
+|	<LABEL: ["A"-"Z", "a"-"z", "0"-"9", "_"] (~[" ","\t","\u000C", ":", "\n", "\r", "%", "$"])* ":"> {
+		// cut the : off of the label
+		matchedToken.image = matchedToken.image.substring(0, matchedToken.image.length() - 2); }
+|	<IF: "if">: CONDITION
+|	<VARIABLE1: "%" (["A"-"Z", "a"-"z", "0"-"9", "_"])+
+		| "$" (["A"-"Z", "a"-"z", "0"-"9", "_"])+>
+			{
+				if(matchedToken.image.charAt(0) == '%')
+					matchedToken.image = matchedToken.image.substring(1, matchedToken.image.length());
+			}: COMMAND
+|	<STRING1: (["A"-"Z", "a"-"z", "0"-"9", "_"])+ | ("%"|"$")>: COMMAND
+}
+
+<CONDITION, COMMAND, NQQ_STRING> TOKEN: {
+	<VARIABLE2: "%" (["A"-"Z", "a"-"z", "0"-"9", "_"])+
+		| "$" (["A"-"Z", "a"-"z", "0"-"9", "_"])+>
+			{
+				if(matchedToken.image.charAt(0) == '%')
+					matchedToken.image = matchedToken.image.substring(1, matchedToken.image.length());
+			}
+}
+
+<CONDITION> TOKEN: {
+	<THEN: "then"> : DEFAULT
+|	<NUMBER: (["0"-"9"])+ ("." (["0"-"9"])+)? >
+|	<TRUE: "true">
+|	<FALSE: "false">
+}
+
+<CONDITION> SKIP: {
+	<NQQ: "\""> : NQQ_STRING
+|	<NQ: "'"> : NQ_STRING
+}
+
+<COMMAND> TOKEN: {
+	<STRING2: (~["%", "$", "\n", "\r"])+ | "%" | "$">
+}
+
+<NQQ_STRING> TOKEN: {
+	<STRING3: (~["\"", "%", "$", "\n", "\r"])+ >
+}
+
+<NQQ_STRING> SKIP: {
+	<"\"">: CONDITION
+}
+
+<NQ_STRING> TOKEN: {
+	<STRING4: (~["'", "\n", "\r"])+ >
+}
+
+<NQ_STRING> SKIP: {
+	<"'">: CONDITION
+}
