@@ -41,6 +41,10 @@ public class RoundtimeTagHandler extends DefaultTagHandler {
 	public void processFollowingPrompt (long currentPromptTime)
 	{
 		long time = rtEnds - currentPromptTime;
+		/* sometimes simu rounds horribly and we end up with a 0 second RT
+		 * this is clearly wrong, so make the value 1 for that case */
+		if(time == 0)
+			time = 1;
 		handler.getClient().startRoundtime((int) time);
 		
 		waitingForPrompt = false;
