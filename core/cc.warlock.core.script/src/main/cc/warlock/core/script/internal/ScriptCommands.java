@@ -98,7 +98,7 @@ public class ScriptCommands implements IScriptCommands, IStreamListener
 	}
 
 	public void move (String direction) {
-		client.send(direction);
+		put(direction);
 		nextRoom();
 	}
 
