@@ -60,7 +60,6 @@ public class StreamView extends ViewPart implements IStreamListener, IGameViewFo
 	protected boolean isPrompting = false;
 	protected boolean multiClient = false;
 	protected boolean buffering = false;
-	protected String lastPrompt;
 	
 	protected WarlockString bufferedText;
 	
@@ -220,9 +219,9 @@ public class StreamView extends ViewPart implements IStreamListener, IGameViewFo
 		if (buffering)
 		{
 			if(bufferedText == null)
-				bufferedText = string;
-			else
-				bufferedText.append(string);
+				bufferedText = new WarlockString(client);
+			
+			bufferedText.append(string);
 		}
 		else
 		{
@@ -282,14 +281,14 @@ public class StreamView extends ViewPart implements IStreamListener, IGameViewFo
 		if (this.mainStream.equals(stream) || this.streams.contains(stream))
 		{
 			WarlockString string = new WarlockString(client);
-			if(isPrompting)
+			if(isPrompting) {
 				string.append("\n");
+				isPrompting = false;
+			}
 			int styleStart = string.length();
 			string.append(text);
 			// TODO: make a different style for client messages
 			string.addStyle(styleStart, text.length(), client.getCommandStyle());
-			if(isPrompting && lastPrompt != null)
-				string.append(lastPrompt);
 			
 			appendText(string);
 		}
@@ -308,7 +307,7 @@ public class StreamView extends ViewPart implements IStreamListener, IGameViewFo
 	}
 	
 	public void streamPrompted(IStream stream, String prompt) {
-		if ((!isPrompting || !prompt.equals(lastPrompt)) &&
+		if ((!isPrompting) &&
 				(this.mainStream.equals(stream) || this.streams.contains(stream)))
 		{
 			WarlockString text = new WarlockString(client);
@@ -325,10 +324,7 @@ public class StreamView extends ViewPart implements IStreamListener, IGameViewFo
 				isPrompting = true;
 			}
 				
-			lastPrompt = prompt;
-			
 			text.append(prompt);
-			
 			appendText(text);
 		}
 	}
@@ -395,5 +391,10 @@ public class StreamView extends ViewPart implements IStreamListener, IGameViewFo
 
 	public void setBuffered(boolean buffer) {
 		this.buffering = buffer;
+	}
+	
+	public void flushBuffer() {
+		appendText(bufferedText);
+		bufferedText = null;
 	}
 }
