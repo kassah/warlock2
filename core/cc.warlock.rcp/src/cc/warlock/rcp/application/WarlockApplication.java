@@ -35,6 +35,7 @@ public class WarlockApplication extends WorkbenchAdvisor implements IApplication
 	private boolean showMenus = true;
 	private String windowTitle = null;
 	private Point initialSize = null;
+	private boolean showCoolBar = false;
 	
 	public WarlockApplication ()
 	{
@@ -56,7 +57,7 @@ public class WarlockApplication extends WorkbenchAdvisor implements IApplication
 		configurer.setShowPerspectiveBar(false);
 		configurer.setShowProgressIndicator(false);
 		configurer.setShowFastViewBars(false);
-		configurer.setShowCoolBar(false);
+		configurer.setShowCoolBar(showCoolBar);
 		configurer.setShowStatusLine(false);
 		configurer.setShowMenuBar(showMenus);
 		if (windowTitle != null)
@@ -167,5 +168,9 @@ public class WarlockApplication extends WorkbenchAdvisor implements IApplication
 
 	public void setInitialSize(Point initialSize) {
 		this.initialSize = initialSize;
+	}
+	
+	public void setShowCoolBar(boolean showCoolBar) {
+		this.showCoolBar = showCoolBar;
 	}
 }

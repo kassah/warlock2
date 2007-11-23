@@ -30,6 +30,8 @@ public class ScriptsWindowHandler extends SimpleCommandHandler implements
 			WarlockApplication.instance().setShowMenus(false);
 			WarlockApplication.instance().setWindowTitle("Warlock Scripts");
 			WarlockApplication.instance().setInitialSize(new Point(800, 600));
+			WarlockApplication.instance().setShowCoolBar(true);
+			
 			IWorkbenchWindow window = 
 				PlatformUI.getWorkbench().openWorkbenchWindow(ScriptsPerspectiveFactory.PERSPECTIVE_ID, WarlockApplication.instance());
 			
