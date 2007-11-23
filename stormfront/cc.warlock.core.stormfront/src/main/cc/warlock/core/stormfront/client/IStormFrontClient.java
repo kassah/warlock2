@@ -13,7 +13,6 @@ import cc.warlock.core.client.ICompass;
 import cc.warlock.core.client.IProperty;
 import cc.warlock.core.client.IStream;
 import cc.warlock.core.client.IWarlockClient;
-import cc.warlock.core.client.IWarlockStyle;
 import cc.warlock.core.script.IScript;
 import cc.warlock.core.script.IScriptListener;
 import cc.warlock.core.stormfront.serversettings.server.ServerSettings;
