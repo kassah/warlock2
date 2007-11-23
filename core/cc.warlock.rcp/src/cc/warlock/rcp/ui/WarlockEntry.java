@@ -6,7 +6,6 @@ import org.eclipse.swt.SWT;
 import org.eclipse.swt.custom.ST;
 import org.eclipse.swt.custom.StyledText;
 import org.eclipse.swt.custom.VerifyKeyListener;
-import org.eclipse.swt.events.KeyEvent;
 import org.eclipse.swt.events.KeyListener;
 import org.eclipse.swt.events.VerifyEvent;
 import org.eclipse.swt.layout.GridData;
@@ -31,8 +30,6 @@ public class WarlockEntry implements VerifyKeyListener {
 		widget.setEditable(true);
 		widget.setLineSpacing(5);
 		widget.setIndent(5);
-		//widget.setEditable(false);
-		//widget.addKeyListener(this);
 		widget.addVerifyKeyListener(this);
 		
 		for (IMacro macro : new CommandHistoryMacroHandler().getMacros())
@@ -165,6 +162,7 @@ public class WarlockEntry implements VerifyKeyListener {
 		if (!command.equals(""))
 		{
 			send(command);
+			viewer.getWarlockClient().getCommandHistory().resetPosition();
 			setText("");
 		}
 	}
