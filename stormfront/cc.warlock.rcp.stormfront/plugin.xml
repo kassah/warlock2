@@ -218,6 +218,10 @@
          <actionProvider
                class="cc.warlock.rcp.stormfront.ui.script.StormfrontScriptActionProvider">
          </actionProvider>
+         <commonSorter
+               class="cc.warlock.rcp.stormfront.ui.script.ServerScriptSorter"
+               id="cc.warlock.rcp.stormfront.navigator.stormfrontScriptSorter">
+         </commonSorter>
       </navigatorContent>
    </extension>
    <extension
