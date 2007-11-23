@@ -47,6 +47,7 @@ public class StormFrontElement {
 		{
 			attr = new StormFrontAttribute();
 			attr.setQuoteType('"');
+			attributes.addAttribute(attr);
 		}
 		
 		attr.setName(name);
@@ -56,6 +57,20 @@ public class StormFrontElement {
 	public void addAttribute (StormFrontAttribute attribute)
 	{
 		attributes.addAttribute(attribute);
+	}
+	
+	public String removeAttribute (StormFrontAttribute attribute)
+	{
+		if (attribute != null && attributes.getList().contains(attribute))
+		{
+			attributes.removeAttribute(attribute);
+		}
+		return null;
+	}
+	
+	public String removeAttribute (String attributeName)
+	{
+		return removeAttribute(attributes.getAttribute(attributeName));
 	}
 	
 	public String attributeValue(String name)

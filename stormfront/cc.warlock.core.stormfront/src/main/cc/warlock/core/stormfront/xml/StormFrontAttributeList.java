@@ -12,6 +12,11 @@ public class StormFrontAttributeList {
 		attributes.add(attribute);
 	}
 	
+	public void removeAttribute (StormFrontAttribute attribute)
+	{
+		attributes.remove(attribute);
+	}
+	
 	public void clear ()
 	{
 		attributes.clear();
