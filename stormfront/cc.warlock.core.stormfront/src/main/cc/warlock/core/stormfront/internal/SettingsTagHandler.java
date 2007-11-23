@@ -80,7 +80,8 @@ public class SettingsTagHandler extends DefaultTagHandler {
 			int index = buffer.indexOf(settings);
 			buffer = buffer.replace(index, index+settings.length(),
 				"<settings crc=\"" + infoTagHandler.getCRC() +
-				"\" major=\"" + infoTagHandler.getMajorVersion() + "\">");
+				"\" major=\"" + infoTagHandler.getMajorVersion() +
+				"\" client=\"" + infoTagHandler.getClientVersion() + "\">");
 			
 			String playerId = handler.getClient().getPlayerId().get();
 			File serverSettings = ConfigurationUtil.getConfigurationFile("serverSettings_" + playerId + ".xml");

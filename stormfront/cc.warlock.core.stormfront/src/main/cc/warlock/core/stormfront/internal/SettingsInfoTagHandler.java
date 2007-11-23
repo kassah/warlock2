@@ -60,22 +60,15 @@ public class SettingsInfoTagHandler extends DefaultTagHandler {
 			if (currentCRC != null && crc.equals(currentCRC))
 			{
 				boolean sendBlankLine = true;
+				
+				handler.getClient().getServerSettings().load(playerId);
 				// crcs match, if we have the bigger major version, override with our settings
 				if (currentMajorVersion > majorVersion)
 				{
-					String settingsDoc = document.getRootElement().toXML("", false, true);
-					settingsDoc = "\n<c>\n\n<db>" + settingsDoc + "\n";
-					
-					try {
-						handler.getClient().getConnection().send(settingsDoc);
-						sendBlankLine = false;
-					} catch (IOException e) {
-						// TODO Auto-generated catch block
-						e.printStackTrace();
-					}
+					handler.getClient().getServerSettings().sendAllSettings();
+					sendBlankLine = false;
 				}
 				
-				handler.getClient().getServerSettings().load(playerId);
 				if (sendBlankLine)
 				{
 					try {
@@ -101,6 +94,10 @@ public class SettingsInfoTagHandler extends DefaultTagHandler {
 	
 	public Integer getMajorVersion () {
 		return majorVersion;
+	}
+	
+	public String getClientVersion () {
+		return clientVersion;
 	}
 
 }
