@@ -46,7 +46,7 @@ public class StormFrontReader extends InputStreamReader {
 			
 				String line = currentLine.substring(0, newLineIndex);
 				connection.dataReady(line);
-				currentLine.replace(0, newLineIndex, "");
+				currentLine.delete(0, newLineIndex);
 			}
 		}
 	}
