@@ -1,11 +1,14 @@
 package cc.warlock.rcp.stormfront.ui.views;
 
+import java.net.URL;
+
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.jface.dialogs.ProgressMonitorDialog;
 import org.eclipse.jface.resource.JFaceResources;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.graphics.Font;
 import org.eclipse.swt.widgets.Caret;
+import org.eclipse.swt.widgets.Display;
 
 import cc.warlock.core.client.IProperty;
 import cc.warlock.core.client.IPropertyListener;
@@ -21,6 +24,7 @@ import cc.warlock.rcp.stormfront.ui.StormFrontMacros;
 import cc.warlock.rcp.stormfront.ui.style.StormFrontStyleProvider;
 import cc.warlock.rcp.ui.style.StyleProviders;
 import cc.warlock.rcp.util.ColorUtil;
+import cc.warlock.rcp.util.RCPUtil;
 import cc.warlock.rcp.views.GameView;
 
 public class StormFrontGameView extends GameView implements IStormFrontClientViewer {
@@ -119,6 +123,15 @@ public class StormFrontGameView extends GameView implements IStormFrontClientVie
 		{
 			StatusView.getDefault().loadServerSettings(settings);
 		}
+	}
+	
+	@Override
+	public void launchURL(final URL url) {
+		Display.getDefault().syncExec(new Runnable () {
+			public void run () {
+				RCPUtil.openURL(url.toString());
+			}
+		});
 	}
 	
 	@Override

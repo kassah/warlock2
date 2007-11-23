@@ -1,5 +1,7 @@
 package cc.warlock.rcp.stormfront.adapters;
 
+import java.net.URL;
+
 import cc.warlock.core.stormfront.client.IStormFrontClient;
 import cc.warlock.core.stormfront.client.IStormFrontClientViewer;
 import cc.warlock.core.stormfront.serversettings.server.ServerSettings;
@@ -23,7 +25,7 @@ public class SWTStormFrontClientViewer extends SWTWarlockClientViewer implements
 	}
 	
 	private static enum EventType {
-		LoadServerSettings, StartDownloadingServerSettings, ReceivedServerSetting, FinishedDownloadingServerSettings
+		LoadServerSettings, StartDownloadingServerSettings, ReceivedServerSetting, FinishedDownloadingServerSettings, LaunchURL
 	};
 	
 	private class ListenerWrapper implements Runnable
@@ -31,6 +33,7 @@ public class SWTStormFrontClientViewer extends SWTWarlockClientViewer implements
 		private EventType eventType;
 		private ServerSettings settings;
 		private SettingType settingType;
+		private URL url;
 		
 		public void run() {
 			switch (eventType)
@@ -39,9 +42,11 @@ public class SWTStormFrontClientViewer extends SWTWarlockClientViewer implements
 				case StartDownloadingServerSettings: viewer.startDownloadingServerSettings(); break;
 				case ReceivedServerSetting: viewer.receivedServerSetting(settingType);
 				case FinishedDownloadingServerSettings: viewer.finishedDownloadingServerSettings(); break;
+				case LaunchURL: viewer.launchURL(url);
 			}
 			
 			settings = null;
+			url = null;
 		}
 	}
 	
@@ -68,6 +73,13 @@ public class SWTStormFrontClientViewer extends SWTWarlockClientViewer implements
 	
 	public void finishedDownloadingServerSettings() {
 		wrapper.eventType = EventType.FinishedDownloadingServerSettings;
+		run(wrapper);
+	}
+	
+	@Override
+	public void launchURL(URL url) {
+		wrapper.eventType = EventType.LaunchURL;
+		wrapper.url = url;
 		run(wrapper);
 	}
 }
