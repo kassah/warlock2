@@ -232,7 +232,7 @@ THEN
 	;
 STRING
 	: { state == State.command }?=> (~('%'|'$'|'\n'|'\r'))+
-	| { state == State.base }?=> NORMAL_STRING (~(':'))=>
+	| { state == State.base }?=> NORMAL_STRING (~(':'|'%'|'$'|'\n'|'\r'))=>
 		{
 			if(state == State.base) state = State.command;
 		}
