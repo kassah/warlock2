@@ -395,14 +395,16 @@ public class WSLScript extends AbstractScript {
 	
 	protected class WSLSetVariable extends WSLCommand {
 		
-		private Pattern format = Pattern.compile("^([\\w_]+)\\s+(.*)$");
+		private Pattern format = Pattern.compile("^([\\w_]+)(\\s+(.+)?)?$");
 		
 		public void execute (String arguments) {
 			Matcher m = format.matcher(arguments);
 			if (m.find())
 			{
 				String name = m.group(1);
-				String value = m.group(2);
+				String value = m.group(3);
+				if(value == null)
+					value = " ";
 				commands.echo("setVariable: " + name + "=" + value);
 				setVariable(name, value);
 			} else {
