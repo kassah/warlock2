@@ -1,6 +1,6 @@
 package cc.warlock.core.stormfront.script.wsl;
 
-public class WSLNotCondition extends WSLBoolean {
+public class WSLNotCondition extends WSLAbstractBoolean {
 
 	private IWSLValue value;
 	

@@ -2,7 +2,7 @@ package cc.warlock.core.stormfront.script.wsl;
 
 import java.util.List;
 
-public class WSLRelationalCondition extends WSLBoolean {
+public class WSLRelationalCondition extends WSLAbstractBoolean {
 
 	public enum RelationalOperator {
 		GreaterThan			{ boolean compare(IWSLValue arg1, IWSLValue arg2) { return arg1.toDouble() > arg2.toDouble(); } },

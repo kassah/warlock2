@@ -35,7 +35,7 @@ public class WSLScript extends AbstractScript {
 	protected WSLScriptLine nextLine;
 	protected WSLScriptLine curLine;
 	protected WSLScriptLine endLine;
-	protected HashMap<String, String> variables = new HashMap<String, String>();
+	protected HashMap<String, IWSLValue> variables = new HashMap<String, IWSLValue>();
 	protected Stack<WSLScriptLine> callstack = new Stack<WSLScriptLine>();
 	protected HashMap<String, WSLCommand> wslCommands = new HashMap<String, WSLCommand>();
 	protected int pauseLine;
@@ -86,31 +86,93 @@ public class WSLScript extends AbstractScript {
 		addCommand("exit", new WSLExit());
 		addCommand("timer", new WSLTimer());
 		
+		setVariable("t", new WSLTime());
+		setVariable("mana", new WSLMana());
+		setVariable("health", new WSLHealth());
+		setVariable("fatigue", new WSLFatigue());
+		setVariable("spirit", new WSLSpirit());
+		setVariable("rt", new WSLRoundTime());
+		setVariable("lefthand", new WSLLeftHand());
+		setVariable("righthand", new WSLRightHand());
+		setVariable("spell", new WSLSpell());
+		setVariable("roomdesc", new WSLRoomDesc());
+		setVariable("roomtitle", new WSLRoomTitle());
+		
+		// TODO add roomexits
 	}
 
 	public IWSLValue getVariable(String name) {
-		//TODO make classes for these variables and put them in the variable list
-		if(name.equals("t")) return new WSLNumber(timer.get());
-		if(name.equals("mana")) return new WSLNumber(client.getMana().get());
-		if(name.equals("health")) return new WSLNumber(client.getHealth().get());
-		if(name.equals("fatigue")) return new WSLNumber(client.getFatigue().get());
-		if(name.equals("spirit")) return new WSLNumber(client.getSpirit().get());
-		if(name.equals("rt")) return new WSLNumber(client.getRoundtime().get());
-		if(name.equals("lefthand")) return new WSLString(client.getLeftHand().get());
-		if(name.equals("righthand")) return new WSLString(client.getRightHand().get());
-		if(name.equals("spell")) return new WSLString(client.getCurrentSpell().get());
-		if(name.equals("roomdesc")) return new WSLString(client.getRoomDescription().get());
-		if(name.equals("roomtitle")) return new WSLString(client.getStream(IStormFrontClient.ROOM_STREAM_NAME).getTitle().get());
-		// if(name.equals("roomexits")) return new WSLString(client.getStream(IStormFrontClient.ROOM_STREAM_NAME).getTitle().get());
-		String value = variables.get(name);
-		if(value != null)
-			return new WSLString(value);
-		else
-			return null;
+		return variables.get(name);
 	}
 	
 	public boolean isRunning() {
 		return running;
+	}
+	
+	private class WSLTime extends WSLAbstractNumber {
+		public double toDouble() {
+			return timer.get();
+		}
+	}
+	
+	private class WSLMana extends WSLAbstractNumber {
+		public double toDouble() {
+			return client.getMana().get();
+		}
+	}
+	
+	private class WSLHealth extends WSLAbstractNumber {
+		public double toDouble() {
+			return client.getHealth().get();
+		}
+	}
+	
+	private class WSLFatigue extends WSLAbstractNumber {
+		public double toDouble() {
+			return client.getFatigue().get();
+		}
+	}
+	
+	private class WSLSpirit extends WSLAbstractNumber {
+		public double toDouble() {
+			return client.getSpirit().get();
+		}
+	}
+	
+	private class WSLRoundTime extends WSLAbstractNumber {
+		public double toDouble() {
+			return client.getRoundtime().get();
+		}
+	}
+	
+	private class WSLLeftHand extends WSLAbstractString {
+		public String toString() {
+			return client.getLeftHand().get();
+		}
+	}
+	
+	private class WSLRightHand extends WSLAbstractString {
+		public String toString() {
+			return client.getRightHand().get();
+		}
+	}
+	
+	private class WSLSpell extends WSLAbstractString {
+		public String toString() {
+			return client.getCurrentSpell().get();
+		}
+	}
+	
+	private class WSLRoomDesc extends WSLAbstractString {
+		public String toString() {
+			return client.getRoomDescription().get();
+		}
+	}
+	
+	private class WSLRoomTitle extends WSLAbstractString {
+		public String toString() {
+			return client.getStream(IStormFrontClient.ROOM_STREAM_NAME).getTitle().get();
+		}
 	}
 	
 	private class ScriptRunner  implements Runnable {
@@ -308,7 +370,7 @@ public class WSLScript extends AbstractScript {
 		
 		public void execute (String arguments) {
 			for (int i = 0; ; i++) {
-				String arg = variables.get(Integer.toString(i + 1));
+				String arg = variables.get(Integer.toString(i + 1)).toString();
 				if (arg == null) {
 					deleteVariable(Integer.toString(i));
 					break;
@@ -334,7 +396,8 @@ public class WSLScript extends AbstractScript {
 				operand = 1;
 
 			String counterFunction = args[0];
-			int value = variables.containsKey("c") ? Integer.parseInt(variables.get("c")) : 0;
+			int value = variables.containsKey("c") ?
+					Integer.parseInt(variables.get("c").toString()) : 0;
 
 			if ("set".equalsIgnoreCase(counterFunction))
 			{
@@ -381,6 +444,9 @@ public class WSLScript extends AbstractScript {
 	}
 
 	private void setVariable(String name, String value) {
+		setVariable(name, new WSLString(value));
+	}
+	private void setVariable(String name, IWSLValue value) {
 		variables.put(name, value);
 		String command = "if_" + name;
 		if(!wslCommands.containsKey(command)) {

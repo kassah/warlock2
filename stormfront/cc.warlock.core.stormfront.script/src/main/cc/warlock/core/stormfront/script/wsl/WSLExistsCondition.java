@@ -1,6 +1,6 @@
 package cc.warlock.core.stormfront.script.wsl;
 
-public class WSLExistsCondition extends WSLBoolean {
+public class WSLExistsCondition extends WSLAbstractBoolean {
 
 	private String name;
 	private WSLScript script;

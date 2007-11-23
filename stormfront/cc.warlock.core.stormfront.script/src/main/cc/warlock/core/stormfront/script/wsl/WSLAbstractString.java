@@ -1,20 +1,12 @@
 package cc.warlock.core.stormfront.script.wsl;
 
-public class WSLString extends WSLAbstractString {
-	
-	private String string;
-	
-	public WSLString(String string) {
-		this.string = string;
-	}
+abstract public class WSLAbstractString implements IWSLValue {
 	
 	public Type getType() {
 		return Type.String;
 	}
 	
-	public String toString() {
-		return string;
-	}
+	abstract public String toString();
 
 	public boolean toBoolean() {
 		String str = toString().trim();

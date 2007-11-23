@@ -2,7 +2,7 @@ package cc.warlock.core.stormfront.script.wsl;
 
 import java.util.List;
 
-public class WSLOrCondition extends WSLBoolean {
+public class WSLOrCondition extends WSLAbstractBoolean {
 
 	private List<IWSLValue> args;
 	

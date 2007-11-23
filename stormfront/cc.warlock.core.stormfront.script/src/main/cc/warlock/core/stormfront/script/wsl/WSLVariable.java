@@ -1,6 +1,6 @@
 package cc.warlock.core.stormfront.script.wsl;
 
-public class WSLVariable extends WSLString {
+public class WSLVariable extends WSLAbstractString {
 	
 	private String variableName;
 	private WSLScript script;

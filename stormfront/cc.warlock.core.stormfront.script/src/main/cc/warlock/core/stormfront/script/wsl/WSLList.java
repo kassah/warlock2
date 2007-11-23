@@ -2,7 +2,7 @@ package cc.warlock.core.stormfront.script.wsl;
 
 import java.util.List;
 
-public class WSLList extends WSLString {
+public class WSLList extends WSLAbstractString {
 
 	private List<IWSLValue> list;
 	

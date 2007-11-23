@@ -3,7 +3,7 @@ package cc.warlock.core.stormfront.script.wsl;
 import java.util.List;
 
 
-public class WSLEqualityCondition extends WSLBoolean {
+public class WSLEqualityCondition extends WSLAbstractBoolean {
 
 	public static enum EqualityOperator {
 		equals { protected boolean eval(boolean value) { return value; } },
