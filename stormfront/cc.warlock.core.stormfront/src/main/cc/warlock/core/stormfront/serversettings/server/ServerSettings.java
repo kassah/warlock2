@@ -34,7 +34,7 @@ public class ServerSettings implements Comparable<ServerSettings>, IHighlightPro
 	public static final String IGNORES_TEXT = "<<m><ignores disable=\"n\"></ignores><ignores disable=\"n\"></ignores></<m>";
 	
 	private IStormFrontClient client;
-	private String playerId, clientVersion;
+	private String playerId, clientVersion, crc;
 	private int majorVersion;
 	private StormFrontDocument document;
 	protected Palette palette;
@@ -133,6 +133,10 @@ public class ServerSettings implements Comparable<ServerSettings>, IHighlightPro
 			document = new StormFrontDocument(stream);
 			
 			loadPalette();
+			
+			majorVersion = Integer.parseInt(document.getRootElement().attributeValue("major"));
+			clientVersion = document.getRootElement().attributeValue("client");
+			crc = document.getRootElement().attributeValue("crc");
 			
 			commandLineSettings = new CommandLineSettings(this, document.getRootElement().element("cmdline"), palette);
 			loadWindowSettings();
@@ -567,6 +571,24 @@ public class ServerSettings implements Comparable<ServerSettings>, IHighlightPro
 				e.printStackTrace();
 			}
 		}
+	}
+	
+	public void sendAllSettings ()
+	{
+		StormFrontElement settingsElement = document.getRootElement();
+		settingsElement.removeAttribute("crc");
+		
+		String settingsDoc = settingsElement.toXML("", false, true);
+		settingsDoc = "\n<c>\n\n<db>" + settingsDoc + "\n";
+		
+		try {
+			client.getConnection().send(settingsDoc);
+		} catch (IOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		
+		settingsElement.setAttribute("crc", crc);
 	}
 	
 	public Preset createPreset ()
