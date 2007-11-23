@@ -22,14 +22,16 @@ public class WarlockEntry implements VerifyKeyListener {
 	private StyledText widget;
 	private IWarlockClientViewer viewer;
 	private ArrayList<IMacro> entryMacros = new ArrayList<IMacro>();
+	private boolean searchMode = false;
+	private StringBuffer searchText = new StringBuffer();
+	private String command = "";
 	
 	public WarlockEntry(Composite parent, IWarlockClientViewer viewer) {
 		this.viewer = viewer;
 		widget = new StyledText(parent, SWT.BORDER | SWT.SINGLE);
 		widget.setLayoutData(new GridData(GridData.FILL, GridData.VERTICAL_ALIGN_END, true, false, 1, 1));
 		widget.setEditable(true);
-		widget.setLineSpacing(5);
-		widget.setIndent(5);
+		widget.setLineSpacing(2);
 		widget.addVerifyKeyListener(this);
 		
 		for (IMacro macro : new CommandHistoryMacroHandler().getMacros())
@@ -39,12 +41,13 @@ public class WarlockEntry implements VerifyKeyListener {
 	}
 	
 	public String getText() {
-		return widget.getText();
+		return command;
 	}
 	
 	public void setText(String text) {
+		command = text;
 		widget.setText(text);
-		widget.setCaretOffset(widget.getText().length());
+		widget.setCaretOffset(command.length());
 	}
 	
 	public void setSelection(int start) {
@@ -103,7 +106,7 @@ public class WarlockEntry implements VerifyKeyListener {
 			}
 		}
 		
-		if (!widget.isFocusControl()) {
+		//if (!widget.isFocusControl()) {
 			// TODO make this a bit more robust
 			if(entryCharacters.contains(e.character))
 			{
@@ -115,13 +118,24 @@ public class WarlockEntry implements VerifyKeyListener {
 				widget.setFocus();
 				e.doit = false;
 			}
-		}
+		//}
 	}
 	
 	public void append(char ch) {
-		widget.append(ch+"");
-		widget.setCaretOffset(widget.getText().length());
-		widget.setFocus();
+		if(searchMode) {
+			searchText.append(ch);
+			ICommand searchCommand = viewer.getWarlockClient().getCommandHistory().search(searchText.toString());
+			if(searchCommand != null) {
+				searchText.setLength(0);
+				searchText.append(searchCommand.getCommand());
+			}
+			setSearchText();
+		} else {
+			command += ch;
+			widget.setText(command);
+			widget.setCaretOffset(command.length());
+			widget.setFocus();
+		}
 	}
 	
 	private static final char[] entryChars = new char[] {
@@ -140,31 +154,46 @@ public class WarlockEntry implements VerifyKeyListener {
 	}
 	
 	public void prevCommand() {
-		ICommand command = viewer.getWarlockClient().getCommandHistory().prev();
+		ICommand prevCommand = viewer.getWarlockClient().getCommandHistory().prev();
 		
-		if(command != null)
-			setText(command.getCommand());
+		if(prevCommand != null)
+			setText(prevCommand.getCommand());
 		else
 			setText("");
 	}
 	
 	public void nextCommand() {
-		ICommand command = viewer.getWarlockClient().getCommandHistory().next();
-		if(command != null) {
-			setText(command.getCommand());
+		ICommand nextCommand = viewer.getWarlockClient().getCommandHistory().next();
+		if(nextCommand != null) {
+			setText(nextCommand.getCommand());
 		} else {
 			setText("");
 		}
 	}
 	
-	public void submit() {
-		String command = widget.getText();
-		if (!command.equals(""))
-		{
-			send(command);
-			viewer.getWarlockClient().getCommandHistory().resetPosition();
-			setText("");
+	public void searchHistory() {
+		if(searchMode) {
+			ICommand searchCommand = viewer.getWarlockClient().getCommandHistory().searchBefore(searchText.toString());
+			if(searchCommand != null) {
+				searchText.setLength(0);
+				searchText.append(searchCommand.getCommand());
+			}
+			setSearchText();
+		} else {
+			searchMode = true;
+			setSearchText();
 		}
+	}
+	
+	private void setSearchText() {
+		widget.setText("(reverse history search)'" + searchText.toString() + "': " + command);
+	}
+	
+	public void submit() {
+		send(command);
+		viewer.getWarlockClient().getCommandHistory().resetPosition();
+		setText("");
+		searchMode = false;
 	}
 	
 	private void send(String command) {

@@ -24,7 +24,19 @@ public interface ICommandHistory {
 	 * @return The next command in the command history towards the present
 	 */
 	public ICommand next();
+	
+	/**
+	 * @param text
+	 * @return The command in the history from the current position that matches the text
+	 */
+	public ICommand search(String text);
 
+	/**
+	 * @param text
+	 * @return The command in the history from before the current position that matches the text
+	 */
+	public ICommand searchBefore(String text);
+	
 	/**
 	 * @return The current command being edited.
 	 */

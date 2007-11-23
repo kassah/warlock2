@@ -218,6 +218,10 @@ public abstract class GameView extends StreamView implements IWarlockClientViewe
 		entry.prevCommand();
 	}
 	
+	public void searchHistory() {
+		entry.searchHistory();
+	}
+	
 	public void submit() {
 		entry.submit();
 	}

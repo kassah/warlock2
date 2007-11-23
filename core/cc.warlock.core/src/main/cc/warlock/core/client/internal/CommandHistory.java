@@ -71,6 +71,25 @@ public class CommandHistory implements ICommandHistory {
 
 		return command;
 	}
+	
+	private ICommand searchFromPos(String text, int pos) {
+		while(pos < size()) {
+			if(getCommandAt(pos).getCommand().contains(text)) {
+				position = pos;
+				return current();
+			}
+			pos++;
+		}
+		return null;
+	}
+	
+	public ICommand search(String text) {
+		return searchFromPos(text, position);
+	}
+	
+	public ICommand searchBefore(String text) {
+		return searchFromPos(text, position + 1);
+	}
 
 	public ICommand current () {
 		return getCommandAt(position);

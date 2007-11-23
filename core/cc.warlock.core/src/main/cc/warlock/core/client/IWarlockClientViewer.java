@@ -27,6 +27,8 @@ public interface IWarlockClientViewer extends IStreamListener {
 	
 	public void nextCommand();
 	
+	public void searchHistory();
+	
 	public void repeatLastCommand();
 	
 	public void repeatSecondToLastCommand();

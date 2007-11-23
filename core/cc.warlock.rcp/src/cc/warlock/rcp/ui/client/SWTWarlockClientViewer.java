@@ -29,7 +29,7 @@ public class SWTWarlockClientViewer extends SWTStreamListener implements IWarloc
 		this.viewer = viewer;
 	}
 	
-	protected class SetCommandWrapper implements Runnable {
+	private class SetCommandWrapper implements Runnable {
 		public String command;
 		
 		public SetCommandWrapper(String command) {
@@ -41,37 +41,43 @@ public class SWTWarlockClientViewer extends SWTStreamListener implements IWarloc
 		}
 	}
 	
-	protected class NextCommandWrapper implements Runnable {
+	private class NextCommandWrapper implements Runnable {
 		public void run () {
 			viewer.nextCommand();
 		}
 	}
 	
-	protected class PrevCommandWrapper implements Runnable {
+	private class PrevCommandWrapper implements Runnable {
 		public void run () {
 			viewer.prevCommand();
 		}
 	}
 	
-	protected class RepeatLastCommandWrapper implements Runnable {
+	private class SearchHistoryWrapper implements Runnable {
+		public void run () {
+			viewer.searchHistory();
+		}
+	}
+	
+	private class RepeatLastCommandWrapper implements Runnable {
 		public void run () {
 			viewer.repeatLastCommand();
 		}
 	}
 	
-	protected class RepeatSecondToLastCommandWrapper implements Runnable {
+	private class RepeatSecondToLastCommandWrapper implements Runnable {
 		public void run () {
 			viewer.repeatSecondToLastCommand();
 		}
 	}
 	
-	protected class SubmitWrapper implements Runnable {
+	private class SubmitWrapper implements Runnable {
 		public void run () {
 			viewer.submit();
 		}
 	}
 	
-	protected class AppendWrapper implements Runnable {
+	private class AppendWrapper implements Runnable {
 		public char c;
 		
 		public AppendWrapper(char ch) {
@@ -105,6 +111,10 @@ public class SWTWarlockClientViewer extends SWTStreamListener implements IWarloc
 	
 	public void prevCommand() {
 		run(new PrevCommandWrapper());
+	}
+	
+	public void searchHistory() {
+		run(new SearchHistoryWrapper());
 	}
 	
 	public void repeatLastCommand() {
