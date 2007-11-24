@@ -7,6 +7,7 @@ import org.eclipse.ui.ISharedImages;
 import org.eclipse.ui.PlatformUI;
 
 import cc.warlock.core.script.IScriptFileInfo;
+import cc.warlock.rcp.application.WarlockApplication;
 
 public class ScriptFilesystemLabelProvider implements ILabelProvider
 {
@@ -23,6 +24,10 @@ public class ScriptFilesystemLabelProvider implements ILabelProvider
 	}
 
 	public String getText(Object element) {
+		if (element instanceof WarlockApplication)
+		{
+			return "Warlock Script Navigator";
+		}
 		if (element instanceof IScriptFileInfo)
 		{
 			return ((IScriptFileInfo)element).getScriptFile().getName();

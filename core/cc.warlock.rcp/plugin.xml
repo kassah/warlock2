@@ -254,6 +254,9 @@
                <instanceof
                      value="cc.warlock.core.script.IScriptInfo">
                </instanceof>
+               <instanceof
+                     value="cc.warlock.rcp.application.WarlockApplication">
+               </instanceof>
             </or>
          </possibleChildren>
          <actionProvider
