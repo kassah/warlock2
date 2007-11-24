@@ -152,7 +152,10 @@ public class StreamView extends ViewPart implements IStreamListener, IGameViewFo
 	public void gameViewFocused(GameView gameView) {
 		if (multiClient)
 		{
-			setClient(gameView.getWarlockClient());
+			if (gameView.getWarlockClient() != null)
+			{
+				setClient(gameView.getWarlockClient());
+			}
 		}
 	}
 	

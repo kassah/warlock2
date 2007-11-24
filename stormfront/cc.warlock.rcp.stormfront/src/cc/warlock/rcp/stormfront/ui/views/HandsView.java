@@ -179,7 +179,10 @@ public class HandsView extends ViewPart implements IPropertyListener<String>
 	
 	protected void gameViewFocused (StormFrontGameView gameView)
 	{
-		setActiveClient(gameView.getStormFrontClient());
+		if (gameView.getStormFrontClient() != null)
+		{
+			setActiveClient(gameView.getStormFrontClient());
+		}
 	}
 	
 	@Override
