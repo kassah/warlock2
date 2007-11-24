@@ -52,7 +52,6 @@ public class ServerScriptTest {
 	private static class SettingsListener implements IServerSettingsListener
 	{
 		public boolean loaded = false;
-		@Override
 		public void serverSettingsLoaded(ServerSettings settings) {
 			loaded = true;
 		}

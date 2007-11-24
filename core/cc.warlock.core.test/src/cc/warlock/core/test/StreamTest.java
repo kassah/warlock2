@@ -30,14 +30,12 @@ public class StreamTest {
 			echo = prompt = null;
 		}
 		
-		@Override
 		public void streamReceivedCommand(IStream stream, String text) {
 			handleEvent();
 			this.receivedCommand = true;
 			this.command = text;
 		}
 		
-		@Override
 		public void streamReceivedText(IStream stream, WarlockString text) {
 			handleEvent();
 			receivedText = true;
