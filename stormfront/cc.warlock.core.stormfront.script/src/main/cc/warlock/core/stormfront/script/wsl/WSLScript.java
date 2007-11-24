@@ -41,7 +41,6 @@ public class WSLScript extends AbstractScript {
 	protected int pauseLine;
 	protected Thread scriptThread;
 	private Pattern commandPattern = Pattern.compile("^([\\w_]+)(\\s+(.*))?");
-	private WSLCommand if_ = new WSLIf_();
 	private ScriptTimer timer = new ScriptTimer();
 	
 	protected WSLEngine engine;
@@ -369,13 +368,21 @@ public class WSLScript extends AbstractScript {
 	protected class WSLShift extends WSLCommand {
 		
 		public void execute (String arguments) {
-			for (int i = 0; ; i++) {
-				String arg = variables.get(Integer.toString(i + 1)).toString();
-				if (arg == null) {
+			for (int i = 1; ; i++) {
+				if (!variables.containsKey(Integer.toString(i+1)))
+				{
 					deleteVariable(Integer.toString(i));
 					break;
 				}
-				setVariable(Integer.toString(i), arg);
+				else
+				{
+					String arg = variables.get(Integer.toString(i+1)).toString();
+					if (arg == null) {
+						deleteVariable(Integer.toString(i));
+						break;
+					}
+					setVariable(Integer.toString(i), arg);
+				}
 			}
 		}
 	}
@@ -450,7 +457,7 @@ public class WSLScript extends AbstractScript {
 		variables.put(name, value);
 		String command = "if_" + name;
 		if(!wslCommands.containsKey(command)) {
-			wslCommands.put(command, if_);
+			wslCommands.put(command, new WSLIf_(name));
 		}
 	}
 	
@@ -765,9 +772,17 @@ public class WSLScript extends AbstractScript {
 	}
 	
 	protected class WSLIf_ extends WSLCommand {
+		private String variableName;
+		public WSLIf_ (String variableName)
+		{
+			this.variableName = variableName;
+		}
 		
 		public void execute (String arguments) {
-			WSLScript.this.execute(arguments);
+			if (variables.containsKey(variableName))
+			{
+				WSLScript.this.execute(arguments);
+			}
 		}
 	}
 	
