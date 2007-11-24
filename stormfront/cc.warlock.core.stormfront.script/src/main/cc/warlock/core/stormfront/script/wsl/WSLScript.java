@@ -85,6 +85,10 @@ public class WSLScript extends AbstractScript {
 		addCommand("exit", new WSLExit());
 		addCommand("timer", new WSLTimer());
 		
+		for(int i = 1; i <= 9; i++) {
+			addCommand("if_" + i, new WSLIf_(String.valueOf(i)));
+		}
+		
 		setVariable("t", new WSLTime());
 		setVariable("mana", new WSLMana());
 		setVariable("health", new WSLHealth());
@@ -280,7 +284,11 @@ public class WSLScript extends AbstractScript {
 		if(arguments == null) arguments = "";
 		
 		WSLCommand command = wslCommands.get(commandName);
-		if(command != null) command.execute(arguments);
+		if(command != null)
+			command.execute(arguments);
+		else
+			//TODO output the line number here
+			commands.echo("Invalid command \"" + line + "\"");
 	}
 	
 	public void stop() {
@@ -453,16 +461,12 @@ public class WSLScript extends AbstractScript {
 	private void setVariable(String name, String value) {
 		setVariable(name, new WSLString(value));
 	}
+	
 	private void setVariable(String name, IWSLValue value) {
 		variables.put(name, value);
-		String command = "if_" + name;
-		if(!wslCommands.containsKey(command)) {
-			wslCommands.put(command, new WSLIf_(name));
-		}
 	}
 	
 	private void deleteVariable(String name) {
-		wslCommands.remove(name);
 		variables.remove(name);
 	}
 	
