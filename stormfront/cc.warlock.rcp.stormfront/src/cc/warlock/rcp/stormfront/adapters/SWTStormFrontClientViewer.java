@@ -76,7 +76,6 @@ public class SWTStormFrontClientViewer extends SWTWarlockClientViewer implements
 		run(wrapper);
 	}
 	
-	@Override
 	public void launchURL(URL url) {
 		wrapper.eventType = EventType.LaunchURL;
 		wrapper.url = url;
