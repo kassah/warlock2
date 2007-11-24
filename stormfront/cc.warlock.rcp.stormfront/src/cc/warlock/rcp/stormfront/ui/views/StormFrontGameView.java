@@ -125,7 +125,6 @@ public class StormFrontGameView extends GameView implements IStormFrontClientVie
 		}
 	}
 	
-	@Override
 	public void launchURL(final URL url) {
 		Display.getDefault().syncExec(new Runnable () {
 			public void run () {
