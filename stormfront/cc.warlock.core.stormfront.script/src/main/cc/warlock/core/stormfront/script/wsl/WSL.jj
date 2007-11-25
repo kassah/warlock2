@@ -248,7 +248,7 @@ TOKEN: {
 
 <CONDITION> TOKEN: {
 	<THEN: "then"> : DEFAULT
-|	<NUMBER: (["0"-"9"])+ ("." (["0"-"9"])+)? >
+|	<NUMBER: ("-")? (["0"-"9"])+ ("." (["0"-"9"])+)? >
 |	<TRUE: "true">
 |	<FALSE: "false">
 }

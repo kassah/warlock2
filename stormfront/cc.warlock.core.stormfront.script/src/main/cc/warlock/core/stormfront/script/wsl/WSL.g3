@@ -210,7 +210,7 @@ EOL
 	: '\r'? '\n' { state = State.base; atStart = true; }
 	;
 COMMENT
-	: { atStart && state == State.base }?=>
+	: { atStart }?=>
 		~(NORMAL_CHAR|'%'|WS|'\n'|'\r') (~('\n'|'\r'))* { atStart = false; }
 	;
 LABEL
@@ -221,11 +221,11 @@ VARIABLE
 	: ('%' var=NORMAL_STRING '%'? { setText($var.text); }
 		| '$' NORMAL_STRING )
 			{
-				if(state == State.base) state = State.command;
+				if(state == State.base) { state = State.command; atStart = false; }
 			}
 	;
 IF
-	: { state == State.base }?=> ('i' | 'I') ('f' | 'F') { state = State.condition; }
+	: { state == State.base }?=> ('i' | 'I') ('f' | 'F') { state = State.condition; atStart = false; }
 	;
 THEN
 	: { state == State.condition }?=> ('t' | 'T') ('h' | 'H') ('e' | 'E') ('n' | 'N') { state = State.base; }
@@ -234,11 +234,12 @@ STRING
 	: { state == State.command }?=> (~('%'|'$'|'\n'|'\r'))+
 	| { state == State.base }?=> NORMAL_STRING (~(':'|'%'|'$'|'\n'|'\r'))=>
 		{
-			if(state == State.base) state = State.command;
+			state = State.command;
+			atStart = false;
 		}
 	| ('%'|'$') (~(NORMAL_CHAR))=>
 		{
-			if(state == State.base) state = State.command;
+			if(state == State.base) { state = State.command; atStart = false; }
 		}
 	| { state == State.nqq_string }?=> (~('"'|'%'|'$'|'\n'|'\r'))+
 	| { state == State.nq_string }?=> (~('\''|'%'|'$'|'\n'|'\r'))+
@@ -250,7 +251,7 @@ QUOTE
 	| { state == State.nq_string }?=> '\''	{ state = State.condition; channel = HIDDEN; }
 	;
 NUMBER
-	: { state == State.condition }?=> (DIGIT)+ ('.' (DIGIT)+)?
+	: { state == State.condition }?=> '-'? (DIGIT)+ ('.' (DIGIT)+)?
 	;
 TRUE
 	: { state == State.condition }?=> ('t' | 'T') ('r' | 'R') ('u' | 'U') ('e' | 'E')
