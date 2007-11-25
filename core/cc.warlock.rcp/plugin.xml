@@ -56,6 +56,7 @@
    <extension
          point="cc.warlock.rcp.macroCommands">
       <macroCommand classname="cc.warlock.rcp.ui.macros.internal.commands.HistoryPrevMacroCommand"/>
+      <macroCommand classname="cc.warlock.rcp.ui.macros.internal.commands.HistorySearchMacroCommand"/>
       <macroCommand classname="cc.warlock.rcp.ui.macros.internal.commands.HistoryNextMacroCommand"/>
       <macroCommand classname="cc.warlock.rcp.ui.macros.internal.commands.RepeatLastMacroCommand"/>
       <macroCommand classname="cc.warlock.rcp.ui.macros.internal.commands.RepeatSecondToLastMacroCommand"/>
