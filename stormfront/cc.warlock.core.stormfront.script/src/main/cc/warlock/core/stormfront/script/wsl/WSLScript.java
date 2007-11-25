@@ -85,7 +85,7 @@ public class WSLScript extends AbstractScript {
 		addCommand("exit", new WSLExit());
 		addCommand("timer", new WSLTimer());
 		
-		for(int i = 1; i <= 9; i++) {
+		for(int i = 0; i <= 9; i++) {
 			addCommand("if_" + i, new WSLIf_(String.valueOf(i)));
 		}
 		
@@ -202,8 +202,15 @@ public class WSLScript extends AbstractScript {
 	
 	public void start (List<String> arguments)
 	{
-		for (int i = 0; i < arguments.size(); i++) {
-			setVariable(Integer.toString(i + 1), arguments.get(i));
+		if (arguments.size() > 0) {
+			StringBuffer totalargs = new StringBuffer();
+			for (int i = 0; i < arguments.size(); i++) {
+				setVariable(Integer.toString(i + 1), arguments.get(i));
+				totalargs.append(arguments.get(i));
+				if (i != arguments.size() - 1)
+					totalargs.append(" ");
+			}
+			setVariable("0", totalargs.toString());
 		}
 		
 		for (String varName : commands.getStormFrontClient().getServerSettings().getVariableNames())
@@ -376,9 +383,16 @@ public class WSLScript extends AbstractScript {
 	protected class WSLShift extends WSLCommand {
 		
 		public void execute (String arguments) {
+			StringBuffer zeroarg = new StringBuffer();
 			for (int i = 1; ; i++) {
 				if (!variables.containsKey(Integer.toString(i+1)))
 				{
+					if (zeroarg.length() > 0) { 
+						zeroarg.deleteCharAt(zeroarg.length() - 1);
+						setVariable("0",zeroarg.toString());
+					} else {
+						deleteVariable("0");
+					}
 					deleteVariable(Integer.toString(i));
 					break;
 				}
@@ -386,9 +400,17 @@ public class WSLScript extends AbstractScript {
 				{
 					String arg = variables.get(Integer.toString(i+1)).toString();
 					if (arg == null) {
+						if (zeroarg.length() > 0) {
+							zeroarg.deleteCharAt(zeroarg.length() - 1);
+							setVariable("0",zeroarg.toString());
+						} else {
+							deleteVariable("0");
+						}
+						
 						deleteVariable(Integer.toString(i));
 						break;
 					}
+					zeroarg.append(arg + " ");
 					setVariable(Integer.toString(i), arg);
 				}
 			}
