@@ -214,8 +214,8 @@ COMMENT
 		~(NORMAL_CHAR|'%'|WS|'\n'|'\r') (~('\n'|'\r'))* { atStart = false; }
 	;
 LABEL
-	: { state == State.base }?=>
-		label=LABEL_STRING ':'			{ setText($label.text); }
+	: { atStart }?=>
+		label=LABEL_STRING ':'			{ setText($label.text); atStart = false; }
 	;
 VARIABLE
 	: ('%' var=NORMAL_STRING '%'? { setText($var.text); }
