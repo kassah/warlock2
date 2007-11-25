@@ -435,6 +435,10 @@ public class WSLScript extends AbstractScript {
 			}
 			else if ("divide".equalsIgnoreCase(counterFunction))
 			{
+				if (operand == 0) {
+					scriptError("Cannot divide by zero");
+					return;
+				}
 				int newValue = value / operand;
 				setVariable("c", Integer.toString(newValue));
 			}
