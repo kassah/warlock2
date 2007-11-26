@@ -112,6 +112,10 @@ public class LoginUtil {
 			{
 				title += "Wrong Password";
 			} break;
+			case SGEConnection.ACCOUNT_EXPIRED:
+			{
+				title += "Account Expired";
+			} break;
 		}
 		
 		if (title != null && message != null)
@@ -128,6 +132,8 @@ public class LoginUtil {
 				return "The account was not recognized by the server.";
 			case SGEConnection.INVALID_PASSWORD:
 				return "The password you entered was incorrect.";
+			case SGEConnection.ACCOUNT_EXPIRED:
+				return "This account or subscription has expired.";
 		}
 		
 		return null;

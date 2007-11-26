@@ -21,6 +21,7 @@ public class SWTSGEConnectionListenerAdapter implements ISGEConnectionListener {
 	private GamesReadyRunnable gamesReadyRunnable;
 	private CharactersReadyRunnable charactersReadyRunnable;
 	private ReadyToPlayRunnable readyToPlayRunnable;
+	private SgeErrorRunnable sgeErrorRunnable;
 	
 	public SWTSGEConnectionListenerAdapter (ISGEConnectionListener listener)
 	{
@@ -31,6 +32,7 @@ public class SWTSGEConnectionListenerAdapter implements ISGEConnectionListener {
 		gamesReadyRunnable = new GamesReadyRunnable();
 		charactersReadyRunnable = new CharactersReadyRunnable();
 		readyToPlayRunnable = new ReadyToPlayRunnable();
+		sgeErrorRunnable = new SgeErrorRunnable();
 	}
 	
 	private class LoginReadyRunnable implements Runnable {
@@ -48,16 +50,14 @@ public class SWTSGEConnectionListenerAdapter implements ISGEConnectionListener {
 
 	private class LoginFinishedRunnable implements Runnable {
 		public SGEConnection connection;
-		public int status;
 		
 		public void run () {
-			listener.loginFinished(connection, status);
+			listener.loginFinished(connection);
 		}
 	}
 	
-	public void loginFinished(SGEConnection connection, int status) {
+	public void loginFinished(SGEConnection connection) {
 		loginFinishedRunnable.connection = connection;
-		loginFinishedRunnable.status = status;
 		Display.getDefault().asyncExec(loginFinishedRunnable);
 	}
 
@@ -104,6 +104,21 @@ public class SWTSGEConnectionListenerAdapter implements ISGEConnectionListener {
 		readyToPlayRunnable.connection = connection;
 		readyToPlayRunnable.loginProperties = loginProperties;
 		Display.getDefault().asyncExec(readyToPlayRunnable);
+	}
+	
+	private class SgeErrorRunnable implements Runnable {
+		public SGEConnection connection;
+		public int errorCode;
+		
+		public void run () {
+			listener.sgeError(connection, errorCode);
+		}
+	}
+	
+	public void sgeError(SGEConnection connection, int errorCode) {
+		sgeErrorRunnable.connection = connection;
+		sgeErrorRunnable.errorCode = errorCode;
+		Display.getDefault().asyncExec(sgeErrorRunnable);
 	}
 
 }

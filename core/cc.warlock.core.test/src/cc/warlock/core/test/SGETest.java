@@ -2,20 +2,14 @@ package cc.warlock.core.test;
 
 import java.util.Hashtable;
 import java.util.List;
-import java.util.Map;
 
-import junit.framework.TestSuite;
-
-import org.junit.AfterClass;
 import org.junit.Assert;
-import org.junit.BeforeClass;
 import org.junit.Test;
 
 import cc.warlock.core.configuration.Profile;
 import cc.warlock.core.configuration.SavedProfiles;
-import cc.warlock.core.configuration.ConfigurationUtil;
-import cc.warlock.core.stormfront.network.ISGEConnectionListener;
 import cc.warlock.core.stormfront.network.SGEConnection;
+import cc.warlock.core.stormfront.network.SGEConnectionListener;
 
 public class SGETest {
 	protected Hashtable<String,Boolean> success = new Hashtable<String,Boolean>();
@@ -33,11 +27,7 @@ public class SGETest {
 			Assert.assertNotNull("Profile described by \"" + profileName + "\" was null!", profile);
 			
 			success.put(profileName, false);
-			TestUtil.autoLogin(profile, new ISGEConnectionListener(){
-				public void charactersReady(SGEConnection connection, Map<String, String> characters) {}
-				public void gamesReady(SGEConnection connection, Map<String, String> games) {}
-				public void loginFinished(SGEConnection connection, int status) {}
-				public void loginReady(SGEConnection connection) {}
+			TestUtil.autoLogin(profile, new SGEConnectionListener(){
 				public void readyToPlay(SGEConnection connection, java.util.Map<String,String> loginProperties) {
 					success.put(profileName, true);
 				};

@@ -25,6 +25,7 @@ public class SGEConnection extends Connection implements IConnectionListener {
 	public static final int INVALID_ACCOUNT = 1;
 	public static final int ACCOUNT_REJECTED = 2;
 	public static final int LOGIN_SUCCESS = 3;
+	public static final int ACCOUNT_EXPIRED = 4;
 	
 	public static final String PROPERTY_KEY = "KEY";
 	public static final String PROPERTY_GAMEHOST = "GAMEHOST";
@@ -44,8 +45,9 @@ public class SGEConnection extends Connection implements IConnectionListener {
 	protected static final int GAMES_READY = 2;
 	protected static final int CHARACTERS_READY = 3;
 	protected static final int READY_TO_PLAY = 4;
+	protected static final int SGE_ERROR = 5;
 	
-	protected int state, loginStatus;
+	protected int state, errorCode;
 	protected String passwordHash;
 	protected ArrayList<ISGEConnectionListener> sgeListeners;
 	
@@ -169,7 +171,7 @@ public class SGEConnection extends Connection implements IConnectionListener {
 	public void dataReady(IConnection connection, String line) {
 		try {
 			
-//			System.out.println("SGE:" + line);
+			System.out.println("SGE:" + line);
 			
 			if (state == SGE_INITIAL)
 			{
@@ -184,25 +186,28 @@ public class SGEConnection extends Connection implements IConnectionListener {
 				{
 					if (line.indexOf("REJECT") != -1)
 					{
-						loginStatus = ACCOUNT_REJECTED;
+						errorCode = ACCOUNT_REJECTED;
 					}
 					else if (line.indexOf("PASSWORD") != -1)
 					{
-						loginStatus = INVALID_PASSWORD;
+						errorCode = INVALID_PASSWORD;
 					}
 					else if (line.indexOf("NORECORD") != -1)
 					{
-						loginStatus = INVALID_ACCOUNT;
+						errorCode = INVALID_ACCOUNT;
 					}
-					else loginStatus = LOGIN_SUCCESS;
+					else errorCode = LOGIN_SUCCESS;
 
-					fireEvent (LOGIN_FINISHED);
 					
-					if (loginStatus == LOGIN_SUCCESS) {
+					if (errorCode == LOGIN_SUCCESS) {
 						sendLine("M");
 						state = SGE_GAME;
+
+						fireEvent (LOGIN_FINISHED);
 					}
 					else {
+						fireEvent (SGE_ERROR);
+						
 						disconnect();
 					}
 
@@ -239,13 +244,24 @@ public class SGEConnection extends Connection implements IConnectionListener {
 				case 'L':
 				{
 					String tokens[] = line.split("\t");
-					for (int i = 2; i < tokens.length; i++)
+					String loginResponse = tokens[1];
+					if ("OK".equals(loginResponse))
 					{
-						String property[] = tokens[i].split("=");
-						loginProperties.put(property[0], property[1]);
+						for (int i = 2; i < tokens.length; i++)
+						{
+							String property[] = tokens[i].split("=");
+							loginProperties.put(property[0], property[1]);
+						}
+
+						fireEvent(READY_TO_PLAY);
 					}
+					else if ("PROBLEM".equals(loginResponse))
+					{
+						errorCode = ACCOUNT_EXPIRED;
+						fireEvent(SGE_ERROR);
+					}
+					
 					disconnect();
-					fireEvent(READY_TO_PLAY);
 				} break;
 			}
 			
@@ -259,10 +275,11 @@ public class SGEConnection extends Connection implements IConnectionListener {
 		for (ISGEConnectionListener listener : sgeListeners) {
 			switch (event) {
 			case LOGIN_READY: listener.loginReady(SGEConnection.this); break;
-			case LOGIN_FINISHED: listener.loginFinished(SGEConnection.this, loginStatus); break;
+			case LOGIN_FINISHED: listener.loginFinished(SGEConnection.this); break;
 			case GAMES_READY: listener.gamesReady(SGEConnection.this, games); break;
 			case CHARACTERS_READY: listener.charactersReady(SGEConnection.this, characters); break;
 			case READY_TO_PLAY: listener.readyToPlay(SGEConnection.this, loginProperties); break;
+			case SGE_ERROR: listener.sgeError(SGEConnection.this, errorCode); break;
 			default: break;
 			}
 		}	

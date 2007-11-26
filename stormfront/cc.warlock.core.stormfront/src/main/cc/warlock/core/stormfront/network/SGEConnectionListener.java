@@ -23,7 +23,7 @@ public class SGEConnectionListener implements ISGEConnectionListener {
 	/* (non-Javadoc)
 	 * @see cc.warlock.network.ISGEConnectionListener#loginFinished(cc.warlock.network.SGEConnection, int)
 	 */
-	public void loginFinished(SGEConnection connection, int status) {
+	public void loginFinished(SGEConnection connection) {
 		// TODO Auto-generated method stub
 
 	}
@@ -52,4 +52,8 @@ public class SGEConnectionListener implements ISGEConnectionListener {
 
 	}
 
+	public void sgeError(SGEConnection connection, int errorCode) {
+		// TODO Auto-generated method stub
+		
+	}
 }

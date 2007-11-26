@@ -74,15 +74,14 @@ public class ProfileConnectAction extends Action implements ISGEConnectionListen
 		}
 	}
 	
-	public void loginFinished(SGEConnection connection, int status) {
+	public void loginFinished(SGEConnection connection) {
 		monitor.worked(1);
-		
-		if (status != SGEConnection.LOGIN_SUCCESS)
-		{
-			LoginUtil.showAuthenticationError(status);
-			this.status = new Status(IStatus.ERROR, Warlock2Plugin.PLUGIN_ID, LoginUtil.getAuthenticationError(status));
-			finished = true;
-		}
+	}
+	
+	public void sgeError(SGEConnection connection, int errorCode) {
+		LoginUtil.showAuthenticationError(errorCode);
+		this.status = new Status(IStatus.ERROR, Warlock2Plugin.PLUGIN_ID, LoginUtil.getAuthenticationError(errorCode));
+		finished = true;
 	}
 	
 	public void gamesReady(SGEConnection connection, Map<String, String> games) {

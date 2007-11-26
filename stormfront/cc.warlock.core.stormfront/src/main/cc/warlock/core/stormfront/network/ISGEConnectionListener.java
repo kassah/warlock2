@@ -16,14 +16,9 @@ public interface ISGEConnectionListener {
 	public void loginReady(SGEConnection connection);
 	
 	/**
-	 * This method will be called when the call to SGEConnection.login() is finished.
-	 * @param status will be one of:
-	 * 			SGEConnection.INVALID_PASSWORD
-	 * 			SGEConnection.INVALID_ACCOUNT
-	 * 			SGEConnection.ACCOUNT_BANNED
-	 * 			SGEConnection.LOGIN_SUCCESS
+	 * This method will be called when the call to SGEConnection.login() has succesfully finished.
 	 */
-	public void loginFinished (SGEConnection connection, int status);
+	public void loginFinished (SGEConnection connection);
 	
 	/**
 	 * This method will be called when the SGE server returns with a list of playable games (a Map of gamecode => description)
@@ -43,4 +38,15 @@ public interface ISGEConnectionListener {
 	 * @param loginProperties
 	 */
 	public void readyToPlay(SGEConnection connection, Map<String,String> loginProperties);
+	
+	/**
+	 * An error occurred during the login process.
+	 * @param connection The connection the error occurred on
+	 * @param errorCode will be one of:
+	 * 			SGEConnection.INVALID_PASSWORD
+	 * 			SGEConnection.INVALID_ACCOUNT
+	 * 			SGEConnection.ACCOUNT_BANNED
+	 * 			SGEConnection.ACCOUNT_EXPIRED
+	 */
+	public void sgeError (SGEConnection connection, int errorCode);
 }

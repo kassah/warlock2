@@ -28,6 +28,7 @@ import cc.warlock.core.configuration.SavedProfiles;
 import cc.warlock.core.stormfront.network.SGEConnection;
 import cc.warlock.core.stormfront.network.SGEConnectionListener;
 import cc.warlock.rcp.stormfront.adapters.SWTSGEConnectionListenerAdapter;
+import cc.warlock.rcp.stormfront.ui.util.LoginUtil;
 import cc.warlock.rcp.ui.ComboField;
 import cc.warlock.rcp.ui.TextField;
 import cc.warlock.rcp.ui.WarlockSharedImages;
@@ -153,26 +154,15 @@ public class AccountWizardPage extends WizardPageWithNotification {
 			this.monitor = monitor;
 		}
 		
-		public void loginFinished(SGEConnection connection, int status) {
+		public void loginFinished(SGEConnection connection) {
 			if (monitor != null)
 			{
 				monitor.worked(1);
 			}
-			
-			if (status != SGEConnection.LOGIN_SUCCESS) {
-				String message = "Unknown error";
-				switch (status) {
-					case SGEConnection.ACCOUNT_REJECTED:	message = WizardMessages.AccountWizardPage_loginError_accountRejected; break;
-					case SGEConnection.INVALID_ACCOUNT: message = WizardMessages.AccountWizardPage_loginError_accountInvalid; break;
-					case SGEConnection.INVALID_PASSWORD: message = WizardMessages.AccountWizardPage_loginError_passwordInvalid; break;
-				}
-				
-				MessageDialog.openError(Display.getDefault().getActiveShell(),
-					WizardMessages.AccountWizardPage_loginError_title, WizardMessages.bind(message, accountName));
-				
-				getContainer().showPage(AccountWizardPage.this);
-			}
-			
+		}
+		
+		public void sgeError(SGEConnection connection, int errorCode) {
+			LoginUtil.showAuthenticationError(errorCode);
 		}
 		
 		public void gamesReady(SGEConnection connection, Map<String, String> games) {
