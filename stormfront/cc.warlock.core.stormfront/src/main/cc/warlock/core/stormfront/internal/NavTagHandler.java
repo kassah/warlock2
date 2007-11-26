@@ -4,16 +4,15 @@ import cc.warlock.core.script.IScript;
 import cc.warlock.core.stormfront.IStormFrontProtocolHandler;
 
 
-public class CompassTagHandler extends DefaultTagHandler {
+public class NavTagHandler extends DefaultTagHandler {
 
-	public CompassTagHandler(IStormFrontProtocolHandler handler) {
+	public NavTagHandler(IStormFrontProtocolHandler handler) {
 		super(handler);
-		// TODO Auto-generated constructor stub
 	}
 
 	@Override
 	public String[] getTagNames() {
-		return new String[] { "compass" };
+		return new String[] { "nav" };
 	}
 	
 	@Override
