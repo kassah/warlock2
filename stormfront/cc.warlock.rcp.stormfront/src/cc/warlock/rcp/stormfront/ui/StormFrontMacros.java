@@ -82,19 +82,20 @@ public class StormFrontMacros {
 		
 		for (MacroKey key : settings.getMacroSet(0))
 		{
-			if (keys.containsKey(key.getKey()))
+			String keyString = key.getKey();
+			if (keys.containsKey(keyString))
 			{
-				int keyCode = keys.get(key.getKey());
+				int keyCode = keys.get(keyString);
 				int mods = modifierListToInt(key.getModifiers());
 				
 				MacroRegistry.instance().addMacro(MacroRegistry.createCommandMacro(keyCode, mods, key.getAction()));
 			}
 			else {
-				if (key.getKey().length() == 1)
+				if (keyString.length() == 1)
 				{
-					char k = key.getKey().charAt(0);
+					char k = key.getKey().toLowerCase().charAt(0);
 					
-					if ((k >= 'A' && k <= 'Z') || (k >= '0' && k <= '9'))
+					if ((k >= 'a' && k <= 'z') || (k >= '0' && k <= '9'))
 					{
 						int mods = modifierListToInt(key.getModifiers());
 						MacroRegistry.instance().addMacro(MacroRegistry.createCommandMacro(k, mods, key.getAction()));
