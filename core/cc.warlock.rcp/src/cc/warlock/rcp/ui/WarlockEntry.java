@@ -24,7 +24,7 @@ public class WarlockEntry implements VerifyKeyListener {
 	private ArrayList<IMacro> entryMacros = new ArrayList<IMacro>();
 	private boolean searchMode = false;
 	private StringBuffer searchText = new StringBuffer();
-	private String command = "";
+	private String searchCommand = "";
 	
 	public WarlockEntry(Composite parent, IWarlockClientViewer viewer) {
 		this.viewer = viewer;
@@ -41,13 +41,15 @@ public class WarlockEntry implements VerifyKeyListener {
 	}
 	
 	public String getText() {
-		return command;
+		if(searchMode)
+			return searchCommand;
+		else
+			return widget.getText();
 	}
 	
 	public void setText(String text) {
-		command = text;
 		widget.setText(text);
-		widget.setCaretOffset(command.length());
+		widget.setCaretOffset(text.length());
 	}
 	
 	public void setSelection(int start) {
@@ -106,7 +108,7 @@ public class WarlockEntry implements VerifyKeyListener {
 			}
 		}
 		
-		//if (!widget.isFocusControl()) {
+		if (!widget.isFocusControl() || searchMode) {
 			// TODO make this a bit more robust
 			if(entryCharacters.contains(e.character))
 			{
@@ -114,12 +116,11 @@ public class WarlockEntry implements VerifyKeyListener {
 				e.doit = false;
 			} else if(e.character == '\b') {
 				widget.invokeAction(ST.DELETE_PREVIOUS);
-				command = widget.getText();
-				widget.setCaretOffset(widget.getText().length());
-				widget.setFocus();
 				e.doit = false;
 			}
-		//}
+			if(!widget.isFocusControl())
+				widget.setFocus();
+		}
 	}
 	
 	public void append(char ch) {
@@ -132,10 +133,9 @@ public class WarlockEntry implements VerifyKeyListener {
 			}
 			setSearchText();
 		} else {
-			command += ch;
-			widget.setText(command);
-			widget.setCaretOffset(command.length());
-			widget.setFocus();
+			int offset = widget.getCaretOffset();
+			widget.insert(String.valueOf(ch));
+			widget.setCaretOffset(offset + 1);
 		}
 	}
 	
@@ -187,11 +187,14 @@ public class WarlockEntry implements VerifyKeyListener {
 	}
 	
 	private void setSearchText() {
-		widget.setText("(reverse history search)'" + searchText.toString() + "': " + command);
+		widget.setText("(reverse history search)'" + searchText.toString() + "': " + searchCommand);
 	}
 	
 	public void submit() {
-		send(command);
+		if(searchMode)
+			send(searchCommand);
+		else
+			send(widget.getText());
 		viewer.getWarlockClient().getCommandHistory().resetPosition();
 		setText("");
 		searchMode = false;
