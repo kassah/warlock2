@@ -105,7 +105,7 @@
 		</if>
 		
 		<progress done="true"/>
-		<echo tofile="${buildDirectory}/${buildLabel}/${warlock-version}/build.properties">
+		<echo file="${buildDirectory}/${buildLabel}/${warlock-version}/build.properties">
 			build.duration=${build-timer}
 			build.date=${DSTAMP}
 			build.time=${TSTAMP}
