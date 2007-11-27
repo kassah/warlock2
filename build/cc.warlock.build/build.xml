@@ -113,7 +113,7 @@
 			build.url=http://www.arcaner.com/warlock2-builds/${warlock-version}
 		</echo>
 		
-		<echo tofile="${buildDirectory}/${buildLabel}/currentSnapshot.properties">
+		<echo file="${buildDirectory}/${buildLabel}/currentSnapshot.properties">
 			build.current.snapshot=${warlock-version}
 		</echo>
 		
