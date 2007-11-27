@@ -2,6 +2,7 @@
 	
 	<target name="build-parsers">
 		<mkdir dir="src/javacc/cc/warlock/core/stormfront/script/wsl"/>
+		<mkdir dir="src/antlr/cc/warlock/core/stormfront/script/wsl"/>
 		
 		<antcall target="javacc">
 			<param name="arguments" value="&quot;-OUTPUT_DIRECTORY:${basedir}/src/javacc/cc/warlock/core/stormfront/script/wsl&quot; -STATIC:false"/>
