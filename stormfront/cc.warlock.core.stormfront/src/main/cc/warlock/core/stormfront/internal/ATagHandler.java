@@ -15,6 +15,8 @@ public class ATagHandler extends DefaultTagHandler {
 
 	@Override
 	public void handleEnd(String newLine) {
-		handler.getClient().getDefaultStream().prompt(newLine);
+		if(newLine != null && newLine.length() > 0) {
+			handler.characters(newLine);
+		}
 	}
 }
