@@ -45,8 +45,10 @@ public class StreamsContributionItem extends CompoundContributionItem  {
 		filters.add(new StreamFilter("weep", IStreamFilter.type.string));
 		filters.add(new StreamFilter("mumble", IStreamFilter.type.string));
 		filters.add(new StreamFilter("dance", IStreamFilter.type.string));
-		filters.add(new StreamFilter("tickle", IStreamFilter.type.string));
-		filters.add(new StreamFilter("^\\(.+\\)$", IStreamFilter.type.regex));
+		filters.add(new StreamFilter("^\\((?!You ).+\\)$", IStreamFilter.type.regex));	//act
+		filters.add(new StreamFilter("^(You tickle |As you reach out to tickle ).+$", IStreamFilter.type.regex));	// tickle: 1st person
+		filters.add(new StreamFilter(" just tickled you ", IStreamFilter.type.string));								// tickle: 2nd person
+		filters.add(new StreamFilter("^.+just tickled (?!you).+$", IStreamFilter.type.regex));						// tickle: 3rd person
 		
 		return filters;
 	}
