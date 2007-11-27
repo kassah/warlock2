@@ -53,7 +53,7 @@
 
 	<target name="build-product" depends="copy-code">
 		<tstamp/>
-		<stopwatch id="build-timer"/>
+		<stopwatch name="build-timer"/>
 		<progress set="0" message="" bar="copy"/>
 		<progress message="Getting Subversion Revision..."/>
 		
