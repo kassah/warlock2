@@ -15,13 +15,11 @@ public class PromptTagHandler extends DefaultTagHandler {
 	
 	protected long currentTime = 0;
 	protected RoundtimeTagHandler roundtimeHandler;
-	protected IStormFrontClient client;
 	protected StringBuffer prompt = new StringBuffer();
 	
 	public PromptTagHandler (IStormFrontProtocolHandler handler, RoundtimeTagHandler roundtimeHandler) {
 		super(handler);
 		this.roundtimeHandler = roundtimeHandler;
-		client = handler.getClient();
 	}
 	
 	@Override
@@ -52,6 +50,6 @@ public class PromptTagHandler extends DefaultTagHandler {
 	
 	@Override
 	public void handleEnd(String newLine) {
-		client.getDefaultStream().prompt(prompt.toString());
+		handler.getClient().getDefaultStream().prompt(prompt.toString());
 	}
 }
