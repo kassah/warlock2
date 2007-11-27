@@ -52,6 +52,8 @@
 	</target>
 
 	<target name="build-product" depends="copy-code">
+		<tstamp/>
+		<stopwatch id="build-timer"/>
 		<progress set="0" message="" bar="copy"/>
 		<progress message="Getting Subversion Revision..."/>
 		
@@ -103,6 +105,18 @@
 		</if>
 		
 		<progress done="true"/>
+		<echo tofile="${buildDirectory}/${buildLabel}/${warlock-version}/build.properties">
+			build.duration=${build-timer}
+			build.date=${DSTAMP}
+			build.time=${TSTAMP}
+			build.id=${warlock-version}
+			build.url=http://www.arcaner.com/warlock2-builds/${warlock-version}
+		</echo>
+		
+		<echo tofile="${buildDirectory}/${buildLabel}/currentSnapshot.properties">
+			build.current.snapshot=${warlock-version}
+		</echo>
+		
 		<post to="http://svn.warlock.cc/page.php">
 			<prop name="key" value="dfud7dk3kjwsuujdjej"/>
 			<prop name="message" value="Warlock nightly build succesfully completed: http://www.arcaner.com/warlock2-builds/${warlock-version}"/>
