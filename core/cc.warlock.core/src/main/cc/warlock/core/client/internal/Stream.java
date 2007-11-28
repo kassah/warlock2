@@ -5,7 +5,9 @@ package cc.warlock.core.client.internal;
 
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Collections;
 import java.util.Hashtable;
+import java.util.List;
 
 import cc.warlock.core.client.IProperty;
 import cc.warlock.core.client.IStream;
@@ -25,7 +27,7 @@ public class Stream implements IStream {
 	protected static Hashtable<String, Stream> streams = new Hashtable<String, Stream>();
 	
 	protected IProperty<String> streamName, streamTitle;
-	protected ArrayList<IStreamListener> listeners;
+	protected List<IStreamListener> listeners;
 	protected boolean isPrompting = false;
 	
 	protected Stream (String streamName) {
@@ -33,7 +35,7 @@ public class Stream implements IStream {
 		this.streamName.set(streamName);
 		this.streamTitle = new Property<String>("streamTitle", null);
 		
-		listeners = new ArrayList<IStreamListener>();
+		listeners = Collections.synchronizedList(new ArrayList<IStreamListener>());
 		
 		streams.put(streamName, this);
 	}
