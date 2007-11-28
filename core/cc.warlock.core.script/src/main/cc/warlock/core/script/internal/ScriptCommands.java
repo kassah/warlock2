@@ -222,6 +222,9 @@ public class ScriptCommands implements IScriptCommands, IStreamListener
 	public void movedToRoom() {
 		lock.lock();
 		try {
+			// TODO we should probably set gotPrompt to false whenever we get
+			// a tag. This is just to fix the case for moving between rooms.
+			gotPrompt = false;
 			roomWaiting = false;
 			nextRoom.signalAll();
 		} finally {
