@@ -14,6 +14,7 @@ import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Text;
 import org.eclipse.ui.part.ViewPart;
 
+import cc.warlock.core.client.IWarlockClient;
 import cc.warlock.core.network.IConnection;
 import cc.warlock.core.network.IConnectionListener;
 import cc.warlock.rcp.application.WarlockApplication;
@@ -25,10 +26,15 @@ public class DebugView extends ViewPart implements IConnectionListener {
 	protected WarlockText console;
 	protected Text entry;
 	protected Button copyAll;
+	private IWarlockClient client;
 	
 	public static final String VIEW_ID = "cc.warlock.rcp.views.DebugView";
 	
 	protected IConnection connection;
+	
+	public void setClient(IWarlockClient client) {
+		this.client = client;
+	}
 	
 	public void setConnection (IConnection connection)
 	{
@@ -52,7 +58,7 @@ public class DebugView extends ViewPart implements IConnectionListener {
 		copyAll = new Button(main, SWT.PUSH);
 		copyAll.setText("Copy All");
 		
-		console = new WarlockText(main, SWT.V_SCROLL | SWT.H_SCROLL);
+		console = new WarlockText(main, SWT.V_SCROLL | SWT.H_SCROLL, client);
 		console.setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, true));
 		console.setScrollDirection(SWT.DOWN);
 		

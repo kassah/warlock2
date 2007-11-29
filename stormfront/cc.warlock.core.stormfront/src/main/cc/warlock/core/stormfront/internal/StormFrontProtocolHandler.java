@@ -145,7 +145,7 @@ public class StormFrontProtocolHandler implements IStormFrontProtocolHandler {
 		// if there was no handler or it couldn't handle the characters,
 		// take a default action
 		if(!handleCharacters(defaultTagHandlers, 0, characters)) {
-			WarlockString str = new WarlockString(client, characters);
+			WarlockString str = new WarlockString(characters);
 			for(IWarlockStyle style : styles) {
 				str.addStyle(style);
 			}

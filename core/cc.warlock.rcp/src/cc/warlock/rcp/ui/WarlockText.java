@@ -38,6 +38,7 @@ import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.Label;
 import org.eclipse.swt.widgets.ScrollBar;
 
+import cc.warlock.core.client.IWarlockClient;
 import cc.warlock.core.client.WarlockString;
 import cc.warlock.core.client.WarlockString.WarlockStringStyleRange;
 import cc.warlock.rcp.ui.style.StyleProviders;
@@ -64,11 +65,13 @@ public class WarlockText implements LineBackgroundListener {
 	private ScrollBar vscroll;
 	private int lineLimit = 5000;
 	private int doScrollDirection = SWT.UP;
+	private IWarlockClient client;
 
 	protected Hashtable<Integer, Color> lineBackgrounds = new Hashtable<Integer,Color>();
 	
-	public WarlockText(Composite parent, int style) {
+	public WarlockText(Composite parent, int style, IWarlockClient client) {
 		textWidget = new StyledText(parent, style);
+		this.client = client;
 		
 		Display display = parent.getDisplay();
 		linkColor = new Color(display, 0xF0, 0x80, 0);
@@ -382,35 +385,56 @@ public class WarlockText implements LineBackgroundListener {
 		
 		int charCount = textWidget.getCharCount();
 		textWidget.append(string.toString());
-		ArrayList<StyleRangeWithData> styles = new ArrayList<StyleRangeWithData>();
-		for(WarlockStringStyleRange range : string.getStyles()) {
-			StyleRangeWithData styleRange = (StyleRangeWithData)StyleProviders.getStyleProvider(string.getClient()).getStyleRange(range.style);
-			if(styleRange == null)
-				continue;
-			if(range.style.getFGColor() != null)
-				styleRange.foreground = ColorUtil.warlockColorToColor(range.style.getFGColor());
-			if(range.style.getBGColor() != null)
-				styleRange.background = ColorUtil.warlockColorToColor(range.style.getBGColor());
-			if(range.style.isFullLine()) {
-				int lineNum = textWidget.getLineAtOffset(charCount + range.start);
-				styleRange.start = textWidget.getOffsetAtLine(lineNum);
-				styleRange.length = textWidget.getOffsetAtLine(lineNum + 1) - styleRange.start;
-				setLineBackground(lineNum, styleRange.background);
-			} else {
-				styleRange.start = charCount + range.start;
-				styleRange.length = range.length;
+		
+		/* Break up the ranges and merge overlapping styles because SWT only
+		 * allows 1 style per section
+		 */
+		ArrayList<WarlockStringStyleRange> currentStyles = new ArrayList<WarlockStringStyleRange>();
+		ArrayList<StyleRangeWithData> finishedStyles = new ArrayList<StyleRangeWithData>();
+		List<WarlockStringStyleRange> styles = string.getStyles();
+		int pos = 0;
+		while(pos >= 0) {
+			// update current styles
+			for(WarlockStringStyleRange style : styles) {
+				if(style.start == pos) {
+					currentStyles.add(style);
+				} else if(style.start + style.length == pos) {
+					currentStyles.remove(style);
+				}
 			}
-			styles.add(styleRange);
-		}
-		ArrayList<StyleRangeWithData> intersections = new ArrayList<StyleRangeWithData>();
-		for(int i = 0; i + 1 < styles.size(); i++) {
-			findIntersections(styles.get(i), styles, i + 1, intersections);
+			
+			// create style segment for pos to next pos
+			int foundPos = findNextEvent(styles, pos + 1);
+			int nextPos;
+			if(foundPos < 0)
+				nextPos = string.length() - 1;
+			else
+				nextPos = foundPos;
+			if(currentStyles.size() > 0) {
+				// merge all of the styles
+				StyleRangeWithData style = warlockStringStyleRangeToStyleRange(currentStyles.get(0), charCount);
+				for(int i = 1; i < currentStyles.size(); i++) {
+					StyleRangeWithData nextStyle = warlockStringStyleRangeToStyleRange(currentStyles.get(i), charCount);
+					if(nextStyle.font != null)
+						style.font = nextStyle.font;
+					if(nextStyle.background != null)
+						style.background = nextStyle.background;
+					if(nextStyle.foreground != null)
+						style.foreground = nextStyle.foreground;
+					if(nextStyle.fontStyle != SWT.NORMAL)
+						style.fontStyle = nextStyle.fontStyle;
+					if(nextStyle.strikeout) style.strikeout = true;
+					if(nextStyle.underline) style.underline = true;
+				}
+				style.start = charCount + pos;
+				style.length = nextPos - pos;
+				finishedStyles.add(style);
+			}
+			
+			pos = foundPos;
 		}
 		
-		for(StyleRangeWithData style : styles) {
-			textWidget.setStyleRange(style);
-		}
-		for(StyleRangeWithData style : intersections) {
+		for(StyleRangeWithData style : finishedStyles) {
 			textWidget.setStyleRange(style);
 		}
 		
@@ -420,63 +444,39 @@ public class WarlockText implements LineBackgroundListener {
 			scrollToBottom();
 	}
 	
-	private void findIntersections(StyleRangeWithData style,
-			List<StyleRangeWithData> stylesToSearch, int startingPoint,
-			List<StyleRangeWithData> resultList) {
-		for(int i = startingPoint; i < stylesToSearch.size(); i++) {
-			// remove duplicates while we're here
-			while(style.equals(stylesToSearch.get(i))) {
-				stylesToSearch.remove(i);
-				if(i >= stylesToSearch.size())
-					return;
-			}
-			
-			StyleRangeWithData intersection = getIntersection(style, stylesToSearch.get(i));
-			if(intersection != null) {
-				resultList.add(intersection);
-				if(stylesToSearch.size() > i + 1)
-					findIntersections(intersection, stylesToSearch, i + 1, resultList);
+	/* find an element in styles that intersects with the first element of styles, starting at pos */
+	private int findNextEvent(List<WarlockStringStyleRange> styles, int pos) {
+		int nextPos = -1;
+		for(WarlockStringStyleRange style : styles) {
+			if(style.start >= pos) {
+				if(nextPos < 0 || style.start < nextPos)
+					nextPos = style.start;
+			} else if(style.start + style.length >= pos) {
+				if(nextPos < 0 || style.start + style.length < nextPos)
+					nextPos = style.start + style.length;
 			}
 		}
+		return nextPos;
 	}
 	
-	private StyleRangeWithData getIntersection(StyleRangeWithData style1, StyleRangeWithData style2) {
-		StyleRangeWithData firstStyle, secondStyle;
-		if(style1.start <= style1.start) {
-			firstStyle = style1;
-			secondStyle = style2;
-		} else {
-			firstStyle = style2;
-			secondStyle = style1;
-		}
-		
-		// check if we intersect
-		if(firstStyle.start + firstStyle.length <= secondStyle.start)
+	private StyleRangeWithData warlockStringStyleRangeToStyleRange(WarlockStringStyleRange range, int offset) {
+		StyleRangeWithData styleRange = (StyleRangeWithData)StyleProviders.getStyleProvider(client).getStyleRange(range.style);
+		if(styleRange == null)
 			return null;
-		
-		StyleRangeWithData intersection = new StyleRangeWithData();
-		intersection.start = secondStyle.start;
-		intersection.length = Math.min(secondStyle.length, firstStyle.length
-				- (secondStyle.start - firstStyle.start));
-		if(style2.font != null)
-			intersection.font = style2.font;
-		else
-			intersection.font = style1.font;
-		if(style2.background != null)
-			intersection.background = style2.background;
-		else
-			intersection.background = style1.background;
-		if(style2.foreground != null)
-			intersection.foreground = style2.foreground;
-		else
-			intersection.foreground = style1.foreground;
-		if(style2.fontStyle != SWT.NORMAL)
-			intersection.fontStyle = style2.fontStyle;
-		else
-			intersection.fontStyle = style2.fontStyle;
-		if(style2.strikeout || style1.strikeout) intersection.strikeout = true;
-		if(style2.underline || style1.underline) intersection.underline = true;
-		return intersection;
+		if(range.style.getFGColor() != null)
+			styleRange.foreground = ColorUtil.warlockColorToColor(range.style.getFGColor());
+		if(range.style.getBGColor() != null)
+			styleRange.background = ColorUtil.warlockColorToColor(range.style.getBGColor());
+		if(range.style.isFullLine()) {
+			int lineNum = textWidget.getLineAtOffset(offset + range.start);
+			styleRange.start = textWidget.getOffsetAtLine(lineNum);
+			styleRange.length = textWidget.getOffsetAtLine(lineNum + 1) - styleRange.start;
+			setLineBackground(lineNum, styleRange.background);
+		} else {
+			styleRange.start = offset + range.start;
+			styleRange.length = range.length;
+		}
+		return styleRange;
 	}
 	
 	private void scrollToBottom() {

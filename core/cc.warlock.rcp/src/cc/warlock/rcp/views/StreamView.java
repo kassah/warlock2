@@ -124,7 +124,7 @@ public class StreamView extends ViewPart implements IStreamListener, IGameViewFo
 		if (!clientStreams.containsKey(client))
 		{
 			// TODO move this section into WarlockText
-			WarlockText text = new WarlockText(book, SWT.V_SCROLL);
+			WarlockText text = new WarlockText(book, SWT.V_SCROLL, client);
 			GridData data = new GridData(GridData.FILL, GridData.FILL, true, true);
 			text.setLayoutData(data);
 			text.setEditable(false);
@@ -175,7 +175,7 @@ public class StreamView extends ViewPart implements IStreamListener, IGameViewFo
 		
 		if (string != null && string.length() > 0)
 		{
-			streamReceivedText(stream, new WarlockString(client, string));
+			streamReceivedText(stream, new WarlockString(string));
 		}
 	}
 	
@@ -222,7 +222,7 @@ public class StreamView extends ViewPart implements IStreamListener, IGameViewFo
 		if (buffering)
 		{
 			if(bufferedText == null)
-				bufferedText = new WarlockString(client);
+				bufferedText = new WarlockString();
 			
 			bufferedText.append(string);
 		}
@@ -264,7 +264,7 @@ public class StreamView extends ViewPart implements IStreamListener, IGameViewFo
 	public void streamReceivedText(IStream stream, WarlockString text) {
 		if (this.mainStream.equals(stream) || this.streams.contains(stream))
 		{
-			WarlockString string = new WarlockString(client);
+			WarlockString string = new WarlockString();
 			
 			if (isPrompting) {
 				string.append("\n");
@@ -283,7 +283,7 @@ public class StreamView extends ViewPart implements IStreamListener, IGameViewFo
 	public void streamEchoed(IStream stream, String text) {
 		if (this.mainStream.equals(stream) || this.streams.contains(stream))
 		{
-			WarlockString string = new WarlockString(client);
+			WarlockString string = new WarlockString();
 			if(isPrompting) {
 				string.append("\n");
 				isPrompting = false;
@@ -300,7 +300,7 @@ public class StreamView extends ViewPart implements IStreamListener, IGameViewFo
 	public void streamReceivedCommand(IStream stream, String text) {
 		if (this.mainStream.equals(stream) || this.streams.contains(stream))
 		{
-			WarlockString string = new WarlockString(client, text);
+			WarlockString string = new WarlockString(text);
 			
 			string.addStyle(0, text.length(), client.getCommandStyle());
 			
@@ -313,7 +313,7 @@ public class StreamView extends ViewPart implements IStreamListener, IGameViewFo
 		if ((!isPrompting) &&
 				(this.mainStream.equals(stream) || this.streams.contains(stream)))
 		{
-			WarlockString text = new WarlockString(client);
+			WarlockString text = new WarlockString();
 			
 			if (bufferedText != null)
 			{

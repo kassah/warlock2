@@ -57,7 +57,7 @@ public class Stream implements IStream {
 	}
 	
 	public void send(String text) {
-		send(new WarlockString(getClient(), text));
+		send(new WarlockString(text));
 	}
 	
 	public void send(WarlockString text) {

@@ -9,7 +9,6 @@ public class WarlockString {
 
 	private StringBuffer text = new StringBuffer();
 	private ArrayList<WarlockStringStyleRange> styles = new ArrayList<WarlockStringStyleRange>();
-	private IWarlockClient client;
 	
 	public class WarlockStringStyleRange {
 		public int start;
@@ -23,22 +22,18 @@ public class WarlockString {
 		}
 	}
 	
-	public WarlockString(IWarlockClient client) {
-		this.client = client;
+	public WarlockString() {
 	}
 	
-	public WarlockString(IWarlockClient client, CharSequence text) {
-		this.client = client;
+	public WarlockString(CharSequence text) {
 		this.text.append(text);
 	}
 	
-	public WarlockString(IWarlockClient client, String text) {
-		this.client = client;
+	public WarlockString(String text) {
 		this.text.append(text);
 	}
 	
-	public WarlockString(IWarlockClient client, String text, IWarlockStyle style) {
-		this.client = client;
+	public WarlockString(String text, IWarlockStyle style) {
 		this.text.append(text);
 		addStyle(style);
 	}
@@ -94,16 +89,12 @@ public class WarlockString {
 		styles.clear();
 	}
 	
-	public IWarlockClient getClient() {
-		return client;
-	}
-	
 	public WarlockString substring(int start) {
 		return substring(start, text.length());
 	}
 	
 	public WarlockString substring(int start, int end) {
-		WarlockString substring = new WarlockString(client, text.substring(start, end));
+		WarlockString substring = new WarlockString(text.substring(start, end));
 		for(WarlockStringStyleRange style : styles) {
 			if(style.start + style.length >= start && style.start < end) {
 				int styleLength = Math.min(style.length, end - style.start);

@@ -9,7 +9,6 @@ import org.eclipse.ui.IWorkbenchPage;
 import org.eclipse.ui.PartInitException;
 import org.eclipse.ui.PlatformUI;
 
-import cc.warlock.core.client.IStream;
 import cc.warlock.core.client.IWarlockClient;
 import cc.warlock.core.client.IWarlockClientListener;
 import cc.warlock.core.client.WarlockClientRegistry;
@@ -60,7 +59,7 @@ public class UserStream extends StreamView implements IWarlockClientListener {
 		}
 		
 		// Process filters on the complete lines
-		WarlockString ret = new WarlockString(client);
+		WarlockString ret = new WarlockString();
 		for (WarlockString buffer : string.split("\\r?\\n")) {
 			for (IStreamFilter filter : this.filters) {
 				if (filter == null) continue;

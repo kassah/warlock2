@@ -73,7 +73,7 @@ public class LoginUtil {
 			IWarlockStyle style = new WarlockStyle();
 			style.addStyleType(IWarlockStyle.StyleType.MONOSPACE);
 			
-			client.getDefaultStream().send(new WarlockString(client, errorConnectMessage, style));
+			client.getDefaultStream().send(new WarlockString(errorConnectMessage, style));
 		} catch (PartInitException e) {
 			e.printStackTrace();
 		}
