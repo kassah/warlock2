@@ -69,7 +69,7 @@ public interface IStormFrontClient extends IWarlockClient {
 	/**
 	 * @return The amount of mana in the mana bar.
 	 */
-	public IProperty<Integer >getMana();
+	public IProperty<Integer> getMana();
 	
 	/**
 	 * @return The amount of fatigue in the fatigue bar.
