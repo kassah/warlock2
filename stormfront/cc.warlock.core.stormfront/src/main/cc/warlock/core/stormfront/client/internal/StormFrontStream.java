@@ -1,8 +1,10 @@
 package cc.warlock.core.stormfront.client.internal;
 
 import cc.warlock.core.client.IWarlockClient;
+import cc.warlock.core.client.WarlockString;
 import cc.warlock.core.client.internal.Stream;
 import cc.warlock.core.stormfront.client.IStormFrontClient;
+import cc.warlock.core.stormfront.serversettings.server.IgnoreSetting;
 
 public class StormFrontStream extends Stream {
 
@@ -26,5 +28,23 @@ public class StormFrontStream extends Stream {
 	@Override
 	public IWarlockClient getClient() {
 		return client;
+	}
+	
+	@Override
+	public void send(WarlockString text) {
+		
+		boolean ignored = false;
+		
+		for (IgnoreSetting ignore : client.getServerSettings().getIgnores())
+		{
+			if (!text.toString().contains(ignore.getText()))
+			{
+				ignored = true; break;
+			}
+		}
+		
+		if (!ignored) {
+			super.send(text);
+		}
 	}
 }

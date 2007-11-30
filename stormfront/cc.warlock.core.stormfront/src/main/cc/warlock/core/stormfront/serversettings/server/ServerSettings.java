@@ -46,6 +46,7 @@ public class ServerSettings implements Comparable<ServerSettings>, IHighlightPro
 	protected Hashtable<String, String> variables = new Hashtable<String, String>();
 	protected ArrayList<ArrayList<MacroKey>> macroSets = new ArrayList<ArrayList<MacroKey>>();
 	protected Hashtable<String, ServerScript> scripts = new Hashtable<String, ServerScript>();
+	protected ArrayList<IgnoreSetting> ignores = new ArrayList<IgnoreSetting>();
 	
 	protected ArrayList<HighlightPreset> deletedHighlightStrings = new ArrayList<HighlightPreset>();
 	protected ArrayList<String> deletedVariables = new ArrayList<String>();
@@ -53,7 +54,7 @@ public class ServerSettings implements Comparable<ServerSettings>, IHighlightPro
 	
 	protected ServerScriptProvider scriptProvider;
 	
-	private StormFrontElement streamElement, paletteElement, presetsElement, stringsElement, namesElement;
+	private StormFrontElement streamElement, paletteElement, presetsElement, stringsElement, namesElement, ignoresElement;
 	
 	public ServerSettings (IStormFrontClient client)
 	{
@@ -145,6 +146,7 @@ public class ServerSettings implements Comparable<ServerSettings>, IHighlightPro
 			loadVariables();
 			loadMacros();
 			loadScripts();
+			loadIgnores();
 			
 			// initalize before we call the viewers
 			client.getStormFrontSkin().loadDefaultPresets(this, presets);
@@ -283,6 +285,21 @@ public class ServerSettings implements Comparable<ServerSettings>, IHighlightPro
 					}
 				} else {
 					System.out.println("didn't get element in script");
+				}
+			}
+		}
+	}
+	
+	protected void loadIgnores ()
+	{
+		ignoresElement = document.getRootElement().element("ignores");
+		if (ignoresElement != null)
+		{
+			for (StormFrontElement hElement : ignoresElement.elements())
+			{
+				if (hElement != null)
+				{
+					ignores.add(new IgnoreSetting(this, hElement));
 				}
 			}
 		}
@@ -671,6 +688,11 @@ public class ServerSettings implements Comparable<ServerSettings>, IHighlightPro
 
 	public IStormFrontSkin getDefaultSkin() {
 		return client.getStormFrontSkin();
+	}
+	
+	public List<IgnoreSetting> getIgnores ()
+	{
+		return ignores;
 	}
 	
 	public WindowSettings getWindowSettings (String windowId)
