@@ -73,6 +73,8 @@ public class CommandHistory implements ICommandHistory {
 	}
 	
 	private ICommand searchFromPos(String text, int pos) {
+		if(pos < 0)
+			pos = 0;
 		while(pos < size()) {
 			if(getCommandAt(pos).getCommand().contains(text)) {
 				position = pos;
