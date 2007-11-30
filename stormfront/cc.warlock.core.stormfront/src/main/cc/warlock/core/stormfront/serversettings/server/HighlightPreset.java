@@ -151,7 +151,7 @@ public class HighlightPreset extends Preset implements IHighlightString {
 	public Pattern getPattern() {
 		if(pattern == null) {
 			// TODO test if we should compile this as a regex
-			pattern = Pattern.compile(text, Pattern.LITERAL);
+			pattern = Pattern.compile(text, Pattern.LITERAL | Pattern.CASE_INSENSITIVE);
 		}
 		
 		return pattern;
