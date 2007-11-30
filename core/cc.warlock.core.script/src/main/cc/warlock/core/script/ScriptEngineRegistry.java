@@ -72,7 +72,8 @@ public class ScriptEngineRegistry {
 				}
 			}
 		}
-		client.getDefaultStream().echo("Could not find script \"" + scriptName + "\"");
+		
+		client.getDefaultStream().echo("Could not find script \"" + scriptName + "\"\n");
 		return null;
 	}
 	
