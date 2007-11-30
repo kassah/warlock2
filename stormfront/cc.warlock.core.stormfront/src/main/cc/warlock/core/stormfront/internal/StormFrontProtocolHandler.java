@@ -78,6 +78,7 @@ public class StormFrontProtocolHandler implements IStormFrontProtocolHandler {
 		new PresetTagHandler(this);
 		new IndicatorTagHandler(this);
 		new LaunchURLTagHandler(this);
+		new ResourceTagHandler(this);
 		new ATagHandler(this);
 	}
 	

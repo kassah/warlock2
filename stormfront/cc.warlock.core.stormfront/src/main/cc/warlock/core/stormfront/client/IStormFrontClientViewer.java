@@ -42,6 +42,12 @@ public interface IStormFrontClientViewer extends IWarlockClientViewer {
 	public void loadServerSettings(ServerSettings settings);
 
 	/**
+	 * Append an image to this viewer
+	 * @param imageURL The URL of the image to show
+	 */
+	public void appendImage (URL imageURL);
+	
+	/**
 	 * Launch a URL
 	 * @param url The URL to launch
 	 */
