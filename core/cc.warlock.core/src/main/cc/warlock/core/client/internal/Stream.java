@@ -41,18 +41,24 @@ public class Stream implements IStream {
 	}
 
 	public void addStreamListener(IStreamListener listener) {
-		if (!listeners.contains(listener))
-			listeners.add(listener);
+		synchronized(listeners) {
+			if (!listeners.contains(listener))
+				listeners.add(listener);
+		}
 	}
 	
 	public void removeStreamListener(IStreamListener listener) {
+		synchronized(listeners) {
 		if (listeners.contains(listener))
 			listeners.remove(listener);
+		}
 	}
 
 	public void clear() {
-		for(IStreamListener listener : listeners) {
-			listener.streamCleared(this);
+		synchronized(listeners) {
+			for(IStreamListener listener : listeners) {
+				listener.streamCleared(this);
+			}
 		}
 	}
 	
@@ -61,12 +67,14 @@ public class Stream implements IStream {
 	}
 	
 	public void send(WarlockString text) {
-		for(IStreamListener listener : listeners) {
-			try {
-				listener.streamReceivedText(this, text);
-			} catch (Throwable t) {
-				// TODO Auto-generated catch block
-				t.printStackTrace();
+		synchronized(listeners) {
+			for(IStreamListener listener : listeners) {
+				try {
+					listener.streamReceivedText(this, text);
+				} catch (Throwable t) {
+					// TODO Auto-generated catch block
+					t.printStackTrace();
+				}
 			}
 		}
 		isPrompting = false;
@@ -75,20 +83,24 @@ public class Stream implements IStream {
 	public void prompt(String prompt) {
 		isPrompting = true;
 		
-		for (IStreamListener listener : listeners)
-		{
-			try {
-				listener.streamPrompted(this, prompt);
-			} catch (Throwable t) {
-				t.printStackTrace();
+		synchronized(listeners) {
+			for (IStreamListener listener : listeners)
+			{
+				try {
+					listener.streamPrompted(this, prompt);
+				} catch (Throwable t) {
+					t.printStackTrace();
+				}
 			}
 		}
 	}
 	
 	public void sendCommand(String text) {
-		for (IStreamListener listener : listeners)
-		{
-			listener.streamReceivedCommand(this, text);
+		synchronized(listeners) {
+			for (IStreamListener listener : listeners)
+			{
+				listener.streamReceivedCommand(this, text);
+			}
 		}
 		
 		isPrompting = false;
@@ -99,12 +111,14 @@ public class Stream implements IStream {
 	}
 	
 	public void echo(String text) {
-		for (IStreamListener listener : listeners)
-		{
-			try {
-				listener.streamEchoed(this, text);
-			} catch (Throwable t) {
-				t.printStackTrace();
+		synchronized(listeners) {
+			for (IStreamListener listener : listeners)
+			{
+				try {
+					listener.streamEchoed(this, text);
+				} catch (Throwable t) {
+					t.printStackTrace();
+				}
 			}
 		}
 	}
