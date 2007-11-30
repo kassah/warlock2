@@ -37,7 +37,7 @@ public class StormFrontStream extends Stream {
 		
 		for (IgnoreSetting ignore : client.getServerSettings().getIgnores())
 		{
-			if (!text.toString().contains(ignore.getText()))
+			if (text.toString().contains(ignore.getText()))
 			{
 				ignored = true; break;
 			}
