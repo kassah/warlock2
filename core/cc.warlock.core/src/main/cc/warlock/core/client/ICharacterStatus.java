@@ -2,7 +2,11 @@ package cc.warlock.core.client;
 
 import java.util.Map;
 
-
+/**
+ * This interface represents the current status of the current character
+ * @author marshall
+ *
+ */
 public interface ICharacterStatus extends IProperty<String> {
 
 	public static enum StatusType {
