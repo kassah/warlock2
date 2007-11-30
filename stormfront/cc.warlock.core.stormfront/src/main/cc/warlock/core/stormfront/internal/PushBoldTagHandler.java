@@ -31,18 +31,22 @@ public class PushBoldTagHandler extends DefaultTagHandler {
 	
 	@Override
 	public void handleEnd(String newLine) {
+		if(style != null) {
+			handler.removeStyle(style);
+			style = null;
+		}
 		if (getCurrentTag().equals("pushBold"))
 		{
 			style = handler.getClient().getServerSettings().getPreset("bold").getStyle();
 			handler.addStyle(style);
 		}
 		
-		else if (getCurrentTag().equals("popBold"))
-		{
-			if(style != null) {
-				handler.removeStyle(style);
-				style = null;
-			}
+		//else if (getCurrentTag().equals("popBold"))
+		//{
+		//	if(style != null) {
+		//		handler.removeStyle(style);
+		//		style = null;
+		//	}
 			// we'll need to figure out another way to auto linkify http links
 //			IStyledString buffer = handler.peekBuffer();
 //			
@@ -66,7 +70,7 @@ public class PushBoldTagHandler extends DefaultTagHandler {
 //			}
 //			
 //			handler.sendAndPopBuffer();
-		}
+//		}
 		
 		if(newLine != null && newLine.length() > 0) {
 			handler.characters(newLine);
