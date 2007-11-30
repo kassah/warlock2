@@ -109,13 +109,17 @@ public class WarlockEntry implements VerifyKeyListener {
 		}
 		
 		if (!widget.isFocusControl() || searchMode) {
-			// TODO make this a bit more robust
 			if(entryCharacters.contains(e.character))
 			{
 				append(e.character);
 				e.doit = false;
 			} else if(e.character == '\b') {
-				widget.invokeAction(ST.DELETE_PREVIOUS);
+				if(searchMode) {
+					searchText.setLength(searchText.length() - 1);
+					search();
+				} else {
+					widget.invokeAction(ST.DELETE_PREVIOUS);
+				}
 				e.doit = false;
 			}
 			if(!widget.isFocusControl())
@@ -126,17 +130,20 @@ public class WarlockEntry implements VerifyKeyListener {
 	public void append(char ch) {
 		if(searchMode) {
 			searchText.append(ch);
-			ICommand searchCommand = viewer.getWarlockClient().getCommandHistory().search(searchText.toString());
-			if(searchCommand != null) {
-				searchText.setLength(0);
-				searchText.append(searchCommand.getCommand());
-			}
-			setSearchText();
+			search();
 		} else {
 			int offset = widget.getCaretOffset();
 			widget.insert(String.valueOf(ch));
 			widget.setCaretOffset(offset + 1);
 		}
+	}
+	
+	private void search() {
+		ICommand foundCommand = viewer.getWarlockClient().getCommandHistory().search(searchText.toString());
+		if(foundCommand != null) {
+			searchCommand = foundCommand.getCommand();
+		}
+		setSearchText();
 	}
 	
 	private static final char[] entryChars = new char[] {
@@ -174,10 +181,9 @@ public class WarlockEntry implements VerifyKeyListener {
 	
 	public void searchHistory() {
 		if(searchMode) {
-			ICommand searchCommand = viewer.getWarlockClient().getCommandHistory().searchBefore(searchText.toString());
-			if(searchCommand != null) {
-				searchText.setLength(0);
-				searchText.append(searchCommand.getCommand());
+			ICommand foundCommand = viewer.getWarlockClient().getCommandHistory().searchBefore(searchText.toString());
+			if(foundCommand != null) {
+				searchCommand = foundCommand.getCommand();
 			}
 			setSearchText();
 		} else {
@@ -191,10 +197,13 @@ public class WarlockEntry implements VerifyKeyListener {
 	}
 	
 	public void submit() {
-		if(searchMode)
+		if(searchMode) {
 			send(searchCommand);
-		else
+			searchCommand = "";
+			searchText.setLength(0);
+		} else {
 			send(widget.getText());
+		}
 		viewer.getWarlockClient().getCommandHistory().resetPosition();
 		setText("");
 		searchMode = false;
