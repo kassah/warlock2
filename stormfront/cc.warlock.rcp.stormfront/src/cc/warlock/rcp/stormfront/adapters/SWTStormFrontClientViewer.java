@@ -25,7 +25,8 @@ public class SWTStormFrontClientViewer extends SWTWarlockClientViewer implements
 	}
 	
 	private static enum EventType {
-		LoadServerSettings, StartDownloadingServerSettings, ReceivedServerSetting, FinishedDownloadingServerSettings, LaunchURL
+		LoadServerSettings, StartDownloadingServerSettings, ReceivedServerSetting,
+		FinishedDownloadingServerSettings, LaunchURL, AppendImage
 	};
 	
 	private class ListenerWrapper implements Runnable
@@ -42,7 +43,8 @@ public class SWTStormFrontClientViewer extends SWTWarlockClientViewer implements
 				case StartDownloadingServerSettings: viewer.startDownloadingServerSettings(); break;
 				case ReceivedServerSetting: viewer.receivedServerSetting(settingType);
 				case FinishedDownloadingServerSettings: viewer.finishedDownloadingServerSettings(); break;
-				case LaunchURL: viewer.launchURL(url);
+				case LaunchURL: viewer.launchURL(url); break;
+				case AppendImage: viewer.appendImage(url); break;
 			}
 			
 			settings = null;
@@ -79,6 +81,12 @@ public class SWTStormFrontClientViewer extends SWTWarlockClientViewer implements
 	public void launchURL(URL url) {
 		wrapper.eventType = EventType.LaunchURL;
 		wrapper.url = url;
+		run(wrapper);
+	}
+	
+	public void appendImage(URL imageURL) {
+		wrapper.eventType = EventType.AppendImage;
+		wrapper.url = imageURL;
 		run(wrapper);
 	}
 }
