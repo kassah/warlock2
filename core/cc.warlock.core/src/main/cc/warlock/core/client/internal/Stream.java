@@ -5,9 +5,9 @@ package cc.warlock.core.client.internal;
 
 import java.util.ArrayList;
 import java.util.Collection;
-import java.util.Collections;
 import java.util.Hashtable;
-import java.util.List;
+import java.util.concurrent.locks.ReadWriteLock;
+import java.util.concurrent.locks.ReentrantReadWriteLock;
 
 import cc.warlock.core.client.IProperty;
 import cc.warlock.core.client.IStream;
@@ -27,7 +27,8 @@ public class Stream implements IStream {
 	protected static Hashtable<String, Stream> streams = new Hashtable<String, Stream>();
 	
 	protected IProperty<String> streamName, streamTitle;
-	protected List<IStreamListener> listeners;
+	private ArrayList<IStreamListener> listeners = new ArrayList<IStreamListener>();
+	private ReadWriteLock lock = new ReentrantReadWriteLock();
 	protected boolean isPrompting = false;
 	
 	protected Stream (String streamName) {
@@ -35,30 +36,37 @@ public class Stream implements IStream {
 		this.streamName.set(streamName);
 		this.streamTitle = new Property<String>("streamTitle", null);
 		
-		listeners = Collections.synchronizedList(new ArrayList<IStreamListener>());
-		
 		streams.put(streamName, this);
 	}
 
 	public void addStreamListener(IStreamListener listener) {
-		synchronized(listeners) {
+		lock.writeLock().lock();
+		try {
 			if (!listeners.contains(listener))
 				listeners.add(listener);
+		} finally {
+			lock.writeLock().unlock();
 		}
 	}
 	
 	public void removeStreamListener(IStreamListener listener) {
-		synchronized(listeners) {
-		if (listeners.contains(listener))
-			listeners.remove(listener);
+		lock.writeLock().lock();
+		try {
+			if (listeners.contains(listener))
+				listeners.remove(listener);
+		} finally {
+			lock.writeLock().unlock();
 		}
 	}
 
 	public void clear() {
-		synchronized(listeners) {
+		lock.readLock().lock();
+		try {
 			for(IStreamListener listener : listeners) {
 				listener.streamCleared(this);
 			}
+		} finally {
+			lock.readLock().unlock();
 		}
 	}
 	
@@ -67,7 +75,8 @@ public class Stream implements IStream {
 	}
 	
 	public void send(WarlockString text) {
-		synchronized(listeners) {
+		lock.readLock().lock();
+		try {
 			for(IStreamListener listener : listeners) {
 				try {
 					listener.streamReceivedText(this, text);
@@ -76,6 +85,8 @@ public class Stream implements IStream {
 					t.printStackTrace();
 				}
 			}
+		} finally {
+			lock.readLock().unlock();
 		}
 		isPrompting = false;
 	}
@@ -83,7 +94,8 @@ public class Stream implements IStream {
 	public void prompt(String prompt) {
 		isPrompting = true;
 		
-		synchronized(listeners) {
+		lock.readLock().lock();
+		try {
 			for (IStreamListener listener : listeners)
 			{
 				try {
@@ -92,15 +104,20 @@ public class Stream implements IStream {
 					t.printStackTrace();
 				}
 			}
+		} finally {
+			lock.readLock().unlock();
 		}
 	}
 	
 	public void sendCommand(String text) {
-		synchronized(listeners) {
+		lock.readLock().lock();
+		try {
 			for (IStreamListener listener : listeners)
 			{
 				listener.streamReceivedCommand(this, text);
 			}
+		} finally {
+			lock.readLock().unlock();
 		}
 		
 		isPrompting = false;
@@ -111,7 +128,8 @@ public class Stream implements IStream {
 	}
 	
 	public void echo(String text) {
-		synchronized(listeners) {
+		lock.readLock().lock();
+		try {
 			for (IStreamListener listener : listeners)
 			{
 				try {
@@ -120,6 +138,8 @@ public class Stream implements IStream {
 					t.printStackTrace();
 				}
 			}
+		} finally {
+			lock.readLock().unlock();
 		}
 	}
 	
