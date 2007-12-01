@@ -13,6 +13,7 @@ import cc.warlock.core.client.IStream;
 import cc.warlock.core.client.IStreamListener;
 import cc.warlock.core.client.IWarlockClient;
 import cc.warlock.core.client.WarlockString;
+import cc.warlock.core.client.internal.Stream;
 import cc.warlock.core.script.IScriptCommands;
 import cc.warlock.core.script.Match;
 
@@ -45,7 +46,10 @@ public class ScriptCommands implements IScriptCommands, IStreamListener
 		this.client = client;
 		this.scriptName = scriptName;
 		this.gotPrompt = client.getDefaultStream().isPrompting();
-		client.getDefaultStream().addStreamListener(this);
+		for(IStream stream : Stream.getStreams()) {
+			if(stream.getClient().equals(client))
+				stream.addStreamListener(this);
+		}
 	}
 	
 	public void echo (String text) {

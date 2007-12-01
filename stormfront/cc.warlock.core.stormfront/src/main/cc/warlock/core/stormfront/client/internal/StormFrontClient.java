@@ -50,10 +50,8 @@ public class StormFrontClient extends WarlockClient implements IStormFrontClient
 	protected int lastPrompt;
 	protected ClientProperty<Integer> roundtime, health, mana, fatigue, spirit;
 	protected ClientProperty<String> leftHand, rightHand, currentSpell;
-	protected boolean isPrompting = false;
 	protected StringBuffer buffer = new StringBuffer();
 	protected IStormFrontProtocolHandler handler;
-	protected boolean isBold;
 	protected ClientProperty<String> playerId, characterName, roomDescription;
 	protected ServerSettings serverSettings;
 	protected RoundtimeRunnable rtRunnable;
@@ -233,22 +231,6 @@ public class StormFrontClient extends WarlockClient implements IStormFrontClient
 	public void streamCleared() {
 		// TODO Auto-generated method stub
 		
-	}
-	
-	public void setPrompting() {
-		isPrompting = true;
-	}
-	
-	public boolean isPrompting() {
-		return isPrompting;
-	}
-	
-	public void setBold(boolean bold) {
-		isBold = bold;
-	}
-	
-	public boolean isBold() {
-		return isBold;
 	}
 
 	public ClientProperty<String> getPlayerId() {
