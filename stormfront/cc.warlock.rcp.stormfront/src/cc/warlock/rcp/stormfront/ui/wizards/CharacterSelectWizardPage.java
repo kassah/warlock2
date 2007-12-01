@@ -125,7 +125,14 @@ public class CharacterSelectWizardPage extends WizardPage {
 		}
 		
 		public Image getImage(Object element) {
-			return WarlockSharedImages.getImage(WarlockSharedImages.IMG_CHARACTER);
+			if (element.equals(SGEConnection.NEW_CHARACTER_CODE))
+			{
+				return WarlockSharedImages.getImage(WarlockSharedImages.IMG_NEW_CHARACTER);
+			}
+			else
+			{
+				return WarlockSharedImages.getImage(WarlockSharedImages.IMG_CHARACTER);
+			}
 		}
 	}
 	
@@ -170,6 +177,8 @@ public class CharacterSelectWizardPage extends WizardPage {
 		public void charactersReady(SGEConnection connection, Map<String,String> characters) {
 //			CharacterSelectWizardPage.this.characterMap.clear();
 			CharacterSelectWizardPage.this.characterMap = characters;
+			characterMap.put(SGEConnection.NEW_CHARACTER_CODE, "Create a new character");
+			
 			characterViewer.setInput(characters);
 			CharacterSelectWizardPage.this.characters.setEnabled(true);
 		}

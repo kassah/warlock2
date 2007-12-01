@@ -27,6 +27,7 @@ public class WarlockSharedImages {
 	
 	public static final String IMG_WIZBAN_WARLOCK = "/images/warlock-wizard-icon.png";
 	public static final String IMG_CHARACTER = "/images/character.gif";
+	public static final String IMG_NEW_CHARACTER = "/images/new_character.gif";
 	
 	// Compass Images
 	public static final String IMG_COMPASS_LARGE_MAIN = "/images/compass/large/compass_main.png";

@@ -31,6 +31,8 @@ public class SGEConnection extends Connection implements IConnectionListener {
 	public static final String PROPERTY_GAMEHOST = "GAMEHOST";
 	public static final String PROPERTY_GAMEPORT = "GAMEPORT";
 	
+	public static final String NEW_CHARACTER_CODE = "0";
+	
 	protected static final int SGE_NONE = 0;
 	protected static final int SGE_INITIAL = 1;
 	protected static final int SGE_ACCOUNT = 2;
