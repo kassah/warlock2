@@ -15,6 +15,7 @@ public class PromptTagHandler extends DefaultTagHandler {
 	protected long currentTime = 0;
 	protected RoundtimeTagHandler roundtimeHandler;
 	protected StringBuffer prompt = new StringBuffer();
+	protected boolean waitingForInitialStreams = false;
 	
 	public PromptTagHandler (IStormFrontProtocolHandler handler, RoundtimeTagHandler roundtimeHandler) {
 		super(handler);
@@ -50,5 +51,19 @@ public class PromptTagHandler extends DefaultTagHandler {
 	@Override
 	public void handleEnd(String newLine) {
 		handler.getClient().getDefaultStream().prompt(prompt.toString());
+		
+		if (waitingForInitialStreams)
+		{
+			handler.getClient().getServerSettings().sendInitialStreamWindows();
+			waitingForInitialStreams = false;
+		}
+	}
+
+	public boolean isWaitingForInitialStreams() {
+		return waitingForInitialStreams;
+	}
+
+	public void setWaitingForInitialStreams(boolean waitingForInitialStreams) {
+		this.waitingForInitialStreams = waitingForInitialStreams;
 	}
 }

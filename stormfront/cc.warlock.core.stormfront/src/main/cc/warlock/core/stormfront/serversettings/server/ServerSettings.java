@@ -4,17 +4,23 @@ import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.FileWriter;
 import java.io.IOException;
+import java.io.InputStream;
+import java.io.InputStreamReader;
+import java.net.URL;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.Hashtable;
 import java.util.List;
 
+import com.sun.org.apache.bcel.internal.generic.GETSTATIC;
+
 import cc.warlock.core.client.IHighlightProvider;
 import cc.warlock.core.client.IHighlightString;
 import cc.warlock.core.client.IWarlockClientViewer;
 import cc.warlock.core.configuration.ConfigurationUtil;
 import cc.warlock.core.script.ScriptEngineRegistry;
+import cc.warlock.core.stormfront.StormFrontCorePlugin;
 import cc.warlock.core.stormfront.client.IStormFrontClient;
 import cc.warlock.core.stormfront.client.IStormFrontClientViewer;
 import cc.warlock.core.stormfront.serversettings.skin.IStormFrontSkin;
@@ -592,11 +598,69 @@ public class ServerSettings implements Comparable<ServerSettings>, IHighlightPro
 	
 	public void sendAllSettings ()
 	{
+		sendSettingsDocument(this.document, true);
+	}
+	
+	public void sendInitialServerSettings ()
+	{
+		StormFrontDocument initialDoc = getInitialServerSettings();
+		sendSettingsDocument(initialDoc, true);
+		
+		this.document = initialDoc;
+		this.playerId = client.getPlayerId().get();
+		
+		saveLocalXml();
+		load(client.getPlayerId().get());
+	}
+	
+	protected String readStream (InputStream stream)
+	{
+		try {
+			InputStreamReader reader = new InputStreamReader(stream);
+			
+			char chunk[] = new char[1024];
+			StringBuffer buffer = new StringBuffer();
+			
+			while (reader.ready())
+			{
+				int read = reader.read(chunk);
+				buffer.append(chunk, 0, read);
+			}
+			stream.close();
+			
+			return buffer.toString();
+		} catch (IOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		return null;
+	}
+	
+	public StormFrontDocument getInitialServerSettings()
+	{
+		try {
+			URL initialServerSettingsURL = StormFrontCorePlugin.getDefault().getBundle().getEntry("initialServerSettings.xml");
+			InputStream stream = initialServerSettingsURL.openStream();
+			
+			StormFrontDocument document = new StormFrontDocument(stream);
+			stream.close();
+			
+			return document;
+		} catch (IOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		return null;
+	}
+	
+	public void sendSettingsDocument (StormFrontDocument document, boolean setCRC)
+	{
 		StormFrontElement settingsElement = document.getRootElement();
-		settingsElement.removeAttribute("crc");
+		if (settingsElement.attribute("crc") != null)
+			settingsElement.removeAttribute("crc");
 		
 		String settingsDoc = settingsElement.toXML("", false, true);
-		settingsDoc = "\n<c>\n\n<db>" + settingsDoc + "\n";
+		settingsDoc = "<c>\n<db>" + settingsDoc + "\n";
 		
 		try {
 			client.getConnection().send(settingsDoc);
@@ -604,8 +668,25 @@ public class ServerSettings implements Comparable<ServerSettings>, IHighlightPro
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
-		
-		settingsElement.setAttribute("crc", crc);
+
+		if (setCRC)
+			settingsElement.setAttribute("crc", crc);
+	}
+	
+	public void sendInitialStreamWindows ()
+	{
+		try {
+			URL initialStreamWindowsURL = StormFrontCorePlugin.getDefault().getBundle().getEntry("initialStreamWindows.xml");
+			InputStream stream = initialStreamWindowsURL.openStream();
+			
+			String initialStreamWindows = readStream(stream);
+			initialStreamWindows += "\n";
+			
+			client.getConnection().send(initialStreamWindows);
+		} catch (IOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
 	}
 	
 	public Preset createPreset ()

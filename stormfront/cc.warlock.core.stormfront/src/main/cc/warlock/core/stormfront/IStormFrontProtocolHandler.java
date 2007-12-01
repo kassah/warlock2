@@ -33,4 +33,6 @@ public interface IStormFrontProtocolHandler extends IStormFrontXMLHandler {
 	
 	public void startSavingRawXML(StringBuffer buffer, String endOnTag);
 	public void stopSavingRawXML();
+	
+	public IStormFrontTagHandler getTagHandler(Class<? extends IStormFrontTagHandler> handlerType);
 }

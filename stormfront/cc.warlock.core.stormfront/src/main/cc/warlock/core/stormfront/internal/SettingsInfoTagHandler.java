@@ -14,6 +14,7 @@ public class SettingsInfoTagHandler extends DefaultTagHandler {
 
 	protected String crc, clientVersion;
 	protected int majorVersion;
+	protected boolean newSettings = false;
 	
 	public SettingsInfoTagHandler(IStormFrontProtocolHandler handler) {
 		super (handler);
@@ -26,6 +27,15 @@ public class SettingsInfoTagHandler extends DefaultTagHandler {
 	
 	@Override
 	public void handleStart(StormFrontAttributeList attributes, String newLine) {
+		
+		if (attributes.getAttribute("space") != null
+			&& attributes.getAttribute("not") != null
+			&& attributes.getAttribute("found") != null)
+		{
+			newSettings = true;
+			return;
+		}
+		
 		crc = attributes.getValue("crc");
 		
 		String major = attributes.getValue("major");
@@ -40,6 +50,17 @@ public class SettingsInfoTagHandler extends DefaultTagHandler {
 	
 	@Override
 	public void handleEnd(String newLine) {
+		if (newSettings) {
+
+			// This is a character that has no server settings, we need to immediately send our own
+			handler.getClient().getServerSettings().sendInitialServerSettings();
+			
+			PromptTagHandler promptHandler = (PromptTagHandler) handler.getTagHandler(PromptTagHandler.class);
+			promptHandler.setWaitingForInitialStreams(true);
+			newSettings = false;
+			return;
+		}
+		
 		String playerId = handler.getClient().getPlayerId().get();
 		
 		File serverSettings = ConfigurationUtil.getConfigurationFile("serverSettings_" + playerId + ".xml", false);

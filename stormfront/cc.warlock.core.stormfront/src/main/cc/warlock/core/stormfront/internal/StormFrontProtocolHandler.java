@@ -296,4 +296,14 @@ public class StormFrontProtocolHandler implements IStormFrontProtocolHandler {
 	public void clearStyles() {
 		styles.clear();
 	}
+	
+	public IStormFrontTagHandler getTagHandler(Class<? extends IStormFrontTagHandler> handlerType) {
+		
+		for (IStormFrontTagHandler handler : defaultTagHandlers.values())
+		{
+			if (handler.getClass().equals(handlerType))
+				return handler;
+		}
+		return null;
+	}
 }
