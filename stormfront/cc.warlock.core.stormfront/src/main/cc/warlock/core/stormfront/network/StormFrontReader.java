@@ -52,9 +52,9 @@ public class StormFrontReader extends InputStreamReader {
 			if(client.getGameMode().get().equals(IStormFrontClient.GameMode.CharacterManager)) {
 				if(output) {
 					recentText.append(cbuf, start, bytesRead);
-					int end = recentText.indexOf("<mode ");
-					if(end > 0) {
-						recentText.delete(end, recentText.length());
+					int end = recentText.indexOf("<mode");
+					if(end >= 0) {
+						recentText.setLength(end);
 						output = false;
 					}
 					try {
