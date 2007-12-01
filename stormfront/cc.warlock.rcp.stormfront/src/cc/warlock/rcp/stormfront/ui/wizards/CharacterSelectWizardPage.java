@@ -194,7 +194,7 @@ public class CharacterSelectWizardPage extends WizardPage {
 			AccountWizardPage accountPage = (AccountWizardPage) getPreviousPage().getPreviousPage();
 			
 			Account account = accountPage.getSavedAccount();
-			if (account != null)
+			if (account != null && !getSelectedCharacterCode().equals(SGEConnection.NEW_CHARACTER_CODE))
 			{
 				Collection<Profile> savedProfiles = SavedProfiles.getProfiles(account);
 
