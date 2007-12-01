@@ -23,6 +23,8 @@ import cc.warlock.core.stormfront.internal.StormFrontProtocolParser;
 public class StormFrontConnection implements IConnection
 {
 	protected StormFrontProtocolHandler handler;
+	private StormFrontReader reader;
+	private StormFrontProtocolParser parser;
 	protected IStormFrontClient client;
 	protected String key, host;
 	protected int port;
@@ -84,14 +86,18 @@ public class StormFrontConnection implements IConnection
 		}
 	}
 	
+	public String getBufferContents() {
+		return parser.getBufferContents();
+	}
+	
 	class SFParser implements Runnable {
 		public void run() {
 			try {
 				sendLine(key);
 				sendLine("/FE:WARLOCK /VERSION:1.0.1.22 /XML\n");
 				
-				StormFrontReader reader = new StormFrontReader(StormFrontConnection.this, socket.getInputStream());
-				StormFrontProtocolParser parser = new StormFrontProtocolParser(reader);
+				reader = new StormFrontReader(StormFrontConnection.this, socket.getInputStream());
+				parser = new StormFrontProtocolParser(reader);
 				parser.setHandler(handler);
 				parser.Document();
 				

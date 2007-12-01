@@ -3,6 +3,7 @@ package cc.warlock.core.stormfront.internal;
 import cc.warlock.core.stormfront.IStormFrontProtocolHandler;
 import cc.warlock.core.stormfront.client.IStormFrontClient;
 import cc.warlock.core.stormfront.client.internal.StormFrontClient;
+import cc.warlock.core.stormfront.network.StormFrontConnection;
 import cc.warlock.core.stormfront.xml.StormFrontAttributeList;
 
 public class ModeTagHandler extends DefaultTagHandler {
@@ -30,6 +31,7 @@ public class ModeTagHandler extends DefaultTagHandler {
 			else if (attributes.getValue("id").equals("CMGR"))
 			{
 				client.getGameMode().set(IStormFrontClient.GameMode.CharacterManager);
+				client.getDefaultStream().send(((StormFrontConnection)client.getConnection()).getBufferContents());
 			}
 		}
 	}

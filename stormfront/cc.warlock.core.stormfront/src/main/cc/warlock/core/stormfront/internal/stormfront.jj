@@ -47,6 +47,10 @@ public class StormFrontProtocolParser {
 		handler.endElement(name, newLine);
 		currentAttributes.clear();
 	}
+	
+	public String getBufferContents() {
+		return jj_input_stream.GetImage();
+	}
 }
 
 PARSER_END(StormFrontProtocolParser)
