@@ -6,7 +6,7 @@ package cc.warlock.core.client.internal;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Hashtable;
-import java.util.concurrent.locks.ReadWriteLock;
+import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReentrantReadWriteLock;
 
 import cc.warlock.core.client.IProperty;
@@ -28,7 +28,9 @@ public class Stream implements IStream {
 	
 	protected IProperty<String> streamName, streamTitle;
 	private ArrayList<IStreamListener> listeners = new ArrayList<IStreamListener>();
-	private ReadWriteLock lock = new ReentrantReadWriteLock();
+	private ReentrantReadWriteLock lock = new ReentrantReadWriteLock();
+	private Lock readLock = lock.readLock();
+	private Lock writeLock = lock.writeLock();
 	protected boolean isPrompting = false;
 	
 	protected Stream (String streamName) {
@@ -40,33 +42,33 @@ public class Stream implements IStream {
 	}
 
 	public void addStreamListener(IStreamListener listener) {
-		lock.writeLock().lock();
+		writeLock.lock();
 		try {
 			if (!listeners.contains(listener))
 				listeners.add(listener);
 		} finally {
-			lock.writeLock().unlock();
+			writeLock.unlock();
 		}
 	}
 	
 	public void removeStreamListener(IStreamListener listener) {
-		lock.writeLock().lock();
+		writeLock.lock();
 		try {
 			if (listeners.contains(listener))
 				listeners.remove(listener);
 		} finally {
-			lock.writeLock().unlock();
+			writeLock.unlock();
 		}
 	}
 
 	public void clear() {
-		lock.readLock().lock();
+		readLock.lock();
 		try {
 			for(IStreamListener listener : listeners) {
 				listener.streamCleared(this);
 			}
 		} finally {
-			lock.readLock().unlock();
+			readLock.unlock();
 		}
 	}
 	
@@ -75,7 +77,7 @@ public class Stream implements IStream {
 	}
 	
 	public void send(WarlockString text) {
-		lock.readLock().lock();
+		readLock.lock();
 		try {
 			for(IStreamListener listener : listeners) {
 				try {
@@ -86,7 +88,7 @@ public class Stream implements IStream {
 				}
 			}
 		} finally {
-			lock.readLock().unlock();
+			readLock.unlock();
 		}
 		isPrompting = false;
 	}
@@ -94,7 +96,7 @@ public class Stream implements IStream {
 	public void prompt(String prompt) {
 		isPrompting = true;
 		
-		lock.readLock().lock();
+		readLock.lock();
 		try {
 			for (IStreamListener listener : listeners)
 			{
@@ -105,19 +107,19 @@ public class Stream implements IStream {
 				}
 			}
 		} finally {
-			lock.readLock().unlock();
+			readLock.unlock();
 		}
 	}
 	
 	public void sendCommand(String text) {
-		lock.readLock().lock();
+		readLock.lock();
 		try {
 			for (IStreamListener listener : listeners)
 			{
 				listener.streamReceivedCommand(this, text);
 			}
 		} finally {
-			lock.readLock().unlock();
+			readLock.unlock();
 		}
 		
 		isPrompting = false;
@@ -128,7 +130,7 @@ public class Stream implements IStream {
 	}
 	
 	public void echo(String text) {
-		lock.readLock().lock();
+		readLock.lock();
 		try {
 			for (IStreamListener listener : listeners)
 			{
@@ -139,7 +141,7 @@ public class Stream implements IStream {
 				}
 			}
 		} finally {
-			lock.readLock().unlock();
+			readLock.unlock();
 		}
 	}
 	
