@@ -394,6 +394,11 @@ public class StreamView extends ViewPart implements IStreamListener, IGameViewFo
 
 	public void setBuffered(boolean buffer) {
 		this.buffering = buffer;
+		
+		if (!buffering && bufferedText != null)
+		{
+			flushBuffer();
+		}
 	}
 	
 	public void flushBuffer() {
