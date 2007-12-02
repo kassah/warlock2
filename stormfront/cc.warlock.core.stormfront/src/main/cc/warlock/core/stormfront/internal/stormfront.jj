@@ -172,8 +172,8 @@ TOKEN: {
 	 <WS: ([" ","\r","\t","\n"])>
 }
 
-<PASS_THRU> MORE: {
-	<REVERT: "<mode">: DEFAULT
+<PASS_THRU> SKIP: {
+	"<mode" { input_stream.backup(5); }: DEFAULT
 }
 
 <PASS_THRU> TOKEN: {
