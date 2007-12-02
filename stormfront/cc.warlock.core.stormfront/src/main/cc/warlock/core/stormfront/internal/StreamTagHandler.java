@@ -24,7 +24,7 @@ public class StreamTagHandler extends DefaultTagHandler {
 		 {
 			String streamId = id;
 			
-			handler.pushStream(streamId, false);
+			handler.pushStream(streamId, true);
 		 }
 	}
 	 
