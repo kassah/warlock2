@@ -95,6 +95,19 @@ public class SWTStreamListener implements IStreamListener {
 		}
 	}
 	
+	private class FlushWrapper implements Runnable
+	{
+		private IStream stream;
+		
+		public FlushWrapper(IStream stream) {
+			this.stream = stream;
+		}
+		
+		public void run() {
+			listener.streamFlush(stream);
+		}
+	}
+	
 	protected void run(Runnable runnable)
 	{
 		if (asynch)
@@ -123,5 +136,9 @@ public class SWTStreamListener implements IStreamListener {
 
 	public void streamReceivedCommand (IStream stream, String text) {
 		run(new CommandWrapper(stream, text));
+	}
+	
+	public void streamFlush(IStream stream) {
+		run(new FlushWrapper(stream));
 	}
 }
