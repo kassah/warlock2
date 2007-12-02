@@ -86,8 +86,8 @@ public class StormFrontConnection implements IConnection
 		}
 	}
 	
-	public String getBufferContents() {
-		return parser.getBufferContents();
+	public void passThrough() {
+		parser.passThrough();
 	}
 	
 	class SFParser implements Runnable {

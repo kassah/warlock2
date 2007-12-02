@@ -7,6 +7,7 @@ import cc.warlock.core.stormfront.network.StormFrontConnection;
 import cc.warlock.core.stormfront.xml.StormFrontAttributeList;
 
 public class ModeTagHandler extends DefaultTagHandler {
+	private String id;
 
 	public ModeTagHandler (IStormFrontProtocolHandler handler)
 	{
@@ -20,18 +21,24 @@ public class ModeTagHandler extends DefaultTagHandler {
 
 	@Override
 	public void handleStart(StormFrontAttributeList attributes, String newLine) {
-		if (attributes.getValue("id") != null)
-		{
-			StormFrontClient client = (StormFrontClient) handler.getClient();
+		id = attributes.getValue("id");
 			
-			if (attributes.getValue("id").equals("GAME"))
+	}
+	
+	@Override
+	public void handleEnd(String newLine) {
+		if(id != null) {
+			StormFrontClient client = (StormFrontClient) handler.getClient();
+
+			if (id.equals("GAME"))
 			{
 				client.getGameMode().set(IStormFrontClient.GameMode.Game);
 			}
-			else if (attributes.getValue("id").equals("CMGR"))
+			else if (id.equals("CMGR"))
 			{
 				client.getGameMode().set(IStormFrontClient.GameMode.CharacterManager);
-				client.getDefaultStream().send(((StormFrontConnection)client.getConnection()).getBufferContents());
+				((StormFrontConnection)client.getConnection()).passThrough();
+				//client.getDefaultStream().send(((StormFrontConnection)client.getConnection()).getBufferContents());
 			}
 		}
 	}

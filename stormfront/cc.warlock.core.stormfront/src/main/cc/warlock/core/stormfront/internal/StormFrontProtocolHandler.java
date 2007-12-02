@@ -135,8 +135,6 @@ public class StormFrontProtocolHandler implements IStormFrontProtocolHandler {
 	 * @see org.xml.sax.ContentHandler#characters(char[], int, int)
 	 */
 	public void characters(String characters) {
-		if(client.getGameMode().get().equals(IStormFrontClient.GameMode.CharacterManager))
-			return;
 		/*String str = String.copyValueOf(ch, start, length);
 		System.out.print(str);*/
 		

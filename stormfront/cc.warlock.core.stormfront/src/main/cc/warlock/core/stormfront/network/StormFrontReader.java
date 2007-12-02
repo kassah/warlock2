@@ -27,13 +27,13 @@ public class StormFrontReader extends InputStreamReader {
 		if (c != -1)
 		{
 			StormFrontClient client = (StormFrontClient) connection.getClient();
-			if(client.getGameMode().get().equals(IStormFrontClient.GameMode.CharacterManager)) {
+			/*if(client.getGameMode().get().equals(IStormFrontClient.GameMode.CharacterManager)) {
 				recentText.append(c);
 				if(!this.ready()) {
 					client.getDefaultStream().send(recentText.toString());
 					recentText.setLength(0);
 				}
-			}
+			}*/
 			currentLine.append((char)c);
 			if (((char)c) == '\n')
 			{
@@ -49,10 +49,11 @@ public class StormFrontReader extends InputStreamReader {
 		if (bytesRead > 0)
 		{
 			StormFrontClient client = (StormFrontClient) connection.getClient();
+			/*String str = new String(cbuf, start, bytesRead);
 			if(client.getGameMode().get().equals(IStormFrontClient.GameMode.CharacterManager)) {
 				if(output) {
 					recentText.append(cbuf, start, bytesRead);
-					int end = recentText.indexOf("<mode");
+					int end = recentText.indexOf("<mode ");
 					if(end >= 0) {
 						recentText.setLength(end);
 						output = false;
@@ -72,7 +73,7 @@ public class StormFrontReader extends InputStreamReader {
 					output = true;
 					recentText.setLength(0);
 				}
-			}
+			}*/
 			currentLine.append(cbuf, start, bytesRead);
 			int newLineIndex = currentLine.indexOf("\n");
 			if(newLineIndex != -1) {

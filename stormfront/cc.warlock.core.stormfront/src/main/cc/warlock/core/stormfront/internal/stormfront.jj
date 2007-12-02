@@ -48,8 +48,49 @@ public class StormFrontProtocolParser {
 		currentAttributes.clear();
 	}
 	
-	public String getBufferContents() {
-		return jj_input_stream.GetImage();
+	public void passThrough() {
+		SetState(PASS_THRU);
+	}
+	
+	private void SetState(int state) {
+  		if (state != token_source.curLexState) {
+    		Token root = new Token(), last=root;
+    		root.next = null;
+
+    		// First, we build a list of tokens to push back, in backwards order
+    		while (token.next != null) {
+      			Token t = token;
+      			// Find the token whose token.next is the last in the chain
+      			while (t.next != null && t.next.next != null)
+        			t = t.next;
+
+      			// put it at the end of the new chain
+      			last.next = t.next;
+      			last = t.next;
+
+      			// If there are special tokens, these go before the regular tokens,
+      			// so we want to push them back onto the input stream in the order
+      			// we find them along the specialToken chain.
+
+      			if (t.next.specialToken != null) {
+        			Token tt=t.next.specialToken;
+        			while (tt != null) {
+          				last.next = tt;
+          				last = tt;
+          				tt.next = null;
+          				tt = tt.specialToken;
+        			}
+      			}
+      			t.next = null;
+    		}
+
+    		while (root.next != null) {
+      			token_source.backup(root.next.image.length());
+      			root.next = root.next.next;
+    		}
+    		jj_ntk = -1;
+    		token_source.SwitchTo(state);
+  		}
 	}
 }
 
@@ -66,6 +107,7 @@ void Element() : {Token data; String str; }
 	Tag()
 	| ( data=<PCDATA> { characters(data.image); } )
 	| ( str=Entity() { characters(str); } )
+	| ( data=<PASS_STRING> { characters(data.image); } )
 	)
 }
 
@@ -99,6 +141,8 @@ String Entity(): { Token entity; }
 
 TOKEN_MGR_DECLS :
 {
+    // Required by SetState
+    void backup(int n) { input_stream.backup(n); } 
   public char quoteChar;
 }
 
@@ -125,5 +169,13 @@ TOKEN: {
 }
 
 <IN_TAG_MODE> SKIP: {
-	 <WS: ([" ","\r","\t","\u000C","\n"])>
+	 <WS: ([" ","\r","\t","\n"])>
+}
+
+<PASS_THRU> MORE: {
+	<REVERT: "<mode ">: DEFAULT
+}
+
+<PASS_THRU> TOKEN: {
+	<PASS_STRING: ~[]>
 }
