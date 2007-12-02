@@ -79,6 +79,7 @@ public class WarlockEntry implements VerifyKeyListener {
 			if (macro.getKeyCode() == e.keyCode && macro.getModifiers() == e.stateMask)
 			{
 				try {
+					leaveSearchMode();
 					macro.execute(viewer);
 					//keyHandled = true;
 				} catch (Exception ex) {
@@ -95,14 +96,15 @@ public class WarlockEntry implements VerifyKeyListener {
 		{
 			if (macro.getKeyCode() == e.keyCode && macro.getModifiers() == e.stateMask)
 			{
-				 try {
+				try {
+					leaveSearchMode();
 					macro.execute(viewer);
 					//keyHandled = true;
 				} catch (Exception ex) {
 					// TODO Auto-generated catch block
 					ex.printStackTrace();
 				}
-				
+
 				e.doit = false;
 				return;
 			}
@@ -125,6 +127,15 @@ public class WarlockEntry implements VerifyKeyListener {
 			if(!widget.isFocusControl())
 				widget.setFocus();
 		}
+	}
+	
+	private void leaveSearchMode() {
+		if(searchMode) {
+			 searchMode = false;
+			 setText(searchCommand);
+			 searchCommand = "";
+			 searchText.setLength(0);
+		 }
 	}
 	
 	public void append(char ch) {
@@ -199,14 +210,12 @@ public class WarlockEntry implements VerifyKeyListener {
 	public void submit() {
 		if(searchMode) {
 			send(searchCommand);
-			searchCommand = "";
-			searchText.setLength(0);
+			leaveSearchMode();
 		} else {
 			send(widget.getText());
 		}
 		viewer.getWarlockClient().getCommandHistory().resetPosition();
 		setText("");
-		searchMode = false;
 	}
 	
 	private void send(String command) {
