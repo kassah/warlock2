@@ -13,14 +13,11 @@ import java.util.Collections;
 import java.util.Hashtable;
 import java.util.List;
 
-import com.sun.org.apache.bcel.internal.generic.GETSTATIC;
-
 import cc.warlock.core.client.IHighlightProvider;
 import cc.warlock.core.client.IHighlightString;
 import cc.warlock.core.client.IWarlockClientViewer;
 import cc.warlock.core.configuration.ConfigurationUtil;
 import cc.warlock.core.script.ScriptEngineRegistry;
-import cc.warlock.core.stormfront.StormFrontCorePlugin;
 import cc.warlock.core.stormfront.client.IStormFrontClient;
 import cc.warlock.core.stormfront.client.IStormFrontClientViewer;
 import cc.warlock.core.stormfront.serversettings.skin.IStormFrontSkin;
@@ -639,7 +636,8 @@ public class ServerSettings implements Comparable<ServerSettings>, IHighlightPro
 	public StormFrontDocument getInitialServerSettings()
 	{
 		try {
-			URL initialServerSettingsURL = StormFrontCorePlugin.getDefault().getBundle().getEntry("initialServerSettings.xml");
+			URL initialServerSettingsURL = getClass().getClassLoader().getResource(
+				"cc/warlock/core/stormfront/serversettings/server/initialServerSettings.xml");
 			InputStream stream = initialServerSettingsURL.openStream();
 			
 			StormFrontDocument document = new StormFrontDocument(stream);
@@ -676,7 +674,8 @@ public class ServerSettings implements Comparable<ServerSettings>, IHighlightPro
 	public void sendInitialStreamWindows ()
 	{
 		try {
-			URL initialStreamWindowsURL = StormFrontCorePlugin.getDefault().getBundle().getEntry("initialStreamWindows.xml");
+			URL initialStreamWindowsURL = getClass().getClassLoader().getResource(
+				"cc/warlock/core/stormfront/serversettings/server/initialStreamWindows.xml");
 			InputStream stream = initialStreamWindowsURL.openStream();
 			
 			String initialStreamWindows = readStream(stream);
