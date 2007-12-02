@@ -335,10 +335,6 @@ public class StormFrontClient extends WarlockClient implements IStormFrontClient
 		return null;
 	}
 	
-	public IProperty<GameMode> getGameMode() {
-		return mode;
-	}
-	
 	@Override
 	protected void finalize() throws Throwable {
 		WarlockClientRegistry.removeClient(this);
@@ -348,4 +344,5 @@ public class StormFrontClient extends WarlockClient implements IStormFrontClient
 	public IWarlockStyle getCommandStyle() {
 		return serverSettings.getPreset("command").getStyle();
 	}
+	
 }

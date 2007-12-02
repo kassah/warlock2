@@ -164,9 +164,5 @@ public interface IStormFrontClient extends IWarlockClient {
 	 * @return The component with the passed in name
 	 */
 	public IProperty<String> getComponent(String componentName);
-	
-	/** 
-	 * @return The current game mode
-	 */
-	public IProperty<GameMode> getGameMode();
+
 }

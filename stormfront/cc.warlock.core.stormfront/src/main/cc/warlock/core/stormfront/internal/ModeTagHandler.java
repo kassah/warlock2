@@ -32,11 +32,11 @@ public class ModeTagHandler extends DefaultTagHandler {
 
 			if (id.equals("GAME"))
 			{
-				client.getGameMode().set(IStormFrontClient.GameMode.Game);
+				//client.getGameMode().set(IStormFrontClient.GameMode.Game);
 			}
 			else if (id.equals("CMGR"))
 			{
-				client.getGameMode().set(IStormFrontClient.GameMode.CharacterManager);
+				//client.getGameMode().set(IStormFrontClient.GameMode.CharacterManager);
 				((StormFrontConnection)client.getConnection()).passThrough();
 				//client.getDefaultStream().send(((StormFrontConnection)client.getConnection()).getBufferContents());
 			}

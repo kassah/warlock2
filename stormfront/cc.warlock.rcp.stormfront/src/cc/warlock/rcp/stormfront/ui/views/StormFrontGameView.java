@@ -82,7 +82,7 @@ public class StormFrontGameView extends GameView implements IStormFrontClientVie
 			StyleProviders.setStyleProvider(client, new StormFrontStyleProvider(sfClient.getServerSettings()));
 			
 			compass.setCompass(sfClient.getCompass());
-			sfClient.getGameMode().addListener(new IPropertyListener<GameMode>() {
+			/*sfClient.getGameMode().addListener(new IPropertyListener<GameMode>() {
 				public void propertyActivated(IProperty<GameMode> property) {}
 				public void propertyChanged(final IProperty<GameMode> property, GameMode oldValue) {
 					Display.getDefault().syncExec(new Runnable() {
@@ -92,7 +92,7 @@ public class StormFrontGameView extends GameView implements IStormFrontClientVie
 					});
 				}
 				public void propertyCleared(IProperty<GameMode> property,	GameMode oldValue) {}
-			});
+			});*/
 		}
 	}
 	

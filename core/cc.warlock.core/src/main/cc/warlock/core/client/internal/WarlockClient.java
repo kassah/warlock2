@@ -66,6 +66,7 @@ public abstract class WarlockClient implements IWarlockClient {
 					streamBuffers.get(stream).append(text);
 				}
 			}
+			public void streamFlush(IStream stream) { }
 		};
 		
 		for (IStream stream : getStreamsToBuffer())
@@ -157,5 +158,20 @@ public abstract class WarlockClient implements IWarlockClient {
 		}
 		
 		return strings;
+	}
+	
+	public Collection<IStream> getStreams() {
+		Collection<IStream> streams = new ArrayList<IStream>();
+		for(IStream stream : Stream.getStreams()) {
+			if(stream.getClient().equals(this))
+				streams.add(stream);
+		}
+		return streams;
+	}
+	
+	public void flushStreams() {
+		for(IStream stream : getStreams()) {
+			stream.flush();
+		}
 	}
 }

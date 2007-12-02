@@ -23,6 +23,7 @@ public interface IStream {
 	public void prompt(String prompt);
 	public void sendCommand(String text);
 	public boolean isPrompting();
+	public void flush();
 	
 	public void echo(String text);
 	

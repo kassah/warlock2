@@ -72,6 +72,17 @@ public class Stream implements IStream {
 		}
 	}
 	
+	public void flush() {
+		readLock.lock();
+		try {
+			for(IStreamListener listener : listeners) {
+				listener.streamFlush(this);
+			}
+		} finally {
+			readLock.unlock();
+		}
+	}
+	
 	public void send(String text) {
 		send(new WarlockString(text));
 	}

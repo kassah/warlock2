@@ -173,7 +173,7 @@ TOKEN: {
 }
 
 <PASS_THRU> MORE: {
-	<REVERT: "<mode ">: DEFAULT
+	<REVERT: "<mode">: DEFAULT
 }
 
 <PASS_THRU> TOKEN: {

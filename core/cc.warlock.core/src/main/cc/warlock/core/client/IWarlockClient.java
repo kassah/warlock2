@@ -118,4 +118,11 @@ public interface IWarlockClient {
 	 * @return combination of highlight strings from all of the highlight providers
 	 */
 	public Collection<IHighlightString> getHighlightStrings();
+	
+	public void flushStreams();
+	
+	/**
+	 * @return a list of streams for this client
+	 */
+	public Collection<IStream> getStreams();
 }

@@ -18,4 +18,6 @@ public interface IStreamListener {
 	public void streamEchoed (IStream stream, String text);
 	
 	public void streamCleared (IStream stream);
+	
+	public void streamFlush (IStream stream);
 }

@@ -59,7 +59,6 @@ public class StreamView extends ViewPart implements IStreamListener, IGameViewFo
 	protected boolean appendNewlines = false;
 	protected boolean isPrompting = false;
 	protected boolean multiClient = false;
-	protected boolean buffering = false;
 	
 	protected WarlockString bufferedText;
 	
@@ -218,18 +217,10 @@ public class StreamView extends ViewPart implements IStreamListener, IGameViewFo
 	
 	protected void bufferText (WarlockString string)
 	{
-		
-		if (buffering)
-		{
 			if(bufferedText == null)
 				bufferedText = new WarlockString();
 			
 			bufferedText.append(string);
-		}
-		else
-		{
-			appendText(string);
-		}
 	}
 	
 	protected void appendText(WarlockString string) {
@@ -387,22 +378,11 @@ public class StreamView extends ViewPart implements IStreamListener, IGameViewFo
 	{
 		setPartName(title);
 	}
-
-	public boolean isBuffered() {
-		return buffering;
-	}
-
-	public void setBuffered(boolean buffer) {
-		this.buffering = buffer;
-		
-		if (!buffering && bufferedText != null)
-		{
-			flushBuffer();
-		}
-	}
 	
-	public void flushBuffer() {
-		appendText(bufferedText);
-		bufferedText = null;
+	public void streamFlush(IStream stream) {
+		if(bufferedText != null) {
+			appendText(bufferedText);
+			bufferedText = null;
+		}
 	}
 }
