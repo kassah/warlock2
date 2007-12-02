@@ -33,49 +33,11 @@ public abstract class WarlockClient implements IWarlockClient {
 	protected String streamPrefix;
 	protected HashSet<IHighlightProvider> highlightProviders = new HashSet<IHighlightProvider>();
 
-	protected Hashtable<IStream, StringBuffer> streamBuffers = new Hashtable<IStream, StringBuffer>();
-	protected Hashtable<IStream, List<IWarlockStyle>> streamStyles = new Hashtable<IStream, List<IWarlockStyle>>();
-	
 	public WarlockClient () {
 		viewers = new ArrayList<IWarlockClientViewer>();
 		streamPrefix = "client:" + hashCode() + ":";
-		
-		bufferStreams();
 	}
 	
-	protected abstract Collection<IStream> getStreamsToBuffer();
-	
-	
-	protected void bufferStreams ()
-	{
-		IStreamListener listener = new IStreamListener () {
-			public void streamCleared(IStream stream) {
-				if (stream != null) {
-					streamBuffers.get(stream).setLength(0);
-				}
-			}
-			public void streamReceivedCommand(IStream stream, String text) {}
-			public void streamEchoed(IStream stream, String text) {}
-			public void streamPrompted(IStream stream, String prompt) {
-				if (stream != null) {
-					streamBuffers.get(stream).append(prompt + "\n");
-				}
-			}
-			public void streamReceivedText(IStream stream, WarlockString text) {
-				if (stream != null) {
-					streamBuffers.get(stream).append(text);
-				}
-			}
-			public void streamFlush(IStream stream) { }
-		};
-		
-		for (IStream stream : getStreamsToBuffer())
-		{
-			streamBuffers.put(stream, new StringBuffer());
-			stream.addStreamListener(listener);
-		}
-	}
-
 	// IWarlockClient methods
 	
 	public ICommandHistory getCommandHistory() {
@@ -121,21 +83,6 @@ public abstract class WarlockClient implements IWarlockClient {
 	
 	public IStream getStream(String streamName) {
 		return Stream.fromName(streamPrefix + streamName);
-	}
-	
-	public StringBuffer getStreamBuffer(IStream stream) {
-		if (streamBuffers.containsKey(stream))
-			return streamBuffers.get(stream);
-		else return null;
-	}
-	
-	public List<IWarlockStyle> getStreamBufferStyles (IStream stream)
-	{
-		if (!streamStyles.containsKey(stream))
-		{
-			streamStyles.put(stream, new ArrayList<IWarlockStyle>());
-		}
-		return streamStyles.get(stream);
 	}
 	
 	public IConnection getConnection() {

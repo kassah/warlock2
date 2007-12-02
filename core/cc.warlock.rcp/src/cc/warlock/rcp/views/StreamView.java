@@ -167,16 +167,6 @@ public class StreamView extends ViewPart implements IStreamListener, IGameViewFo
 	public IStream getMainStream() {
 		return mainStream;
 	}
-
-	protected void appendStreamBuffer (IStream stream)
-	{
-		StringBuffer string = client.getStreamBuffer(stream);
-		
-		if (string != null && string.length() > 0)
-		{
-			streamReceivedText(stream, new WarlockString(string));
-		}
-	}
 	
 	public void setMainStream(IStream stream) {
 		this.mainStream = stream;
@@ -192,15 +182,12 @@ public class StreamView extends ViewPart implements IStreamListener, IGameViewFo
 			}
 		});
 		stream.getTitle().addListener(propertyListenerWrapper);
-		
-		appendStreamBuffer(stream);
 	}
 	
 	public void addStream (IStream stream) {
 		stream.addStreamListener(streamListenerWrapper);
 		streams.add(stream);
-		
-		appendStreamBuffer(stream);
+		stream.setView(true);
 	}
 	
 	public void streamCleared(IStream stream) {
@@ -350,6 +337,7 @@ public class StreamView extends ViewPart implements IStreamListener, IGameViewFo
 		for (IStream stream : streams)
 		{
 			stream.removeStreamListener(streamListenerWrapper);
+			stream.setView(false);
 		}
 		
 		clientStreams.clear();

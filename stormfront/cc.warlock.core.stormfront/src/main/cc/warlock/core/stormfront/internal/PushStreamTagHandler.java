@@ -26,6 +26,12 @@ public class PushStreamTagHandler extends DefaultTagHandler {
 	@Override
 	public void handleStart(StormFrontAttributeList attributes, String newLine) {
 		String id = attributes.getValue("id");
-		handler.pushStream(id);
+		
+		String closedStyle = attributes.getValue("ifClosedStyle");
+		boolean watch = false;
+		if(closedStyle != null && closedStyle.equals("watching"))
+			watch = true;
+		
+		handler.pushStream(id, watch);
 	}
 }

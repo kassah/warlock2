@@ -8,8 +8,6 @@ package cc.warlock.core.stormfront.client.internal;
 
 import java.io.IOException;
 import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collection;
 import java.util.Hashtable;
 import java.util.List;
 
@@ -86,11 +84,6 @@ public class StormFrontClient extends WarlockClient implements IStormFrontClient
 		scriptListeners = new ArrayList<IScriptListener>();
 		
 		WarlockClientRegistry.activateClient(this);
-	}
-	
-	@Override
-	protected Collection<IStream> getStreamsToBuffer() {
-		return Arrays.asList(new IStream[] { getThoughtsStream(), getInventoryStream(), getDeathsStream(), getRoomStream(), getFamiliarStream() });
 	}
 	
 	@Override

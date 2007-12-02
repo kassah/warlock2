@@ -5,7 +5,6 @@ package cc.warlock.core.client;
 
 import java.io.IOException;
 import java.util.Collection;
-import java.util.List;
 
 import cc.warlock.core.network.IConnection;
 
@@ -69,20 +68,6 @@ public interface IWarlockClient {
 	 * @return The stream associated with the given name. If this stream does not exist, it will be lazily created.
 	 */
 	public IStream getStream(String streamName);
-	
-	/**
-	 * Get the current buffer for the passed-in stream
-	 * @param stream
-	 * @return
-	 */
-	public StringBuffer getStreamBuffer(IStream stream);
-	
-	/**
-	 * Get the list of styles buffered for the passed-in stream
-	 * @param stream
-	 * @return
-	 */
-	public List<IWarlockStyle>getStreamBufferStyles(IStream stream);
 	
 	/**
 	 * Get the connection associated with this client.

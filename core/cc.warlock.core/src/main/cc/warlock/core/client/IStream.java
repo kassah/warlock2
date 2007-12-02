@@ -24,6 +24,8 @@ public interface IStream {
 	public void sendCommand(String text);
 	public boolean isPrompting();
 	public void flush();
+	public boolean hasView();
+	public void setView(boolean view);
 	
 	public void echo(String text);
 	

@@ -240,13 +240,6 @@ public abstract class GameView extends StreamView implements IWarlockClientViewe
 		
 		setMainStream(client.getDefaultStream());
 		client.addViewer(wrapper);
-		
-//		for (StreamView streamView : StreamView.getOpenViews())
-//		{
-//			if (!(streamView instanceof GameView)) {
-//				streamView.setClient(client);
-//			}
-//		}
 	}
 	
 	public IWarlockClient getWarlockClient() {

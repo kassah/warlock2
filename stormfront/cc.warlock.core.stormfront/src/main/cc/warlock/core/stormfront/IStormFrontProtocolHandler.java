@@ -23,7 +23,7 @@ public interface IStormFrontProtocolHandler extends IStormFrontXMLHandler {
 	
 	public void removeHandler(IStormFrontTagHandler tagHandler);
 	public IStormFrontClient getClient();
-	public void pushStream(String name);
+	public void pushStream(String name, boolean watch);
 	public void popStream();
 	public IStream getCurrentStream();
 	

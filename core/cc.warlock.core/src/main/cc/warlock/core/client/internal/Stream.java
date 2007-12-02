@@ -32,6 +32,7 @@ public class Stream implements IStream {
 	private Lock readLock = lock.readLock();
 	private Lock writeLock = lock.writeLock();
 	protected boolean isPrompting = false;
+	private boolean hasView = false;
 	
 	protected Stream (String streamName) {
 		this.streamName = new Property<String>("streamName", null);
@@ -191,5 +192,13 @@ public class Stream implements IStream {
 
 	public IProperty<String> getTitle() {
 		return streamTitle;
+	}
+	
+	public boolean hasView() {
+		return hasView;
+	}
+	
+	public void setView(boolean view) {
+		hasView = view;
 	}
 }

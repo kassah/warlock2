@@ -34,7 +34,7 @@ public class StormFrontProtocolHandler implements IStormFrontProtocolHandler {
 	
 	protected IStormFrontClient client;
 	protected HashMap<String, IStormFrontTagHandler> defaultTagHandlers = new HashMap<String, IStormFrontTagHandler>();
-	protected Stack<IStream> streamStack = new Stack<IStream>();
+	protected Stack<StreamMarker> streamStack = new Stack<StreamMarker>();
 	protected Stack<String> tagStack = new Stack<String>();
 	protected ArrayList<IWarlockStyle> styles = new ArrayList<IWarlockStyle>();
 	protected StringBuffer rawXMLBuffer;
@@ -107,11 +107,24 @@ public class StormFrontProtocolHandler implements IStormFrontProtocolHandler {
 		return client;
 	}
 	
+	private class StreamMarker {
+		public IStream stream;
+		public boolean watch;
+		
+		public StreamMarker(IStream stream, boolean watch) {
+			this.stream = stream;
+			this.watch = watch;
+		}
+	}
+	
 	/*
 	 *  push a stream onto the stack
 	 */
-	public void pushStream(String name) {
-		streamStack.push(client.getStream(name));
+	public void pushStream(String streamId, boolean watch) {
+		IStream stream = client.getStream(streamId);
+		if(stream != null) {
+			streamStack.push(new StreamMarker(stream, watch));
+		}
 	}
 	
 	/*
@@ -125,10 +138,11 @@ public class StormFrontProtocolHandler implements IStormFrontProtocolHandler {
 	
 	public IStream getCurrentStream ()
 	{
-		if (streamStack.size() > 0)
-			return streamStack.peek();
-		
-		return client.getDefaultStream();
+		try {
+			return streamStack.peek().stream;
+		} catch(Exception e) {
+			return client.getDefaultStream();
+		}
 	}
 	
 	/* (non-Javadoc)
@@ -153,7 +167,13 @@ public class StormFrontProtocolHandler implements IStormFrontProtocolHandler {
 			
 			IStream stream;
 			try {
-				stream = streamStack.peek();
+				StreamMarker marker = streamStack.peek();
+				stream = marker.stream;
+				if(!stream.hasView() && marker.watch) {
+					stream = client.getDefaultStream();
+					// TODO use a different style here
+					str.addStyle(client.getCommandStyle());
+				}
 			} catch(EmptyStackException e) {
 				stream = client.getDefaultStream();
 			}
