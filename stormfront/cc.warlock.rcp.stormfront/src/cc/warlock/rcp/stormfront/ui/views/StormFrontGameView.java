@@ -84,8 +84,12 @@ public class StormFrontGameView extends GameView implements IStormFrontClientVie
 			compass.setCompass(sfClient.getCompass());
 			sfClient.getGameMode().addListener(new IPropertyListener<GameMode>() {
 				public void propertyActivated(IProperty<GameMode> property) {}
-				public void propertyChanged(IProperty<GameMode> property, GameMode oldValue) {
-					setBuffered(property.get() == GameMode.Game);
+				public void propertyChanged(final IProperty<GameMode> property, GameMode oldValue) {
+					Display.getDefault().syncExec(new Runnable() {
+						public void run() {
+							setBuffered(property.get() == GameMode.Game);
+						}
+					});
 				}
 				public void propertyCleared(IProperty<GameMode> property,	GameMode oldValue) {}
 			});
