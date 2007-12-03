@@ -71,6 +71,7 @@ public class WSLScript extends AbstractScript {
 		addCommand("counter", new WSLCounter());
 		addCommand("deletevariable", new WSLDeleteVariable());
 		addCommand("setvariable", new WSLSetVariable());
+		addCommand("setlocalvariable", new WSLSetLocalVariable());
 		addCommand("goto", new WSLGoto());
 		addCommand("gosub", new WSLGosub());
 		addCommand("random", new WSLRandom());
@@ -111,6 +112,10 @@ public class WSLScript extends AbstractScript {
 	
 	public boolean variableExists(String name) {
 		return globalVariables.containsKey(name);
+	}
+	
+	public boolean localVariableExists(String name) {
+		return localVariables.containsKey(name);
 	}
 	
 	public IWSLValue getLocalVariable(String name) {
@@ -541,6 +546,26 @@ public class WSLScript extends AbstractScript {
 		}
 	}
 	
+	protected class WSLSetLocalVariable extends WSLCommand {
+		
+		private Pattern format = Pattern.compile("^([\\w_]+)(\\s+(.+)?)?$");
+		
+		public void execute (String arguments) {
+			Matcher m = format.matcher(arguments);
+			if (m.find())
+			{
+				String name = m.group(1);
+				String value = m.group(3);
+				if(value == null)
+					value = " ";
+				commands.echo("setLocalVariable: " + name + "=" + value);
+				setLocalVariable(name, value);
+			} else {
+				scriptError("Invalid arguments to setLocalVariable");
+			}
+		}
+	}
+	
 	protected class WSLAction extends WSLCommand {
 		
 		private Pattern clearFormat = Pattern.compile("^clear");
@@ -670,6 +695,13 @@ public class WSLScript extends AbstractScript {
 		}
 	}
 
+	private void getVariablesFromMatch(Match match) {
+		String value;
+		for(int i = 0; (value = (String)match.getAttribute(String.valueOf(i))) != null; i++) {
+			setLocalVariable(String.valueOf(i), value);
+		}
+	}
+	
 	protected class WSLMatchWait extends WSLCommand {
 		
 		public void execute (String arguments) {
@@ -677,10 +709,7 @@ public class WSLScript extends AbstractScript {
 			
 			if (match != null)
 			{
-				String value;
-				for(int i = 0; (value = (String)match.getAttribute(String.valueOf(i))) != null; i++) {
-					setLocalVariable(String.valueOf(i), value);
-				}
+				getVariablesFromMatch(match);
 				gotoLabel((String)match.getAttribute("label"));
 				commands.waitForPrompt();
 				commands.waitForRoundtime();
@@ -754,6 +783,7 @@ public class WSLScript extends AbstractScript {
 				Match match = new RegexMatch(m.group(1), ignoreCase);
 				
 				commands.waitFor(match);
+				getVariablesFromMatch(match);
 			} else {
 				scriptError("Invalid arguments to waitforre");
 			}

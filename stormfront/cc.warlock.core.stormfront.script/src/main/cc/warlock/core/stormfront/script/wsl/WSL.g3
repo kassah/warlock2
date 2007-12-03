@@ -188,7 +188,7 @@ relationalOp returns [RelationalOperator op]
 
 unaryExpression returns [IWSLValue cond]
 	: ('!' | 'not') arg=unaryExpression	{ cond = new WSLNotCondition(arg); }
-	| ('exist' | 'exists') name=VARIABLE	{ cond = new WSLExistsCondition($name.text, script); }
+	| ('exist' | 'exists') arg=unaryExpression	{ cond = new WSLExistsCondition(arg); }
 	| arg=primaryExpression		{ cond = arg; }
 	;
 

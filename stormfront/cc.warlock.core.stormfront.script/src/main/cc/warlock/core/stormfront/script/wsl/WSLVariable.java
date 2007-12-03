@@ -1,21 +1,21 @@
 package cc.warlock.core.stormfront.script.wsl;
 
-public class WSLVariable extends WSLAbstractString {
+public class WSLVariable extends WSLAbstractVariable {
 	
-	private String variableName;
 	private WSLScript script;
 	
 	public WSLVariable(String var, WSLScript script) {
-		variableName = var;
+		super(var, "%");
 		this.script = script;
 	}
 	
 	@Override
-	public String toString() {
-		IWSLValue value = script.getVariable(variableName);
-		if(value == null) {
-			return "%" + variableName;
-		}
-		return value.toString();
+	public IWSLValue getVariable() {
+		return script.getVariable(variableName);
+	}
+	
+	@Override
+	public boolean variableExists() {
+		return script.variableExists(variableName);
 	}
 }

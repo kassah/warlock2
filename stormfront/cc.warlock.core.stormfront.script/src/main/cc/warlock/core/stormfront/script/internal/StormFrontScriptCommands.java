@@ -15,6 +15,7 @@ import cc.warlock.core.script.internal.RegexMatch;
 import cc.warlock.core.script.internal.ScriptCommands;
 import cc.warlock.core.stormfront.client.IStormFrontClient;
 import cc.warlock.core.stormfront.script.IStormFrontScriptCommands;
+import cc.warlock.core.stormfront.script.wsl.WSLScript;
 
 public class StormFrontScriptCommands extends ScriptCommands implements IStormFrontScriptCommands, IPropertyListener<Integer> {
 
@@ -118,6 +119,11 @@ public class StormFrontScriptCommands extends ScriptCommands implements IStormFr
 				for(Match action : actions) {
 					if(action.matches(text)) {
 						String command = (String)action.getAttribute("action");
+						String value;
+						// FIXME breaks JS scripts
+						for(int i = 0; (value = (String)action.getAttribute(String.valueOf(i))) != null; i++) {
+							((WSLScript)script).setLocalVariable(String.valueOf(i), value);
+						}
 						script.execute(command);
 						break;
 					}
