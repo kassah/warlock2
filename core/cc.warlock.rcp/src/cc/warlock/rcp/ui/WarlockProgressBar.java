@@ -3,11 +3,12 @@
  */
 package cc.warlock.rcp.ui;
 
-import org.eclipse.swt.SWT;
+import org.eclipse.jface.resource.JFaceResources;
 import org.eclipse.swt.events.PaintEvent;
 import org.eclipse.swt.events.PaintListener;
 import org.eclipse.swt.graphics.Color;
 import org.eclipse.swt.graphics.Font;
+import org.eclipse.swt.graphics.FontData;
 import org.eclipse.swt.graphics.Point;
 import org.eclipse.swt.graphics.Rectangle;
 import org.eclipse.swt.widgets.Canvas;
@@ -37,7 +38,12 @@ public class WarlockProgressBar extends Canvas
 		width = 100; height = 15;
 		showText = true;
 		
-		progressFont = new Font(getShell().getDisplay(), "Arial", 8, SWT.NONE);
+		Font textFont = JFaceResources.getDefaultFont();
+		FontData textData = textFont.getFontData()[0];
+		int minHeight = 8;
+		
+		progressFont = new Font(getShell().getDisplay(),
+			textData.name, (int)Math.max(minHeight,textData.height), textData.style);
 		foreground = new Color(getShell().getDisplay(), 255, 255, 255);
 		background = new Color(getShell().getDisplay(), 0, 0, 0);
 		borderColor = new Color(getShell().getDisplay(), 25, 25, 25);
