@@ -182,6 +182,7 @@ public class StreamView extends ViewPart implements IStreamListener, IGameViewFo
 			}
 		});
 		stream.getTitle().addListener(propertyListenerWrapper);
+		stream.setView(true);
 	}
 	
 	public void addStream (IStream stream) {
