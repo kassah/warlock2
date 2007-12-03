@@ -116,11 +116,11 @@ public class ScriptCommands implements IScriptCommands, IStreamListener
 		}
 	}
 
-	public void pause (int seconds) {
+	public void pause (double seconds) {
 		try {
 			// FIXME need to make this work for multiple users
 			pausedThread = Thread.currentThread();
-			Thread.sleep(seconds * 1000);
+			Thread.sleep((long)(seconds * 1000.0));
 		} catch(InterruptedException e) {
 			e.printStackTrace();
 		} finally {

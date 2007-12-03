@@ -18,7 +18,7 @@ public interface IScriptCommands {
 	
 	public Match matchWait ();
 	
-	public void pause (int seconds);
+	public void pause (double seconds);
 	
 	public void waitForPrompt ();
 	

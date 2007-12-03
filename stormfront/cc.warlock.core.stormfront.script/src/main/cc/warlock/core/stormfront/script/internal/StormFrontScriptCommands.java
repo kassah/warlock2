@@ -62,12 +62,9 @@ public class StormFrontScriptCommands extends ScriptCommands implements IStormFr
 	}
 	
 	@Override
-	public void pause(int seconds) {
-		try {
-			super.pause(seconds);
-		} finally {
-			waitForRoundtime();
-		}
+	public void pause(double seconds) {
+		super.pause(seconds);
+		waitForRoundtime();
 	}
 	
 	@Override

@@ -830,13 +830,13 @@ public class WSLScript extends AbstractScript {
 		
 		public void execute (String arguments)
 		{
-			int time;
+			double time;
 			
 			if(arguments.trim().length() > 0) {
 				String[] args = arguments.split(argSeparator);
 			
 				try {
-					time = Integer.parseInt(args[0]);
+					time = Double.parseDouble(args[0]);
 				} catch(NumberFormatException e) {
 					scriptError("Non-numeral \"" + args[0] + "\" passed to pause");
 					return;
