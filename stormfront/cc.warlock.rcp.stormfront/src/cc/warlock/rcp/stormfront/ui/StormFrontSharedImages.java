@@ -17,12 +17,17 @@ public class StormFrontSharedImages {
 	public static final String IMG_GAME = "/images/game.gif";
 	
 	// Status images
-	public static final String IMG_STATUS_BLANK = "/images/status/standard/blank.gif";
-	public static final String IMG_STATUS_HIDE = "/images/status/standard/hide.gif";
-	public static final String IMG_STATUS_KNEEL = "/images/status/standard/kneel.gif";
-	public static final String IMG_STATUS_LIE = "/images/status/standard/lie.gif";
-	public static final String IMG_STATUS_SIT = "/images/status/standard/sit.gif";
-	public static final String IMG_STATUS_STAND = "/images/status/standard/stand.gif";
+	public static final String IMG_STATUS_BLANK = "/images/status/standard/blank.png";
+	public static final String IMG_STATUS_HIDDEN = "/images/status/standard/hidden.png";
+	public static final String IMG_STATUS_KNEELING = "/images/status/standard/kneeling.png";
+	public static final String IMG_STATUS_PRONE = "/images/status/standard/prone.png";
+	public static final String IMG_STATUS_SITTING = "/images/status/standard/sitting.png";
+	public static final String IMG_STATUS_STANDING = "/images/status/standard/standing.png";
+	public static final String IMG_STATUS_DEAD = "/images/status/standard/dead.png";
+	public static final String IMG_STATUS_JOINED = "/images/status/standard/joined.png";
+	public static final String IMG_STATUS_STUNNED = "/images/status/standard/stunned.png";
+	public static final String IMG_STATUS_BLEEDING = "/images/status/standard/bleeding.png";
+	public static final String IMG_STATUS_WEBBED = "/images/status/standard/webbed.png";
 	
 	public static final String IMG_LEFT_HAND = "/images/left_hand.gif";
 	public static final String IMG_RIGHT_HAND = "/images/right_hand.gif";

@@ -1,7 +1,5 @@
 package cc.warlock.rcp.stormfront.ui.views;
 
-import java.io.IOException;
-import java.io.InputStream;
 import java.net.URL;
 
 import org.eclipse.core.runtime.IProgressMonitor;
@@ -9,25 +7,21 @@ import org.eclipse.jface.dialogs.ProgressMonitorDialog;
 import org.eclipse.jface.resource.JFaceResources;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.graphics.Font;
-import org.eclipse.swt.graphics.Image;
-import org.eclipse.swt.graphics.ImageData;
-import org.eclipse.swt.graphics.ImageLoader;
+import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.widgets.Caret;
+import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Display;
 
-import cc.warlock.core.client.IProperty;
-import cc.warlock.core.client.IPropertyListener;
 import cc.warlock.core.client.IWarlockClient;
 import cc.warlock.core.client.WarlockColor;
 import cc.warlock.core.stormfront.client.IStormFrontClient;
 import cc.warlock.core.stormfront.client.IStormFrontClientViewer;
 import cc.warlock.core.stormfront.client.StormFrontColor;
-import cc.warlock.core.stormfront.client.IStormFrontClient.GameMode;
 import cc.warlock.core.stormfront.serversettings.server.ServerSettings;
 import cc.warlock.rcp.stormfront.adapters.SWTStormFrontClientViewer;
 import cc.warlock.rcp.stormfront.ui.StormFrontMacros;
+import cc.warlock.rcp.stormfront.ui.StormFrontStatus;
 import cc.warlock.rcp.stormfront.ui.style.StormFrontStyleProvider;
-import cc.warlock.rcp.ui.WarlockText;
 import cc.warlock.rcp.ui.style.StyleProviders;
 import cc.warlock.rcp.util.ColorUtil;
 import cc.warlock.rcp.util.RCPUtil;
@@ -38,12 +32,21 @@ public class StormFrontGameView extends GameView implements IStormFrontClientVie
 	public static final String VIEW_ID = "cc.warlock.rcp.stormfront.ui.views.StormFrontGameView";
 	
 	protected IStormFrontClient sfClient;
+	protected StormFrontStatus status;
 	
 	public StormFrontGameView ()
 	{
 		super();
 
 		wrapper = new SWTStormFrontClientViewer(this);
+	}
+	
+	@Override
+	public void createPartControl(Composite parent) {
+		super.createPartControl(parent);
+		
+		((GridLayout)entryComposite.getLayout()).numColumns = 2;
+		status = new StormFrontStatus(entryComposite);
 	}
 	
 	private ProgressMonitorDialog settingsProgressDialog;
@@ -93,6 +96,9 @@ public class StormFrontGameView extends GameView implements IStormFrontClientVie
 				}
 				public void propertyCleared(IProperty<GameMode> property,	GameMode oldValue) {}
 			});*/
+			
+			if (status != null)
+				status.setActiveClient(sfClient);
 		}
 	}
 	
@@ -129,10 +135,9 @@ public class StormFrontGameView extends GameView implements IStormFrontClientVie
 		{
 			HandsView.getDefault().loadServerSettings(settings);
 		}
-		if (StatusView.getDefault() != null)
-		{
-			StatusView.getDefault().loadServerSettings(settings);
-		}
+		
+		if (status != null)
+			status.loadServerSettings(settings);
 	}
 	
 	public void launchURL(final URL url) {

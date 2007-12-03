@@ -47,6 +47,10 @@ public class LoginUtil {
 			{
 				page.showView(BarsView.VIEW_ID);
 			}
+//			if (page.findView(StatusView.VIEW_ID) == null)
+//			{
+//				page.showView(StatusView.VIEW_ID);
+//			}
 		} catch (PartInitException e1) {
 			// TODO Auto-generated catch block
 			e1.printStackTrace();

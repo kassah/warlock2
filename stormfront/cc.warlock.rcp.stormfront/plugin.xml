@@ -36,14 +36,9 @@
       <view
             allowMultiple="false"
             class="cc.warlock.rcp.stormfront.ui.views.HandsView"
-            icon="images/left_hand.gif"
+            icon="images/handview.gif"
             id="cc.warlock.rcp.stormfront.ui.views.HandsView"
             name="Hands">
-      </view>
-      <view
-            class="cc.warlock.rcp.stormfront.ui.views.StatusView"
-            id="cc.warlock.rcp.stormfront.ui.views.StatusView"
-            name="Status">
       </view>
       <view
             class="cc.warlock.rcp.views.StreamView"
