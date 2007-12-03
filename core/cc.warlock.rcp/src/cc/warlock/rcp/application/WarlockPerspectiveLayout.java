@@ -90,12 +90,12 @@ public class WarlockPerspectiveLayout implements IConfigurationProvider {
 	
 	public void loadSavedLayout ()
 	{
-		if (savedLayout != null)
-		{
-			WorkbenchPage page = (WorkbenchPage) PlatformUI.getWorkbench().getActiveWorkbenchWindow().getActivePage();
-			PerspectiveHelper presentation = page.getPerspectivePresentation();
-			
-			presentation.restoreState(savedLayout);
-		}
+//		if (savedLayout != null)
+//		{
+//			WorkbenchPage page = (WorkbenchPage) PlatformUI.getWorkbench().getActiveWorkbenchWindow().getActivePage();
+//			PerspectiveHelper presentation = page.getPerspectivePresentation();
+//			
+//			presentation.restoreState(savedLayout);
+//		}
 	}
 }

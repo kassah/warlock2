@@ -29,7 +29,7 @@ public class WarlockEntry implements VerifyKeyListener {
 	public WarlockEntry(Composite parent, IWarlockClientViewer viewer) {
 		this.viewer = viewer;
 		widget = new StyledText(parent, SWT.BORDER | SWT.SINGLE);
-		widget.setLayoutData(new GridData(GridData.FILL, GridData.VERTICAL_ALIGN_END, true, false, 1, 1));
+		widget.setLayoutData(new GridData(GridData.FILL, GridData.FILL, true, true, 1, 1));
 		widget.setEditable(true);
 		widget.setLineSpacing(2);
 		widget.addVerifyKeyListener(this);

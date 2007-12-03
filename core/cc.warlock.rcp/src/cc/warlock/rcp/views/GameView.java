@@ -15,6 +15,8 @@ import org.eclipse.swt.graphics.Image;
 import org.eclipse.swt.graphics.ImageData;
 import org.eclipse.swt.graphics.PaletteData;
 import org.eclipse.swt.graphics.RGB;
+import org.eclipse.swt.layout.GridData;
+import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.widgets.Caret;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Display;
@@ -48,6 +50,7 @@ public abstract class GameView extends StreamView implements IWarlockClientViewe
 	protected WarlockEntry entry;
 	protected WarlockCompass compass;
 	protected SWTWarlockClientViewer wrapper;
+	protected Composite entryComposite;
 	
 	public GameView () {
 		if (firstInstance == null) {
@@ -136,8 +139,16 @@ public abstract class GameView extends StreamView implements IWarlockClientViewe
 		text.setLineLimit(GameViewConfiguration.instance().getBufferLines());
 		text.setScrollDirection(SWT.DOWN);
 		
+		entryComposite = new Composite(mainComposite, SWT.NONE);
+		GridLayout layout = new GridLayout(1, false);
+		layout.horizontalSpacing = 0;
+		layout.verticalSpacing = 0;
+		layout.marginHeight = 0;
+		layout.marginWidth = 0;
+		entryComposite.setLayout(layout);
+		entryComposite.setLayoutData(new GridData(GridData.FILL, GridData.VERTICAL_ALIGN_END, true, false));
 		
-		entry = new WarlockEntry(mainComposite, wrapper);
+		entry = new WarlockEntry(entryComposite, wrapper);
 		
 		compass = new WarlockCompass(text, CompassThemes.getCompassTheme("small"));
 		text.setBackgroundMode(SWT.INHERIT_DEFAULT);
