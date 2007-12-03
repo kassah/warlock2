@@ -648,7 +648,7 @@ public class WSLScript extends AbstractScript {
 		callstack.push(frame);
 		
 		// TODO perhaps abstract this
-		localVariables = new HashMap<String, IWSLValue>();
+		localVariables = (HashMap<String, IWSLValue>)localVariables.clone();
 		setLocalVariable("0", arguments);
 		for(int i = 0; i < args.length; i++) {
 			setLocalVariable(String.valueOf(i + 1), args[i]);
