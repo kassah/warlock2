@@ -73,11 +73,12 @@ value_list_helper returns [ArrayList<IWSLValue> list]
 	;
 
 script_value returns [IWSLValue value]
-	: v=STRING	{ value = new WSLString($v.text); }
-	| v=VARIABLE { value = new WSLVariable($v.text, script); }
-	| v=NUMBER		{ value = new WSLNumber($v.text); }
-	| TRUE			{ value = new WSLBoolean(true); }
-	| FALSE			{ value = new WSLBoolean(false); }
+	: v=STRING			{ value = new WSLString($v.text); }
+	| v=VARIABLE		{ value = new WSLVariable($v.text, script); }
+	| v=LOCAL_VARIABLE	{ value = new WSLLocalVariable($v.text, script); }
+	| v=NUMBER			{ value = new WSLNumber($v.text); }
+	| TRUE				{ value = new WSLBoolean(true); }
+	| FALSE				{ value = new WSLBoolean(false); }
 	;
 	
 conditionalExpression returns [IWSLValue cond]
@@ -218,9 +219,16 @@ LABEL
 		label=LABEL_STRING ':'			{ setText($label.text); atStart = false; }
 	;
 VARIABLE
-	: ('%' var=NORMAL_STRING '%'? { setText($var.text); }
-		| '$' NORMAL_STRING )
+	: '%' var=NORMAL_STRING '%'?
 			{
+				setText($var.text);
+				if(state == State.base) { state = State.command; atStart = false; }
+			}
+	;
+LOCAL_VARIABLE
+	:  '$' var=NORMAL_STRING '$'?
+			{
+				setText($var.text);
 				if(state == State.base) { state = State.command; atStart = false; }
 			}
 	;

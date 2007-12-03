@@ -35,8 +35,9 @@ public class WSLScript extends AbstractScript {
 	protected WSLScriptLine nextLine;
 	protected WSLScriptLine curLine;
 	protected WSLScriptLine endLine;
-	protected HashMap<String, IWSLValue> variables = new HashMap<String, IWSLValue>();
-	protected Stack<WSLScriptLine> callstack = new Stack<WSLScriptLine>();
+	protected HashMap<String, IWSLValue> globalVariables = new HashMap<String, IWSLValue>();
+	protected HashMap<String, IWSLValue> localVariables = new HashMap<String, IWSLValue>();
+	protected Stack<WSLFrame> callstack = new Stack<WSLFrame>();
 	protected HashMap<String, WSLCommand> wslCommands = new HashMap<String, WSLCommand>();
 	protected int pauseLine;
 	protected Thread scriptThread;
@@ -105,11 +106,35 @@ public class WSLScript extends AbstractScript {
 	}
 
 	public IWSLValue getVariable(String name) {
-		return variables.get(name);
+		return globalVariables.get(name);
+	}
+	
+	public boolean variableExists(String name) {
+		return globalVariables.containsKey(name);
+	}
+	
+	public IWSLValue getLocalVariable(String name) {
+		return localVariables.get(name);
 	}
 	
 	public boolean isRunning() {
 		return running;
+	}
+	
+	private class WSLFrame {
+		private WSLScriptLine line;
+		private HashMap<String, IWSLValue> localVariables;
+		
+		public WSLFrame(WSLScriptLine line, HashMap<String, IWSLValue> variables) {
+			this.line = line;
+			this.localVariables = variables;
+		}
+
+		public void restore() {
+			WSLScript.this.localVariables = localVariables;
+			WSLScript.this.curLine = line;
+			WSLScript.this.nextLine = line;
+		}
 	}
 	
 	private class WSLTime extends WSLAbstractNumber {
@@ -385,7 +410,7 @@ public class WSLScript extends AbstractScript {
 		public void execute (String arguments) {
 			StringBuffer zeroarg = new StringBuffer();
 			for (int i = 1; ; i++) {
-				if (!variables.containsKey(Integer.toString(i+1)))
+				if (!variableExists(Integer.toString(i+1)))
 				{
 					if (zeroarg.length() > 0) { 
 						zeroarg.deleteCharAt(zeroarg.length() - 1);
@@ -398,7 +423,7 @@ public class WSLScript extends AbstractScript {
 				}
 				else
 				{
-					String arg = variables.get(Integer.toString(i+1)).toString();
+					String arg = getVariable(Integer.toString(i+1)).toString();
 					if (arg == null) {
 						if (zeroarg.length() > 0) {
 							zeroarg.deleteCharAt(zeroarg.length() - 1);
@@ -433,8 +458,8 @@ public class WSLScript extends AbstractScript {
 				operand = 1;
 
 			String counterFunction = args[0];
-			int value = variables.containsKey("c") ?
-					Integer.parseInt(variables.get("c").toString()) : 0;
+			int value = variableExists("c") ?
+					Integer.parseInt(getVariable("c").toString()) : 0;
 
 			if ("set".equalsIgnoreCase(counterFunction))
 			{
@@ -489,11 +514,11 @@ public class WSLScript extends AbstractScript {
 	}
 	
 	private void setVariable(String name, IWSLValue value) {
-		variables.put(name, value);
+		globalVariables.put(name, value);
 	}
 	
 	private void deleteVariable(String name) {
-		variables.remove(name);
+		globalVariables.remove(name);
 	}
 	
 	protected class WSLSetVariable extends WSLCommand {
@@ -582,17 +607,28 @@ public class WSLScript extends AbstractScript {
 		}
 	}
 	
+	public void setLocalVariable(String name, String value) {
+		setLocalVariable(name, new WSLString(value));
+	}
+	
+	public void setLocalVariable(String name, IWSLValue value) {
+		localVariables.put(name, value);
+	}
+	
 	protected void gosub (String label, String arguments)
 	{
 		String[] args = arguments.split(argSeparator);
 		
-		// TODO save previous state of variables
-		setVariable("$0", arguments);
+		WSLFrame frame = new WSLFrame(nextLine, localVariables);
+		callstack.push(frame);
+		
+		// TODO perhaps abstract this
+		localVariables = new HashMap<String, IWSLValue>();
+		setLocalVariable("0", arguments);
 		for(int i = 0; i < args.length; i++) {
-			setVariable("$" + (i + 1), args[i]);
+			setLocalVariable(String.valueOf(i + 1), args[i]);
 		}
 		
-		callstack.push(nextLine);
 		WSLScriptLine command = labels.get(label.toLowerCase());
 		
 		if (command != null)
@@ -622,7 +658,8 @@ public class WSLScript extends AbstractScript {
 		if (callstack.empty()) {
 			scriptError("Invalid use of return, not in a subroutine");
 		} else {
-			curLine = nextLine = callstack.pop();
+			WSLFrame frame = callstack.pop();
+			frame.restore();
 		}
 	}
 	
@@ -640,6 +677,10 @@ public class WSLScript extends AbstractScript {
 			
 			if (match != null)
 			{
+				String value;
+				for(int i = 0; (value = (String)match.getAttribute(String.valueOf(i))) != null; i++) {
+					setLocalVariable(String.valueOf(i), value);
+				}
 				gotoLabel((String)match.getAttribute("label"));
 				commands.waitForPrompt();
 				commands.waitForRoundtime();
@@ -809,7 +850,7 @@ public class WSLScript extends AbstractScript {
 		}
 		
 		public void execute (String arguments) {
-			if (variables.containsKey(variableName))
+			if (variableExists(variableName))
 			{
 				WSLScript.this.execute(arguments);
 			}

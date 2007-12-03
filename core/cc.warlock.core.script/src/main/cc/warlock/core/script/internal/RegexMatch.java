@@ -26,7 +26,10 @@ public class RegexMatch extends Match {
 	public boolean matches(String text) {
 		Matcher m = regex.matcher(text);
 		if(m.find()) {
-			// TODO should set some variables for the groups here
+			setAttribute("0", m.group());
+			for(int i = 1; i <= m.groupCount(); i++) {
+				setAttribute(String.valueOf(i), m.group(i));
+			}
 			
 			return true;
 		} else {

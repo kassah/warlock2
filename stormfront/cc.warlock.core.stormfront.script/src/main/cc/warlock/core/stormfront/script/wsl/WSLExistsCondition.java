@@ -12,9 +12,7 @@ public class WSLExistsCondition extends WSLAbstractBoolean {
 	
 	@Override
 	public boolean toBoolean() {
-		String value = script.getVariable(name).toString();
-		if(value == null) return false;
-		else return true;
+		return script.variableExists(name);
 	}
 
 }

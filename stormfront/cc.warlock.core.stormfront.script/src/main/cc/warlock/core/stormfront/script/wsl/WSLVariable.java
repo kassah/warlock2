@@ -14,8 +14,6 @@ public class WSLVariable extends WSLAbstractString {
 	public String toString() {
 		IWSLValue value = script.getVariable(variableName);
 		if(value == null) {
-			if(variableName.startsWith("$"))
-				return variableName;
 			return "%" + variableName;
 		}
 		return value.toString();
