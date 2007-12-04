@@ -45,7 +45,7 @@ public class CompDefTagHandler extends DefaultTagHandler {
 	
 	@Override
 	public boolean handleCharacters(String characters) {
-		if (id != null && id.equals("room desc")) {
+		if (id != null) {
 			buffer.append(characters);
 		}
 		// let the stream have the text, we just want to store the value in a property
@@ -54,10 +54,6 @@ public class CompDefTagHandler extends DefaultTagHandler {
 	
 	@Override
 	public void handleEnd(String newLine) {
-		if (id != null && id.equals("room desc"))
-		{
-			handler.getClient().getRoomDescription().set(buffer.toString());
-		}
 		handler.getCurrentStream().send("\n");
 
 		StormFrontClient client = (StormFrontClient) handler.getClient();

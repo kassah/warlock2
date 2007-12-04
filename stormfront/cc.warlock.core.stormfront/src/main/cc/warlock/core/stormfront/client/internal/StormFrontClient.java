@@ -307,10 +307,6 @@ public class StormFrontClient extends WarlockClient implements IStormFrontClient
 		return getStream(FAMILIAR_STREAM_NAME);
 	}
 	
-	public IProperty<String> getRoomDescription() {
-		return roomDescription;
-	}
-	
 	public void setComponent (String componentName, String value)
 	{
 		if (!components.containsKey(componentName)) {

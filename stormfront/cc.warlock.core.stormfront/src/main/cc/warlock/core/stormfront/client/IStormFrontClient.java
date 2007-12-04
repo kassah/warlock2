@@ -29,6 +29,8 @@ public interface IStormFrontClient extends IWarlockClient {
 	public static final String ROOM_STREAM_NAME = "room";
 	public static final String FAMILIAR_STREAM_NAME = "familiar";
 	
+	public static final String COMPONENT_ROOM_PLAYERS = "room players";
+	public static final String COMPONENT_ROOM_OBJECTS = "room objs";
 	public static final String COMPONENT_ROOM_EXITS = "room exits";
 	public static final String COMPONENT_ROOM_DESCRIPTION = "room desc";
 	
@@ -153,11 +155,6 @@ public interface IStormFrontClient extends IWarlockClient {
 	 * @return The stream for familiars / wounds
 	 */
 	public IStream getFamiliarStream();
-	
-	/**
-	 * @return The description of the current room
-	 */
-	public IProperty<String> getRoomDescription();
 	
 	/**
 	 * @param componentName
