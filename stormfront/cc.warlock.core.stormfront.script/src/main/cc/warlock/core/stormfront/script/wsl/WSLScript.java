@@ -101,10 +101,11 @@ public class WSLScript extends AbstractScript {
 		setVariable("lefthand", new WSLLeftHand());
 		setVariable("righthand", new WSLRightHand());
 		setVariable("spell", new WSLSpell());
-		setVariable("roomdesc", new WSLRoomDesc());
+		setVariable("roomdesc", new WSLComponent(IStormFrontClient.COMPONENT_ROOM_DESCRIPTION));
+		setVariable("roomexits", new WSLComponent(IStormFrontClient.COMPONENT_ROOM_EXITS));
+		setVariable("roomplayers", new WSLComponent(IStormFrontClient.COMPONENT_ROOM_PLAYERS));
+		setVariable("roomobjects", new WSLComponent(IStormFrontClient.COMPONENT_ROOM_OBJECTS));
 		setVariable("roomtitle", new WSLRoomTitle());
-		
-		// TODO add roomexits
 	}
 
 	public IWSLValue getVariable(String name) {
@@ -197,15 +198,20 @@ public class WSLScript extends AbstractScript {
 		}
 	}
 	
-	private class WSLRoomDesc extends WSLAbstractString {
-		public String toString() {
-			return client.getRoomDescription().get();
-		}
-	}
-	
 	private class WSLRoomTitle extends WSLAbstractString {
 		public String toString() {
 			return client.getStream(IStormFrontClient.ROOM_STREAM_NAME).getTitle().get();
+		}
+	}
+	
+	private class WSLComponent extends WSLAbstractString {
+		protected String componentName;
+		public WSLComponent(String componentName) {
+			this.componentName = componentName;
+		}
+		
+		public String toString () {
+			return client.getComponent(componentName).get();
 		}
 	}
 	
