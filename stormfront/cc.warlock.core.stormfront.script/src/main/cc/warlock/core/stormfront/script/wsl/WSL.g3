@@ -29,7 +29,7 @@ script
 	;
 
 line
-	: (COMMENT | l=expr
+	: (l=expr
 		{
 			script.addLine(l);
 		}
@@ -212,7 +212,7 @@ EOL
 	;
 COMMENT
 	: { atStart }?=>
-		~(NORMAL_CHAR|'%'|WS|'\n'|'\r') (~('\n'|'\r'))* { atStart = false; }
+		('#'|';') (~('\n'|'\r'))* { channel = HIDDEN; }
 	;
 LABEL
 	: { atStart }?=>
