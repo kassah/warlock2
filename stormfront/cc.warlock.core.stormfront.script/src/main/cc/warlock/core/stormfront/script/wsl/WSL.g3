@@ -19,7 +19,7 @@ grammar WSL;
 }
 
 @lexer::members {
-	private enum State { base, command, condition, nq_string, nqq_string }
+	private enum State { base, command, condition, action }
 	private boolean atStart = true;
 	private State state = State.base;
 }
@@ -240,32 +240,27 @@ THEN
 	;
 STRING
 	: { state == State.command }?=> (~('%'|'$'|'\n'|'\r'))+
-	| { state == State.base }?=> NORMAL_STRING (~(':'|'%'|'$'|'\n'|'\r'))=>
+	| { state == State.base }?=> NORMAL_STRING
 		{
 			state = State.command;
 			atStart = false;
 		}
-	| ('%'|'$') (~(NORMAL_CHAR))=>
+	| ('%'|'$')
 		{
 			if(state == State.base) { state = State.command; atStart = false; }
 		}
-	| { state == State.nqq_string }?=> (~('"'|'%'|'$'|'\n'|'\r'))+
-	| { state == State.nq_string }?=> (~('\''|'%'|'$'|'\n'|'\r'))+
-	;
-QUOTE
-	: { state == State.condition }?=> '"'	{ state = State.nqq_string; channel = HIDDEN; }
-	| { state == State.condition }?=> '\''	{ state = State.nq_string; channel = HIDDEN; }
-	| { state == State.nqq_string }?=> '"'	{ state = State.condition; channel = HIDDEN; }
-	| { state == State.nq_string }?=> '\''	{ state = State.condition; channel = HIDDEN; }
+	| { state == State.condition || state == State.action }?=> (~(WS|'%'|'$'|'\r'|'\n'))+
+	| { state == State.condition || state == State.action }?=> '"' str=NQQ_STRING '"' { setText($str.text); }
+	| { state == State.condition || state == State.action }?=> '\'' str=NQ_STRING '\'' { setText($str.text); }
 	;
 NUMBER
-	: { state == State.condition }?=> '-'? (DIGIT)+ ('.' (DIGIT)+)?
+	: { state == State.condition || state == State.action }?=> '-'? (DIGIT)+ ('.' (DIGIT)+)?
 	;
 TRUE
-	: { state == State.condition }?=> ('t' | 'T') ('r' | 'R') ('u' | 'U') ('e' | 'E')
+	: { state == State.condition || state == State.action }?=> ('t' | 'T') ('r' | 'R') ('u' | 'U') ('e' | 'E')
 	;
 FALSE
-	: { state == State.condition }?=> ('f' | 'F') ('a' | 'A') ('l' | 'L') ('s' | 'S') ('e' | 'E')
+	: { state == State.condition || state == State.action }?=> ('f' | 'F') ('a' | 'A') ('l' | 'L') ('s' | 'S') ('e' | 'E')
 	;
 
 fragment WS
@@ -276,6 +271,12 @@ fragment DIGIT
 	;
 fragment NORMAL_CHAR
 	: ('A'..'Z'|'a'..'z'|DIGIT|'_')
+	;
+fragment NQQ_STRING
+	: (~('"'|'%'|'$'|'\n'|'\r'))+
+	;
+fragment NQ_STRING
+	: (~('\''|'%'|'$'|'\n'|'\r'))+
 	;
 fragment NORMAL_STRING
 	: NORMAL_CHAR+
