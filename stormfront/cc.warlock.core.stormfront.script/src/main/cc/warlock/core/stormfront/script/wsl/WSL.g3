@@ -279,10 +279,10 @@ fragment NORMAL_CHAR
 	: ('a'..'z'|DIGIT|'_')
 	;
 fragment NQQ_STRING
-	: (~('"'|'%'|'$'|'\n'|'\r'))+
+	: (~('"'|'%'|'$'|'\n'|'\r'))*
 	;
 fragment NQ_STRING
-	: (~('\''|'%'|'$'|'\n'|'\r'))+
+	: (~('\''|'%'|'$'|'\n'|'\r'))*
 	;
 fragment NORMAL_STRING
 	: NORMAL_CHAR+
