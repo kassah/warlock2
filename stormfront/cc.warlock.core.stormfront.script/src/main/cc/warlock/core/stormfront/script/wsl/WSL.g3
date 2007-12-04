@@ -233,10 +233,25 @@ LOCAL_VARIABLE
 			}
 	;
 IF
-	: { state == State.base }?=> ('i' | 'I') ('f' | 'F') { state = State.condition; atStart = false; }
+	: { state == State.base }?=> 'if' { state = State.condition; atStart = false; }
 	;
 THEN
-	: { state == State.condition }?=> ('t' | 'T') ('h' | 'H') ('e' | 'E') ('n' | 'N') { state = State.base; }
+	: { state == State.condition }?=> 'then' { state = State.base; }
+	;
+ACTION
+	: { state == State.base }?=> 'action' { state = State.action; atStart = false; }
+	;
+WHEN
+	: { state == State.action }?=> 'when' { state = State.base; }
+	;
+TRUE
+	: { state == State.condition || state == State.action }?=> 'true'
+	;
+FALSE
+	: { state == State.condition || state == State.action }?=> 'false'
+	;
+NUMBER
+	: { state == State.condition || state == State.action }?=> '-'? (DIGIT)+ ('.' (DIGIT)+)?
 	;
 STRING
 	: { state == State.command }?=> (~('%'|'$'|'\n'|'\r'))+
@@ -253,15 +268,6 @@ STRING
 	| { state == State.condition || state == State.action }?=> '"' str=NQQ_STRING '"' { setText($str.text); }
 	| { state == State.condition || state == State.action }?=> '\'' str=NQ_STRING '\'' { setText($str.text); }
 	;
-NUMBER
-	: { state == State.condition || state == State.action }?=> '-'? (DIGIT)+ ('.' (DIGIT)+)?
-	;
-TRUE
-	: { state == State.condition || state == State.action }?=> ('t' | 'T') ('r' | 'R') ('u' | 'U') ('e' | 'E')
-	;
-FALSE
-	: { state == State.condition || state == State.action }?=> ('f' | 'F') ('a' | 'A') ('l' | 'L') ('s' | 'S') ('e' | 'E')
-	;
 
 fragment WS
 	: ' ' | '\t'
@@ -270,7 +276,7 @@ fragment DIGIT
 	: '0'..'9'
 	;
 fragment NORMAL_CHAR
-	: ('A'..'Z'|'a'..'z'|DIGIT|'_')
+	: ('a'..'z'|DIGIT|'_')
 	;
 fragment NQQ_STRING
 	: (~('"'|'%'|'$'|'\n'|'\r'))+

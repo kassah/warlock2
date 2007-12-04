@@ -17,6 +17,7 @@ import org.antlr.runtime.CharStream;
 import org.antlr.runtime.CommonTokenStream;
 import org.antlr.runtime.RecognitionException;
 
+import cc.warlock.core.client.internal.WarlockStyle;
 import cc.warlock.core.script.AbstractScript;
 import cc.warlock.core.script.IScriptEngine;
 import cc.warlock.core.script.IScriptInfo;
@@ -260,7 +261,7 @@ public class WSLScript extends AbstractScript {
 		try {
 			Reader scriptReader = info.openReader();
 			
-			CharStream input = new ANTLRReaderStream(scriptReader);
+			CharStream input = new ANTLRNoCaseReaderStream(scriptReader);
 			WSLLexer lex = new WSLLexer(input);
 			CommonTokenStream tokens = new CommonTokenStream(lex);
 			WSLParser parser = new WSLParser(tokens);
@@ -923,6 +924,35 @@ public class WSLScript extends AbstractScript {
 				}
 			} else {
 				scriptError("Invalid arguments to timer");
+			}
+		}
+	}
+	
+	protected class WSLAddHighlightString extends WSLCommand {
+		
+		private Pattern format = Pattern.compile("^\"([^\"])\"(\\s*(.*))?");
+		private Pattern optionFormat = Pattern.compile("(\\w+)=(.*)");
+		
+		public void execute (String arguments)
+		{
+			Matcher m = format.matcher(arguments);
+			if(m.find()) {
+				String text = m.group(1);
+				String optionString = m.group(3);
+				String[] options = optionString.split(argSeparator);
+				
+				WarlockStyle style = new WarlockStyle();
+				for(String option : options) {
+					Matcher optionMatcher = optionFormat.matcher(option);
+					if(optionMatcher.find()) {
+						String key = optionMatcher.group(1);
+						String value = optionMatcher.group(2);
+						
+						if(key.equalsIgnoreCase("forecolor")) {
+							
+						}
+					}
+				}
 			}
 		}
 	}
