@@ -147,8 +147,8 @@ equalityExpression returns [IWSLValue cond]
 	;
 
 equalityOp returns [EqualityOperator op]
-	: ('=' | '==')		{ op = EqualityOperator.equals; }
-	| ('!=' | '<>')		{ op = EqualityOperator.notequals; }
+	: ('=' | '==')		{ op = EqualityOperator.equals; System.out.print("EQUALS "); }
+	| ('!=' | '<>')		{ op = EqualityOperator.notequals; System.out.print("NOTEQUALS "); }
 	;
 	
 relationalExpression returns [IWSLValue cond]
@@ -208,35 +208,35 @@ WHITESPACE
 		WS+			{ channel = HIDDEN; }
 	;
 EOL
-	: '\r'? '\n' { state = State.base; atStart = true; }
+	: '\r'? '\n' { state = State.base; atStart = true; System.out.println("EOL"); }
 	;
 COMMENT
 	: { atStart }?=>
-		('#'|';') (~('\n'|'\r'))* { channel = HIDDEN; }
+		('#'|';') (~('\n'|'\r'))* { channel = HIDDEN; System.out.print("COMMENT "); }
 	;
 LABEL
 	: { atStart }?=>
-		label=LABEL_STRING ':'			{ setText($label.text); atStart = false; }
+		label=LABEL_STRING ':'			{ setText($label.text); atStart = false; System.out.print("LABEL "); }
 	;
 VARIABLE
 	: '%' var=NORMAL_STRING '%'?
 			{
 				setText($var.text);
-				if(state == State.base) { state = State.command; atStart = false; }
+				if(state == State.base) { state = State.command; atStart = false; System.out.print("VARIABLE "); }
 			}
 	;
 LOCAL_VARIABLE
 	:  '$' var=NORMAL_STRING '$'?
 			{
 				setText($var.text);
-				if(state == State.base) { state = State.command; atStart = false; }
+				if(state == State.base) { state = State.command; atStart = false; System.out.print("LOCALVARIABLE "); }
 			}
 	;
 IF
-	: { state == State.base }?=> 'if' { state = State.condition; atStart = false; }
+	: { state == State.base }?=> 'if' { state = State.condition; atStart = false; System.out.print("IF "); }
 	;
 THEN
-	: { state == State.condition }?=> 'then' { state = State.base; }
+	: { state == State.condition }?=> 'then' { state = State.base; System.out.print("THEN "); }
 	;
 ACTION
 	: { state == State.base }?=> 'action' { state = State.action; atStart = false; }
@@ -251,10 +251,11 @@ FALSE
 	: { state == State.condition || state == State.action }?=> 'false'
 	;
 NUMBER
-	: { state == State.condition || state == State.action }?=> '-'? (DIGIT)+ ('.' (DIGIT)+)?
+	: { state == State.condition || state == State.action }?=> '-'? (DIGIT)+ ('.' (DIGIT)+)? { System.out.print("NUMBER "); }
 	;
 STRING
-	: { state == State.command }?=> (~('%'|'$'|'\n'|'\r'))+
+	:
+	( { state == State.command }?=> (~('%'|'$'|'\n'|'\r'))+
 	| { state == State.base }?=> NORMAL_STRING
 		{
 			state = State.command;
@@ -267,6 +268,7 @@ STRING
 	| { state == State.condition || state == State.action }?=> (~(WS|'%'|'$'|'\r'|'\n'))+
 	| { state == State.condition || state == State.action }?=> '"' str=NQQ_STRING '"' { setText($str.text); }
 	| { state == State.condition || state == State.action }?=> '\'' str=NQ_STRING '\'' { setText($str.text); }
+	) { System.out.print("STRING "); }
 	;
 
 fragment WS
