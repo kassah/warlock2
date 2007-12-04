@@ -132,7 +132,8 @@ public class StormFrontStatus implements IPropertyListener<String> {
 				setStatusImage(1, StormFrontSharedImages.IMG_STATUS_BLANK);
 			}
 			
-			if (status.getStatus().get(ICharacterStatus.StatusType.Hidden))
+			if (status.getStatus().get(ICharacterStatus.StatusType.Hidden)
+				|| status.getStatus().get(ICharacterStatus.StatusType.Invisible))
 			{
 				setStatusImage(2, StormFrontSharedImages.IMG_STATUS_HIDDEN);
 			}
