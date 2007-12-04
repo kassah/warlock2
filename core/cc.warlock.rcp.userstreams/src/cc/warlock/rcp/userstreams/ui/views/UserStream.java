@@ -48,7 +48,7 @@ public class UserStream extends StreamView implements IWarlockClientListener {
 		}
 		// Remove the end of our line if it isn't closed by a "\n"
 		int lastReturn = string.lastIndexOf("\n");
-		if (lastReturn != string.length()) {
+		if (lastReturn != string.length() - 1) {
 			if (lastReturn > 0) {
 				this.lineBuffer = string.substring(lastReturn);
 			} else {
