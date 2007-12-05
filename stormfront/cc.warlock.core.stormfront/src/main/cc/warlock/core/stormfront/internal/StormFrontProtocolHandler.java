@@ -9,6 +9,7 @@ package cc.warlock.core.stormfront.internal;
 import java.util.ArrayList;
 import java.util.EmptyStackException;
 import java.util.HashMap;
+import java.util.Iterator;
 import java.util.Map;
 import java.util.Stack;
 
@@ -123,6 +124,14 @@ public class StormFrontProtocolHandler implements IStormFrontProtocolHandler {
 	public void pushStream(String streamId, boolean watch) {
 		IStream stream = client.getStream(streamId);
 		if(stream != null) {
+			// remove the stream if we already have the same one on the stack
+			for(Iterator<StreamMarker> iter = streamStack.iterator(); iter.hasNext(); ) {
+				StreamMarker curMarker = iter.next();
+				if(curMarker.stream.equals(stream)) {
+					iter.remove();
+					break;
+				}
+			}
 			streamStack.push(new StreamMarker(stream, watch));
 		}
 	}
