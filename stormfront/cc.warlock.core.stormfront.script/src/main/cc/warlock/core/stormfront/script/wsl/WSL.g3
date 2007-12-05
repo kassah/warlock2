@@ -152,8 +152,8 @@ equalityExpression returns [IWSLValue cond]
 	;
 
 equalityOp returns [EqualityOperator op]
-	: ('=' | '==')		{ op = EqualityOperator.equals; System.out.print("EQUALS "); }
-	| ('!=' | '<>')		{ op = EqualityOperator.notequals; System.out.print("NOTEQUALS "); }
+	: ('=' | '==')		{ op = EqualityOperator.equals; }
+	| ('!=' | '<>')		{ op = EqualityOperator.notequals; }
 	;
 	
 relationalExpression returns [IWSLValue cond]
@@ -213,11 +213,11 @@ WHITESPACE
 		WS+			{ channel = HIDDEN; }
 	;
 EOL
-	: '\r'? '\n' { state = State.base; atStart = true; System.out.println("EOL"); }
+	: '\r'? '\n' { state = State.base; atStart = true; }
 	;
 COMMENT
 	: { atStart }?=>
-		('#'|';') (~('\n'|'\r'))* { channel = HIDDEN; System.out.print("COMMENT "); }
+		('#'|';') (~('\n'|'\r'))* { channel = HIDDEN; }
 	;
 VARIABLE
 	: '%' var=WORD '%'?
@@ -236,31 +236,31 @@ LOCAL_VARIABLE
 			}
 	;
 IF
-	: { state == State.base }?=> 'if' { state = State.condition; atStart = false; System.out.print("IF "); }
+	: { state == State.base }?=> 'if' { state = State.condition; atStart = false; }
 	;
 THEN
-	: { state == State.condition }?=> 'then' { state = State.base; System.out.print("THEN "); }
+	: { state == State.condition }?=> 'then' { state = State.base; }
 	;
 OR
-	: { state == State.condition }?=> ('||' | 'or') { System.out.print("OR "); }
+	: { state == State.condition }?=> ('||' | 'or')
 	;
 AND
-	: { state == State.condition }?=> ('&&' | 'and') { System.out.print("AND "); }
+	: { state == State.condition }?=> ('&&' | 'and')
 	;
 NOT
-	: { state == State.condition }?=> ('!' | 'not') { System.out.print("NOT "); }
+	: { state == State.condition }?=> ('!' | 'not')
 	;
 EXISTS
-	: { state == State.condition }?=> ('exists') { System.out.print("EXISTS "); }
+	: { state == State.condition }?=> ('exists')
 	;
 CONTAINS
-	: { state == State.condition }?=> ('contains') { System.out.print("CONTAINS "); }
+	: { state == State.condition }?=> ('contains')
 	;
 ACTION
-	: { state == State.base }?=> 'action' WS+ { state = State.action; atStart = false; System.out.print("ACTION "); }
+	: { state == State.base }?=> 'action' WS+ { state = State.action; atStart = false; }
 	;
 WHEN
-	: { state == State.action }?=> 'when' { state = State.variableReplace; System.out.print("WHEN "); }
+	: { state == State.action }?=> 'when' { state = State.variableReplace; }
 	;
 REMOVE
 	: { state == State.action }?=> 'remove' { state = State.variableReplace; }
@@ -275,11 +275,10 @@ FALSE
 	: { state == State.condition || state == State.action }?=> 'false'
 	;
 NUMBER
-	: { state == State.condition || state == State.action }?=> '-'? (DIGIT)+ ('.' (DIGIT)+)? { System.out.print("NUMBER "); }
+	: { state == State.condition || state == State.action }?=> '-'? (DIGIT)+ ('.' (DIGIT)+)?
 	;
 STRING
-	:
-	( { state == State.variableReplace }?=> (~('%'|'$'|'\n'|'\r'))+
+	: { state == State.variableReplace }?=> (~('%'|'$'|'\n'|'\r'))+
 	| { state == State.base }?=> WORD
 		{
 			state = State.variableReplace;
@@ -294,10 +293,9 @@ STRING
 	| { state == State.condition }?=> '"' { state = State.quoted; setText(""); }
 	| { state == State.quoted }?=> '"' { state = State.condition; channel = HIDDEN; }
 	| { state == State.quoted }?=> (~('"'|'%'|'$'|'\n'|'\r'|'\\'))+ | ('\\' str=ANY { setText($str.text); })
-	) { System.out.print("STRING "); }
 	;
 LABEL
-	: label=LABEL_STRING ':'			{ setText($label.text); atStart = false; System.out.print("LABEL "); }
+	: label=LABEL_STRING ':'			{ setText($label.text); atStart = false; }
 	;
 	
 fragment WS
