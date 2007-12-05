@@ -293,7 +293,7 @@ STRING
 	| { state == State.action }?=> (~(WS|'%'|'$'|'\n'|'\r'))+ | WS+
 	| { state == State.condition }?=> '"' { state = State.quoted; setText(""); }
 	| { state == State.quoted }?=> '"' { state = State.condition; channel = HIDDEN; }
-	| { state == State.quoted }?=> (~('"'|'%'|'$'|'\n'|'\r'|'\\'))+ | '\\\\' | '\\"'
+	| { state == State.quoted }?=> (~('"'|'%'|'$'|'\n'|'\r'|'\\'))+ | ('\\' str=ANY { setText($str.text); })
 	) { System.out.print("STRING "); }
 	;
 LABEL
@@ -305,6 +305,9 @@ fragment WS
 	;
 fragment DIGIT
 	: '0'..'9'
+	;
+fragment ANY
+	: .
 	;
 fragment WORD_CHAR
 	: ('a'..'z'|DIGIT|'_')
