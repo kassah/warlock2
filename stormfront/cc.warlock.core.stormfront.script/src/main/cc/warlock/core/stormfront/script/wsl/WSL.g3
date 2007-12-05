@@ -224,7 +224,6 @@ VARIABLE
 			{
 				setText($var.text);
 				if(state == State.base) { state = State.variableReplace; atStart = false; }
-				System.out.print("VARIABLE ");
 			}
 	;
 LOCAL_VARIABLE
@@ -232,7 +231,6 @@ LOCAL_VARIABLE
 			{
 				setText($var.text);
 				if(state == State.base) { state = State.variableReplace; atStart = false; }
-				System.out.print("LOCALVARIABLE ");
 			}
 	;
 IF

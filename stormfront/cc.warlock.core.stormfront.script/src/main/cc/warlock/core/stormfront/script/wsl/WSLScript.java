@@ -452,64 +452,7 @@ public class WSLScript extends AbstractScript {
 		}
 	}
 
-	protected class WSLCounter extends WSLCommandDefinition {
-		
-		public void execute (String arguments) {
-			String[] args = arguments.split(argSeparator);
-			if (args.length < 1) {
-				scriptError("Invalid arguments to counter");
-				return;
-			}
-			
-			int operand;
-			if (args.length > 1)
-				operand = Integer.parseInt(args[1]);
-			else
-				operand = 1;
 
-			String counterFunction = args[0];
-			int value = variableExists("c") ?
-					Integer.parseInt(getVariable("c").toString()) : 0;
-
-			if ("set".equalsIgnoreCase(counterFunction))
-			{
-				setVariable("c", Integer.toString(operand));
-			}
-			else if ("add".equalsIgnoreCase(counterFunction))
-			{	
-				int newValue = value + operand;
-				setVariable("c", Integer.toString(newValue));
-			}
-			else if ("subtract".equalsIgnoreCase(counterFunction))
-			{
-				int newValue = value - operand;
-				setVariable("c", Integer.toString(newValue));
-			}
-			else if ("multiply".equalsIgnoreCase(counterFunction))
-			{
-				int newValue = value * operand;
-				setVariable("c", Integer.toString(newValue));
-			}
-			else if ("divide".equalsIgnoreCase(counterFunction))
-			{
-				if (operand == 0) {
-					scriptError("Cannot divide by zero");
-					return;
-				}
-				int newValue = value / operand;
-				setVariable("c", Integer.toString(newValue));
-			}
-			else if ("modulus".equalsIgnoreCase(counterFunction))
-			{
-				int newValue = value % operand;
-				setVariable("c", Integer.toString(newValue));
-			}
-			else
-			{
-				scriptError("Unrecognized counter command");
-			}
-		}
-	}
 
 	protected class WSLDeleteVariable extends WSLCommandDefinition {
 		
@@ -745,73 +688,110 @@ public class WSLScript extends AbstractScript {
 		}
 	}
 	
-	
-	protected class WSLMath extends WSLCommandDefinition {
+	protected class WSLCounter extends WSLCommandDefinition {
 		
 		public void execute (String arguments) {
-			String[] args = arguments.split(argSeparator);
-			if (args.length < 2) {
-				scriptError("Invalid arguments to counter");
+			if (arguments.length() == 0) {
+				scriptError("You must provide an argument to counter");
 				return;
 			}
 			
-			int operand;
-			if (args.length > 2)
-				operand = Integer.parseInt(args[2]);
-			else
-				operand = 1;
-
-			String counterFunction = args[1];
-			String targetVar = args[0];
-			int value = variableExists(targetVar) ?
-					Integer.parseInt(getVariable(targetVar).toString()) : 0;
-
-			if ("set".equalsIgnoreCase(counterFunction))
-			{
-				setVariable(targetVar, Integer.toString(operand));
-			}
-			else if ("add".equalsIgnoreCase(counterFunction))
-			{	
-				int newValue = value + operand;
-				setVariable(targetVar, Integer.toString(newValue));
-			}
-			else if ("subtract".equalsIgnoreCase(counterFunction))
-			{
-				int newValue = value - operand;
-				setVariable(targetVar, Integer.toString(newValue));
-			}
-			else if ("multiply".equalsIgnoreCase(counterFunction))
-			{
-				int newValue = value * operand;
-				setVariable(targetVar, Integer.toString(newValue));
-			}
-			else if ("divide".equalsIgnoreCase(counterFunction))
-			{
-				if (operand == 0) {
-					scriptError("Cannot divide by zero");
-					return;
-				}
-				int newValue = value / operand;
-				setVariable(targetVar, Integer.toString(newValue));
-			}
-			else if ("modulus".equalsIgnoreCase(counterFunction))
-			{
-				int newValue = value % operand;
-				setVariable(targetVar, Integer.toString(newValue));
-			}
-			else
-			{
-				scriptError("Unrecognized counter command");
-			}
+			doMath("c", arguments);
+			
 		}
 	}
 	
+	protected class WSLMath extends WSLCommandDefinition {
+
+		public void execute (String arguments) {
+			String[] args = arguments.split(argSeparator, 2);
+			if (args.length < 2) {
+				scriptError("Not enough arguments to math");
+				return;
+			}
+
+			doMath(args[0], args[1]);
+
+		}
+	}
 	
+	private void doMath(String targetVar, String arguments) {
+		String[] args = arguments.split(argSeparator);
+		if (args.length < 1) {
+			scriptError("No operator for math");
+			return;
+		}
+
+		String operator = args[0];
+		
+		int operand;
+		if (args.length > 1) {
+			try {
+				operand = Integer.parseInt(args[1]);
+			} catch (NumberFormatException e) {
+				scriptError("Operand must be a number");
+				return;
+			}
+		} else
+				operand = 1;
+
+		if ("set".equalsIgnoreCase(operator))
+		{
+			setVariable(targetVar, Integer.toString(operand));
+			return;
+		}
+		
+		int value;
+		if(variableExists(targetVar)) {
+			try {
+				value = Integer.parseInt(getVariable(targetVar).toString());
+			} catch(NumberFormatException e) {
+				scriptError("The variable \"" + targetVar + "\" must be a number to do math with it");
+				return;
+			}
+		} else
+				value = 0;
+
+
+		if ("add".equalsIgnoreCase(operator))
+		{	
+			int newValue = value + operand;
+			setVariable(targetVar, Integer.toString(newValue));
+		}
+		else if ("subtract".equalsIgnoreCase(operator))
+		{
+			int newValue = value - operand;
+			setVariable(targetVar, Integer.toString(newValue));
+		}
+		else if ("multiply".equalsIgnoreCase(operator))
+		{
+			int newValue = value * operand;
+			setVariable(targetVar, Integer.toString(newValue));
+		}
+		else if ("divide".equalsIgnoreCase(operator))
+		{
+			if (operand == 0) {
+				scriptError("Cannot divide by zero");
+				return;
+			}
+			int newValue = value / operand;
+			setVariable(targetVar, Integer.toString(newValue));
+		}
+		else if ("modulus".equalsIgnoreCase(operator))
+		{
+			int newValue = value % operand;
+			setVariable(targetVar, Integer.toString(newValue));
+		}
+		else
+		{
+			scriptError("Unrecognized math command \"" + operator + "\"");
+		}
+	}
 
 	protected class WSLWaitForRe extends WSLCommandDefinition {
-		
+
 		private Pattern format = Pattern.compile("^/(.*)/(\\w*)");
-		
+
 		public void execute (String arguments) {
 			Matcher m = format.matcher(arguments);
 			
