@@ -29,32 +29,37 @@ script
 	;
 
 line
-	: (l=expr
+	: (label=LABEL)? c=expr
 		{
-			script.addLine(l);
+			script.addCommand(c);
+			if(label != null)
+				script.addLabel($label.text, c);
+			lineNum++;
 		}
-		)? { lineNum++; }
 	;
 
-expr returns [WSLScriptLine line]
-	: label=LABEL (l=expr)?
+expr returns [WSLAbstractCommand command]
+	: IF cond=conditionalExpression THEN c=expr
 		{
-			if (l == null) {
-				line = new WSLScriptLine(lineNum);
-			} else {
-				line = l;
-			}
-		
-			script.addLabel($label.text, line);
+			command = new WSLCondition(lineNum, cond, c);
 		}
-	| (IF cond=conditionalExpression THEN)?
-		args=value_list
-			{
-				line = new WSLScriptLine(lineNum);
-				line.setValue(args);
-				if(cond != null)
-					line.setCondition(cond);
-			}
+	| ACTION c=expr WHEN args=value_list
+		{
+			command = new WSLAction(lineNum, script, c, args);
+		}
+	| ACTION REMOVE args=value_list
+		{
+			command = new WSLActionRemove(lineNum, script, args);
+		}
+	| ACTION CLEAR
+		{
+			command = new WSLActionClear(lineNum, script);
+		}
+	| args=value_list
+		{
+			command = new WSLCommand(lineNum, script, args);
+		}
+	| { command = new WSLCommand(lineNum, script, null); }
 	;
 
 value_list returns [IWSLValue value]
@@ -256,10 +261,16 @@ CONTAINS
 	: { state == State.condition }?=> ('contains') { System.out.print("CONTAINS "); }
 	;
 ACTION
-	: { state == State.base }?=> 'action' { state = State.action; atStart = false; }
+	: { state == State.base }?=> 'action' WS+ { state = State.action; atStart = false; System.out.print("ACTION "); }
 	;
 WHEN
-	: { state == State.action }?=> 'when' { state = State.base; }
+	: { state == State.action }?=> 'when' { state = State.base; System.out.print("WHEN "); }
+	;
+REMOVE
+	: { state == State.action }?=> 'remove' { state = State.base; }
+	;
+CLEAR
+	: { state == State.action }?=> 'clear' { state = State.base; }
 	;
 TRUE
 	: { state == State.condition || state == State.action }?=> 'true'
@@ -283,9 +294,9 @@ STRING
 			if(state == State.base) { state = State.command; atStart = false; }
 		}
 	| { state == State.condition }?=> NORMAL_STRING
-	| { state == State.action }?=> (~(WS|'%'|'$'|'\n'|'\r'))+
-	| { state == State.condition || state == State.action }?=> '"' str=NQQ_STRING '"' { setText($str.text); }
-	| { state == State.condition || state == State.action }?=> '\'' str=NQ_STRING '\'' { setText($str.text); }
+	| { state == State.action }?=> (~(WS|'%'|'$'|'\n'|'\r'))+ | WS+
+	| { state == State.condition }?=> '"' str=NQQ_STRING '"' { setText($str.text); }
+	| { state == State.condition }?=> '\'' str=NQ_STRING '\'' { setText($str.text); }
 	) { System.out.print("STRING "); }
 	;
 
