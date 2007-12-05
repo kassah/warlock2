@@ -43,6 +43,7 @@ public class WSLScript extends AbstractScript {
 	protected Thread scriptThread;
 	private Pattern commandPattern = Pattern.compile("^([\\w_]+)(\\s+(.*))?");
 	private ScriptTimer timer = new ScriptTimer();
+	private boolean lastCondition = false;
 	private ArrayList<WSLAbstractCommand> commands = new ArrayList<WSLAbstractCommand>();
 	
 	protected WSLEngine engine;
@@ -63,30 +64,31 @@ public class WSLScript extends AbstractScript {
 		scriptCommands = new StormFrontScriptCommands(client, this);
 		
 		// add command handlers
-		addCommandDefinition("put", new WSLPut());
-		addCommandDefinition("echo", new WSLEcho());
-		addCommandDefinition("pause", new WSLPause());
-		addCommandDefinition("shift", new WSLShift());
-		addCommandDefinition("save", new WSLSave());
 		addCommandDefinition("counter", new WSLCounter());
 		addCommandDefinition("deletevariable", new WSLDeleteVariable());
-		addCommandDefinition("setvariable", new WSLSetVariable());
-		addCommandDefinition("setlocalvariable", new WSLSetLocalVariable());
-		addCommandDefinition("goto", new WSLGoto());
+		addCommandDefinition("echo", new WSLEcho());
+		addCommandDefinition("else", new WSLElse());
+		addCommandDefinition("exit", new WSLExit());
 		addCommandDefinition("gosub", new WSLGosub());
-		addCommandDefinition("random", new WSLRandom());
-		addCommandDefinition("return", new WSLReturn());
-		addCommandDefinition("matchwait", new WSLMatchWait());
-		addCommandDefinition("matchre", new WSLMatchRe());
+		addCommandDefinition("goto", new WSLGoto());
 		addCommandDefinition("match", new WSLMatch());
+		addCommandDefinition("matchre", new WSLMatchRe());
+		addCommandDefinition("matchwait", new WSLMatchWait());
 		addCommandDefinition("math", new WSLMath());
-		addCommandDefinition("waitforre", new WSLWaitForRe());
-		addCommandDefinition("waitfor", new WSLWaitFor());
-		addCommandDefinition("wait", new WSLWait());
 		addCommandDefinition("move", new WSLMove());
 		addCommandDefinition("nextroom", new WSLNextRoom());
-		addCommandDefinition("exit", new WSLExit());
+		addCommandDefinition("pause", new WSLPause());
+		addCommandDefinition("put", new WSLPut());
+		addCommandDefinition("random", new WSLRandom());
+		addCommandDefinition("return", new WSLReturn());
+		addCommandDefinition("save", new WSLSave());
+		addCommandDefinition("setlocalvariable", new WSLSetLocalVariable());
+		addCommandDefinition("setvariable", new WSLSetVariable());
+		addCommandDefinition("shift", new WSLShift());
 		addCommandDefinition("timer", new WSLTimer());
+		addCommandDefinition("wait", new WSLWait());
+		addCommandDefinition("waitfor", new WSLWaitFor());
+		addCommandDefinition("waitforre", new WSLWaitForRe());
 		
 		for(int i = 0; i <= 9; i++) {
 			addCommandDefinition("if_" + i, new WSLIf_(String.valueOf(i)));
@@ -995,6 +997,20 @@ public class WSLScript extends AbstractScript {
 						}
 					}
 				}
+			}
+		}
+	}
+	
+	public void setLastCondition(boolean condition) {
+		this.lastCondition = condition;
+	}
+	
+	private class WSLElse extends WSLCommandDefinition {
+		
+		public void execute (String arguments) {
+			if (!lastCondition)
+			{
+				WSLScript.this.execute(arguments);
 			}
 		}
 	}

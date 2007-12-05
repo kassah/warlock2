@@ -41,7 +41,7 @@ line
 expr returns [WSLAbstractCommand command]
 	: IF cond=conditionalExpression THEN c=expr
 		{
-			command = new WSLCondition(lineNum, cond, c);
+			command = new WSLCondition(lineNum, script, cond, c);
 		}
 	| ACTION c=expr WHEN args=value_list
 		{
