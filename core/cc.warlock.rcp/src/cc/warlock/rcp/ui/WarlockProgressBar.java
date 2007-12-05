@@ -43,7 +43,7 @@ public class WarlockProgressBar extends Canvas
 		int minHeight = 8;
 		
 		progressFont = new Font(getShell().getDisplay(),
-			textData.name, (int)Math.max(minHeight,textData.height), textData.style);
+			textData.getName(), (int)Math.max(minHeight,textData.getHeight()), textData.getStyle());
 		foreground = new Color(getShell().getDisplay(), 255, 255, 255);
 		background = new Color(getShell().getDisplay(), 0, 0, 0);
 		borderColor = new Color(getShell().getDisplay(), 25, 25, 25);
