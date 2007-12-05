@@ -83,7 +83,7 @@ script_value returns [IWSLValue value]
 	
 conditionalExpression returns [IWSLValue cond]
 	: arg=conditionalAndExpression  { ArrayList<IWSLValue> args = null; }
-		(('||' | 'or') argNext=conditionalAndExpression
+		(OR argNext=conditionalAndExpression
 			{
 				if(args == null) {
 					args = new ArrayList<IWSLValue>();
@@ -102,7 +102,7 @@ conditionalExpression returns [IWSLValue cond]
 
 conditionalAndExpression returns [IWSLValue cond]
 	: arg=equalityExpression { ArrayList<IWSLValue> args = null; }
-		(('&&' | 'and') argNext=equalityExpression
+		(AND argNext=equalityExpression
 			{
 				if(args == null) {
 					args = new ArrayList<IWSLValue>();
@@ -183,12 +183,12 @@ relationalOp returns [RelationalOperator op]
 	| '<'			{ op = RelationalOperator.LessThan; }
 	| '>='			{ op = RelationalOperator.GreaterThanEqualTo; }
 	| '<='			{ op = RelationalOperator.LessThanEqualTo; }
-	| 'contains'	{ op = RelationalOperator.Contains; }
+	| CONTAINS		{ op = RelationalOperator.Contains; }
 	;
 
 unaryExpression returns [IWSLValue cond]
-	: ('!' | 'not') arg=unaryExpression	{ cond = new WSLNotCondition(arg); }
-	| ('exist' | 'exists') arg=unaryExpression	{ cond = new WSLExistsCondition(arg); }
+	: NOT arg=unaryExpression	{ cond = new WSLNotCondition(arg); }
+	| EXISTS arg=unaryExpression	{ cond = new WSLExistsCondition(arg); }
 	| arg=primaryExpression		{ cond = arg; }
 	;
 
@@ -222,14 +222,16 @@ VARIABLE
 	: '%' var=NORMAL_STRING '%'?
 			{
 				setText($var.text);
-				if(state == State.base) { state = State.command; atStart = false; System.out.print("VARIABLE "); }
+				if(state == State.base) { state = State.command; atStart = false; }
+				System.out.print("VARIABLE ");
 			}
 	;
 LOCAL_VARIABLE
 	:  '$' var=NORMAL_STRING '$'?
 			{
 				setText($var.text);
-				if(state == State.base) { state = State.command; atStart = false; System.out.print("LOCALVARIABLE "); }
+				if(state == State.base) { state = State.command; atStart = false; }
+				System.out.print("LOCALVARIABLE ");
 			}
 	;
 IF
@@ -237,6 +239,21 @@ IF
 	;
 THEN
 	: { state == State.condition }?=> 'then' { state = State.base; System.out.print("THEN "); }
+	;
+OR
+	: { state == State.condition }?=> ('||' | 'or') { System.out.print("OR "); }
+	;
+AND
+	: { state == State.condition }?=> ('&&' | 'and') { System.out.print("AND "); }
+	;
+NOT
+	: { state == State.condition }?=> ('!' | 'not') { System.out.print("NOT "); }
+	;
+EXISTS
+	: { state == State.condition }?=> ('exists') { System.out.print("EXISTS "); }
+	;
+CONTAINS
+	: { state == State.condition }?=> ('contains') { System.out.print("CONTAINS "); }
 	;
 ACTION
 	: { state == State.base }?=> 'action' { state = State.action; atStart = false; }
@@ -265,7 +282,8 @@ STRING
 		{
 			if(state == State.base) { state = State.command; atStart = false; }
 		}
-	| { state == State.condition || state == State.action }?=> (~(WS|'%'|'$'|'\r'|'\n'))+
+	| { state == State.condition }?=> NORMAL_STRING
+	| { state == State.action }?=> (~(WS|'%'|'$'|'\n'|'\r'))+
 	| { state == State.condition || state == State.action }?=> '"' str=NQQ_STRING '"' { setText($str.text); }
 	| { state == State.condition || state == State.action }?=> '\'' str=NQ_STRING '\'' { setText($str.text); }
 	) { System.out.print("STRING "); }

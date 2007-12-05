@@ -12,7 +12,6 @@ import java.util.concurrent.locks.ReentrantLock;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-import org.antlr.runtime.ANTLRReaderStream;
 import org.antlr.runtime.CharStream;
 import org.antlr.runtime.CommonTokenStream;
 import org.antlr.runtime.RecognitionException;
@@ -109,19 +108,19 @@ public class WSLScript extends AbstractScript {
 	}
 
 	public IWSLValue getVariable(String name) {
-		return globalVariables.get(name);
+		return globalVariables.get(name.toLowerCase());
 	}
 	
 	public boolean variableExists(String name) {
-		return globalVariables.containsKey(name);
+		return globalVariables.containsKey(name.toLowerCase());
 	}
 	
 	public boolean localVariableExists(String name) {
-		return localVariables.containsKey(name);
+		return localVariables.containsKey(name.toLowerCase());
 	}
 	
 	public IWSLValue getLocalVariable(String name) {
-		return localVariables.get(name);
+		return localVariables.get(name.toLowerCase());
 	}
 	
 	public boolean isRunning() {
@@ -526,11 +525,11 @@ public class WSLScript extends AbstractScript {
 	}
 	
 	private void setVariable(String name, IWSLValue value) {
-		globalVariables.put(name, value);
+		globalVariables.put(name.toLowerCase(), value);
 	}
 	
 	private void deleteVariable(String name) {
-		globalVariables.remove(name);
+		globalVariables.remove(name.toLowerCase());
 	}
 	
 	protected class WSLSetVariable extends WSLCommand {

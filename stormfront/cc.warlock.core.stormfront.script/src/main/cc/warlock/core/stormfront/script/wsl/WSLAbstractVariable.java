@@ -19,6 +19,12 @@ abstract public class WSLAbstractVariable extends WSLAbstractString {
 		return value.toString();
 	}
 	
+	@Override
+	public boolean toBoolean() {
+		if(!variableExists()) return false;
+		return super.toBoolean();
+	}
+	
 	abstract protected IWSLValue getVariable();
 	abstract protected boolean variableExists();
 }

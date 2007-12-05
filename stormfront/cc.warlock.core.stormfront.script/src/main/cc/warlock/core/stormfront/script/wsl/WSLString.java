@@ -8,26 +8,8 @@ public class WSLString extends WSLAbstractString {
 		this.string = string;
 	}
 	
-	public Type getType() {
-		return Type.String;
-	}
-	
+	@Override
 	public String toString() {
 		return string;
-	}
-
-	public boolean toBoolean() {
-		String str = toString().trim();
-		
-		if(str == null || str.equals("") || str.equals("false") || str.equals("0")) return false;
-		else return true;
-	}
-	
-	public double toDouble() {
-		try {
-			return Double.parseDouble(toString().trim());
-		} catch(NumberFormatException e) {
-			return 0.0;
-		}
 	}
 }
