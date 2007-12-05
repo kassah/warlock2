@@ -79,6 +79,7 @@ public class WSLScript extends AbstractScript {
 		addCommandDefinition("matchwait", new WSLMatchWait());
 		addCommandDefinition("matchre", new WSLMatchRe());
 		addCommandDefinition("match", new WSLMatch());
+		addCommandDefinition("math", new WSLMath());
 		addCommandDefinition("waitforre", new WSLWaitForRe());
 		addCommandDefinition("waitfor", new WSLWaitFor());
 		addCommandDefinition("wait", new WSLWait());
@@ -741,6 +742,69 @@ public class WSLScript extends AbstractScript {
 			}
 		}
 	}
+	
+	
+	protected class WSLMath extends WSLCommandDefinition {
+		
+		public void execute (String arguments) {
+			String[] args = arguments.split(argSeparator);
+			if (args.length < 2) {
+				scriptError("Invalid arguments to counter");
+				return;
+			}
+			
+			int operand;
+			if (args.length > 2)
+				operand = Integer.parseInt(args[2]);
+			else
+				operand = 1;
+
+			String counterFunction = args[1];
+			String targetVar = args[0];
+			int value = variableExists(targetVar) ?
+					Integer.parseInt(getVariable(targetVar).toString()) : 0;
+
+			if ("set".equalsIgnoreCase(counterFunction))
+			{
+				setVariable(targetVar, Integer.toString(operand));
+			}
+			else if ("add".equalsIgnoreCase(counterFunction))
+			{	
+				int newValue = value + operand;
+				setVariable(targetVar, Integer.toString(newValue));
+			}
+			else if ("subtract".equalsIgnoreCase(counterFunction))
+			{
+				int newValue = value - operand;
+				setVariable(targetVar, Integer.toString(newValue));
+			}
+			else if ("multiply".equalsIgnoreCase(counterFunction))
+			{
+				int newValue = value * operand;
+				setVariable(targetVar, Integer.toString(newValue));
+			}
+			else if ("divide".equalsIgnoreCase(counterFunction))
+			{
+				if (operand == 0) {
+					scriptError("Cannot divide by zero");
+					return;
+				}
+				int newValue = value / operand;
+				setVariable(targetVar, Integer.toString(newValue));
+			}
+			else if ("modulus".equalsIgnoreCase(counterFunction))
+			{
+				int newValue = value % operand;
+				setVariable(targetVar, Integer.toString(newValue));
+			}
+			else
+			{
+				scriptError("Unrecognized counter command");
+			}
+		}
+	}
+	
+	
 
 	protected class WSLWaitForRe extends WSLCommandDefinition {
 		
