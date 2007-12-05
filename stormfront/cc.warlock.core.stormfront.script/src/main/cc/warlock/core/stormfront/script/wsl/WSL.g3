@@ -19,7 +19,7 @@ grammar WSL;
 }
 
 @lexer::members {
-	private enum State { base, command, condition, action }
+	private enum State { base, variableReplace, condition, action, quoted }
 	private boolean atStart = true;
 	private State state = State.base;
 }
@@ -219,23 +219,19 @@ COMMENT
 	: { atStart }?=>
 		('#'|';') (~('\n'|'\r'))* { channel = HIDDEN; System.out.print("COMMENT "); }
 	;
-LABEL
-	: { atStart }?=>
-		label=LABEL_STRING ':'			{ setText($label.text); atStart = false; System.out.print("LABEL "); }
-	;
 VARIABLE
-	: '%' var=NORMAL_STRING '%'?
+	: '%' var=WORD '%'?
 			{
 				setText($var.text);
-				if(state == State.base) { state = State.command; atStart = false; }
+				if(state == State.base) { state = State.variableReplace; atStart = false; }
 				System.out.print("VARIABLE ");
 			}
 	;
 LOCAL_VARIABLE
-	:  '$' var=NORMAL_STRING '$'?
+	:  '$' var=WORD '$'?
 			{
 				setText($var.text);
-				if(state == State.base) { state = State.command; atStart = false; }
+				if(state == State.base) { state = State.variableReplace; atStart = false; }
 				System.out.print("LOCALVARIABLE ");
 			}
 	;
@@ -264,13 +260,13 @@ ACTION
 	: { state == State.base }?=> 'action' WS+ { state = State.action; atStart = false; System.out.print("ACTION "); }
 	;
 WHEN
-	: { state == State.action }?=> 'when' { state = State.base; System.out.print("WHEN "); }
+	: { state == State.action }?=> 'when' { state = State.variableReplace; System.out.print("WHEN "); }
 	;
 REMOVE
-	: { state == State.action }?=> 'remove' { state = State.base; }
+	: { state == State.action }?=> 'remove' { state = State.variableReplace; }
 	;
 CLEAR
-	: { state == State.action }?=> 'clear' { state = State.base; }
+	: { state == State.action }?=> 'clear' { state = State.variableReplace; }
 	;
 TRUE
 	: { state == State.condition || state == State.action }?=> 'true'
@@ -283,41 +279,39 @@ NUMBER
 	;
 STRING
 	:
-	( { state == State.command }?=> (~('%'|'$'|'\n'|'\r'))+
-	| { state == State.base }?=> NORMAL_STRING
+	( { state == State.variableReplace }?=> (~('%'|'$'|'\n'|'\r'))+
+	| { state == State.base }?=> WORD
 		{
-			state = State.command;
+			state = State.variableReplace;
 			atStart = false;
 		}
 	| ('%'|'$')
 		{
-			if(state == State.base) { state = State.command; atStart = false; }
+			if(state == State.base) { state = State.variableReplace; atStart = false; }
 		}
-	| { state == State.condition }?=> NORMAL_STRING
+	| { state == State.condition }?=> WORD
 	| { state == State.action }?=> (~(WS|'%'|'$'|'\n'|'\r'))+ | WS+
-	| { state == State.condition }?=> '"' str=NQQ_STRING '"' { setText($str.text); }
-	| { state == State.condition }?=> '\'' str=NQ_STRING '\'' { setText($str.text); }
+	| { state == State.condition }?=> '"' { state = State.quoted; setText(""); }
+	| { state == State.quoted }?=> '"' { state = State.condition; channel = HIDDEN; }
+	| { state == State.quoted }?=> (~('"'|'%'|'$'|'\n'|'\r'|'\\'))+ | '\\\\' | '\\"'
 	) { System.out.print("STRING "); }
 	;
-
+LABEL
+	: label=LABEL_STRING ':'			{ setText($label.text); atStart = false; System.out.print("LABEL "); }
+	;
+	
 fragment WS
 	: ' ' | '\t'
 	;
 fragment DIGIT
 	: '0'..'9'
 	;
-fragment NORMAL_CHAR
+fragment WORD_CHAR
 	: ('a'..'z'|DIGIT|'_')
 	;
-fragment NQQ_STRING
-	: (~('"'|'%'|'$'|'\n'|'\r'))*
-	;
-fragment NQ_STRING
-	: (~('\''|'%'|'$'|'\n'|'\r'))*
-	;
-fragment NORMAL_STRING
-	: NORMAL_CHAR+
+fragment WORD
+	: WORD_CHAR+
 	;
 fragment LABEL_STRING
-	: NORMAL_CHAR (~(WS|':'|'\n'|'\r'|'%'|'$'))*
+	: (WORD_CHAR|'.'|'-')+
 	;
