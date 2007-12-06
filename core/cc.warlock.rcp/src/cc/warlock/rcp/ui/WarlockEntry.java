@@ -218,21 +218,27 @@ public class WarlockEntry implements VerifyKeyListener {
 		setText("");
 	}
 	
-	private void send(String command) {
+	private void send (String command) {
+		send (command, true);
+	}
+	
+	private void send(String command, boolean addToHistory) {
 		viewer.getWarlockClient().send(command);
-		viewer.getWarlockClient().getCommandHistory().addCommand(command);
+		
+		if (addToHistory)
+			viewer.getWarlockClient().getCommandHistory().addCommand(command);
 	}
 	
 	public void repeatLastCommand() {
 		ICommand command = viewer.getWarlockClient().getCommandHistory().getLastCommand();
-		send(command.getCommand());
+		send(command.getCommand(), false);
 	}
 	
-	public void repeatSecondToLastCommand() {	
+	public void repeatSecondToLastCommand() {
 		if (viewer.getWarlockClient().getCommandHistory().size() >= 2)
 		{
 			ICommand command = viewer.getWarlockClient().getCommandHistory().getCommandAt(1);
-			send(command.getCommand());
+			send(command.getCommand(), false);
 		}
 	}
 }
