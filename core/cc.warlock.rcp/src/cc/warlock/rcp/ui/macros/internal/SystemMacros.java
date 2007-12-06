@@ -26,6 +26,12 @@ public class SystemMacros {
 			systemMacros.add(macro);
 		}
 		
+		CommandHistoryMacroHandler commandHistoryMacroHandler = new CommandHistoryMacroHandler();
+		for (IMacro macro : commandHistoryMacroHandler.getMacros())
+		{
+			systemMacros.add(macro);
+		}
+		
 //		systemMacros.add(MacroRegistry.createCommandMacro(SWT.KEYPAD_8, "north\\r"));
 //		systemMacros.add(MacroRegistry.createCommandMacro(SWT.KEYPAD_9, "northeast\\r"));
 //		systemMacros.add(MacroRegistry.createCommandMacro(SWT.KEYPAD_6, "east\\r"));
