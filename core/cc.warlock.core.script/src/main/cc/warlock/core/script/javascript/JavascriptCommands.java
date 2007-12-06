@@ -7,6 +7,7 @@ import org.mozilla.javascript.Scriptable;
 
 import cc.warlock.core.script.IScriptCommands;
 import cc.warlock.core.script.Match;
+import cc.warlock.core.script.internal.RegexMatch;
 import cc.warlock.core.script.internal.TextMatch;
 
 public class JavascriptCommands {
@@ -61,6 +62,16 @@ public class JavascriptCommands {
 	{
 		waitFor(new TextMatch(string, true));
 	}
+	
+	// Default to case sensitivity
+	public void waitForRe(String string) {
+		waitForRe(string, false);
+	}
+	
+	public void waitForRe(String string, Boolean ignoreCase)
+	{
+		waitFor(new RegexMatch(string, ignoreCase));
+	}
 
 	public void waitFor(Match match) {
 		commands.waitFor(match);
@@ -76,8 +87,31 @@ public class JavascriptCommands {
 		throw new JavascriptStopException();
 	}
 	
+	// Match match(String text, Function function[, Scriptable object])
+	
+	public Match match(String text, Function function) {
+		return match(text, function, null);
+	}
+	
 	public Match match(String text, Function function, Scriptable object) {
 		Match m = new TextMatch(text);
+		m.setAttribute(CALLBACK, function);
+		m.setAttribute(USER_OBJECT, object);
+		
+		return m;
+	}
+	
+	// Match matchre(String text, Function function[, Boolean ignoreCase[, Scriptable object]])
+	public Match matchRe(String text, Function function) {
+		return matchRe(text, function, false);
+	}
+	
+	public Match matchRe(String text, Function function, Boolean ignoreCase) {
+		return matchRe(text, function, ignoreCase, null);
+	}
+	
+	public Match matchRe(String text, Function function, Boolean ignoreCase, Scriptable object) {
+		Match m = new RegexMatch(text, ignoreCase);
 		m.setAttribute(CALLBACK, function);
 		m.setAttribute(USER_OBJECT, object);
 		
