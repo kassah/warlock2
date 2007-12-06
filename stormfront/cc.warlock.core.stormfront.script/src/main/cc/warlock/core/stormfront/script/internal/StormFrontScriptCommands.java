@@ -123,7 +123,6 @@ public class StormFrontScriptCommands extends ScriptCommands implements IStormFr
 							((WSLScript)script).setLocalVariable(String.valueOf(i), value);
 						}
 						command.execute();
-						break;
 					}
 				}
 			}
