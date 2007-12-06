@@ -95,6 +95,7 @@ public class JavascriptEngine implements IScriptEngine {
 					Reader reader = script.getScriptInfo().openReader();
 					Object result = context.evaluateReader(scope, reader, script.getName(), 1, null);
 					System.out.println("script result: " + Context.toString(result));
+					script.getClient().getDefaultStream().echo("[script finished: " + script.getName() + "]\n");
 					reader.close();
 				}
 				catch (WrappedException e) {
@@ -102,6 +103,7 @@ public class JavascriptEngine implements IScriptEngine {
 				}
 				catch (Exception e) {
 					e.printStackTrace();
+					script.getClient().getDefaultStream().echo("[script terminated with error: "+ script.getName()+"]");
 				}
 				finally {
 					Context.exit();

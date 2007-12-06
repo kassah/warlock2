@@ -50,6 +50,7 @@ public class JavascriptScript extends AbstractScript {
 	
 	public void start () {
 		stopped = false;
+		client.getDefaultStream().echo("[script started: " + getName() + "]\n");
 		
 		for (IScriptListener listener : listeners) listener.scriptStarted(this);
 	}
@@ -57,17 +58,19 @@ public class JavascriptScript extends AbstractScript {
 	public void stop() {
 		stopped = true;
 		commands.stop();
+		client.getDefaultStream().echo("[script stopped: " + getName() + "]\n");
 		
 		super.stop();
 	}
 	
 	public void suspend() {
-
+		// TODO Implement Suspend within JavaScript.
+		client.getDefaultStream().echo("[Pausing not yet supported in JavaScript.]\n");
 	}
 	
 	public void resume() {
-		// TODO Auto-generated method stub
-		
+		// TODO Implement Resume within JavaScript.
+		client.getDefaultStream().echo("[Pausing not yet supported in JavaScript.]\n");
 	}
 
 	public JavascriptCommands getCommands() {
