@@ -32,6 +32,7 @@ import cc.warlock.core.stormfront.script.internal.StormFrontScriptCommands;
 public class WSLScript extends AbstractScript {
 	
 	protected boolean running, stopped;
+	protected boolean debugging = false;
 	protected HashMap<String, WSLAbstractCommand> labels = new HashMap<String, WSLAbstractCommand>();
 	protected WSLAbstractCommand nextCommand;
 	protected WSLAbstractCommand curCommand;
@@ -326,11 +327,13 @@ public class WSLScript extends AbstractScript {
 		if(arguments == null) arguments = "";
 		
 		WSLCommandDefinition command = wslCommands.get(commandName);
-		if(command != null)
+		if(command != null) {
+			if (debugging) scriptCommands.echo("Debug: " + line);
 			command.execute(arguments);
-		else
+		} else {
 			//TODO output the line number here
 			scriptCommands.echo("Invalid command \"" + line + "\"");
+		}
 	}
 	
 	public void stop() {
