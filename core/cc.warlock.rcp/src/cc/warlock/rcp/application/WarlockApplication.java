@@ -117,6 +117,11 @@ public class WarlockApplication extends WorkbenchAdvisor implements IApplication
 	}
 	
 	@Override
+	public void postStartup() {
+		WarlockPerspectiveLayout.instance().loadBounds();
+	}
+	
+	@Override
 	public boolean preShutdown() {
 		timer.cancel();
 		WarlockPerspectiveLayout.instance().saveLayout();
