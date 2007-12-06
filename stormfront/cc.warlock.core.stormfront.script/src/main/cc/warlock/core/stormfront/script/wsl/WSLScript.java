@@ -722,12 +722,12 @@ public class WSLScript extends AbstractScript {
 			return;
 		}
 
-		String operator = args[0];
+		String operator = args[0].trim().toLowerCase();
 		
 		int operand;
 		if (args.length > 1) {
 			try {
-				operand = Integer.parseInt(args[1]);
+				operand = Integer.parseInt(args[1].trim());
 			} catch (NumberFormatException e) {
 				scriptError("Operand must be a number");
 				return;
@@ -744,7 +744,7 @@ public class WSLScript extends AbstractScript {
 		int value;
 		if(variableExists(targetVar)) {
 			try {
-				value = Integer.parseInt(getVariable(targetVar).toString());
+				value = (int)getVariable(targetVar).toDouble();
 			} catch(NumberFormatException e) {
 				scriptError("The variable \"" + targetVar + "\" must be a number to do math with it");
 				return;
