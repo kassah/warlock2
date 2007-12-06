@@ -89,6 +89,18 @@ public class SWTWarlockClientViewer extends SWTStreamListener implements IWarloc
 		}
 	}
 	
+	private class CopyWrapper implements Runnable {
+		public void run () {
+			viewer.copy();
+		}
+	}
+	
+	private class PasteWrapper implements Runnable {
+		public void run () {
+			viewer.paste();
+		}
+	}
+	
 	public String getCurrentCommand() {
 		return viewer.getCurrentCommand();
 	}
@@ -127,5 +139,13 @@ public class SWTWarlockClientViewer extends SWTStreamListener implements IWarloc
 	
 	public void submit() {
 		run(new SubmitWrapper());
+	}
+	
+	public void copy() {
+		run(new CopyWrapper());
+	}
+	
+	public void paste() {
+		run(new PasteWrapper());
 	}
 }

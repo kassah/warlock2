@@ -5,9 +5,8 @@ import java.util.ArrayList;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.custom.ST;
 import org.eclipse.swt.custom.StyledText;
-import org.eclipse.swt.custom.VerifyKeyListener;
+import org.eclipse.swt.events.KeyEvent;
 import org.eclipse.swt.events.KeyListener;
-import org.eclipse.swt.events.VerifyEvent;
 import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.widgets.Composite;
 
@@ -15,13 +14,11 @@ import cc.warlock.core.client.ICommand;
 import cc.warlock.core.client.IWarlockClientViewer;
 import cc.warlock.rcp.ui.macros.IMacro;
 import cc.warlock.rcp.ui.macros.MacroRegistry;
-import cc.warlock.rcp.ui.macros.internal.CommandHistoryMacroHandler;
 
-public class WarlockEntry implements VerifyKeyListener {
+public class WarlockEntry implements KeyListener {
 
 	private StyledText widget;
 	private IWarlockClientViewer viewer;
-	private ArrayList<IMacro> entryMacros = new ArrayList<IMacro>();
 	private boolean searchMode = false;
 	private StringBuffer searchText = new StringBuffer();
 	private String searchCommand = "";
@@ -32,12 +29,8 @@ public class WarlockEntry implements VerifyKeyListener {
 		widget.setLayoutData(new GridData(GridData.FILL, GridData.FILL, true, true, 1, 1));
 		widget.setEditable(true);
 		widget.setLineSpacing(2);
-		widget.addVerifyKeyListener(this);
+		widget.addKeyListener(this);
 		
-		for (IMacro macro : new CommandHistoryMacroHandler().getMacros())
-		{
-			entryMacros.add(macro);
-		}
 	}
 	
 	public String getText() {
@@ -73,8 +66,11 @@ public class WarlockEntry implements VerifyKeyListener {
 		return widget;
 	}
 
-	public void verifyKey(VerifyEvent e) {
-		for (IMacro macro : entryMacros)
+	public void keyPressed(KeyEvent e) {}
+	
+	public void keyReleased(KeyEvent e) {
+		System.out.println("handling key event: " + e);
+		for (IMacro macro : MacroRegistry.instance().getMacros())
 		{
 			if (macro.getKeyCode() == e.keyCode && macro.getModifiers() == e.stateMask)
 			{

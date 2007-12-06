@@ -32,4 +32,8 @@ public interface IWarlockClientViewer extends IStreamListener {
 	public void repeatLastCommand();
 	
 	public void repeatSecondToLastCommand();
+	
+	public void copy();
+	
+	public void paste();
 }

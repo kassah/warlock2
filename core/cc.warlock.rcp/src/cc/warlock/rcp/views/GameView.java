@@ -8,7 +8,9 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Random;
 
+import org.eclipse.jface.resource.JFaceResources;
 import org.eclipse.swt.SWT;
+import org.eclipse.swt.dnd.Clipboard;
 import org.eclipse.swt.graphics.Color;
 import org.eclipse.swt.graphics.GC;
 import org.eclipse.swt.graphics.Image;
@@ -153,7 +155,7 @@ public abstract class GameView extends StreamView implements IWarlockClientViewe
 		compass = new WarlockCompass(text, CompassThemes.getCompassTheme("small"));
 		text.setBackgroundMode(SWT.INHERIT_DEFAULT);
 		
-		text.getTextWidget().addVerifyKeyListener(entry);
+		text.getTextWidget().addKeyListener(entry);
 		
 	}
 	
@@ -243,6 +245,14 @@ public abstract class GameView extends StreamView implements IWarlockClientViewe
 	
 	public void repeatSecondToLastCommand() {
 		entry.repeatSecondToLastCommand();
+	}
+	
+	public void copy() {
+		text.copy();
+	}
+	
+	public void paste() {
+		entry.getWidget().paste();
 	}
 	
 	public void setClient(IWarlockClient client) {
