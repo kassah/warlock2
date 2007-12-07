@@ -141,7 +141,7 @@ public abstract class GameView extends StreamView implements IWarlockClientViewe
 		text.setBackgroundMode(SWT.INHERIT_DEFAULT);
 		
 		text.getTextWidget().addKeyListener(entry);
-		
+		text.getTextWidget().addVerifyKeyListener(entry);
 	}
 	
 	

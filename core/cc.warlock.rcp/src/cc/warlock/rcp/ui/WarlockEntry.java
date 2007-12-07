@@ -5,8 +5,10 @@ import java.util.ArrayList;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.custom.ST;
 import org.eclipse.swt.custom.StyledText;
+import org.eclipse.swt.custom.VerifyKeyListener;
 import org.eclipse.swt.events.KeyEvent;
 import org.eclipse.swt.events.KeyListener;
+import org.eclipse.swt.events.VerifyEvent;
 import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.widgets.Composite;
 
@@ -15,7 +17,7 @@ import cc.warlock.core.client.IWarlockClientViewer;
 import cc.warlock.rcp.ui.macros.IMacro;
 import cc.warlock.rcp.ui.macros.MacroRegistry;
 
-public class WarlockEntry implements KeyListener {
+public class WarlockEntry implements KeyListener, VerifyKeyListener {
 
 	private StyledText widget;
 	private IWarlockClientViewer viewer;
@@ -30,7 +32,7 @@ public class WarlockEntry implements KeyListener {
 		widget.setEditable(true);
 		widget.setLineSpacing(2);
 		widget.addKeyListener(this);
-		
+		widget.addVerifyKeyListener(this);
 	}
 	
 	public String getText() {
@@ -65,28 +67,21 @@ public class WarlockEntry implements KeyListener {
 	public StyledText getWidget() {
 		return widget;
 	}
+	
+	public void verifyKey(VerifyEvent event) {
+		for (IMacro macro : MacroRegistry.instance().getMacros())
+		{
+			if (macro.getKeyCode() == event.keyCode && macro.getModifiers() == event.stateMask)
+			{
+				event.doit = false;
+				return;
+			}
+		}
+	}
 
 	public void keyPressed(KeyEvent e) {}
 	
 	public void keyReleased(KeyEvent e) {
-		for (IMacro macro : MacroRegistry.instance().getMacros())
-		{
-			if (macro.getKeyCode() == e.keyCode && macro.getModifiers() == e.stateMask)
-			{
-				try {
-					leaveSearchMode();
-					macro.execute(viewer);
-					//keyHandled = true;
-				} catch (Exception ex) {
-					// TODO Auto-generated catch block
-					ex.printStackTrace();
-				}
-
-				e.doit = false;
-				return;
-			}
-		}
-		
 		for (IMacro macro : MacroRegistry.instance().getMacros())
 		{
 			if (macro.getKeyCode() == e.keyCode && macro.getModifiers() == e.stateMask)
