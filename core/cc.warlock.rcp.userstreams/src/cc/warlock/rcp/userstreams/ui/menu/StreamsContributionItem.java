@@ -38,13 +38,11 @@ public class StreamsContributionItem extends CompoundContributionItem  {
 		// (say|ask|exclaim|whisper)
 		filters.add(new StreamFilter("^\\w+ \\w+( (at|to) \\w+)?, \".+\"$", IStreamFilter.type.regex));
 		filters.add(new StreamFilter("thoughts in your head", IStreamFilter.type.string));
-		filters.add(new StreamFilter("^\\w+ (nod|lean|stretch|smile|yawn|chuckle|chortle|beam|hug|applaud|babble|blink|bow|cackle|cringe|cower|weep|mumble|wave|ponder|peers quizzically|snort|snuggle|cuddle|smirk|laugh|jumps back from|nods? slightly|whistles? a merry tune.)", IStreamFilter.type.regex));
+		filters.add(new StreamFilter("^\\w+ (\\bnod|\\blean|\\bstretch|\\bsmile|\\byawn|\\bchuckle|\\bchortle|\\bbeam|\\bhug|\\bapplaud|\\bbabble|\\bblink|\\bbow|\\bcackle|\\bcringe|\\bcower|\\bweep|\\bmumble|\\bwave|\\bponder|\\bpeers quizzically|\\bsnort|\\bsnuggle|\\bcuddle|\\bsmirk|\\blaugh|\\bjumps back from|\\bwhistles? a merry tune.)", IStreamFilter.type.regex));
 		filters.add(new StreamFilter("accusatory", IStreamFilter.type.string));
 		filters.add(new StreamFilter("flush", IStreamFilter.type.string));
 		filters.add(new StreamFilter("\"Boo\"", IStreamFilter.type.string));
-		filters.add(new StreamFilter("weep", IStreamFilter.type.string));
-		filters.add(new StreamFilter("mumble", IStreamFilter.type.string));
-		filters.add(new StreamFilter("dance", IStreamFilter.type.string));
+		// filters.add(new StreamFilter("dance", IStreamFilter.type.string));
 		filters.add(new StreamFilter("^\\((?!You ).+\\)$", IStreamFilter.type.regex));	//act
 		filters.add(new StreamFilter("^(You tickle |As you reach out to tickle ).+$", IStreamFilter.type.regex));	// tickle: 1st person
 		filters.add(new StreamFilter("^\\w+ just tickled you", IStreamFilter.type.regex));							// tickle: 2nd person
