@@ -11,6 +11,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.mozilla.javascript.Context;
+import org.mozilla.javascript.RhinoException;
 import org.mozilla.javascript.Scriptable;
 import org.mozilla.javascript.WrappedException;
 
@@ -99,11 +100,17 @@ public class JavascriptEngine implements IScriptEngine {
 					reader.close();
 				}
 				catch (WrappedException e) {
-					
+					System.out.println("Caught a wrapped error.");
+				}
+				catch (RhinoException e) {
+					script.getClient().getDefaultStream().echo(
+							"[JS " + e.details() + " at line " + e.lineNumber() + "]\n"
+							+ "[script terminated: "+ script.getName()+"]\n"
+						);
 				}
 				catch (Exception e) {
 					e.printStackTrace();
-					script.getClient().getDefaultStream().echo("[script terminated with error: "+ script.getName()+"]");
+					script.getClient().getDefaultStream().echo("[script terminated with error: "+ script.getName()+"]\n");
 				}
 				finally {
 					Context.exit();
