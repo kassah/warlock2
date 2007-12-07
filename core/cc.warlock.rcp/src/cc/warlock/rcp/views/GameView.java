@@ -5,12 +5,9 @@ package cc.warlock.rcp.views;
 
 import java.io.IOException;
 import java.util.ArrayList;
-import java.util.Collection;
-import java.util.Random;
+import java.util.List;
 
-import org.eclipse.jface.resource.JFaceResources;
 import org.eclipse.swt.SWT;
-import org.eclipse.swt.dnd.Clipboard;
 import org.eclipse.swt.graphics.Color;
 import org.eclipse.swt.graphics.GC;
 import org.eclipse.swt.graphics.Image;
@@ -78,7 +75,7 @@ public abstract class GameView extends StreamView implements IWarlockClientViewe
 			focusListeners.remove(listener);
 	}
 	
-	public static Collection<GameView> getOpenGameViews ()
+	public static List<GameView> getOpenGameViews ()
 	{
 		return openViews;
 	}

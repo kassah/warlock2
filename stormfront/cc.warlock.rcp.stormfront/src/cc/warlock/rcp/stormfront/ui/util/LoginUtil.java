@@ -33,11 +33,8 @@ public class LoginUtil {
 		int port = Integer.parseInt (loginProperties.get("GAMEPORT"));
 		String key = loginProperties.get("KEY");
 
-		IWarlockClient client = gameView.getWarlockClient();
-		if (client == null)
-		{
-			client = Warlock2Plugin.getDefault().addNextClient(new StormFrontClient());
-		}
+		IWarlockClient client = Warlock2Plugin.getDefault().addNextClient(new StormFrontClient());
+		
 		gameView.setClient(client);
 		
 		IWorkbenchPage page = PlatformUI.getWorkbench().getActiveWorkbenchWindow().getActivePage();
@@ -91,11 +88,17 @@ public class LoginUtil {
 			RCPUtil.openPerspective(StormFrontPerspectiveFactory.PERSPECTIVE_ID);
 		}
 		
-		GameView viewInFocus = GameView.getViewInFocus();
-		if (viewInFocus.getWarlockClient() == null || viewInFocus.getWarlockClient().getConnection() == null)
+		GameView firstEmptyView = null;
+		for (GameView view : GameView.getOpenGameViews()) {
+			if (view.getWarlockClient().getConnection() == null || !view.getWarlockClient().getConnection().isConnected()) {
+				firstEmptyView = view; break;
+			}
+		}
+		
+		if (firstEmptyView != null)
 		{
 			// reuse the existing view if it's already created
-			connect(viewInFocus, loginProperties);
+			connect(firstEmptyView, loginProperties);
 		}
 		else 
 		{
