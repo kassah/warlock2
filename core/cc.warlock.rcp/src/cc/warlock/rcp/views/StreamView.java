@@ -116,6 +116,12 @@ public class StreamView extends ViewPart implements IStreamListener, IGameViewFo
 		
 		book = new PageBook(mainComposite, SWT.NONE);
 		book.setLayoutData(new GridData(GridData.FILL, GridData.FILL, true, true));
+
+		if (!(this instanceof GameView))
+		{
+			String streamName = getViewSite().getId().substring(getViewSite().getId().lastIndexOf('.')+1);
+			setStreamName(streamName);
+		}
 	}
 	
 	protected WarlockText getTextForClient (IWarlockClient client)
