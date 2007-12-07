@@ -69,7 +69,6 @@ public class WarlockEntry implements KeyListener {
 	public void keyPressed(KeyEvent e) {}
 	
 	public void keyReleased(KeyEvent e) {
-		System.out.println("handling key event: " + e);
 		for (IMacro macro : MacroRegistry.instance().getMacros())
 		{
 			if (macro.getKeyCode() == e.keyCode && macro.getModifiers() == e.stateMask)
