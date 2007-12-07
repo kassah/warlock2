@@ -11,11 +11,16 @@ import org.eclipse.equinox.app.IApplication;
 import org.eclipse.equinox.app.IApplicationContext;
 import org.eclipse.swt.graphics.Point;
 import org.eclipse.swt.widgets.Display;
+import org.eclipse.ui.PartInitException;
 import org.eclipse.ui.PlatformUI;
+import org.eclipse.ui.WorkbenchException;
+import org.eclipse.ui.application.IWorkbenchConfigurer;
 import org.eclipse.ui.application.IWorkbenchWindowConfigurer;
 import org.eclipse.ui.application.WorkbenchAdvisor;
+import org.eclipse.ui.application.WorkbenchWindowAdvisor;
 
 import cc.warlock.core.configuration.WarlockConfiguration;
+import cc.warlock.rcp.views.ConnectionView;
 
 import com.martiansoftware.jsap.FlaggedOption;
 import com.martiansoftware.jsap.JSAP;
@@ -64,6 +69,11 @@ public class WarlockApplication extends WorkbenchAdvisor implements IApplication
 			configurer.setTitle(windowTitle);
 		if (initialSize != null)
 			configurer.setInitialSize(initialSize);
+	}
+	
+	@Override
+	public void initialize(IWorkbenchConfigurer configurer) {
+		configurer.setSaveAndRestore(true);
 	}
 	
 	@Override
@@ -124,6 +134,7 @@ public class WarlockApplication extends WorkbenchAdvisor implements IApplication
 	@Override
 	public boolean preShutdown() {
 		timer.cancel();
+		
 		WarlockPerspectiveLayout.instance().saveLayout();
 		return true;
 	}

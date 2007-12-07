@@ -222,9 +222,7 @@ public class CharacterSelectWizardPage extends WizardPage {
 				}
 			}
 			
-			LoginUtil.connectAndOpenGameView(loginProperties);
-			
-			
+			LoginUtil.connectAndOpenGameView(loginProperties, getSelectedCharacterName());
 		}
 	}
 	

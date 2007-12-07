@@ -74,7 +74,7 @@ public class StreamView extends ViewPart implements IStreamListener, IGameViewFo
 		}
 	}
 	
-	protected void setMultiClient (boolean multiClient)
+	public void setMultiClient (boolean multiClient)
 	{
 		this.multiClient = multiClient;
 	}

@@ -16,7 +16,6 @@ import cc.warlock.core.client.internal.WarlockStyle;
 import cc.warlock.core.stormfront.client.internal.StormFrontClient;
 import cc.warlock.core.stormfront.network.SGEConnection;
 import cc.warlock.rcp.application.WarlockApplication;
-import cc.warlock.rcp.application.WarlockPerspectiveLayout;
 import cc.warlock.rcp.plugin.Warlock2Plugin;
 import cc.warlock.rcp.stormfront.ui.StormFrontPerspectiveFactory;
 import cc.warlock.rcp.stormfront.ui.views.BarsView;
@@ -34,8 +33,13 @@ public class LoginUtil {
 		int port = Integer.parseInt (loginProperties.get("GAMEPORT"));
 		String key = loginProperties.get("KEY");
 
-		IWarlockClient client = Warlock2Plugin.getDefault().addNextClient(new StormFrontClient());
+		IWarlockClient client = gameView.getWarlockClient();
+		if (client == null)
+		{
+			client = Warlock2Plugin.getDefault().addNextClient(new StormFrontClient());
+		}
 		gameView.setClient(client);
+		
 		IWorkbenchPage page = PlatformUI.getWorkbench().getActiveWorkbenchWindow().getActivePage();
 		
 		try {
@@ -47,10 +51,6 @@ public class LoginUtil {
 			{
 				page.showView(BarsView.VIEW_ID);
 			}
-//			if (page.findView(StatusView.VIEW_ID) == null)
-//			{
-//				page.showView(StatusView.VIEW_ID);
-//			}
 		} catch (PartInitException e1) {
 			// TODO Auto-generated catch block
 			e1.printStackTrace();
@@ -83,16 +83,24 @@ public class LoginUtil {
 		}
 	}
 	
-	public static void connectAndOpenGameView (Map<String,String> loginProperties)
+	public static void connectAndOpenGameView (Map<String,String> loginProperties, String characterName)
 	{
 		IWorkbenchPage page = PlatformUI.getWorkbench().getActiveWorkbenchWindow().getActivePage();
 		if (!page.getPerspective().getId().equals(StormFrontPerspectiveFactory.PERSPECTIVE_ID))
 		{
 			RCPUtil.openPerspective(StormFrontPerspectiveFactory.PERSPECTIVE_ID);
-			WarlockPerspectiveLayout.instance().loadSavedLayout();
 		}
 		
-		connect (GameView.createNext(StormFrontGameView.VIEW_ID), loginProperties);
+		GameView viewInFocus = GameView.getViewInFocus();
+		if (viewInFocus.getWarlockClient() == null || viewInFocus.getWarlockClient().getConnection() == null)
+		{
+			// reuse the existing view if it's already created
+			connect(viewInFocus, loginProperties);
+		}
+		else 
+		{
+			connect(GameView.createNext(StormFrontGameView.VIEW_ID, characterName), loginProperties);
+		}
 	}
 	
 	public static void showAuthenticationError (int status)

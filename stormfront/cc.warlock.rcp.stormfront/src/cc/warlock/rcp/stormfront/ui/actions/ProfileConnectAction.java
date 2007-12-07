@@ -95,7 +95,7 @@ public class ProfileConnectAction extends Action implements ISGEConnectionListen
 			finished = true;
 		}
 	}
-	
+	 
 	public void charactersReady(SGEConnection connection, Map<String, String> characters) {
 		monitor.worked(1);
 		
@@ -109,7 +109,7 @@ public class ProfileConnectAction extends Action implements ISGEConnectionListen
 		if (!monitor.isCanceled())
 		{
 			if (gameView == null)
-				LoginUtil.connectAndOpenGameView(loginProperties);
+				LoginUtil.connectAndOpenGameView(loginProperties, profile.getCharacterName());
 			else
 				LoginUtil.connect(gameView, loginProperties);
 		} else {

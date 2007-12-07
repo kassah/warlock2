@@ -57,6 +57,7 @@ public abstract class GameView extends StreamView implements IWarlockClientViewe
 	public GameView () {
 		if (firstInstance == null) {
 			firstInstance = this;
+			viewInFocus = this;
 		}
 		
 		// currentCommand = "";
@@ -87,53 +88,40 @@ public abstract class GameView extends StreamView implements IWarlockClientViewe
 		return viewInFocus;
 	}
 	
-	
-	public static GameView createNext (String viewId) {
-//		if (firstInstance != null)	
-//		{
-//			if (!firstInstanceIsUsed)
-//			{
-//				firstInstanceIsUsed = true;
-//				viewInFocus = firstInstance;
-//				return firstInstance;
-//			}
-//			
-//			else {
-				IWorkbenchPage page = PlatformUI.getWorkbench().getActiveWorkbenchWindow().getActivePage();
-				try {
-					IViewPart part = page.showView(viewId, generateUniqueId(), IWorkbenchPage.VIEW_ACTIVATE);
-					// if there's an error in creating the view, we want to know about it.. don't cast unless we know it's not an errorviewpart
-					if (part instanceof GameView)
-					{
-						GameView nextInstance = (GameView) part;
-						viewInFocus = nextInstance;
-						
-						if (ConnectionView.closeAfterConnect)
-						{
-							part = page.findView(ConnectionView.VIEW_ID);
-							if (part != null)
-								page.hideView(part);
-						}
-						
-						return nextInstance;
-					}
-					
-				} catch (PartInitException e) {
-					e.printStackTrace();
-				}	
-//			}
-//		}	
-//		
-		return null;
+	public static void initializeGameView (GameView gameView)
+	{
+		viewInFocus = gameView;
+		
+		if (ConnectionView.closeAfterConnect)
+		{
+			IWorkbenchPage page = PlatformUI.getWorkbench().getActiveWorkbenchWindow().getActivePage();
+			IViewPart part = page.findView(ConnectionView.VIEW_ID);
+			if (part != null)
+				page.hideView(part);
+		}
 	}
 	
-	protected static String generateUniqueId () {
-		return new Random().nextInt() + "";
+	public static GameView createNext (String viewId, String secondId) {
+		IWorkbenchPage page = PlatformUI.getWorkbench().getActiveWorkbenchWindow().getActivePage();
+		try {
+			IViewPart part = page.showView(viewId, secondId, IWorkbenchPage.VIEW_ACTIVATE);
+			// if there's an error in creating the view, we want to know about it.. don't cast unless we know it's not an errorviewpart
+			if (part instanceof GameView)
+			{
+				GameView nextInstance = (GameView) part;
+				initializeGameView(nextInstance);
+				return nextInstance;
+			}
+			
+		} catch (PartInitException e) {
+			e.printStackTrace();
+		}
+		return null;
 	}
 	
 	public void createPartControl(Composite parent) {
 		super.createPartControl(parent);
-
+		
 		this.client = Warlock2Plugin.getDefault().getCurrentClient();
 		this.text = getTextForClient(this.client);
 		book.showPage(this.text.getTextWidget());
@@ -158,6 +146,7 @@ public abstract class GameView extends StreamView implements IWarlockClientViewe
 		text.getTextWidget().addKeyListener(entry);
 		
 	}
+	
 	
 	public void setFocus() {
 		viewInFocus = this;
@@ -261,6 +250,16 @@ public abstract class GameView extends StreamView implements IWarlockClientViewe
 		
 		setMainStream(client.getDefaultStream());
 		client.addViewer(wrapper);
+		
+		for (StreamView streamView : StreamView.openViews)
+		{
+			if (!(streamView instanceof GameView))
+			{
+				// initialize pre-opened stream views
+				streamView.setAppendNewlines(false);
+				streamView.setClient(client);
+			}
+		}
 	}
 	
 	public IWarlockClient getWarlockClient() {

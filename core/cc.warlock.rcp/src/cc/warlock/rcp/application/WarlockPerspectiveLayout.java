@@ -11,10 +11,7 @@ import org.eclipse.ui.PlatformUI;
 import cc.warlock.core.configuration.IConfigurationProvider;
 
 public class WarlockPerspectiveLayout implements IConfigurationProvider {
-
 	protected Rectangle bounds = new Rectangle(25, 25, 1024, 768);
-	
-//	protected XMLMemento savedLayout;
 	protected static WarlockPerspectiveLayout _instance;
 	
 	public static WarlockPerspectiveLayout instance()
@@ -42,7 +39,7 @@ public class WarlockPerspectiveLayout implements IConfigurationProvider {
 			bounds.y = Integer.parseInt(element.attributeValue("y"));
 			bounds.width = Integer.parseInt(element.attributeValue("width"));
 			bounds.height = Integer.parseInt(element.attributeValue("height"));
-		}	
+		}
 	}
 
 	public boolean supportsElement(Element element) {
@@ -61,9 +58,5 @@ public class WarlockPerspectiveLayout implements IConfigurationProvider {
 	public void loadBounds ()
 	{
 		PlatformUI.getWorkbench().getActiveWorkbenchWindow().getShell().setBounds(bounds);
-	}
-	
-	public void loadSavedLayout ()
-	{
 	}
 }

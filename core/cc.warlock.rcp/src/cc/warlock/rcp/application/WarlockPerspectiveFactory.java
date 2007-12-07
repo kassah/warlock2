@@ -6,6 +6,8 @@
  */
 package cc.warlock.rcp.application;
 
+import java.util.HashMap;
+
 import org.eclipse.ui.IFolderLayout;
 import org.eclipse.ui.IPageLayout;
 import org.eclipse.ui.IPerspectiveFactory;
@@ -18,25 +20,17 @@ import cc.warlock.rcp.views.ConnectionView;
  */
 public class WarlockPerspectiveFactory implements IPerspectiveFactory {
 
-	private static IPageLayout myLayout = null;
-	
 	public static final String WARLOCK_PERSPECTIVE_ID = "cc.warlock.warlockPerspective";
 	public static final String BOTTOM_FOLDER_ID = "cc.warlock.bottomFolder";
 	public static final String TOP_FOLDER_ID = "cc.warlock.topFolder";
 	public static final String RIGHT_FOLDER_ID = "cc.warlock.rightFolder";
 	public static final String LEFT_FOLDER_ID = "cc.warlock.leftFolder";
 	public static final String MAIN_FOLDER_ID = "cc.warlock.mainFolder";
-	
-	public static IPageLayout getLayout() {
-		return myLayout;
-	}
-	
+
 	/* (non-Javadoc)
 	 * @see org.eclipse.ui.IPerspectiveFactory#createInitialLayout(org.eclipse.ui.IPageLayout)
 	 */
 	public void createInitialLayout(IPageLayout layout) {
-		myLayout = layout;
-		
 		layout.setEditorAreaVisible(false);
 		IFolderLayout mainFolder = layout.createFolder(MAIN_FOLDER_ID, IPageLayout.BOTTOM, 0.15f, layout.getEditorArea());
 		mainFolder.addView(ConnectionView.VIEW_ID);
