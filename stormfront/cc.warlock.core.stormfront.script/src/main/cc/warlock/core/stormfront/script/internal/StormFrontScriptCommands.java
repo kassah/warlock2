@@ -32,7 +32,6 @@ public class StormFrontScriptCommands extends ScriptCommands implements IStormFr
 		this.script = script;
 		
 		client.getRoundtime().addListener(this);
-		client.getDefaultStream().addStreamListener(this);
 		client.getDeathsStream().addStreamListener(this);
 		client.getFamiliarStream().addStreamListener(this);
 	}

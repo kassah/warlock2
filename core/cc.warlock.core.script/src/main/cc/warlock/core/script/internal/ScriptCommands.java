@@ -45,6 +45,8 @@ public class ScriptCommands implements IScriptCommands, IStreamListener
 		this.client = client;
 		this.scriptName = scriptName;
 		this.gotPrompt = client.getDefaultStream().isPrompting();
+
+		client.getDefaultStream().addStreamListener(this);
 	}
 	
 	public void echo (String text) {
