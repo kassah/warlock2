@@ -33,14 +33,28 @@ public class JavascriptCommands {
 	}
 
 	public Match matchWait(NativeArray matches) {
-		for(Object o : matches.getAllIds()) {
+		/*
+		int len = (int) matches.getLength(); 
+		for (int i = 0; i < len; i++) {
+			Object obj = matches.get(i, matches);
+			engine.content.toObject(obj, matches);
+			
+		}
+		*/
+		for(Object o : matches.getIds()) {
 			if (o instanceof Match) continue; // TODO: Throw a friendly error
 			commands.addMatch((Match) matches.getAssociatedValue(o));
 		}
+		commands.echo("Sending off to matching");
 		Match match = commands.matchWait();
+		commands.echo("Got a match!");
 		Function function = (Function)match.getAttribute(CALLBACK);
 		try {
-			function.call(script.getContext(), script.getScope(), null, new Object[] {match.getAttribute(USER_OBJECT)});
+			if (match.getAttribute(USER_OBJECT) == null) {
+				function.call(script.getContext(), script.getScope(), null, new Object[] {});
+			} else {
+				function.call(script.getContext(), script.getScope(), null, new Object[] {match.getAttribute(USER_OBJECT)});
+			}
 		}
 		catch (Exception e) {
 			e.printStackTrace();

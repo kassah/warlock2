@@ -29,6 +29,7 @@ public class TextMatch extends Match {
 	}
 
 	public boolean matches(String text) {
+		System.out.println("Matching Against Text: "+text);
 		boolean rv = false;
 
 		if(ignoreCase) {

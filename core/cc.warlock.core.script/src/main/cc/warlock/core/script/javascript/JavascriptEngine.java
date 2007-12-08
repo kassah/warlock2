@@ -101,6 +101,7 @@ public class JavascriptEngine implements IScriptEngine {
 				}
 				catch (WrappedException e) {
 					System.out.println("Caught a wrapped error.");
+					e.printStackTrace();
 				}
 				catch (RhinoException e) {
 					script.getClient().getDefaultStream().echo(
