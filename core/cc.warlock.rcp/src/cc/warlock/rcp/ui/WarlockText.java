@@ -342,6 +342,7 @@ public class WarlockText implements LineBackgroundListener {
 			
 			i++;
 		}
+		update();
 	}
 	
 	public void addImage (Image image) {

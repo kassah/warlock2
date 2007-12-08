@@ -58,6 +58,7 @@ public class WarlockSharedImages {
 	
 	public static final String IMG_CONNECT = "/images/connect.png";
 	public static final String IMG_CONNECT_LARGE = "/images/connect_large.png";
+	public static final String IMG_RECONNECT = "/images/reconnect.png";
 	public static final String IMG_WINDOW = "/images/window.png";
 	public static final String IMG_ADD = "/images/add.png";
 	public static final String IMG_REMOVE = "/images/remove.png";
