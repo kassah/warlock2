@@ -4,6 +4,8 @@ import java.io.Serializable;
 
 import org.mozilla.javascript.Function;
 import org.mozilla.javascript.NativeArray;
+import org.mozilla.javascript.NativeJavaObject;
+import org.mozilla.javascript.ScriptRuntime;
 import org.mozilla.javascript.Scriptable;
 
 import cc.warlock.core.script.IScriptCommands;
@@ -42,25 +44,32 @@ public class JavascriptCommands {
 		}
 		*/
 		for(Object o : matches.getIds()) {
-			if (!(matches.getAssociatedValue(o) instanceof Match)) continue; // TODO: Throw a friendly error
-			Match m = (Match) matches.getAssociatedValue(o);
-			commands.addMatch(m);
-			commands.echo("Adding: "+m.getAttribute("MatchText"));
+			Integer index = (Integer) o;
+			
+			NativeJavaObject object = (NativeJavaObject) matches.get(index, script.getScope());
+			Object actualObject = object.unwrap();
+			
+			commands.addMatch((Match) actualObject);
 		}
 		commands.echo("Sending off to matching");
 		Match match = commands.matchWait();
-		commands.echo("Got a match!");
-		Function function = (Function)match.getAttribute(CALLBACK);
-		try {
-			if (match.getAttribute(USER_OBJECT) == null) {
-				function.call(script.getContext(), script.getScope(), null, new Object[] {});
-			} else {
-				function.call(script.getContext(), script.getScope(), null, new Object[] {match.getAttribute(USER_OBJECT)});
+		
+		if (match != null)
+		{
+			commands.echo("Got a match!");
+			Function function = (Function)match.getAttribute(CALLBACK);
+			try {
+				if (match.getAttribute(USER_OBJECT) == null) {
+					function.call(script.getContext(), script.getScope(), null, new Object[] {});
+				} else {
+					function.call(script.getContext(), script.getScope(), null, new Object[] {match.getAttribute(USER_OBJECT)});
+				}
+			}
+			catch (Exception e) {
+				e.printStackTrace();
 			}
 		}
-		catch (Exception e) {
-			e.printStackTrace();
-		}
+		
 		return match;
 	}
 
