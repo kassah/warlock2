@@ -3,6 +3,7 @@ package cc.warlock.core.script.javascript;
 import java.io.Serializable;
 
 import org.mozilla.javascript.Function;
+import org.mozilla.javascript.NativeArray;
 import org.mozilla.javascript.Scriptable;
 
 import cc.warlock.core.script.IScriptCommands;
@@ -31,9 +32,10 @@ public class JavascriptCommands {
 		commands.echo(text);
 	}
 
-	public Match matchWait(Match[] matches) {
-		for(Match m : matches) {
-			commands.addMatch(m);
+	public Match matchWait(NativeArray matches) {
+		for(Object o : matches.getAllIds()) {
+			if (o instanceof Match) continue; // TODO: Throw a friendly error
+			commands.addMatch((Match) matches.getAssociatedValue(o));
 		}
 		Match match = commands.matchWait();
 		Function function = (Function)match.getAttribute(CALLBACK);
