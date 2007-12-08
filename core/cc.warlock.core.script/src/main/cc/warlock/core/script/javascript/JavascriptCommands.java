@@ -42,8 +42,10 @@ public class JavascriptCommands {
 		}
 		*/
 		for(Object o : matches.getIds()) {
-			if (o instanceof Match) continue; // TODO: Throw a friendly error
-			commands.addMatch((Match) matches.getAssociatedValue(o));
+			if (!(matches.getAssociatedValue(o) instanceof Match)) continue; // TODO: Throw a friendly error
+			Match m = (Match) matches.getAssociatedValue(o);
+			commands.addMatch(m);
+			commands.echo("Adding: "+m.getAttribute("MatchText"));
 		}
 		commands.echo("Sending off to matching");
 		Match match = commands.matchWait();
@@ -113,6 +115,7 @@ public class JavascriptCommands {
 		Match m = new TextMatch(text);
 		m.setAttribute(CALLBACK, function);
 		m.setAttribute(USER_OBJECT, object);
+		m.setAttribute("MatchText", text);
 		
 		return m;
 	}
@@ -130,6 +133,7 @@ public class JavascriptCommands {
 		Match m = new RegexMatch(text, ignoreCase);
 		m.setAttribute(CALLBACK, function);
 		m.setAttribute(USER_OBJECT, object);
+		m.setAttribute("MatchText", text);
 		
 		return m;
 	}
