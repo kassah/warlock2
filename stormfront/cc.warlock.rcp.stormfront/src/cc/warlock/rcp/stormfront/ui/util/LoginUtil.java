@@ -33,8 +33,8 @@ public class LoginUtil {
 		int port = Integer.parseInt (loginProperties.get("GAMEPORT"));
 		String key = loginProperties.get("KEY");
 
-		IWarlockClient client = Warlock2Plugin.getDefault().addNextClient(new StormFrontClient());
-		
+		IWarlockClient client = Warlock2Plugin.getDefault().getCurrentClient();
+//		
 		gameView.setClient(client);
 		
 		IWorkbenchPage page = PlatformUI.getWorkbench().getActiveWorkbenchWindow().getActivePage();
@@ -102,6 +102,7 @@ public class LoginUtil {
 		}
 		else 
 		{
+			Warlock2Plugin.getDefault().addNextClient(new StormFrontClient());
 			connect(GameView.createNext(StormFrontGameView.VIEW_ID, characterName), loginProperties);
 		}
 	}
