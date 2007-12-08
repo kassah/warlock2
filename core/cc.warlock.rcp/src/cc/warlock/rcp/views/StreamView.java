@@ -191,10 +191,23 @@ public class StreamView extends ViewPart implements IStreamListener, IGameViewFo
 		stream.setView(true);
 	}
 	
+	public void removeMainStream ()
+	{
+		mainStream.removeStreamListener(streamListenerWrapper);
+		mainStream.getTitle().removeListener(propertyListenerWrapper);
+		mainStream.setView(false);
+	}
+	
 	public void addStream (IStream stream) {
 		stream.addStreamListener(streamListenerWrapper);
 		streams.add(stream);
 		stream.setView(true);
+	}
+	
+	public void removeStream (IStream stream) {
+		stream.removeStreamListener(streamListenerWrapper);
+		streams.remove(stream);
+		stream.setView(false);
 	}
 	
 	public void streamCleared(IStream stream) {
@@ -380,5 +393,15 @@ public class StreamView extends ViewPart implements IStreamListener, IGameViewFo
 			appendText(bufferedText);
 			bufferedText = null;
 		}
+	}
+	
+	public void setForeground (IWarlockClient client, Color foreground)
+	{
+		getTextForClient(client).setForeground(foreground);
+	}
+	
+	public void setBackground (IWarlockClient client, Color background)
+	{
+		getTextForClient(client).setBackground(background);
 	}
 }

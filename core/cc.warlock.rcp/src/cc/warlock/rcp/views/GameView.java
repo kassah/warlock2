@@ -33,6 +33,7 @@ import cc.warlock.rcp.ui.WarlockEntry;
 import cc.warlock.rcp.ui.WarlockText;
 import cc.warlock.rcp.ui.client.SWTWarlockClientViewer;
 import cc.warlock.rcp.ui.style.CompassThemes;
+import cc.warlock.rcp.util.ColorUtil;
 
 /**
  * @author marshall
@@ -136,6 +137,11 @@ public abstract class GameView extends StreamView implements IWarlockClientViewe
 		entryComposite.setLayoutData(new GridData(GridData.FILL, GridData.VERTICAL_ALIGN_END, true, false));
 		
 		entry = new WarlockEntry(entryComposite, wrapper);
+		Color background = ColorUtil.warlockColorToColor(GameViewConfiguration.instance().getDefaultBackground());
+		Color foreground = ColorUtil.warlockColorToColor(GameViewConfiguration.instance().getDefaultForeground());
+		
+		entry.getWidget().setBackground(background);
+		entry.getWidget().setForeground(foreground);
 		
 		compass = new WarlockCompass(text, CompassThemes.getCompassTheme("small"));
 		text.setBackgroundMode(SWT.INHERIT_DEFAULT);
@@ -257,6 +263,12 @@ public abstract class GameView extends StreamView implements IWarlockClientViewe
 				streamView.setClient(client);
 			}
 		}
+	}
+	
+	protected void disconnected ()
+	{
+		removeMainStream();
+		client.removeViewer(wrapper);
 	}
 	
 	public IWarlockClient getWarlockClient() {
