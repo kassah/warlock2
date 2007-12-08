@@ -77,6 +77,11 @@ public abstract class WarlockClient implements IWarlockClient {
 		viewers.add(viewer);
 	}
 	
+	public void removeViewer(IWarlockClientViewer viewer) {
+		if (viewers.contains(viewer))
+			viewers.remove(viewer);
+	}
+	
 	public IStream getDefaultStream() {
 		return getStream(IWarlockClient.DEFAULT_STREAM_NAME);
 	}

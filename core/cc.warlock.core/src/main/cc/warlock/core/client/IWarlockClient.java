@@ -8,8 +8,6 @@ import java.util.Collection;
 
 import cc.warlock.core.network.IConnection;
 
-
-
 /**
  * @author Marshall
  * 
@@ -56,6 +54,12 @@ public interface IWarlockClient {
 	 * @param viewer The viewer to add
 	 */
 	public void addViewer (IWarlockClientViewer viewer);
+	
+	/**
+	 * Remove a viewer from this client
+	 * @param viewer The viewer to remove
+	 */
+	public void removeViewer (IWarlockClientViewer viewer);
 
 	/**
 	 * Functionally equivalent to getStream(DEFAULT_STREAM_NAME)
