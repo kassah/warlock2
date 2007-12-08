@@ -8,6 +8,9 @@ import java.net.Socket;
 import java.util.ArrayList;
 
 import cc.warlock.core.client.IWarlockClient;
+import cc.warlock.core.client.IWarlockStyle;
+import cc.warlock.core.client.WarlockString;
+import cc.warlock.core.client.internal.WarlockStyle;
 import cc.warlock.core.network.IConnection;
 import cc.warlock.core.network.IConnectionListener;
 import cc.warlock.core.stormfront.client.IStormFrontClient;
@@ -90,6 +93,26 @@ public class StormFrontConnection implements IConnection
 		parser.passThrough();
 	}
 	
+	protected void disconnected ()
+	{	
+		WarlockString message = new WarlockString();
+		message.append(
+			"******************************\n"+
+			"* Disconnected from the game *\n" +
+			"******************************\n");
+		
+		message.addStyle(new WarlockStyle(new IWarlockStyle.StyleType[] { IWarlockStyle.StyleType.MONOSPACE }));
+		
+		client.getDefaultStream().send(message);
+		client.getDefaultStream().flush();
+		connected = false;
+		
+		for (IConnectionListener listener : listeners)
+		{
+			listener.disconnected(this);
+		}
+	}
+	
 	class SFParser implements Runnable {
 		public void run() {
 			try {
@@ -101,12 +124,7 @@ public class StormFrontConnection implements IConnection
 				parser.setHandler(handler);
 				parser.Document();
 				
-				connected = false;
-				client.getDefaultStream().echo(
-						"******************************\n"+
-						"* Disconnected from the game *\n" +
-						"******************************\n");
-			
+				disconnected();
 			} catch (Throwable t) {
 				t.printStackTrace();
 			}
