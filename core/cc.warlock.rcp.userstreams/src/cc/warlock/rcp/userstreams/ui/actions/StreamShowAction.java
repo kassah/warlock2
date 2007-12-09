@@ -17,19 +17,16 @@ import cc.warlock.rcp.userstreams.ui.views.UserStream;
  */
 public class StreamShowAction extends Action {
 	private String name;
-	private IStreamFilter[] filters = null; 
 	
-	public StreamShowAction (String name, IStreamFilter[] filters) {
+	public StreamShowAction (String name) {
 		super(name);
 		this.name = name;
-		this.filters = filters;
 		setDescription("Custom output window: " + this.name);
 		setImageDescriptor(WarlockSharedImages.getImageDescriptor(WarlockSharedImages.IMG_WINDOW));
 	}
 	
 	public void run() {
-		UserStream stream = UserStream.getViewForUserStream(this.name);
-		stream.setFilters(this.filters);
+		UserStream.getViewForUserStream(this.name);
 	}
 	
 	protected static String generateUniqueId () {
