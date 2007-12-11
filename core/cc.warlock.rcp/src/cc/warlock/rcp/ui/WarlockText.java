@@ -495,7 +495,8 @@ public class WarlockText implements LineBackgroundListener {
 	private void scrollToBottom() {
 		if (doScrollDirection == SWT.DOWN) {
 			textWidget.invokeAction(ST.TEXT_END);
-			compass.redraw();
+			if (compass != null)
+				compass.redraw();
 		}
 	}
 	
