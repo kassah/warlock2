@@ -24,8 +24,10 @@ public class FilesystemScriptProvider implements IFilesystemScriptProvider, Runn
 
 	protected Hashtable<ScriptFileInfo, Long> infos = new Hashtable<ScriptFileInfo, Long>();
 	
-	protected boolean scanning = false;
+	protected boolean scanning = false, scanFinished = false;
 	protected static FilesystemScriptProvider _instance;
+	protected boolean forcedScan = false;
+	protected Thread scanningThread;
 	
 	static {
 		ScriptEngineRegistry.addScriptProvider(instance());
@@ -81,7 +83,8 @@ public class FilesystemScriptProvider implements IFilesystemScriptProvider, Runn
 	protected void start () {
 		scanning = true;
 		
-		new Thread(this).start();
+		scanningThread = new Thread(this);
+		scanningThread.start();
 	}
 	
 	public void addScriptDirectory (File directory)
@@ -176,6 +179,7 @@ public class FilesystemScriptProvider implements IFilesystemScriptProvider, Runn
 				scanDirectory(dir);
 			}
 		}
+		scanFinished = true;
 	}
 	
 	public void run ()
@@ -187,8 +191,11 @@ public class FilesystemScriptProvider implements IFilesystemScriptProvider, Runn
 			try {
 				Thread.sleep(ScriptConfiguration.instance().getScanTimeout().get());
 			} catch (InterruptedException e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
+				if (!forcedScan)
+				{
+					e.printStackTrace();
+				}
+				forcedScan = false;
 			}
 		}
 	}
@@ -197,6 +204,21 @@ public class FilesystemScriptProvider implements IFilesystemScriptProvider, Runn
 		Set<File> scriptDirs = ScriptConfiguration.instance().getScriptDirectories();
 		
 		return Arrays.asList(scriptDirs.toArray(new File[scriptDirs.size()]));
+	}
+	
+	public void forceScan() {
+		forcedScan = true;
+		scanFinished = false;
+		
+		scanningThread.interrupt();
+		while (!scanFinished) {
+			try {
+				Thread.sleep((long)200);
+			} catch (InterruptedException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
+		}
 	}
 	
 	@Override

@@ -48,6 +48,16 @@ public class ScriptEngineRegistry {
 		return providers;
 	}
 	
+	public static IScriptProvider getScriptProvider (Class<? extends IScriptProvider> clazz)
+	{
+		for (IScriptProvider provider : providers)
+		{
+			if (clazz.isInstance(provider))
+				return provider;
+		}
+		return null;
+	}
+	
 	public static IScriptEngine getScriptEngine (String engineId)
 	{
 		for (IScriptEngine engine : engines)
