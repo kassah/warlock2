@@ -282,6 +282,11 @@ STRING
 			state = State.variableReplace;
 			atStart = false;
 		}
+	| ('%%'|'$$')
+		{
+			setText(getText().substring(0,1));
+			if(state == State.base) { state = State.variableReplace; atStart = false; }
+		}
 	| ('%'|'$')
 		{
 			if(state == State.base) { state = State.variableReplace; atStart = false; }
