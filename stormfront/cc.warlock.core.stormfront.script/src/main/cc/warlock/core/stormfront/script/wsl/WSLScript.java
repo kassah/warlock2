@@ -73,6 +73,9 @@ public class WSLScript extends AbstractScript {
 		addCommandDefinition("exit", new WSLExit());
 		addCommandDefinition("gosub", new WSLGosub());
 		addCommandDefinition("goto", new WSLGoto());
+		for(int i = 0; i <= 9; i++) {
+			addCommandDefinition("if_" + i, new WSLIf_(String.valueOf(i)));
+		}
 		addCommandDefinition("match", new WSLMatch());
 		addCommandDefinition("matchre", new WSLMatchRe());
 		addCommandDefinition("matchwait", new WSLMatchWait());
@@ -92,18 +95,14 @@ public class WSLScript extends AbstractScript {
 		addCommandDefinition("waitfor", new WSLWaitFor());
 		addCommandDefinition("waitforre", new WSLWaitForRe());
 		
-		for(int i = 0; i <= 9; i++) {
-			addCommandDefinition("if_" + i, new WSLIf_(String.valueOf(i)));
-		}
-		
 		setVariable("t", new WSLTime());
 		setVariable("mana", new WSLMana());
 		setVariable("health", new WSLHealth());
 		setVariable("fatigue", new WSLFatigue());
 		setVariable("spirit", new WSLSpirit());
 		setVariable("rt", new WSLRoundTime());
-		setVariable("lefthand", new WSLLeftHand());
-		setVariable("righthand", new WSLRightHand());
+		setVariable("lhand", new WSLLeftHand());
+		setVariable("rhand", new WSLRightHand());
 		setVariable("spell", new WSLSpell());
 		setVariable("roomdesc", new WSLComponent(IStormFrontClient.COMPONENT_ROOM_DESCRIPTION));
 		setVariable("roomexits", new WSLComponent(IStormFrontClient.COMPONENT_ROOM_EXITS));
