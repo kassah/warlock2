@@ -13,7 +13,6 @@ import cc.warlock.rcp.application.WarlockApplication;
 
 public class ScriptFilesystemContentProvider implements ITreeContentProvider
 {
-
 	public static final String LOCAL_SCRIPTS = "localScripts";
 	
 	protected IFilesystemScriptProvider getFilesystemScriptProvider ()
