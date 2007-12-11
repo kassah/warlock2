@@ -52,7 +52,7 @@ public class JavascriptCommands {
 			commands.addMatch((Match) actualObject);
 		}
 		commands.echo("Sending off to matching");
-		Match match = commands.matchWait();
+		Match match = commands.matchWait(0.0);
 		
 		if (match != null)
 		{

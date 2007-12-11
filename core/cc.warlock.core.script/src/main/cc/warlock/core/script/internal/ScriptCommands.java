@@ -65,8 +65,9 @@ public class ScriptCommands implements IScriptCommands, IStreamListener
 		}
 	}
 	
-	public Match matchWait () {
+	public Match matchWait (double timeout) {
 		try {
+			boolean ignoreTimeout = timeout <= 0.0;
 			// run until we get a match or are told to stop
 			matchWaitLoop: while(true) {
 				String text = null;
@@ -74,6 +75,12 @@ public class ScriptCommands implements IScriptCommands, IStreamListener
 				while(text == null) {
 					try {
 						text = matchQueue.poll(100L, TimeUnit.MILLISECONDS);
+						// if we change the poll timeout, make sure the following line is updated
+						if(!ignoreTimeout) {
+							timeout -= 0.1;
+							if(timeout <= 0)
+								break matchWaitLoop;
+						}
 					} catch(Exception e) {
 						e.printStackTrace();
 					}

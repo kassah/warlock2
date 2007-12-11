@@ -16,7 +16,7 @@ public interface IScriptCommands {
 	
 	public void addMatch(Match match);
 	
-	public Match matchWait ();
+	public Match matchWait (double timeout);
 	
 	public void pause (double seconds);
 	

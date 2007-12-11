@@ -36,6 +36,7 @@ public class WSLScript extends AbstractScript {
 	protected HashMap<String, WSLAbstractCommand> labels = new HashMap<String, WSLAbstractCommand>();
 	protected WSLAbstractCommand nextCommand;
 	protected WSLAbstractCommand curCommand;
+	private String curLine;
 	protected HashMap<String, IWSLValue> globalVariables = new HashMap<String, IWSLValue>();
 	protected HashMap<String, IWSLValue> localVariables = new HashMap<String, IWSLValue>();
 	protected Stack<WSLFrame> callstack = new Stack<WSLFrame>();
@@ -316,6 +317,7 @@ public class WSLScript extends AbstractScript {
 	}
 	
 	public void execute(String line) {
+		curLine = line;
 		Matcher m = commandPattern.matcher(line);
 		
 		if (!m.find()) {
@@ -374,8 +376,12 @@ public class WSLScript extends AbstractScript {
 	}
 	
 	protected void scriptError(String message) {
-		client.getDefaultStream().echo("Script error on line " + curCommand.getLineNumber() + ": " + message + "\n");
+		client.getDefaultStream().echo("Script error on line " + curCommand.getLineNumber() + " (" + curLine + "): " + message + "\n");
 		stop();
+	}
+	
+	protected void scriptWarning(String message) {
+		client.getDefaultStream().echo("Script warning on line " + curCommand.getLineNumber() + " (" + curLine + "): " + message + "\n");
 	}
 	
 	protected class ScriptTimer {
@@ -492,7 +498,7 @@ public class WSLScript extends AbstractScript {
 				scriptCommands.echo("setVariable: " + name + "=" + value);
 				setVariable(name, value);
 			} else {
-				scriptError("Invalid arguments to setvariable");
+				scriptWarning("Invalid arguments to setvariable");
 			}
 		}
 	}
@@ -633,7 +639,22 @@ public class WSLScript extends AbstractScript {
 	protected class WSLMatchWait extends WSLCommandDefinition {
 		
 		public void execute (String arguments) {
-			Match match = scriptCommands.matchWait();
+			double time;
+			
+			if(arguments.trim().length() > 0) {
+				String[] args = arguments.split(argSeparator);
+			
+				try {
+					time = Double.parseDouble(args[0]);
+				} catch(NumberFormatException e) {
+					scriptError("Non-numeral \"" + args[0] + "\" passed to matchwait");
+					return;
+				}
+			} else {
+				time = 0;
+			}
+			
+			Match match = scriptCommands.matchWait(time);
 			
 			if (match != null)
 			{
@@ -641,9 +662,6 @@ public class WSLScript extends AbstractScript {
 				gotoLabel((String)match.getAttribute("label"));
 				scriptCommands.waitForPrompt();
 				scriptCommands.waitForRoundtime();
-			} else {
-				if(!stopped)
-					scriptError("Internal error, no match was found. Please inform Warlock developers.");
 			}
 		}
 	}
