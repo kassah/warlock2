@@ -6,7 +6,6 @@ import org.eclipse.swt.SWT;
 import org.eclipse.swt.custom.ST;
 import org.eclipse.swt.custom.StyledText;
 import org.eclipse.swt.custom.VerifyKeyListener;
-import org.eclipse.swt.events.KeyEvent;
 import org.eclipse.swt.events.KeyListener;
 import org.eclipse.swt.events.VerifyEvent;
 import org.eclipse.swt.layout.GridData;
@@ -17,7 +16,7 @@ import cc.warlock.core.client.IWarlockClientViewer;
 import cc.warlock.rcp.ui.macros.IMacro;
 import cc.warlock.rcp.ui.macros.MacroRegistry;
 
-public class WarlockEntry implements KeyListener, VerifyKeyListener {
+public class WarlockEntry implements VerifyKeyListener {
 
 	private StyledText widget;
 	private IWarlockClientViewer viewer;
@@ -31,7 +30,6 @@ public class WarlockEntry implements KeyListener, VerifyKeyListener {
 		widget.setLayoutData(new GridData(GridData.FILL, GridData.FILL, true, true, 1, 1));
 		widget.setEditable(true);
 		widget.setLineSpacing(2);
-		widget.addKeyListener(this);
 		widget.addVerifyKeyListener(this);
 	}
 	
@@ -68,20 +66,8 @@ public class WarlockEntry implements KeyListener, VerifyKeyListener {
 		return widget;
 	}
 	
-	public void verifyKey(VerifyEvent event) {
-		for (IMacro macro : MacroRegistry.instance().getMacros())
-		{
-			if (macro.getKeyCode() == event.keyCode && macro.getModifiers() == event.stateMask)
-			{
-				event.doit = false;
-				return;
-			}
-		}
-	}
-
-	public void keyPressed(KeyEvent e) {}
-	
-	public void keyReleased(KeyEvent e) {
+	public void verifyKey(VerifyEvent e) {
+		
 		for (IMacro macro : MacroRegistry.instance().getMacros())
 		{
 			if (macro.getKeyCode() == e.keyCode && macro.getModifiers() == e.stateMask)
@@ -198,37 +184,29 @@ public class WarlockEntry implements KeyListener, VerifyKeyListener {
 	}
 	
 	public void submit() {
+		String command;
 		if(searchMode) {
-			send(searchCommand);
+			command = searchCommand;
 			leaveSearchMode();
 		} else {
-			send(widget.getText());
+			command = widget.getText();
 		}
+		viewer.getWarlockClient().send(command);
+		viewer.getWarlockClient().getCommandHistory().addCommand(command);
 		viewer.getWarlockClient().getCommandHistory().resetPosition();
 		setText("");
 	}
 	
-	private void send (String command) {
-		send (command, true);
-	}
-	
-	private void send(String command, boolean addToHistory) {
-		viewer.getWarlockClient().send(command);
-		
-		if (addToHistory)
-			viewer.getWarlockClient().getCommandHistory().addCommand(command);
-	}
-	
 	public void repeatLastCommand() {
 		ICommand command = viewer.getWarlockClient().getCommandHistory().getLastCommand();
-		send(command.getCommand(), false);
+		viewer.getWarlockClient().send(command.getCommand());
 	}
 	
 	public void repeatSecondToLastCommand() {
 		if (viewer.getWarlockClient().getCommandHistory().size() >= 2)
 		{
 			ICommand command = viewer.getWarlockClient().getCommandHistory().getCommandAt(1);
-			send(command.getCommand(), false);
+			viewer.getWarlockClient().send(command.getCommand());
 		}
 	}
 }

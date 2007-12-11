@@ -146,7 +146,7 @@ public abstract class GameView extends StreamView implements IWarlockClientViewe
 		compass = new WarlockCompass(text, CompassThemes.getCompassTheme("small"));
 		text.setBackgroundMode(SWT.INHERIT_DEFAULT);
 		
-		text.getTextWidget().addKeyListener(entry);
+		//text.getTextWidget().addKeyListener(entry);
 		text.getTextWidget().addVerifyKeyListener(entry);
 	}
 	
