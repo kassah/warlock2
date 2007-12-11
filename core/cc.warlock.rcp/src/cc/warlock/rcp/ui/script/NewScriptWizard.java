@@ -35,6 +35,11 @@ public class NewScriptWizard extends Wizard {
 		File scriptFile = new File(page1.getScriptDir(), page1.getScriptName() + "." + page1.getScriptExt());
 		
 		try {
+			File dir = scriptFile.getParentFile();
+			if (!dir.exists()) {
+				dir.mkdirs();
+			}
+			
 			scriptFile.createNewFile();
 		} catch (IOException e) {
 			// TODO Auto-generated catch block
