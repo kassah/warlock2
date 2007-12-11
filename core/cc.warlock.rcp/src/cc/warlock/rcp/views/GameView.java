@@ -28,11 +28,9 @@ import cc.warlock.core.client.IWarlockClient;
 import cc.warlock.core.client.IWarlockClientViewer;
 import cc.warlock.rcp.configuration.GameViewConfiguration;
 import cc.warlock.rcp.plugin.Warlock2Plugin;
-import cc.warlock.rcp.ui.WarlockCompass;
 import cc.warlock.rcp.ui.WarlockEntry;
 import cc.warlock.rcp.ui.WarlockText;
 import cc.warlock.rcp.ui.client.SWTWarlockClientViewer;
-import cc.warlock.rcp.ui.style.CompassThemes;
 import cc.warlock.rcp.util.ColorUtil;
 
 /**
@@ -48,7 +46,6 @@ public abstract class GameView extends StreamView implements IWarlockClientViewe
 	
 	protected WarlockText text;
 	protected WarlockEntry entry;
-	protected WarlockCompass compass;
 	protected SWTWarlockClientViewer wrapper;
 	protected Composite entryComposite;
 	
@@ -143,7 +140,6 @@ public abstract class GameView extends StreamView implements IWarlockClientViewe
 		entry.getWidget().setBackground(background);
 		entry.getWidget().setForeground(foreground);
 		
-		compass = new WarlockCompass(text, CompassThemes.getCompassTheme("small"));
 		text.setBackgroundMode(SWT.INHERIT_DEFAULT);
 		
 		//text.getTextWidget().addKeyListener(entry);

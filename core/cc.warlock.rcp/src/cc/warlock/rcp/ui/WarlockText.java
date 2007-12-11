@@ -41,6 +41,7 @@ import org.eclipse.swt.widgets.ScrollBar;
 import cc.warlock.core.client.IWarlockClient;
 import cc.warlock.core.client.WarlockString;
 import cc.warlock.core.client.WarlockString.WarlockStringStyleRange;
+import cc.warlock.rcp.ui.style.CompassThemes;
 import cc.warlock.rcp.ui.style.StyleProviders;
 import cc.warlock.rcp.util.ColorUtil;
 import cc.warlock.rcp.util.RCPUtil;
@@ -66,7 +67,8 @@ public class WarlockText implements LineBackgroundListener {
 	private int lineLimit = 5000;
 	private int doScrollDirection = SWT.UP;
 	private IWarlockClient client;
-
+	private WarlockCompass compass;
+	
 	protected Hashtable<Integer, Color> lineBackgrounds = new Hashtable<Integer,Color>();
 	
 	public WarlockText(Composite parent, int style, IWarlockClient client) {
@@ -162,6 +164,16 @@ public class WarlockText implements LineBackgroundListener {
 				redraw();
 			}
 		});
+	}
+	
+	public void addCompass ()
+	{
+		compass = new WarlockCompass(this, CompassThemes.getCompassTheme("small"));
+	}
+	
+	public WarlockCompass getCompass ()
+	{
+		return compass;
 	}
 	
 	public void addLineBackgroundListener(LineBackgroundListener listener) {
@@ -483,6 +495,7 @@ public class WarlockText implements LineBackgroundListener {
 	private void scrollToBottom() {
 		if (doScrollDirection == SWT.DOWN) {
 			textWidget.invokeAction(ST.TEXT_END);
+			compass.redraw();
 		}
 	}
 	

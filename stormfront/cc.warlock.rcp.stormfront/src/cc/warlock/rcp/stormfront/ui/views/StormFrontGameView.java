@@ -66,6 +66,8 @@ public class StormFrontGameView extends GameView implements IStormFrontClientVie
 	public void createPartControl(Composite parent) {
 		super.createPartControl(parent);
 		
+		text.addCompass();
+		
 		((GridLayout)entryComposite.getLayout()).numColumns = 2;
 		status = new StormFrontStatus(entryComposite);
 		
@@ -177,7 +179,7 @@ public class StormFrontGameView extends GameView implements IStormFrontClientVie
 
 			StyleProviders.setStyleProvider(client, new StormFrontStyleProvider(sfClient.getServerSettings()));
 			
-			compass.setCompass(sfClient.getCompass());
+			text.getCompass().setCompass(sfClient.getCompass());
 			
 			if (status != null)
 				status.setActiveClient(sfClient);

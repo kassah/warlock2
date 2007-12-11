@@ -63,6 +63,7 @@ public class WarlockSharedImages {
 	public static final String IMG_ADD = "/images/add.png";
 	public static final String IMG_REMOVE = "/images/remove.png";
 	public static final String IMG_SCRIPT = "/images/script.gif";
+	public static final String IMG_NEWFILE_WIZBAN = "/images/newfile_wiz.png";
 	
 	private static WarlockSharedImages instance;
 	
