@@ -66,7 +66,7 @@ public class WarlockString {
 		for(WarlockStringStyleRange curStyle : styles) {
 			if(curStyle.style.equals(style)) {
 				// check if the new style is contained by an old style, or is overlapping the end of an old style
-				if(start > curStyle.start && curStyle.start + curStyle.length <= start) {
+				if(start >= curStyle.start && curStyle.start + curStyle.length <= start) {
 					curStyle.length = Math.max(curStyle.length, start - curStyle.start + length);
 					return;
 				}
@@ -96,7 +96,7 @@ public class WarlockString {
 	public WarlockString substring(int start, int end) {
 		WarlockString substring = new WarlockString(text.substring(start, end));
 		for(WarlockStringStyleRange style : styles) {
-			if(style.start + style.length > start && style.start < end) {
+			if(style.start + style.length >= start && style.start < end) {
 				int styleLength = Math.min(style.length, end - style.start);
 				int styleStart = Math.max(0, style.start - start);
 				substring.addStyle(styleStart, styleLength, style.style);
@@ -106,7 +106,7 @@ public class WarlockString {
 	}
 	
 	public WarlockString[] split(String regex) {
-		return split(regex,length()); // Limit should be the number of characters in the string
+		return split(regex, 0);
 	}
 	
 	public WarlockString[] split(String regex, int limit) {
@@ -115,26 +115,25 @@ public class WarlockString {
 		ArrayList<WarlockString> parts = new ArrayList<WarlockString>();
 		int i = 0;
 		int start = 0;
-		int end = 0;
-		WarlockString part = null;
 
-		while (m.find(start) && i < limit) {
-			end = m.start();
+		// if limit is non-positive, there is not limit
+		// always allow an extra space at the end for the remainder
+		while (m.find(start) && (i + 1 < limit || limit <= 0)) {
+			int end = m.start();
 			// make sure that we actually have a substring to add
 			if(end != start) {
-				part = this.substring(start, end);
-				parts.add(part);
+				parts.add(this.substring(start, end));
 				++i;
 			}
 			// set the start of the next substring
 			start = m.end();
 		}
-		if ((i == 0 || !m.hitEnd()) && i < limit) {
-			if (this.length() - start >= 1) {  // Redundent if... I know. But this looks better than all on one confusing line
-				part = this.substring(start);
-				parts.add(part);
-			}
+		
+		// add the remainder of the string if we didn't get there
+		if (this.length() - start > 0) {
+			parts.add(this.substring(start));
 		}
+		
 		return parts.toArray(new WarlockString[parts.size()]);
 	}
 }
