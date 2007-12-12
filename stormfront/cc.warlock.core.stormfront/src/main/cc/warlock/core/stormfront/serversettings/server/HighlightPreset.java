@@ -99,8 +99,7 @@ public class HighlightPreset extends Preset implements IHighlightString {
 			mPrefix + emptyTag + justTextTag + mSuffix +
 			mPrefix + justTextTag + textAndColorTag + mSuffix +
 			mPrefix + textAndColorTag + textAndColorsTag + mSuffix +
-			(fillEntireLine ?
-				mPrefix + textAndColorsTag + allAttribsTag + mSuffix : "");
+			mPrefix + textAndColorsTag + allAttribsTag + mSuffix;
 	}
 	
 	public static HighlightPreset createHighlightStringFromParent (ServerSettings serverSettings, StormFrontElement parent)
