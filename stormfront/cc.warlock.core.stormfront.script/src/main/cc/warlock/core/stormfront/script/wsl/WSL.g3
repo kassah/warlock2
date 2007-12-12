@@ -252,7 +252,7 @@ EXISTS
 	: { state == State.condition }?=> ('exists')
 	;
 CONTAINS
-	: { state == State.condition }?=> ('contains')
+	: { state == State.condition }?=> ('contains' | 'indexof')
 	;
 ACTION
 	: { state == State.base }?=> 'action' WS+ { state = State.action; atStart = false; }
