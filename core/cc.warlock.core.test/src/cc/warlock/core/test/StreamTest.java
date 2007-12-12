@@ -15,17 +15,17 @@ import cc.warlock.core.client.internal.WarlockStyle;
 public class StreamTest {
 
 	protected static class StreamExt extends Stream {
-		public StreamExt(String name) { super(name); }
-		public static Stream createStream (String name) { return Stream.fromName(name); } 
+		public StreamExt() { super(null,null); }
+		public static Stream createStream (String name) { return Stream.fromName(null, name); } 
 	}
 	
 	protected static class Listener implements IStreamListener {
-		public boolean cleared, receivedText, receivedCommand, prompted, echoed, donePrompting;
+		public boolean cleared, receivedText, receivedCommand, prompted, echoed, donePrompting, flushed;
 		public String echo, prompt, command;
 		public WarlockString text;
 		
 		protected void handleEvent() {
-			cleared = receivedText = receivedCommand = prompted = echoed = donePrompting = false;
+			cleared = receivedText = receivedCommand = prompted = echoed = donePrompting = flushed = false;
 			text = null;
 			echo = prompt = null;
 		}
@@ -62,6 +62,11 @@ public class StreamTest {
 			handleEvent();
 			prompted = true;
 			this.prompt = prompt;
+		}
+		
+		public void streamFlush(IStream stream) {
+			handleEvent();
+			flushed = true;
 		}
 	}
 	
@@ -100,7 +105,7 @@ public class StreamTest {
 
 	@Test
 	public void testSendWarlockString() {
-		WarlockString string = new WarlockString(null);
+		WarlockString string = new WarlockString();
 		string.addStyle(TEST_STYLE);
 		string.append(TEST_STRING);
 		
@@ -137,6 +142,13 @@ public class StreamTest {
 	@Test
 	public void testGetName() {
 		Assert.assertEquals(stream.getName().get(), STREAM_NAME);
+	}
+	
+	@Test
+	public void testFlush () {
+		stream.flush();
+		
+		Assert.assertTrue(listener.flushed);
 	}
 
 }
