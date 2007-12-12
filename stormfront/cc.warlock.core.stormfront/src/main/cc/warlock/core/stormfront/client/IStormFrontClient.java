@@ -66,22 +66,22 @@ public interface IStormFrontClient extends IWarlockClient {
 	/**
 	 * @return The health property
 	 */
-	public IProperty<Integer> getHealth();	
+	public IProperty<BarStatus> getHealth();	
 	
 	/**
 	 * @return The amount of mana in the mana bar.
 	 */
-	public IProperty<Integer> getMana();
+	public IProperty<BarStatus> getMana();
 	
 	/**
 	 * @return The amount of fatigue in the fatigue bar.
 	 */
-	public IProperty<Integer> getFatigue();
+	public IProperty<BarStatus> getFatigue();
 	
 	/**
 	 * @return The amount of spirit in the spirit bar.
 	 */
-	public IProperty<Integer> getSpirit();
+	public IProperty<BarStatus> getSpirit();
 	
 	/**
 	 * @return The client's compass.

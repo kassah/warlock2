@@ -22,6 +22,7 @@ import cc.warlock.core.client.IWarlockClient;
 import cc.warlock.core.client.WarlockClientAdapter;
 import cc.warlock.core.client.WarlockClientRegistry;
 import cc.warlock.core.client.internal.ClientProperty;
+import cc.warlock.core.stormfront.client.BarStatus;
 import cc.warlock.core.stormfront.client.IStormFrontClient;
 import cc.warlock.rcp.ui.WarlockProgressBar;
 import cc.warlock.rcp.ui.client.SWTPropertyListener;
@@ -34,7 +35,7 @@ import cc.warlock.rcp.views.IGameViewFocusListener;
  * TODO To change the template for this generated type comment go to
  * Window - Preferences - Java - Code Style - Code Templates
  */
-public class BarsView extends ViewPart implements IPropertyListener<Integer> {
+public class BarsView extends ViewPart {
 
 	public static final String VIEW_ID = "cc.warlock.rcp.stormfront.ui.views.BarsView";
 	
@@ -47,13 +48,15 @@ public class BarsView extends ViewPart implements IPropertyListener<Integer> {
 	
 	protected WarlockProgressBar health, fatigue, spirit, mana, roundtime;
 	
-	protected SWTPropertyListener<Integer> listenerWrapper;
+	protected SWTPropertyListener<Integer> rtListener;
+	protected SWTPropertyListener<BarStatus> barListener;
 	protected IStormFrontClient activeClient;
 	protected ArrayList<IStormFrontClient> clients = new ArrayList<IStormFrontClient>();
 	
 	public BarsView() {
 		instance = this;
-		listenerWrapper = new SWTPropertyListener<Integer>(this);
+		rtListener = new SWTPropertyListener<Integer>(new RoundtimeListener());
+		barListener = new SWTPropertyListener<BarStatus>(new BarListener());
 		
 		WarlockClientRegistry.addWarlockClientListener(new WarlockClientAdapter() {
 			public void clientConnected(final IWarlockClient client) {
@@ -86,20 +89,20 @@ public class BarsView extends ViewPart implements IPropertyListener<Integer> {
 		
 		if (!clients.contains(client))
 		{
-			client.getHealth().addListener(listenerWrapper);
-			client.getMana().addListener(listenerWrapper);
-			client.getSpirit().addListener(listenerWrapper);
-			client.getFatigue().addListener(listenerWrapper);
-			client.getRoundtime().addListener(listenerWrapper);
+			client.getHealth().addListener(barListener);
+			client.getMana().addListener(barListener);
+			client.getSpirit().addListener(barListener);
+			client.getFatigue().addListener(barListener);
+			client.getRoundtime().addListener(rtListener);
 			clients.add(client);
 			
 		} else {
 			activateRoundtime = true;
-			propertyChanged(client.getHealth(), null);
-			propertyChanged(client.getMana(), null);
-			propertyChanged(client.getSpirit(), null);
-			propertyChanged(client.getFatigue(), null);
-			propertyChanged(client.getRoundtime(), null);
+			barListener.propertyChanged(client.getHealth(), null);
+			barListener.propertyChanged(client.getMana(), null);
+			barListener.propertyChanged(client.getSpirit(), null);
+			barListener.propertyChanged(client.getFatigue(), null);
+			rtListener.propertyChanged(client.getRoundtime(), null);
 		}
 	}
 	
@@ -194,55 +197,72 @@ public class BarsView extends ViewPart implements IPropertyListener<Integer> {
 	}
 	
 	private boolean activateRoundtime = false;
-	public void propertyActivated(IProperty<Integer> property) {
-		if (property == null || property.getName() == null) return;
-		
-		if ("roundtime".equals(property.getName()))
-		{
+	
+	private class RoundtimeListener implements IPropertyListener<Integer> {
+		public void propertyActivated(IProperty<Integer> property) {
+			if (property == null || property.getName() == null) return;
 			activateRoundtime = true;
+		}
+
+		public void propertyCleared(IProperty<Integer> property, Integer oldValue) {	}
+		public void propertyChanged(IProperty<Integer> property, Integer oldValue) {
+			if (property == null || property.getName() == null) return;
+
+			if (property instanceof ClientProperty)
+			{
+				ClientProperty<Integer> clientProperty = (ClientProperty<Integer>) property;
+				if (clientProperty.getClient() == activeClient)
+				{
+					if (property.getName().equals("roundtime"))
+					{
+						if (activateRoundtime)
+						{
+							roundtime.setMaximum(property.get() * 1000);
+							roundtime.setMinimum(0);
+							activateRoundtime = false;
+						}
+						roundtime.setSelection(property.get() * 1000);
+						roundtime.setLabel("roundtime: " + property.get() + " seconds");
+					}
+				}
+			}
 		}
 	}
 	
-	public void propertyCleared(IProperty<Integer> property, Integer oldValue) {	}
-	public void propertyChanged(IProperty<Integer> property, Integer oldValue) {
-		if (property == null || property.getName() == null) return;
+	private class BarListener implements IPropertyListener<BarStatus> {
 		
-		if (property instanceof ClientProperty)
-		{
-			ClientProperty<Integer> clientProperty = (ClientProperty<Integer>) property;
-			if (clientProperty.getClient() == activeClient)
+		public void propertyActivated(IProperty<BarStatus> property) { }
+		public void propertyCleared(IProperty<BarStatus> property, BarStatus oldValue) { }
+		
+		public void propertyChanged(IProperty<BarStatus> property, BarStatus oldValue) {
+			if (property == null || property.getName() == null) return;
+
+			if (property instanceof ClientProperty)
 			{
-			
-				if (property.getName().equals("health"))
+				ClientProperty<BarStatus> clientProperty = (ClientProperty<BarStatus>) property;
+				if (clientProperty.getClient() == activeClient)
 				{
-					health.setSelection(property.get());
-					health.setLabel("health: " + property.get() + "%");
-				}
-				else if (property.getName().equals("mana"))
-				{
-					mana.setSelection(property.get());
-					mana.setLabel("mana: " + property.get() + "%");
-				}
-				else if (property.getName().equals("spirit"))
-				{
-					spirit.setSelection(property.get());
-					spirit.setLabel("spirit: " + property.get() + "%");
-				}
-				else if (property.getName().equals("fatigue"))
-				{
-					fatigue.setSelection(property.get());
-					fatigue.setLabel("fatigue: " + property.get() + "%");
-				}
-				else if (property.getName().equals("roundtime"))
-				{
-					if (activateRoundtime)
+
+					if (property.getName().equals("health"))
 					{
-						roundtime.setMaximum(property.get() * 1000);
-						roundtime.setMinimum(0);
-						activateRoundtime = false;
+						health.setSelection(property.get().getValue());
+						health.setLabel(property.get().getText());
 					}
-					roundtime.setSelection(property.get() * 1000);
-					roundtime.setLabel("roundtime: " + property.get() + " seconds");
+					else if (property.getName().equals("mana"))
+					{
+						mana.setSelection(property.get().getValue());
+						mana.setLabel(property.get().getText());
+					}
+					else if (property.getName().equals("spirit"))
+					{
+						spirit.setSelection(property.get().getValue());
+						spirit.setLabel(property.get().getText());
+					}
+					else if (property.getName().equals("fatigue"))
+					{
+						fatigue.setSelection(property.get().getValue());
+						fatigue.setLabel(property.get().getText());
+					}
 				}
 			}
 		}

@@ -4,6 +4,7 @@
 package cc.warlock.core.stormfront.internal;
 
 import cc.warlock.core.stormfront.IStormFrontProtocolHandler;
+import cc.warlock.core.stormfront.client.BarStatus;
 import cc.warlock.core.stormfront.client.IStormFrontClient;
 import cc.warlock.core.stormfront.xml.StormFrontAttributeList;
 
@@ -27,28 +28,28 @@ public class BarTagHandler extends BaseTagHandler {
 
 	@Override
 	public void handleStart(StormFrontAttributeList attributes, String newLine) {
-    	handleProgressBar(attributes.getValue("id"), Integer.parseInt(attributes.getValue("value")), attributes.getValue("text"));	
-	}
-	
-	private void handleProgressBar (String which, int percentage, String label)
-	{
+    	String id = attributes.getValue("id");
+    	int value = Integer.parseInt(attributes.getValue("value"));
+    	String text = attributes.getValue("text");
+    	BarStatus bar = new BarStatus(value, text);
+
 		IStormFrontClient client = handler.getClient();
 		
-		if (which.equals("health"))
+		if (id.equals("health"))
 		{
-			client.getHealth().set(percentage);
+			client.getHealth().set(bar);
 		}
-		else if (which.equals("mana"))
+		else if (id.equals("mana"))
 		{
-			client.getMana().set(percentage);
+			client.getMana().set(bar);
 		}
-		else if (which.equals("stamina"))
+		else if (id.equals("stamina"))
 		{
-			client.getFatigue().set(percentage);
+			client.getFatigue().set(bar);
 		}
-		else if (which.equals("spirit"))
+		else if (id.equals("spirit"))
 		{
-			client.getSpirit().set(percentage);
+			client.getSpirit().set(bar);
 		}
 	}
 }

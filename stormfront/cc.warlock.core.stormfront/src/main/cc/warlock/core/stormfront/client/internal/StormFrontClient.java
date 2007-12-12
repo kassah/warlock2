@@ -27,6 +27,7 @@ import cc.warlock.core.script.IScriptListener;
 import cc.warlock.core.script.ScriptEngineRegistry;
 import cc.warlock.core.script.configuration.ScriptConfiguration;
 import cc.warlock.core.stormfront.IStormFrontProtocolHandler;
+import cc.warlock.core.stormfront.client.BarStatus;
 import cc.warlock.core.stormfront.client.IStormFrontClient;
 import cc.warlock.core.stormfront.network.StormFrontConnection;
 import cc.warlock.core.stormfront.serversettings.server.ServerSettings;
@@ -46,7 +47,8 @@ public class StormFrontClient extends WarlockClient implements IStormFrontClient
 	protected ICompass compass;
 	protected ICharacterStatus status;
 	protected int lastPrompt;
-	protected ClientProperty<Integer> roundtime, health, mana, fatigue, spirit;
+	protected ClientProperty<Integer> roundtime;
+	protected ClientProperty<BarStatus> health, mana, fatigue, spirit;
 	protected ClientProperty<String> leftHand, rightHand, currentSpell;
 	protected StringBuffer buffer = new StringBuffer();
 	protected IStormFrontProtocolHandler handler;
@@ -69,10 +71,10 @@ public class StormFrontClient extends WarlockClient implements IStormFrontClient
 		currentSpell = new ClientProperty<String>(this, "currentSpell", null);
 		
 		roundtime = new ClientProperty<Integer>(this, "roundtime", 0);
-		health = new ClientProperty<Integer>(this, "health", 0);
-		mana = new ClientProperty<Integer>(this, "mana", 0);
-		fatigue = new ClientProperty<Integer>(this, "fatigue", 0);
-		spirit = new ClientProperty<Integer>(this, "spirit", 0);
+		health = new ClientProperty<BarStatus>(this, "health", null);
+		mana = new ClientProperty<BarStatus>(this, "mana", null);
+		fatigue = new ClientProperty<BarStatus>(this, "fatigue", null);
+		spirit = new ClientProperty<BarStatus>(this, "spirit", null);
 		playerId = new ClientProperty<String>(this, "playerId", null);
 		characterName = new ClientProperty<String>(this, "characterName", null);
 		roomDescription = new ClientProperty<String>(this, "roomDescription", null);
@@ -194,19 +196,19 @@ public class StormFrontClient extends WarlockClient implements IStormFrontClient
 		roundtime.set(currentRoundtime);
 	}
 	
-	public IProperty<Integer> getHealth() {
+	public IProperty<BarStatus> getHealth() {
 		return health;
 	}
 
-	public IProperty<Integer> getMana() {
+	public IProperty<BarStatus> getMana() {
 		return mana;
 	}
 
-	public IProperty<Integer> getFatigue() {
+	public IProperty<BarStatus> getFatigue() {
 		return fatigue;
 	}
 
-	public IProperty<Integer> getSpirit() {
+	public IProperty<BarStatus> getSpirit() {
 		return spirit;
 	}
 
