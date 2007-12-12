@@ -3,8 +3,8 @@ package cc.warlock.core.stormfront.script.wsl;
 import java.io.IOException;
 import java.io.Reader;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Random;
 import java.util.Stack;
 import java.util.concurrent.locks.Condition;
@@ -241,18 +241,21 @@ public class WSLScript extends AbstractScript {
 		}
 	}
 	
-	public void start (List<String> arguments)
+	public void start (Collection<String> arguments)
 	{
-		if (arguments.size() > 0) {
-			StringBuffer totalargs = new StringBuffer();
-			for (int i = 0; i < arguments.size(); i++) {
-				setVariable(Integer.toString(i + 1), arguments.get(i));
-				totalargs.append(arguments.get(i));
-				if (i != arguments.size() - 1)
-					totalargs.append(" ");
-			}
-			setVariable("0", totalargs.toString());
+		StringBuffer totalargs = new StringBuffer();
+		int i = 1;
+		for (String argument : arguments) {
+			setVariable(Integer.toString(i), argument);
+			if (i > 1)
+				totalargs.append(" ");
+			totalargs.append(argument);
+			i++;
 		}
+		for(; i <= 9; i++) {
+			setVariable(Integer.toString(i), "");
+		}
+		setVariable("0", totalargs.toString());
 		
 		for (String varName : scriptCommands.getStormFrontClient().getServerSettings().getVariableNames())
 		{
