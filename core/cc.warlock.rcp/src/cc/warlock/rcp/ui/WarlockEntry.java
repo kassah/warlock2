@@ -67,7 +67,7 @@ public class WarlockEntry implements VerifyKeyListener {
 	}
 	
 	public void verifyKey(VerifyEvent e) {
-		
+		//System.out.println("got char \"" + e.character + "\"");
 		for (IMacro macro : MacroRegistry.instance().getMacros())
 		{
 			if (macro.getKeyCode() == e.keyCode && macro.getModifiers() == e.stateMask)
@@ -198,8 +198,10 @@ public class WarlockEntry implements VerifyKeyListener {
 	}
 	
 	public void repeatLastCommand() {
-		ICommand command = viewer.getWarlockClient().getCommandHistory().getLastCommand();
-		viewer.getWarlockClient().send(command.getCommand());
+		if (viewer.getWarlockClient().getCommandHistory().size() >= 1) {
+			ICommand command = viewer.getWarlockClient().getCommandHistory().getLastCommand();
+			viewer.getWarlockClient().send(command.getCommand());
+		}
 	}
 	
 	public void repeatSecondToLastCommand() {
