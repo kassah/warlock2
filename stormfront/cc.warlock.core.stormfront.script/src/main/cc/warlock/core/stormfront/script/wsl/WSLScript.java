@@ -928,7 +928,7 @@ public class WSLScript extends AbstractScript {
 		}
 		
 		public void execute (String arguments) {
-			if (variableExists(variableName))
+			if (variableExists(variableName) && getVariable(variableName).toString().length() > 0)
 			{
 				WSLScript.this.execute(arguments);
 			}
