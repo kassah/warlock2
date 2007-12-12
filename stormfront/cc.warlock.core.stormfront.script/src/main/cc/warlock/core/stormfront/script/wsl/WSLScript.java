@@ -155,25 +155,25 @@ public class WSLScript extends AbstractScript {
 	
 	private class WSLMana extends WSLAbstractNumber {
 		public double toDouble() {
-			return client.getMana().get();
+			return client.getMana().get().getValue();
 		}
 	}
 	
 	private class WSLHealth extends WSLAbstractNumber {
 		public double toDouble() {
-			return client.getHealth().get();
+			return client.getHealth().get().getValue();
 		}
 	}
 	
 	private class WSLFatigue extends WSLAbstractNumber {
 		public double toDouble() {
-			return client.getFatigue().get();
+			return client.getFatigue().get().getValue();
 		}
 	}
 	
 	private class WSLSpirit extends WSLAbstractNumber {
 		public double toDouble() {
-			return client.getSpirit().get();
+			return client.getSpirit().get().getValue();
 		}
 	}
 	
