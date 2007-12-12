@@ -8,7 +8,6 @@ import java.util.Random;
 import org.eclipse.jface.action.Action;
 
 import cc.warlock.rcp.ui.WarlockSharedImages;
-import cc.warlock.rcp.userstreams.IStreamFilter;
 import cc.warlock.rcp.userstreams.ui.views.UserStream;
 
 /**

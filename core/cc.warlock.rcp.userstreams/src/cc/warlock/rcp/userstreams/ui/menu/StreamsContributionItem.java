@@ -6,12 +6,9 @@ package cc.warlock.rcp.userstreams.ui.menu;
 import java.util.ArrayList;
 
 import org.eclipse.jface.action.ActionContributionItem;
-import org.eclipse.jface.action.IAction;
 import org.eclipse.jface.action.IContributionItem;
 import org.eclipse.ui.actions.CompoundContributionItem;
 
-import cc.warlock.rcp.userstreams.IStreamFilter;
-import cc.warlock.rcp.userstreams.internal.StreamFilter;
 import cc.warlock.rcp.userstreams.ui.actions.StreamShowAction;
 
 /**

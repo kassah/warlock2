@@ -1,7 +1,6 @@
 package cc.warlock.core.stormfront.internal;
 
 import cc.warlock.core.stormfront.IStormFrontProtocolHandler;
-import cc.warlock.core.stormfront.client.IStormFrontClient;
 import cc.warlock.core.stormfront.client.internal.StormFrontClient;
 import cc.warlock.core.stormfront.network.StormFrontConnection;
 import cc.warlock.core.stormfront.xml.StormFrontAttributeList;
