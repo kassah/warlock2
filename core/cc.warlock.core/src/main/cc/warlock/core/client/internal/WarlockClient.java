@@ -59,8 +59,13 @@ public abstract class WarlockClient implements IWarlockClient {
 		String text = command + "\n";
 		if(prefix != null)
 			getDefaultStream().sendCommand(prefix + text);
-		else
-			getDefaultStream().sendCommand(text);
+		else {
+			String commands[] = text.split(";");
+//			for (String command : commands)
+//			{
+				getDefaultStream().sendCommand(text);
+//			}
+		}
 		
 		try {
 			connection.send(text);
@@ -87,7 +92,7 @@ public abstract class WarlockClient implements IWarlockClient {
 	}
 	
 	public IStream getStream(String streamName) {
-		return Stream.fromName(streamPrefix + streamName);
+		return Stream.fromName(this, streamPrefix + streamName);
 	}
 	
 	public IConnection getConnection() {
@@ -115,7 +120,8 @@ public abstract class WarlockClient implements IWarlockClient {
 	public Collection<IStream> getStreams() {
 		Collection<IStream> streams = new ArrayList<IStream>();
 		for(IStream stream : Stream.getStreams()) {
-			if(stream.getClient().equals(this))
+			IWarlockClient client = stream.getClient();
+			if (client != null && client.equals(this))
 				streams.add(stream);
 		}
 		return streams;

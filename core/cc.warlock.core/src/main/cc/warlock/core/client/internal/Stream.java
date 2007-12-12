@@ -25,6 +25,7 @@ import cc.warlock.core.client.WarlockString;
 public class Stream implements IStream {
 	
 	protected static Hashtable<String, Stream> streams = new Hashtable<String, Stream>();
+	protected IWarlockClient client;
 	
 	protected IProperty<String> streamName, streamTitle;
 	private ArrayList<IStreamListener> listeners = new ArrayList<IStreamListener>();
@@ -34,7 +35,8 @@ public class Stream implements IStream {
 	protected boolean isPrompting = false;
 	private boolean hasView = false;
 	
-	protected Stream (String streamName) {
+	protected Stream (IWarlockClient client, String streamName) {
+		this.client = client;
 		this.streamName = new Property<String>("streamName", null);
 		this.streamName.set(streamName);
 		this.streamTitle = new Property<String>("streamTitle", null);
@@ -161,12 +163,12 @@ public class Stream implements IStream {
 		return streamName;
 	}
 	
-	protected static Stream fromName (String name)
+	protected static Stream fromName (IWarlockClient client, String name)
 	{
 		if (streams.containsKey(name))
 			return streams.get(name);
 		
-		else return new Stream(name);
+		else return new Stream(client, name);
 	}
 	
 	public static Collection<Stream> getStreams ()
@@ -176,18 +178,7 @@ public class Stream implements IStream {
 	
 	public IWarlockClient getClient ()
 	{
-		for (IWarlockClient client : WarlockClientRegistry.getActiveClients())
-		{
-			if (client instanceof WarlockClient)
-			{
-				WarlockClient c = (WarlockClient) client;
-				if (getName().get().indexOf(c.streamPrefix) > -1)
-				{
-					return c;
-				}
-			}
-		}
-		return null;
+		return client;
 	}
 
 	public IProperty<String> getTitle() {

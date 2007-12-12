@@ -12,9 +12,7 @@ public class StormFrontStream extends Stream {
 	
 	protected StormFrontStream (IStormFrontClient client, String streamName)
 	{
-		super(streamName);
-		
-		this.client = client;
+		super(client, streamName);
 	}
 	
 	protected static Stream fromNameAndClient (IStormFrontClient client, String name)
@@ -32,14 +30,16 @@ public class StormFrontStream extends Stream {
 	
 	@Override
 	public void send(WarlockString text) {
-		
 		boolean ignored = false;
 		
-		for (IgnoreSetting ignore : client.getServerSettings().getIgnores())
+		if (client != null)
 		{
-			if (text.toString().contains(ignore.getText()))
+			for (IgnoreSetting ignore : client.getServerSettings().getIgnores())
 			{
-				ignored = true; break;
+				if (text.toString().contains(ignore.getText()))
+				{
+					ignored = true; break;
+				}
 			}
 		}
 		
