@@ -180,8 +180,8 @@ public class WarlockUpdates {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		} catch (CoreException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
+			MessageDialog.openError(Display.getDefault().getActiveShell(), "Error updating",
+					"There was an error while attempting to update Warlock: " + e.getMessage());
 		}
 	}
 }
