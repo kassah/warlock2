@@ -35,16 +35,31 @@ public class StormFrontStream extends Stream {
 			for (IgnoreSetting ignore : client.getServerSettings().getIgnores())
 			{
 				String ignoreText = ignore.getText();
-				while(text.toString().contains(ignoreText))
+				int pos = text.toString().indexOf(ignoreText);
+				while(pos >= 0)
 				{
+					System.out.println("Ignore matched text in: " + text.toString());
+					
 					String str = text.toString();
-					int pos = str.indexOf(ignoreText);
 					int start = str.substring(0, pos).lastIndexOf('\n');
 					int end = str.indexOf('\n', pos);
-					WarlockString newText = text.substring(0, start);
-					newText.append(text.substring(end));
-					System.out.println("Ignore matched text in: " + text.toString());
-					text = newText;
+					
+					// we are the first line and don't have anything to remove there
+					if(start < 0) {
+						// we only have one line, don't show anything
+						if(end < 0 || end + 1 >= str.length())
+							return;
+						
+						text = text.substring(end + 1);
+					} else {
+						WarlockString newText = text.substring(0, start + 1);
+						
+						// if we have text after the line after the ignore, add it
+						if(end >= 0 && end + 1 < str.length())
+							newText.append(text.substring(end + 1));
+
+						text = newText;
+					}
 				}
 			}
 		}
