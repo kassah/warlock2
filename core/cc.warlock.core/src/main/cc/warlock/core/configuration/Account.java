@@ -37,4 +37,9 @@ public class Account {
 		
 		return super.equals(obj);
 	}
+	
+	@Override
+	public int hashCode() {
+		return accountName.hashCode();
+	}
 }
