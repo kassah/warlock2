@@ -30,21 +30,25 @@ public class StormFrontStream extends Stream {
 	
 	@Override
 	public void send(WarlockString text) {
-		boolean ignored = false;
-		
 		if (client != null)
 		{
 			for (IgnoreSetting ignore : client.getServerSettings().getIgnores())
 			{
-				if (text.toString().contains(ignore.getText()))
+				String str = text.toString();
+				String ignoreText = ignore.getText();
+				if (str.contains(ignoreText))
 				{
-					ignored = true; break;
+					int pos = str.lastIndexOf(ignoreText);
+					int start = str.substring(0, pos).lastIndexOf('\n');
+					int end = str.indexOf('\n', pos);
+					WarlockString newText = text.substring(0, start);
+					newText.append(text.substring(end));
+					System.out.println("Ignore matched text in: " + text.toString());
+					text = newText;
 				}
 			}
 		}
 		
-		if (!ignored) {
-			super.send(text);
-		}
+		super.send(text);
 	}
 }
