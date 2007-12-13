@@ -107,6 +107,12 @@ public class Preset extends ColorSetting {
 		if (o instanceof Preset)
 		{
 			Preset p = (Preset) o;
+			if(name == null) {
+				if(p.name == null) return 0;
+				return -1;
+			}
+			if(p.name == null)
+				return 1;
 			return name.compareTo(p.name);
 		}
 		return super.compareTo(o);
