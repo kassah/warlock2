@@ -1,14 +1,11 @@
 package cc.warlock.core.stormfront.client.internal;
 
-import cc.warlock.core.client.IWarlockClient;
 import cc.warlock.core.client.WarlockString;
 import cc.warlock.core.client.internal.Stream;
 import cc.warlock.core.stormfront.client.IStormFrontClient;
 import cc.warlock.core.stormfront.serversettings.server.IgnoreSetting;
 
 public class StormFrontStream extends Stream {
-
-	protected IStormFrontClient client;
 	
 	protected StormFrontStream (IStormFrontClient client, String streamName)
 	{
@@ -24,19 +21,14 @@ public class StormFrontStream extends Stream {
 	}
 	
 	@Override
-	public IWarlockClient getClient() {
-		return client;
-	}
-	
-	@Override
 	public void send(WarlockString text) {
 		if (client != null)
 		{
-			for (IgnoreSetting ignore : client.getServerSettings().getIgnores())
+			for (IgnoreSetting ignore : ((IStormFrontClient)client).getServerSettings().getIgnores())
 			{
 				String ignoreText = ignore.getText();
-				int pos = text.toString().indexOf(ignoreText);
-				while(pos >= 0)
+				int pos;
+				while((pos = text.toString().indexOf(ignoreText)) >= 0)
 				{
 					System.out.println("Ignore matched text in: " + text.toString());
 					
