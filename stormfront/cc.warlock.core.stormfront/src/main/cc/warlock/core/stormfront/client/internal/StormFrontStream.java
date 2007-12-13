@@ -34,11 +34,11 @@ public class StormFrontStream extends Stream {
 		{
 			for (IgnoreSetting ignore : client.getServerSettings().getIgnores())
 			{
-				String str = text.toString();
 				String ignoreText = ignore.getText();
-				if (str.contains(ignoreText))
+				while(text.toString().contains(ignoreText))
 				{
-					int pos = str.lastIndexOf(ignoreText);
+					String str = text.toString();
+					int pos = str.indexOf(ignoreText);
 					int start = str.substring(0, pos).lastIndexOf('\n');
 					int end = str.indexOf('\n', pos);
 					WarlockString newText = text.substring(0, start);
