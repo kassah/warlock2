@@ -7,18 +7,13 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashSet;
-import java.util.Hashtable;
-import java.util.List;
 
 import cc.warlock.core.client.ICommandHistory;
 import cc.warlock.core.client.IHighlightProvider;
 import cc.warlock.core.client.IHighlightString;
 import cc.warlock.core.client.IStream;
-import cc.warlock.core.client.IStreamListener;
 import cc.warlock.core.client.IWarlockClient;
 import cc.warlock.core.client.IWarlockClientViewer;
-import cc.warlock.core.client.IWarlockStyle;
-import cc.warlock.core.client.WarlockString;
 import cc.warlock.core.network.IConnection;
 
 
@@ -59,13 +54,8 @@ public abstract class WarlockClient implements IWarlockClient {
 		String text = command + "\n";
 		if(prefix != null)
 			getDefaultStream().sendCommand(prefix + text);
-		else {
-			String commands[] = text.split(";");
-//			for (String command : commands)
-//			{
-				getDefaultStream().sendCommand(text);
-//			}
-		}
+		else
+			getDefaultStream().sendCommand(text);
 		
 		try {
 			connection.send(text);
