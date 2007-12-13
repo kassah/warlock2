@@ -18,10 +18,13 @@ public class HighlightPreset extends Preset implements IHighlightString {
 	protected boolean isName, isNew = false;
 	protected HighlightPreset originalString;
 	protected Pattern pattern;
+	protected int index;
 	
-	protected HighlightPreset (ServerSettings serverSettings, Palette palette)
+	protected HighlightPreset (ServerSettings serverSettings, Palette palette, int index)
 	{
 		super(serverSettings, palette);
+		
+		this.index = index;
 	}
 	
 	public HighlightPreset (HighlightPreset other)
@@ -32,6 +35,7 @@ public class HighlightPreset extends Preset implements IHighlightString {
 		this.isName = other.isName;
 		this.isNew = other.isNew;
 		this.originalString = other;
+		this.index = other.index;
 	}
 	
 	public HighlightPreset (ServerSettings serverSettings, StormFrontElement highlightElement, Palette palette)
@@ -154,5 +158,34 @@ public class HighlightPreset extends Preset implements IHighlightString {
 		}
 		
 		return pattern;
+	}
+	
+	@Override
+	public boolean equals(Object obj) {
+		if (obj instanceof HighlightPreset)
+		{
+			HighlightPreset other =(HighlightPreset) obj;
+			if (other.getText().equals(getText()) && other.getIndex() == getIndex())
+			{
+				return true;
+			}
+		}
+		return super.equals(obj);
+	}
+
+	public int getIndex() {
+		return index;
+	}
+
+	public void setIndex(int index) {
+		this.index = index;
+	}
+	
+	public String surroundMarkup(String childMarkup)
+	{
+		String tagPrefix = isName ? HighlightPreset.NAMES_PREFIX : HighlightPreset.STRINGS_PREFIX;
+		String tagSuffix = isName ? HighlightPreset.NAMES_SUFFIX : HighlightPreset.STRINGS_SUFFIX;
+		
+		return tagPrefix + childMarkup + tagSuffix;
 	}
 }

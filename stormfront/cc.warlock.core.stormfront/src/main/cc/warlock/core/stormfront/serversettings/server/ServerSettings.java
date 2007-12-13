@@ -10,8 +10,11 @@ import java.net.URL;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
+import java.util.HashMap;
 import java.util.Hashtable;
 import java.util.List;
+import java.util.ListIterator;
+import java.util.Map;
 
 import cc.warlock.core.client.IHighlightProvider;
 import cc.warlock.core.client.IHighlightString;
@@ -45,13 +48,13 @@ public class ServerSettings implements Comparable<ServerSettings>, IHighlightPro
 	protected Hashtable<String, WindowSettings> windowSettings = new Hashtable<String,WindowSettings>();
 	protected CommandLineSettings commandLineSettings;
 	protected Hashtable<String, Preset> presets = new Hashtable<String,Preset>();
-	protected Hashtable<String, HighlightPreset> highlightStrings = new Hashtable<String, HighlightPreset>();
+	protected ArrayList<HighlightPreset> highlightStrings = new ArrayList<HighlightPreset>();
 	protected Hashtable<String, String> variables = new Hashtable<String, String>();
 	protected ArrayList<ArrayList<MacroKey>> macroSets = new ArrayList<ArrayList<MacroKey>>();
 	protected Hashtable<String, ServerScript> scripts = new Hashtable<String, ServerScript>();
 	protected ArrayList<IgnoreSetting> ignores = new ArrayList<IgnoreSetting>();
 	
-	protected ArrayList<HighlightPreset> deletedHighlightStrings = new ArrayList<HighlightPreset>();
+	protected HashMap<HighlightPreset, HighlightPreset> deletedHighlightStrings = new HashMap<HighlightPreset, HighlightPreset>();
 	protected ArrayList<String> deletedVariables = new ArrayList<String>();
 	protected ArrayList<IServerSettingsListener> listeners = new ArrayList<IServerSettingsListener>();
 	
@@ -222,7 +225,7 @@ public class ServerSettings implements Comparable<ServerSettings>, IHighlightPro
 				String text = hElement.attributeValue("text");
 				
 				if(text != null)
-					highlightStrings.put(text, new HighlightPreset(this, hElement, palette));
+					highlightStrings.add(new HighlightPreset(this, hElement, palette));
 			}
 		}
 		
@@ -233,8 +236,9 @@ public class ServerSettings implements Comparable<ServerSettings>, IHighlightPro
 			{
 				String text = hElement.attributeValue("text");
 				
-				highlightStrings.put(text, new HighlightPreset(this, hElement, palette));
-				highlightStrings.get(text).setIsName(true);
+				HighlightPreset highlight = new HighlightPreset(this, hElement, palette);
+				highlight.setIsName(true);
+				highlightStrings.add(highlight);
 			}
 		}
 	}
@@ -338,22 +342,20 @@ public class ServerSettings implements Comparable<ServerSettings>, IHighlightPro
 		return presets.get(presetId);
 	}
 	
-	public HighlightPreset getHighlightString (String text)
+	public HighlightPreset getHighlightString (int index)
 	{
 		if (highlightStrings == null) return null;
 		
-		if (!highlightStrings.containsKey(text)) return null;
-		
-		return highlightStrings.get(text);
+		return highlightStrings.get(index);
 	}
 	
 	public Collection<? extends IHighlightString> getHighlightStrings ()
 	{	
-		return highlightStrings == null ? null : highlightStrings.values();
+		return highlightStrings;
 	}
 	
 	public Collection<HighlightPreset> getHighlightPresets() {
-		return highlightStrings == null ? null : highlightStrings.values();
+		return highlightStrings;
 	}
 	
 	public void clearHighlightStrings ()
@@ -363,11 +365,20 @@ public class ServerSettings implements Comparable<ServerSettings>, IHighlightPro
 	
 	public void updateHighlightString (HighlightPreset string)
 	{
-		if (!highlightStrings.containsKey(string.getText()))
+		if (!highlightStrings.contains(string))
 		{
 			string.setNew(true);
 		}
-		highlightStrings.put(string.getText(), string);
+		
+		for (ListIterator<HighlightPreset> iter = highlightStrings.listIterator(); iter.hasNext(); )
+		{
+			HighlightPreset highlight = iter.next();
+			if (highlight.equals(string))
+			{
+				iter.remove();
+				iter.add(string);
+			}
+		}
 	}
 	
 	public void updatePreset (Preset preset)
@@ -382,10 +393,21 @@ public class ServerSettings implements Comparable<ServerSettings>, IHighlightPro
 	
 	public void deleteHighlightString (HighlightPreset string)
 	{
-		if (highlightStrings.containsKey(string.getText()))
+		HighlightPreset toDelete =
+			string.getOriginalHighlightString() == null ? string : string.getOriginalHighlightString();
+		
+		if (highlightStrings.contains(toDelete))
 		{
-			deletedHighlightStrings.add(string);
-			highlightStrings.remove(string.getText());
+			int index = highlightStrings.indexOf(toDelete);
+			HighlightPreset next = null;
+			if (index < highlightStrings.size() - 1)
+			{
+				next = highlightStrings.get(index+1);
+			}
+			
+			
+			deletedHighlightStrings.put(toDelete, next);
+			highlightStrings.remove(toDelete);
 		}
 	}
 	
@@ -401,7 +423,7 @@ public class ServerSettings implements Comparable<ServerSettings>, IHighlightPro
 			paletteMarkup = palette.toStormfrontMarkup();
 		}
 		
-		for (HighlightPreset string : highlightStrings.values())
+		for (HighlightPreset string : highlightStrings)
 		{
 			if (string.isName() == saveNames) {
 				if (string.needsUpdate())
@@ -431,21 +453,28 @@ public class ServerSettings implements Comparable<ServerSettings>, IHighlightPro
 			}
 		}
 		
-		for (HighlightPreset string : deletedHighlightStrings)
+		for (Map.Entry<HighlightPreset, HighlightPreset> entry: deletedHighlightStrings.entrySet())
 		{
+			HighlightPreset string = entry.getKey();
 			// don't send the delete command if it was re-added after it was marked for deletion
-			if (highlightStrings.containsKey(string.getText())) continue;
+			if (highlightStrings.contains(string)) continue;
 			
 			if (saveNames == string.isName()) {
-				stringsDeleteMarkup.append(saveNames ?
-						HighlightPreset.NAMES_PREFIX :
-							HighlightPreset.STRINGS_PREFIX);
-				stringsDeleteMarkup.append(ServerSetting.DELETE_PREFIX);
-				stringsDeleteMarkup.append(string.toStormfrontMarkup());
-				stringsDeleteMarkup.append(ServerSetting.DELETE_SUFFIX);
-				stringsDeleteMarkup.append(saveNames ?
-						HighlightPreset.NAMES_SUFFIX :
-							HighlightPreset.STRINGS_SUFFIX);
+				String markup = string.toStormfrontMarkup();
+				String updateMarkup = ServerSetting.updateMarkup(markup+markup);
+				
+				stringsDeleteMarkup.append(string.surroundMarkup(updateMarkup));
+				stringsDeleteMarkup.append(string.surroundMarkup(updateMarkup));
+				stringsDeleteMarkup.append(string.surroundMarkup(string.deleteMarkup()));
+				
+				if (deletedHighlightStrings.get(string) != null)
+				{
+					HighlightPreset next = entry.getValue();
+					markup = next.toStormfrontMarkup();
+					updateMarkup = ServerSetting.updateMarkup(markup+markup);
+					
+					stringsDeleteMarkup.append(next.surroundMarkup(updateMarkup));
+				}
 				
 				string.deleteFromDOM();
 			}

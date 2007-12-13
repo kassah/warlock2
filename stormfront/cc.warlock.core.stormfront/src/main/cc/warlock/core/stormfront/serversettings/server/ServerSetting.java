@@ -66,4 +66,14 @@ public abstract class ServerSetting {
 		
 		return (int) Math.round(pixels);
 	}
+	
+	public String deleteMarkup()
+	{
+		return DELETE_PREFIX + toStormfrontMarkup() + DELETE_SUFFIX;
+	}
+	
+	public static String updateMarkup(String childMarkup)
+	{
+		return UPDATE_PREFIX + childMarkup + UPDATE_SUFFIX;
+	}
 }
