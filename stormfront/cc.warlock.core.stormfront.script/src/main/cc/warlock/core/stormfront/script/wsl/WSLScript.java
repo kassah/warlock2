@@ -433,27 +433,19 @@ public class WSLScript extends AbstractScript {
 			for (int i = 1; ; i++) {
 				if (!variableExists(Integer.toString(i+1)))
 				{
-					if (zeroarg.length() > 0) { 
-						zeroarg.deleteCharAt(zeroarg.length() - 1);
-						setVariable("0",zeroarg.toString());
-					} else {
-						deleteVariable("0");
-					}
-					deleteVariable(Integer.toString(i));
+					zeroarg.deleteCharAt(zeroarg.length() - 1);
+					setVariable("0",zeroarg.toString());
+					setVariable(Integer.toString(i), "");
 					break;
 				}
 				else
 				{
 					String arg = getVariable(Integer.toString(i+1)).toString();
 					if (arg == null) {
-						if (zeroarg.length() > 0) {
-							zeroarg.deleteCharAt(zeroarg.length() - 1);
-							setVariable("0",zeroarg.toString());
-						} else {
-							deleteVariable("0");
-						}
-						
-						deleteVariable(Integer.toString(i));
+						zeroarg.deleteCharAt(zeroarg.length() - 1);
+						setVariable("0",zeroarg.toString());
+
+						setVariable(Integer.toString(i), "");
 						break;
 					}
 					zeroarg.append(arg + " ");
