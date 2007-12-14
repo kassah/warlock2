@@ -75,7 +75,7 @@ public class ScriptEngineRegistry {
 		{
 			for (IScriptInfo scriptInfo : provider.getScriptInfos())
 			{
-				if (scriptInfo.getScriptName().equals(scriptName)) {
+				if (scriptInfo.getScriptName().equalsIgnoreCase(scriptName)) {
 					IScript script = provider.startScript(scriptInfo, client, arguments);
 					if(script != null)
 						return script;

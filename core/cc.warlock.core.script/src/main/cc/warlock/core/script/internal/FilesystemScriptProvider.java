@@ -58,7 +58,7 @@ public class FilesystemScriptProvider implements IFilesystemScriptProvider, Runn
 		}
 		
 		public int compareTo(ScriptFileInfo o) {
-			return scriptName.compareTo(o.scriptName);
+			return scriptName.compareToIgnoreCase(o.scriptName);
 		}
 		
 		public String getExtension() {
