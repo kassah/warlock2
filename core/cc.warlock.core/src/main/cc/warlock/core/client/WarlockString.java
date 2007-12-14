@@ -116,8 +116,9 @@ public class WarlockString {
 		int i = 0;
 		int start = 0;
 
-		// if limit is non-positive, there is not limit
-		// always allow an extra space at the end for the remainder
+		// if limit is non-positive, there is no limit
+		// always stop with one substring less than the limit,
+		// so we don't go over the limit by adding the remainder
 		while (m.find(start) && (i + 1 < limit || limit <= 0)) {
 			int end = m.start();
 			// make sure that we actually have a substring to add
@@ -129,7 +130,7 @@ public class WarlockString {
 			start = m.end();
 		}
 		
-		// add the remainder of the string if we didn't get there
+		// add the remainder of the string if we didn't get to the end
 		if (this.length() - start > 0) {
 			parts.add(this.substring(start));
 		}
