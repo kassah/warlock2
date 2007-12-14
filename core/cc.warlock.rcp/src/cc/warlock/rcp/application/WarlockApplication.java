@@ -90,12 +90,8 @@ public class WarlockApplication extends WorkbenchAdvisor implements IApplication
 		FlaggedOption profileOption = new FlaggedOption("profile",
 			JSAP.STRING_PARSER, JSAP.NO_DEFAULT, JSAP.NOT_REQUIRED, 'p', "profile", "The profile to start Warlock with");
 		
-		Switch debugSwitch = new Switch("debugConsole", 'd', "debugConsole", "Start Warlock in debug mode (allows raw input/output mode)");
-		debugSwitch.setDefault("false");
-		
 		try {
 			jsap.registerParameter(profileOption);
-			jsap.registerParameter(debugSwitch);
 		} catch (JSAPException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
