@@ -11,16 +11,12 @@ import org.eclipse.equinox.app.IApplication;
 import org.eclipse.equinox.app.IApplicationContext;
 import org.eclipse.swt.graphics.Point;
 import org.eclipse.swt.widgets.Display;
-import org.eclipse.ui.PartInitException;
 import org.eclipse.ui.PlatformUI;
-import org.eclipse.ui.WorkbenchException;
 import org.eclipse.ui.application.IWorkbenchConfigurer;
 import org.eclipse.ui.application.IWorkbenchWindowConfigurer;
 import org.eclipse.ui.application.WorkbenchAdvisor;
-import org.eclipse.ui.application.WorkbenchWindowAdvisor;
 
 import cc.warlock.core.configuration.WarlockConfiguration;
-import cc.warlock.rcp.views.ConnectionView;
 
 import com.martiansoftware.jsap.FlaggedOption;
 import com.martiansoftware.jsap.JSAP;
@@ -35,7 +31,6 @@ public class WarlockApplication extends WorkbenchAdvisor implements IApplication
 	
 	private String startWithProfile = null;
 	private static WarlockApplication _instance;
-	private boolean debugMode = false;
 	private Timer timer = new Timer();
 	private boolean showMenus = true;
 	private String windowTitle = null;
@@ -111,14 +106,6 @@ public class WarlockApplication extends WorkbenchAdvisor implements IApplication
 		{
 			startWithProfile = result.getString("profile");
 		}
-		if (result.contains("debugConsole"))
-		{
-			if (result.getBoolean("debugConsole"))
-			{
-				debugMode = true;
-				
-			}
-		}
 	}
 	
 	@Override
@@ -163,10 +150,6 @@ public class WarlockApplication extends WorkbenchAdvisor implements IApplication
 
 	public String getStartWithProfile() {
 		return startWithProfile;
-	}
-	
-	public boolean inDebugMode() {
-		return debugMode;
 	}
 	
 	public Timer getTimer ()

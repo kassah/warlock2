@@ -45,9 +45,7 @@ public class DebugView extends ViewPart implements IConnectionListener {
 	
 	public void debug (String message)
 	{
-		if (WarlockApplication.instance().inDebugMode()) {
-			console.append(message);
-		}
+		console.append(message);
 	}
 	
 	@Override

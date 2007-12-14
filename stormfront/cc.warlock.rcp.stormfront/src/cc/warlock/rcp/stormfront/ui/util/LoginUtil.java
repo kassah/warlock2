@@ -55,15 +55,6 @@ public class LoginUtil {
 		
 		try {
 			client.connect(server, port, key);
-			
-			if (WarlockApplication.instance().inDebugMode())
-			{
-				DebugView view = (DebugView)
-					PlatformUI.getWorkbench().getActiveWorkbenchWindow().getActivePage().showView(DebugView.VIEW_ID, key, IWorkbenchPage.VIEW_VISIBLE);
-				
-				view.setConnection(client.getConnection());
-			}
-			
 		} catch (IOException e) {
 			String errorConnectMessage =
 			"******************************************************************\n" +
@@ -75,8 +66,6 @@ public class LoginUtil {
 			style.addStyleType(IWarlockStyle.StyleType.MONOSPACE);
 			
 			client.getDefaultStream().send(new WarlockString(errorConnectMessage, style));
-		} catch (PartInitException e) {
-			e.printStackTrace();
 		}
 	}
 	
