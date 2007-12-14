@@ -240,7 +240,8 @@ public class StreamView extends ViewPart implements IStreamListener, IGameViewFo
 	{	
 		for (IHighlightString hstring : client.getHighlightStrings())
 		{
-			findHighlight(hstring, text);
+			if(hstring != null)
+				findHighlight(hstring, text);
 		}
 	}
 	
