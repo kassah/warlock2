@@ -10,12 +10,15 @@ import cc.warlock.core.script.ScriptEngineRegistry;
 import cc.warlock.rcp.ui.macros.IMacro;
 import cc.warlock.rcp.ui.macros.IMacroHandler;
 
-public class ScriptMacroHandler implements IMacroHandler {
+public class SystemMacroHandler implements IMacroHandler {
 
-	protected IMacro stopScript, pauseOrResumeScript;
+	private IMacro sendMacro, stopScript, pauseOrResumeScript;
 	
-	public ScriptMacroHandler ()
+	public SystemMacroHandler ()
 	{
+		sendMacro = new Macro(SWT.CR);
+		sendMacro.addHandler(this);
+		
 		stopScript = new Macro(SWT.ESC);
 		pauseOrResumeScript = new Macro(SWT.ESC, SWT.SHIFT);
 		
@@ -23,23 +26,35 @@ public class ScriptMacroHandler implements IMacroHandler {
 		pauseOrResumeScript.addHandler(this);
 	}
 	
-	public IMacro[] getMacros()
+	public IMacro[] getMacros ()
 	{
-		return new IMacro[] { stopScript, pauseOrResumeScript };
+		return new IMacro[] { sendMacro, stopScript, pauseOrResumeScript };
 	}
 	
-	public boolean handleMacro(IMacro macro, IWarlockClientViewer viewer)
+	public boolean handleMacro (IMacro macro, IWarlockClientViewer viewer)
 	{
-		if (macro.equals(stopScript))
+		if (macro.equals(sendMacro))
+		{
+			handleSend(viewer);
+			return true;
+		}
+		else if (macro.equals(stopScript))
 		{
 			handleStopScript(viewer);
+			return true;
 		}
 		else if (macro.equals(pauseOrResumeScript))
 		{
 			handlePauseOrResumeScript(viewer);
+			return true;
 		}
 		
-		return true;
+		return false;
+	}
+	
+	public void handleSend (IWarlockClientViewer viewer)
+	{
+		viewer.submit();
 	}
 
 	private void handlePauseOrResumeScript(IWarlockClientViewer viewer)
