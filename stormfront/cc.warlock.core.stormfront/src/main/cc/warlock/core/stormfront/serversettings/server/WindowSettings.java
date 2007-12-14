@@ -59,7 +59,9 @@ public class WindowSettings extends ColorSetting {
 		if (fontElement != null)
 		{
 			fontFace = fontElement.attributeValue(KEY_FACE);
-			fontSize = Integer.parseInt(fontElement.attributeValue(KEY_SIZE));
+			String size = fontElement.attributeValue(KEY_SIZE);
+			if(size != null)
+				fontSize = Integer.parseInt(size);
 			addAttributes(fontElement, fontAttributes);
 		}
 		if (columnFontElement != null)
