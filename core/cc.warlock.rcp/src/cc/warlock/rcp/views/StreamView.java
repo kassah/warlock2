@@ -5,6 +5,7 @@ import java.util.Collection;
 import java.util.Hashtable;
 import java.util.regex.MatchResult;
 import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.graphics.Color;
@@ -240,14 +241,16 @@ public class StreamView extends ViewPart implements IStreamListener, IGameViewFo
 	{	
 		for (IHighlightString hstring : client.getHighlightStrings())
 		{
-			if(hstring != null)
-				findHighlight(hstring, text);
+			findHighlight(hstring, text);
 		}
 	}
 	
 	protected void findHighlight (IHighlightString highlight, WarlockString text)
 	{
-		Matcher matcher = highlight.getPattern().matcher(text.toString());
+		Pattern p = highlight.getPattern();
+		if(p == null)
+			return;
+		Matcher matcher = p.matcher(text.toString());
 		
 		while (matcher.find())
 		{
