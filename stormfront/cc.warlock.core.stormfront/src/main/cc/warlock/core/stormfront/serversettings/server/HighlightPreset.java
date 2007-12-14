@@ -1,6 +1,7 @@
 package cc.warlock.core.stormfront.serversettings.server;
 
 import java.util.regex.Pattern;
+import java.util.regex.PatternSyntaxException;
 
 import cc.warlock.core.client.IHighlightString;
 import cc.warlock.core.stormfront.xml.StormFrontElement;
@@ -154,7 +155,11 @@ public class HighlightPreset extends Preset implements IHighlightString {
 	public Pattern getPattern() {
 		if(pattern == null) {
 			// TODO test if we should compile this as a regex
+			try {
 			pattern = Pattern.compile(text, Pattern.LITERAL | Pattern.CASE_INSENSITIVE);
+			} catch(PatternSyntaxException e) {
+				System.out.println("Pattern error: " + e.getMessage());
+			}
 		}
 		
 		return pattern;
