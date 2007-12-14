@@ -58,15 +58,12 @@
       <macroCommand classname="cc.warlock.rcp.ui.macros.internal.commands.HistoryPrevMacroCommand"/>
       <macroCommand classname="cc.warlock.rcp.ui.macros.internal.commands.HistorySearchMacroCommand"/>
       <macroCommand classname="cc.warlock.rcp.ui.macros.internal.commands.HistoryNextMacroCommand"/>
+      <macroCommand classname="cc.warlock.rcp.ui.macros.internal.commands.PauseScriptMacroCommand"/>
       <macroCommand classname="cc.warlock.rcp.ui.macros.internal.commands.ReturnOrRepeatLastMacroCommand"/>
       <macroCommand classname="cc.warlock.rcp.ui.macros.internal.commands.RepeatLastMacroCommand"/>
       <macroCommand classname="cc.warlock.rcp.ui.macros.internal.commands.RepeatSecondToLastMacroCommand"/>
-      <macroCommand
-            classname="cc.warlock.rcp.ui.macros.internal.commands.CopyMacroCommand">
-      </macroCommand>
-      <macroCommand
-            classname="cc.warlock.rcp.ui.macros.internal.commands.PasteMacroCommand">
-      </macroCommand>
+      <macroCommand classname="cc.warlock.rcp.ui.macros.internal.commands.CopyMacroCommand"/>
+      <macroCommand classname="cc.warlock.rcp.ui.macros.internal.commands.PasteMacroCommand"/>
    </extension>
    <extension
          id="product"

@@ -12,7 +12,7 @@ import cc.warlock.rcp.ui.macros.IMacroHandler;
 
 public class SystemMacroHandler implements IMacroHandler {
 
-	private IMacro sendMacro, stopScript, pauseOrResumeScript;
+	private IMacro sendMacro, stopScript;
 	
 	public SystemMacroHandler ()
 	{
@@ -20,15 +20,12 @@ public class SystemMacroHandler implements IMacroHandler {
 		sendMacro.addHandler(this);
 		
 		stopScript = new Macro(SWT.ESC);
-		pauseOrResumeScript = new Macro(SWT.ESC, SWT.SHIFT);
-		
 		stopScript.addHandler(this);
-		pauseOrResumeScript.addHandler(this);
 	}
 	
 	public IMacro[] getMacros ()
 	{
-		return new IMacro[] { sendMacro, stopScript, pauseOrResumeScript };
+		return new IMacro[] { sendMacro, stopScript };
 	}
 	
 	public boolean handleMacro (IMacro macro, IWarlockClientViewer viewer)
@@ -43,11 +40,6 @@ public class SystemMacroHandler implements IMacroHandler {
 			handleStopScript(viewer);
 			return true;
 		}
-		else if (macro.equals(pauseOrResumeScript))
-		{
-			handlePauseOrResumeScript(viewer);
-			return true;
-		}
 		
 		return false;
 	}
@@ -55,24 +47,6 @@ public class SystemMacroHandler implements IMacroHandler {
 	public void handleSend (IWarlockClientViewer viewer)
 	{
 		viewer.submit();
-	}
-
-	private void handlePauseOrResumeScript(IWarlockClientViewer viewer)
-	{
-		List<IScript> runningScripts = ScriptEngineRegistry.getRunningScripts();
-		if (runningScripts.size() > 0)
-		{
-			IScript currentScript = runningScripts.get(runningScripts.size() - 1);
-			if (currentScript != null)
-			{
-				if (currentScript.isSuspended()) {
-					currentScript.resume();
-				}
-				else {
-					currentScript.suspend();
-				}
-			}
-		}
 	}
 
 	private void handleStopScript(IWarlockClientViewer viewer)
