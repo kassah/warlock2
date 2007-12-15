@@ -21,6 +21,7 @@ public interface IWarlockStyle {
 	public WarlockColor getFGColor();
 	public WarlockColor getBGColor();
 	public boolean isFullLine();
+	public String getName();
 	
 	public void addStyleType (StyleType styleType);
 
@@ -29,4 +30,5 @@ public interface IWarlockStyle {
 	public void setFGColor(WarlockColor color);
 	public void setBGColor(WarlockColor color);
 	public void setFullLine(boolean fullLine);
+	public void setName(String name);
 }

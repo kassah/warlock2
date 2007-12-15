@@ -33,6 +33,7 @@ public class PresetTagHandler extends DefaultTagHandler {
 		else
 			style = new WarlockStyle();
 
+		style.setName(id);
 		styles.push(style);
 		handler.addStyle(style);
 		

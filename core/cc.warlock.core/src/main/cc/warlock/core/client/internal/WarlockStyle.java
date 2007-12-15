@@ -17,6 +17,7 @@ public class WarlockStyle implements IWarlockStyle {
 	private WarlockColor FGColor;
 	private WarlockColor BGColor;
 	private boolean fullLine;
+	private String name;
 	
 	public WarlockStyle (StyleType[] styleTypes, URL linkAddress)
 	{
@@ -99,5 +100,13 @@ public class WarlockStyle implements IWarlockStyle {
 	
 	public void setFullLine(boolean fullLine) {
 		this.fullLine = fullLine;
+	}
+	
+	public void setName(String name) {
+		this.name = name;
+	}
+	
+	public String getName() {
+		return name;
 	}
 }

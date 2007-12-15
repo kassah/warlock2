@@ -14,6 +14,7 @@ import cc.warlock.core.client.IWarlockClient;
 import cc.warlock.core.client.IWarlockClientListener;
 import cc.warlock.core.client.WarlockClientRegistry;
 import cc.warlock.core.client.WarlockString;
+import cc.warlock.core.client.WarlockString.WarlockStringStyleRange;
 import cc.warlock.rcp.ui.client.SWTWarlockClientListener;
 import cc.warlock.rcp.userstreams.IStreamFilter;
 import cc.warlock.rcp.userstreams.internal.StreamFilter;
@@ -62,14 +63,22 @@ public class UserStream extends StreamView implements IWarlockClientListener {
 		
 		// Process filters on the complete lines
 		WarlockString ret = new WarlockString();
-		for (WarlockString buffer : string.split("\\r?\\n")) {
+		bufferLoop: for (WarlockString buffer : string.split("\\r?\\n")) {
+			for(WarlockStringStyleRange style : buffer.getStyles()) {
+				String name = style.style.getName();
+				if(name != null && name.equals("speech")) {
+					ret.append(buffer);
+					ret.append("\n");
+					continue bufferLoop;
+				}
+			}
 			for (IStreamFilter filter : this.filters) {
 				if (filter == null) continue;
 				if (filter.match(buffer)) {
 					// If a filter matches, we go ahead and display the chunk
 					ret.append(buffer);
 					ret.append("\n");
-					break;
+					continue bufferLoop;
 				}
 			}
 		}
@@ -122,26 +131,23 @@ public class UserStream extends StreamView implements IWarlockClientListener {
 	protected IStreamFilter[] getConversationsFilters ()
 	{
 		ArrayList<IStreamFilter> filters = new ArrayList<IStreamFilter>();
-		// (say|ask|exclaim|whisper)
-		filters.add(new StreamFilter("^\\w+ \\w+( (at|to) \\w+)?, \".+\"$", IStreamFilter.type.regex));
-		filters.add(new StreamFilter("thoughts in your head", IStreamFilter.type.string));
-		filters.add(new StreamFilter("^\\w+ (\\bnod|\\blean|\\bstretch|\\bsmile|\\byawn|\\bchuckle|\\bchortle|\\bbeam|\\bhug|\\bapplaud|\\bbabble|\\bblink|\\bbow|\\bcackle|\\bcringe|\\bcower|\\bweep|\\bmumble|\\bwave|\\bponder|\\bpeers quizzically|\\bsnort|\\bsnuggle|\\bcuddle|\\bsmirk|\\blaugh|\\bjumps back from|\\bwhistles? a merry tune.)", IStreamFilter.type.regex));
-		filters.add(new StreamFilter("accusatory", IStreamFilter.type.string));
-		filters.add(new StreamFilter("flush", IStreamFilter.type.string));
+		filters.add(new StreamFilter("\\bthoughts in your head\\b", IStreamFilter.type.regex));
+		filters.add(new StreamFilter("^\\w+ (\\bnod|\\blean|\\bstretch|\\bsmile|\\byawn|\\bchuckle|\\bchortle|\\bbeam|\\bhug|\\bapplaud|\\bbabble|\\bblink|\\bbow|\\bcackle|\\bcringe|\\bcower|\\bweep|\\bmumble|\\bwave|\\bponder|\\bpeers quizzically|\\bsnort|\\bsnuggle|\\bcuddle|\\bsmirk|\\blaugh|\\bjumps back from|\\bwhistles? a merry tune|\\bgrumble)", IStreamFilter.type.regex));
+		filters.add(new StreamFilter("\\baccusatory\\b", IStreamFilter.type.regex));
+		filters.add(new StreamFilter("\\bflush\\b", IStreamFilter.type.regex));
 		filters.add(new StreamFilter("\"Boo\"", IStreamFilter.type.string));
 		// filters.add(new StreamFilter("dance", IStreamFilter.type.string));
 		filters.add(new StreamFilter("^\\((?!You ).+\\)$", IStreamFilter.type.regex));	//act
-		filters.add(new StreamFilter("^(You tickle |As you reach out to tickle ).+$", IStreamFilter.type.regex));	// tickle: 1st person
-		filters.add(new StreamFilter("^\\w+ just tickled you", IStreamFilter.type.regex));							// tickle: 2nd person
-		filters.add(new StreamFilter("^\\w+ just tickled (?!you).+$", IStreamFilter.type.regex));					// tickle: 3rd person
-		filters.add(new StreamFilter("^(You hug |.+to avoid your hug.|You try to give \\w+ a hug, but).*$", IStreamFilter.type.regex));	// hug: 1st person
-		filters.add(new StreamFilter("^\\w+ hugs you.+$", IStreamFilter.type.regex));													// hug: 2nd person
-		filters.add(new StreamFilter("^\\w+ (just hugged |hugs )(?!you).+$", IStreamFilter.type.regex));								// hug: 3rd person
+		filters.add(new StreamFilter("^(You tickle |As you reach out to tickle )", IStreamFilter.type.regex));	// tickle: 1st person
+		filters.add(new StreamFilter("^\\w+ just tickled ", IStreamFilter.type.regex));					// tickle: 2nd + 3rd person
+		filters.add(new StreamFilter("(^You hug | to avoid your hug|^You try to give \\w+ a hug, but)", IStreamFilter.type.regex));	// hug: 1st person
+		filters.add(new StreamFilter("^\\w+ (just hugged|hugs)", IStreamFilter.type.regex));								// hug: 2nd + 3rd person
 		filters.add(new StreamFilter("^You\\b (?:.(?!\\bat\\b))*?\\bgrin\\b(?:.(?!\\bat\\b))*?", IStreamFilter.type.regex));													// grin: 1st person, no target
 		filters.add(new StreamFilter("^(?!You )\\w+ (?!\\bgives\\b)(?:.(?!\\bat\\b))*?\\bgrin(?:.(?!\\bat\\b))*?", IStreamFilter.type.regex));									// grin: 3rd person, no target
-		filters.add(new StreamFilter("^\\bYou\\b.*\\bgrin\\b.*\\bat\\b.+$", IStreamFilter.type.regex));																			// grin: 1st person
-		filters.add(new StreamFilter("^.+(\\bgrin.*\\byou\\b|\\byou\\b.*grin).*$", IStreamFilter.type.regex));																	// grin: 2nd person
-		filters.add(new StreamFilter("^(?!You ).+(\\bgrin.*\\bat (?!\\byou\\b)|\\bat (?!\\byou\\b).*\\bgrin|\\bgives (?!\\byou\\b).*\\bgrin).*$", IStreamFilter.type.regex));	// grin: 3rd person
+		// grin: 2nd person
+		filters.add(new StreamFilter("^.+(\\bgrin.*\\byou\\b|\\byou\\b.*grin).*$", IStreamFilter.type.regex));																	
+		// grin: 1st and 3rd person
+		filters.add(new StreamFilter("(\\bgrin .*\\bat |\\bat .*\\bgrin|\\bgives .*\\bgrin)", IStreamFilter.type.regex));
 		
 		return filters.toArray(new IStreamFilter[filters.size()]);
 	}

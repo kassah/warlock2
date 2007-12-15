@@ -26,16 +26,16 @@ public class OutputTagHandler extends DefaultTagHandler {
 			handler.removeStyle(currentStyle);
 		}
 	
-		String classId = attributes.getValue("class");
+		String className = attributes.getValue("class");
 		
-		if (classId != null) {
+		if (className != null) {
 			currentStyle = new WarlockStyle();
 		
-			if(classId.equals("mono")) {
+			if(className.equals("mono")) {
 				currentStyle.addStyleType(IWarlockStyle.StyleType.MONOSPACE);
 			}
+			currentStyle.setName(className);
 			handler.addStyle(currentStyle);
 		}
-		//TODO decide if we should output newLine here
 	}
 }
