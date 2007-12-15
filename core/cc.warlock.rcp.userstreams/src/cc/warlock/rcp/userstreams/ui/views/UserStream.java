@@ -28,9 +28,9 @@ import cc.warlock.rcp.views.StreamView;
 public class UserStream extends StreamView implements IWarlockClientListener {
 	public static final String VIEW_ID = "cc.warlock.rcp.userstreams.rightView.userStream";
 	protected static ArrayList<UserStream> openStreams = new ArrayList<UserStream>();
-	private WarlockString lineBuffer = null;
 	private IStreamFilter[] filters = null;
 	private String name = "Stream";
+	private ArrayList<String> styles;
 	
 	public void clientActivated(IWarlockClient client) {
 		// TODO Auto-generated method stub
@@ -43,35 +43,18 @@ public class UserStream extends StreamView implements IWarlockClientListener {
 	@Override
 	protected void appendText (WarlockString string)
 	{
-		// Add our buffer to the beginning if we have any.
-		if (this.lineBuffer != null) {
-			this.lineBuffer.append(string);
-			string = this.lineBuffer;
-			this.lineBuffer = null;
-		}
-		// Remove the end of our line if it isn't closed by a "\n"
-		int lastReturn = string.lastIndexOf("\n");
-		if (lastReturn != string.length() - 1) {
-			if (lastReturn > 0) {
-				this.lineBuffer = string.substring(lastReturn);
-			} else {
-				this.lineBuffer = string;
-				// Nothing we can output.. return
-				return;
-			}
-		}
-		
 		// Process filters on the complete lines
 		WarlockString ret = new WarlockString();
 		bufferLoop: for (WarlockString buffer : string.split("\\r?\\n")) {
-			for(WarlockStringStyleRange style : buffer.getStyles()) {
-				String name = style.style.getName();
-				if(name != null && name.equals("speech")) {
-					ret.append(buffer);
-					ret.append("\n");
-					continue bufferLoop;
+			if(styles != null)
+				for(WarlockStringStyleRange style : buffer.getStyles()) {
+					String name = style.style.getName();
+					if(name != null && styles.contains(name)) {
+						ret.append(buffer);
+						ret.append("\n");
+						continue bufferLoop;
+					}
 				}
-			}
 			for (IStreamFilter filter : this.filters) {
 				if (filter == null) continue;
 				if (filter.match(buffer)) {
@@ -111,6 +94,8 @@ public class UserStream extends StreamView implements IWarlockClientListener {
 			this.filters = getEventsFilters();
 		} else if (streamName.equals("Conversations")) {
 			this.filters = getConversationsFilters();
+			this.styles = new ArrayList<String>();
+			styles.add("speech");
 		} else {
 			System.out.println("Not a stream name we recognize! ("+streamName+")");
 		}
