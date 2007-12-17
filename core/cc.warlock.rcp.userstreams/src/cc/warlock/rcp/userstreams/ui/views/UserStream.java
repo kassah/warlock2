@@ -117,23 +117,9 @@ public class UserStream extends StreamView implements IWarlockClientListener {
 	{
 		ArrayList<IStreamFilter> filters = new ArrayList<IStreamFilter>();
 		filters.add(new StreamFilter("\\bthoughts in your head\\b", IStreamFilter.type.regex));
-		filters.add(new StreamFilter("^\\w+ (\\bnod|\\blean|\\bstretch|\\bsmile|\\byawn|\\bchuckle|\\bchortle|\\bbeam|\\bhug|\\bapplaud|\\bbabble|\\bblink|\\bbow|\\bcackle|\\bcringe|\\bcower|\\bweep|\\bmumble|\\bwave|\\bponder|\\bpeers quizzically|\\bsnort|\\bsnuggle|\\bcuddle|\\bsmirk|\\blaugh|\\bjumps back from|\\bwhistles? a merry tune|\\bgrumble)", IStreamFilter.type.regex));
-		filters.add(new StreamFilter("\\baccusatory\\b", IStreamFilter.type.regex));
-		filters.add(new StreamFilter("\\bflush\\b", IStreamFilter.type.regex));
-		filters.add(new StreamFilter("\"Boo\"", IStreamFilter.type.string));
-		// filters.add(new StreamFilter("dance", IStreamFilter.type.string));
+		filters.add(new StreamFilter("^\\w+ (nod|lean|stretch|smile|yawn|chuckle|chortle|beam|hug|applaud|babble|blink|bow|cackle|cringe|cower|weep|mumble|wave|ponder|peers quizzically|snort|snuggle|cuddle|smirk|laugh|grumble|dance|grin)s?( (at|to|with) \\w+)?\\.$", IStreamFilter.type.regex));
 		filters.add(new StreamFilter("^\\((?!You ).+\\)$", IStreamFilter.type.regex));	//act
-		filters.add(new StreamFilter("^(You tickle |As you reach out to tickle )", IStreamFilter.type.regex));	// tickle: 1st person
-		filters.add(new StreamFilter("^\\w+ just tickled ", IStreamFilter.type.regex));					// tickle: 2nd + 3rd person
-		filters.add(new StreamFilter("(^You hug | to avoid your hug|^You try to give \\w+ a hug, but)", IStreamFilter.type.regex));	// hug: 1st person
-		filters.add(new StreamFilter("^\\w+ (just hugged|hugs)", IStreamFilter.type.regex));								// hug: 2nd + 3rd person
-		filters.add(new StreamFilter("^You\\b (?:.(?!\\bat\\b))*?\\bgrin\\b(?:.(?!\\bat\\b))*?", IStreamFilter.type.regex));													// grin: 1st person, no target
-		filters.add(new StreamFilter("^(?!You )\\w+ (?!\\bgives\\b)(?:.(?!\\bat\\b))*?\\bgrin(?:.(?!\\bat\\b))*?", IStreamFilter.type.regex));									// grin: 3rd person, no target
-		// grin: 2nd person
-		filters.add(new StreamFilter("^.+(\\bgrin.*\\byou\\b|\\byou\\b.*grin).*$", IStreamFilter.type.regex));																	
-		// grin: 1st and 3rd person
-		filters.add(new StreamFilter("(\\bgrin .*\\bat |\\bat .*\\bgrin|\\bgives .*\\bgrin)", IStreamFilter.type.regex));
-		
+
 		return filters.toArray(new IStreamFilter[filters.size()]);
 	}
 
