@@ -96,6 +96,7 @@ public class UserStream extends StreamView implements IWarlockClientListener {
 			this.filters = getConversationsFilters();
 			this.styles = new ArrayList<String>();
 			styles.add("speech");
+			styles.add("whisper");
 		} else {
 			System.out.println("Not a stream name we recognize! ("+streamName+")");
 		}
