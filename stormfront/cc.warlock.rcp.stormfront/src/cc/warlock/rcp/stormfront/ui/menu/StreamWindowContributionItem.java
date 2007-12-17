@@ -20,7 +20,7 @@ public class StreamWindowContributionItem extends CompoundContributionItem {
 
 	private class DebugAction extends Action {
 		
-		private static final String title = "Debug View";
+		private static final String title = "Debug";
 		
 		public DebugAction() {
 			super(title, Action.AS_CHECK_BOX);
