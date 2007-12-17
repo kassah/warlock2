@@ -158,6 +158,13 @@
                label="Help"
                mnemonic="H">
             <command
+                  commandId="cc.warlock.rcp.command.helpContents"
+                  icon="images/help.gif"
+                  id="cc.warlock.rcp.menu.helpContents"
+                  label="Help Contents"
+                  mnemonic="C">
+            </command>
+            <command
                   commandId="cc.warlock.rcp.commands.visitWebpage"
                   icon="images/website.gif"
                   id="cc.warlock.rcp.menu.visitWebpage"
@@ -208,6 +215,11 @@
             defaultHandler="cc.warlock.rcp.menu.ScriptsWindowHandler"
             id="cc.warlock.rcp.commands.scriptsWindow"
             name="Scripts Window">
+      </command>
+      <command
+            defaultHandler="cc.warlock.rcp.help.HelpContentsCommand"
+            id="cc.warlock.rcp.command.helpContents"
+            name="Help Contents">
       </command>
    </extension>
    <extension
@@ -313,6 +325,12 @@
             </contentExtension>
          </includes>
       </viewerContentBinding>
+   </extension>
+   <extension
+         point="org.eclipse.ui.helpSupport">
+      <config
+            class="cc.warlock.rcp.help.WarlockHelpUI">
+      </config>
    </extension>
 
 </plugin>
