@@ -148,6 +148,7 @@ public class StormFrontClient extends WarlockClient implements IStormFrontClient
 	
 	public void scriptStopped(IScript script, boolean userStopped) {
 		runningScripts.remove(script);
+		removeRoomListener(script);
 		
 		for (IScriptListener listener : scriptListeners) listener.scriptStopped(script, userStopped);
 	}
