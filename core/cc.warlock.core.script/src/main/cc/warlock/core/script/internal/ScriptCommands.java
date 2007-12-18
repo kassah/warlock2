@@ -137,7 +137,7 @@ public class ScriptCommands implements IScriptCommands, IStreamListener, IRoomLi
 			pausedThread = Thread.currentThread();
 			Thread.sleep((long)(seconds * 1000.0));
 		} catch(InterruptedException e) {
-			e.printStackTrace();
+			System.out.println("Pause was interrupted");
 		} finally {
 			pausedThread = null;
 		}
