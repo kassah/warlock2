@@ -9,17 +9,10 @@ import cc.warlock.core.client.WarlockString;
 public class SWTStreamListener implements IStreamListener {
 	
 	private IStreamListener listener;
-	protected boolean asynch;
 	
 	public SWTStreamListener (IStreamListener listener)
 	{
-		this(listener, false);
-	}
-	
-	public SWTStreamListener (IStreamListener listener, boolean asynch)
-	{
 		this.listener = listener;
-		this.asynch = asynch;
 	}
 	
 	private class ClearedWrapper implements Runnable
@@ -110,12 +103,7 @@ public class SWTStreamListener implements IStreamListener {
 	
 	protected void run(Runnable runnable)
 	{
-		if (asynch)
-		{
-			//Display.getDefault().asyncExec(runnable);
-		} else {
-			Display.getDefault().syncExec(runnable);
-		}
+		Display.getDefault().asyncExec(runnable);
 	}
 	
 	public void streamCleared(IStream stream) {

@@ -15,12 +15,7 @@ public class SWTStormFrontClientViewer extends SWTWarlockClientViewer implements
 	
 	public SWTStormFrontClientViewer (IStormFrontClientViewer viewer)
 	{
-		this(viewer, false);
-	}
-	
-	public SWTStormFrontClientViewer (IStormFrontClientViewer viewer, boolean asynch)
-	{
-		super (viewer, asynch);
+		super (viewer);
 		this.viewer = viewer;
 	}
 	

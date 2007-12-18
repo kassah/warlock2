@@ -21,11 +21,6 @@ public class SWTWarlockClientViewer extends SWTStreamListener implements IWarloc
 	public SWTWarlockClientViewer (IWarlockClientViewer viewer)
 	{
 		super(viewer);
-	}
-	
-	public SWTWarlockClientViewer (IWarlockClientViewer viewer, boolean asynch)
-	{
-		super(viewer, asynch);
 		this.viewer = viewer;
 	}
 	
