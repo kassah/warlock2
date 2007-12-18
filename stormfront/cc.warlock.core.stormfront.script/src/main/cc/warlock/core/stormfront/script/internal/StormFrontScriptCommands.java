@@ -1,9 +1,9 @@
 package cc.warlock.core.stormfront.script.internal;
 
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.Collections;
 import java.util.Iterator;
-import java.util.List;
 import java.util.concurrent.LinkedBlockingQueue;
 import java.util.concurrent.TimeUnit;
 
@@ -22,7 +22,7 @@ public class StormFrontScriptCommands extends ScriptCommands implements IStormFr
 
 	protected IStormFrontClient sfClient;
 	protected IScript script;
-	protected List<Match> actions;
+	protected Collection<Match> actions;
 	
 	public StormFrontScriptCommands (IStormFrontClient client, IScript script)
 	{
@@ -113,15 +113,17 @@ public class StormFrontScriptCommands extends ScriptCommands implements IStormFr
 						e.printStackTrace();
 					}
 				}
-				for(Match action : actions) {
-					if(action.matches(text)) {
-						WSLAbstractCommand command = (WSLAbstractCommand)action.getAttribute("action");
-						String value;
-						// FIXME breaks JS scripts
-						for(int i = 0; (value = (String)action.getAttribute(String.valueOf(i))) != null; i++) {
-							((WSLScript)script).setLocalVariable(String.valueOf(i), value);
+				synchronized(actions) {
+					for(Match action : actions) {
+						if(action.matches(text)) {
+							WSLAbstractCommand command = (WSLAbstractCommand)action.getAttribute("action");
+							String value;
+							// FIXME breaks JS scripts
+							for(int i = 0; (value = (String)action.getAttribute(String.valueOf(i))) != null; i++) {
+								((WSLScript)script).setLocalVariable(String.valueOf(i), value);
+							}
+							command.execute();
 						}
-						command.execute();
 					}
 				}
 			}
@@ -131,13 +133,15 @@ public class StormFrontScriptCommands extends ScriptCommands implements IStormFr
 	
 	public void addAction(WSLAbstractCommand action, String text) {
 		if(actions == null) {
-			actions = Collections.synchronizedList(new ArrayList<Match>());
+			actions = Collections.synchronizedCollection(new ArrayList<Match>());
 			new Thread(new ScriptActionThread()).start();
 		}
 		Match m = new RegexMatch(text);
 		m.setAttribute("action", action);
 		m.setAttribute("name", text);
-		actions.add(m);
+		synchronized(actions) {
+			actions.add(m);
+		}
 	}
 	
 	public void clearActions() {
@@ -145,15 +149,17 @@ public class StormFrontScriptCommands extends ScriptCommands implements IStormFr
 	}
 	
 	public void removeAction(String text) {
-		Iterator<Match> iter = actions.iterator();
-		while(iter.hasNext()) {
-			// remove the element with the same name as text
-			if(iter.next().getAttribute("name").equals(text)) {
-				iter.remove();
+		synchronized(actions) {
+			Iterator<Match> iter = actions.iterator();
+			while(iter.hasNext()) {
+				// remove the element with the same name as text
+				if(iter.next().getAttribute("name").equals(text)) {
+					iter.remove();
+				}
 			}
-		}
-		if(actions.size() == 0) {
-			actions = null;
+			if(actions.size() == 0) {
+				actions = null;
+			}
 		}
 	}
 	
