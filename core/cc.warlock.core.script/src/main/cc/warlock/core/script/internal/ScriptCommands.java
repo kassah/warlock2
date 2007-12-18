@@ -1,8 +1,8 @@
 package cc.warlock.core.script.internal;
 
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.Collections;
-import java.util.List;
 import java.util.concurrent.LinkedBlockingQueue;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.locks.Condition;
@@ -25,9 +25,9 @@ public class ScriptCommands implements IScriptCommands, IStreamListener, IRoomLi
 	
 	protected final Lock lock = new ReentrantLock();
 	
-	protected List<LinkedBlockingQueue<String>> textWaiters = Collections.synchronizedList(new ArrayList<LinkedBlockingQueue<String>>());
+	protected Collection<LinkedBlockingQueue<String>> textWaiters = Collections.synchronizedCollection(new ArrayList<LinkedBlockingQueue<String>>());
 	
-	protected List<Match> matches = new ArrayList<Match>();
+	protected Collection<Match> matches = new ArrayList<Match>();
 	protected LinkedBlockingQueue<String> matchQueue = new LinkedBlockingQueue<String>();
 	
 	protected final Condition nextRoom = lock.newCondition();
@@ -62,8 +62,10 @@ public class ScriptCommands implements IScriptCommands, IStreamListener, IRoomLi
 	
 	public void addMatch(Match match) {
 		matches.add(match);
-		if(!textWaiters.contains(matchQueue)) {
-			textWaiters.add(matchQueue);
+		synchronized(textWaiters) {
+			if(!textWaiters.contains(matchQueue)) {
+				textWaiters.add(matchQueue);
+			}
 		}
 	}
 	
@@ -101,7 +103,9 @@ public class ScriptCommands implements IScriptCommands, IStreamListener, IRoomLi
 			}
 		} finally {
 			matches.clear();
-			textWaiters.remove(matchQueue);
+			synchronized(textWaiters) {
+				textWaiters.remove(matchQueue);
+			}
 		}
 
 		return null;
@@ -149,7 +153,9 @@ public class ScriptCommands implements IScriptCommands, IStreamListener, IRoomLi
 		LinkedBlockingQueue<String> queue = new LinkedBlockingQueue<String>();
 		String text = null;
 
-		textWaiters.add(queue);
+		synchronized(textWaiters) {
+			textWaiters.add(queue);
+		}
 		try {
 			waitForLoop: while(true) {
 				while(text == null) {
@@ -167,7 +173,9 @@ public class ScriptCommands implements IScriptCommands, IStreamListener, IRoomLi
 				text = null;
 			}
 		} finally {
-			textWaiters.remove(queue);
+			synchronized(textWaiters) {
+				textWaiters.remove(queue);
+			}
 		}
 	}
 
