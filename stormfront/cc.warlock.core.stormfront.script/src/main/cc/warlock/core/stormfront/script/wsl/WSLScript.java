@@ -900,7 +900,7 @@ public class WSLScript extends AbstractScript {
 		
 		public void execute (String arguments)
 		{
-			scriptCommands.nextRoom();
+			scriptCommands.waitNextRoom();
 		}
 	}
 	
@@ -1014,8 +1014,8 @@ public class WSLScript extends AbstractScript {
 		return engine;
 	}
 	
-	public void movedToRoom() {
-		scriptCommands.movedToRoom();
+	public void nextRoom() {
+		scriptCommands.nextRoom();
 	}
 	
 }

@@ -54,4 +54,5 @@ public abstract class AbstractScript implements IScript {
 	public IScriptInfo getScriptInfo() {
 		return info;
 	}
+	
 }

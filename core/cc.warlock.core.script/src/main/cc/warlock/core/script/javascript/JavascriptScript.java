@@ -97,8 +97,8 @@ public class JavascriptScript extends AbstractScript {
 		return reader;
 	}
 	
-	public void movedToRoom() {
-		commands.movedToRoom();
+	public void nextRoom() {
+		commands.nextRoom();
 	}
 	
 	public IWarlockClient getClient() {

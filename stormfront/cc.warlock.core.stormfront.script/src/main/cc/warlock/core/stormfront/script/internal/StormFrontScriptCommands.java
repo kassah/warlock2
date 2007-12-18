@@ -56,7 +56,7 @@ public class StormFrontScriptCommands extends ScriptCommands implements IStormFr
 	}
 	
 	@Override
-	public void nextRoom() {
+	public void waitNextRoom() {
 		super.nextRoom();
 		waitForRoundtime();
 	}

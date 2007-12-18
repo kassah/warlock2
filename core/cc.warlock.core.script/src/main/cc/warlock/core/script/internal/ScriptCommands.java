@@ -9,6 +9,7 @@ import java.util.concurrent.locks.Condition;
 import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReentrantLock;
 
+import cc.warlock.core.client.IRoomListener;
 import cc.warlock.core.client.IStream;
 import cc.warlock.core.client.IStreamListener;
 import cc.warlock.core.client.IWarlockClient;
@@ -16,7 +17,7 @@ import cc.warlock.core.client.WarlockString;
 import cc.warlock.core.script.IScriptCommands;
 import cc.warlock.core.script.Match;
 
-public class ScriptCommands implements IScriptCommands, IStreamListener
+public class ScriptCommands implements IScriptCommands, IStreamListener, IRoomListener
 {
 
 	protected IWarlockClient client;
@@ -107,10 +108,10 @@ public class ScriptCommands implements IScriptCommands, IStreamListener
 
 	public void move (String direction) {
 		put(direction);
-		nextRoom();
+		waitNextRoom();
 	}
 
-	public void nextRoom () {
+	public void waitNextRoom () {
 		lock.lock();
 		try {
 			roomWaiting = true;
@@ -228,7 +229,7 @@ public class ScriptCommands implements IScriptCommands, IStreamListener
 		}
 	}
 	
-	public void movedToRoom() {
+	public void nextRoom() {
 		lock.lock();
 		try {
 			// TODO we should probably set gotPrompt to false whenever we get

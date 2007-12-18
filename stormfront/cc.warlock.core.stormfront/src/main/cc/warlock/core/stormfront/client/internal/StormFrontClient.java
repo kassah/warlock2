@@ -8,12 +8,14 @@ package cc.warlock.core.stormfront.client.internal;
 
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Collection;
+import java.util.Collections;
 import java.util.Hashtable;
-import java.util.List;
 
 import cc.warlock.core.client.ICharacterStatus;
 import cc.warlock.core.client.ICompass;
 import cc.warlock.core.client.IProperty;
+import cc.warlock.core.client.IRoomListener;
 import cc.warlock.core.client.IStream;
 import cc.warlock.core.client.IWarlockSkin;
 import cc.warlock.core.client.IWarlockStyle;
@@ -42,7 +44,7 @@ import com.martiansoftware.jsap.CommandLineTokenizer;
  * TODO To change the template for this generated type comment go to
  * Window - Preferences - Java - Code Style - Code Templates
  */
-public class StormFrontClient extends WarlockClient implements IStormFrontClient, IScriptListener {
+public class StormFrontClient extends WarlockClient implements IStormFrontClient, IScriptListener, IRoomListener {
 
 	protected ICompass compass;
 	protected ICharacterStatus status;
@@ -61,6 +63,7 @@ public class StormFrontClient extends WarlockClient implements IStormFrontClient
 	protected DefaultSkin skin;
 	protected Hashtable<String, ClientProperty<String>> components = new Hashtable<String, ClientProperty<String>>();
 	protected ClientProperty<GameMode> mode;
+	private Collection<IRoomListener> roomListeners = Collections.synchronizedCollection(new ArrayList<IRoomListener>());
 	
 	public StormFrontClient() {
 		super();
@@ -119,6 +122,7 @@ public class StormFrontClient extends WarlockClient implements IStormFrontClient
 			script.addScriptListener(this);
 			for (IScriptListener listener : scriptListeners) listener.scriptStarted(script);
 			runningScripts.add(script);
+			addRoomListener(script);
 		}
 	}
 	
@@ -256,7 +260,7 @@ public class StormFrontClient extends WarlockClient implements IStormFrontClient
 		return status;
 	}
 	
-	public List<IScript> getRunningScripts() {
+	public Collection<IScript> getRunningScripts() {
 		return runningScripts;
 	}
 	
@@ -334,6 +338,25 @@ public class StormFrontClient extends WarlockClient implements IStormFrontClient
 	
 	public IWarlockStyle getCommandStyle() {
 		return serverSettings.getPreset("command").getStyle();
+	}
+	
+	public void addRoomListener(IRoomListener roomListener) {
+		synchronized(roomListeners) {
+			roomListeners.add(roomListener);
+		}
+	}
+	
+	public void removeRoomListener(IRoomListener roomListener) {
+		synchronized(roomListeners) {
+			roomListeners.remove(roomListener);
+		}
+	}
+	
+	public void nextRoom() {
+		synchronized(roomListeners) {
+			for(IRoomListener listener : roomListeners)
+				listener.nextRoom();
+		}
 	}
 	
 }

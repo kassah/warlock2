@@ -6,11 +6,12 @@
  */
 package cc.warlock.core.stormfront.client;
 
-import java.util.List;
+import java.util.Collection;
 
 import cc.warlock.core.client.ICharacterStatus;
 import cc.warlock.core.client.ICompass;
 import cc.warlock.core.client.IProperty;
+import cc.warlock.core.client.IRoomListener;
 import cc.warlock.core.client.IStream;
 import cc.warlock.core.client.IWarlockClient;
 import cc.warlock.core.script.IScript;
@@ -21,7 +22,7 @@ import cc.warlock.core.stormfront.serversettings.skin.IStormFrontSkin;
 /**
  * @author Marshall
  */
-public interface IStormFrontClient extends IWarlockClient {
+public interface IStormFrontClient extends IWarlockClient, IRoomListener {
 	
 	public static final String DEATH_STREAM_NAME = "death";
 	public static final String INVENTORY_STREAM_NAME = "inv";
@@ -116,7 +117,7 @@ public interface IStormFrontClient extends IWarlockClient {
 	/**
 	 * @return A list of currently running scripts
 	 */
-	public List<IScript> getRunningScripts();
+	public Collection<IScript> getRunningScripts();
 	
 	/**
 	 * Add a script listener
@@ -161,5 +162,8 @@ public interface IStormFrontClient extends IWarlockClient {
 	 * @return The component with the passed in name
 	 */
 	public IProperty<String> getComponent(String componentName);
+	
+	public void addRoomListener(IRoomListener roomListener);
+	public void removeRoomListener(IRoomListener roomListener);
 
 }

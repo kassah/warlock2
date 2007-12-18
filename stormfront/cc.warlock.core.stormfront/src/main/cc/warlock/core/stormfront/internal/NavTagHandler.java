@@ -1,6 +1,5 @@
 package cc.warlock.core.stormfront.internal;
 
-import cc.warlock.core.script.IScript;
 import cc.warlock.core.stormfront.IStormFrontProtocolHandler;
 
 
@@ -17,10 +16,7 @@ public class NavTagHandler extends DefaultTagHandler {
 	
 	@Override
 	public void handleEnd(String newLine) {
-		for (IScript script : handler.getClient().getRunningScripts())
-		{
-			script.movedToRoom();
-		}
+		handler.getClient().nextRoom();
 	}
 
 }
