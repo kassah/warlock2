@@ -1014,8 +1014,4 @@ public class WSLScript extends AbstractScript {
 		return engine;
 	}
 	
-	public void nextRoom() {
-		scriptCommands.nextRoom();
-	}
-	
 }

@@ -97,10 +97,6 @@ public class JavascriptScript extends AbstractScript {
 		return reader;
 	}
 	
-	public void nextRoom() {
-		commands.nextRoom();
-	}
-	
 	public IWarlockClient getClient() {
 		return client;
 	}

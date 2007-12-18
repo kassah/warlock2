@@ -6,7 +6,6 @@
  */
 package cc.warlock.core.script;
 
-import cc.warlock.core.client.IRoomListener;
 
 
 /**
@@ -15,7 +14,7 @@ import cc.warlock.core.client.IRoomListener;
  * TODO To change the template for this generated type comment go to
  * Window - Preferences - Java - Code Style - Code Templates
  */
-public interface IScript extends IRoomListener {
+public interface IScript {
 
 	public String getName ();
 	
@@ -27,8 +26,6 @@ public interface IScript extends IRoomListener {
 	public void suspend();
 	
 	public void resume();
-	
-	public void nextRoom();
 	
 	public void addScriptListener (IScriptListener listener);
 	
