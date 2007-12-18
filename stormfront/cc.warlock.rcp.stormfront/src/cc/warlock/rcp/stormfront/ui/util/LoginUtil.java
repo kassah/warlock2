@@ -55,6 +55,8 @@ public class LoginUtil {
 		
 		try {
 			client.connect(server, port, key);
+			gameView.setFocus();
+			
 		} catch (IOException e) {
 			String errorConnectMessage =
 			"******************************************************************\n" +
@@ -87,6 +89,8 @@ public class LoginUtil {
 		if (firstEmptyView != null)
 		{
 			// reuse the existing view if it's already created
+			
+			GameView.initializeGameView(firstEmptyView);
 			connect(firstEmptyView, loginProperties);
 		}
 		else 

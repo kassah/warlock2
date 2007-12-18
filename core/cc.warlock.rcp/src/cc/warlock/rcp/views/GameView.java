@@ -153,6 +153,8 @@ public abstract class GameView extends StreamView implements IWarlockClientViewe
 		{
 			listener.gameViewFocused(this);
 		}
+		
+		text.redraw();
 	}
 	
 	protected Image createCaretImage (int width, Color foreground)
