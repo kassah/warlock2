@@ -20,7 +20,9 @@ import org.eclipse.swt.widgets.Label;
 import org.eclipse.ui.PartInitException;
 import org.eclipse.ui.PlatformUI;
 
+import cc.warlock.core.client.IProperty;
 import cc.warlock.core.client.IWarlockClient;
+import cc.warlock.core.client.PropertyListener;
 import cc.warlock.core.client.WarlockColor;
 import cc.warlock.core.configuration.Profile;
 import cc.warlock.core.configuration.SavedProfiles;
@@ -30,6 +32,7 @@ import cc.warlock.core.stormfront.client.IStormFrontClient;
 import cc.warlock.core.stormfront.client.IStormFrontClientViewer;
 import cc.warlock.core.stormfront.client.StormFrontColor;
 import cc.warlock.core.stormfront.serversettings.server.ServerSettings;
+import cc.warlock.rcp.stormfront.StormFrontGameViewConfiguration;
 import cc.warlock.rcp.stormfront.adapters.SWTStormFrontClientViewer;
 import cc.warlock.rcp.stormfront.ui.StormFrontMacros;
 import cc.warlock.rcp.stormfront.ui.StormFrontSharedImages;
@@ -71,7 +74,8 @@ public class StormFrontGameView extends GameView implements IStormFrontClientVie
 		((GridLayout)entryComposite.getLayout()).numColumns = 2;
 		status = new StormFrontStatus(entryComposite);
 		
-		String characterName = getViewSite().getSecondaryId();
+		String fullId = getViewSite().getId() + ":" + getViewSite().getSecondaryId();
+		String characterName = StormFrontGameViewConfiguration.instance().getProfileId(fullId);
 		
 		final Profile profile = SavedProfiles.getProfileByCharacterName(characterName);
 		String message, reconnectLabel;
@@ -211,6 +215,13 @@ public class StormFrontGameView extends GameView implements IStormFrontClientVie
 						StormFrontGameView.this.disconnected();
 					}
 				});
+			}
+		});
+		
+		sfClient.getCharacterName().addListener(new PropertyListener<String>() {
+			public void propertyChanged(IProperty<String> property, String oldValue) {
+				String viewId = getViewSite().getId() + ":" + getViewSite().getSecondaryId();
+				StormFrontGameViewConfiguration.instance().addProfileMapping(viewId, sfClient.getCharacterName().get());
 			}
 		});
 		
