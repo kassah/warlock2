@@ -6,17 +6,23 @@ import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.jface.dialogs.ProgressMonitorDialog;
 import org.eclipse.jface.resource.JFaceResources;
 import org.eclipse.swt.SWT;
+import org.eclipse.swt.events.MenuAdapter;
+import org.eclipse.swt.events.MenuEvent;
 import org.eclipse.swt.events.SelectionAdapter;
 import org.eclipse.swt.events.SelectionEvent;
 import org.eclipse.swt.events.SelectionListener;
 import org.eclipse.swt.graphics.Font;
 import org.eclipse.swt.graphics.Image;
+import org.eclipse.swt.graphics.Point;
+import org.eclipse.swt.graphics.Rectangle;
 import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.widgets.Button;
 import org.eclipse.swt.widgets.Caret;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.Label;
+import org.eclipse.swt.widgets.Menu;
+import org.eclipse.swt.widgets.MenuItem;
 import org.eclipse.ui.PartInitException;
 import org.eclipse.ui.PlatformUI;
 
@@ -115,11 +121,16 @@ public class StormFrontGameView extends GameView implements IStormFrontClientVie
 			};
 		}
 		
+		createReconnectPopup(message, reconnectLabel, reconnectImage, listener);
+	}
+	
+	protected void createReconnectPopup(String message, String reconnectLabel, Image reconnectImage, SelectionListener listener)
+	{		
 		reconnectPopup = new WarlockPopupAction(text.getTextWidget(), SWT.NONE);
 		reconnectPopup.setLayout(new GridLayout(2, false));
 		new Label(reconnectPopup, SWT.WRAP).setText(message);
 		
-		Composite buttons = new Composite(reconnectPopup, SWT.NONE);
+		final Composite buttons = new Composite(reconnectPopup, SWT.NONE);
 		GridLayout layout = new GridLayout(2, false);
 		layout.horizontalSpacing = 0;
 		layout.verticalSpacing = 0;
@@ -132,19 +143,63 @@ public class StormFrontGameView extends GameView implements IStormFrontClientVie
 		reconnect.setImage(reconnectImage);
 		reconnect.addSelectionListener(listener);
 		
-		connections = new Button(buttons, SWT.PUSH);
+		final Button connections = new Button(buttons, SWT.TOGGLE);
 		connections.setText("Connections...");
 		connections.setImage(WarlockSharedImages.getImage(WarlockSharedImages.IMG_CONNECT));
-		connections.addSelectionListener(new SelectionAdapter () {
+
+		final Menu profileMenu = createProfileMenu(connections);
+		
+		connections.addSelectionListener(new SelectionAdapter() {
+			public void widgetSelected(SelectionEvent e) {
+				Rectangle rect = connections.getBounds();
+				Point pt = new Point(rect.x, rect.y + rect.height);
+				pt = buttons.toDisplay(pt);
+				profileMenu.setLocation(pt.x, pt.y);
+				profileMenu.setVisible(true);
+			}
+		});
+	}
+	
+	protected Menu createProfileMenu (final Button connections)
+	{
+		Menu menu = new Menu(connections);
+		menu.addMenuListener(new MenuAdapter() {
+			public void menuShown(MenuEvent e) {
+				connections.setSelection(true);
+			}
+			public void menuHidden(MenuEvent e) {
+				connections.setSelection(false);
+			}
+		});
+		
+		for (final Profile profile : SavedProfiles.getAllProfiles())
+		{
+			MenuItem item = new MenuItem (menu, SWT.PUSH);
+			item.setText(profile.getCharacterName());
+			item.setImage(WarlockSharedImages.getImage(WarlockSharedImages.IMG_CHARACTER));
+			item.addSelectionListener(new SelectionAdapter () {
+				public void widgetSelected(SelectionEvent e) {
+					ProfileConnectAction action = new ProfileConnectAction(profile);
+					action.run();
+					reconnectPopup.setVisible(false);
+				}
+			});
+		}
+		
+		MenuItem item = new MenuItem(menu, SWT.SEPARATOR);
+		item = new MenuItem(menu, SWT.PUSH);
+		item.setText("All Connections...");
+		item.setImage(WarlockSharedImages.getImage(WarlockSharedImages.IMG_CONNECT));
+		item.addSelectionListener(new SelectionAdapter() {
 			public void widgetSelected(SelectionEvent e) {
 				try {
 					PlatformUI.getWorkbench().getActiveWorkbenchWindow().getActivePage().showView(ConnectionView.VIEW_ID);
 				} catch (PartInitException e1) {
-					// TODO Auto-generated catch block
 					e1.printStackTrace();
 				}
 			}
 		});
+		return menu;
 	}
 	
 	private ProgressMonitorDialog settingsProgressDialog;
@@ -201,8 +256,6 @@ public class StormFrontGameView extends GameView implements IStormFrontClientVie
 	protected Font normalFont;
 
 	private Button reconnect;
-
-	private Button connections;
 	
 	public void loadServerSettings (ServerSettings settings)
 	{
