@@ -256,6 +256,7 @@ public class ScriptCommands implements IScriptCommands, IStreamListener, IRoomLi
 		interrupt();
 
 		client.getDefaultStream().removeStreamListener(this);
+		client.removeRoomListener(this);
 	}
 	
 	public void interrupt() {
