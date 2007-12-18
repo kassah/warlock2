@@ -16,7 +16,7 @@ import cc.warlock.core.network.IConnection;
  * 
  * Extension writers who wish to add support for their game should start by extending this interface (see IStormFrontClient)
  */
-public interface IWarlockClient {
+public interface IWarlockClient extends IRoomListener {
 	
 	public static final String DEFAULT_STREAM_NAME = "defaultView";
 	
@@ -114,4 +114,8 @@ public interface IWarlockClient {
 	 * @return a list of streams for this client
 	 */
 	public Collection<IStream> getStreams();
+	
+	public void addRoomListener(IRoomListener roomListener);
+	public void removeRoomListener(IRoomListener roomListener);
+	
 }

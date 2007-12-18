@@ -9,7 +9,6 @@ package cc.warlock.core.stormfront.client.internal;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collection;
-import java.util.Collections;
 import java.util.Hashtable;
 
 import cc.warlock.core.client.ICharacterStatus;
@@ -63,7 +62,6 @@ public class StormFrontClient extends WarlockClient implements IStormFrontClient
 	protected DefaultSkin skin;
 	protected Hashtable<String, ClientProperty<String>> components = new Hashtable<String, ClientProperty<String>>();
 	protected ClientProperty<GameMode> mode;
-	private Collection<IRoomListener> roomListeners = Collections.synchronizedCollection(new ArrayList<IRoomListener>());
 	
 	public StormFrontClient() {
 		super();
@@ -122,7 +120,6 @@ public class StormFrontClient extends WarlockClient implements IStormFrontClient
 			script.addScriptListener(this);
 			for (IScriptListener listener : scriptListeners) listener.scriptStarted(script);
 			runningScripts.add(script);
-			addRoomListener(script);
 		}
 	}
 	
@@ -148,7 +145,6 @@ public class StormFrontClient extends WarlockClient implements IStormFrontClient
 	
 	public void scriptStopped(IScript script, boolean userStopped) {
 		runningScripts.remove(script);
-		removeRoomListener(script);
 		
 		for (IScriptListener listener : scriptListeners) listener.scriptStopped(script, userStopped);
 	}
@@ -339,25 +335,6 @@ public class StormFrontClient extends WarlockClient implements IStormFrontClient
 	
 	public IWarlockStyle getCommandStyle() {
 		return serverSettings.getPreset("command").getStyle();
-	}
-	
-	public void addRoomListener(IRoomListener roomListener) {
-		synchronized(roomListeners) {
-			roomListeners.add(roomListener);
-		}
-	}
-	
-	public void removeRoomListener(IRoomListener roomListener) {
-		synchronized(roomListeners) {
-			roomListeners.remove(roomListener);
-		}
-	}
-	
-	public void nextRoom() {
-		synchronized(roomListeners) {
-			for(IRoomListener listener : roomListeners)
-				listener.nextRoom();
-		}
 	}
 	
 }

@@ -6,11 +6,13 @@ package cc.warlock.core.client.internal;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Collections;
 import java.util.HashSet;
 
 import cc.warlock.core.client.ICommandHistory;
 import cc.warlock.core.client.IHighlightProvider;
 import cc.warlock.core.client.IHighlightString;
+import cc.warlock.core.client.IRoomListener;
 import cc.warlock.core.client.IStream;
 import cc.warlock.core.client.IWarlockClient;
 import cc.warlock.core.client.IWarlockClientViewer;
@@ -27,7 +29,8 @@ public abstract class WarlockClient implements IWarlockClient {
 	protected ICommandHistory commandHistory = new CommandHistory();
 	protected String streamPrefix;
 	protected HashSet<IHighlightProvider> highlightProviders = new HashSet<IHighlightProvider>();
-
+	private Collection<IRoomListener> roomListeners = Collections.synchronizedCollection(new ArrayList<IRoomListener>());
+	
 	public WarlockClient () {
 		viewers = new ArrayList<IWarlockClientViewer>();
 		streamPrefix = "client:" + hashCode() + ":";
@@ -122,4 +125,24 @@ public abstract class WarlockClient implements IWarlockClient {
 			stream.flush();
 		}
 	}
+	
+	public void addRoomListener(IRoomListener roomListener) {
+		synchronized(roomListeners) {
+			roomListeners.add(roomListener);
+		}
+	}
+	
+	public void removeRoomListener(IRoomListener roomListener) {
+		synchronized(roomListeners) {
+			roomListeners.remove(roomListener);
+		}
+	}
+	
+	public void nextRoom() {
+		synchronized(roomListeners) {
+			for(IRoomListener listener : roomListeners)
+				listener.nextRoom();
+		}
+	}
+	
 }

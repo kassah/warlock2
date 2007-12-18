@@ -48,6 +48,7 @@ public class ScriptCommands implements IScriptCommands, IStreamListener, IRoomLi
 		this.gotPrompt = client.getDefaultStream().isPrompting();
 
 		client.getDefaultStream().addStreamListener(this);
+		client.addRoomListener(this);
 	}
 	
 	public void echo (String text) {
