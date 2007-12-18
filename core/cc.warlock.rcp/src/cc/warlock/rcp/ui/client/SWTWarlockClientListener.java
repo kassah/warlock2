@@ -8,51 +8,74 @@ import cc.warlock.core.client.IWarlockClientListener;
 public class SWTWarlockClientListener implements IWarlockClientListener {
 
 	protected IWarlockClientListener listener;
-	protected ListenerWrapper wrapper = new ListenerWrapper();
 	
 	public SWTWarlockClientListener (IWarlockClientListener listener)
 	{
 		this.listener = listener;
 	}
 	
-	private static enum EventType {Activated, Connected, Disconnected, Removed}
-	
-	private class ListenerWrapper implements Runnable {
-		public IWarlockClient client;
-		public EventType eventType;
+	private class ActivatedListener implements Runnable {
+		private IWarlockClient client;
+
+		public ActivatedListener(IWarlockClient client) {
+			this.client = client;
+		}
 		
 		public void run () {
-			switch (eventType) {
-			case Activated: listener.clientActivated(client); break;
-			case Connected: listener.clientConnected(client); break;
-			case Disconnected: listener.clientDisconnected(client); break;
-			case Removed: listener.clientRemoved(client); break;
-			}
+			listener.clientActivated(client);
+		}
+	}
+	
+	private class ConnectedListener implements Runnable {
+		private IWarlockClient client;
+		
+		public ConnectedListener(IWarlockClient client) {
+			this.client = client;
+		}
+		
+		public void run () {
+			listener.clientConnected(client);
+		}
+	}
+	
+	private class DisconnectedListener implements Runnable {
+		private IWarlockClient client;
+		
+		public DisconnectedListener(IWarlockClient client) {
+			this.client = client;
+		}
+		
+		public void run () {
+			listener.clientDisconnected(client);
+		}
+	}
+	
+	private class RemovedListener implements Runnable {
+		private IWarlockClient client;
+		
+		public RemovedListener(IWarlockClient client) {
+			this.client = client;
+		}
+		
+		public void run () {
+			listener.clientConnected(client);
 		}
 	}
 	
 	public void clientActivated(IWarlockClient client) {
-		wrapper.client = client;
-		wrapper.eventType = EventType.Activated;
-		Display.getDefault().syncExec(wrapper);
+		Display.getDefault().asyncExec(new ActivatedListener(client));
 	}
 
 	public void clientConnected(IWarlockClient client) {
-		wrapper.client = client;
-		wrapper.eventType = EventType.Connected;
-		Display.getDefault().syncExec(wrapper);
+		Display.getDefault().asyncExec(new ConnectedListener(client));
 	}
 
 	public void clientDisconnected(IWarlockClient client) {
-		wrapper.client = client;
-		wrapper.eventType = EventType.Disconnected;
-		Display.getDefault().syncExec(wrapper);
+		Display.getDefault().asyncExec(new DisconnectedListener(client));
 	}
 
 	public void clientRemoved(IWarlockClient client) {
-		wrapper.client = client;
-		wrapper.eventType = EventType.Removed;
-		Display.getDefault().syncExec(wrapper);
+		Display.getDefault().asyncExec(new RemovedListener(client));
 	}
 
 }

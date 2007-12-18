@@ -8,92 +8,119 @@ import cc.warlock.core.script.IScriptListener;
 public class SWTScriptListener implements IScriptListener {
 
 	protected IScriptListener listener;
-	protected ListenerWrapper wrapper;
-	protected boolean asynch;
 	
 	public SWTScriptListener (IScriptListener listener)
 	{
-		this(listener, false);
-	}
-	
-	public SWTScriptListener (IScriptListener listener, boolean asynch)
-	{
 		this.listener = listener;
-		this.wrapper = new ListenerWrapper();
-		this.asynch = asynch;
 	}
 	
-	private static enum EventType {
-		Added, Removed, Paused, Resumed, Started, Stopped
-	}
-	
-	private class ListenerWrapper implements Runnable
+	private class AddedListener implements Runnable
 	{
-		public IScript script;
-		public EventType eventType;
-		public boolean userStopped;
+		private IScript script;
+		
+		public AddedListener(IScript script) {
+			this.script = script;
+		}
 		
 		public void run() {
-			switch (eventType)
-			{
-			case Added: listener.scriptAdded(script); break;
-			case Removed: listener.scriptRemoved(script); break;
-			case Paused: listener.scriptPaused(script); break;
-			case Resumed: listener.scriptResumed(script); break;
-			case Started: listener.scriptStarted(script); break;
-			case Stopped: listener.scriptStopped(script, userStopped); break;
-			}
-			script = null;
-			eventType = null;
-			userStopped = false;
+			listener.scriptAdded(script);
+		}
+	}
+	
+	private class RemovedListener implements Runnable
+	{
+		private IScript script;
+		
+		public RemovedListener(IScript script) {
+			this.script = script;
+		}
+		
+		public void run() {
+			listener.scriptRemoved(script);
+		}
+	}
+	
+	private class PausedListener implements Runnable
+	{
+		private IScript script;
+		
+		public PausedListener(IScript script) {
+			this.script = script;
+		}
+		
+		public void run() {
+			listener.scriptPaused(script);
+		}
+	}
+	
+	private class ResumedListener implements Runnable
+	{
+		private IScript script;
+		
+		public ResumedListener(IScript script) {
+			this.script = script;
+		}
+		
+		public void run() {
+			listener.scriptResumed(script);
+		}
+	}
+	
+	private class StartedListener implements Runnable
+	{
+		private IScript script;
+		
+		public StartedListener(IScript script) {
+			this.script = script;
+		}
+		
+		public void run() {
+			listener.scriptStarted(script);
+		}
+	}
+	
+	private class StoppedListener implements Runnable
+	{
+		private IScript script;
+		private boolean userStopped;
+		
+		public StoppedListener(IScript script, boolean userStopped) {
+			this.script = script;
+			this.userStopped = userStopped;
+		}
+		
+		public void run() {
+			listener.scriptStopped(script, userStopped);
 		}
 	}
 	
 	protected void run(Runnable runnable)
 	{
-		if (asynch)
-		{
-			Display.getDefault().asyncExec(runnable);
-		} else {
-			Display.getDefault().syncExec(runnable);
-		}
+		Display.getDefault().asyncExec(runnable);
 	}
 	
 	public void scriptAdded(IScript script) {
-		wrapper.script = script;
-		wrapper.eventType = EventType.Added;
-		run(wrapper);
+		run(new AddedListener(script));
 	}
 	
 	public void scriptRemoved(IScript script) {
-		wrapper.script = script;
-		wrapper.eventType = EventType.Removed;
-		run(wrapper);
+		run(new RemovedListener(script));
 	}
 	
 	public void scriptPaused(IScript script) {
-		wrapper.script = script;
-		wrapper.eventType = EventType.Paused;
-		run(wrapper);
+		run(new PausedListener(script));
 	}
 
 	public void scriptResumed(IScript script) {
-		wrapper.script = script;
-		wrapper.eventType = EventType.Resumed;
-		run(wrapper);
+		run(new ResumedListener(script));
 	}
 
 	public void scriptStarted(IScript script) {
-		wrapper.script = script;
-		wrapper.eventType = EventType.Started;
-		run(wrapper);
+		run(new StartedListener(script));
 	}
 
 	public void scriptStopped(IScript script, boolean userStopped) {
-		wrapper.script = script;
-		wrapper.userStopped = userStopped;
-		wrapper.eventType = EventType.Stopped;
-		run(wrapper);
+		run(new StoppedListener(script, userStopped));
 	}
 
 }

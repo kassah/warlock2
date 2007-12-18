@@ -49,7 +49,7 @@ public class HandsView extends ViewPart implements IPropertyListener<String>
 			public void clientConnected(final IWarlockClient client) {
 				if (client instanceof IStormFrontClient)
 				{
-					Display.getDefault().syncExec(new Runnable() {
+					Display.getDefault().asyncExec(new Runnable() {
 						public void run () {
 							setActiveClient((IStormFrontClient)client);
 						}

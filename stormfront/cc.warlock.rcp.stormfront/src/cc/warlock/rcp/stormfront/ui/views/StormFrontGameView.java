@@ -206,7 +206,7 @@ public class StormFrontGameView extends GameView implements IStormFrontClientVie
 			public void connected(IConnection connection) {};
 			public void dataReady(IConnection connection, String line) {};
 			public void disconnected(IConnection connection) {
-				Display.getDefault().syncExec(new Runnable() {
+				Display.getDefault().asyncExec(new Runnable() {
 					public void run () { 
 						StormFrontGameView.this.disconnected();
 					}
@@ -258,7 +258,7 @@ public class StormFrontGameView extends GameView implements IStormFrontClientVie
 	}
 	
 	public void launchURL(final URL url) {
-		Display.getDefault().syncExec(new Runnable () {
+		Display.getDefault().asyncExec(new Runnable () {
 			public void run () {
 				RCPUtil.openURL(url.toString());
 			}
@@ -266,7 +266,7 @@ public class StormFrontGameView extends GameView implements IStormFrontClientVie
 	}
 	
 	public void appendImage(final URL imageURL) {
-//		Display.getDefault().syncExec(new Runnable () {
+//		Display.getDefault().asyncExec(new Runnable () {
 //			public void run () {
 //				text.append(""+WarlockText.OBJECT_HOLDER);
 //				
