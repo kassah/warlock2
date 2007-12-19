@@ -24,16 +24,23 @@ public class StormFrontScriptCommands extends ScriptCommands implements IStormFr
 	protected IScript script;
 	protected Collection<Match> actions;
 	
-	public StormFrontScriptCommands (IStormFrontClient client, IScript script)
+	public StormFrontScriptCommands (IStormFrontClient client, String name)
 	{
-		super(client, script.getName());
+		super(client, name);
 		this.sfClient = client;
 		waitingForRoundtime = false;
-		this.script = script;
 		
 		client.getRoundtime().addListener(this);
 		client.getDeathsStream().addStreamListener(this);
 		client.getFamiliarStream().addStreamListener(this);
+		client.addRoomListener(this);
+	}
+	
+	public StormFrontScriptCommands (IStormFrontClient client, IScript script)
+	{
+		this(client, script.getName());
+		
+		this.script = script;
 	}
 	
 	public IStormFrontClient getStormFrontClient() {
