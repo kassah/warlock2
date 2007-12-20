@@ -12,9 +12,9 @@ abstract public class BaseTagHandler implements IStormFrontTagHandler {
 	
 	public abstract String[] getTagNames();
 	
-	public void handleStart(StormFrontAttributeList attributes, String newLine) { }
+	public void handleStart(StormFrontAttributeList attributes) { }
 
-	public void handleEnd(String newLine) { }
+	public void handleEnd() { }
 
 	public boolean handleCharacters(String characters) {
 		return false;
@@ -43,5 +43,9 @@ abstract public class BaseTagHandler implements IStormFrontTagHandler {
 	
 	public Map<String, IStormFrontTagHandler> getTagHandlers() {
 		return tagHandlers;
+	}
+	
+	public boolean ignoreNewlines() {
+		return true;
 	}
 }

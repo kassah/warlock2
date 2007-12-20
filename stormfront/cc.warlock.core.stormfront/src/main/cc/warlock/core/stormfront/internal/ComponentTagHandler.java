@@ -20,7 +20,7 @@ public class ComponentTagHandler extends DefaultTagHandler {
 	}
 	
 	@Override
-	public void handleStart(StormFrontAttributeList attributes, String newLine) {
+	public void handleStart(StormFrontAttributeList attributes) {
 		id = attributes.getValue("id");
 		componentText.setLength(0);
 	}
@@ -33,7 +33,7 @@ public class ComponentTagHandler extends DefaultTagHandler {
 	}
 	
 	@Override
-	public void handleEnd(String newLine) {
+	public void handleEnd() {
 		if (id != null) {
 			((StormFrontClient)handler.getClient()).setComponent(id, componentText.toString());
 		}

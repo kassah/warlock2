@@ -16,7 +16,7 @@ public class SentSettingsTagHandler extends DefaultTagHandler {
 	}
 
 	@Override
-	public void handleEnd(String newLine) {
+	public void handleEnd() {
 		handler.getClient().send("");
 	}
 }

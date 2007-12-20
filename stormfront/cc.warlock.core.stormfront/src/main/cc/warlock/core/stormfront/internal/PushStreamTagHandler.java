@@ -24,7 +24,7 @@ public class PushStreamTagHandler extends DefaultTagHandler {
 	}
 	
 	@Override
-	public void handleStart(StormFrontAttributeList attributes, String newLine) {
+	public void handleStart(StormFrontAttributeList attributes) {
 		String id = attributes.getValue("id");
 		
 		String closedStyle = attributes.getValue("ifClosedStyle");
@@ -33,15 +33,10 @@ public class PushStreamTagHandler extends DefaultTagHandler {
 			watch = true;
 		
 		handler.pushStream(id, watch);
-		if(newLine != null && newLine.length() > 0) {
-			handler.characters(newLine);
-		}
 	}
 	
 	@Override
-	public void handleEnd(String newLine) {
-		if(newLine != null && newLine.length() > 0) {
-			handler.characters(newLine);
-		}
+	public boolean ignoreNewlines() {
+		return false;
 	}
 }

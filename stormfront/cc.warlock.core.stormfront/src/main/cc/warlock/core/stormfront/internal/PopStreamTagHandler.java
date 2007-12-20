@@ -19,7 +19,12 @@ public class PopStreamTagHandler extends DefaultTagHandler {
 	}
 	
 	@Override
-	public void handleStart(StormFrontAttributeList attributes, String newLine) {
+	public void handleStart(StormFrontAttributeList attributes) {
 		handler.popStream();
+	}
+	
+	@Override
+	public boolean ignoreNewlines() {
+		return false;
 	}
 }

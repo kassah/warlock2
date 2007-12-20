@@ -236,7 +236,12 @@ public class StormFrontProtocolHandler implements IStormFrontProtocolHandler {
 		IStormFrontTagHandler tagHandler = getTagHandlerForElement(name, defaultTagHandlers, 0);
 		if(tagHandler != null) {
 			tagHandler.setCurrentTag(name);
-			tagHandler.handleEnd(newLine);
+			tagHandler.handleEnd();
+			if(!tagHandler.ignoreNewlines()) {
+				if(newLine != null && newLine.length() > 0) {
+					characters(newLine);
+				}
+			}
 		} else {
 			// System.out.println("Didn't handle end element for \"" + name + "\"");
 		}
@@ -272,7 +277,12 @@ public class StormFrontProtocolHandler implements IStormFrontProtocolHandler {
 		
 		if(tagHandler != null) {
 			tagHandler.setCurrentTag(name);
-			tagHandler.handleStart(attributes, newLine);
+			tagHandler.handleStart(attributes);
+			if(!tagHandler.ignoreNewlines()) {
+				if(newLine != null && newLine.length() > 0) {
+					characters(newLine);
+				}
+			}
 		} else {
 			// System.out.println("didn't handle start element for \"" + name + "\"");
 		}

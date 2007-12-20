@@ -34,7 +34,7 @@ public class CompDefTagHandler extends DefaultTagHandler {
 	}
 
 	@Override
-	public void handleStart(StormFrontAttributeList attributes, String newLine) {
+	public void handleStart(StormFrontAttributeList attributes) {
 		buffer.setLength(0);
 		this.id = attributes.getValue("id");
 		
@@ -53,7 +53,7 @@ public class CompDefTagHandler extends DefaultTagHandler {
 	}
 	
 	@Override
-	public void handleEnd(String newLine) {
+	public void handleEnd() {
 		handler.getCurrentStream().send("\n");
 
 		StormFrontClient client = (StormFrontClient) handler.getClient();

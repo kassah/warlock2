@@ -19,7 +19,7 @@ public class ClearStreamTagHandler extends DefaultTagHandler {
 	}
 	
 	@Override
-	public void handleStart(StormFrontAttributeList attributes, String newLine) {
+	public void handleStart(StormFrontAttributeList attributes) {
 		String id = attributes.getValue("id");
 		
 		handler.getClient().getStream(id).clear();

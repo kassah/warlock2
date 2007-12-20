@@ -32,7 +32,7 @@ public class RoundtimeTagHandler extends DefaultTagHandler {
 	}
 	
 	@Override
-	public void handleStart(StormFrontAttributeList attributes, String newLine) {
+	public void handleStart(StormFrontAttributeList attributes) {
 		rtEnds = Long.parseLong(attributes.getValue("value"));
 		waitingForPrompt = true;
 		roundtimeStarted = false;

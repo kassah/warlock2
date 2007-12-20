@@ -4,7 +4,6 @@ import java.util.regex.Pattern;
 
 import cc.warlock.core.client.IWarlockStyle;
 import cc.warlock.core.stormfront.IStormFrontProtocolHandler;
-import cc.warlock.core.stormfront.xml.StormFrontAttributeList;
 
 
 public class PushBoldTagHandler extends DefaultTagHandler {
@@ -23,14 +22,7 @@ public class PushBoldTagHandler extends DefaultTagHandler {
 	}
 	
 	@Override
-	public void handleStart(StormFrontAttributeList attributes, String newLine) {
-		if(newLine != null && newLine.length() > 0) {
-			handler.characters(newLine);
-		}
-	}
-	
-	@Override
-	public void handleEnd(String newLine) {
+	public void handleEnd() {
 		if(style != null) {
 			handler.removeStyle(style);
 			style = null;
@@ -71,9 +63,10 @@ public class PushBoldTagHandler extends DefaultTagHandler {
 //			
 //			handler.sendAndPopBuffer();
 //		}
-		
-		if(newLine != null && newLine.length() > 0) {
-			handler.characters(newLine);
-		}
+	}
+	
+	@Override
+	public boolean ignoreNewlines() {
+		return false;
 	}
 }

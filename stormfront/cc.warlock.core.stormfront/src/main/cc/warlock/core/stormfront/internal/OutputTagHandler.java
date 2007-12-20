@@ -21,7 +21,7 @@ public class OutputTagHandler extends DefaultTagHandler {
 	}
 
 	@Override
-	public void handleStart(StormFrontAttributeList attributes, String newLine) {
+	public void handleStart(StormFrontAttributeList attributes) {
 		if(currentStyle != null) {
 			handler.removeStyle(currentStyle);
 		}

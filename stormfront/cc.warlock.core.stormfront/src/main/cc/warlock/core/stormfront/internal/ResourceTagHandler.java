@@ -20,7 +20,7 @@ public class ResourceTagHandler extends DefaultTagHandler {
 	}
 	
 	@Override
-	public void handleStart(StormFrontAttributeList attributes, String newLine) {
+	public void handleStart(StormFrontAttributeList attributes) {
 		String pictureId = null;
 		
 		if (attributes.getValue("picture") != null)

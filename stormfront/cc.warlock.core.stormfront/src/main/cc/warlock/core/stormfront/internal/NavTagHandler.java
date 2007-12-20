@@ -15,7 +15,7 @@ public class NavTagHandler extends DefaultTagHandler {
 	}
 	
 	@Override
-	public void handleEnd(String newLine) {
+	public void handleEnd() {
 		handler.getClient().nextRoom();
 	}
 

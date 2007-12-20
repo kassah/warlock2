@@ -17,7 +17,7 @@ public class StreamWindowTagHandler extends DefaultTagHandler {
 	}
 
 	@Override
-	public void handleStart(StormFrontAttributeList attributes, String newLine) {
+	public void handleStart(StormFrontAttributeList attributes) {
 		String subtitle = attributes.getValue("subtitle");
 		String title = attributes.getValue("title");
 		String id = attributes.getValue("id");

@@ -31,17 +31,19 @@ public interface IStormFrontTagHandler {
 	 * Handle the start tag 
 	 * @param atts
 	 */
-	public void handleStart(StormFrontAttributeList attributes, String newLine);
+	public void handleStart(StormFrontAttributeList attributes);
 	
 	/**
 	 * handle the end tag
 	 * @param
 	 */
-	public void handleEnd(String newLine);
+	public void handleEnd();
 	
 	/**
 	 * handle contents of the tag
 	 * @param characters
 	 */
 	public boolean handleCharacters(String characters);
+	
+	public boolean ignoreNewlines();
 }

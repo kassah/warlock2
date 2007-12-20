@@ -23,7 +23,7 @@ public class PresetTagHandler extends DefaultTagHandler {
 	}
 	
 	@Override
-	public void handleStart(StormFrontAttributeList attributes, String newLine) {
+	public void handleStart(StormFrontAttributeList attributes) {
 		String id = attributes.getValue("id");
 		Preset preset = handler.getClient().getServerSettings().getPreset(id);
 		
@@ -36,20 +36,17 @@ public class PresetTagHandler extends DefaultTagHandler {
 		style.setName(id);
 		styles.push(style);
 		handler.addStyle(style);
-		
-		if(newLine != null && newLine.length() > 0) {
-			handler.characters(newLine);
-		}
 	}
 	
 	@Override
-	public void handleEnd(String newLine) {
+	public void handleEnd() {
 		IWarlockStyle style = styles.pop();
 		handler.removeStyle(style);
-		
-		if(newLine != null && newLine.length() > 0) {
-			handler.characters(newLine);
-		}
+	}
+	
+	@Override
+	public  boolean ignoreNewlines() {
+		return false;
 	}
 
 }

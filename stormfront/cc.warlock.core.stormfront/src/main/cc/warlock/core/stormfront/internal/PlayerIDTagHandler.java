@@ -17,7 +17,7 @@ public class PlayerIDTagHandler extends DefaultTagHandler {
 	}
 	
 	@Override
-	public void handleStart(StormFrontAttributeList attributes, String newLine) {
+	public void handleStart(StormFrontAttributeList attributes) {
 		handler.getClient().getPlayerId().set(attributes.getValue("id"));
 	}
 
