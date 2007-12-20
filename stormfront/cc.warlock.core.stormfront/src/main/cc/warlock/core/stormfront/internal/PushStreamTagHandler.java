@@ -33,5 +33,15 @@ public class PushStreamTagHandler extends DefaultTagHandler {
 			watch = true;
 		
 		handler.pushStream(id, watch);
+		if(newLine != null && newLine.length() > 0) {
+			handler.characters(newLine);
+		}
+	}
+	
+	@Override
+	public void handleEnd(String newLine) {
+		if(newLine != null && newLine.length() > 0) {
+			handler.characters(newLine);
+		}
 	}
 }
