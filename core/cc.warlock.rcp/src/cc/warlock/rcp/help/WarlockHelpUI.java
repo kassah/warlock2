@@ -3,13 +3,26 @@ package cc.warlock.rcp.help;
 import org.eclipse.help.IContext;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.browser.Browser;
+import org.eclipse.swt.browser.LocationEvent;
+import org.eclipse.swt.browser.LocationListener;
+import org.eclipse.swt.browser.ProgressEvent;
+import org.eclipse.swt.browser.ProgressListener;
+import org.eclipse.swt.events.SelectionAdapter;
+import org.eclipse.swt.events.SelectionEvent;
+import org.eclipse.swt.graphics.Rectangle;
+import org.eclipse.swt.layout.FormAttachment;
+import org.eclipse.swt.layout.FormData;
+import org.eclipse.swt.layout.FormLayout;
 import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.widgets.Button;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Label;
+import org.eclipse.swt.widgets.ProgressBar;
+import org.eclipse.swt.widgets.Sash;
 import org.eclipse.swt.widgets.Shell;
-import org.eclipse.swt.widgets.Text;
+import org.eclipse.swt.widgets.Tree;
+import org.eclipse.swt.widgets.TreeItem;
 import org.eclipse.ui.PlatformUI;
 import org.eclipse.ui.help.AbstractHelpUI;
 
@@ -18,7 +31,8 @@ import cc.warlock.rcp.ui.WarlockSharedImages;
 public class WarlockHelpUI extends AbstractHelpUI {
 	@Override
 	public void displayHelp() {
-		Shell shell = new Shell(PlatformUI.getWorkbench().getActiveWorkbenchWindow().getShell());
+		Shell parent = PlatformUI.getWorkbench().getActiveWorkbenchWindow().getShell();
+		Shell shell = new Shell(parent, SWT.RESIZE);
 		GridLayout layout = new GridLayout(1, false);
 		layout.horizontalSpacing = 0;
 		layout.verticalSpacing = 0;
@@ -28,8 +42,10 @@ public class WarlockHelpUI extends AbstractHelpUI {
 		shell.setText("Warlock Online Help");
 		
 		createContents(shell);
+
+		Rectangle bounds = parent.getBounds();
 		
-		shell.setSize(640, 480);
+		shell.setBounds(bounds.x + 25, bounds.y + 25, bounds.width - 50, bounds.height - 50);
 		shell.open();
 	}
 	
@@ -50,24 +66,150 @@ public class WarlockHelpUI extends AbstractHelpUI {
 		new Label(locationComposite, SWT.NONE).setText(
 			"Warlock Online Help > Help Index");
 		
-		Composite searchComposite = new Composite(topComposite, SWT.NONE);
-		layout = new GridLayout(2, false);
-		layout.marginHeight = layout.marginWidth = 0;
+//		Composite searchComposite = new Composite(topComposite, SWT.NONE);
+//		layout = new GridLayout(2, false);
+//		layout.marginHeight = layout.marginWidth = 0;
+//		
+//		searchComposite.setLayout(layout);
+//		searchComposite.setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, false));
+//		
+//		Text searchText = new Text(searchComposite, SWT.BORDER);
+//		searchText.setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, false));
+//		
+//		Button search = new Button(searchComposite, SWT.PUSH);
+//		search.setText("Search");
+//		search.setImage(WarlockSharedImages.getImage(WarlockSharedImages.IMG_HELP_SEARCH));
+//		search.addSelectionListener(new SelectionAdapter () {
+//			public void widgetSelected(SelectionEvent e) {
+//				
+//			}
+//		});
 		
-		searchComposite.setLayout(layout);
-		searchComposite.setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, false));
+		createHelpBrowser(parent);
+	}
+	
+	protected Tree categories;
+	protected Browser browser;
+	
+	protected void createHelpBrowser (Composite parent)
+	{
+		Composite helpBrowserComposite = new Composite(parent, SWT.NONE);
+		helpBrowserComposite.setLayout(new FormLayout());
+		helpBrowserComposite.setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, true));
 		
-		Text searchText = new Text(searchComposite, SWT.BORDER);
-		searchText.setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, false));
-		
-		Button search = new Button(searchComposite, SWT.PUSH);
-		search.setText("Search");
-		search.setImage(WarlockSharedImages.getImage(WarlockSharedImages.IMG_HELP_SEARCH));
-		
-		Browser browser = new Browser(parent, SWT.BORDER);
-		browser.setUrl("http://warlock.cc/wiki/index.php/Main_Page?useskin=monobook");
-		
+		Sash sash = new Sash(helpBrowserComposite, SWT.VERTICAL);
+		FormData data = new FormData();
+	    data.top = new FormAttachment(0, 0);
+	    data.bottom = new FormAttachment(100, 0);
+	    data.left = new FormAttachment(35, 0);
+	    sash.setLayoutData(data);
+	    
+	    categories = new Tree(helpBrowserComposite, SWT.BORDER | SWT.SINGLE);
+	    data = new FormData();
+	    data.top = new FormAttachment(0, 0);
+	    data.bottom = new FormAttachment(100, 0);
+	    data.left = new FormAttachment(0, 0);
+	    data.right = new FormAttachment(sash, 0);
+	    categories.setLayoutData(data);
+	    
+	    Composite browserComposite = new Composite(helpBrowserComposite, SWT.NONE);
+	    data = new FormData();
+	    data.top = new FormAttachment(0, 0);
+	    data.bottom = new FormAttachment(100, 0);
+	    data.left = new FormAttachment(sash, 0);
+	    data.right = new FormAttachment(100, 0);
+	    browserComposite.setLayoutData(data);
+	    browserComposite.setLayout(new GridLayout(1, false));
+	    
+	    Composite browserControls = new Composite(browserComposite, SWT.NONE);
+	    browserControls.setLayout(new GridLayout(5, false));
+	    browserControls.setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, false));
+	    
+	    final Button back = new Button(browserControls, SWT.PUSH);
+	    back.setText("Back");
+	    back.setImage(WarlockSharedImages.getImage(WarlockSharedImages.IMG_BACK));
+	    back.addSelectionListener(new SelectionAdapter () {
+	    	public void widgetSelected(SelectionEvent e) {
+	    		browser.back();
+	    	}
+	    });
+	    
+	    final Button forward = new Button(browserControls, SWT.PUSH | SWT.RIGHT_TO_LEFT);
+	    forward.setText("Forward");
+	    forward.setImage(WarlockSharedImages.getImage(WarlockSharedImages.IMG_NEXT));
+	    forward.addSelectionListener(new SelectionAdapter () {
+	    	public void widgetSelected(SelectionEvent e) {
+	    		browser.forward();
+	    	}
+	    });
+	    
+	    final Button stop = new Button(browserControls, SWT.PUSH);
+	    stop.setText("Stop");
+	    stop.setImage(WarlockSharedImages.getImage(WarlockSharedImages.IMG_STOP));
+	    stop.addSelectionListener(new SelectionAdapter () {
+	    	public void widgetSelected(SelectionEvent e) {
+	    		browser.stop();
+	    	}
+	    });
+	    
+	    final Button refresh = new Button(browserControls, SWT.PUSH);
+	    refresh.setText("Refresh");
+	    refresh.setImage(WarlockSharedImages.getImage(WarlockSharedImages.IMG_REFRESH));
+	    refresh.addSelectionListener(new SelectionAdapter () {
+	    	public void widgetSelected(SelectionEvent e) {
+	    		browser.refresh();
+	    	}
+	    });
+	    
+	    final ProgressBar progress = new ProgressBar(browserControls, SWT.NONE);
+	    progress.setLayoutData(new GridData(SWT.FILL, SWT.CENTER, true, false));
+	    
+		browser = new Browser(browserComposite, SWT.BORDER);
 		browser.setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, true));
+		browser.addProgressListener(new ProgressListener () {
+			public void changed(ProgressEvent event) {
+				progress.setMaximum(event.total);
+		        progress.setSelection(event.current);
+			}
+			public void completed(ProgressEvent event) {
+				progress.setSelection(0);
+			}
+		});
+	    
+		browser.addLocationListener(new LocationListener () {
+			public void changing(LocationEvent event) {
+				stop.setEnabled(true);
+			}
+			
+			public void changed(LocationEvent event) {
+				back.setEnabled(browser.isBackEnabled());
+				forward.setEnabled(browser.isForwardEnabled());
+				stop.setEnabled(false);
+			}
+		});
+		
+	    loadContent();
+	}
+	
+	protected void loadContent ()
+	{
+		WikiCategory helpCategory = WikiCategory.getHelpCategory();
+		
+		for (WikiPage page : helpCategory.getPages())
+		{
+			TreeItem item = new TreeItem(categories, SWT.NONE);
+			item.setText(page.getTitle());
+			item.setImage(WarlockSharedImages.getImage(WarlockSharedImages.IMG_CATEGORY));
+			item.setData(page);
+		}
+		
+		categories.addSelectionListener(new SelectionAdapter () {
+			public void widgetSelected(SelectionEvent e) {
+				WikiPage page = (WikiPage) categories.getSelection()[0].getData();
+				
+				browser.setUrl(page.getURL());
+			}
+		});
 	}
 
 	@Override

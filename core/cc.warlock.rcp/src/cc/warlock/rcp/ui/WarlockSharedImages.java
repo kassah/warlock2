@@ -27,6 +27,11 @@ public class WarlockSharedImages {
 	public static final String IMG_HELP = "/images/help.gif";
 	public static final String IMG_HELP_SEARCH = "/images/helpsearch.gif";
 	public static final String IMG_HELP_INDEX = "/images/helpindex.gif";
+	public static final String IMG_CATEGORY = "/images/category.gif";
+	public static final String IMG_NEXT = "/images/next.png";
+	public static final String IMG_BACK = "/images/back.png";
+	public static final String IMG_REFRESH = "/images/refresh.png";
+	public static final String IMG_STOP= "/images/stop.png";
 	
 	public static final String IMG_WIZBAN_WARLOCK = "/images/warlock-wizard-icon.png";
 	public static final String IMG_CHARACTER = "/images/character.gif";
