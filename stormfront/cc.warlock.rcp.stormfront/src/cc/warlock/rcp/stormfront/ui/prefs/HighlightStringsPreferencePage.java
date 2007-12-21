@@ -3,7 +3,6 @@ package cc.warlock.rcp.stormfront.ui.prefs;
 import java.util.ArrayList;
 
 import org.eclipse.core.runtime.IAdaptable;
-import org.eclipse.jface.preference.ColorSelector;
 import org.eclipse.jface.util.IPropertyChangeListener;
 import org.eclipse.jface.util.PropertyChangeEvent;
 import org.eclipse.jface.viewers.ArrayContentProvider;
@@ -41,6 +40,7 @@ import org.eclipse.ui.dialogs.PropertyPage;
 import cc.warlock.core.stormfront.client.IStormFrontClient;
 import cc.warlock.core.stormfront.client.StormFrontColor;
 import cc.warlock.core.stormfront.serversettings.server.HighlightPreset;
+import cc.warlock.rcp.stormfront.ui.PaletteColorSelector;
 import cc.warlock.rcp.ui.WarlockSharedImages;
 import cc.warlock.rcp.util.ColorUtil;
 
@@ -52,7 +52,7 @@ public class HighlightStringsPreferencePage extends PropertyPage implements
 	
 	protected TableViewer stringTable;
 	protected Button fillLineButton;
-	protected ColorSelector customBGSelector, customFGSelector;
+	protected PaletteColorSelector customBGSelector, customFGSelector;
 	protected Button defaultBG, customBG, defaultFG, customFG;
 	protected Button addString, removeString;
 	protected IStormFrontClient client;
@@ -231,7 +231,7 @@ public class HighlightStringsPreferencePage extends PropertyPage implements
 		defaultFG = new Button(fgColorComposite, SWT.RADIO);
 		defaultFG.setText("Default");
 		customFG = new Button(fgColorComposite, SWT.RADIO);
-		customFGSelector = new ColorSelector(fgColorComposite);
+		customFGSelector = new PaletteColorSelector(fgColorComposite, client.getServerSettings().getPalette());
 		
 		
 		new Label(optionsGroup, SWT.NONE).setText("Background Color: ");
@@ -240,7 +240,7 @@ public class HighlightStringsPreferencePage extends PropertyPage implements
 		defaultBG = new Button(bgColorComposite, SWT.RADIO);
 		defaultBG.setText("Default");
 		customBG = new Button(bgColorComposite, SWT.RADIO);
-		customBGSelector = new ColorSelector(bgColorComposite);
+		customBGSelector = new PaletteColorSelector(bgColorComposite, client.getServerSettings().getPalette());
 		
 		fillLineButton = new Button(optionsGroup, SWT.CHECK);
 		fillLineButton.setText("Fill Entire Line");
@@ -304,7 +304,7 @@ public class HighlightStringsPreferencePage extends PropertyPage implements
 	
 	private void customForegroundChanged ()
 	{
-		selectedString.setForegroundColor(new StormFrontColor(ColorUtil.rgbToWarlockColor(customFGSelector.getColorValue())));
+		selectedString.setForegroundColor(customFGSelector.getStormFrontColor());
 		stringTable.update(selectedString, null);
 		setValid(true);
 	}
@@ -320,7 +320,7 @@ public class HighlightStringsPreferencePage extends PropertyPage implements
 	
 	private void customBackgroundChanged ()
 	{
-		selectedString.setBackgroundColor(new StormFrontColor(ColorUtil.rgbToWarlockColor(customBGSelector.getColorValue())));
+		selectedString.setBackgroundColor(customBGSelector.getStormFrontColor());
 		stringTable.update(selectedString, null);
 		setValid(true);
 	}
