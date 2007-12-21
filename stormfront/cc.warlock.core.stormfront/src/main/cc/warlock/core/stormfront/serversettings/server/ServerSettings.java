@@ -482,19 +482,19 @@ public class ServerSettings implements Comparable<ServerSettings>, IHighlightPro
 		
 		if (stringsDeleteMarkup.length() > 0)
 		{
-			sendSettingsUpdate(SETTING_UPDATE_PREFIX, stringsDeleteMarkup, IGNORES_TEXT + paletteMarkup);
+			sendSettingsUpdate(SETTING_UPDATE_PREFIX, stringsDeleteMarkup, paletteMarkup + IGNORES_TEXT);
 			
 			deletedHighlightStrings.clear();
 		}
 		
 		if (stringsAddMarkup.length() > 0)
 		{
-			sendSettingsUpdate(SETTING_UPDATE_PREFIX, stringsAddMarkup, IGNORES_TEXT + paletteMarkup);
+			sendSettingsUpdate(SETTING_UPDATE_PREFIX, stringsAddMarkup, paletteMarkup + IGNORES_TEXT);
 		}
 		
 		if (stringsUpdateMarkup.length() > 0)
 		{
-			sendSettingsUpdate(SETTING_UPDATE_PREFIX, stringsUpdateMarkup, IGNORES_TEXT + paletteMarkup);
+			sendSettingsUpdate(SETTING_UPDATE_PREFIX, stringsUpdateMarkup, paletteMarkup + IGNORES_TEXT);
 		}
 		
 		saveLocalXml();

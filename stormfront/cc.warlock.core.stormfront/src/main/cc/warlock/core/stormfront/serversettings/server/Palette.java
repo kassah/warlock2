@@ -1,6 +1,10 @@
 package cc.warlock.core.stormfront.serversettings.server;
 
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Comparator;
 import java.util.Hashtable;
+import java.util.List;
 
 import cc.warlock.core.stormfront.client.StormFrontColor;
 import cc.warlock.core.stormfront.xml.StormFrontElement;
@@ -26,7 +30,7 @@ public class Palette extends ServerSetting {
 		}
 	}
 	
-	protected static class PaletteEntry {
+	protected class PaletteEntry {
 		protected String id;
 		protected StormFrontColor originalColor, color;
 		protected boolean needsUpdate = false;
@@ -41,8 +45,12 @@ public class Palette extends ServerSetting {
 		{
 			originalColor = this.color;
 			
-			if (!color.equals(this.color))
+			if (!color.equals(this.color)) {
 				needsUpdate = true;
+				StormFrontElement iElement = getIElement(id);
+				
+				setAttribute(iElement, "color", color.toHexString());
+			}
 			
 			this.color = color;
 		}
@@ -60,6 +68,25 @@ public class Palette extends ServerSetting {
 		return null;
 	}
 	
+	public List<StormFrontColor> getAllColors ()
+	{
+		ArrayList<StormFrontColor> colors = new ArrayList<StormFrontColor>();
+		ArrayList<String> ids = new ArrayList<String>();
+		ids.addAll(palette.keySet());
+		Collections.sort(ids, new Comparator<String> () {
+			public int compare(String o1, String o2) {
+				return Integer.parseInt(o1) - Integer.parseInt(o2);
+			}
+		});
+		
+		
+		for (String id : ids) {
+			colors.add(palette.get(id).color);
+		}
+		
+		return colors;
+	}
+	
 	public String findColor (StormFrontColor color)
 	{
 		for (PaletteEntry entry : palette.values())
@@ -74,31 +101,31 @@ public class Palette extends ServerSetting {
 	// We'll start with the 2nd instance we can find so there's always at least one white palette color.
 	// Not sure what to do when we start running out of palette entries but hopefully that error won't pop up
 	// for 99% of usecases. (Best case scenario we can just start inserting new palette entries)
-	public String getFirstFreePaletteId ()
-	{
-		boolean skipEntry = true;
-		PaletteEntry firstFreeEntry = null;
-		
-		for (PaletteEntry entry : palette.values())
-		{
-			StormFrontColor color = entry.getColor();
-			
-			if (color.getRed() == 255 && color.getGreen() == 255 && color.getBlue() == 255)
-			{
-				if (skipEntry) {
-					skipEntry = false;
-				} else {
-					firstFreeEntry = entry;
-					break;
-				}
-			} else if (color.getPaletteReferenceCount() == 0) {
-				firstFreeEntry = entry;
-				break;
-			}
-		}
-		
-		return firstFreeEntry == null ? null : firstFreeEntry.getId();
-	}
+//	public String getFirstFreePaletteId ()
+//	{
+//		boolean skipEntry = true;
+//		PaletteEntry firstFreeEntry = null;
+//		
+//		for (PaletteEntry entry : palette.values())
+//		{
+//			StormFrontColor color = entry.getColor();
+//			
+//			if (color.getRed() == 255 && color.getGreen() == 255 && color.getBlue() == 255)
+//			{
+//				if (skipEntry) {
+//					skipEntry = false;
+//				} else {
+//					firstFreeEntry = entry;
+//					break;
+//				}
+//			} else if (color.getPaletteReferenceCount() == 0) {
+//				firstFreeEntry = entry;
+//				break;
+//			}
+//		}
+//		
+//		return firstFreeEntry == null ? null : firstFreeEntry.getId();
+//	}
 	
 	public void setPaletteColor (String id, StormFrontColor color)
 	{

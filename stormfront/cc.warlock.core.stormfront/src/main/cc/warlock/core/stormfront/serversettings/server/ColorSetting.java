@@ -1,4 +1,4 @@
-package cc.warlock.core.stormfront.serversettings.server;
+ package cc.warlock.core.stormfront.serversettings.server;
 
 import cc.warlock.core.stormfront.client.StormFrontColor;
 import cc.warlock.core.stormfront.xml.StormFrontElement;
@@ -84,7 +84,6 @@ public abstract class ColorSetting extends ServerSetting implements Comparable<C
 		else if (color.charAt(0) == '@')
 		{
 			StormFrontColor paletteColor = palette.getPaletteColor(color.substring(1));
-			paletteColor.addPaletteReference(this);
 			
 			return paletteColor;
 		}
@@ -104,7 +103,7 @@ public abstract class ColorSetting extends ServerSetting implements Comparable<C
 
 	protected String assignColor (StormFrontColor color, String currentColor)
 	{
-		color.assignToPalette(palette);
+		palette.setPaletteColor(color.getPaletteId(), color);
 		String stormfrontString = color.toStormfrontString();
 		
 		if (!stormfrontString.equals(currentColor))
