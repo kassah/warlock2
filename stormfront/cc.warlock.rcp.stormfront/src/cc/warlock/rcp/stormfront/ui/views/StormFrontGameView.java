@@ -12,7 +12,6 @@ import org.eclipse.swt.events.SelectionAdapter;
 import org.eclipse.swt.events.SelectionEvent;
 import org.eclipse.swt.events.SelectionListener;
 import org.eclipse.swt.graphics.Font;
-import org.eclipse.swt.graphics.Image;
 import org.eclipse.swt.graphics.Point;
 import org.eclipse.swt.graphics.Rectangle;
 import org.eclipse.swt.layout.GridLayout;
@@ -84,33 +83,23 @@ public class StormFrontGameView extends GameView implements IStormFrontClientVie
 		String characterName = StormFrontGameViewConfiguration.instance().getProfileId(fullId);
 		
 		final Profile profile = SavedProfiles.getProfileByCharacterName(characterName);
-		String message, reconnectLabel;
-		Image reconnectImage;
 		SelectionListener listener;
 		
 		if (profile != null)
 		{
-			message = "The character \"" + characterName +
-				"\" is currently disconnected.";
-			reconnectLabel = "Login as \"" + characterName + "\"";
-			reconnectImage = WarlockSharedImages.getImage(WarlockSharedImages.IMG_RECONNECT);
-			
-			listener = new SelectionAdapter () {
+			createReconnectPopup(new SelectionAdapter () {
 				public void widgetSelected(SelectionEvent e) {
 					ProfileConnectAction action = new ProfileConnectAction(profile);
 					action.run();
 					reconnectPopup.setVisible(false);
 				}
-			};
+			});
+			
+			setReconnectProfile(profile);
 		}
 		else
 		{
-			message = "The character \"" + characterName +
-				"\" is not a saved profile, you will need to re-login:";
-			reconnectLabel = "Login";
-			reconnectImage = StormFrontSharedImages.getImage(StormFrontSharedImages.IMG_GAME);
-			
-			listener = new SelectionAdapter () {
+			createReconnectPopup(new SelectionAdapter () {
 				public void widgetSelected(SelectionEvent e) {
 					WarlockWizardDialog dialog = new WarlockWizardDialog(Display.getDefault().getActiveShell(),
 						new SGEConnectWizard());
@@ -118,17 +107,20 @@ public class StormFrontGameView extends GameView implements IStormFrontClientVie
 					int response = dialog.open();
 					reconnectPopup.setVisible(false);
 				}
-			};
+			});
+			
+			setNoReconnectProfile(characterName);
 		}
 		
-		createReconnectPopup(message, reconnectLabel, reconnectImage, listener);
 	}
 	
-	protected void createReconnectPopup(String message, String reconnectLabel, Image reconnectImage, SelectionListener listener)
-	{		
+	protected Label reconnectLabel;
+	
+	protected void createReconnectPopup(SelectionListener listener)
+	{
 		reconnectPopup = new WarlockPopupAction(text.getTextWidget(), SWT.NONE);
 		reconnectPopup.setLayout(new GridLayout(2, false));
-		new Label(reconnectPopup, SWT.WRAP).setText(message);
+		reconnectLabel = new Label(reconnectPopup, SWT.WRAP);
 		
 		final Composite buttons = new Composite(reconnectPopup, SWT.NONE);
 		GridLayout layout = new GridLayout(2, false);
@@ -139,8 +131,6 @@ public class StormFrontGameView extends GameView implements IStormFrontClientVie
 		buttons.setLayout(layout);
 		
 		reconnect = new Button(buttons, SWT.PUSH);
-		reconnect.setText(reconnectLabel);
-		reconnect.setImage(reconnectImage);
 		reconnect.addSelectionListener(listener);
 		
 		final Button connections = new Button(buttons, SWT.TOGGLE);
@@ -158,6 +148,23 @@ public class StormFrontGameView extends GameView implements IStormFrontClientVie
 				profileMenu.setVisible(true);
 			}
 		});
+	}
+	
+	protected void setReconnectProfile (Profile profile)
+	{
+		String characterName = profile.getCharacterName();
+		reconnectLabel.setText("The character \"" + characterName + "\" is currently disconnected.");
+
+		reconnect.setText("Login as \"" + characterName + "\"");
+		reconnect.setImage(WarlockSharedImages.getImage(WarlockSharedImages.IMG_RECONNECT));
+	}
+	
+	protected void setNoReconnectProfile (String characterName)
+	{
+		reconnectLabel.setText("The character \"" + characterName +
+			"\" is not a saved profile, you will need to re-login:");
+		reconnect.setText("Login");
+		reconnect.setImage(StormFrontSharedImages.getImage(StormFrontSharedImages.IMG_GAME));
 	}
 	
 	protected Menu createProfileMenu (final Button connections)
@@ -275,6 +282,17 @@ public class StormFrontGameView extends GameView implements IStormFrontClientVie
 			public void propertyChanged(IProperty<String> property, String oldValue) {
 				String viewId = getViewSite().getId() + ":" + getViewSite().getSecondaryId();
 				StormFrontGameViewConfiguration.instance().addProfileMapping(viewId, sfClient.getCharacterName().get());
+				
+				Display.getDefault().asyncExec(new Runnable() {
+					public void run() {
+						Profile profile = SavedProfiles.getProfileByCharacterName(sfClient.getCharacterName().get());
+						if (profile != null) {
+							setReconnectProfile(profile);
+						} else {
+							setNoReconnectProfile(sfClient.getCharacterName().get());
+						}	
+					}
+				});
 			}
 		});
 		
