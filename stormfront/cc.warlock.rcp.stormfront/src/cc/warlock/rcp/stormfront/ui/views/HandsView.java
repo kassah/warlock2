@@ -130,7 +130,7 @@ public class HandsView extends ViewPart implements IPropertyListener<String>
 			e.gc.setBackground(background);
 			e.gc.setForeground(gradientColor);
 			e.gc.fillRectangle(0, 0, bounds.width, bounds.height);
-			e.gc.fillGradientRectangle(tabPadding/2, tabPadding/2, bounds.width - tabPadding/2, e.gc.textExtent(text).y, true);
+			e.gc.fillGradientRectangle(tabPadding/2, tabPadding/2, bounds.width - tabPadding/2, text == null ? 0 : e.gc.textExtent(text).y, true);
 			
 			e.gc.setForeground(foreground);
 			e.gc.drawImage(image, tabPadding/2, tabPadding/2);
