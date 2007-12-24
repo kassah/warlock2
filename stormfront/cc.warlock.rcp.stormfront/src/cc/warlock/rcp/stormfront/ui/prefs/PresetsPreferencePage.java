@@ -111,8 +111,8 @@ public class PresetsPreferencePage extends PropertyPage implements
 		
 		mainBGSelector = colorSelectorWithLabel(main, "Main window background color:");
 		mainFGSelector = colorSelectorWithLabel(main, "Main window foreground color:");
-		mainFontSelector = fontSelectorWithLabel(main, "Main window font:");
-		columnFontSelector = fontSelectorWithLabel(main, "Column font:");
+//		mainFontSelector = fontSelectorWithLabel(main, "Main window font:");
+//		columnFontSelector = fontSelectorWithLabel(main, "Column font:");
 		
 		createPresetsTable(main);
 		
@@ -370,8 +370,8 @@ public class PresetsPreferencePage extends PropertyPage implements
 			mainFGSelector.setColorValue(
 				ColorUtil.warlockColorToRGB(settings.getMainWindowSettings().getForegroundColor()));
 			
-			mainFontSelector.setFontData(getDefaultFont());
-			columnFontSelector.setFontData(getDefaultColumnFont());
+//			mainFontSelector.setFontData(getDefaultFont());
+//			columnFontSelector.setFontData(getDefaultColumnFont());
 			
 			presetsTable.setInput(presets.values());
 			presetsTable.getTable().setBackground(new Color(getShell().getDisplay(), getColor(mainBGSelector)));
@@ -435,7 +435,7 @@ public class PresetsPreferencePage extends PropertyPage implements
 		
 		preview.setBackground(mainBG);
 		preview.setForeground(mainFG);
-		preview.setFont(new Font(getShell().getDisplay(), mainFontSelector.getFontData()));
+//		preview.setFont(new Font(getShell().getDisplay(), mainFontSelector.getFontData()));
 		
 		updatePresetColors(Preset.PRESET_ROOM_NAME, roomNameStyleRange);
 		updatePresetColors(Preset.PRESET_BOLD, boldStyleRange);
@@ -449,7 +449,7 @@ public class PresetsPreferencePage extends PropertyPage implements
 		
 		columnStyleRange.background = mainBG;
 		columnStyleRange.foreground = mainFG;
-		columnStyleRange.font = new Font(getShell().getDisplay(), columnFontSelector.getFontData());
+//		columnStyleRange.font = new Font(getShell().getDisplay(), columnFontSelector.getFontData());
 		
 		preview.setStyleRanges(new StyleRange[] { roomNameStyleRange, boldStyleRange, commandStyleRange, speechStyleRange, whisperStyleRange, thoughtStyleRange, columnStyleRange });
 		preview.update();
