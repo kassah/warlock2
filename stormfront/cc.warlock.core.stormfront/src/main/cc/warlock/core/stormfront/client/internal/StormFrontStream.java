@@ -1,5 +1,8 @@
 package cc.warlock.core.stormfront.client.internal;
 
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
+
 import cc.warlock.core.client.WarlockString;
 import cc.warlock.core.client.internal.Stream;
 import cc.warlock.core.stormfront.client.IStormFrontClient;
@@ -24,17 +27,27 @@ public class StormFrontStream extends Stream {
 	public void send(WarlockString text) {
 		if (client != null)
 		{
+			// Ignore text containing ignores
 			for (IgnoreSetting ignore : ((IStormFrontClient)client).getServerSettings().getIgnores())
 			{
-				String ignoreText = ignore.getText();
-				int pos;
-				while((pos = text.toString().indexOf(ignoreText)) >= 0)
+				Pattern ignoreRegex = ignore.getRegex();
+				int pos = 0;
+				for(;;)
 				{
+					String str = text.toString();
+					
+					Matcher m = ignoreRegex.matcher(str);
+					if(!m.find(pos))
+						break;
+					
 					System.out.println("Ignore matched text in: " + text.toString());
 					
-					String str = text.toString();
-					int start = str.substring(0, pos).lastIndexOf('\n');
-					int end = str.indexOf('\n', pos);
+					// remove text from beginning of line of match to end, find those points
+					int start = str.substring(0, m.start()).lastIndexOf('\n');
+					int end = str.indexOf('\n', m.end() - 1);
+					
+					// start index becomes index after the match once it's removed
+					pos = start;
 					
 					// we are the first line and don't have anything to remove there
 					if(start < 0) {
