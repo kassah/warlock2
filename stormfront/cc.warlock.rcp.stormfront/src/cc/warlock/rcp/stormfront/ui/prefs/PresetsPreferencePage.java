@@ -5,6 +5,7 @@ import java.util.HashMap;
 
 import org.eclipse.core.runtime.IAdaptable;
 import org.eclipse.jface.preference.ColorSelector;
+import org.eclipse.jface.resource.JFaceResources;
 import org.eclipse.jface.util.IPropertyChangeListener;
 import org.eclipse.jface.util.PropertyChangeEvent;
 import org.eclipse.jface.viewers.ArrayContentProvider;
@@ -19,6 +20,7 @@ import org.eclipse.swt.SWT;
 import org.eclipse.swt.custom.StyleRange;
 import org.eclipse.swt.custom.StyledText;
 import org.eclipse.swt.graphics.Color;
+import org.eclipse.swt.graphics.Font;
 import org.eclipse.swt.graphics.FontData;
 import org.eclipse.swt.graphics.Image;
 import org.eclipse.swt.graphics.RGB;
@@ -48,6 +50,8 @@ public class PresetsPreferencePage extends PropertyPage implements
 	
 	private ColorSelector mainBGSelector, mainFGSelector;
 	private FontSelector mainFontSelector;
+	private FontSelector columnFontSelector;
+	
 	private ColorSelector bgSelector, fgSelector;
 	private StyledText preview;
 	private TableViewer presetsTable;
@@ -58,6 +62,13 @@ public class PresetsPreferencePage extends PropertyPage implements
 	private static String speechPreview = "You say, \"Hello.\"";
 	private static String whisperPreview = "Someone whispers, \"Hi\"";
 	private static String thoughtPreview = "Your mind hears Someone thinking, \"hello everyone\"";
+	private static String columnPreview =
+		"    Strength : 20           Reflex : 20\n"+
+		"     Agility : 20         Charisma : 20\n"+
+		"  Discipline : 20           Wisdom : 20\n"+
+		"Intelligence : 20          Stamina : 20\n"+
+		"       Favors: 10";
+	
 	private static String previewText = 
 		roomNamePreview + "\n" +
 		boldPreview + "\n" +
@@ -67,7 +78,9 @@ public class PresetsPreferencePage extends PropertyPage implements
 		">\n"+
 		whisperPreview +
 		">\n" +
-		thoughtPreview;
+		thoughtPreview +
+		"\n" +
+		columnPreview;
 
 	private StyleRange roomNameStyleRange, boldStyleRange;
 	private StyleRange commandStyleRange, speechStyleRange;
@@ -99,6 +112,7 @@ public class PresetsPreferencePage extends PropertyPage implements
 		mainBGSelector = colorSelectorWithLabel(main, "Main window background color:");
 		mainFGSelector = colorSelectorWithLabel(main, "Main window foreground color:");
 		mainFontSelector = fontSelectorWithLabel(main, "Main window font:");
+		columnFontSelector = fontSelectorWithLabel(main, "Column font:");
 		
 		createPresetsTable(main);
 		
@@ -202,6 +216,8 @@ public class PresetsPreferencePage extends PropertyPage implements
 	}
 	
 	protected Preset currentPreset;
+
+	private StyleRange columnStyleRange;
 	protected void presetSelected (IStructuredSelection selection)
 	{
 		currentPreset = (Preset) selection.getFirstElement();
@@ -275,6 +291,20 @@ public class PresetsPreferencePage extends PropertyPage implements
 	
 	private void fontChanged (FontSelector source, FontData fontData)
 	{
+		String fontFace = fontData.getName();
+		int fontSize = fontData.getHeight();
+		
+		if (source == mainFontSelector)
+		{
+			mainWindow.setFontFace(fontFace);
+			mainWindow.setFontSizeInPoints(fontSize);
+		}
+		else if (source == columnFontSelector)
+		{
+			mainWindow.setColumnFontFace(fontFace);
+			mainWindow.setColumnFontSizeInPoints(fontSize);
+		}
+		
 		updatePreview();
 	}
 	
@@ -284,6 +314,42 @@ public class PresetsPreferencePage extends PropertyPage implements
 		if (client != null)
 		{
 			this.settings = client.getServerSettings();
+		}
+	}
+	
+	private FontData getDefaultFont ()
+	{
+		String fontFace = settings.getMainWindowSettings().getFontFace();
+		FontData datas[] = new FontData[0];
+		
+		if (fontFace != null)
+			datas = getShell().getDisplay().getFontList(fontFace, true);
+		
+		if (datas.length == 0)
+		{
+			return JFaceResources.getDefaultFont().getFontData()[0];
+		}
+		else
+		{
+			return datas[0];
+		}
+	}
+	
+	private FontData getDefaultColumnFont ()
+	{
+		String fontFace = settings.getMainWindowSettings().getColumnFontFace();
+		FontData datas[] = new FontData[0];
+		
+		if (fontFace != null)
+			datas = getShell().getDisplay().getFontList(fontFace, true);
+		
+		if (datas.length == 0)
+		{
+			return JFaceResources.getTextFont().getFontData()[0];
+		}
+		else
+		{
+			return datas[0];
 		}
 	}
 	
@@ -304,11 +370,8 @@ public class PresetsPreferencePage extends PropertyPage implements
 			mainFGSelector.setColorValue(
 				ColorUtil.warlockColorToRGB(settings.getMainWindowSettings().getForegroundColor()));
 			
-			mainFontSelector.setFontData(
-				new FontData(
-					settings.getMainWindowSettings().getFontFace(),
-					settings.getMainWindowSettings().getFontSizeInPoints(),
-					0));
+			mainFontSelector.setFontData(getDefaultFont());
+			columnFontSelector.setFontData(getDefaultColumnFont());
 			
 			presetsTable.setInput(presets.values());
 			presetsTable.getTable().setBackground(new Color(getShell().getDisplay(), getColor(mainBGSelector)));
@@ -325,6 +388,7 @@ public class PresetsPreferencePage extends PropertyPage implements
 		commandStyleRange = new StyleRange();
 		whisperStyleRange = new StyleRange();
 		thoughtStyleRange = new StyleRange();
+		columnStyleRange = new StyleRange();
 		
 		roomNameStyleRange.start = 0;
 		roomNameStyleRange.length = roomNamePreview.length();
@@ -344,6 +408,9 @@ public class PresetsPreferencePage extends PropertyPage implements
 		thoughtStyleRange.start = previewText.indexOf(thoughtPreview);
 		thoughtStyleRange.length = thoughtPreview.length();
 		
+		columnStyleRange.start = previewText.indexOf(columnPreview);
+		columnStyleRange.length = columnPreview.length();
+		
 		updatePreview();
 	}
 	
@@ -360,12 +427,15 @@ public class PresetsPreferencePage extends PropertyPage implements
 	
 	private void updatePreview ()
 	{
-		presetsTable.getTable().setBackground(new Color(getShell().getDisplay(), getColor(mainBGSelector)));
+		Color mainBG = new Color(getShell().getDisplay(), mainBGSelector.getColorValue());
+		Color mainFG = new Color(getShell().getDisplay(), mainFGSelector.getColorValue());
+		
+		presetsTable.getTable().setBackground(mainBG);
 		presetsTable.setInput(presets.values());
 		
-		preview.setBackground(new Color(getShell().getDisplay(), getColor(mainBGSelector)));
-		preview.setForeground(new Color(getShell().getDisplay(), mainFGSelector.getColorValue()));
-		preview.setFont(mainFontSelector.getFont());
+		preview.setBackground(mainBG);
+		preview.setForeground(mainFG);
+		preview.setFont(new Font(getShell().getDisplay(), mainFontSelector.getFontData()));
 		
 		updatePresetColors(Preset.PRESET_ROOM_NAME, roomNameStyleRange);
 		updatePresetColors(Preset.PRESET_BOLD, boldStyleRange);
@@ -377,7 +447,11 @@ public class PresetsPreferencePage extends PropertyPage implements
 		roomNameStyleRange.background = ColorUtil.warlockColorToColor(presets.get(Preset.PRESET_ROOM_NAME).getBackgroundColor());
 		roomNameStyleRange.foreground = ColorUtil.warlockColorToColor(presets.get(Preset.PRESET_ROOM_NAME).getForegroundColor());
 		
-		preview.setStyleRanges(new StyleRange[] { roomNameStyleRange, boldStyleRange, commandStyleRange, speechStyleRange, whisperStyleRange, thoughtStyleRange });
+		columnStyleRange.background = mainBG;
+		columnStyleRange.foreground = mainFG;
+		columnStyleRange.font = new Font(getShell().getDisplay(), columnFontSelector.getFontData());
+		
+		preview.setStyleRanges(new StyleRange[] { roomNameStyleRange, boldStyleRange, commandStyleRange, speechStyleRange, whisperStyleRange, thoughtStyleRange, columnStyleRange });
 		preview.update();
 		
 	}
