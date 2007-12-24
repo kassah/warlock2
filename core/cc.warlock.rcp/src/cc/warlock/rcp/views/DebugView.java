@@ -122,16 +122,6 @@ public class DebugView extends ViewPart implements IConnectionListener, IGameVie
 			text.setWordWrap(true);
 			text.getTextWidget().setIndent(1);
 			
-			Color background = ColorUtil.warlockColorToColor(GameViewConfiguration.instance().getDefaultBackground());
-			Color foreground = ColorUtil.warlockColorToColor(GameViewConfiguration.instance().getDefaultForeground());
-			
-			text.setBackground(background);
-			text.setForeground(foreground);
-			
-			String fontFace = GameViewConfiguration.instance().getDefaultFontFace();
-			int fontSize = GameViewConfiguration.instance().getDefaultFontSize();
-			
-			text.setFont(new Font(Display.getDefault(), fontFace, fontSize, SWT.NORMAL));
 			text.setScrollDirection(SWT.DOWN);
 			
 			clientStreams.put(client, text);
