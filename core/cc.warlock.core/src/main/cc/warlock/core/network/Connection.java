@@ -77,8 +77,6 @@ public class Connection implements IConnection {
 	public void send (byte[] bytes)
 		throws IOException
 	{
-//		System.out.print("SGE Out:");
-//		System.out.write(bytes); // Some Debug Output
 		socket.getOutputStream().write(bytes);
 	}
 	
@@ -114,7 +112,6 @@ public class Connection implements IConnection {
 							String line = reader.readLine();
 							listenersGotLine(line);
 						} catch(Exception e) {
-							System.out.println("IO Exception in Run Thread");
 							e.printStackTrace();
 						}
 					}

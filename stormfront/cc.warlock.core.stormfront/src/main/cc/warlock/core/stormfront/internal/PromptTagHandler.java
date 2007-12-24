@@ -29,7 +29,6 @@ public class PromptTagHandler extends DefaultTagHandler {
 	
 	@Override
 	public void handleStart(StormFrontAttributeList attributes) {
-		//System.out.println("got prompt");
 		handler.clearStyles();
 		prompt.setLength(0);
 		

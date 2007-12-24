@@ -7,8 +7,8 @@ import cc.warlock.core.stormfront.IStormFrontTagHandler;
 import cc.warlock.core.stormfront.xml.StormFrontAttributeList;
 
 abstract public class BaseTagHandler implements IStormFrontTagHandler {
-	protected String currentTag;
-	protected Map<String, IStormFrontTagHandler> tagHandlers;
+	private String currentTag;
+	private Map<String, IStormFrontTagHandler> tagHandlers;
 	
 	public abstract String[] getTagNames();
 	

@@ -158,8 +158,6 @@ public class StormFrontProtocolHandler implements IStormFrontProtocolHandler {
 	 * @see org.xml.sax.ContentHandler#characters(char[], int, int)
 	 */
 	public void characters(String characters) {
-		/*String str = String.copyValueOf(ch, start, length);
-		System.out.print(str);*/
 		
 		if (rawXMLBuffer != null)
 		{
@@ -229,7 +227,7 @@ public class StormFrontProtocolHandler implements IStormFrontProtocolHandler {
 		
 		String popName = tagStack.pop();
 		if(!name.equals(popName))
-			System.out.println("Whoa!! close tag we got \"" + name + "\" is not what we expected \"" + popName + "\"");
+			System.err.println("Unexpected close tag \"" + name + "\". Expected \"" + popName + "\"");
 		assert(name.equals(popName));
 		
 		// call the method for the object
@@ -242,8 +240,6 @@ public class StormFrontProtocolHandler implements IStormFrontProtocolHandler {
 					characters(newLine);
 				}
 			}
-		} else {
-			// System.out.println("Didn't handle end element for \"" + name + "\"");
 		}
 	}
 	
@@ -283,8 +279,6 @@ public class StormFrontProtocolHandler implements IStormFrontProtocolHandler {
 					characters(newLine);
 				}
 			}
-		} else {
-			// System.out.println("didn't handle start element for \"" + name + "\"");
 		}
 	}
 	

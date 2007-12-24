@@ -100,7 +100,6 @@ public class JavascriptEngine implements IScriptEngine {
 					reader.close();
 				}
 				catch (WrappedException e) {
-					System.out.println("Caught a wrapped error.");
 					e.printStackTrace();
 				}
 				catch (RhinoException e) {
@@ -122,7 +121,7 @@ public class JavascriptEngine implements IScriptEngine {
 		return script;
 	}
 
-	public static void loadString (String content)
+	public static Object loadString (String content)
 	{
 		Context context = Context.enter();
 		try {
@@ -130,10 +129,11 @@ public class JavascriptEngine implements IScriptEngine {
 			Scriptable scope = context.initStandardObjects();
 			Object result = context.evaluateString(scope, content, "<cmd>", 1, null);
 			
-			System.out.println("script result: " + Context.toString(result));
+			return result;
 		}
 		catch (Exception e) {
 			e.printStackTrace();
+			return null;
 		}
 		finally {
 			Context.exit();

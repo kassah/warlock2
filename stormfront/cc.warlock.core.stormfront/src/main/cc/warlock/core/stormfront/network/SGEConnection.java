@@ -173,8 +173,6 @@ public class SGEConnection extends Connection implements IConnectionListener {
 	public void dataReady(IConnection connection, String line) {
 		try {
 			
-			System.out.println("SGE:" + line);
-			
 			if (state == SGE_INITIAL)
 			{
 				passwordHash = line;

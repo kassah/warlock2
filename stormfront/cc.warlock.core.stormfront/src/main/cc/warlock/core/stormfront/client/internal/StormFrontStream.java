@@ -40,8 +40,6 @@ public class StormFrontStream extends Stream {
 					if(!m.find(pos))
 						break;
 					
-					System.out.println("Ignore matched text in: " + text.toString());
-					
 					// remove text from beginning of line of match to end, find those points
 					int start = str.substring(0, m.start()).lastIndexOf('\n');
 					int end = str.indexOf('\n', m.end() - 1);

@@ -160,7 +160,7 @@ public class HighlightPreset extends Preset implements IHighlightString {
 			try {
 				pattern = Pattern.compile(text, Pattern.LITERAL | Pattern.CASE_INSENSITIVE);
 			} catch(PatternSyntaxException e) {
-				System.out.println("Pattern error: " + e.getMessage());
+				System.err.println("Pattern error: " + e.getMessage());
 			}
 		}
 		

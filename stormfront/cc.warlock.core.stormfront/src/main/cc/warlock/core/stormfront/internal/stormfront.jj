@@ -16,22 +16,17 @@ public class StormFrontProtocolParser {
 	
 	protected void characters (String characters)
 	{
-		// System.out.println("characters: " + string);
 		handler.characters(characters);
 	}
 	
 	protected void startElement (String name, String newLine)
 	{
-		// System.out.println("startElement: " + name.image);
-		
 		handler.startElement(name, currentAttributes, newLine);
 		currentAttributes.clear();
 	}
 	
 	protected void addAttribute (String name, String value)
 	{	
-		// System.out.println("addAttribute name=" + name.image + ",value=" +newValue);
-		
 		StormFrontAttribute attribute = new StormFrontAttribute();
 		attribute.setName(name);
 		attribute.setValue(value);
@@ -42,8 +37,6 @@ public class StormFrontProtocolParser {
 	
 	protected void endElement (String name, String newLine)
 	{
-		// System.out.println("end element: " + name.image);
-		
 		handler.endElement(name, newLine);
 		currentAttributes.clear();
 	}

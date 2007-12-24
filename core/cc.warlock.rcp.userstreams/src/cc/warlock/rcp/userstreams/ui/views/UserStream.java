@@ -98,7 +98,7 @@ public class UserStream extends StreamView implements IWarlockClientListener {
 			styles.add("speech");
 			styles.add("whisper");
 		} else {
-			System.out.println("Not a stream name we recognize! ("+streamName+")");
+			System.err.println("Not a stream name we recognize! ("+streamName+")");
 		}
 	}
 	

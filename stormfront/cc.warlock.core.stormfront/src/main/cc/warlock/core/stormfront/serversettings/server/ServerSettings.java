@@ -287,11 +287,7 @@ public class ServerSettings implements Comparable<ServerSettings>, IHighlightPro
 						scripts.put(name, script);
 						
 						scriptProvider.scriptContentsUpdated(script);
-					} else {
-						System.out.println("Couldn't find name");
 					}
-				} else {
-					System.out.println("didn't get element in script");
 				}
 			}
 		}
