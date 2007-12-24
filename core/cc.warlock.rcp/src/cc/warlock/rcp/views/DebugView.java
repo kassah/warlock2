@@ -1,50 +1,49 @@
 package cc.warlock.rcp.views;
 
 import java.io.IOException;
+import java.util.HashMap;
 
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.KeyAdapter;
 import org.eclipse.swt.events.KeyEvent;
 import org.eclipse.swt.events.SelectionAdapter;
 import org.eclipse.swt.events.SelectionEvent;
+import org.eclipse.swt.graphics.Color;
+import org.eclipse.swt.graphics.Font;
 import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.widgets.Button;
 import org.eclipse.swt.widgets.Composite;
+import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.Text;
+import org.eclipse.ui.part.PageBook;
 import org.eclipse.ui.part.ViewPart;
 
 import cc.warlock.core.client.IWarlockClient;
 import cc.warlock.core.network.IConnection;
 import cc.warlock.core.network.IConnectionListener;
-import cc.warlock.rcp.application.WarlockApplication;
+import cc.warlock.rcp.configuration.GameViewConfiguration;
 import cc.warlock.rcp.ui.WarlockText;
-import cc.warlock.rcp.ui.network.SWTConnectionListenerAdapter;
+import cc.warlock.rcp.util.ColorUtil;
 
-public class DebugView extends ViewPart implements IConnectionListener {
+public class DebugView extends ViewPart implements IConnectionListener, IGameViewFocusListener {
 
-	protected WarlockText console;
+	protected PageBook book;
 	protected Text entry;
 	protected Button copyAll;
+	private HashMap<IWarlockClient, WarlockText> clientStreams = new HashMap<IWarlockClient, WarlockText>();
 	private IWarlockClient client;
 	
 	public static final String VIEW_ID = "cc.warlock.rcp.views.DebugView";
 	
-	protected IConnection connection;
-	
 	public void setClient(IWarlockClient client) {
 		this.client = client;
+		book.showPage(getTextForClient(client).getTextWidget());
 	}
 	
-	public void setConnection (IConnection connection)
+	private void debug (String message)
 	{
-		this.connection = connection;
-		
-		connection.addConnectionListener(new SWTConnectionListenerAdapter(this));
-	}
-	
-	public void debug (String message)
-	{
+		WarlockText console = getTextForClient(client);
 		console.append(message);
 	}
 	
@@ -56,14 +55,13 @@ public class DebugView extends ViewPart implements IConnectionListener {
 		copyAll = new Button(main, SWT.PUSH);
 		copyAll.setText("Copy All");
 		
-		console = new WarlockText(main, SWT.V_SCROLL | SWT.H_SCROLL, client);
-		console.setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, true));
-		console.setScrollDirection(SWT.DOWN);
+		book = new PageBook(main, SWT.NONE);
+		book.setLayoutData(new GridData(GridData.FILL, GridData.FILL, true, true));
 		
 		copyAll.addSelectionListener(new SelectionAdapter() {
 			public void widgetSelected(SelectionEvent e) {
-				console.selectAll();
-				console.copy();
+				getTextForClient(client).selectAll();
+				getTextForClient(client).copy();
 			}
 		});
 		
@@ -84,7 +82,7 @@ public class DebugView extends ViewPart implements IConnectionListener {
 	{
 		String toSend = entry.getText() + "\n";
 		try {
-			connection.send(toSend.getBytes());
+			client.getConnection().send(toSend.getBytes());
 			entry.setText("");
 		} catch (IOException e1) {
 			// TODO Auto-generated catch block
@@ -94,7 +92,7 @@ public class DebugView extends ViewPart implements IConnectionListener {
 
 	@Override
 	public void setFocus() {
-		console.setFocus();
+		getTextForClient(client).setFocus();
 	}
 	
 	public void connected(IConnection connection) {
@@ -109,4 +107,36 @@ public class DebugView extends ViewPart implements IConnectionListener {
 		debug ("disconnected");
 	}
 
+	public void gameViewFocused(GameView gameView) {
+		setClient(gameView.getWarlockClient());
+	}
+	
+	public WarlockText getTextForClient(IWarlockClient client) {
+		if (!clientStreams.containsKey(client))
+		{
+			// TODO move this section into WarlockText
+			WarlockText text = new WarlockText(book, SWT.V_SCROLL, client);
+			GridData data = new GridData(GridData.FILL, GridData.FILL, true, true);
+			text.setLayoutData(data);
+			text.setEditable(false);
+			text.setWordWrap(true);
+			text.getTextWidget().setIndent(1);
+			
+			Color background = ColorUtil.warlockColorToColor(GameViewConfiguration.instance().getDefaultBackground());
+			Color foreground = ColorUtil.warlockColorToColor(GameViewConfiguration.instance().getDefaultForeground());
+			
+			text.setBackground(background);
+			text.setForeground(foreground);
+			
+			String fontFace = GameViewConfiguration.instance().getDefaultFontFace();
+			int fontSize = GameViewConfiguration.instance().getDefaultFontSize();
+			
+			text.setFont(new Font(Display.getDefault(), fontFace, fontSize, SWT.NORMAL));
+			text.setScrollDirection(SWT.DOWN);
+			
+			clientStreams.put(client, text);
+			return text;
+		}
+		else return clientStreams.get(client);
+	}
 }

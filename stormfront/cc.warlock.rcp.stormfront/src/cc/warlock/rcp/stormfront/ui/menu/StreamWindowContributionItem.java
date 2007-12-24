@@ -12,6 +12,7 @@ import cc.warlock.core.stormfront.client.IStormFrontClient;
 import cc.warlock.core.stormfront.network.StormFrontConnection;
 import cc.warlock.rcp.actions.OpenStreamWindowAction;
 import cc.warlock.rcp.plugin.Warlock2Plugin;
+import cc.warlock.rcp.ui.network.SWTConnectionListenerAdapter;
 import cc.warlock.rcp.views.DebugView;
 import cc.warlock.rcp.views.StreamView;
 
@@ -34,7 +35,7 @@ public class StreamWindowContributionItem extends CompoundContributionItem {
 				DebugView view = (DebugView)
 				PlatformUI.getWorkbench().getActiveWorkbenchWindow().getActivePage().showView(DebugView.VIEW_ID, connection.getKey(), IWorkbenchPage.VIEW_VISIBLE);
 				view.setClient(client);
-				view.setConnection(client.getConnection());
+				connection.addConnectionListener(new SWTConnectionListenerAdapter(view));
 			} catch(Exception e) {
 				e.printStackTrace();
 			}
