@@ -19,10 +19,12 @@ import cc.warlock.core.client.IStream;
 import cc.warlock.core.client.IWarlockSkin;
 import cc.warlock.core.client.IWarlockStyle;
 import cc.warlock.core.client.WarlockClientRegistry;
+import cc.warlock.core.client.WarlockString;
 import cc.warlock.core.client.internal.CharacterStatus;
 import cc.warlock.core.client.internal.ClientProperty;
 import cc.warlock.core.client.internal.Compass;
 import cc.warlock.core.client.internal.WarlockClient;
+import cc.warlock.core.client.internal.WarlockStyle;
 import cc.warlock.core.script.IScript;
 import cc.warlock.core.script.IScriptListener;
 import cc.warlock.core.script.ScriptEngineRegistry;
@@ -31,6 +33,7 @@ import cc.warlock.core.stormfront.IStormFrontProtocolHandler;
 import cc.warlock.core.stormfront.client.BarStatus;
 import cc.warlock.core.stormfront.client.IStormFrontClient;
 import cc.warlock.core.stormfront.network.StormFrontConnection;
+import cc.warlock.core.stormfront.serversettings.server.Preset;
 import cc.warlock.core.stormfront.serversettings.server.ServerSettings;
 import cc.warlock.core.stormfront.serversettings.skin.DefaultSkin;
 import cc.warlock.core.stormfront.serversettings.skin.IStormFrontSkin;
@@ -334,7 +337,11 @@ public class StormFrontClient extends WarlockClient implements IStormFrontClient
 	}
 	
 	public IWarlockStyle getCommandStyle() {
-		return serverSettings.getPreset("command").getStyle();
+		Preset commandPreset = serverSettings.getPreset(Preset.PRESET_COMMAND);
+		if (commandPreset == null) {
+			return new WarlockStyle();
+		}
+		return commandPreset.getStyle();
 	}
 	
 }
