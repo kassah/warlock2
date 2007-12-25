@@ -26,6 +26,7 @@ import cc.warlock.core.client.WarlockClientRegistry;
 import cc.warlock.core.client.internal.ClientProperty;
 import cc.warlock.core.stormfront.client.IStormFrontClient;
 import cc.warlock.core.stormfront.serversettings.server.ServerSettings;
+import cc.warlock.core.stormfront.serversettings.server.WindowSettings;
 import cc.warlock.rcp.stormfront.ui.StormFrontSharedImages;
 import cc.warlock.rcp.ui.client.SWTPropertyListener;
 import cc.warlock.rcp.util.ColorUtil;
@@ -228,8 +229,13 @@ public class HandsView extends ViewPart implements IPropertyListener<String>
 	
 	public void loadServerSettings (ServerSettings settings)
 	{
-		Color bg = ColorUtil.warlockColorToColor(settings.getMainWindowSettings().getBackgroundColor());
-		Color fg = ColorUtil.warlockColorToColor(settings.getMainWindowSettings().getForegroundColor());
+		if(settings == null)
+			return;
+		WindowSettings mainSettings = settings.getMainWindowSettings();
+		if(mainSettings == null)
+			return;
+		Color bg = ColorUtil.warlockColorToColor(mainSettings.getBackgroundColor());
+		Color fg = ColorUtil.warlockColorToColor(mainSettings.getForegroundColor());
 		
 		setColors(fg, bg);
 	}
