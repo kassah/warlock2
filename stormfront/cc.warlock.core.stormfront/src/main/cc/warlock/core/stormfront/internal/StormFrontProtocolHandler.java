@@ -81,6 +81,7 @@ public class StormFrontProtocolHandler implements IStormFrontProtocolHandler {
 		new LaunchURLTagHandler(this);
 		new ResourceTagHandler(this);
 		new ATagHandler(this);
+		new DTagHandler(this);
 	}
 	
 	/*
