@@ -308,7 +308,7 @@ public class SGEConnection extends Connection implements IConnectionListener {
 		
 		public void charactersReady(SGEConnection connection,
 				Map<String, String> characters) {
-			connection.selectCharacter(profile.getCharacterCode());
+			connection.selectCharacter(profile.getId());
 		}
 		
 		@Override
