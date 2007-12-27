@@ -24,7 +24,7 @@ import org.eclipse.swt.widgets.Label;
 import org.eclipse.swt.widgets.Text;
 
 import cc.warlock.core.configuration.Account;
-import cc.warlock.core.configuration.SavedProfiles;
+import cc.warlock.core.stormfront.ProfileConfiguration;
 import cc.warlock.core.stormfront.network.SGEConnection;
 import cc.warlock.core.stormfront.network.SGEConnectionListener;
 import cc.warlock.rcp.stormfront.adapters.SWTSGEConnectionListenerAdapter;
@@ -74,14 +74,14 @@ public class AccountWizardPage extends WizardPageWithNotification {
 		
 		setControl(controls);
 		
-		final Collection<Account> accounts = SavedProfiles.getAccounts();
+		final Collection<Account> accounts = ProfileConfiguration.instance().getAllAccounts();
 		for (Account account : accounts) {
 			this.account.getCombo().add(account.getAccountName());
 		}
 		if (accounts.size() > 0)
 		{
 			account.getCombo().select(0);
-			password.getTextControl().setText(SavedProfiles.getAccount(account.getCombo().getText()).getPassword());
+			password.getTextControl().setText(ProfileConfiguration.instance().getAccount(account.getCombo().getText()).getPassword());
 			
 			account.getCombo().addSelectionListener(new SelectionListener() {
 				public void widgetDefaultSelected(SelectionEvent e) {
@@ -89,7 +89,7 @@ public class AccountWizardPage extends WizardPageWithNotification {
 				}
 				public void widgetSelected(SelectionEvent e) {
 					String accountName = account.getCombo().getText();
-					password.getTextControl().setText(SavedProfiles.getAccount(accountName).getPassword());
+					password.getTextControl().setText(ProfileConfiguration.instance().getAccount(accountName).getPassword());
 				}
 			});
 		}
@@ -116,7 +116,7 @@ public class AccountWizardPage extends WizardPageWithNotification {
 			}
 			
 			accountName = account.getText();
-			savedAccount = SavedProfiles.getAccount(account.getText());
+			savedAccount = ProfileConfiguration.instance().getAccount(account.getText());
 			if (savedAccount == null)
 			{
 				boolean save = MessageDialog.openQuestion(Display.getDefault().getActiveShell(),
@@ -124,7 +124,9 @@ public class AccountWizardPage extends WizardPageWithNotification {
 				
 				if (save)
 				{
-					savedAccount = SavedProfiles.addAccount(account.getText(), password.getText());
+					savedAccount = new Account(account.getText(), password.getText());
+					
+					ProfileConfiguration.instance().addAccount(savedAccount);
 				}
 			}
 			

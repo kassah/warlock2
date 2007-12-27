@@ -30,8 +30,10 @@ import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Table;
 
 import cc.warlock.core.configuration.Account;
+import cc.warlock.core.configuration.ConfigurationUtil;
 import cc.warlock.core.configuration.Profile;
-import cc.warlock.core.configuration.SavedProfiles;
+import cc.warlock.core.configuration.WarlockConfiguration;
+import cc.warlock.core.stormfront.ProfileConfiguration;
 import cc.warlock.core.stormfront.network.SGEConnection;
 import cc.warlock.core.stormfront.network.SGEConnectionListener;
 import cc.warlock.rcp.stormfront.adapters.SWTSGEConnectionListenerAdapter;
@@ -196,14 +198,14 @@ public class CharacterSelectWizardPage extends WizardPage {
 			Account account = accountPage.getSavedAccount();
 			if (account != null && !getSelectedCharacterCode().equals(SGEConnection.NEW_CHARACTER_CODE))
 			{
-				Collection<Profile> savedProfiles = SavedProfiles.getProfiles(account);
+				Collection<Profile> savedProfiles = account.getProfiles();
 
 				boolean exists = false;
 				if (savedProfiles != null && savedProfiles.size() > 0)
 				{
 					for (Profile profile : savedProfiles)
 					{
-						if (getSelectedCharacterName().equals(profile.getCharacterName())) {
+						if (getSelectedCharacterName().equals(profile.getName())) {
 							exists = true; break;
 						}
 					}
@@ -216,8 +218,12 @@ public class CharacterSelectWizardPage extends WizardPage {
 					
 					if (response)
 					{
-						SavedProfiles.addProfile(account, getSelectedCharacterCode(), getSelectedCharacterName(),
-							gameSelectPage.getSelectedGameCode(), gameSelectPage.getSelectedGameName());
+						Profile profile = new Profile(account, getSelectedCharacterCode(), getSelectedCharacterName(),
+								gameSelectPage.getSelectedGameCode(), gameSelectPage.getSelectedGameName());
+						
+						ProfileConfiguration.getProfileConfiguration().save();
+						
+						// should be auto-added to the account list by ctor
 					}
 				}
 			}

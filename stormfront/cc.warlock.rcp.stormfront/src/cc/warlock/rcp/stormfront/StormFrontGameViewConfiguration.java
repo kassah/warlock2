@@ -10,8 +10,8 @@ import org.dom4j.Element;
 
 import cc.warlock.core.configuration.IConfigurationProvider;
 import cc.warlock.core.configuration.Profile;
-import cc.warlock.core.configuration.SavedProfiles;
 import cc.warlock.core.configuration.WarlockConfiguration;
+import cc.warlock.core.stormfront.ProfileConfiguration;
 
 public class StormFrontGameViewConfiguration implements IConfigurationProvider {
 
@@ -70,7 +70,7 @@ public class StormFrontGameViewConfiguration implements IConfigurationProvider {
 		{
 			String profileId = profileViewMappings.get(viewId);
 			
-			return SavedProfiles.getProfileByCharacterName(profileId);
+			return ProfileConfiguration.instance().getProfileByCharacterName(profileId);
 		}
 		return null;
 	}

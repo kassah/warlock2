@@ -26,8 +26,8 @@ public class ProfileConnectAction extends Action implements ISGEConnectionListen
 	private GameView gameView;
 	
 	public ProfileConnectAction (Profile profile) {
-		super(profile.getCharacterName(), StormFrontSharedImages.getImageDescriptor(StormFrontSharedImages.IMG_CHARACTER));
-		setDescription(profile.getGameName() + " character \"" + profile.getCharacterName() + "\"");
+		super(profile.getName(), StormFrontSharedImages.getImageDescriptor(StormFrontSharedImages.IMG_CHARACTER));
+		setDescription(profile.getGameName() + " character \"" + profile.getName() + "\"");
 		
 		this.profile = profile;
 	}
@@ -37,13 +37,13 @@ public class ProfileConnectAction extends Action implements ISGEConnectionListen
 		finished = false;
 		status = Status.OK_STATUS;
 		
-		Job connectJob = new Job("Logging into profile \"" + profile.getCharacterName() + "\"...") {
+		Job connectJob = new Job("Logging into profile \"" + profile.getName() + "\"...") {
 			protected IStatus run(IProgressMonitor monitor) {
 				ProfileConnectAction.this.monitor = monitor;
 				
 				SGEConnection connection = new SGEConnection();
 				connection.addSGEConnectionListener(new SWTSGEConnectionListenerAdapter(ProfileConnectAction.this));
-				monitor.beginTask("Logging into profile \"" + profile.getCharacterName() + "\"...", 5);
+				monitor.beginTask("Logging into profile \"" + profile.getName() + "\"...", 5);
 
 				connection.connect();
 				
@@ -99,7 +99,7 @@ public class ProfileConnectAction extends Action implements ISGEConnectionListen
 	public void charactersReady(SGEConnection connection, Map<String, String> characters) {
 		monitor.worked(1);
 		
-		connection.selectCharacter(profile.getCharacterCode());
+		connection.selectCharacter(profile.getId());
 	}
 
 	public void readyToPlay(SGEConnection connection, Map<String,String> loginProperties) {
@@ -109,7 +109,7 @@ public class ProfileConnectAction extends Action implements ISGEConnectionListen
 		if (!monitor.isCanceled())
 		{
 			if (gameView == null)
-				LoginUtil.connectAndOpenGameView(loginProperties, profile.getCharacterName());
+				LoginUtil.connectAndOpenGameView(loginProperties, profile.getName());
 			else
 				LoginUtil.connect(gameView, loginProperties);
 		} else {

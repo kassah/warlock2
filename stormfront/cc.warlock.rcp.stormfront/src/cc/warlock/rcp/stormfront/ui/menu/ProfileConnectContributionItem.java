@@ -11,7 +11,7 @@ import org.eclipse.swt.graphics.Image;
 import org.eclipse.ui.actions.CompoundContributionItem;
 
 import cc.warlock.core.configuration.Profile;
-import cc.warlock.core.configuration.SavedProfiles;
+import cc.warlock.core.stormfront.ProfileConfiguration;
 import cc.warlock.rcp.stormfront.ui.StormFrontSharedImages;
 import cc.warlock.rcp.stormfront.ui.actions.ProfileConnectAction;
 import cc.warlock.rcp.ui.ConnectionAction;
@@ -31,7 +31,7 @@ public class ProfileConnectContributionItem extends CompoundContributionItem imp
 
 	@Override
 	protected IContributionItem[] getContributionItems() {
-		Collection<Profile> profiles = SavedProfiles.getAllProfiles();
+		Collection<Profile> profiles = ProfileConfiguration.instance().getAllProfiles();
 		IContributionItem[] items = new IContributionItem[profiles.size()];
 		int i = 0;
 		
@@ -47,7 +47,7 @@ public class ProfileConnectContributionItem extends CompoundContributionItem imp
 	public List<IConnectionCommand> getConnectionCommands () {
 		ArrayList<IConnectionCommand> commands = new ArrayList<IConnectionCommand>();
 		
-		for (Profile profile : SavedProfiles.getAllProfiles())
+		for (Profile profile : ProfileConfiguration.instance().getAllProfiles())
 		{
 			commands.add(new ConnectionAction(new ProfileConnectAction(profile)));
 		}
@@ -58,7 +58,7 @@ public class ProfileConnectContributionItem extends CompoundContributionItem imp
 	public String getDescription(IHandler handler) {
 		ProfileConnectAction phandler = (ProfileConnectAction)handler;
 		
-		return phandler.getProfile().getGameName() + ": " + phandler.getProfile().getCharacterName(); 
+		return phandler.getProfile().getGameName() + ": " + phandler.getProfile().getName(); 
 	}
 	
 	public Image getImage(IHandler handler) {
@@ -66,6 +66,6 @@ public class ProfileConnectContributionItem extends CompoundContributionItem imp
 	}
 	
 	public String getLabel(IHandler handler) {
-		return ((ProfileConnectAction)handler).getProfile().getCharacterName();
+		return ((ProfileConnectAction)handler).getProfile().getName();
 	}
 }

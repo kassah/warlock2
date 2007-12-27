@@ -30,9 +30,9 @@ import cc.warlock.core.client.IWarlockClient;
 import cc.warlock.core.client.PropertyListener;
 import cc.warlock.core.client.WarlockColor;
 import cc.warlock.core.configuration.Profile;
-import cc.warlock.core.configuration.SavedProfiles;
 import cc.warlock.core.network.IConnection;
 import cc.warlock.core.network.IConnectionListener;
+import cc.warlock.core.stormfront.ProfileConfiguration;
 import cc.warlock.core.stormfront.client.IStormFrontClient;
 import cc.warlock.core.stormfront.client.IStormFrontClientViewer;
 import cc.warlock.core.stormfront.client.StormFrontColor;
@@ -82,7 +82,7 @@ public class StormFrontGameView extends GameView implements IStormFrontClientVie
 		String fullId = getViewSite().getId() + ":" + getViewSite().getSecondaryId();
 		String characterName = StormFrontGameViewConfiguration.instance().getProfileId(fullId);
 		
-		final Profile profile = SavedProfiles.getProfileByCharacterName(characterName);
+		final Profile profile = ProfileConfiguration.instance().getProfileByCharacterName(characterName);
 		SelectionListener listener;
 		
 		if (profile != null)
@@ -152,7 +152,7 @@ public class StormFrontGameView extends GameView implements IStormFrontClientVie
 	
 	protected void setReconnectProfile (Profile profile)
 	{
-		String characterName = profile.getCharacterName();
+		String characterName = profile.getName();
 		reconnectLabel.setText("The character \"" + characterName + "\" is currently disconnected.");
 
 		reconnect.setText("Login as \"" + characterName + "\"");
@@ -179,10 +179,10 @@ public class StormFrontGameView extends GameView implements IStormFrontClientVie
 			}
 		});
 		
-		for (final Profile profile : SavedProfiles.getAllProfiles())
+		for (final Profile profile : ProfileConfiguration.instance().getAllProfiles())
 		{
 			MenuItem item = new MenuItem (menu, SWT.PUSH);
-			item.setText(profile.getCharacterName());
+			item.setText(profile.getName());
 			item.setImage(WarlockSharedImages.getImage(WarlockSharedImages.IMG_CHARACTER));
 			item.addSelectionListener(new SelectionAdapter () {
 				public void widgetSelected(SelectionEvent e) {
@@ -285,7 +285,7 @@ public class StormFrontGameView extends GameView implements IStormFrontClientVie
 				
 				Display.getDefault().asyncExec(new Runnable() {
 					public void run() {
-						Profile profile = SavedProfiles.getProfileByCharacterName(sfClient.getCharacterName().get());
+						Profile profile = ProfileConfiguration.instance().getProfileByCharacterName(sfClient.getCharacterName().get());
 						if (profile != null) {
 							setReconnectProfile(profile);
 						} else {

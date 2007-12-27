@@ -5,7 +5,7 @@ import org.eclipse.ui.plugin.AbstractUIPlugin;
 import org.osgi.framework.BundleContext;
 
 import cc.warlock.core.configuration.Profile;
-import cc.warlock.core.configuration.SavedProfiles;
+import cc.warlock.core.stormfront.ProfileConfiguration;
 import cc.warlock.core.stormfront.client.internal.StormFrontClient;
 import cc.warlock.core.stormfront.script.javascript.StormFrontJavascriptVars;
 import cc.warlock.rcp.application.WarlockApplication;
@@ -50,9 +50,9 @@ public class StormFrontRCPPlugin extends AbstractUIPlugin {
 		if (WarlockApplication.instance().getStartWithProfile() != null) {
 			Profile connectToProfile = null;
 			
-			for (Profile profile : SavedProfiles.getAllProfiles())
+			for (Profile profile : ProfileConfiguration.instance().getAllProfiles())
 			{
-				if (WarlockApplication.instance().getStartWithProfile().equals(profile.getCharacterName()))
+				if (WarlockApplication.instance().getStartWithProfile().equals(profile.getName()))
 				{
 					connectToProfile = profile;
 				}
