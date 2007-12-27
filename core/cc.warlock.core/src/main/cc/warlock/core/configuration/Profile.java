@@ -8,33 +8,28 @@ package cc.warlock.core.configuration;
  */
 public class Profile {
 
-	private String profileId, characterCode, characterName, gameCode, gameName;
+	private String id, name, gameCode, gameName;
 	private Account account;
 	
-	/**
-	 * @return Returns the characterCode.
-	 */
-	public String getCharacterCode() {
-		return characterCode;
+	public Profile () { }
+	public Profile (Account account, String id, String name, String gameCode, String gameName)
+	{
+		this(id, name, gameCode, gameName);
+		
+		this.account = account;
+		if (account != null && !account.getProfiles().contains(this)) {
+			account.getProfiles().add(this);
+		}
 	}
-	/**
-	 * @param characterCode The characterCode to set.
-	 */
-	public void setCharacterCode(String characterCode) {
-		this.characterCode = characterCode;
+	
+	public Profile (String id, String name, String gameCode, String gameName)
+	{
+		this.id = id;
+		this.name = name;
+		this.gameCode = gameCode;
+		this.gameName = gameName;
 	}
-	/**
-	 * @return Returns the characterName.
-	 */
-	public String getCharacterName() {
-		return characterName;
-	}
-	/**
-	 * @param characterName The characterName to set.
-	 */
-	public void setCharacterName(String characterName) {
-		this.characterName = characterName;
-	}
+	
 	/**
 	 * @return Returns the gameCode.
 	 */
@@ -59,16 +54,22 @@ public class Profile {
 	public void setGameName(String gameName) {
 		this.gameName = gameName;
 	}
-	public String getProfileId() {
-		return profileId;
-	}
-	public void setProfileId(String profileId) {
-		this.profileId = profileId;
-	}
 	public Account getAccount() {
 		return account;
 	}
 	public void setAccount(Account account) {
 		this.account = account;
+	}
+	public String getId() {
+		return id;
+	}
+	public void setId(String id) {
+		this.id = id;
+	}
+	public String getName() {
+		return name;
+	}
+	public void setName(String name) {
+		this.name = name;
 	}
 }
