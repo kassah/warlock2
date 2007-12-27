@@ -7,7 +7,7 @@ import org.junit.BeforeClass;
 import org.junit.Test;
 
 import cc.warlock.core.configuration.Profile;
-import cc.warlock.core.configuration.SavedProfiles;
+import cc.warlock.core.stormfront.ProfileConfiguration;
 import cc.warlock.core.stormfront.client.internal.StormFrontClient;
 import cc.warlock.core.stormfront.network.SGEConnection;
 import cc.warlock.core.stormfront.serversettings.server.IServerSettingsListener;
@@ -33,7 +33,7 @@ public class ServerScriptTest {
 				TestProperties.failProperty(TestProperties.DEFAULT_PROFILE);
 			}
 			
-			Profile profile = SavedProfiles.getProfileByCharacterName(defaultProfile);
+			Profile profile = ProfileConfiguration.instance().getProfileByCharacterName(defaultProfile);
 			SettingsListener listener = new SettingsListener();
 			client = TestUtil.autoConnectToClient(profile, listener);
 			

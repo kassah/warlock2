@@ -7,7 +7,7 @@ import org.junit.Assert;
 import org.junit.Test;
 
 import cc.warlock.core.configuration.Profile;
-import cc.warlock.core.configuration.SavedProfiles;
+import cc.warlock.core.stormfront.ProfileConfiguration;
 import cc.warlock.core.stormfront.network.SGEConnection;
 import cc.warlock.core.stormfront.network.SGEConnectionListener;
 
@@ -23,7 +23,7 @@ public class SGETest {
 		
 		for (final String profileName : profileNames)
 		{
-			Profile profile = SavedProfiles.getProfileByCharacterName(profileName);
+			Profile profile = ProfileConfiguration.instance().getProfileByCharacterName(profileName);
 			Assert.assertNotNull("Profile described by \"" + profileName + "\" was null!", profile);
 			
 			success.put(profileName, false);
