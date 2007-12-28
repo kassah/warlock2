@@ -100,21 +100,7 @@ public class AccountWizardPage extends WizardPageWithNotification {
 	@Override
 	public void pageExited(int button) {
 //		if (button == WizardWithNotification.NEXT)
-//		{
-			if (!connection.isConnected())
-			{
-				connection.connect();
-				while (!connection.isConnected()) {
-					Display.getDefault().readAndDispatch();
-					try {
-						Thread.sleep((long) 200);
-					} catch (InterruptedException e) {
-						// TODO Auto-generated catch block
-						e.printStackTrace();
-					}
-				}
-			}
-			
+//		{	
 			accountName = account.getText();
 			savedAccount = ProfileConfiguration.instance().getAccount(account.getText());
 			if (savedAccount == null)
@@ -137,8 +123,8 @@ public class AccountWizardPage extends WizardPageWithNotification {
 					{
 						listener.setProgressMonitor(monitor);
 						
-						monitor.beginTask(WizardMessages.bind(WizardMessages.AccountWizardPage_progressMessage, account.getText()), 3);
-						connection.login(account.getText(), password.getText());
+						monitor.beginTask(WizardMessages.bind(WizardMessages.AccountWizardPage_progressMessage, account.getText()), 4);
+						connection.connect();
 						monitor.worked(1);
 					}
 				});
@@ -154,6 +140,14 @@ public class AccountWizardPage extends WizardPageWithNotification {
 		public void setProgressMonitor(IProgressMonitor monitor)
 		{
 			this.monitor = monitor;
+		}
+		
+		public void loginReady(SGEConnection connection) {
+			if (monitor != null) {
+				monitor.worked(1);
+			}
+			
+			connection.login(account.getText(), password.getText());
 		}
 		
 		public void loginFinished(SGEConnection connection) {
