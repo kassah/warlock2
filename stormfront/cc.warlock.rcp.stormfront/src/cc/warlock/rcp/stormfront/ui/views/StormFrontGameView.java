@@ -83,32 +83,12 @@ public class StormFrontGameView extends GameView implements IStormFrontClientVie
 		String characterName = StormFrontGameViewConfiguration.instance().getProfileId(fullId);
 		
 		final Profile profile = ProfileConfiguration.instance().getProfileByCharacterName(characterName);
-		SelectionListener listener;
+		createReconnectPopup();
 		
-		if (profile != null)
-		{
-			createReconnectPopup(new SelectionAdapter () {
-				public void widgetSelected(SelectionEvent e) {
-					ProfileConnectAction action = new ProfileConnectAction(profile);
-					action.run();
-					reconnectPopup.setVisible(false);
-				}
-			});
-			
+		if (profile != null) {
 			setReconnectProfile(profile);
 		}
-		else
-		{
-			createReconnectPopup(new SelectionAdapter () {
-				public void widgetSelected(SelectionEvent e) {
-					WarlockWizardDialog dialog = new WarlockWizardDialog(Display.getDefault().getActiveShell(),
-						new SGEConnectWizard());
-					
-					int response = dialog.open();
-					reconnectPopup.setVisible(false);
-				}
-			});
-			
+		else {			
 			setNoReconnectProfile(characterName);
 		}
 		
@@ -116,7 +96,7 @@ public class StormFrontGameView extends GameView implements IStormFrontClientVie
 	
 	protected Label reconnectLabel;
 	
-	protected void createReconnectPopup(SelectionListener listener)
+	protected void createReconnectPopup()
 	{
 		reconnectPopup = new WarlockPopupAction(text.getTextWidget(), SWT.NONE);
 		reconnectPopup.setLayout(new GridLayout(2, false));
@@ -131,7 +111,6 @@ public class StormFrontGameView extends GameView implements IStormFrontClientVie
 		buttons.setLayout(layout);
 		
 		reconnect = new Button(buttons, SWT.PUSH);
-		reconnect.addSelectionListener(listener);
 		
 		final Button connections = new Button(buttons, SWT.TOGGLE);
 		connections.setText("Connections...");
@@ -150,13 +129,25 @@ public class StormFrontGameView extends GameView implements IStormFrontClientVie
 		});
 	}
 	
-	protected void setReconnectProfile (Profile profile)
+	protected SelectionListener currentListener;
+	protected void setReconnectProfile (final Profile profile)
 	{
 		String characterName = profile.getName();
 		reconnectLabel.setText("The character \"" + characterName + "\" is currently disconnected.");
 
 		reconnect.setText("Login as \"" + characterName + "\"");
 		reconnect.setImage(WarlockSharedImages.getImage(WarlockSharedImages.IMG_RECONNECT));
+		if (currentListener != null)
+			reconnect.removeSelectionListener(currentListener);
+		currentListener = new SelectionAdapter () {
+			public void widgetSelected(SelectionEvent e) {
+				ProfileConnectAction action = new ProfileConnectAction(profile);
+				action.run();
+				reconnectPopup.setVisible(false);
+			}
+		};
+		
+		reconnect.addSelectionListener(currentListener);
 	}
 	
 	protected void setNoReconnectProfile (String characterName)
@@ -165,6 +156,19 @@ public class StormFrontGameView extends GameView implements IStormFrontClientVie
 			"\" is not a saved profile, you will need to re-login:");
 		reconnect.setText("Login");
 		reconnect.setImage(StormFrontSharedImages.getImage(StormFrontSharedImages.IMG_GAME));
+		if (currentListener != null)
+			reconnect.removeSelectionListener(currentListener);
+		currentListener = new SelectionAdapter () {
+			public void widgetSelected(SelectionEvent e) {
+				WarlockWizardDialog dialog = new WarlockWizardDialog(Display.getDefault().getActiveShell(),
+						new SGEConnectWizard());
+			
+				int response = dialog.open();
+				reconnectPopup.setVisible(false);
+			}
+		};
+		
+		reconnect.addSelectionListener(currentListener);
 	}
 	
 	protected Menu createProfileMenu (final Button connections)
