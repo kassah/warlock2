@@ -186,4 +186,14 @@ public class JavascriptCommands {
 	public void stop() {
 		commands.stop();
 	}
+	
+	public IScriptCommands getScriptCommands ()
+	{
+		return commands;
+	}
+	
+	public JavascriptScript getScript ()
+	{
+		return script;
+	}
 }
