@@ -1,13 +1,19 @@
 package cc.warlock.core.script.javascript;
 
+import java.io.File;
+import java.io.FileNotFoundException;
+import java.io.FileReader;
+import java.io.IOException;
 import java.io.Serializable;
 
 import org.mozilla.javascript.Function;
 import org.mozilla.javascript.NativeArray;
 import org.mozilla.javascript.NativeJavaObject;
+import org.mozilla.javascript.Script;
 import org.mozilla.javascript.Scriptable;
 
 import cc.warlock.core.script.IScriptCommands;
+import cc.warlock.core.script.IScriptFileInfo;
 import cc.warlock.core.script.Match;
 import cc.warlock.core.script.internal.RegexMatch;
 import cc.warlock.core.script.internal.TextMatch;
@@ -33,6 +39,37 @@ public class JavascriptCommands {
 		commands.echo(text);
 	}
 
+	public void include (String otherScript)
+	{
+		if (script.getScriptInfo() instanceof IScriptFileInfo)
+		{
+			IScriptFileInfo info = (IScriptFileInfo) script.getScriptInfo();
+			
+			File scriptFile = new File(otherScript);
+			if (!scriptFile.exists())
+			{
+				scriptFile = new File(info.getScriptFile().getParentFile(), otherScript);
+			}
+			if (scriptFile.exists()) {
+				try {
+					FileReader reader = new FileReader(scriptFile);
+					
+					Script includedScript = 
+						script.getContext().compileReader(reader, scriptFile.getName(), 1, null);
+					
+					includedScript.exec(script.getContext(), script.getScope());
+					
+				} catch (FileNotFoundException e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+				} catch (IOException e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+				}
+			}
+		}
+	}
+	
 	public Match matchWait(NativeArray matches) {
 		/*
 		int len = (int) matches.getLength(); 

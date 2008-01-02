@@ -11,6 +11,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.mozilla.javascript.Context;
+import org.mozilla.javascript.Function;
 import org.mozilla.javascript.RhinoException;
 import org.mozilla.javascript.Scriptable;
 import org.mozilla.javascript.WrappedException;
@@ -21,6 +22,7 @@ import cc.warlock.core.script.IScriptEngine;
 import cc.warlock.core.script.IScriptFileInfo;
 import cc.warlock.core.script.IScriptInfo;
 import cc.warlock.core.script.configuration.ScriptConfiguration;
+import cc.warlock.core.script.javascript.JavascriptCommands.JavascriptStopException;
 
 
 /**
@@ -73,6 +75,8 @@ public class JavascriptEngine implements IScriptEngine {
 		return false;
 	}
 	
+	protected static String includeFunction = "function include (src) { script.include(src); }";
+	protected static String includeFunctionName = "<warlock js:include>";
 	public IScript startScript(IScriptInfo info, IWarlockClient client, final String[] arguments) {
 		final JavascriptScript script = new JavascriptScript(this, info, client);
 		
@@ -88,6 +92,9 @@ public class JavascriptEngine implements IScriptEngine {
 					scope = context.initStandardObjects();
 					scope.put("script", scope, script.getCommands());
 					scope.put("arguments", scope, arguments);
+
+					Function function = context.compileFunction(scope, includeFunction, includeFunctionName, 0, null);
+					scope.put("include", scope, function);
 					
 					for (IJavascriptVariableProvider provider : varProviders) {
 						provider.loadVariables(script, scope);
@@ -100,7 +107,10 @@ public class JavascriptEngine implements IScriptEngine {
 					reader.close();
 				}
 				catch (WrappedException e) {
-					e.printStackTrace();
+					if (!(e.getCause() instanceof JavascriptStopException))
+					{
+						e.printStackTrace();
+					}
 				}
 				catch (RhinoException e) {
 					script.getClient().getDefaultStream().echo(
