@@ -9,7 +9,6 @@ public class WSLActionClear extends WSLAbstractCommand {
 		this.script = script;
 	}
 	
-	@Override
 	public void execute() {
 		script.scriptCommands.clearActions();
 	}

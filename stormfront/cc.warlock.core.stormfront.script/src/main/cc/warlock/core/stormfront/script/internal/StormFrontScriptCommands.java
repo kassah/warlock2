@@ -7,15 +7,19 @@ import java.util.Iterator;
 import java.util.concurrent.LinkedBlockingQueue;
 import java.util.concurrent.TimeUnit;
 
+import org.mozilla.javascript.Context;
+import org.mozilla.javascript.Scriptable;
+
 import cc.warlock.core.client.IProperty;
 import cc.warlock.core.client.IPropertyListener;
 import cc.warlock.core.script.IScript;
 import cc.warlock.core.script.Match;
 import cc.warlock.core.script.internal.RegexMatch;
 import cc.warlock.core.script.internal.ScriptCommands;
+import cc.warlock.core.script.javascript.JavascriptScript;
 import cc.warlock.core.stormfront.client.IStormFrontClient;
+import cc.warlock.core.stormfront.script.IStormFrontScriptCommand;
 import cc.warlock.core.stormfront.script.IStormFrontScriptCommands;
-import cc.warlock.core.stormfront.script.wsl.WSLAbstractCommand;
 import cc.warlock.core.stormfront.script.wsl.WSLScript;
 
 public class StormFrontScriptCommands extends ScriptCommands implements IStormFrontScriptCommands, IPropertyListener<Integer> {
@@ -123,12 +127,33 @@ public class StormFrontScriptCommands extends ScriptCommands implements IStormFr
 				synchronized(actions) {
 					for(Match action : actions) {
 						if(action.matches(text)) {
-							WSLAbstractCommand command = (WSLAbstractCommand)action.getAttribute("action");
+							IStormFrontScriptCommand command = (IStormFrontScriptCommand)action.getAttribute("action");
 							String value;
 							// FIXME breaks JS scripts
-							for(int i = 0; (value = (String)action.getAttribute(String.valueOf(i))) != null; i++) {
-								((WSLScript)script).setLocalVariable(String.valueOf(i), value);
+							if (script instanceof WSLScript)
+							{
+								for(int i = 0; (value = (String)action.getAttribute(String.valueOf(i))) != null; i++) {
+									((WSLScript)script).setLocalVariable(String.valueOf(i), value);
+								}
 							}
+							else if (script instanceof JavascriptScript)
+							{
+								Context context = ((JavascriptScript)script).getContext();
+								Scriptable scope = ((JavascriptScript)script).getScope();
+								
+								ArrayList<String> actionGroups = new ArrayList<String>();
+								for(int i = 0; (value = (String)action.getAttribute(String.valueOf(i))) != null; i++) {
+									actionGroups.add(value);
+								}
+								
+								Scriptable array = context.newArray(scope, actionGroups.size());
+								for (int i = 0; i < actionGroups.size(); i++) {
+									array.put(i, scope, actionGroups.get(i));	
+								}
+								
+								scope.put("actionGroups", scope, array);
+							}
+								
 							command.execute();
 						}
 					}
@@ -138,7 +163,7 @@ public class StormFrontScriptCommands extends ScriptCommands implements IStormFr
 		}
 	}
 	
-	public void addAction(WSLAbstractCommand action, String text) {
+	public void addAction(IStormFrontScriptCommand action, String text) {
 		if(actions == null) {
 			actions = Collections.synchronizedCollection(new ArrayList<Match>());
 			new Thread(new ScriptActionThread()).start();

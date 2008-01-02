@@ -13,7 +13,6 @@ public class WSLAction extends WSLAbstractCommand {
 		this.when = when;
 	}
 	
-	@Override
 	public void execute() {
 		script.scriptCommands.addAction(command, when.toString());
 	}

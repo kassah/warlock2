@@ -13,7 +13,6 @@ public class WSLCondition extends WSLAbstractCommand {
 		this.command = command;
 	}
 	
-	@Override
 	public void execute() {
 		boolean cond = condition.toBoolean();
 		script.setLastCondition(cond);

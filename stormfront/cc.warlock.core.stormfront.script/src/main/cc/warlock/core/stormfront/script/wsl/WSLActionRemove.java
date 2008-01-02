@@ -10,8 +10,7 @@ public class WSLActionRemove extends WSLAbstractCommand {
 		this.script = script;
 		this.when = when;
 	}
-	
-	@Override
+
 	public void execute() {
 		script.scriptCommands.removeAction(when.toString());
 	}
