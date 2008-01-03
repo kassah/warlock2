@@ -39,6 +39,12 @@ public class StormFrontJavascriptVars implements IJavascriptVariableProvider, IS
 			scope.put("script", scope, commands);
 			scope.put("compass", scope, sfClient.getCompass());
 			scope.put("commandHistory", scope, sfClient.getCommandHistory());
+			
+			scope.put("roomExits", scope, new JavascriptComponent(sfClient, IStormFrontClient.COMPONENT_ROOM_EXITS));
+			scope.put("roomObjects", scope, new JavascriptComponent(sfClient, IStormFrontClient.COMPONENT_ROOM_OBJECTS));
+			scope.put("roomDescription", scope, new JavascriptComponent(sfClient, IStormFrontClient.COMPONENT_ROOM_DESCRIPTION));
+			scope.put("roomPlayers", scope, new JavascriptComponent(sfClient, IStormFrontClient.COMPONENT_ROOM_PLAYERS));
+			
 			script.addScriptListener(this);
 		}
 	}
