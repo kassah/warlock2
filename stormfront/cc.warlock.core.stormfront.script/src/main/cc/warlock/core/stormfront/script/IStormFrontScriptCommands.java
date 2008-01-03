@@ -13,6 +13,8 @@ public interface IStormFrontScriptCommands extends IScriptCommands {
 	
 	public void clearActions();
 	
-	public void removeAction(String text);
+	public void removeAction(IStormFrontScriptCommand action);
+	
+	public IStormFrontScriptCommand removeAction(String text);
 	
 }

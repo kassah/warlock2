@@ -148,7 +148,7 @@ public class StormFrontScriptCommands extends ScriptCommands implements IStormFr
 								
 								Scriptable array = context.newArray(scope, actionGroups.size());
 								for (int i = 0; i < actionGroups.size(); i++) {
-									array.put(i, scope, actionGroups.get(i));	
+									array.put(i, array, new String(actionGroups.get(i)));	
 								}
 								
 								scope.put("actionGroups", scope, array);
@@ -180,18 +180,37 @@ public class StormFrontScriptCommands extends ScriptCommands implements IStormFr
 		actions = null;
 	}
 	
-	public void removeAction(String text) {
+	public void removeAction(IStormFrontScriptCommand action) {
 		synchronized(actions) {
 			Iterator<Match> iter = actions.iterator();
 			while(iter.hasNext()) {
+				Match match = iter.next();
 				// remove the element with the same name as text
-				if(iter.next().getAttribute("name").equals(text)) {
+				if(match.getAttribute("action").equals(action)) {
 					iter.remove();
 				}
 			}
 			if(actions.size() == 0) {
 				actions = null;
 			}
+		}
+	}
+	
+	public IStormFrontScriptCommand removeAction(String text) {
+		synchronized(actions) {
+			Iterator<Match> iter = actions.iterator();
+			while(iter.hasNext()) {
+				Match match = iter.next();
+				// remove the element with the same name as text
+				if(match.getAttribute("name").equals(text)) {
+					iter.remove();
+					return (IStormFrontScriptCommand) match.getAttribute("action");
+				}
+			}
+			if(actions.size() == 0) {
+				actions = null;
+			}
+			return null;
 		}
 	}
 	

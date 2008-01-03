@@ -58,7 +58,7 @@ public class JavascriptScript extends AbstractScript {
 	public void stop() {
 		stopped = true;
 		commands.stop();
-		client.getDefaultStream().echo("[script stopped: " + getName() + "]\n");
+//		client.getDefaultStream().echo("[script stopped: " + getName() + "]\n");
 		
 		super.stop();
 	}

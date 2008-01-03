@@ -3,6 +3,9 @@
  */
 package cc.warlock.core.stormfront.script.javascript;
 
+import java.util.ArrayList;
+
+import org.mozilla.javascript.Context;
 import org.mozilla.javascript.Function;
 import org.mozilla.javascript.NativeArray;
 import org.mozilla.javascript.Scriptable;
@@ -17,6 +20,7 @@ public class StormFrontJavascriptCommands
 {
 	protected JavascriptCommands commands;
 	protected IStormFrontScriptCommands sfCommands;
+	protected ArrayList<StormFrontJavascriptCommand> actions = new ArrayList<StormFrontJavascriptCommand>();
 	
 	public StormFrontJavascriptCommands (JavascriptCommands commands, IStormFrontScriptCommands sfCommands)
 	{
@@ -34,17 +38,34 @@ public class StormFrontJavascriptCommands
 		}
 		
 		public void execute() {
-			function.call(commands.getScript().getContext(), commands.getScript().getScope(), null, new Object[] {});
+			Context.enter();
+			try {
+				function.call(commands.getScript().getContext(), commands.getScript().getScope(), null, new Object[] {});
+			} finally {
+				Context.exit();
+			}
 		}
 	}
 	
 	// IStormFrontScriptCommands delegated methods
 	public void addAction(Function action, String text) {
-		sfCommands.addAction(new StormFrontJavascriptCommand(action), text);
+		StormFrontJavascriptCommand command = new StormFrontJavascriptCommand(action);
+		actions.add(command);
+		sfCommands.addAction(command, text);
 	}
 
 	public void removeAction(String text) {
-		sfCommands.removeAction(text);
+		IStormFrontScriptCommand action = sfCommands.removeAction(text);
+		if (action != null)
+		{
+			actions.remove(action);
+		}
+	}
+	
+	public void removeAction(IStormFrontScriptCommand action)
+	{
+		sfCommands.removeAction(action);
+		actions.remove(action);
 	}
 	
 	public void addMatch(Match match) {
@@ -147,5 +168,9 @@ public class StormFrontJavascriptCommands
 
 	public void waitForRe(String string) {
 		commands.waitForRe(string);
+	}
+
+	public ArrayList<StormFrontJavascriptCommand> getActions() {
+		return actions;
 	}
 }

@@ -125,6 +125,7 @@ public class JavascriptEngine implements IScriptEngine {
 				finally {
 					Context.exit();
 					runningScripts.remove(script);
+					script.stop();
 				}
 			}
 		}).start();
