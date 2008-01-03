@@ -4,6 +4,7 @@
 package cc.warlock.core.stormfront.script.javascript;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 
 import org.mozilla.javascript.Context;
 import org.mozilla.javascript.Function;
@@ -31,6 +32,7 @@ public class StormFrontJavascriptCommands
 	protected class StormFrontJavascriptCommand implements IStormFrontScriptCommand 
 	{
 		protected Function function;
+		protected HashMap<String, Object> properties = new HashMap<String, Object>();
 		
 		public StormFrontJavascriptCommand (Function function)
 		{
@@ -40,10 +42,25 @@ public class StormFrontJavascriptCommands
 		public void execute() {
 			Context.enter();
 			try {
-				function.call(commands.getScript().getContext(), commands.getScript().getScope(), null, new Object[] {});
+				Object[] arguments = new Object[0];
+				if (properties.containsKey("matchGroups"))
+				{
+					ArrayList<String> matchGroups = (ArrayList<String>) properties.get("matchGroups");
+					arguments = matchGroups.toArray(new String[matchGroups.size()]);
+				}
+				
+				function.call(commands.getScript().getContext(), commands.getScript().getScope(), null, arguments);
 			} finally {
 				Context.exit();
 			}
+		}
+		
+		public Object getProperty(String name) {
+			return properties.get(name);
+		}
+		
+		public void setProperty(String name, Object value) {
+			properties.put(name, value);
 		}
 	}
 	

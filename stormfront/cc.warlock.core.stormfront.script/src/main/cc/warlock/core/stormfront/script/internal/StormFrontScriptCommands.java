@@ -141,17 +141,12 @@ public class StormFrontScriptCommands extends ScriptCommands implements IStormFr
 								Context context = ((JavascriptScript)script).getContext();
 								Scriptable scope = ((JavascriptScript)script).getScope();
 								
-								ArrayList<String> actionGroups = new ArrayList<String>();
+								ArrayList<String> matchGroups = new ArrayList<String>();
 								for(int i = 0; (value = (String)action.getAttribute(String.valueOf(i))) != null; i++) {
-									actionGroups.add(value);
+									matchGroups.add(value);
 								}
 								
-								Scriptable array = context.newArray(scope, actionGroups.size());
-								for (int i = 0; i < actionGroups.size(); i++) {
-									array.put(i, array, new String(actionGroups.get(i)));	
-								}
-								
-								scope.put("actionGroups", scope, array);
+								command.setProperty("matchGroups", matchGroups);
 							}
 								
 							command.execute();
