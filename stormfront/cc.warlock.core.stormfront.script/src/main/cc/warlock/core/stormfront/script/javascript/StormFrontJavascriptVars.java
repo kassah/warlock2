@@ -40,10 +40,20 @@ public class StormFrontJavascriptVars implements IJavascriptVariableProvider, IS
 			scope.put("compass", scope, sfClient.getCompass());
 			scope.put("commandHistory", scope, sfClient.getCommandHistory());
 			
+			scope.put("mana", scope, new JavascriptBarStatus(sfClient.getMana()));
+			scope.put("health", scope, new JavascriptBarStatus(sfClient.getHealth()));
+			scope.put("fatigue", scope, new JavascriptBarStatus(sfClient.getFatigue()));
+			scope.put("spirit", scope, new JavascriptBarStatus(sfClient.getSpirit()));
+			scope.put("roundtime", scope, new JavascriptProperty<Integer>(sfClient.getRoundtime()));
+			scope.put("leftHand", scope, new JavascriptProperty<String>(sfClient.getLeftHand()));
+			scope.put("rightHand", scope, new JavascriptProperty<String>(sfClient.getRightHand()));
+			scope.put("spell", scope, new JavascriptProperty<String>(sfClient.getCurrentSpell()));
+			
 			scope.put("roomExits", scope, new JavascriptComponent(sfClient, IStormFrontClient.COMPONENT_ROOM_EXITS));
 			scope.put("roomObjects", scope, new JavascriptComponent(sfClient, IStormFrontClient.COMPONENT_ROOM_OBJECTS));
 			scope.put("roomDescription", scope, new JavascriptComponent(sfClient, IStormFrontClient.COMPONENT_ROOM_DESCRIPTION));
 			scope.put("roomPlayers", scope, new JavascriptComponent(sfClient, IStormFrontClient.COMPONENT_ROOM_PLAYERS));
+			scope.put("roomTitle", scope, new JavascriptProperty<String>(sfClient.getRoomStream().getTitle()));
 			
 			script.addScriptListener(this);
 		}
