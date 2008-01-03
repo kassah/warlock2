@@ -126,25 +126,25 @@ public class StormFrontJavascriptCommands
 		commands.include(otherScript);
 	}
 
-	public Match match(String text, Function function, Scriptable object) {
-		return commands.match(text, function, object);
+	public Match match(Function function, String text, Scriptable object) {
+		return commands.match(function, text, object);
 	}
 
-	public Match match(String text, Function function) {
-		return commands.match(text, function);
+	public Match match(Function function, String text) {
+		return commands.match(function, text);
 	}
 
-	public Match matchRe(String text, Function function,
+	public Match matchRe(Function function, String text, 
 			Boolean ignoreCase, Scriptable object) {
-		return commands.matchRe(text, function, ignoreCase, object);
+		return commands.matchRe(function, text, ignoreCase, object);
 	}
 
-	public Match matchRe(String text, Function function, Boolean ignoreCase) {
-		return commands.matchRe(text, function, ignoreCase);
+	public Match matchRe(Function function, String text, Boolean ignoreCase) {
+		return commands.matchRe(function, text, ignoreCase);
 	}
 
-	public Match matchRe(String text, Function function) {
-		return commands.matchRe(text, function);
+	public Match matchRe(Function function, String text) {
+		return commands.matchRe(function, text);
 	}
 
 	public Match matchWait(NativeArray matches) {

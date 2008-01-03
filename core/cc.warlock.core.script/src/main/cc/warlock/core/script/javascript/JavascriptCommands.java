@@ -152,11 +152,11 @@ public class JavascriptCommands {
 	
 	// Match match(String text, Function function[, Scriptable object])
 	
-	public Match match(String text, Function function) {
-		return match(text, function, null);
+	public Match match(Function function, String text) {
+		return match(function, text, null);
 	}
 	
-	public Match match(String text, Function function, Scriptable object) {
+	public Match match(Function function, String text, Scriptable object) {
 		Match m = new TextMatch(text);
 		m.setAttribute(CALLBACK, function);
 		m.setAttribute(USER_OBJECT, object);
@@ -166,15 +166,15 @@ public class JavascriptCommands {
 	}
 	
 	// Match matchre(String text, Function function[, Boolean ignoreCase[, Scriptable object]])
-	public Match matchRe(String text, Function function) {
-		return matchRe(text, function, false);
+	public Match matchRe(Function function, String text) {
+		return matchRe(function, text, false);
 	}
 	
-	public Match matchRe(String text, Function function, Boolean ignoreCase) {
-		return matchRe(text, function, ignoreCase, null);
+	public Match matchRe(Function function, String text, Boolean ignoreCase) {
+		return matchRe(function, text, ignoreCase, null);
 	}
 	
-	public Match matchRe(String text, Function function, Boolean ignoreCase, Scriptable object) {
+	public Match matchRe(Function function, String text, Boolean ignoreCase, Scriptable object) {
 		Match m = new RegexMatch(text, ignoreCase);
 		m.setAttribute(CALLBACK, function);
 		m.setAttribute(USER_OBJECT, object);
