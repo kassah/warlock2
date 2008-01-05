@@ -14,6 +14,7 @@ import org.mozilla.javascript.Context;
 import org.mozilla.javascript.Function;
 import org.mozilla.javascript.RhinoException;
 import org.mozilla.javascript.Scriptable;
+import org.mozilla.javascript.ScriptableObject;
 import org.mozilla.javascript.WrappedException;
 
 import cc.warlock.core.client.IWarlockClient;
@@ -99,6 +100,7 @@ public class JavascriptEngine implements IScriptEngine {
 					for (IJavascriptVariableProvider provider : varProviders) {
 						provider.loadVariables(script, scope);
 					}
+					ScriptableObject.defineClass(scope, MatchList.class);
 					
 					Reader reader = script.getScriptInfo().openReader();
 					Object result = context.evaluateReader(scope, reader, script.getName(), 1, null);
@@ -110,6 +112,10 @@ public class JavascriptEngine implements IScriptEngine {
 					if (!(e.getCause() instanceof JavascriptStopException))
 					{
 						e.printStackTrace();
+						script.getClient().getDefaultStream().echo(
+								"[JS " + e.details() + " at line " + e.lineNumber() + "]\n"
+								+ "[script terminated: "+ script.getName()+"]\n"
+							);
 					}
 				}
 				catch (RhinoException e) {

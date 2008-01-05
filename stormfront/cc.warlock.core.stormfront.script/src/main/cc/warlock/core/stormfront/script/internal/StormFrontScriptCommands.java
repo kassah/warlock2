@@ -1,32 +1,24 @@
 package cc.warlock.core.stormfront.script.internal;
 
-import java.util.ArrayList;
-import java.util.Collection;
 import java.util.Collections;
-import java.util.Iterator;
+import java.util.HashMap;
+import java.util.Map;
 import java.util.concurrent.LinkedBlockingQueue;
 import java.util.concurrent.TimeUnit;
 
-import org.mozilla.javascript.Context;
-import org.mozilla.javascript.Scriptable;
-
 import cc.warlock.core.client.IProperty;
 import cc.warlock.core.client.IPropertyListener;
+import cc.warlock.core.script.IMatch;
 import cc.warlock.core.script.IScript;
-import cc.warlock.core.script.Match;
 import cc.warlock.core.script.internal.RegexMatch;
 import cc.warlock.core.script.internal.ScriptCommands;
-import cc.warlock.core.script.javascript.JavascriptScript;
 import cc.warlock.core.stormfront.client.IStormFrontClient;
-import cc.warlock.core.stormfront.script.IStormFrontScriptCommand;
 import cc.warlock.core.stormfront.script.IStormFrontScriptCommands;
-import cc.warlock.core.stormfront.script.wsl.WSLScript;
 
 public class StormFrontScriptCommands extends ScriptCommands implements IStormFrontScriptCommands, IPropertyListener<Integer> {
 
 	protected IStormFrontClient sfClient;
 	protected IScript script;
-	protected Collection<Match> actions;
 	
 	public StormFrontScriptCommands (IStormFrontClient client, String name)
 	{
@@ -79,7 +71,7 @@ public class StormFrontScriptCommands extends ScriptCommands implements IStormFr
 	}
 	
 	@Override
-	public void waitFor(Match match) {
+	public void waitFor(IMatch match) {
 		try {
 			super.waitFor(match);
 		} finally {
@@ -107,6 +99,8 @@ public class StormFrontScriptCommands extends ScriptCommands implements IStormFr
 	
 	public void propertyCleared(IProperty<Integer> property, Integer oldValue) {}
 	
+	private Map<IMatch, Runnable> actions = Collections.synchronizedMap(new HashMap<IMatch, Runnable>());
+	
 	protected  class ScriptActionThread implements Runnable {
 		public void run() {
 			LinkedBlockingQueue<String> queue = new LinkedBlockingQueue<String>();
@@ -125,32 +119,9 @@ public class StormFrontScriptCommands extends ScriptCommands implements IStormFr
 					}
 				}
 				synchronized(actions) {
-					for(Match action : actions) {
-						if(action.matches(text)) {
-							IStormFrontScriptCommand command = (IStormFrontScriptCommand)action.getAttribute("action");
-							String value;
-							// FIXME breaks JS scripts
-							if (script instanceof WSLScript)
-							{
-								for(int i = 0; (value = (String)action.getAttribute(String.valueOf(i))) != null; i++) {
-									((WSLScript)script).setLocalVariable(String.valueOf(i), value);
-								}
-							}
-							else if (script instanceof JavascriptScript)
-							{
-								Context context = ((JavascriptScript)script).getContext();
-								Scriptable scope = ((JavascriptScript)script).getScope();
-								
-								ArrayList<String> matchGroups = new ArrayList<String>();
-								for(int i = 0; (value = (String)action.getAttribute(String.valueOf(i))) != null; i++) {
-									matchGroups.add(value);
-								}
-								
-								command.setProperty("matchGroups", matchGroups);
-							}
-								
-							command.execute();
-						}
+					for(Map.Entry<IMatch, Runnable> action : actions.entrySet()) {
+						if(action.getKey().matches(text))
+							action.getValue().run();
 					}
 				}
 			}
@@ -158,54 +129,35 @@ public class StormFrontScriptCommands extends ScriptCommands implements IStormFr
 		}
 	}
 	
-	public void addAction(IStormFrontScriptCommand action, String text) {
-		if(actions == null) {
-			actions = Collections.synchronizedCollection(new ArrayList<Match>());
+	public IMatch addAction(Runnable action, String text) {
+		if(actions.size() == 0) {
 			new Thread(new ScriptActionThread()).start();
 		}
-		Match m = new RegexMatch(text);
-		m.setAttribute("action", action);
-		m.setAttribute("name", text);
+		IMatch m = new RegexMatch(text);
 		synchronized(actions) {
-			actions.add(m);
+			actions.put(m, action);
 		}
+		return m;
 	}
 	
 	public void clearActions() {
-		actions = null;
+		actions.clear();
 	}
 	
-	public void removeAction(IStormFrontScriptCommand action) {
+	public void removeAction(IMatch action) {
 		synchronized(actions) {
-			Iterator<Match> iter = actions.iterator();
-			while(iter.hasNext()) {
-				Match match = iter.next();
-				// remove the element with the same name as text
-				if(match.getAttribute("action").equals(action)) {
-					iter.remove();
-				}
-			}
-			if(actions.size() == 0) {
-				actions = null;
-			}
+			actions.remove(action);
 		}
 	}
 	
-	public IStormFrontScriptCommand removeAction(String text) {
+	public void removeAction(String text) {
 		synchronized(actions) {
-			Iterator<Match> iter = actions.iterator();
-			while(iter.hasNext()) {
-				Match match = iter.next();
+			for(IMatch match : actions.keySet()) {
 				// remove the element with the same name as text
-				if(match.getAttribute("name").equals(text)) {
-					iter.remove();
-					return (IStormFrontScriptCommand) match.getAttribute("action");
+				if(match.getText().equals(text)) {
+					actions.remove(match);
 				}
 			}
-			if(actions.size() == 0) {
-				actions = null;
-			}
-			return null;
 		}
 	}
 	

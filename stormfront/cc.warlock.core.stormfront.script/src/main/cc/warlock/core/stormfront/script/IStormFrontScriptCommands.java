@@ -1,5 +1,6 @@
 package cc.warlock.core.stormfront.script;
 
+import cc.warlock.core.script.IMatch;
 import cc.warlock.core.script.IScriptCommands;
 import cc.warlock.core.stormfront.client.IStormFrontClient;
 
@@ -9,12 +10,12 @@ public interface IStormFrontScriptCommands extends IScriptCommands {
 	
 	public void waitForRoundtime();
 	
-	public void addAction(IStormFrontScriptCommand action, String text);
+	public IMatch addAction(Runnable action, String text);
 	
 	public void clearActions();
 	
-	public void removeAction(IStormFrontScriptCommand action);
+	public void removeAction(IMatch action);
 	
-	public IStormFrontScriptCommand removeAction(String text);
+	public void removeAction(String text);
 	
 }

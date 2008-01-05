@@ -8,28 +8,23 @@ import java.util.HashMap;
 
 import org.mozilla.javascript.Context;
 import org.mozilla.javascript.Function;
-import org.mozilla.javascript.NativeArray;
-import org.mozilla.javascript.Scriptable;
 
-import cc.warlock.core.script.Match;
+import cc.warlock.core.script.IMatch;
 import cc.warlock.core.script.javascript.JavascriptCommands;
-import cc.warlock.core.script.javascript.JavascriptCommands.JavascriptStopException;
-import cc.warlock.core.stormfront.script.IStormFrontScriptCommand;
+import cc.warlock.core.script.javascript.JavascriptScript;
 import cc.warlock.core.stormfront.script.IStormFrontScriptCommands;
 
-public class StormFrontJavascriptCommands 
+public class StormFrontJavascriptCommands extends JavascriptCommands
 {
-	protected JavascriptCommands commands;
 	protected IStormFrontScriptCommands sfCommands;
-	protected ArrayList<StormFrontJavascriptCommand> actions = new ArrayList<StormFrontJavascriptCommand>();
 	
-	public StormFrontJavascriptCommands (JavascriptCommands commands, IStormFrontScriptCommands sfCommands)
+	public StormFrontJavascriptCommands (IStormFrontScriptCommands commands, JavascriptScript script)
 	{
-		this.commands = commands;
-		this.sfCommands = sfCommands;
+		super(commands, script);
+		this.sfCommands = commands;
 	}
 
-	protected class StormFrontJavascriptCommand implements IStormFrontScriptCommand 
+	protected class StormFrontJavascriptCommand implements Runnable 
 	{
 		protected Function function;
 		protected HashMap<String, Object> properties = new HashMap<String, Object>();
@@ -39,7 +34,7 @@ public class StormFrontJavascriptCommands
 			this.function = function;
 		}
 		
-		public void execute() {
+		public void run() {
 			Context.enter();
 			try {
 				Object[] arguments = new Object[0];
@@ -49,52 +44,30 @@ public class StormFrontJavascriptCommands
 					arguments = matchGroups.toArray(new String[matchGroups.size()]);
 				}
 				
-				function.call(commands.getScript().getContext(), commands.getScript().getScope(), null, arguments);
+				function.call(script.getContext(), script.getScope(), null, arguments);
 			} finally {
 				Context.exit();
 			}
-		}
-		
-		public Object getProperty(String name) {
-			return properties.get(name);
-		}
-		
-		public void setProperty(String name, Object value) {
-			properties.put(name, value);
 		}
 	}
 	
 	// IStormFrontScriptCommands delegated methods
 	public void addAction(Function action, String text) {
 		StormFrontJavascriptCommand command = new StormFrontJavascriptCommand(action);
-		actions.add(command);
 		sfCommands.addAction(command, text);
 	}
 
 	public void removeAction(String text) {
-		IStormFrontScriptCommand action = sfCommands.removeAction(text);
-		if (action != null)
-		{
-			actions.remove(action);
-		}
+		sfCommands.removeAction(text);
 	}
 	
-	public void removeAction(IStormFrontScriptCommand action)
+	public void removeAction(IMatch action)
 	{
 		sfCommands.removeAction(action);
-		actions.remove(action);
-	}
-	
-	public void addMatch(Match match) {
-		sfCommands.addMatch(match);
 	}
 
 	public void clearActions() {
 		sfCommands.clearActions();
-	}
-
-	public Match matchWait(double timeout) {
-		return sfCommands.matchWait(timeout);
 	}
 
 	public void nextRoom() {
@@ -112,82 +85,5 @@ public class StormFrontJavascriptCommands
 	public void waitNextRoom() {
 		sfCommands.waitNextRoom();
 	}
-	
-	// JavascriptCommands delegated methods
-	public void echo(String text) {
-		commands.echo(text);
-	}
 
-	public void exit() throws JavascriptStopException {
-		commands.exit();
-	}
-
-	public void include(String otherScript) {
-		commands.include(otherScript);
-	}
-
-	public Match match(Function function, String text, Scriptable object) {
-		return commands.match(function, text, object);
-	}
-
-	public Match match(Function function, String text) {
-		return commands.match(function, text);
-	}
-
-	public Match matchRe(Function function, String text, 
-			Boolean ignoreCase, Scriptable object) {
-		return commands.matchRe(function, text, ignoreCase, object);
-	}
-
-	public Match matchRe(Function function, String text, Boolean ignoreCase) {
-		return commands.matchRe(function, text, ignoreCase);
-	}
-
-	public Match matchRe(Function function, String text) {
-		return commands.matchRe(function, text);
-	}
-
-	public Match matchWait(NativeArray matches) {
-		return commands.matchWait(matches);
-	}
-
-	public void move(String direction) {
-		commands.move(direction);
-	}
-
-	public void pause(int seconds) {
-		commands.pause(seconds);
-	}
-
-	public void put(String text) {
-		commands.put(text);
-	}
-
-	public void stop() {
-		commands.stop();
-	}
-
-	public void waitFor(Match match) {
-		commands.waitFor(match);
-	}
-
-	public void waitFor(String string) {
-		commands.waitFor(string);
-	}
-
-	public void waitForPrompt() {
-		commands.waitForPrompt();
-	}
-
-	public void waitForRe(String string, Boolean ignoreCase) {
-		commands.waitForRe(string, ignoreCase);
-	}
-
-	public void waitForRe(String string) {
-		commands.waitForRe(string);
-	}
-
-	public ArrayList<StormFrontJavascriptCommand> getActions() {
-		return actions;
-	}
 }

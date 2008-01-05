@@ -3,6 +3,7 @@ package cc.warlock.core.script.internal;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
+import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.LinkedBlockingQueue;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.locks.Condition;
@@ -14,8 +15,8 @@ import cc.warlock.core.client.IStream;
 import cc.warlock.core.client.IStreamListener;
 import cc.warlock.core.client.IWarlockClient;
 import cc.warlock.core.client.WarlockString;
+import cc.warlock.core.script.IMatch;
 import cc.warlock.core.script.IScriptCommands;
-import cc.warlock.core.script.Match;
 
 public class ScriptCommands implements IScriptCommands, IStreamListener, IRoomListener
 {
@@ -27,8 +28,8 @@ public class ScriptCommands implements IScriptCommands, IStreamListener, IRoomLi
 	
 	protected Collection<LinkedBlockingQueue<String>> textWaiters = Collections.synchronizedCollection(new ArrayList<LinkedBlockingQueue<String>>());
 	
-	protected Collection<Match> matches = new ArrayList<Match>();
-	protected LinkedBlockingQueue<String> matchQueue = new LinkedBlockingQueue<String>();
+	protected Collection<IMatch> matches = new ArrayList<IMatch>();
+	
 	
 	protected final Condition nextRoom = lock.newCondition();
 	protected boolean roomWaiting = false;
@@ -60,16 +61,17 @@ public class ScriptCommands implements IScriptCommands, IStreamListener, IRoomLi
 			waitForPrompt();
 	}
 	
-	public void addMatch(Match match) {
-		matches.add(match);
+	public BlockingQueue<String> getLineQueue() {
+		LinkedBlockingQueue<String> queue = new LinkedBlockingQueue<String>();
 		synchronized(textWaiters) {
-			if(!textWaiters.contains(matchQueue)) {
-				textWaiters.add(matchQueue);
+			if(!textWaiters.contains(queue)) {
+				textWaiters.add(queue);
 			}
 		}
+		return queue;
 	}
 	
-	public Match matchWait (double timeout) {
+	public IMatch matchWait (Collection<IMatch> matches, BlockingQueue<String> matchQueue, double timeout) {
 		try {
 			boolean ignoreTimeout = timeout <= 0.0;
 			// run until we get a match or are told to stop
@@ -94,7 +96,7 @@ public class ScriptCommands implements IScriptCommands, IStreamListener, IRoomLi
 				String[] lines = text.split("\\n");
 				for(String line : lines) {
 					// try all of our matches
-					for(Match match : matches) {
+					for(IMatch match : matches) {
 						if(match.matches(line)) {
 							return match;
 						}
@@ -102,7 +104,6 @@ public class ScriptCommands implements IScriptCommands, IStreamListener, IRoomLi
 				}
 			}
 		} finally {
-			matches.clear();
 			synchronized(textWaiters) {
 				textWaiters.remove(matchQueue);
 			}
@@ -149,7 +150,7 @@ public class ScriptCommands implements IScriptCommands, IStreamListener, IRoomLi
 		client.send("[" + scriptName + "]: ", text);
 	}
 
-	public void waitFor (Match match) {
+	public void waitFor (IMatch match) {
 		LinkedBlockingQueue<String> queue = new LinkedBlockingQueue<String>();
 		String text = null;
 

@@ -1,21 +1,22 @@
 package cc.warlock.core.script.internal;
 
+import java.util.ArrayList;
+import java.util.Collection;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-import cc.warlock.core.script.Match;
+import cc.warlock.core.script.IMatch;
 
-public class RegexMatch extends Match {
+public class RegexMatch implements IMatch {
 	
-	String matchText;
 	Pattern regex;
+	ArrayList<String> groups = new ArrayList<String>();
 	
 	public RegexMatch(String text) {
 		this(text, false);
 	}
 	
 	public RegexMatch(String text, boolean ignoreCase) {
-		matchText = text;
 		
 		int flags = 0;
 		if(ignoreCase) flags |= Pattern.CASE_INSENSITIVE;
@@ -26,14 +27,21 @@ public class RegexMatch extends Match {
 	public boolean matches(String text) {
 		Matcher m = regex.matcher(text);
 		if(m.find()) {
-			setAttribute("0", m.group());
+			groups.add(m.group());
 			for(int i = 1; i <= m.groupCount(); i++) {
-				setAttribute(String.valueOf(i), m.group(i));
+				groups.add(m.group(i));
 			}
 			
 			return true;
 		} else {
 			return false;
 		}
+	}
+	
+	public String getText() {
+		return regex.pattern();
+	}
+	public Collection<String> groups() {
+		return groups;
 	}
 }

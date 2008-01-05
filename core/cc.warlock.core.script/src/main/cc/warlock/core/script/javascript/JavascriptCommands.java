@@ -6,15 +6,11 @@ import java.io.FileReader;
 import java.io.IOException;
 import java.io.Serializable;
 
-import org.mozilla.javascript.Function;
-import org.mozilla.javascript.NativeArray;
-import org.mozilla.javascript.NativeJavaObject;
 import org.mozilla.javascript.Script;
-import org.mozilla.javascript.Scriptable;
 
+import cc.warlock.core.script.IMatch;
 import cc.warlock.core.script.IScriptCommands;
 import cc.warlock.core.script.IScriptFileInfo;
-import cc.warlock.core.script.Match;
 import cc.warlock.core.script.internal.RegexMatch;
 import cc.warlock.core.script.internal.TextMatch;
 
@@ -22,9 +18,6 @@ public class JavascriptCommands {
 
 	protected IScriptCommands commands;
 	protected JavascriptScript script;
-	
-	private static final String CALLBACK = "callback";
-	private static final String USER_OBJECT = "userobject";
 	
 	public class JavascriptStopException extends Exception implements Serializable {
 		private static final long serialVersionUID = 7226391328268718796L;
@@ -69,45 +62,6 @@ public class JavascriptCommands {
 			}
 		}
 	}
-	
-	public Match matchWait(NativeArray matches) {
-		/*
-		int len = (int) matches.getLength(); 
-		for (int i = 0; i < len; i++) {
-			Object obj = matches.get(i, matches);
-			engine.content.toObject(obj, matches);
-			
-		}
-		*/
-		for(Object o : matches.getIds()) {
-			Integer index = (Integer) o;
-			
-			NativeJavaObject object = (NativeJavaObject) matches.get(index, script.getScope());
-			Object actualObject = object.unwrap();
-			
-			commands.addMatch((Match) actualObject);
-		}
-		commands.echo("Sending off to matching");
-		Match match = commands.matchWait(0.0);
-		
-		if (match != null)
-		{
-			commands.echo("Got a match!");
-			Function function = (Function)match.getAttribute(CALLBACK);
-			try {
-				if (match.getAttribute(USER_OBJECT) == null) {
-					function.call(script.getContext(), script.getScope(), null, new Object[] {});
-				} else {
-					function.call(script.getContext(), script.getScope(), null, new Object[] {match.getAttribute(USER_OBJECT)});
-				}
-			}
-			catch (Exception e) {
-				e.printStackTrace();
-			}
-		}
-		
-		return match;
-	}
 
 	public void move(String direction) {
 		commands.move(direction);
@@ -136,7 +90,7 @@ public class JavascriptCommands {
 		waitFor(new RegexMatch(string, ignoreCase));
 	}
 
-	public void waitFor(Match match) {
+	public void waitFor(IMatch match) {
 		commands.waitFor(match);
 	}
 
@@ -148,39 +102,6 @@ public class JavascriptCommands {
 		script.stop();
 		
 		throw new JavascriptStopException();
-	}
-	
-	// Match match(String text, Function function[, Scriptable object])
-	
-	public Match match(Function function, String text) {
-		return match(function, text, null);
-	}
-	
-	public Match match(Function function, String text, Scriptable object) {
-		Match m = new TextMatch(text);
-		m.setAttribute(CALLBACK, function);
-		m.setAttribute(USER_OBJECT, object);
-		m.setAttribute("MatchText", text);
-		
-		return m;
-	}
-	
-	// Match matchre(String text, Function function[, Boolean ignoreCase[, Scriptable object]])
-	public Match matchRe(Function function, String text) {
-		return matchRe(function, text, false);
-	}
-	
-	public Match matchRe(Function function, String text, Boolean ignoreCase) {
-		return matchRe(function, text, ignoreCase, null);
-	}
-	
-	public Match matchRe(Function function, String text, Boolean ignoreCase, Scriptable object) {
-		Match m = new RegexMatch(text, ignoreCase);
-		m.setAttribute(CALLBACK, function);
-		m.setAttribute(USER_OBJECT, object);
-		m.setAttribute("MatchText", text);
-		
-		return m;
 	}
 	
 	public void stop() {

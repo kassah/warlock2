@@ -1,5 +1,8 @@
 package cc.warlock.core.script;
 
+import java.util.Collection;
+import java.util.concurrent.BlockingQueue;
+
 import cc.warlock.core.client.IRoomListener;
 import cc.warlock.core.client.IWarlockClient;
 
@@ -11,13 +14,13 @@ public interface IScriptCommands extends IRoomListener {
 	
 	public void move (String direction);
 	
-	public void waitFor (Match match);
+	public void waitFor (IMatch match);
 	
 	public void waitNextRoom ();
 	
-	public void addMatch(Match match);
+	public BlockingQueue<String> getLineQueue();
 	
-	public Match matchWait (double timeout);
+	public IMatch matchWait (Collection<IMatch> matches, BlockingQueue<String> matchQueue, double timeout);
 	
 	public void pause (double seconds);
 	

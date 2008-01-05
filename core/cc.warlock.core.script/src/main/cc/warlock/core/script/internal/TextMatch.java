@@ -1,9 +1,10 @@
 package cc.warlock.core.script.internal;
 
-import cc.warlock.core.script.Match;
+import cc.warlock.core.script.IMatch;
 
-public class TextMatch extends Match {
+public class TextMatch implements IMatch {
 	
+	private String originalText;
 	private String matchText;
 	private String matchLine;//BFisher - For getting line we matched against.
 	private boolean ignoreCase;
@@ -20,6 +21,7 @@ public class TextMatch extends Match {
 	
 	public TextMatch(String text, boolean ignoreCase) {
 		this.ignoreCase = ignoreCase;
+		this.originalText = text;
 		
 		if(ignoreCase) {
 			matchText = text.toLowerCase();
@@ -46,5 +48,9 @@ public class TextMatch extends Match {
 		}
 
 		return rv;
+	}
+	
+	public String getText() {
+		return originalText;
 	}
 }

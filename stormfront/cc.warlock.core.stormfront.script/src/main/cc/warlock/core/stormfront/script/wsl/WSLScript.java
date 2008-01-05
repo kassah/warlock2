@@ -7,6 +7,7 @@ import java.util.Collection;
 import java.util.HashMap;
 import java.util.Random;
 import java.util.Stack;
+import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.locks.Condition;
 import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReentrantLock;
@@ -19,10 +20,10 @@ import org.antlr.runtime.RecognitionException;
 
 import cc.warlock.core.client.internal.WarlockStyle;
 import cc.warlock.core.script.AbstractScript;
+import cc.warlock.core.script.IMatch;
 import cc.warlock.core.script.IScriptEngine;
 import cc.warlock.core.script.IScriptInfo;
 import cc.warlock.core.script.IScriptListener;
-import cc.warlock.core.script.Match;
 import cc.warlock.core.script.internal.RegexMatch;
 import cc.warlock.core.script.internal.TextMatch;
 import cc.warlock.core.stormfront.client.IStormFrontClient;
@@ -47,6 +48,8 @@ public class WSLScript extends AbstractScript {
 	private ScriptTimer timer = new ScriptTimer();
 	private boolean lastCondition = false;
 	private ArrayList<WSLAbstractCommand> commands = new ArrayList<WSLAbstractCommand>();
+	private HashMap<IMatch, Runnable> matches = new HashMap<IMatch, Runnable>();
+	private BlockingQueue<String> matchQueue;
 	
 	protected WSLEngine engine;
 	protected IStormFrontScriptCommands scriptCommands;
@@ -623,10 +626,11 @@ public class WSLScript extends AbstractScript {
 		}
 	}
 
-	private void getVariablesFromMatch(Match match) {
-		String value;
-		for(int i = 0; (value = (String)match.getAttribute(String.valueOf(i))) != null; i++) {
+	private void getVariablesFromMatch(RegexMatch match) {
+		int i = 0;
+		for(String value : match.groups()) {
 			setLocalVariable(String.valueOf(i), value);
+			i++;
 		}
 	}
 	
@@ -648,21 +652,29 @@ public class WSLScript extends AbstractScript {
 				time = 0;
 			}
 			
-			Match match = scriptCommands.matchWait(time);
+			IMatch match = scriptCommands.matchWait(matches.keySet(), matchQueue, time);
+			matchQueue = null;
 			
 			if (match != null)
 			{
-				getVariablesFromMatch(match);
-				gotoLabel((String)match.getAttribute("label"));
+				matches.get(match).run();
 				scriptCommands.waitForPrompt();
 				scriptCommands.waitForRoundtime();
 			}
 		}
 	}
 
-	protected void addMatch(String label, Match match) {
-		match.setAttribute("label", label);
-		scriptCommands.addMatch(match);
+	private class WSLTextMatchData implements Runnable {
+		
+		private String label;
+		
+		public WSLTextMatchData(String label) {
+			this.label = label;
+		}
+		
+		public void run() {
+			gotoLabel(label);
+		}
 	}
 	
 	protected class WSLMatchRe extends WSLCommandDefinition {
@@ -676,9 +688,12 @@ public class WSLScript extends AbstractScript {
 			{
 				String regex = m.group(2);
 				boolean caseInsensitive = m.group(3).contains("i");
-				Match match = new RegexMatch(regex, caseInsensitive);
+				IMatch match = new RegexMatch(regex, caseInsensitive);
 				
-				addMatch(m.group(1), match);
+				matches.put(match, new WSLTextMatchData(m.group(1)));
+				if(matchQueue == null) {
+					matchQueue = scriptCommands.getLineQueue();
+				}
 			} else {
 				scriptError("Invalid arguments to matchre");
 			}
@@ -695,8 +710,11 @@ public class WSLScript extends AbstractScript {
 			
 			if (m.find())
 			{
-				Match match = new TextMatch(m.group(2));
-				addMatch(m.group(1), match);
+				IMatch match = new TextMatch(m.group(2));
+				matches.put(match, new WSLTextMatchData(m.group(1)));
+				if(matchQueue == null) {
+					matchQueue = scriptCommands.getLineQueue();
+				}
 			} else {
 				scriptError("Invalid arguments to match");
 			}
@@ -820,10 +838,10 @@ public class WSLScript extends AbstractScript {
 					ignoreCase = true;
 				}
 				
-				Match match = new RegexMatch(m.group(1), ignoreCase);
+				IMatch match = new RegexMatch(m.group(1), ignoreCase);
 				
 				scriptCommands.waitFor(match);
-				getVariablesFromMatch(match);
+				//getVariablesFromMatch(match);
 			} else {
 				scriptError("Invalid arguments to waitforre");
 			}
@@ -835,7 +853,7 @@ public class WSLScript extends AbstractScript {
 		public void execute (String arguments) {
 			if (arguments.length() >= 1)
 			{
-				Match match = new TextMatch(arguments);
+				IMatch match = new TextMatch(arguments);
 				scriptCommands.waitFor(match);
 				
 			} else {

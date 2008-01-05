@@ -13,8 +13,20 @@ public class WSLAction extends WSLAbstractCommand {
 		this.when = when;
 	}
 	
+	private class WSLActionAdapter implements Runnable {
+		private WSLAbstractCommand command;
+		
+		public WSLActionAdapter(WSLAbstractCommand command) {
+			this.command = command;
+		}
+		
+		public void run() {
+			command.execute();
+		}
+	}
+	
 	public void execute() {
-		script.scriptCommands.addAction(command, when.toString());
+		script.scriptCommands.addAction(new WSLActionAdapter(command), when.toString());
 	}
 
 }

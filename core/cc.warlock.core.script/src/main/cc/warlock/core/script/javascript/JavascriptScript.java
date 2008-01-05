@@ -30,7 +30,6 @@ public class JavascriptScript extends AbstractScript {
 	private JavascriptEngine engine;
 	private boolean stopped;
 	private Context context;
-	private JavascriptCommands jsCommands;
 	private IScriptCommands commands;
 	IWarlockClient client;
 	
@@ -41,7 +40,6 @@ public class JavascriptScript extends AbstractScript {
 		this.engine = engine;
 		this.client = client;
 		this.commands = new ScriptCommands(client, getName());
-		this.jsCommands = new JavascriptCommands(commands, this);
 	}
 
 	public boolean isRunning() {
@@ -73,8 +71,8 @@ public class JavascriptScript extends AbstractScript {
 		client.getDefaultStream().echo("[Pausing not yet supported in JavaScript.]\n");
 	}
 
-	public JavascriptCommands getCommands() {
-		return jsCommands;
+	public IScriptCommands getCommands() {
+		return commands;
 	}
 	
 	public Scriptable getScope() {

@@ -33,7 +33,7 @@ public class StormFrontJavascriptVars implements IJavascriptVariableProvider, IS
 			
 			//overwrite the "script" variable with our big delegator
 			StormFrontScriptCommands sfCommands = new StormFrontScriptCommands(sfClient, script);
-			StormFrontJavascriptCommands commands = new StormFrontJavascriptCommands(script.getCommands(), sfCommands);
+			StormFrontJavascriptCommands commands = new StormFrontJavascriptCommands(sfCommands, script);
 			scriptCommands.put(script, commands);
 			
 			scope.put("script", scope, commands);
