@@ -677,6 +677,22 @@ public class WSLScript extends AbstractScript {
 		}
 	}
 	
+	private class WSLRegexMatchData implements Runnable {
+		
+		private String label;
+		private RegexMatch match;
+		
+		public WSLRegexMatchData(String label, RegexMatch match) {
+			this.label = label;
+			this.match = match;
+		}
+		
+		public void run() {
+			setVariablesFromMatch(match);
+			gotoLabel(label);
+		}
+	}
+	
 	protected class WSLMatchRe extends WSLCommandDefinition {
 		
 		private Pattern format = Pattern.compile("^([\\w_]+)\\s+/(.*)/(\\w*)");
@@ -688,9 +704,9 @@ public class WSLScript extends AbstractScript {
 			{
 				String regex = m.group(2);
 				boolean caseInsensitive = m.group(3).contains("i");
-				IMatch match = new RegexMatch(regex, caseInsensitive);
+				RegexMatch match = new RegexMatch(regex, caseInsensitive);
 				
-				matches.put(match, new WSLTextMatchData(m.group(1)));
+				matches.put(match, new WSLRegexMatchData(m.group(1), match));
 				if(matchQueue == null) {
 					matchQueue = scriptCommands.getLineQueue();
 				}
@@ -699,6 +715,13 @@ public class WSLScript extends AbstractScript {
 			}
 		}
 
+	}
+	
+	public void setVariablesFromMatch(RegexMatch match) {
+		int i = 0;
+		for(String var : match.groups()) {
+			setLocalVariable(String.valueOf(i), var);
+		}
 	}
 
 	protected class WSLMatch extends WSLCommandDefinition {
