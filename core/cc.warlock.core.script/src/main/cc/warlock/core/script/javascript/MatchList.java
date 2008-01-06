@@ -3,11 +3,13 @@ package cc.warlock.core.script.javascript;
 import java.util.HashMap;
 import java.util.concurrent.BlockingQueue;
 
+import org.mozilla.javascript.Context;
 import org.mozilla.javascript.Function;
 import org.mozilla.javascript.Scriptable;
 import org.mozilla.javascript.ScriptableObject;
 
 import cc.warlock.core.script.IMatch;
+import cc.warlock.core.script.internal.RegexMatch;
 import cc.warlock.core.script.internal.TextMatch;
 
 public class MatchList extends ScriptableObject {
@@ -48,8 +50,36 @@ public class MatchList extends ScriptableObject {
 		matches.put(match, new JSTextMatchData(function));
 	}
 	
-	public void jsFunction_matchRe(Function function, String regex) {
+	private class JSRegexMatchData implements Runnable {
 		
+		private Function function;
+		private RegexMatch match;
+		
+		public JSRegexMatchData(Function function, RegexMatch match) {
+			this.function = function;
+			this.match = match;
+		}
+		
+		public void run() {
+			Context cx = script.getContext();
+			Scriptable scope = script.getScope();
+			Scriptable groups = cx.newArray(scope, match.groups().size());
+			int i = 0;
+			for(String str : match.groups()) {
+				scope.put(i, groups, str);
+				i++;
+			}
+			if (userObject == null) {
+				function.call(cx, scope, null, new Object[] { groups });
+			} else {
+				function.call(cx, scope, null, new Object[] { groups, userObject });
+			}
+		}
+	}
+	
+	public void jsFunction_matchRe(Function function, String regex) {
+		RegexMatch match = new RegexMatch(regex);
+		matches.put(match, new JSRegexMatchData(function, match));
 	}
 	
 	public IMatch jsFunction_matchWait() {
