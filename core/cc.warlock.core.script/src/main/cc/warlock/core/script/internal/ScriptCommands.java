@@ -35,7 +35,6 @@ public class ScriptCommands implements IScriptCommands, IStreamListener, IRoomLi
 	protected boolean roomWaiting = false;
 	
 	protected final Condition gotPromptCond = lock.newCondition();
-	protected int promptWaiters = 0;
 	protected boolean gotPrompt = false;
 	
 	protected boolean interrupted = false;
@@ -57,8 +56,17 @@ public class ScriptCommands implements IScriptCommands, IStreamListener, IRoomLi
 	}
 	
 	protected void assertPrompt() {
-		if (!gotPrompt)
-			waitForPrompt();
+		if (!gotPrompt) {
+			lock.lock();
+			try {
+				while(!interrupted && !gotPrompt)
+					gotPromptCond.await();
+			} catch(Exception e) {
+				e.printStackTrace();
+			} finally {
+				lock.unlock();
+			}
+		}
 	}
 	
 	public BlockingQueue<String> getLineQueue() {
@@ -183,14 +191,10 @@ public class ScriptCommands implements IScriptCommands, IStreamListener, IRoomLi
 	public void waitForPrompt () {
 		lock.lock();
 		try {
-			promptWaiters++;
-			while(!interrupted && !gotPrompt) {
-				gotPromptCond.await();
-			}
+			gotPromptCond.await();
 		} catch(Exception e) {
 			e.printStackTrace();
 		} finally {
-			promptWaiters--;
 			lock.unlock();
 		}
 	}
@@ -205,15 +209,13 @@ public class ScriptCommands implements IScriptCommands, IStreamListener, IRoomLi
 	
 	public void streamPrompted(IStream stream, String prompt) {
 		gotPrompt = true;
-		if(promptWaiters > 0) {
-			lock.lock();
-			try {
-				gotPromptCond.signalAll();
-			} catch(Exception e) {
-				e.printStackTrace();
-			} finally {
-				lock.unlock();
-			}
+		lock.lock();
+		try {
+			gotPromptCond.signalAll();
+		} catch(Exception e) {
+			e.printStackTrace();
+		} finally {
+			lock.unlock();
 		}
 	}
 	
