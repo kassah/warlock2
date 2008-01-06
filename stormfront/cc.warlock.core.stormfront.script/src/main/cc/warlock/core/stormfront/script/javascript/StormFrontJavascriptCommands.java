@@ -27,7 +27,7 @@ public class StormFrontJavascriptCommands extends JavascriptCommands
 	protected class JSActionHandler implements Runnable 
 	{
 		private Function function;
-		private IMatch match;
+		private RegexMatch match;
 		
 		public JSActionHandler (Function function, RegexMatch match)
 		{
@@ -39,7 +39,7 @@ public class StormFrontJavascriptCommands extends JavascriptCommands
 			Context.enter();
 			try {
 				Object[] arguments = new Object[0];
-				Collection<String> matchGroups = ((RegexMatch)match).groups();
+				Collection<String> matchGroups = match.groups();
 				arguments = matchGroups.toArray(new String[matchGroups.size()]);
 				
 				function.call(script.getContext(), script.getScope(), null, arguments);
