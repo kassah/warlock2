@@ -652,6 +652,7 @@ public class WSLScript extends AbstractScript {
 				matches.get(match).run();
 				scriptCommands.waitForRoundtime();
 			}
+			matches.clear();
 		}
 	}
 
