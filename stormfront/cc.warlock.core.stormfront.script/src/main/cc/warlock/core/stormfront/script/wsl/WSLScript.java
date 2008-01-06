@@ -625,14 +625,6 @@ public class WSLScript extends AbstractScript {
 			gosubReturn();
 		}
 	}
-
-	private void getVariablesFromMatch(RegexMatch match) {
-		int i = 0;
-		for(String value : match.groups()) {
-			setLocalVariable(String.valueOf(i), value);
-			i++;
-		}
-	}
 	
 	protected class WSLMatchWait extends WSLCommandDefinition {
 		
@@ -861,10 +853,10 @@ public class WSLScript extends AbstractScript {
 					ignoreCase = true;
 				}
 				
-				IMatch match = new RegexMatch(m.group(1), ignoreCase);
+				RegexMatch match = new RegexMatch(m.group(1), ignoreCase);
 				
 				scriptCommands.waitFor(match);
-				//getVariablesFromMatch(match);
+				setVariablesFromMatch(match);
 			} else {
 				scriptError("Invalid arguments to waitforre");
 			}
