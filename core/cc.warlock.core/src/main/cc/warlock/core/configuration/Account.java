@@ -1,5 +1,6 @@
 package cc.warlock.core.configuration;
 
+import java.awt.color.ProfileDataException;
 import java.io.UnsupportedEncodingException;
 import java.security.InvalidAlgorithmParameterException;
 import java.security.InvalidKeyException;
@@ -22,6 +23,8 @@ import org.apache.commons.codec.binary.Base64;
 
 public class Account {
 
+	protected Account originalAccount;
+	protected boolean needsUpdate;
 	protected String accountName, password;
 	protected ArrayList<Profile> profiles = new ArrayList<Profile>();
 	
@@ -78,41 +81,51 @@ public class Account {
 		
 		public String encrypt (String text)
 		{
-			try {
-				byte[] utf8 = text.getBytes("UTF8");
-				byte[] encoded = eCipher.doFinal(utf8);
-				return new String(Base64.encodeBase64(encoded));
-			} catch (UnsupportedEncodingException e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
-			} catch (IllegalBlockSizeException e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
-			} catch (BadPaddingException e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
+			if (eCipher != null)
+			{
+				try {
+					byte[] utf8 = text.getBytes("UTF8");
+					byte[] encoded = eCipher.doFinal(utf8);
+					return new String(Base64.encodeBase64(encoded));
+				} catch (UnsupportedEncodingException e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+				} catch (IllegalBlockSizeException e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+				} catch (BadPaddingException e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+				}
+				return null;
+			} else {
+				return text;
 			}
-			return null;
 		}
 		
 		public String decrypt (String text)
 		{
-			try {
-				byte[] encoded = Base64.decodeBase64(text.getBytes());
-				byte[] utf8 = dCipher.doFinal(encoded);
-				
-				return new String(utf8, "UTF8");
-			} catch (IllegalBlockSizeException e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
-			} catch (BadPaddingException e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
-			} catch (UnsupportedEncodingException e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
+			if (dCipher != null)
+			{
+				try {
+					byte[] encoded = Base64.decodeBase64(text.getBytes());
+					byte[] utf8 = dCipher.doFinal(encoded);
+					
+					return new String(utf8, "UTF8");
+				} catch (IllegalBlockSizeException e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+				} catch (BadPaddingException e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+				} catch (UnsupportedEncodingException e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+				}
+				return null;
+			} else {
+				return text;
 			}
-			return null;
 		}
 	}
 	
@@ -123,11 +136,28 @@ public class Account {
 		this.password = password;
 	}
 	
+	public Account (Account other)
+	{
+		this.accountName = other.accountName == null ? null : new String(other.accountName);
+		this.password = other.password == null ? null : new String(other.password);
+				
+		this.originalAccount = other;
+		this.needsUpdate = false;
+		
+		for (Profile profile : other.getProfiles())
+		{
+			Profile copy = new Profile(this, profile);
+		}
+	}
+	
 	public String getAccountName() {
 		return accountName;
 	}
 
 	public void setAccountName(String accountName) {
+		if (!this.accountName.equals(accountName))
+			needsUpdate = true;
+		
 		this.accountName = accountName;
 	}
 
@@ -136,6 +166,9 @@ public class Account {
 	}
 
 	public void setPassword(String password) {
+		if (!this.password.equals(password))
+			needsUpdate = true;
+		
 		this.password = password;
 	}
 	
@@ -156,5 +189,13 @@ public class Account {
 
 	public ArrayList<Profile> getProfiles() {
 		return profiles;
+	}
+
+	public Account getOriginalAccount() {
+		return originalAccount;
+	}
+	
+	public boolean needsUpdate () {
+		return needsUpdate;
 	}
 }
