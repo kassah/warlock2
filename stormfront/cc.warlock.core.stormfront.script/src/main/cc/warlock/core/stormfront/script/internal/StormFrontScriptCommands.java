@@ -10,7 +10,6 @@ import cc.warlock.core.client.IProperty;
 import cc.warlock.core.client.IPropertyListener;
 import cc.warlock.core.script.IMatch;
 import cc.warlock.core.script.IScript;
-import cc.warlock.core.script.internal.RegexMatch;
 import cc.warlock.core.script.internal.ScriptCommands;
 import cc.warlock.core.stormfront.client.IStormFrontClient;
 import cc.warlock.core.stormfront.script.IStormFrontScriptCommands;
@@ -129,15 +128,14 @@ public class StormFrontScriptCommands extends ScriptCommands implements IStormFr
 		}
 	}
 	
-	public IMatch addAction(Runnable action, String text) {
+	public void addAction(Runnable action, IMatch match) {
 		if(actions.size() == 0) {
 			new Thread(new ScriptActionThread()).start();
 		}
-		IMatch m = new RegexMatch(text);
+		
 		synchronized(actions) {
-			actions.put(m, action);
+			actions.put(match, action);
 		}
-		return m;
 	}
 	
 	public void clearActions() {

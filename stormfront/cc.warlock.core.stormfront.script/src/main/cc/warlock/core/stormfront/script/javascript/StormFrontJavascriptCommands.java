@@ -3,13 +3,13 @@
  */
 package cc.warlock.core.stormfront.script.javascript;
 
-import java.util.ArrayList;
-import java.util.HashMap;
+import java.util.Collection;
 
 import org.mozilla.javascript.Context;
 import org.mozilla.javascript.Function;
 
 import cc.warlock.core.script.IMatch;
+import cc.warlock.core.script.internal.RegexMatch;
 import cc.warlock.core.script.javascript.JavascriptCommands;
 import cc.warlock.core.script.javascript.JavascriptScript;
 import cc.warlock.core.stormfront.script.IStormFrontScriptCommands;
@@ -24,25 +24,23 @@ public class StormFrontJavascriptCommands extends JavascriptCommands
 		this.sfCommands = commands;
 	}
 
-	protected class StormFrontJavascriptCommand implements Runnable 
+	protected class JSActionHandler implements Runnable 
 	{
-		protected Function function;
-		protected HashMap<String, Object> properties = new HashMap<String, Object>();
+		private Function function;
+		private IMatch match;
 		
-		public StormFrontJavascriptCommand (Function function)
+		public JSActionHandler (Function function, RegexMatch match)
 		{
 			this.function = function;
+			this.match = match;
 		}
 		
 		public void run() {
 			Context.enter();
 			try {
 				Object[] arguments = new Object[0];
-				if (properties.containsKey("matchGroups"))
-				{
-					ArrayList<String> matchGroups = (ArrayList<String>) properties.get("matchGroups");
-					arguments = matchGroups.toArray(new String[matchGroups.size()]);
-				}
+				Collection<String> matchGroups = ((RegexMatch)match).groups();
+				arguments = matchGroups.toArray(new String[matchGroups.size()]);
 				
 				function.call(script.getContext(), script.getScope(), null, arguments);
 			} finally {
@@ -53,8 +51,9 @@ public class StormFrontJavascriptCommands extends JavascriptCommands
 	
 	// IStormFrontScriptCommands delegated methods
 	public void addAction(Function action, String text) {
-		StormFrontJavascriptCommand command = new StormFrontJavascriptCommand(action);
-		sfCommands.addAction(command, text);
+		RegexMatch match = new RegexMatch(text);
+		JSActionHandler command = new JSActionHandler(action, match);
+		sfCommands.addAction(command, match);
 	}
 
 	public void removeAction(String text) {

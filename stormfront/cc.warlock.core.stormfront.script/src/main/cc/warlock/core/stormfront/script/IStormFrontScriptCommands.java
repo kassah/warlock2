@@ -10,7 +10,7 @@ public interface IStormFrontScriptCommands extends IScriptCommands {
 	
 	public void waitForRoundtime();
 	
-	public IMatch addAction(Runnable action, String text);
+	public void addAction(Runnable action, IMatch match);
 	
 	public void clearActions();
 	
