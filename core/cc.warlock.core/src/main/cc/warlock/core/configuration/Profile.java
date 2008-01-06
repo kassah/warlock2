@@ -8,8 +8,8 @@ package cc.warlock.core.configuration;
  */
 public class Profile {
 
-	private String id, name, gameCode, gameName;
-	private Account account;
+	protected String id, name, gameCode, gameName;
+	protected Account account;
 	
 	public Profile () { }
 	public Profile (Account account, String id, String name, String gameCode, String gameName)
@@ -28,6 +28,19 @@ public class Profile {
 		this.name = name;
 		this.gameCode = gameCode;
 		this.gameName = gameName;
+	}
+	
+	public Profile (Account account, Profile other)
+	{
+		this.id = other.id == null ? null : new String(other.id);
+		this.name = other.name== null ? null : new String(other.name);
+		this.gameCode = other.gameCode == null ? null : new String(other.gameCode);
+		this.gameName = other.gameName == null ? null : new String(other.gameName);
+		
+		this.account = account;
+		if (account != null && !account.getProfiles().contains(this)) {
+			account.getProfiles().add(this);
+		}
 	}
 	
 	/**
