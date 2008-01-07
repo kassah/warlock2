@@ -48,7 +48,8 @@ public class WSLScript extends AbstractScript {
 	private ScriptTimer timer = new ScriptTimer();
 	private boolean lastCondition = false;
 	private ArrayList<WSLAbstractCommand> commands = new ArrayList<WSLAbstractCommand>();
-	private HashMap<IMatch, Runnable> matches = new HashMap<IMatch, Runnable>();
+	private ArrayList<IMatch> matches = new ArrayList<IMatch>();
+	private HashMap<IMatch, Runnable> matchData = new HashMap<IMatch, Runnable>();
 	private BlockingQueue<String> matchQueue;
 	
 	protected WSLEngine engine;
@@ -644,15 +645,16 @@ public class WSLScript extends AbstractScript {
 				time = 0;
 			}
 			
-			IMatch match = scriptCommands.matchWait(matches.keySet(), matchQueue, time);
+			IMatch match = scriptCommands.matchWait(matches, matchQueue, time);
 			matchQueue = null;
 			
 			if (match != null)
 			{
-				matches.get(match).run();
+				matchData.get(match).run();
 				scriptCommands.waitForRoundtime();
 			}
 			matches.clear();
+			matchData.clear();
 		}
 	}
 
@@ -698,7 +700,8 @@ public class WSLScript extends AbstractScript {
 				boolean caseInsensitive = m.group(3).contains("i");
 				RegexMatch match = new RegexMatch(regex, caseInsensitive);
 				
-				matches.put(match, new WSLRegexMatchData(m.group(1), match));
+				matches.add(match);
+				matchData.put(match, new WSLRegexMatchData(m.group(1), match));
 				if(matchQueue == null) {
 					matchQueue = scriptCommands.getLineQueue();
 				}
@@ -726,7 +729,8 @@ public class WSLScript extends AbstractScript {
 			if (m.find())
 			{
 				IMatch match = new TextMatch(m.group(2));
-				matches.put(match, new WSLTextMatchData(m.group(1)));
+				matches.add(match);
+				matchData.put(match, new WSLTextMatchData(m.group(1)));
 				if(matchQueue == null) {
 					matchQueue = scriptCommands.getLineQueue();
 				}
