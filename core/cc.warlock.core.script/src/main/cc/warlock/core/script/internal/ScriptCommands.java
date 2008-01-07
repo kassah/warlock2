@@ -138,6 +138,7 @@ public class ScriptCommands implements IScriptCommands, IStreamListener, IRoomLi
 			roomWaiting = false;
 			lock.unlock();
 		}
+		assertPrompt();
 	}
 
 	public void pause (double seconds) {
