@@ -1,7 +1,10 @@
 package cc.warlock.rcp.stormfront.ui.prefs;
 
+import java.util.ArrayList;
 import java.util.Collection;
+import java.util.HashMap;
 
+import org.eclipse.jface.dialogs.Dialog;
 import org.eclipse.jface.viewers.ILabelProvider;
 import org.eclipse.jface.viewers.ILabelProviderListener;
 import org.eclipse.jface.viewers.ISelectionChangedListener;
@@ -10,6 +13,7 @@ import org.eclipse.jface.viewers.ITreeContentProvider;
 import org.eclipse.jface.viewers.SelectionChangedEvent;
 import org.eclipse.jface.viewers.TreeViewer;
 import org.eclipse.jface.viewers.Viewer;
+import org.eclipse.jface.viewers.ViewerFilter;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.SelectionAdapter;
 import org.eclipse.swt.events.SelectionEvent;
@@ -33,9 +37,23 @@ public class AccountsPreferencePage extends PropertyPage implements
 		IWorkbenchPropertyPage {
 
 	public static final String PAGE_ID = "cc.warlock.rcp.stormfront.ui.prefs.accountsAndProfiles";
+	protected ArrayList<Account> accounts = new ArrayList<Account>();
+	protected ArrayList<Account> addedAccounts = new ArrayList<Account>();
+	protected ArrayList<Account> removedAccounts = new ArrayList<Account>();
+	protected HashMap<Account, ArrayList<Profile>> addedProfiles = new HashMap<Account, ArrayList<Profile>>();
+	protected HashMap<Account, ArrayList<Profile>> removedProfiles = new HashMap<Account, ArrayList<Profile>>();
 	
-	protected TreeViewer accounts, profiles;
+	protected TreeViewer accountViewer;
 	protected Button addAccount, removeAccount, editAccount, addProfile, removeProfile;
+	
+	public AccountsPreferencePage ()
+	{
+		for (Account account : ProfileConfiguration.instance().getAllAccounts())
+		{
+			Account copy = new Account(account);
+			accounts.add(copy);
+		}
+	}
 	
 	@Override
 	protected Control createContents(Composite parent) {
@@ -48,24 +66,13 @@ public class AccountsPreferencePage extends PropertyPage implements
 		accountGroup.setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, true));
 		accountGroup.setLayout(new GridLayout(2, false));
 		
-		accounts = createTreeViewer(accountGroup, new ILabelProvider() {
-			public void addListener(ILabelProviderListener listener) {}
-			public void dispose() {}
-			public Image getImage(Object element) {
-				return null;
-			}
-			public String getText(Object element) {
-				return ((Account)element).getAccountName();
-			}
-			public boolean isLabelProperty(Object element, String property) { return true; }
-			public void removeListener(ILabelProviderListener listener) {}
-		});
+		accountViewer = createAccountViewer(accountGroup);
 		
-		Composite accountButtons = new Composite(accountGroup, SWT.NONE);
-		accountButtons.setLayout(new FillLayout(SWT.VERTICAL));
-		accountButtons.setLayoutData(new GridData(GridData.CENTER, GridData.BEGINNING, false, false));
+		Composite buttonsComposite = new Composite(accountGroup, SWT.NONE);
+		buttonsComposite.setLayout(new FillLayout(SWT.VERTICAL));
+		buttonsComposite.setLayoutData(new GridData(GridData.CENTER, GridData.BEGINNING, false, false));
 		
-		addAccount = new Button(accountButtons, SWT.PUSH);
+		addAccount = new Button(buttonsComposite, SWT.PUSH);
 		addAccount.setText("Add Account");
 		addAccount.setImage(WarlockSharedImages.getImage(WarlockSharedImages.IMG_ADD));
 		addAccount.addSelectionListener(new SelectionAdapter () {
@@ -74,7 +81,7 @@ public class AccountsPreferencePage extends PropertyPage implements
 			}
 		});
 		
-		removeAccount = new Button(accountButtons, SWT.PUSH);
+		removeAccount = new Button(buttonsComposite, SWT.PUSH);
 		removeAccount.setText("Remove Account");
 		removeAccount.setImage(WarlockSharedImages.getImage(WarlockSharedImages.IMG_REMOVE));
 		removeAccount.setEnabled(false);
@@ -84,7 +91,7 @@ public class AccountsPreferencePage extends PropertyPage implements
 			}
 		});
 		
-		editAccount = new Button(accountButtons, SWT.PUSH);
+		editAccount = new Button(buttonsComposite, SWT.PUSH);
 		editAccount.setText("Edit Account");
 		editAccount.setEnabled(false);
 		editAccount.addSelectionListener(new SelectionAdapter () {
@@ -93,30 +100,9 @@ public class AccountsPreferencePage extends PropertyPage implements
 			}
 		});
 		
-		Group profileGroup = new Group(main, SWT.NONE);
-		profileGroup.setText("Profiles");
-		profileGroup.setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, true));
-		profileGroup.setLayout(new GridLayout(2, false));
-		
-		profiles = createTreeViewer(profileGroup, new ILabelProvider() {
-			public void addListener(ILabelProviderListener listener) {}
-			public void dispose() {}
-			public Image getImage(Object element) {
-				return WarlockSharedImages.getImage(WarlockSharedImages.IMG_CHARACTER);
-			}
-			public String getText(Object element) {
-				return ((Profile)element).getName();
-			}
-			public boolean isLabelProperty(Object element, String property) { return true; }
-			public void removeListener(ILabelProviderListener listener) {}
-		});
-		
-		Composite profileButtons = new Composite(profileGroup, SWT.NONE);
-		profileButtons.setLayout(new FillLayout(SWT.VERTICAL));
-		profileButtons.setLayoutData(new GridData(GridData.CENTER, GridData.BEGINNING, false, false));
-		
-		addProfile = new Button(profileButtons, SWT.PUSH);
+		addProfile = new Button(buttonsComposite, SWT.PUSH);
 		addProfile.setText("Add Profile");
+		addProfile.setEnabled(false);
 		addProfile.setImage(WarlockSharedImages.getImage(WarlockSharedImages.IMG_ADD));
 		addProfile.addSelectionListener(new SelectionAdapter () {
 			public void widgetSelected(SelectionEvent e) {
@@ -124,7 +110,7 @@ public class AccountsPreferencePage extends PropertyPage implements
 			}
 		});
 		
-		removeProfile = new Button(profileButtons, SWT.PUSH);
+		removeProfile = new Button(buttonsComposite, SWT.PUSH);
 		removeProfile.setText("Remove Profile");
 		removeProfile.setImage(WarlockSharedImages.getImage(WarlockSharedImages.IMG_REMOVE));
 		removeProfile.setEnabled(false);
@@ -138,25 +124,92 @@ public class AccountsPreferencePage extends PropertyPage implements
 		return main;
 	}
 	
-	protected TreeViewer createTreeViewer (Composite parent, ILabelProvider provider)
+	protected TreeViewer createAccountViewer (Composite parent)
 	{
 		final TreeViewer viewer = new TreeViewer(parent, SWT.BORDER | SWT.SINGLE | SWT.H_SCROLL);
 		viewer.getTree().setLayoutData(new GridData(GridData.BEGINNING, GridData.FILL, true, true));
 		viewer.setContentProvider(new ITreeContentProvider() {
 			public void dispose() {	}
 			public Object[] getChildren(Object parentElement) {
+				if (parentElement instanceof Account)
+				{
+					return ((Account)parentElement).getProfiles().toArray();
+				}
 				return new Object[0];
 			}
+			
 			public Object[] getElements(Object inputElement) {
-				return ((Collection)inputElement).toArray();
+				if (inputElement instanceof Collection)
+				{
+					return ((Collection)inputElement).toArray();
+				} else if (inputElement instanceof Object[]){
+					return (Object[]) inputElement;
+				} else {
+					return new Object[] { inputElement };
+				}
 			}
-			public Object getParent(Object element) {return null;}
-			public boolean hasChildren(Object element) { return false; }
+			
+			public Object getParent(Object element) {
+				if (element instanceof Profile) {
+					return ((Profile)element).getAccount();
+				}
+				return null;
+			}
+			
+			public boolean hasChildren(Object element) {
+				if (element instanceof Account)
+				{
+					return ((Account)element).getProfiles().size() > 0;
+				}
+				return false;
+			}
+			
 			public void inputChanged(Viewer viewer, Object oldInput, Object newInput) {}
 		});
-		viewer.setLabelProvider(provider);
+		viewer.setLabelProvider(new ILabelProvider() {
+			public void addListener(ILabelProviderListener listener) {}
+			public void dispose() {}
+			public Image getImage(Object element) {
+				if (element instanceof Profile)
+					return WarlockSharedImages.getImage(WarlockSharedImages.IMG_CHARACTER);
+				return null;
+			}
+			public String getText(Object element) {
+				if (element instanceof Account) {
+					return ((Account)element).getAccountName();
+				} else if (element instanceof Profile) {
+					return ((Profile)element).getName();
+				}
+				return "";
+			}
+			public boolean isLabelProperty(Object element, String property) { return true; }
+			public void removeListener(ILabelProviderListener listener) {}
+		});
+		
+		viewer.addFilter(new ViewerFilter() {
+			public boolean select(Viewer viewer, Object parentElement, Object element) {
+				if (element instanceof Account)
+				{
+					Account account = (Account) element;
+					if (removedAccounts.contains(account)) {
+						return false;
+					}
+				}
+				else if (element instanceof Profile) {
+					Profile profile = (Profile) element;
+					
+					if (removedProfiles.containsKey(parentElement) &&
+						removedProfiles.get(parentElement).contains(profile))
+					{
+						return false;
+					}
+				}
+				return true;
+			}
+		});
+		
 		viewer.getTree().setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, true));
-		viewer.getTree().setLinesVisible(false);
+		viewer.getTree().setLinesVisible(true);
 		viewer.getTree().setSize(300, viewer.getTree().getSize().y);
 		viewer.addSelectionChangedListener(new ISelectionChangedListener() {
 			public void selectionChanged(SelectionChangedEvent event) {
@@ -173,7 +226,8 @@ public class AccountsPreferencePage extends PropertyPage implements
 
 	protected void updateData ()
 	{
-		accounts.setInput(ProfileConfiguration.instance().getAllAccounts());
+		accountViewer.setInput(accounts);
+		accountViewer.expandAll();
 	}
 	
 	protected Account currentAccount;
@@ -181,8 +235,9 @@ public class AccountsPreferencePage extends PropertyPage implements
 	{
 		removeAccount.setEnabled(true);
 		editAccount.setEnabled(true);
+		removeProfile.setEnabled(false);
+		addProfile.setEnabled(true);
 		
-		profiles.setInput(account.getProfiles());
 		currentAccount = account;
 	}
 	
@@ -192,40 +247,94 @@ public class AccountsPreferencePage extends PropertyPage implements
 		removeProfile.setEnabled(true);
 		
 		currentProfile = profile;
+		currentAccount = currentProfile.getAccount();
 	}
 	
 	protected void removeProfileClicked() {
 		if (currentProfile != null)
 		{
-			currentProfile.getAccount().getProfiles().remove(currentProfile);
-			profiles.remove(currentProfile);
+			removedProfiles.get(currentAccount).add(currentProfile);
+			accountViewer.remove(currentProfile);
 		}
 	}
 
 	protected void addProfileClicked() {
 		if (currentAccount != null)
 		{
-			
+			ProfileEditDialog dialog = new ProfileEditDialog(getShell(), currentAccount);
+			int response = dialog.open();
+			if (response == Dialog.OK)
+			{
+				
+			}
 		}
 	}
 
 	protected void editAccountClicked() {
 		if (currentAccount != null)
 		{
-			
+			AccountEditDialog dialog = new AccountEditDialog(getShell(), currentAccount.getAccountName(), currentAccount.getPassword());
+			int response = dialog.open();
+			if (response == Dialog.OK)
+			{
+				currentAccount.setAccountName(dialog.getUsername());
+				currentAccount.setPassword(dialog.getPassword());
+				
+				accountViewer.update(currentAccount, new String[0]);
+			}	
 		}
 	}
 
 	protected void removeAccountClicked() {
 		if (currentAccount != null)
 		{
-			ProfileConfiguration.instance().removeAccount(currentAccount);
+			accountViewer.remove(currentAccount);
+			removedAccounts.add(currentAccount);
 			accounts.remove(currentAccount);
 		}
 	}
 
 	protected void addAccountClicked() {
-		
+		AccountEditDialog dialog = new AccountEditDialog(getShell());
+		int response = dialog.open();
+		if (response == Dialog.OK)
+		{
+			String username = dialog.getUsername();
+			String password = dialog.getPassword();
+			
+			Account account = new Account(username, password);
+			accountViewer.add(account, new Object[0]);
+			addedAccounts.add(account);
+		}
 	}
 
+	@Override
+	public boolean performOk() {
+		for (Account account : accounts)
+		{
+			if (account.needsUpdate())
+			{
+				ProfileConfiguration.instance().removeAccount(account.getOriginalAccount());
+				ProfileConfiguration.instance().addAccount(account);
+			}
+		}
+		
+		for (Account account : removedAccounts)
+		{
+			ProfileConfiguration.instance().removeAccount(account.getOriginalAccount());
+		}
+		
+		for (Account account : addedAccounts)
+		{
+			ProfileConfiguration.instance().addAccount(account);
+		}
+		
+		return true;
+	}
+	
+	@Override
+	protected void performDefaults() {
+		// TODO Auto-generated method stub
+		super.performDefaults();
+	}
 }
