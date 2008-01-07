@@ -101,13 +101,10 @@ public class ScriptCommands implements IScriptCommands, IStreamListener, IRoomLi
 					if(interrupted)
 						break matchWaitLoop;
 				}
-				String[] lines = text.split("\\n");
-				for(String line : lines) {
-					// try all of our matches
-					for(IMatch match : matches) {
-						if(match.matches(line)) {
-							return match;
-						}
+				// try all of our matches
+				for(IMatch match : matches) {
+					if(match.matches(text)) {
+						return match;
 					}
 				}
 			}
@@ -234,7 +231,14 @@ public class ScriptCommands implements IScriptCommands, IStreamListener, IRoomLi
 		synchronized(textWaiters) {
 			for(LinkedBlockingQueue<String>  queue : textWaiters) {
 				try {
-					queue.put(text);
+					// TODO only do this once for each line
+					int end;
+					while ((end = text.indexOf('\n')) != -1) {
+						queue.put(text.substring(0, end + 1));
+						text = text.substring(end + 1);
+					}
+					if(text.length() != 0)
+						queue.put(text);
 				} catch(Exception e) {
 					e.printStackTrace();
 				}
