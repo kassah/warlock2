@@ -7,10 +7,12 @@
 package cc.warlock.rcp.stormfront.ui.wizards;
 
 import java.lang.reflect.InvocationTargetException;
+import java.util.List;
 import java.util.Map;
 
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.jface.operation.IRunnableWithProgress;
+import org.eclipse.jface.viewers.ArrayContentProvider;
 import org.eclipse.jface.viewers.DoubleClickEvent;
 import org.eclipse.jface.viewers.IDoubleClickListener;
 import org.eclipse.jface.viewers.ISelection;
@@ -21,6 +23,7 @@ import org.eclipse.jface.viewers.LabelProvider;
 import org.eclipse.jface.viewers.SelectionChangedEvent;
 import org.eclipse.jface.viewers.TableViewer;
 import org.eclipse.jface.viewers.Viewer;
+import org.eclipse.jface.viewers.ViewerFilter;
 import org.eclipse.jface.wizard.IWizardPage;
 import org.eclipse.jface.wizard.WizardPage;
 import org.eclipse.swt.SWT;
@@ -29,6 +32,7 @@ import org.eclipse.swt.layout.FillLayout;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Table;
 
+import cc.warlock.core.stormfront.network.ISGEGame;
 import cc.warlock.core.stormfront.network.SGEConnection;
 import cc.warlock.core.stormfront.network.SGEConnectionListener;
 import cc.warlock.rcp.stormfront.adapters.SWTSGEConnectionListenerAdapter;
@@ -44,15 +48,15 @@ import cc.warlock.rcp.ui.WarlockSharedImages;
 public class GameSelectWizardPage extends WizardPage {
 
 	private Table games;
-	private Map<String, String> gameMap;
+	private List<? extends ISGEGame> gameList;
 	private SGEConnection connection;
 	private TableViewer gamesViewer;
-	private String selectedGameCode;
+	private ISGEGame selectedGame;
 	private Listener listener;
 	
-	private static String[] gameFilterCodes = new String[] {
-		"CS", "DRDT", "GS4D", "HXD", "MOD"
-	};
+//	private static String[] gameFilterCodes = new String[] {
+//		"CS", "DRDT", "GS4D", "HXD", "MOD"
+//	};
 	
 	public GameSelectWizardPage (SGEConnection connection)
 	{
@@ -76,7 +80,7 @@ public class GameSelectWizardPage extends WizardPage {
 		games.setEnabled(false);
 		
 		gamesViewer = new TableViewer (games);
-		gamesViewer.setContentProvider(new GameContentProvider());
+		gamesViewer.setContentProvider(new ArrayContentProvider());
 		gamesViewer.setLabelProvider(new GameLabelProvider());
 		gamesViewer.addSelectionChangedListener(new ISelectionChangedListener() {
 			public void selectionChanged(SelectionChangedEvent event) {
@@ -93,30 +97,21 @@ public class GameSelectWizardPage extends WizardPage {
 				setVisible(false);
 			}
 		});
+		gamesViewer.addFilter(new ViewerFilter() {
+			public boolean select(Viewer viewer, Object parentElement, Object element) {
+				ISGEGame game = (ISGEGame) element;
+				
+				if (game.getAccountStatus() == ISGEGame.AccountStatus.Normal
+					|| game.getAccountStatus() == ISGEGame.AccountStatus.Trial)
+				{
+					return true;
+				}
+				return false;
+			}
+		});
+		
 		setControl(controls);
 	}
-
-	private class GameContentProvider implements IStructuredContentProvider
-	{
-		
-		@SuppressWarnings("unchecked")
-		public Object[] getElements(Object inputElement) {
-			if(inputElement instanceof Map) {
-				Map<String,String> gameMap = (Map<String,String>) inputElement;
-				return gameMap.keySet().toArray();
-			} else {
-				return null;
-			}
-		}
-		
-		public void dispose() {
-			// TODO Auto-generated method stub
-		}
-		
-		public void inputChanged(Viewer viewer, Object oldInput, Object newInput) {
-			// TODO Auto-generated method stub
-		}
-}
 	
 	private class GameLabelProvider extends LabelProvider
 	{
@@ -125,7 +120,13 @@ public class GameSelectWizardPage extends WizardPage {
 		}
 		
 		public String getText(Object element) {
-			return (String) gameMap.get(element);
+			ISGEGame game = (ISGEGame) element;
+			
+			if (game.getAccountStatus() == ISGEGame.AccountStatus.Trial)
+			{
+				return game.getGameName() + " (Trial: " + game.getAccountStatusInterval() + " days)";
+			}
+			return game.getGameName();
 		}
 	}
 	
@@ -134,14 +135,14 @@ public class GameSelectWizardPage extends WizardPage {
 		if (selection instanceof IStructuredSelection)
 		{
 			IStructuredSelection selection2 = (IStructuredSelection) selection;
-			selectedGameCode = (String) selection2.getFirstElement();
+			selectedGame = (ISGEGame) selection2.getFirstElement();
 		}
 	}
 	
 	public void setVisible (boolean visible) {
 		super.setVisible(visible);
 		
-		if (!visible && gameMap != null && !gameMap.isEmpty()) {
+		if (!visible && gameList != null && !gameList.isEmpty()) {
 			try {
 				getContainer().run(true, true, new IRunnableWithProgress() {
 					public void run(IProgressMonitor monitor)
@@ -149,8 +150,8 @@ public class GameSelectWizardPage extends WizardPage {
 					{
 						listener.setProgressMonitor(monitor);
 						
-						monitor.beginTask("Finding characters in \"" + gameMap.get(selectedGameCode) + "\"...", 2);
-						connection.selectGame(selectedGameCode);
+						monitor.beginTask("Finding characters in \"" + selectedGame.getGameName() + "\"...", 2);
+						connection.selectGame(selectedGame.getGameCode());
 						monitor.worked(1);
 					}
 				});
@@ -170,16 +171,11 @@ public class GameSelectWizardPage extends WizardPage {
 			this.monitor = monitor;
 		}
 		
-		public void gamesReady(SGEConnection connection, Map<String, String> games) {
-			GameSelectWizardPage.this.gameMap = games;
-			
-			for (String gameCode : gameFilterCodes)
-			{
-				GameSelectWizardPage.this.gameMap.remove(gameCode);
-			}
+		public void gamesReady(SGEConnection connection, List<? extends ISGEGame> games) {
+			GameSelectWizardPage.this.gameList = games;
 			
 			GameSelectWizardPage.this.games.setEnabled(true);
-			gamesViewer.setInput(gameMap);
+			gamesViewer.setInput(gameList);
 		}
 
 		public void charactersReady(SGEConnection connection, Map<String, String> characters) {
@@ -192,11 +188,11 @@ public class GameSelectWizardPage extends WizardPage {
 	}
 
 	public String getSelectedGameCode() {
-		return selectedGameCode;
+		return selectedGame.getGameCode();
 	}
 	
 	public String getSelectedGameName() {
-		return gameMap.get(selectedGameCode);
+		return selectedGame.getGameName();
 	}
 	
 }

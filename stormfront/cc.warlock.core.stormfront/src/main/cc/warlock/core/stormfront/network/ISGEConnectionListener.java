@@ -3,6 +3,7 @@
  */
 package cc.warlock.core.stormfront.network;
 
+import java.util.List;
 import java.util.Map;
 
 /**
@@ -23,7 +24,7 @@ public interface ISGEConnectionListener {
 	/**
 	 * This method will be called when the SGE server returns with a list of playable games (a Map of gamecode => description)
 	 */
-	public void gamesReady(SGEConnection connection, Map<String, String> games);
+	public void gamesReady(SGEConnection connection, List<? extends ISGEGame> games);
 
 	/**
 	 * This method will be called when the SGE server returns a list of characters for the selected game (a Map of character code => character name)

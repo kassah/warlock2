@@ -8,7 +8,7 @@ package cc.warlock.rcp.stormfront.ui.wizards;
 
 import java.lang.reflect.InvocationTargetException;
 import java.util.Collection;
-import java.util.Map;
+import java.util.List;
 
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.jface.dialogs.MessageDialog;
@@ -25,6 +25,7 @@ import org.eclipse.swt.widgets.Text;
 
 import cc.warlock.core.configuration.Account;
 import cc.warlock.core.stormfront.ProfileConfiguration;
+import cc.warlock.core.stormfront.network.ISGEGame;
 import cc.warlock.core.stormfront.network.SGEConnection;
 import cc.warlock.core.stormfront.network.SGEConnectionListener;
 import cc.warlock.rcp.stormfront.adapters.SWTSGEConnectionListenerAdapter;
@@ -161,7 +162,7 @@ public class AccountWizardPage extends WizardPageWithNotification {
 			LoginUtil.showAuthenticationError(errorCode);
 		}
 		
-		public void gamesReady(SGEConnection connection, Map<String, String> games) {
+		public void gamesReady(SGEConnection connection, List<? extends ISGEGame> games) {
 			if (monitor != null)
 			{
 				monitor.worked(1);

@@ -6,12 +6,16 @@ package cc.warlock.core.stormfront.network;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
+import java.util.ListIterator;
 import java.util.Map;
 
 import cc.warlock.core.configuration.Profile;
 import cc.warlock.core.network.Connection;
 import cc.warlock.core.network.IConnection;
 import cc.warlock.core.network.IConnectionListener;
+import cc.warlock.core.stormfront.network.ISGEGame.AccountStatus;
+import cc.warlock.core.stormfront.network.ISGEGame.GameURL;
 
 /**
  * @author Marshall
@@ -52,8 +56,10 @@ public class SGEConnection extends Connection implements IConnectionListener {
 	protected int state, errorCode;
 	protected String passwordHash;
 	protected ArrayList<ISGEConnectionListener> sgeListeners;
+	protected boolean retrieveGameInfo = true;
 	
-	protected HashMap<String, String> games, characters, loginProperties;
+	protected HashMap<String, String> characters, loginProperties;
+	protected ArrayList<SGEGame> games;
 	
 	public SGEConnection ()
 	{
@@ -62,7 +68,7 @@ public class SGEConnection extends Connection implements IConnectionListener {
 		
 		state = SGE_NONE;
 		sgeListeners = new ArrayList<ISGEConnectionListener>();
-		games = new HashMap<String, String>();
+		games = new ArrayList<SGEGame>();
 		characters = new HashMap<String, String>();
 		loginProperties = new HashMap<String, String>();
 	}
@@ -170,8 +176,49 @@ public class SGEConnection extends Connection implements IConnectionListener {
 		}
 	}
 
+	public static class SGEGame implements ISGEGame {
+		public AccountStatus accountStatus;
+		public int interval;
+		public String gameCode, gameName;
+		public HashMap<GameURL, String> gameURLs = new HashMap<GameURL, String>();
+		
+		public AccountStatus getAccountStatus() {
+			return accountStatus;
+		}
+		public int getAccountStatusInterval() {
+			return interval;
+		}
+		public String getGameCode() {
+			return gameCode;
+		}
+		public String getGameName() {
+			return gameName;
+		}
+		public String getGameURL(GameURL url) {
+			if (!gameURLs.containsKey(url)) {
+				return null;
+			}
+			
+			String gameUrl = gameURLs.get(url);
+			if (gameUrl.indexOf("http://") == -1
+				&& gameUrl.indexOf("https://") == -1)
+			{
+				String root = gameURLs.get(GameURL.Root);
+				return "http://www.play.net/" + root + "/" + gameUrl;
+			} else {
+				return gameUrl;
+			}
+		}
+	}
+	
+	protected ListIterator<SGEGame> gameIterator;
+	protected SGEGame currentGame;
+	protected boolean retrievingGames = false;
+	
 	public void dataReady(IConnection connection, String line) {
 		try {
+			
+			System.out.println("SGE: " + line);
 			
 			if (state == SGE_INITIAL)
 			{
@@ -207,8 +254,6 @@ public class SGEConnection extends Connection implements IConnectionListener {
 					}
 					else {
 						fireEvent (SGE_ERROR);
-						
-						disconnect();
 					}
 
 				} break;
@@ -218,16 +263,75 @@ public class SGEConnection extends Connection implements IConnectionListener {
 					String tokens[] = line.split("\t");
 					for (int i = 1; i < tokens.length; i+=2)
 					{
-						games.put(tokens[i], tokens[i+1]);
+						SGEGame game = new SGEGame();
+						game.gameCode = tokens[i];
+						game.gameName = tokens[i+1];
+						
+						games.add(game);
 					}
 					
-					fireEvent(GAMES_READY);
+					if (retrieveGameInfo)
+					{
+						retrievingGames = true;
+						gameIterator = games.listIterator();
+						if (gameIterator.hasNext())
+						{
+							currentGame = gameIterator.next();
+							sendLine("G\t" + currentGame.gameCode);
+						}
+					} else {
+						fireEvent(GAMES_READY);
+					}
 					
 				} break;
 				
 				case 'G':
 				{
-					sendLine("C");
+					if (retrievingGames)
+					{
+						String tokens[] = line.split("\t");
+						if ("NORMAL".equals(tokens[2])) {
+							currentGame.accountStatus = AccountStatus.Normal;
+						} else if ("TRIAL".equals(tokens[2])) {
+							currentGame.accountStatus = AccountStatus.Trial;
+						} else if ("EXPIRED".equals(tokens[2])) {
+							currentGame.accountStatus = AccountStatus.Expired;
+						} else {
+							currentGame.accountStatus = AccountStatus.Unknown;
+						}
+						
+						int startIndex = 3;
+						if (currentGame.accountStatus != AccountStatus.Unknown)
+						{
+							startIndex = 4;
+							currentGame.interval = Integer.parseInt(tokens[3]);
+						}
+						
+						for (int i = startIndex; i < tokens.length; i++)
+						{
+							if (tokens[i].indexOf("=") != -1)
+							{
+								String keyval[] = tokens[i].split("=");
+								
+								GameURL url = GameURL.getURL(keyval[0]);
+								if (url != null) {
+									currentGame.gameURLs.put(url, keyval[1]);
+								}
+							}
+						}
+						
+						if (gameIterator.hasNext())
+						{
+							currentGame = (SGEGame) gameIterator.next();
+							sendLine("G\t" + currentGame.gameCode);
+						}
+						else {
+							retrievingGames = false;
+							fireEvent(GAMES_READY);
+						}
+					} else {
+						sendLine("C");
+					}
 				} break;
 				
 				case 'C':
@@ -302,7 +406,7 @@ public class SGEConnection extends Connection implements IConnectionListener {
 		public void loginFinished(SGEConnection connection, int status) {/* noop */}
 		
 		public void gamesReady(SGEConnection connection,
-				Map<String, String> games) {
+				List<? extends ISGEGame> games) {
 			connection.selectGame(profile.getGameCode());
 		}
 		
@@ -322,6 +426,7 @@ public class SGEConnection extends Connection implements IConnectionListener {
 	public static Map<String, String> autoLogin (Profile profile, ISGEConnectionListener extraListener)
 	{
 		SGEConnection connection = new SGEConnection();
+		connection.setRetrieveGameInfo(false);
 		AutoLoginListener listener = new AutoLoginListener();
 		listener.profile = profile;
 		
@@ -341,6 +446,10 @@ public class SGEConnection extends Connection implements IConnectionListener {
 		}
 		
 		return listener.properties;
+	}
+
+	public void setRetrieveGameInfo(boolean retrieveGameInfo) {
+		this.retrieveGameInfo = retrieveGameInfo;
 	}
 
 }

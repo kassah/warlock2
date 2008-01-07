@@ -3,11 +3,13 @@
  */
 package cc.warlock.rcp.stormfront.adapters;
 
+import java.util.List;
 import java.util.Map;
 
 import org.eclipse.swt.widgets.Display;
 
 import cc.warlock.core.stormfront.network.ISGEConnectionListener;
+import cc.warlock.core.stormfront.network.ISGEGame;
 import cc.warlock.core.stormfront.network.SGEConnection;
 
 /**
@@ -63,14 +65,14 @@ public class SWTSGEConnectionListenerAdapter implements ISGEConnectionListener {
 
 	private class GamesReadyRunnable implements Runnable {
 		public SGEConnection connection;
-		public Map<String, String> games;
+		public List<? extends ISGEGame> games;
 		
 		public void run () {
 			listener.gamesReady(connection, games);
 		}
 	}
 	
-	public void gamesReady(SGEConnection connection, Map<String, String> games) {
+	public void gamesReady(SGEConnection connection, List<? extends ISGEGame> games) {
 		gamesReadyRunnable.connection = connection;
 		gamesReadyRunnable.games = games;
 		Display.getDefault().asyncExec(gamesReadyRunnable);

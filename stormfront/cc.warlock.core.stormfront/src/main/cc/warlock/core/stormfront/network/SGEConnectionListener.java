@@ -3,6 +3,7 @@
  */
 package cc.warlock.core.stormfront.network;
 
+import java.util.List;
 import java.util.Map;
 
 /**
@@ -31,7 +32,7 @@ public class SGEConnectionListener implements ISGEConnectionListener {
 	/* (non-Javadoc)
 	 * @see cc.warlock.network.ISGEConnectionListener#gamesReady(cc.warlock.network.SGEConnection, java.util.Map)
 	 */
-	public void gamesReady(SGEConnection connection, Map<String,String> games) {
+	public void gamesReady(SGEConnection connection, List<? extends ISGEGame> games) {
 		// TODO Auto-generated method stub
 
 	}

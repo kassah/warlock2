@@ -1,5 +1,6 @@
 package cc.warlock.rcp.stormfront.ui.actions;
 
+import java.util.List;
 import java.util.Map;
 
 import org.eclipse.core.runtime.IProgressMonitor;
@@ -11,6 +12,7 @@ import org.eclipse.swt.widgets.Display;
 
 import cc.warlock.core.configuration.Profile;
 import cc.warlock.core.stormfront.network.ISGEConnectionListener;
+import cc.warlock.core.stormfront.network.ISGEGame;
 import cc.warlock.core.stormfront.network.SGEConnection;
 import cc.warlock.rcp.plugin.Warlock2Plugin;
 import cc.warlock.rcp.stormfront.adapters.SWTSGEConnectionListenerAdapter;
@@ -42,6 +44,7 @@ public class ProfileConnectAction extends Action implements ISGEConnectionListen
 				ProfileConnectAction.this.monitor = monitor;
 				
 				SGEConnection connection = new SGEConnection();
+				connection.setRetrieveGameInfo(false);
 				connection.addSGEConnectionListener(new SWTSGEConnectionListenerAdapter(ProfileConnectAction.this));
 				monitor.beginTask("Logging into profile \"" + profile.getName() + "\"...", 5);
 
@@ -84,7 +87,7 @@ public class ProfileConnectAction extends Action implements ISGEConnectionListen
 		finished = true;
 	}
 	
-	public void gamesReady(SGEConnection connection, Map<String, String> games) {
+	public void gamesReady(SGEConnection connection, List<? extends ISGEGame> games) {
 		monitor.worked(1);
 		
 		if (!monitor.isCanceled())
