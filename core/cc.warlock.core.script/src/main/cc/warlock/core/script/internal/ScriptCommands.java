@@ -228,18 +228,21 @@ public class ScriptCommands implements IScriptCommands, IStreamListener, IRoomLi
 	}
 	
 	protected void receiveText(String text) {
+		int end;
+		while ((end = text.indexOf('\n')) != -1) {
+			receiveLine(text.substring(0, end + 1));
+			text = text.substring(end + 1);
+		}
+		if(text.length() != 0)
+			receiveLine(text);
+	}
+	
+	protected void receiveLine(String line) {
 		synchronized(textWaiters) {
 			for(LinkedBlockingQueue<String>  queue : textWaiters) {
 				try {
-					// TODO only do this once for each line
-					int end;
-					while ((end = text.indexOf('\n')) != -1) {
-						queue.put(text.substring(0, end + 1));
-						text = text.substring(end + 1);
-					}
-					if(text.length() != 0)
-						queue.put(text);
-				} catch(Exception e) {
+					queue.put(line);
+				} catch(InterruptedException e) {
 					e.printStackTrace();
 				}
 			}
