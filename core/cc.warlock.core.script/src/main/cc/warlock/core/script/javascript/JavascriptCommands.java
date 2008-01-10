@@ -5,7 +5,11 @@ import java.io.FileNotFoundException;
 import java.io.FileReader;
 import java.io.IOException;
 import java.io.Serializable;
+import java.util.HashMap;
+import java.util.Timer;
+import java.util.TimerTask;
 
+import org.mozilla.javascript.Context;
 import org.mozilla.javascript.Script;
 
 import cc.warlock.core.script.IMatch;
@@ -18,6 +22,9 @@ public class JavascriptCommands {
 
 	protected IScriptCommands commands;
 	protected JavascriptScript script;
+	protected HashMap<Integer, TimerTask> timeTasks = new HashMap<Integer, TimerTask>();
+	private int nextTimerID = 1;
+	private Timer timer = new Timer();
 	
 	public class JavascriptStopException extends Exception implements Serializable {
 		private static final long serialVersionUID = 7226391328268718796L;
@@ -116,5 +123,46 @@ public class JavascriptCommands {
 	public JavascriptScript getScript ()
 	{
 		return script;
+	}
+	
+	private class CommandCallback extends TimerTask {
+		private String command;
+		
+		public CommandCallback(String command) {
+			this.command = command;
+		}
+		
+		public void run() {
+			Context.enter();
+			try {
+				Script jsCommand = script.getContext().compileString(command, "callback", 0, null);
+
+				jsCommand.exec(script.getContext(), script.getScope());
+			} catch(Exception e) {
+				e.printStackTrace();
+			} finally {
+				Context.exit();
+			}
+		}
+	}
+	
+	public int setInterval(String command, long interval) {
+		int id = nextTimerID++;
+		
+		CommandCallback c = new CommandCallback(command);
+		timeTasks.put(id, c);
+		timer.scheduleAtFixedRate(c, interval, interval);
+		
+		return id;
+	}
+	
+	public int setTimeout(String command, long timeout) {
+		int id = nextTimerID++;
+		
+		CommandCallback c = new CommandCallback(command);
+		timeTasks.put(id, c);
+		timer.schedule(c, timeout);
+		
+		return id;
 	}
 }
