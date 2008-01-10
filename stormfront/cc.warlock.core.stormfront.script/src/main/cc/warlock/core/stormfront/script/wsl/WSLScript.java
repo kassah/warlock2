@@ -256,9 +256,11 @@ public class WSLScript extends AbstractScript {
 			totalargs.append(argument);
 			i++;
 		}
+		// populate the rest of the argument variable
 		for(; i <= 9; i++) {
 			setVariable(Integer.toString(i), "");
 		}
+		// set 0 to the entire list
 		setVariable("0", totalargs.toString());
 		
 		for (String varName : scriptCommands.getStormFrontClient().getServerSettings().getVariableNames())
@@ -294,7 +296,7 @@ public class WSLScript extends AbstractScript {
 			// TODO handle the exception
 		}
 
-		client.getDefaultStream().echo("[script started: " + getName() + "]\n");
+		echo("[script started: " + getName() + "]");
 		running = true;
 		stopped = false;
 		scriptCommands.waitForRoundtime();
@@ -316,6 +318,14 @@ public class WSLScript extends AbstractScript {
 	
 	public void addLabel(String label, WSLAbstractCommand line) {
 		labels.put(label.toLowerCase(), line);
+	}
+	
+	public int labelLineNumber(String label) {
+		WSLAbstractCommand line = labels.get(label);
+		if(line != null)
+			return line.getLineNumber();
+		else
+			return -1;
 	}
 	
 	public void addCommand(WSLAbstractCommand command) {
@@ -349,21 +359,21 @@ public class WSLScript extends AbstractScript {
 		stopped = true;
 		scriptCommands.stop();
 		
-		client.getDefaultStream().echo("[script stopped: " + getName() + "]\n");
+		echo("[script stopped: " + getName() + "]");
 		super.stop();
 	}
 
 	public void suspend() {
 		running = false;
 		
-		client.getDefaultStream().echo("[script paused: " + getName() + "]\n");
+		echo("[script paused: " + getName() + "]");
 		super.suspend();
 	}
 	
 	public void resume() {
 		running = true;
 		
-		client.getDefaultStream().echo("[script resumed: " + getName() + "]\n");
+		echo("[script resumed: " + getName() + "]");
 
 		super.resume();
 		
@@ -381,13 +391,13 @@ public class WSLScript extends AbstractScript {
 		wslCommands.put(name, command);
 	}
 	
-	protected void scriptError(String message) {
-		client.getDefaultStream().echo("Script error on line " + curCommand.getLineNumber() + " (" + curLine + "): " + message + "\n");
+	private void scriptError(String message) {
+		echo("Script error on line " + curCommand.getLineNumber() + " (" + curLine + "): " + message);
 		stop();
 	}
 	
-	protected void scriptWarning(String message) {
-		client.getDefaultStream().echo("Script warning on line " + curCommand.getLineNumber() + " (" + curLine + "): " + message + "\n");
+	private void scriptWarning(String message) {
+		echo("Script warning on line " + curCommand.getLineNumber() + " (" + curLine + "): " + message);
 	}
 	
 	protected class ScriptTimer {
@@ -1045,6 +1055,10 @@ public class WSLScript extends AbstractScript {
 				WSLScript.this.execute(arguments);
 			}
 		}
+	}
+	
+	protected void echo(String message) {
+		client.getDefaultStream().echo(message + "\n");
 	}
 	
 	public IScriptEngine getScriptEngine() {

@@ -32,8 +32,12 @@ line
 	: (label=LABEL)? c=expr
 		{
 			script.addCommand(c);
-			if(label != null)
+			if(label != null) {
+				int existingLine = script.labelLineNumber($label.text);
+				if(existingLine != -1)
+					script.echo("Redefinition of label \"" + $label.text + "\" on line " + lineNum + ", originally defined on line " + existingLine);
 				script.addLabel($label.text, c);
+			}
 			lineNum++;
 		}
 	;
