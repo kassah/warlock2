@@ -5,6 +5,7 @@ import java.util.concurrent.BlockingQueue;
 
 import org.mozilla.javascript.Context;
 import org.mozilla.javascript.Function;
+import org.mozilla.javascript.Script;
 import org.mozilla.javascript.Scriptable;
 import org.mozilla.javascript.ScriptableObject;
 
@@ -17,7 +18,6 @@ public class MatchList extends ScriptableObject {
 	private HashMap<IMatch, Runnable> matches = new HashMap<IMatch, Runnable>();
 	private BlockingQueue<String> queue;
 	private JavascriptScript script;
-	private Scriptable userObject;
 	
 	public MatchList() {
 	}
@@ -28,58 +28,88 @@ public class MatchList extends ScriptableObject {
 		queue = script.getCommands().getLineQueue();
 	}
 	
-	private class JSTextMatchData implements Runnable {
+	private class JSMatchData implements Runnable {
 		
 		private Function function;
+		private String expression;
 		
-		public JSTextMatchData(Function function) {
+		public JSMatchData(Function function, String expression) {
 			this.function = function;
+			this.expression = expression;
 		}
 		
 		public void run() {
-			if (userObject == null) {
+			if(function != null) {
 				function.call(script.getContext(), script.getScope(), null, new Object[] {});
-			} else {
-				function.call(script.getContext(), script.getScope(), null, new Object[] { userObject });
+			}
+			if(expression != null) {
+				Script jsCommand = script.getContext().compileString(expression, "matchWait", 0, null);
+
+				jsCommand.exec(script.getContext(), script.getScope());
 			}
 		}
 	}
 	
-	public void jsFunction_match(Function function, String text) {
+	public IMatch jsFunction_match(String text) {
 		TextMatch match = new TextMatch(text, true);
-		matches.put(match, new JSTextMatchData(function));
+		matches.put(match, new JSMatchData(null, null));
+		
+		return match;
 	}
 	
-	private class JSRegexMatchData implements Runnable {
+	public IMatch jsFunction_match(String text, Function function) {
+		TextMatch match = new TextMatch(text, true);
+		matches.put(match, new JSMatchData(function, null));
 		
-		private Function function;
+		return match;
+	}
+	
+	public IMatch jsFunction_match(String text, String expression) {
+		TextMatch match = new TextMatch(text, true);
+		matches.put(match, new JSMatchData(null, expression));
+		
+		return match;
+	}
+	
+	private class JSRegexMatchData extends JSMatchData {
+		
 		private RegexMatch match;
 		
-		public JSRegexMatchData(Function function, RegexMatch match) {
-			this.function = function;
+		public JSRegexMatchData(RegexMatch match, Function function, String expression) {
+			super(function, expression);
 			this.match = match;
 		}
 		
 		public void run() {
-			Context cx = script.getContext();
-			Scriptable scope = script.getScope();
-			Scriptable groups = cx.newArray(scope, match.groups().size());
+			Scriptable groups = script.getContext().newArray(script.getScope(), match.groups().size());
 			int i = 0;
 			for(String str : match.groups()) {
-				scope.put(i, groups, str);
+				script.getScope().put(i, groups, str);
 				i++;
 			}
-			if (userObject == null) {
-				function.call(cx, scope, null, new Object[] { groups });
-			} else {
-				function.call(cx, scope, null, new Object[] { groups, userObject });
-			}
+			super.run();
 		}
 	}
 	
-	public void jsFunction_matchRe(Function function, String regex) {
+	public IMatch jsFunction_matchRe(String regex) {
 		RegexMatch match = new RegexMatch(regex);
-		matches.put(match, new JSRegexMatchData(function, match));
+		matches.put(match, new JSRegexMatchData(match, null, null));
+		
+		return match;
+	}
+	
+	public IMatch jsFunction_matchRe(String regex, Function function) {
+		RegexMatch match = new RegexMatch(regex);
+		matches.put(match, new JSRegexMatchData(match, function, null));
+		
+		return match;
+	}
+	
+	public IMatch jsFunction_matchRe(String regex, String expression) {
+		RegexMatch match = new RegexMatch(regex);
+		matches.put(match, new JSRegexMatchData(match, null, expression));
+		
+		return match;
 	}
 	
 	public IMatch jsFunction_matchWait() {
