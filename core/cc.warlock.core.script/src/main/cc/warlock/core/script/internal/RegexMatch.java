@@ -25,6 +25,7 @@ public class RegexMatch implements IMatch {
 	}
 	
 	public boolean matches(String text) {
+		groups.clear();
 		Matcher m = regex.matcher(text);
 		if(m.find()) {
 			groups.add(m.group());
