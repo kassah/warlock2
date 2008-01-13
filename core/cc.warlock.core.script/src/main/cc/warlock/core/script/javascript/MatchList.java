@@ -32,6 +32,7 @@ public class MatchList extends ScriptableObject {
 		
 		private Function function;
 		private String expression;
+		protected Object[] args = new Object[0];
 		
 		public JSMatchData(Function function, String expression) {
 			this.function = function;
@@ -40,7 +41,7 @@ public class MatchList extends ScriptableObject {
 		
 		public void run() {
 			if(function != null) {
-				function.call(script.getContext(), script.getScope(), null, new Object[] {});
+				function.call(script.getContext(), script.getScope(), null, args);
 			}
 			if(expression != null) {
 				Script jsCommand = script.getContext().compileString(expression, "matchWait", 0, null);
@@ -64,12 +65,12 @@ public class MatchList extends ScriptableObject {
 		return match;
 	}
 	
-	public IMatch jsFunction_match(String text, String expression) {
-		TextMatch match = new TextMatch(text, true);
-		matches.put(match, new JSMatchData(null, expression));
-		
-		return match;
-	}
+//	public IMatch jsFunction_match(String text, String expression) {
+//		TextMatch match = new TextMatch(text, true);
+//		matches.put(match, new JSMatchData(null, expression));
+//		
+//		return match;
+//	}
 	
 	private class JSRegexMatchData extends JSMatchData {
 		
@@ -87,6 +88,8 @@ public class MatchList extends ScriptableObject {
 				script.getScope().put(i, groups, str);
 				i++;
 			}
+			
+			args = new Object[] { groups };
 			super.run();
 		}
 	}
@@ -105,19 +108,19 @@ public class MatchList extends ScriptableObject {
 		return match;
 	}
 	
-	public IMatch jsFunction_matchRe(String regex, String expression) {
-		RegexMatch match = new RegexMatch(regex);
-		matches.put(match, new JSRegexMatchData(match, null, expression));
-		
-		return match;
-	}
+//	public IMatch jsFunction_matchRe(String regex, String expression) {
+//		RegexMatch match = new RegexMatch(regex);
+//		matches.put(match, new JSRegexMatchData(match, null, expression));
+//		
+//		return match;
+//	}
 	
 	public IMatch jsFunction_matchWait() {
 		IMatch match = script.getCommands().matchWait(matches.keySet(), queue, 0.0);
 		
 		if (match != null)
 		{
-			script.getCommands().echo("Got a match!");
+//			script.getCommands().echo("Got a match!");
 			matches.get(match).run();
 		}
 		
