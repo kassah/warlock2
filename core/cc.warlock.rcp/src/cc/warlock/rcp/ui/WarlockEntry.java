@@ -91,6 +91,8 @@ public class WarlockEntry implements VerifyKeyListener {
 			{
 				append(e.character);
 				e.doit = false;
+				if(!widget.isFocusControl())
+					widget.setFocus();
 			} else if(e.character == '\b') {
 				if(searchMode) {
 					searchText.setLength(searchText.length() - 1);
@@ -99,9 +101,9 @@ public class WarlockEntry implements VerifyKeyListener {
 					widget.invokeAction(ST.DELETE_PREVIOUS);
 				}
 				e.doit = false;
+				if(!widget.isFocusControl())
+					widget.setFocus();
 			}
-			if(!widget.isFocusControl())
-				widget.setFocus();
 		}
 	}
 	
