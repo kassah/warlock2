@@ -10,6 +10,8 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Hashtable;
+import java.util.Timer;
+import java.util.TimerTask;
 
 import cc.warlock.core.client.ICharacterStatus;
 import cc.warlock.core.client.ICompass;
@@ -19,7 +21,6 @@ import cc.warlock.core.client.IStream;
 import cc.warlock.core.client.IWarlockSkin;
 import cc.warlock.core.client.IWarlockStyle;
 import cc.warlock.core.client.WarlockClientRegistry;
-import cc.warlock.core.client.WarlockString;
 import cc.warlock.core.client.internal.CharacterStatus;
 import cc.warlock.core.client.internal.ClientProperty;
 import cc.warlock.core.client.internal.Compass;
@@ -50,7 +51,6 @@ public class StormFrontClient extends WarlockClient implements IStormFrontClient
 
 	protected ICompass compass;
 	protected ICharacterStatus status;
-	protected int lastPrompt;
 	protected ClientProperty<Integer> roundtime;
 	protected ClientProperty<BarStatus> health, mana, fatigue, spirit;
 	protected ClientProperty<String> leftHand, rightHand, currentSpell;
@@ -58,8 +58,10 @@ public class StormFrontClient extends WarlockClient implements IStormFrontClient
 	protected IStormFrontProtocolHandler handler;
 	protected ClientProperty<String> playerId, characterName, roomDescription;
 	protected ServerSettings serverSettings;
-	protected RoundtimeRunnable rtRunnable;
-	protected Thread rtThread;
+	private Timer timer;
+	protected SFTimerTask timerTask;
+	private double currentTime = 0.0;
+	private double rtEnd = -1.0;
 	protected ArrayList<IScript> runningScripts;
 	protected ArrayList<IScriptListener> scriptListeners;
 	protected DefaultSkin skin;
@@ -85,7 +87,9 @@ public class StormFrontClient extends WarlockClient implements IStormFrontClient
 		mode = new ClientProperty<GameMode>(this, "gameMode", GameMode.Game);
 		serverSettings = new ServerSettings(this);
 		skin = new DefaultSkin(serverSettings);
-		rtRunnable = new RoundtimeRunnable();
+		timer = new Timer();
+		timerTask = new SFTimerTask();
+		timer.scheduleAtFixedRate(timerTask, 0, 100L);
 		runningScripts = new ArrayList<IScript>();
 		scriptListeners = new ArrayList<IScriptListener>();
 		
@@ -156,48 +160,35 @@ public class StormFrontClient extends WarlockClient implements IStormFrontClient
 		return roundtime;
 	}
 
-	private class RoundtimeRunnable implements Runnable
+	private class SFTimerTask extends TimerTask
 	{
-		public int roundtime;
-		public boolean running = false;
 		
-		public synchronized void run () 
+		public void run () 
 		{
-			running = true;
-			for (; roundtime > 0; roundtime--)
-			{
-				try {
-					Thread.sleep(1000);
-				} catch (InterruptedException e) {
-					// TODO Auto-generated catch block
-					e.printStackTrace();
-				}
-				
-//				getDefaultStream().echo("roundtime.set = " + (StormFrontClient.this.roundtime.get() - 1));
-//				getDefaultStream().prompt(">");
-				
-				updateRoundtime(StormFrontClient.this.roundtime.get() - 1);
+			currentTime += 0.1;
+			
+			if(rtEnd >= 0.0) {
+				int newRT = (int)(rtEnd - currentTime + 1);
+				updateRoundtime(newRT);
 			}
-			running = false;
 		}
 	}
 	
 	public void startRoundtime (int seconds)
 	{
 		roundtime.activate();
-		roundtime.set(seconds);
-		rtRunnable.roundtime = seconds;
-		
-		if (!rtRunnable.running)
-		{
-			// don't overwrite the current thread
-			new Thread(rtRunnable).start();
-		}
+		rtEnd = currentTime + seconds;
+		updateRoundtime(seconds);
 	}
 	
-	public void updateRoundtime (int currentRoundtime)
+	public void updateRoundtime (int newRT)
 	{
-		roundtime.set(currentRoundtime);
+		if(newRT <= 0) {
+			newRT = 0;
+			rtEnd = -1;
+		}
+		if(roundtime.get() != newRT)
+			roundtime.set(newRT);
 	}
 	
 	public IProperty<BarStatus> getHealth() {
@@ -344,4 +335,14 @@ public class StormFrontClient extends WarlockClient implements IStormFrontClient
 		return commandPreset.getStyle();
 	}
 	
+	public long getTime() {
+		return (long)currentTime;
+	}
+	
+	public void setTime(long time) {
+		if(time < (long)currentTime)
+			currentTime = time + 0.9;
+		else if(time > (long)currentTime)
+			currentTime = time;
+	}
 }

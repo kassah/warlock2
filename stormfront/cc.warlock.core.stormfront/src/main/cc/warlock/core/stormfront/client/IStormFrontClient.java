@@ -162,5 +162,9 @@ public interface IStormFrontClient extends IWarlockClient, IRoomListener {
 	 * @return The component with the passed in name
 	 */
 	public IProperty<String> getComponent(String componentName);
+	
+	public long getTime();
+	
+	public void setTime(long time);
 
 }

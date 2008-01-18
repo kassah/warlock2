@@ -17,10 +17,6 @@ import cc.warlock.core.stormfront.xml.StormFrontAttributeList;
  * Window - Preferences - Java - Code Style - Code Templates
  */
 public class RoundtimeTagHandler extends DefaultTagHandler {
-	protected boolean waitingForPrompt, roundtimeStarted;
-	protected long rtEnds;
-	
-	public boolean isWaitingForPrompt() { return waitingForPrompt; }
 	
 	public RoundtimeTagHandler (IStormFrontProtocolHandler handler) {
 		super(handler);
@@ -33,20 +29,13 @@ public class RoundtimeTagHandler extends DefaultTagHandler {
 	
 	@Override
 	public void handleStart(StormFrontAttributeList attributes) {
-		rtEnds = Long.parseLong(attributes.getValue("value"));
-		waitingForPrompt = true;
-		roundtimeStarted = false;
+		long rtEnd = Long.parseLong(attributes.getValue("value"));
+		long rtLength = rtEnd - handler.getClient().getTime();
+		/* sometimes we're poorly synced and end up with a RT < 1,
+		 * so make the value 1 for that case */
+		if(rtLength < 1)
+			rtLength = 1;
+		handler.getClient().startRoundtime((int)rtLength);
 	}
-	
-	public void processFollowingPrompt (long currentPromptTime)
-	{
-		long time = rtEnds - currentPromptTime;
-		/* sometimes simu rounds horribly and we end up with a 0 second RT
-		 * this is clearly wrong, so make the value 1 for that case */
-		if(time == 0)
-			time = 1;
-		handler.getClient().startRoundtime((int) time);
-		
-		waitingForPrompt = false;
-	}
+
 }
