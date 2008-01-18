@@ -61,7 +61,7 @@ public class StormFrontClient extends WarlockClient implements IStormFrontClient
 	private Timer timer;
 	protected SFTimerTask timerTask;
 	private double currentTime = 0.0;
-	private double rtEnd = -1.0;
+	private double rtRemaining = -1.0;
 	protected ArrayList<IScript> runningScripts;
 	protected ArrayList<IScriptListener> scriptListeners;
 	protected DefaultSkin skin;
@@ -167,9 +167,9 @@ public class StormFrontClient extends WarlockClient implements IStormFrontClient
 		{
 			currentTime += 0.1;
 			
-			if(rtEnd >= 0.0) {
-				int newRT = (int)(rtEnd - currentTime + 1);
-				updateRoundtime(newRT);
+			if(rtRemaining > 0.0) {
+				rtRemaining -= 0.1;
+				updateRoundtime((int)Math.ceil(rtRemaining));
 			}
 		}
 	}
@@ -177,16 +177,12 @@ public class StormFrontClient extends WarlockClient implements IStormFrontClient
 	public void startRoundtime (int seconds)
 	{
 		roundtime.activate();
-		rtEnd = currentTime + seconds;
+		rtRemaining = seconds;
 		updateRoundtime(seconds);
 	}
 	
 	public void updateRoundtime (int newRT)
 	{
-		if(newRT <= 0) {
-			newRT = 0;
-			rtEnd = -1;
-		}
 		if(roundtime.get() != newRT)
 			roundtime.set(newRT);
 	}
