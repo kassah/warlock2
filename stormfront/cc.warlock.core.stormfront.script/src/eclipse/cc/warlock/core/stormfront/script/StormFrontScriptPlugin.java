@@ -3,8 +3,6 @@ package cc.warlock.core.stormfront.script;
 import org.eclipse.core.runtime.Plugin;
 import org.osgi.framework.BundleContext;
 
-import cc.warlock.core.stormfront.script.javascript.StormFrontJavascriptVars;
-
 /**
  * The activator class controls the plug-in life cycle
  */

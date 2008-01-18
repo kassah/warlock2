@@ -6,7 +6,7 @@
  */
 package cc.warlock.core.script;
 
-import java.util.List;
+import java.util.Collection;
 
 import cc.warlock.core.client.IWarlockClient;
 
@@ -43,6 +43,6 @@ public interface IScriptEngine {
 	/**
 	 * @return a list of currently running scripts for this script engine.
 	 */
-	public List<IScript> getRunningScripts();
+	public Collection<? extends IScript> getRunningScripts();
 	
 }

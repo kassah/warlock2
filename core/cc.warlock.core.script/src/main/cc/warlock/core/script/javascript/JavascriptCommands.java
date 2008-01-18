@@ -26,10 +26,6 @@ public class JavascriptCommands {
 	private int nextTimerID = 1;
 	private Timer timer = new Timer();
 	
-	public class JavascriptStopException extends Exception implements Serializable {
-		private static final long serialVersionUID = 7226391328268718796L;
-	}
-	
 	public JavascriptCommands(IScriptCommands commands, JavascriptScript script) {
 		this.commands = commands;
 		this.script = script;
@@ -105,14 +101,10 @@ public class JavascriptCommands {
 		commands.waitForPrompt();
 	}
 
-	public void exit() throws JavascriptStopException {
-		script.stop();
-		
-		throw new JavascriptStopException();
-	}
-	
-	public void stop() {
+	public void exit() throws Error {
 		commands.stop();
+		
+		throw new Error();
 	}
 	
 	public IScriptCommands getScriptCommands ()

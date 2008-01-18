@@ -2,6 +2,7 @@ package cc.warlock.core.stormfront.script.wsl;
 
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collection;
 import java.util.List;
 
 import cc.warlock.core.client.IWarlockClient;
@@ -79,7 +80,7 @@ public class WSLEngine implements IScriptEngine, IScriptListener {
 		runningScripts.remove(script);
 	}
 	
-	public List<IScript> getRunningScripts() {
+	public Collection<? extends IScript> getRunningScripts() {
 		return runningScripts;
 	}
 }

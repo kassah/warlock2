@@ -3,7 +3,6 @@ package cc.warlock.core.script.javascript;
 import java.util.HashMap;
 import java.util.concurrent.BlockingQueue;
 
-import org.mozilla.javascript.Context;
 import org.mozilla.javascript.Function;
 import org.mozilla.javascript.Script;
 import org.mozilla.javascript.Scriptable;

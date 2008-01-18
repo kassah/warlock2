@@ -8,9 +8,11 @@ package cc.warlock.core.script.javascript;
 
 import java.io.Reader;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.List;
 
 import org.mozilla.javascript.Context;
+import org.mozilla.javascript.ContextFactory;
 import org.mozilla.javascript.Function;
 import org.mozilla.javascript.RhinoException;
 import org.mozilla.javascript.Scriptable;
@@ -23,7 +25,6 @@ import cc.warlock.core.script.IScriptEngine;
 import cc.warlock.core.script.IScriptFileInfo;
 import cc.warlock.core.script.IScriptInfo;
 import cc.warlock.core.script.configuration.ScriptConfiguration;
-import cc.warlock.core.script.javascript.JavascriptCommands.JavascriptStopException;
 
 
 /**
@@ -36,9 +37,40 @@ public class JavascriptEngine implements IScriptEngine {
 
 	public static final String ENGINE_ID = "cc.warlock.script.javascript.JavascriptEngine";
 	protected ArrayList<IJavascriptVariableProvider> varProviders = new ArrayList<IJavascriptVariableProvider>();
-	protected ArrayList<IScript> runningScripts = new ArrayList<IScript>();
+	protected ArrayList<JavascriptScript> runningScripts = new ArrayList<JavascriptScript>();
 	
 	public Scriptable scope;
+	
+	private class WarlockContextFactory extends ContextFactory {
+		
+		protected Context makeContext() {
+			Context cx = new Context();
+			cx.setOptimizationLevel(-1);
+			cx.setInstructionObserverThreshold(1000);
+			return cx;
+		}
+		
+		protected void observeInstructionCount(Context cx, int instructionCount) {
+			JavascriptScript script = null;
+			for(JavascriptScript cur : runningScripts) {
+				if(cur.getContext().equals(cx)) {
+					script = cur;
+					break;
+				}
+			}
+			if(script == null) {
+				System.out.println("Couldn't find context.");
+				return;
+			}
+			if (!script.isRunning()) {
+				throw new Error();
+			}
+		}
+	}
+	
+	public JavascriptEngine() {
+		ContextFactory.initGlobal(new WarlockContextFactory());
+	}
 	
 	public String getScriptEngineId() {
 		return ENGINE_ID;
@@ -78,6 +110,9 @@ public class JavascriptEngine implements IScriptEngine {
 	
 	protected static String includeFunction = "function include (src) { script.include(src); }";
 	protected static String includeFunctionName = "<warlock js:include>";
+	
+
+	
 	public IScript startScript(IScriptInfo info, IWarlockClient client, final String[] arguments) {
 		final JavascriptScript script = new JavascriptScript(this, info, client);
 		
@@ -85,6 +120,7 @@ public class JavascriptEngine implements IScriptEngine {
 		runningScripts.add(script);
 		
 		new Thread(new Runnable() {
+			
 			public void run () {
 				Context context = Context.enter();
 				try {
@@ -109,7 +145,7 @@ public class JavascriptEngine implements IScriptEngine {
 					reader.close();
 				}
 				catch (WrappedException e) {
-					if (!(e.getCause() instanceof JavascriptStopException))
+					if (!(e.getCause() instanceof Error))
 					{
 						e.printStackTrace();
 						script.getClient().getDefaultStream().echo(
@@ -124,14 +160,17 @@ public class JavascriptEngine implements IScriptEngine {
 							+ "[script terminated: "+ script.getName()+"]\n"
 						);
 				}
+				catch(Error e) {
+					script.getClient().getDefaultStream().echo("[script terminated by user " + script.getName() + "]\n");
+					e.printStackTrace();
+				}
 				catch (Exception e) {
 					e.printStackTrace();
-					script.getClient().getDefaultStream().echo("[script terminated with error: "+ script.getName()+"]\n");
+					script.getClient().getDefaultStream().echo("[script terminated with error: " + script.getName() + "]\n");
 				}
 				finally {
 					Context.exit();
 					runningScripts.remove(script);
-					script.stop();
 				}
 			}
 		}).start();
@@ -162,7 +201,7 @@ public class JavascriptEngine implements IScriptEngine {
 		loadString("function helloWorld () { return 'Hello World'; } helloWorld(); ");
 	}
 	
-	public List<IScript> getRunningScripts() {
+	public Collection<? extends IScript> getRunningScripts() {
 		return runningScripts;
 	}
 }
