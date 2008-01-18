@@ -4,7 +4,6 @@ import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.FileReader;
 import java.io.IOException;
-import java.io.Serializable;
 import java.util.HashMap;
 import java.util.Timer;
 import java.util.TimerTask;
@@ -31,12 +30,21 @@ public class JavascriptCommands {
 		this.script = script;
 	}
 
+	protected void checkStop() {
+		if(!script.isRunning())
+			throw new Error();
+	}
+	
 	public void echo(String text) {
+		checkStop();
+		
 		commands.echo(text);
 	}
 
 	public void include (String otherScript)
 	{
+		checkStop();
+		
 		if (script.getScriptInfo() instanceof IScriptFileInfo)
 		{
 			IScriptFileInfo info = (IScriptFileInfo) script.getScriptInfo();
@@ -67,37 +75,53 @@ public class JavascriptCommands {
 	}
 
 	public void move(String direction) {
+		checkStop();
+		
 		commands.move(direction);
 	}
 
 	public void pause(int seconds) {
+		checkStop();
+		
 		commands.pause(seconds);
 	}
 
 	public void put(String text) {
+		checkStop();
+		
 		commands.put(text);
 	}
 	
 	public void waitFor(String string)
 	{
+		checkStop();
+		
 		waitFor(new TextMatch(string, true));
 	}
 	
 	// Default to case sensitivity
 	public void waitForRe(String string) {
+		checkStop();
+		
 		waitForRe(string, false);
 	}
 	
 	public void waitForRe(String string, Boolean ignoreCase)
 	{
+		checkStop();
+		
 		waitFor(new RegexMatch(string, ignoreCase));
 	}
 
 	public void waitFor(IMatch match) {
+		checkStop();
+		
 		commands.waitFor(match);
 	}
 
 	public void waitForPrompt() {
+		checkStop();
+		
 		commands.waitForPrompt();
 	}
 
@@ -109,6 +133,8 @@ public class JavascriptCommands {
 	
 	public IScriptCommands getScriptCommands ()
 	{
+		checkStop();
+		
 		return commands;
 	}
 	
@@ -139,6 +165,8 @@ public class JavascriptCommands {
 	}
 	
 	public int setInterval(String command, long interval) {
+		checkStop();
+		
 		int id = nextTimerID++;
 		
 		CommandCallback c = new CommandCallback(command);
@@ -149,6 +177,8 @@ public class JavascriptCommands {
 	}
 	
 	public int setTimeout(String command, long timeout) {
+		checkStop();
+		
 		int id = nextTimerID++;
 		
 		CommandCallback c = new CommandCallback(command);
