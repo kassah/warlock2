@@ -44,8 +44,8 @@ public class WSLScript extends AbstractScript {
 	protected HashMap<String, WSLCommandDefinition> wslCommands = new HashMap<String, WSLCommandDefinition>();
 	protected int pauseLine;
 	protected Thread scriptThread;
-	private Pattern commandPattern = Pattern.compile("^([\\w_]+)(\\s+(.*))?");
-	private ScriptTimer timer = new ScriptTimer();
+	private Pattern commandPattern = Pattern.compile("^([\\w]+)(\\s+(.*))?");
+
 	private boolean lastCondition = false;
 	private ArrayList<WSLAbstractCommand> commands = new ArrayList<WSLAbstractCommand>();
 	private ArrayList<IMatch> matches = new ArrayList<IMatch>();
@@ -99,7 +99,6 @@ public class WSLScript extends AbstractScript {
 		addCommandDefinition("waitfor", new WSLWaitFor());
 		addCommandDefinition("waitforre", new WSLWaitForRe());
 		
-		setVariable("t", new WSLTime());
 		setVariable("mana", new WSLMana());
 		setVariable("health", new WSLHealth());
 		setVariable("fatigue", new WSLFatigue());
@@ -148,12 +147,6 @@ public class WSLScript extends AbstractScript {
 			WSLScript.this.localVariables = localVariables;
 			WSLScript.this.curCommand = line;
 			WSLScript.this.nextCommand = line;
-		}
-	}
-	
-	private class WSLTime extends WSLAbstractNumber {
-		public double toDouble() {
-			return timer.get();
 		}
 	}
 	
@@ -400,11 +393,11 @@ public class WSLScript extends AbstractScript {
 		echo("Script warning on line " + curCommand.getLineNumber() + " (" + curLine + "): " + message);
 	}
 	
-	protected class ScriptTimer {
+	private class ScriptTimer extends WSLAbstractNumber {
 		private long timerStart = -1L;
 		private long timePast = 0L;
 		
-		public long get() {
+		public double toDouble() {
 			if(timerStart < 0) return timePast / 1000;
 			return (System.currentTimeMillis() - timerStart) / 1000;
 		}
@@ -493,7 +486,7 @@ public class WSLScript extends AbstractScript {
 	
 	protected class WSLSetVariable extends WSLCommandDefinition {
 		
-		private Pattern format = Pattern.compile("^([\\w_]+)(\\s+(.+)?)?$");
+		private Pattern format = Pattern.compile("^([^\\s]+)(\\s+(.+)?)?$");
 		
 		public void execute (String arguments) {
 			Matcher m = format.matcher(arguments);
@@ -513,7 +506,7 @@ public class WSLScript extends AbstractScript {
 	
 	protected class WSLSetLocalVariable extends WSLCommandDefinition {
 		
-		private Pattern format = Pattern.compile("^([\\w_]+)(\\s+(.+)?)?$");
+		private Pattern format = Pattern.compile("^([^\\s]+)(\\s+(.+)?)?$");
 		
 		public void execute (String arguments) {
 			Matcher m = format.matcher(arguments);
@@ -608,7 +601,7 @@ public class WSLScript extends AbstractScript {
 	
 	protected class WSLGosub extends WSLCommandDefinition {
 		
-		private Pattern format = Pattern.compile("^([\\w_]+)\\s*(.*)?$");
+		private Pattern format = Pattern.compile("^([^\\s]+)\\s*(.*)?$");
 		
 		public void execute (String arguments) {
 			Matcher m = format.matcher(arguments);
@@ -701,7 +694,7 @@ public class WSLScript extends AbstractScript {
 	
 	protected class WSLMatchRe extends WSLCommandDefinition {
 		
-		private Pattern format = Pattern.compile("^([\\w_]+)\\s+/(.*)/(\\w*)");
+		private Pattern format = Pattern.compile("^([^\\s]+)\\s+/(.*)/(\\w*)");
 		
 		public void execute (String arguments) {
 			Matcher m = format.matcher(arguments);
@@ -854,7 +847,7 @@ public class WSLScript extends AbstractScript {
 
 	protected class WSLWaitForRe extends WSLCommandDefinition {
 
-		private Pattern format = Pattern.compile("^/(.*)/(\\w*)");
+		private Pattern format = Pattern.compile("^/([^/]*)/(\\w*)");
 
 		public void execute (String arguments) {
 			Matcher m = format.matcher(arguments);
@@ -997,18 +990,42 @@ public class WSLScript extends AbstractScript {
 	
 	private class WSLTimer extends WSLCommandDefinition {
 		
-		private Pattern format = Pattern.compile("^(\\w+)");
+		private Pattern format = Pattern.compile("^(\\w+)(\\s+([^\\s]+))?");
 		
 		public void execute(String arguments) {
 			Matcher m = format.matcher(arguments);
 			
 			if(m.find()) {
 				String command = m.group(1);
-				if(command.equals("start"))			timer.start();
-				else if(command.equals("stop"))		timer.stop();
-				else if(command.equals("clear"))	timer.clear();
-				else {
-					scriptError("Invalid command \"" + command + "\" given to timer");
+				String timerName = m.group(3);
+				if(timerName == null)
+					timerName = "t";
+				IWSLValue var = getVariable(timerName);
+				if(var instanceof ScriptTimer || var == null) {
+					ScriptTimer timer = (ScriptTimer)var;
+					if(command.equals("start")) {
+						if(timer == null) {
+							timer = new ScriptTimer();
+							setVariable(timerName, timer);
+						}
+						timer.start();
+					} else if(command.equals("stop")) {
+						if(timer == null) {
+							scriptWarning("Timer \"" + timerName + "\" undefined.");
+						} else {
+							timer.stop();
+						}
+					} else if(command.equals("clear")) {
+						if(timer == null) {
+							scriptWarning("Timer \"" + timerName + "\" undefined.");
+						} else {
+							timer.clear();
+						}
+					} else {
+						scriptError("Invalid command \"" + command + "\" given to timer");
+					}
+				} else {
+					scriptError("Variable \"" + timerName + "\" is not a timer.");
 				}
 			} else {
 				scriptError("Invalid arguments to timer");
