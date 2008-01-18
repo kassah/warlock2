@@ -62,8 +62,6 @@ public interface IStormFrontClient extends IWarlockClient, IRoomListener {
 	 */
 	public void startRoundtime(int seconds);
 	
-	public void updateRoundtime(int secondsLeft);
-	
 	/**
 	 * @return The health property
 	 */

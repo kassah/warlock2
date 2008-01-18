@@ -169,7 +169,9 @@ public class StormFrontClient extends WarlockClient implements IStormFrontClient
 			
 			if(rtRemaining > 0.0) {
 				rtRemaining -= 0.1;
-				updateRoundtime((int)Math.ceil(rtRemaining));
+				int newRT = (int)Math.ceil(rtRemaining);
+				if(roundtime.get() != newRT)
+					roundtime.set(newRT);
 			}
 		}
 	}
@@ -178,13 +180,7 @@ public class StormFrontClient extends WarlockClient implements IStormFrontClient
 	{
 		roundtime.activate();
 		rtRemaining = seconds;
-		updateRoundtime(seconds);
-	}
-	
-	public void updateRoundtime (int newRT)
-	{
-		if(roundtime.get() != newRT)
-			roundtime.set(newRT);
+		roundtime.set(seconds);
 	}
 	
 	public IProperty<BarStatus> getHealth() {
