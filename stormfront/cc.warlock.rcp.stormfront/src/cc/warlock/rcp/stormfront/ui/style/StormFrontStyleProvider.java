@@ -1,5 +1,6 @@
 package cc.warlock.rcp.stormfront.ui.style;
 
+import org.eclipse.core.runtime.Platform;
 import org.eclipse.jface.resource.JFaceResources;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.graphics.Font;
@@ -30,6 +31,9 @@ public class StormFrontStyleProvider extends DefaultStyleProvider {
 		{
 			String monoFontFace = settings.getMainWindowSettings().getColumnFontFace();
 			int monoFontSize = settings.getMainWindowSettings().getColumnFontSizeInPoints();
+			if (Platform.getOS().equals(Platform.OS_MACOSX)) {
+				monoFontSize = settings.getMainWindowSettings().getColumnFontSizeInPixels();
+			}
 			if (monoFontFace != null)
 			{
 				if (JFaceResources.getFontRegistry().hasValueFor(monoFontFace))

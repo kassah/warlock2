@@ -3,6 +3,7 @@ package cc.warlock.rcp.stormfront.ui.views;
 import java.net.URL;
 
 import org.eclipse.core.runtime.IProgressMonitor;
+import org.eclipse.core.runtime.Platform;
 import org.eclipse.jface.dialogs.ProgressMonitorDialog;
 import org.eclipse.jface.resource.JFaceResources;
 import org.eclipse.swt.SWT;
@@ -305,6 +306,9 @@ public class StormFrontGameView extends GameView implements IStormFrontClientVie
 		
 		String fontFace = settings.getMainWindowSettings().getFontFace();
 		int fontSize = settings.getMainWindowSettings().getFontSizeInPoints();
+		if (Platform.getOS().equals(Platform.OS_MACOSX)) {
+			fontSize = settings.getMainWindowSettings().getFontSizeInPixels();
+		}
 		
 		boolean fontFaceEmpty = (fontFace == null || fontFace.length() == 0);
 		normalFont = fontFaceEmpty ? JFaceResources.getDefaultFont() : new Font(getSite().getShell().getDisplay(), fontFace, fontSize, SWT.NONE);
