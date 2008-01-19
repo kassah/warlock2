@@ -51,37 +51,53 @@ public class StormFrontJavascriptCommands extends JavascriptCommands
 	
 	// IStormFrontScriptCommands delegated methods
 	public void addAction(Function action, String text) {
+		checkStop();
+		
 		RegexMatch match = new RegexMatch(text);
 		JSActionHandler command = new JSActionHandler(action, match);
 		sfCommands.addAction(command, match);
 	}
 
 	public void removeAction(String text) {
+		checkStop();
+		
 		sfCommands.removeAction(text);
 	}
 	
 	public void removeAction(IMatch action)
 	{
+		checkStop();
+		
 		sfCommands.removeAction(action);
 	}
 
 	public void clearActions() {
+		checkStop();
+		
 		sfCommands.clearActions();
 	}
 
 	public void nextRoom() {
+		checkStop();
+		
 		sfCommands.nextRoom();
 	}
 
 	public void pause(double seconds) {
+		checkStop();
+		
 		sfCommands.pause(seconds);
 	}
 
 	public void waitForRoundtime() {
+		checkStop();
+		
 		sfCommands.waitForRoundtime();
 	}
 
 	public void waitNextRoom() {
+		checkStop();
+		
 		sfCommands.waitNextRoom();
 	}
 
