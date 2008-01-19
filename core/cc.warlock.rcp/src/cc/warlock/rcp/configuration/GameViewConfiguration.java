@@ -5,6 +5,7 @@ import java.util.List;
 
 import org.dom4j.DocumentHelper;
 import org.dom4j.Element;
+import org.eclipse.core.runtime.Platform;
 import org.eclipse.jface.resource.JFaceResources;
 
 import cc.warlock.core.client.WarlockColor;
@@ -32,6 +33,7 @@ public class GameViewConfiguration implements IConfigurationProvider {
 		defaultForeground = new WarlockColor(240, 240, 255);
 		defaultFontFace = JFaceResources.getDefaultFont().getFontData()[0].getName();
 		defaultFontSize = JFaceResources.getDefaultFont().getFontData()[0].getHeight();
+				
 		defaultEchoBackground = new WarlockColor(64, 64, 64);
 		defaultEchoForeground = new WarlockColor(255, 255, 255);
 		

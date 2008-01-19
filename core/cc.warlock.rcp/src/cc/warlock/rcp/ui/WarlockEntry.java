@@ -2,6 +2,7 @@ package cc.warlock.rcp.ui;
 
 import java.util.ArrayList;
 
+import org.eclipse.core.runtime.Platform;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.custom.ST;
 import org.eclipse.swt.custom.StyledText;
@@ -26,10 +27,14 @@ public class WarlockEntry implements VerifyKeyListener {
 	
 	public WarlockEntry(Composite parent, IWarlockClientViewer viewer) {
 		this.viewer = viewer;
-		widget = new StyledText(parent, SWT.BORDER | SWT.SINGLE);
+		
+		widget = new StyledText(parent, SWT.SINGLE); 
 		widget.setLayoutData(new GridData(GridData.FILL, GridData.FILL, true, true, 1, 1));
 		widget.setEditable(true);
-		widget.setLineSpacing(2);
+		
+		if (!Platform.getOS().equals(Platform.OS_MACOSX))
+			widget.setLineSpacing(2);
+		
 		widget.addVerifyKeyListener(this);
 	}
 	

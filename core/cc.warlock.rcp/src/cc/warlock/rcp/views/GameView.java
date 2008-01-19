@@ -128,7 +128,7 @@ public abstract class GameView extends StreamView implements IWarlockClientViewe
 		GridLayout layout = new GridLayout(1, false);
 		layout.horizontalSpacing = 0;
 		layout.verticalSpacing = 0;
-		layout.marginHeight = 0;
+		layout.marginHeight = 1;
 		layout.marginWidth = 0;
 		entryComposite.setLayout(layout);
 		entryComposite.setLayoutData(new GridData(GridData.FILL, GridData.VERTICAL_ALIGN_END, true, false));
