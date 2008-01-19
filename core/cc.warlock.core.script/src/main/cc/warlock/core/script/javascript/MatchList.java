@@ -51,6 +51,9 @@ public class MatchList extends ScriptableObject {
 	}
 	
 	public IMatch jsFunction_match(String text) {
+		if(!script.isRunning()) {
+			throw new Error();
+		}
 		TextMatch match = new TextMatch(text, true);
 		matches.put(match, new JSMatchData(null, null));
 		
@@ -58,6 +61,9 @@ public class MatchList extends ScriptableObject {
 	}
 	
 	public IMatch jsFunction_match(String text, Function function) {
+		if(!script.isRunning()) {
+			throw new Error();
+		}
 		TextMatch match = new TextMatch(text, true);
 		matches.put(match, new JSMatchData(function, null));
 		
@@ -94,6 +100,9 @@ public class MatchList extends ScriptableObject {
 	}
 	
 	public IMatch jsFunction_matchRe(String regex) {
+		if(!script.isRunning()) {
+			throw new Error();
+		}
 		RegexMatch match = new RegexMatch(regex);
 		matches.put(match, new JSRegexMatchData(match, null, null));
 		
@@ -101,6 +110,9 @@ public class MatchList extends ScriptableObject {
 	}
 	
 	public IMatch jsFunction_matchRe(String regex, Function function) {
+		if(!script.isRunning()) {
+			throw new Error();
+		}
 		RegexMatch match = new RegexMatch(regex);
 		matches.put(match, new JSRegexMatchData(match, function, null));
 		
@@ -115,6 +127,9 @@ public class MatchList extends ScriptableObject {
 //	}
 	
 	public IMatch jsFunction_matchWait() {
+		if(!script.isRunning()) {
+			throw new Error();
+		}
 		IMatch match = script.getCommands().matchWait(matches.keySet(), queue, 0.0);
 		
 		if (match != null)
