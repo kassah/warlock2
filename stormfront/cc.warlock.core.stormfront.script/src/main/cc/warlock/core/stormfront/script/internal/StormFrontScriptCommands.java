@@ -102,7 +102,9 @@ public class StormFrontScriptCommands extends ScriptCommands implements IStormFr
 	protected  class ScriptActionThread implements Runnable {
 		public void run() {
 			LinkedBlockingQueue<String> queue = new LinkedBlockingQueue<String>();
-			textWaiters.add(queue);
+			synchronized(textWaiters) {
+				textWaiters.add(queue);
+			}
 			actionLoop: while(true) {
 				String text = null;
 
