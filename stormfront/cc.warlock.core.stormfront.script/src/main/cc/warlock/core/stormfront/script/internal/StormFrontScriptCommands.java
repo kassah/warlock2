@@ -111,7 +111,7 @@ public class StormFrontScriptCommands extends ScriptCommands implements IStormFr
 				while(text == null) {
 					try {
 						text = queue.poll(100L, TimeUnit.MILLISECONDS);
-						if(actions == null || interrupted) {
+						if(actions.size() == 0 || interrupted) {
 							break actionLoop;
 						}
 					} catch(Exception e) {
