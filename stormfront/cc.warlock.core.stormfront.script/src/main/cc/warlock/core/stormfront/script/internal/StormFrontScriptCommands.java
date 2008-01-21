@@ -160,4 +160,9 @@ public class StormFrontScriptCommands extends ScriptCommands implements IStormFr
 		}
 	}
 	
+	@Override
+	public void stop() {
+		super.stop();
+		clearActions();
+	}
 }

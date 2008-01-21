@@ -169,6 +169,9 @@ public class JavascriptEngine implements IScriptEngine {
 					script.getClient().getDefaultStream().echo("[script terminated with error: " + script.getName() + "]\n");
 				}
 				finally {
+					if(script.isRunning()) {
+						script.stop();
+					}
 					Context.exit();
 					runningScripts.remove(script);
 				}

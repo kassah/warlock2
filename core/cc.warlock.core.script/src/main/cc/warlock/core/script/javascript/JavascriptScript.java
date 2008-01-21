@@ -56,6 +56,7 @@ public class JavascriptScript extends AbstractScript {
 	public void stop() {
 		stopped = true;
 		super.stop();
+		commands.stop();
 	}
 	
 	public void suspend() {

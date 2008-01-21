@@ -13,7 +13,7 @@ import cc.warlock.core.script.javascript.JavascriptScript;
 import cc.warlock.core.stormfront.client.IStormFrontClient;
 import cc.warlock.core.stormfront.script.internal.StormFrontScriptCommands;
 
-public class StormFrontJavascriptVars implements IJavascriptVariableProvider, IScriptListener {
+public class StormFrontJavascriptVars implements IJavascriptVariableProvider {
 
 	protected Hashtable<JavascriptScript, StormFrontJavascriptCommands> scriptCommands =
 		new Hashtable<JavascriptScript, StormFrontJavascriptCommands>();
@@ -55,25 +55,6 @@ public class StormFrontJavascriptVars implements IJavascriptVariableProvider, IS
 			scope.put("roomPlayers", scope, new JavascriptComponent(scope, sfClient, IStormFrontClient.COMPONENT_ROOM_PLAYERS));
 			scope.put("roomTitle", scope, new JavascriptProperty<String>(scope, sfClient.getRoomStream().getTitle()));
 			
-			script.addScriptListener(this);
-		}
-	}
-
-	public void scriptAdded(IScript script) {}
-	public void scriptPaused(IScript script) {}
-	public void scriptRemoved(IScript script) {}
-	public void scriptResumed(IScript script) {}
-	public void scriptStarted(IScript script) {}
-	
-	public void scriptStopped(IScript script, boolean userStopped) {
-		// Cleanup on stop
-		if (script instanceof JavascriptScript)
-		{
-			JavascriptScript jscript = (JavascriptScript)script;
-			if (scriptCommands.containsKey(jscript)) {
-				StormFrontJavascriptCommands commands = scriptCommands.get(jscript);
-				commands.clearActions();
-			}
 		}
 	}
 	
