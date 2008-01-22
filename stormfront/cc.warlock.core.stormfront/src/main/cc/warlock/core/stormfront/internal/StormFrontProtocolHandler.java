@@ -84,6 +84,8 @@ public class StormFrontProtocolHandler implements IStormFrontProtocolHandler {
 		new ResourceTagHandler(this);
 		new ATagHandler(this);
 		new DTagHandler(this);
+		
+		new StubTagHandler(this); // handles knows tags that don't have an implementation.
 	}
 	
 	/*
