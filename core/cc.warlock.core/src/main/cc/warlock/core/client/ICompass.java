@@ -6,14 +6,14 @@
  */
 package cc.warlock.core.client;
 
-import java.util.Map;
+import java.util.Set;
 
 /**
  * @author Marshall
  *
  * This interface represents the compass data structure
  */
-public interface ICompass extends IProperty<String> {
+public interface ICompass {
 	
 	public static enum DirectionType
 	{
@@ -73,6 +73,6 @@ public interface ICompass extends IProperty<String> {
 	/**
 	 * @return An array of the available directions
 	 */
-	public Map<DirectionType, Boolean> getDirections();
+	public Set<DirectionType> getDirections();
 	
 }

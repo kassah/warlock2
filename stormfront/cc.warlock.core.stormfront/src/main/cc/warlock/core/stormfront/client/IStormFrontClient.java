@@ -81,11 +81,6 @@ public interface IStormFrontClient extends IWarlockClient, IRoomListener {
 	 * @return The amount of spirit in the spirit bar.
 	 */
 	public IProperty<BarStatus> getSpirit();
-	
-	/**
-	 * @return The client's compass.
-	 */
-	public ICompass getCompass();
 
 	/**
 	 * @return The left hand property

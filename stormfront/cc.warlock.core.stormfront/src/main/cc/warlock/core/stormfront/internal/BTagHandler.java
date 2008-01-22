@@ -3,9 +3,9 @@ package cc.warlock.core.stormfront.internal;
 import cc.warlock.core.stormfront.IStormFrontProtocolHandler;
 
 
-public class BoldTagHandler extends DefaultTagHandler {
+public class BTagHandler extends DefaultTagHandler {
 
-	public BoldTagHandler(IStormFrontProtocolHandler handler) {
+	public BTagHandler(IStormFrontProtocolHandler handler) {
 		super(handler);
 		// TODO Auto-generated constructor stub
 	}
@@ -16,8 +16,8 @@ public class BoldTagHandler extends DefaultTagHandler {
 	}
 	
 	@Override
-	public boolean handleCharacters(String characters) {
-		return true;
+	public boolean ignoreNewlines() {
+		return false;
 	}
 
 }

@@ -25,7 +25,8 @@ public class CompDefTagHandler extends DefaultTagHandler {
 	public CompDefTagHandler (IStormFrontProtocolHandler handler) {
 		super(handler);
 		
-		addTagHandler("d", new DirectionTagHandler(handler));
+		addTagHandler(new DTagHandler(handler));
+		addTagHandler(new BTagHandler(handler));
 	}
 	
 	@Override
@@ -37,10 +38,6 @@ public class CompDefTagHandler extends DefaultTagHandler {
 	public void handleStart(StormFrontAttributeList attributes) {
 		buffer.setLength(0);
 		this.id = attributes.getValue("id");
-		
-		if (attributes.getValue("id").equals("room exits")) {
-			handler.getClient().getCompass().clear();
-		}
 	}
 	
 	@Override

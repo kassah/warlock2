@@ -250,8 +250,6 @@ public class StormFrontGameView extends GameView implements IStormFrontClientVie
 
 			StyleProviders.setStyleProvider(client, new StormFrontStyleProvider(sfClient.getServerSettings()));
 			
-			text.getCompass().setCompass(sfClient.getCompass());
-			
 			if (status != null)
 				status.setActiveClient(sfClient);
 		}

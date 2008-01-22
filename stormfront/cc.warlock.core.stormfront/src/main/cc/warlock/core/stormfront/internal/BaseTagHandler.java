@@ -28,7 +28,7 @@ abstract public class BaseTagHandler implements IStormFrontTagHandler {
 		this.currentTag = tagName;
 	}
 	
-	protected void addTagHandler(String tagName, IStormFrontTagHandler tagHandler) {
+	private void addTagHandler(String tagName, IStormFrontTagHandler tagHandler) {
 		if(tagHandlers == null) {
 			tagHandlers = new HashMap<String, IStormFrontTagHandler>();
 		}

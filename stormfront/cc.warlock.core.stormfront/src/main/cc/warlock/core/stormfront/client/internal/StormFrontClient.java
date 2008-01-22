@@ -14,7 +14,6 @@ import java.util.Timer;
 import java.util.TimerTask;
 
 import cc.warlock.core.client.ICharacterStatus;
-import cc.warlock.core.client.ICompass;
 import cc.warlock.core.client.IProperty;
 import cc.warlock.core.client.IRoomListener;
 import cc.warlock.core.client.IStream;
@@ -23,7 +22,6 @@ import cc.warlock.core.client.IWarlockStyle;
 import cc.warlock.core.client.WarlockClientRegistry;
 import cc.warlock.core.client.internal.CharacterStatus;
 import cc.warlock.core.client.internal.ClientProperty;
-import cc.warlock.core.client.internal.Compass;
 import cc.warlock.core.client.internal.WarlockClient;
 import cc.warlock.core.client.internal.WarlockStyle;
 import cc.warlock.core.script.IScript;
@@ -49,7 +47,6 @@ import com.martiansoftware.jsap.CommandLineTokenizer;
  */
 public class StormFrontClient extends WarlockClient implements IStormFrontClient, IScriptListener, IRoomListener {
 
-	protected ICompass compass;
 	protected ICharacterStatus status;
 	protected ClientProperty<Integer> roundtime;
 	protected ClientProperty<BarStatus> health, mana, fatigue, spirit;
@@ -70,7 +67,7 @@ public class StormFrontClient extends WarlockClient implements IStormFrontClient
 	
 	public StormFrontClient() {
 		super();
-		compass = new Compass(this);
+		
 		status = new CharacterStatus(this);
 		leftHand = new ClientProperty<String>(this, "leftHand", null);
 		rightHand = new ClientProperty<String>(this, "rightHand", null);
@@ -199,10 +196,6 @@ public class StormFrontClient extends WarlockClient implements IStormFrontClient
 		return spirit;
 	}
 
-	public ICompass getCompass() {
-		return compass;
-	}
-	
 	public void connect(String server, int port, String key) throws IOException {
 		connection = new StormFrontConnection(this, key);
 		connection.connect(server, port);

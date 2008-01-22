@@ -57,8 +57,9 @@ public class StormFrontProtocolHandler implements IStormFrontProtocolHandler {
 		new DialogDataTagHandler(this);
 		new PromptTagHandler(this);
 		new RoundtimeTagHandler(this);
-		new CompDefTagHandler(this); // compass handler
+		new CompDefTagHandler(this); // for the room stream
 		new NavTagHandler(this); // for nextRoom notification
+		new CompassTagHandler(this);
 		
 		// stream handlers
 		new PushStreamTagHandler(this);
@@ -75,7 +76,7 @@ public class StormFrontProtocolHandler implements IStormFrontProtocolHandler {
 		new StyleTagHandler(this);
 		new OutputTagHandler(this);
 		
-		new BoldTagHandler(this);
+		new BTagHandler(this);
 		new PushBoldTagHandler(this);
 		new PresetTagHandler(this);
 		new IndicatorTagHandler(this);
@@ -92,14 +93,6 @@ public class StormFrontProtocolHandler implements IStormFrontProtocolHandler {
 		for (String tagName : tagHandler.getTagNames())
 		{
 			defaultTagHandlers.put(tagName, tagHandler);
-		}
-	}
-	
-	public void removeHandler(IStormFrontTagHandler tagHandler) {
-		for (String tagName : tagHandler.getTagNames())
-		{
-			if (defaultTagHandlers.get(tagName).equals(tagHandler))
-				defaultTagHandlers.remove(tagName);
 		}
 	}
 	
@@ -227,20 +220,27 @@ public class StormFrontProtocolHandler implements IStormFrontProtocolHandler {
 		
 		//System.out.print("</" + name + ">");
 		
-		String popName = tagStack.pop();
-		if(!name.equals(popName))
-			System.err.println("Unexpected close tag \"" + name + "\". Expected \"" + popName + "\"");
-		assert(name.equals(popName));
+		// Get the tag name off the stack
+		if(tagStack.size() == 0 || !name.equals(tagStack.peek())) {
+			System.err.println("Unexpected close tag \"" + name + "\". Probably an unsupported tag.");
+		} else {
+			tagStack.pop();
+		}
+		
 		
 		// call the method for the object
 		IStormFrontTagHandler tagHandler = getTagHandlerForElement(name, defaultTagHandlers, 0);
 		if(tagHandler != null) {
+			
 			tagHandler.setCurrentTag(name);
 			tagHandler.handleEnd();
-			if(!tagHandler.ignoreNewlines()) {
-				if(newLine != null && newLine.length() > 0) {
-					characters(newLine);
-				}
+			if(!tagHandler.ignoreNewlines() && newLine != null && newLine.length() > 0) {
+				characters(newLine);
+			}
+		} else {
+			characters("</" + name + ">");
+			if(newLine != null && newLine.length() > 0) {
+				characters(newLine);
 			}
 		}
 	}
@@ -271,15 +271,27 @@ public class StormFrontProtocolHandler implements IStormFrontProtocolHandler {
 		// call the method for the object
 		IStormFrontTagHandler tagHandler = getTagHandlerForElement(name, defaultTagHandlers, 0);
 		
-		tagStack.push(name);
-		
 		if(tagHandler != null) {
+			
+			tagStack.push(name);
 			tagHandler.setCurrentTag(name);
 			tagHandler.handleStart(attributes);
-			if(!tagHandler.ignoreNewlines()) {
-				if(newLine != null && newLine.length() > 0) {
-					characters(newLine);
-				}
+			if(!tagHandler.ignoreNewlines() && newLine != null && newLine.length() > 0) {
+				characters(newLine);
+			}
+		} else {
+			String startTag = "<" + name;
+			if (attributes != null) {
+	            for (StormFrontAttribute attribute : attributes.getList())
+	            {
+	                startTag += " " + attribute.getName() + "=" +
+	                	attribute.getQuoteType() + attribute.getValue() + attribute.getQuoteType();
+	            }
+	        }
+			startTag += ">";
+			characters(startTag);
+			if(newLine != null && newLine.length() > 0) {
+				characters(newLine);
 			}
 		}
 	}

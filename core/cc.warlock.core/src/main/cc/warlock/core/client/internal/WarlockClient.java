@@ -10,8 +10,10 @@ import java.util.Collections;
 import java.util.HashSet;
 
 import cc.warlock.core.client.ICommandHistory;
+import cc.warlock.core.client.ICompass;
 import cc.warlock.core.client.IHighlightProvider;
 import cc.warlock.core.client.IHighlightString;
+import cc.warlock.core.client.IProperty;
 import cc.warlock.core.client.IRoomListener;
 import cc.warlock.core.client.IStream;
 import cc.warlock.core.client.IWarlockClient;
@@ -30,6 +32,7 @@ public abstract class WarlockClient implements IWarlockClient {
 	protected String streamPrefix;
 	protected HashSet<IHighlightProvider> highlightProviders = new HashSet<IHighlightProvider>();
 	private Collection<IRoomListener> roomListeners = Collections.synchronizedCollection(new ArrayList<IRoomListener>());
+	protected ClientProperty<ICompass> compass = new ClientProperty<ICompass>(this, "compass", null);
 	
 	public WarlockClient () {
 		viewers = new ArrayList<IWarlockClientViewer>();
@@ -143,6 +146,10 @@ public abstract class WarlockClient implements IWarlockClient {
 			for(IRoomListener listener : roomListeners)
 				listener.nextRoom();
 		}
+	}
+	
+	public IProperty<ICompass> getCompass() {
+		return compass;
 	}
 	
 }

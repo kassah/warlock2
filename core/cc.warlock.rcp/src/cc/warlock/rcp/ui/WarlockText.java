@@ -606,4 +606,8 @@ public class WarlockText implements LineBackgroundListener {
 	public StyledText getTextWidget() {
 		return textWidget;
 	}
+	
+	public IWarlockClient getClient() {
+		return client;
+	}
 }

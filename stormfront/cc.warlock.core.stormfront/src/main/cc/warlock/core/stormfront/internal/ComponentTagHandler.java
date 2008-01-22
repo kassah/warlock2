@@ -12,6 +12,8 @@ public class ComponentTagHandler extends DefaultTagHandler {
 	
 	public ComponentTagHandler(IStormFrontProtocolHandler handler) {
 		super(handler);
+		
+		addTagHandler(new BTagHandler(handler));
 	}
 	
 	@Override

@@ -29,7 +29,7 @@ import cc.warlock.rcp.ui.style.CompassTheme;
  * This is our custom compass that is drawn on top of the text widget and is movable like a normal window (within the text area for now).
  * @author marshall
  */
-public class WarlockCompass implements PaintListener, MouseMoveListener, MouseListener, IPropertyListener<String> {
+public class WarlockCompass implements PaintListener, MouseMoveListener, MouseListener, IPropertyListener<ICompass> {
 
 	private WarlockText text;
 	private boolean dragging = false;
@@ -43,7 +43,8 @@ public class WarlockCompass implements PaintListener, MouseMoveListener, MouseLi
 	private Rectangle compassBounds = compassImage.getBounds();
 	
 	public WarlockCompass (WarlockText text, CompassTheme theme)
-	{	
+	{
+		text.getClient().getCompass().addListener(new SWTPropertyListener<ICompass>(this));
 		this.text = text;
 		this.theme = theme;
 		
@@ -101,7 +102,7 @@ public class WarlockCompass implements PaintListener, MouseMoveListener, MouseLi
 		{
 			for (DirectionType direction : DirectionType.values())
 			{
-				if (direction != DirectionType.None && compass.getDirections().get(direction))
+				if (direction != DirectionType.None && compass.getDirections().contains(direction))
 				{
 					Point point = theme.getDirectionPosition(direction);
 					gc.drawImage(theme.getDirectionImage(direction), point.x + x, point.y + y);
@@ -164,11 +165,11 @@ public class WarlockCompass implements PaintListener, MouseMoveListener, MouseLi
 		}
 	}
 	
-	public void propertyActivated(IProperty<String> property) {}
-	public void propertyCleared(IProperty<String> property, String oldValue) {}
-	public void propertyChanged(IProperty<String> property, String oldValue) {
-		if (property.equals(compass))
-		{
+	public void propertyActivated(IProperty<ICompass> property) {}
+	public void propertyCleared(IProperty<ICompass> property, ICompass oldValue) {}
+	public void propertyChanged(IProperty<ICompass> property, ICompass oldValue) {
+		if(compass == null || !compass.equals(property.get())) {
+			compass = property.get();
 			redraw();
 		}
 	}
@@ -219,11 +220,4 @@ public class WarlockCompass implements PaintListener, MouseMoveListener, MouseLi
 		return compass;
 	}
 
-	public void setCompass(ICompass compass) {
-		this.compass = compass;
-		
-		compass.addListener(new SWTPropertyListener<String>(this));
-		redraw();
-	}
-	
 }

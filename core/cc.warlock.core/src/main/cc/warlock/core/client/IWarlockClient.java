@@ -118,4 +118,9 @@ public interface IWarlockClient extends IRoomListener {
 	public void addRoomListener(IRoomListener roomListener);
 	public void removeRoomListener(IRoomListener roomListener);
 	
+	/**
+	 * @return The client's compass.
+	 */
+	public IProperty<ICompass> getCompass();
+	
 }
