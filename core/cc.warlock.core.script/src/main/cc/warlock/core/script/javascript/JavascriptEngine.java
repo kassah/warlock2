@@ -21,9 +21,11 @@ import org.mozilla.javascript.WrappedException;
 
 import cc.warlock.core.client.IWarlockClient;
 import cc.warlock.core.script.IScript;
+import cc.warlock.core.script.IScriptCommands;
 import cc.warlock.core.script.IScriptEngine;
 import cc.warlock.core.script.IScriptFileInfo;
 import cc.warlock.core.script.IScriptInfo;
+import cc.warlock.core.script.ScriptCommandsFactory;
 import cc.warlock.core.script.configuration.ScriptConfiguration;
 
 
@@ -115,7 +117,9 @@ public class JavascriptEngine implements IScriptEngine {
 	
 	public IScript startScript(IScriptInfo info, IWarlockClient client, final String[] arguments) {
 		// FIXME need to somehow get dependent IScriptCommands to pass into the following constructor
-		final JavascriptScript script = new JavascriptScript(this, info, client, /* here */ );
+		
+		IScriptCommands commands = ScriptCommandsFactory.getFactory().createScriptCommands(client, info.getScriptName());
+		final JavascriptScript script = new JavascriptScript(this, info, client, commands);
 		
 		script.start();
 		runningScripts.add(script);
