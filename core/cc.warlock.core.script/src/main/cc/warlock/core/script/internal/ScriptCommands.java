@@ -39,7 +39,7 @@ public class ScriptCommands implements IScriptCommands, IStreamListener, IRoomLi
 	
 	protected boolean interrupted = false;
 	
-	protected Thread pausedThread;
+	private Thread pausedThread;
 	
 	public ScriptCommands (IWarlockClient client, String scriptName)
 	{

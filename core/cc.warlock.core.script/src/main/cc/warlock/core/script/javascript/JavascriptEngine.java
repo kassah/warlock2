@@ -114,7 +114,8 @@ public class JavascriptEngine implements IScriptEngine {
 
 	
 	public IScript startScript(IScriptInfo info, IWarlockClient client, final String[] arguments) {
-		final JavascriptScript script = new JavascriptScript(this, info, client);
+		// FIXME need to somehow get dependent IScriptCommands to pass into the following constructor
+		final JavascriptScript script = new JavascriptScript(this, info, client, /* here */ );
 		
 		script.start();
 		runningScripts.add(script);

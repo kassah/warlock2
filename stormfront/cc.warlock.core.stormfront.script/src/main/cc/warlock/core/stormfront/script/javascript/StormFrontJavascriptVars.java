@@ -4,14 +4,12 @@ import java.util.Hashtable;
 
 import org.mozilla.javascript.Scriptable;
 
-import cc.warlock.core.script.IScript;
-import cc.warlock.core.script.IScriptListener;
 import cc.warlock.core.script.ScriptEngineRegistry;
 import cc.warlock.core.script.javascript.IJavascriptVariableProvider;
 import cc.warlock.core.script.javascript.JavascriptEngine;
 import cc.warlock.core.script.javascript.JavascriptScript;
 import cc.warlock.core.stormfront.client.IStormFrontClient;
-import cc.warlock.core.stormfront.script.internal.StormFrontScriptCommands;
+import cc.warlock.core.stormfront.script.IStormFrontScriptCommands;
 
 public class StormFrontJavascriptVars implements IJavascriptVariableProvider {
 
@@ -32,8 +30,7 @@ public class StormFrontJavascriptVars implements IJavascriptVariableProvider {
 			IStormFrontClient sfClient = (IStormFrontClient) script.getClient();
 			
 			//overwrite the "script" variable with our big delegator
-			StormFrontScriptCommands sfCommands = new StormFrontScriptCommands(sfClient, script);
-			StormFrontJavascriptCommands commands = new StormFrontJavascriptCommands(sfCommands, script);
+			StormFrontJavascriptCommands commands = new StormFrontJavascriptCommands((IStormFrontScriptCommands)script.getCommands(), script);
 			scriptCommands.put(script, commands);
 			
 			scope.put("script", scope, commands);

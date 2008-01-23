@@ -33,13 +33,13 @@ public class JavascriptScript extends AbstractScript {
 	private IScriptCommands commands;
 	IWarlockClient client;
 	
-	public JavascriptScript (JavascriptEngine engine, IScriptInfo info, IWarlockClient client)
+	public JavascriptScript (JavascriptEngine engine, IScriptInfo info, IWarlockClient client, IScriptCommands commands)
 	{
 		super(info);
 		
 		this.engine = engine;
 		this.client = client;
-		this.commands = new ScriptCommands(client, getName());
+		this.commands = commands;
 	}
 
 	public boolean isRunning() {

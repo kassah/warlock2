@@ -77,18 +77,6 @@ public class StormFrontJavascriptCommands extends JavascriptCommands
 		sfCommands.clearActions();
 	}
 
-	public void nextRoom() {
-		checkStop();
-		
-		sfCommands.nextRoom();
-	}
-
-	public void pause(double seconds) {
-		checkStop();
-		
-		sfCommands.pause(seconds);
-	}
-
 	public void waitForRoundtime() {
 		checkStop();
 		
