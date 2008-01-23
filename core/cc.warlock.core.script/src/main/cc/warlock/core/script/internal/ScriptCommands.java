@@ -3,6 +3,7 @@ package cc.warlock.core.script.internal;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
+import java.util.List;
 import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.LinkedBlockingQueue;
 import java.util.concurrent.TimeUnit;
@@ -39,7 +40,7 @@ public class ScriptCommands implements IScriptCommands, IStreamListener, IRoomLi
 	
 	protected boolean interrupted = false;
 	
-	private Thread pausedThread;
+	private List<Thread> pausedThreads = Collections.synchronizedList(new ArrayList<Thread>());
 	
 	public ScriptCommands (IWarlockClient client, String scriptName)
 	{
@@ -139,14 +140,18 @@ public class ScriptCommands implements IScriptCommands, IStreamListener, IRoomLi
 	}
 
 	public void pause (double seconds) {
+		Thread thread = Thread.currentThread();
 		try {
-			// FIXME need to make this work for multiple users
-			pausedThread = Thread.currentThread();
+			synchronized(pausedThreads) {
+				pausedThreads.add(thread);
+			}
 			Thread.sleep((long)(seconds * 1000.0));
 		} catch(InterruptedException e) {
 			// we really don't care
 		} finally {
-			pausedThread = null;
+			synchronized(pausedThreads) {
+				pausedThreads.remove(thread);
+			}
 		}
 	}
 	
@@ -276,8 +281,10 @@ public class ScriptCommands implements IScriptCommands, IStreamListener, IRoomLi
 			interrupted = true;
 			gotPromptCond.signalAll();
 			nextRoom.signalAll();
-			if(pausedThread != null)
-				pausedThread.interrupt();
+			synchronized(pausedThreads) {
+				for(Thread pausedThread : pausedThreads)
+					pausedThread.interrupt();
+			}
 		} catch(Exception e) {
 			e.printStackTrace();
 		} finally {
