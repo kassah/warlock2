@@ -3,6 +3,7 @@ package cc.warlock.core.script.javascript;
 import java.util.HashMap;
 import java.util.concurrent.BlockingQueue;
 
+import org.mozilla.javascript.Context;
 import org.mozilla.javascript.Function;
 import org.mozilla.javascript.Script;
 import org.mozilla.javascript.Scriptable;
@@ -50,32 +51,19 @@ public class MatchList extends ScriptableObject {
 		}
 	}
 	
-	public IMatch jsFunction_match(String text) {
+	public IMatch jsFunction_match(String text, Object f) {
 		if(!script.isRunning()) {
 			throw new Error();
 		}
 		TextMatch match = new TextMatch(text, true);
-		matches.put(match, new JSMatchData(null, null));
+		Function function = null;
+		if (function != null && function instanceof Function)
+			function = (Function)function;
 		
-		return match;
-	}
-	
-	public IMatch jsFunction_match(String text, Function function) {
-		if(!script.isRunning()) {
-			throw new Error();
-		}
-		TextMatch match = new TextMatch(text, true);
 		matches.put(match, new JSMatchData(function, null));
 		
 		return match;
 	}
-	
-//	public IMatch jsFunction_match(String text, String expression) {
-//		TextMatch match = new TextMatch(text, true);
-//		matches.put(match, new JSMatchData(null, expression));
-//		
-//		return match;
-//	}
 	
 	private class JSRegexMatchData extends JSMatchData {
 		
@@ -99,32 +87,19 @@ public class MatchList extends ScriptableObject {
 		}
 	}
 	
-	public IMatch jsFunction_matchRe(String regex) {
+	public IMatch jsFunction_matchRe(String regex, Object f) {
 		if(!script.isRunning()) {
 			throw new Error();
 		}
 		RegexMatch match = new RegexMatch(regex);
-		matches.put(match, new JSRegexMatchData(match, null, null));
+		Function function = null;
+		if (function != null && function instanceof Function)
+			function = (Function)function;
 		
-		return match;
-	}
-	
-	public IMatch jsFunction_matchRe(String regex, Function function) {
-		if(!script.isRunning()) {
-			throw new Error();
-		}
-		RegexMatch match = new RegexMatch(regex);
 		matches.put(match, new JSRegexMatchData(match, function, null));
 		
 		return match;
 	}
-	
-//	public IMatch jsFunction_matchRe(String regex, String expression) {
-//		RegexMatch match = new RegexMatch(regex);
-//		matches.put(match, new JSRegexMatchData(match, null, expression));
-//		
-//		return match;
-//	}
 	
 	public IMatch jsFunction_matchWait() {
 		if(!script.isRunning()) {
