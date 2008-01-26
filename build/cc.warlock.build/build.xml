@@ -117,7 +117,7 @@
 			build.current.snapshot=${warlock-version}
 		</echo>
 		
-		<post to="http://www.arcaner.com/warlockbot-message.php">
+		<post to="http://verena.warlock.cc/warlockbot-message.php">
 			<prop name="key" value="asdf34zkkzxcvmmw43kaka000asdfk"/>
 			<prop name="message" value="Warlock nightly build succesfully completed: http://www.arcaner.com/warlock2-builds/${warlock-version}"/>
 		</post>
