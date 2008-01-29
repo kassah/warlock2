@@ -128,7 +128,12 @@ public class CommandHistory implements ICommandHistory {
 	public void addCommand(ICommand command) {
 		
 		if(commands.size() > 0 && command.getCommand().equals(commands.getFirst().getCommand()))
+		{
+			for (ICommandHistoryListener listener : listeners) {
+				listener.commandRepeated(commands.getFirst());
+			}
 			return;
+		}
 		
 		// command.setBoundForHistory(false);
 		commands.addFirst(command);

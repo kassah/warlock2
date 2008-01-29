@@ -4,6 +4,8 @@ public interface ICommandHistoryListener {
 
 	public void commandAdded (ICommand command);
 	
+	public void commandRepeated (ICommand command);
+	
 	public void historyNext (ICommand next);
 	
 	public void historyPrevious (ICommand previous);
