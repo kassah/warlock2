@@ -721,6 +721,7 @@ public class WSLScript extends AbstractScript {
 		int i = 0;
 		for(String var : match.groups()) {
 			setLocalVariable(String.valueOf(i), var);
+			i++;
 		}
 	}
 
