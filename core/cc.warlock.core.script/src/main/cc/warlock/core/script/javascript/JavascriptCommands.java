@@ -101,7 +101,7 @@ public class JavascriptCommands {
 		commands.move(direction);
 	}
 
-	public void pause(int seconds) {
+	public void pause(double seconds) {
 		checkStop();
 		
 		commands.pause(seconds);
