@@ -29,8 +29,6 @@ import org.eclipse.swt.events.KeyAdapter;
 import org.eclipse.swt.events.KeyEvent;
 import org.eclipse.swt.events.SelectionAdapter;
 import org.eclipse.swt.events.SelectionEvent;
-import org.eclipse.swt.graphics.Color;
-import org.eclipse.swt.graphics.Font;
 import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.widgets.Button;
@@ -41,11 +39,12 @@ import org.eclipse.ui.part.PageBook;
 import org.eclipse.ui.part.ViewPart;
 
 import cc.warlock.core.client.IWarlockClient;
+import cc.warlock.core.client.WarlockClientAdapter;
+import cc.warlock.core.client.WarlockClientRegistry;
 import cc.warlock.core.network.IConnection;
 import cc.warlock.core.network.IConnectionListener;
-import cc.warlock.rcp.configuration.GameViewConfiguration;
 import cc.warlock.rcp.ui.WarlockText;
-import cc.warlock.rcp.util.ColorUtil;
+import cc.warlock.rcp.ui.network.SWTConnectionListenerAdapter;
 
 public class DebugView extends ViewPart implements IConnectionListener, IGameViewFocusListener {
 
@@ -56,6 +55,19 @@ public class DebugView extends ViewPart implements IConnectionListener, IGameVie
 	private IWarlockClient client;
 	
 	public static final String VIEW_ID = "cc.warlock.rcp.views.DebugView";
+	
+	public DebugView() {
+		WarlockClientRegistry.addWarlockClientListener(new WarlockClientAdapter() {
+			public void clientConnected(final IWarlockClient client) {
+				Display.getDefault().asyncExec(new Runnable() {
+					public void run () {
+						setClient(client);
+						client.getConnection().addConnectionListener(new SWTConnectionListenerAdapter(DebugView.this));
+					}
+				});
+			}
+		});
+	}
 	
 	public void setClient(IWarlockClient client) {
 		this.client = client;

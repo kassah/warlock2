@@ -35,6 +35,7 @@ import cc.warlock.rcp.actions.OpenStreamWindowAction;
 import cc.warlock.rcp.plugin.Warlock2Plugin;
 import cc.warlock.rcp.ui.network.SWTConnectionListenerAdapter;
 import cc.warlock.rcp.views.DebugView;
+import cc.warlock.rcp.views.GameView;
 import cc.warlock.rcp.views.StreamView;
 
 
@@ -49,14 +50,14 @@ public class StreamWindowContributionItem extends CompoundContributionItem {
 		}
 		
 		public void run() {
-			IWarlockClient client = Warlock2Plugin.getDefault().getCurrentClient();
-			StormFrontConnection connection = (StormFrontConnection)client.getConnection();
-			
 			try {
 				DebugView view = (DebugView)
-				PlatformUI.getWorkbench().getActiveWorkbenchWindow().getActivePage().showView(DebugView.VIEW_ID, connection.getKey(), IWorkbenchPage.VIEW_VISIBLE);
-				view.setClient(client);
-				connection.addConnectionListener(new SWTConnectionListenerAdapter(view));
+				PlatformUI.getWorkbench().getActiveWorkbenchWindow().getActivePage().showView(DebugView.VIEW_ID, null, IWorkbenchPage.VIEW_VISIBLE);
+				GameView inFocus = GameView.getViewInFocus();
+				if (inFocus != null) {
+					view.setClient(inFocus.getWarlockClient());
+				}
+				
 			} catch(Exception e) {
 				e.printStackTrace();
 			}
