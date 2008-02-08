@@ -40,7 +40,7 @@ public class SettingsTagHandler extends DefaultTagHandler {
 		super(handler);
 		this.infoTagHandler = infoTagHandler;
 		
-		addTagHandler(new SettingsElementsTagHandler(handler, this));
+		//addTagHandler(new SettingsElementsTagHandler(handler, this));
 	}
 
 	protected static interface ViewerVisitor {
@@ -68,7 +68,7 @@ public class SettingsTagHandler extends DefaultTagHandler {
 	public void handleStart(StormFrontAttributeList attributes) {
 
 		buffer.setLength(0);	
-		handler.startSavingRawXML(buffer, "settings");
+		//handler.startSavingRawXML(buffer, "settings");
 		visitViewers(new ViewerVisitor() {
 			public void visit(IStormFrontClientViewer viewer) {
 				viewer.startDownloadingServerSettings();
@@ -115,6 +115,7 @@ public class SettingsTagHandler extends DefaultTagHandler {
 	
 	@Override
 	public boolean handleCharacters(String characters) {
+		buffer.append(characters);
 		return true;
 	}
 }
