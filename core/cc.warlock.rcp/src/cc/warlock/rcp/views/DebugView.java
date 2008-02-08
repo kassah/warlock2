@@ -57,6 +57,12 @@ public class DebugView extends ViewPart implements IConnectionListener, IGameVie
 	public static final String VIEW_ID = "cc.warlock.rcp.views.DebugView";
 	
 	public DebugView() {
+		// Add listeners to existing clients
+		for(IWarlockClient client : WarlockClientRegistry.getActiveClients()) {
+			client.getConnection().addConnectionListener(new SWTConnectionListenerAdapter(DebugView.this));
+		}
+		
+		// Add listeners to future clients
 		WarlockClientRegistry.addWarlockClientListener(new WarlockClientAdapter() {
 			public void clientConnected(final IWarlockClient client) {
 				Display.getDefault().asyncExec(new Runnable() {
@@ -109,6 +115,10 @@ public class DebugView extends ViewPart implements IConnectionListener, IGameVie
 			}
 		});
 		entry.setLayoutData(new GridData(GridData.FILL, GridData.FILL, true, false));
+		GameView view = GameView.getViewInFocus();
+		if(view != null) {
+			setClient(view.getWarlockClient());
+		}
 	}
 	
 	protected void sendRawText ()
