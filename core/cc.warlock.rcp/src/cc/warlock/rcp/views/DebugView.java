@@ -59,7 +59,9 @@ public class DebugView extends ViewPart implements IConnectionListener, IGameVie
 	public DebugView() {
 		// Add listeners to existing clients
 		for(IWarlockClient client : WarlockClientRegistry.getActiveClients()) {
-			client.getConnection().addConnectionListener(new SWTConnectionListenerAdapter(DebugView.this));
+			IConnection conn = client.getConnection();
+			if(conn != null)
+				conn.addConnectionListener(new SWTConnectionListenerAdapter(DebugView.this));
 		}
 		
 		// Add listeners to future clients
