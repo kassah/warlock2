@@ -23,6 +23,7 @@ package cc.warlock.rcp.views;
 
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.HashMap;
 import java.util.Hashtable;
 import java.util.regex.MatchResult;
 import java.util.regex.Matcher;
@@ -50,7 +51,6 @@ import cc.warlock.core.client.IWarlockStyle;
 import cc.warlock.core.client.PropertyListener;
 import cc.warlock.core.client.WarlockString;
 import cc.warlock.rcp.configuration.GameViewConfiguration;
-import cc.warlock.rcp.ui.IStyleProvider;
 import cc.warlock.rcp.ui.WarlockText;
 import cc.warlock.rcp.ui.client.SWTPropertyListener;
 import cc.warlock.rcp.ui.client.SWTStreamListener;
@@ -82,7 +82,7 @@ public class StreamView extends ViewPart implements IStreamListener, IGameViewFo
 	protected boolean isPrompting = false;
 	protected boolean multiClient = false;
 	
-	protected WarlockString bufferedText;
+	protected HashMap<IWarlockClient, WarlockString> textBuffers = new HashMap<IWarlockClient, WarlockString>();
 	
 	public StreamView() {
 		openViews.add(this);
@@ -235,30 +235,28 @@ public class StreamView extends ViewPart implements IStreamListener, IGameViewFo
 	public void streamCleared(IStream stream) {
 		if (this.mainStream.equals(stream) || streams.contains(stream))
 		{
-			clientStreams.get(client).setText("");
+			clientStreams.get(stream.getClient()).setText("");
 		}
 	}
 	
-	protected IStyleProvider getStyleProvider ()
+	protected void bufferText (IWarlockClient client, WarlockString string)
 	{
-		return StyleProviders.getStyleProvider(client);
+		WarlockString bufferedText = textBuffers.get(client);
+		if(bufferedText == null) {
+			bufferedText = new WarlockString();
+			textBuffers.put(client, bufferedText);
+		}
+
+		bufferedText.append(string);
 	}
 	
-	protected void bufferText (WarlockString string)
-	{
-			if(bufferedText == null)
-				bufferedText = new WarlockString();
-			
-			bufferedText.append(string);
-	}
-	
-	protected void appendText(WarlockString string) {
+	protected void appendText(IWarlockClient client, WarlockString string) {
 		WarlockText text = getTextForClient(client);
-		highlightText(string);
+		highlightText(client, string);
 		text.append(string);
 	}
 	
-	protected void highlightText (WarlockString text)
+	protected void highlightText (IWarlockClient client, WarlockString text)
 	{	
 		for (IHighlightString hstring : client.getHighlightStrings())
 		{
@@ -299,13 +297,14 @@ public class StreamView extends ViewPart implements IStreamListener, IGameViewFo
 			if (appendNewlines)
 				string.append("\n");
 			
-			bufferText(string);
+			bufferText(stream.getClient(), string);
 		}
 	}
 	
 	public void streamEchoed(IStream stream, String text) {
 		if (this.mainStream.equals(stream) || this.streams.contains(stream))
 		{
+			IWarlockClient client = stream.getClient();
 			WarlockString string = new WarlockString();
 			if(isPrompting) {
 				string.append("\n");
@@ -316,19 +315,20 @@ public class StreamView extends ViewPart implements IStreamListener, IGameViewFo
 			// TODO: make a different style for client messages
 			string.addStyle(styleStart, text.length(), client.getCommandStyle());
 			
-			appendText(string);
+			appendText(client, string);
 		}
 	}
 	
 	public void streamReceivedCommand(IStream stream, String text) {
 		if (this.mainStream.equals(stream) || this.streams.contains(stream))
 		{
+			IWarlockClient client = stream.getClient();
 			WarlockString string = new WarlockString(text);
 			
 			string.addStyle(0, text.length(), client.getCommandStyle());
 			
 			isPrompting = false;
-			appendText(string);
+			appendText(client, string);
 		}
 	}
 	
@@ -336,12 +336,15 @@ public class StreamView extends ViewPart implements IStreamListener, IGameViewFo
 		if ((!isPrompting) &&
 				(this.mainStream.equals(stream) || this.streams.contains(stream)))
 		{
+			IWarlockClient client = stream.getClient();
+			
 			WarlockString text = new WarlockString();
+			WarlockString bufferedText = textBuffers.get(client);
 			
 			if (bufferedText != null)
 			{
 				text.append(bufferedText);
-				bufferedText = null;
+				textBuffers.remove(client);
 			}
 			
 			if(isPrompting) {
@@ -351,7 +354,7 @@ public class StreamView extends ViewPart implements IStreamListener, IGameViewFo
 			}
 				
 			text.append(prompt);
-			appendText(text);
+			appendText(client, text);
 		}
 	}
 
@@ -414,9 +417,10 @@ public class StreamView extends ViewPart implements IStreamListener, IGameViewFo
 	}
 	
 	public void streamFlush(IStream stream) {
+		WarlockString bufferedText = textBuffers.get(stream.getClient());
 		if(bufferedText != null) {
-			appendText(bufferedText);
-			bufferedText = null;
+			appendText(stream.getClient(), bufferedText);
+			textBuffers.remove(client);
 		}
 	}
 	

@@ -82,7 +82,7 @@ public class DebugView extends ViewPart implements IConnectionListener, IGameVie
 		book.showPage(getTextForClient(client).getTextWidget());
 	}
 	
-	private void debug (String message)
+	private void debug (IWarlockClient client, String message)
 	{
 		WarlockText console = getTextForClient(client);
 		console.append(message);
@@ -141,15 +141,15 @@ public class DebugView extends ViewPart implements IConnectionListener, IGameVie
 	}
 	
 	public void connected(IConnection connection) {
-		debug ("connected");
+		debug (connection.getClient(), "connected");
 	}
 	
 	public void dataReady(IConnection connection, String line) {
-		debug (line);
+		debug (connection.getClient(), line);
 	}
 	
 	public void disconnected(IConnection connection) {
-		debug ("disconnected");
+		debug (connection.getClient(), "disconnected");
 	}
 
 	public void gameViewFocused(GameView gameView) {

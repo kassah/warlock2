@@ -62,7 +62,7 @@ public class UserStream extends StreamView implements IWarlockClientListener {
 	}
 	
 	@Override
-	protected void appendText (WarlockString string)
+	protected void appendText (IWarlockClient client, WarlockString string)
 	{
 		// Process filters on the complete lines
 		WarlockString ret = new WarlockString();
@@ -87,7 +87,7 @@ public class UserStream extends StreamView implements IWarlockClientListener {
 			}
 		}
 		if (ret.length() > 0) {
-			super.appendText(ret);
+			super.appendText(client, ret);
 		}
 	}
 	
