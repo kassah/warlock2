@@ -163,4 +163,8 @@ public class StormFrontConnection implements IConnection
 	public String getKey() {
 		return key;
 	}
+	
+	public StormFrontProtocolHandler getProtocolHandler() {
+		return handler;
+	}
 }
