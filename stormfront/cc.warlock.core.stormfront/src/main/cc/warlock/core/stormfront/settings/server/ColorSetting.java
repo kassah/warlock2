@@ -19,12 +19,15 @@
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
- package cc.warlock.core.stormfront.serversettings.server;
+ package cc.warlock.core.stormfront.settings.server;
 
+import cc.warlock.core.client.settings.IClientSettingProvider;
+import cc.warlock.core.client.settings.IColorSetting;
 import cc.warlock.core.stormfront.client.StormFrontColor;
 import cc.warlock.core.stormfront.xml.StormFrontElement;
 
-public abstract class ColorSetting extends ServerSetting implements Comparable<ColorSetting> {
+@Deprecated
+public abstract class ColorSetting extends ServerSetting implements Comparable<ColorSetting>, IColorSetting {
 
 	protected String foregroundColor, backgroundColor;
 	protected Palette palette;
@@ -54,7 +57,7 @@ public abstract class ColorSetting extends ServerSetting implements Comparable<C
 	{
 		if (this == serverSettings.getMainWindowSettings())
 		{
-			return serverSettings.getDefaultSkin().getDefaultWindowForeground();
+			return new StormFrontColor(serverSettings.getDefaultSkin().getDefaultWindowForeground());
 		}
 		else
 		{
@@ -66,7 +69,7 @@ public abstract class ColorSetting extends ServerSetting implements Comparable<C
 	{
 		if (this == serverSettings.getMainWindowSettings())
 		{
-			return serverSettings.getDefaultSkin().getDefaultWindowBackground();
+			return new StormFrontColor(serverSettings.getDefaultSkin().getDefaultWindowBackground());
 		}
 		else
 		{
@@ -114,9 +117,9 @@ public abstract class ColorSetting extends ServerSetting implements Comparable<C
 				return StormFrontColor.DEFAULT_COLOR;
 			
 			if (KEY_FGCOLOR.equals(key) || foregroundKey.equals(key))
-				return serverSettings.getDefaultSkin().getSkinForegroundColor(this);
+				return new StormFrontColor(serverSettings.getDefaultSkin().getSkinForegroundColor(getId(), this));
 			else if (KEY_BGCOLOR.equals(key))
-				return serverSettings.getDefaultSkin().getSkinBackgroundColor(this);
+				return new StormFrontColor(serverSettings.getDefaultSkin().getSkinBackgroundColor(getId(), this));
 		}
 		
 		return new StormFrontColor(color);
@@ -186,4 +189,9 @@ public abstract class ColorSetting extends ServerSetting implements Comparable<C
 	public int compareTo(ColorSetting o) {
 		return foregroundColor.compareTo(o.foregroundColor);
 	}
+	
+	public IClientSettingProvider getProvider() {
+		return null;
+	}
+	
 }

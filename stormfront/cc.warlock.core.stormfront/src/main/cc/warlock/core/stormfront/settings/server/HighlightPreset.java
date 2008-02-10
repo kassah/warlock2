@@ -19,14 +19,16 @@
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
-package cc.warlock.core.stormfront.serversettings.server;
+package cc.warlock.core.stormfront.settings.server;
 
 import java.util.regex.Pattern;
 import java.util.regex.PatternSyntaxException;
 
-import cc.warlock.core.client.IHighlightString;
+import cc.warlock.core.client.settings.IClientSettingProvider;
+import cc.warlock.core.client.settings.IHighlightString;
 import cc.warlock.core.stormfront.xml.StormFrontElement;
 
+@Deprecated
 public class HighlightPreset extends Preset implements IHighlightString {
 
 	public static final String KEY_TEXT = "text";
@@ -215,5 +217,17 @@ public class HighlightPreset extends Preset implements IHighlightString {
 		String tagSuffix = isName ? HighlightPreset.NAMES_SUFFIX : HighlightPreset.STRINGS_SUFFIX;
 		
 		return tagPrefix + childMarkup + tagSuffix;
+	}
+	
+	public boolean isCaseSensitive() {
+		return false;
+	}
+	
+	public boolean isLiteral() {
+		return true;
+	}
+	
+	public IClientSettingProvider getProvider() {
+		return null;
 	}
 }

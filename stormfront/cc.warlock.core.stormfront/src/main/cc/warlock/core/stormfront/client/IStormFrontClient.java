@@ -30,15 +30,14 @@ package cc.warlock.core.stormfront.client;
 import java.util.Collection;
 
 import cc.warlock.core.client.ICharacterStatus;
-import cc.warlock.core.client.ICompass;
 import cc.warlock.core.client.IProperty;
 import cc.warlock.core.client.IRoomListener;
 import cc.warlock.core.client.IStream;
 import cc.warlock.core.client.IWarlockClient;
 import cc.warlock.core.script.IScript;
 import cc.warlock.core.script.IScriptListener;
-import cc.warlock.core.stormfront.serversettings.server.ServerSettings;
-import cc.warlock.core.stormfront.serversettings.skin.IStormFrontSkin;
+import cc.warlock.core.stormfront.settings.IStormFrontClientSettings;
+import cc.warlock.core.stormfront.settings.skin.IStormFrontSkin;
 
 /**
  * @author Marshall
@@ -64,7 +63,7 @@ public interface IStormFrontClient extends IWarlockClient, IRoomListener {
 	 * The server settings for this client
 	 * @return
 	 */
-	public ServerSettings getServerSettings();
+	public IStormFrontClientSettings getStormFrontClientSettings();
 	
 	/**
 	 * @return The player ID of the current player

@@ -19,7 +19,7 @@
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
-package cc.warlock.core.stormfront.serversettings.server;
+package cc.warlock.core.stormfront.settings.server;
 
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
@@ -37,19 +37,17 @@ import java.util.List;
 import java.util.ListIterator;
 import java.util.Map;
 
-import cc.warlock.core.client.IHighlightProvider;
-import cc.warlock.core.client.IHighlightString;
-import cc.warlock.core.client.IWarlockClientViewer;
+import cc.warlock.core.client.IWarlockStyle;
+import cc.warlock.core.client.settings.IHighlightString;
 import cc.warlock.core.configuration.ConfigurationUtil;
 import cc.warlock.core.script.ScriptEngineRegistry;
 import cc.warlock.core.stormfront.client.IStormFrontClient;
-import cc.warlock.core.stormfront.client.IStormFrontClientViewer;
-import cc.warlock.core.stormfront.serversettings.skin.IStormFrontSkin;
+import cc.warlock.core.stormfront.settings.skin.IStormFrontSkin;
 import cc.warlock.core.stormfront.xml.StormFrontDocument;
 import cc.warlock.core.stormfront.xml.StormFrontElement;
 
-
-public class ServerSettings implements Comparable<ServerSettings>, IHighlightProvider
+@Deprecated
+public class ServerSettings implements Comparable<ServerSettings>
 {
 	public static final String WINDOW_MAIN = "smain";
 	public static final String WINDOW_INVENTORY = "sinv";
@@ -89,15 +87,6 @@ public class ServerSettings implements Comparable<ServerSettings>, IHighlightPro
 		
 		scriptProvider = new ServerScriptProvider(client);
 		ScriptEngineRegistry.addScriptProvider(scriptProvider);
-		
-		client.addHighlightProvider(this);
-	}
-	
-	public ServerSettings (IStormFrontClient client, String playerId)
-	{
-		this(client);
-		
-		load(playerId);
 	}
 	
 	public static StormFrontDocument getDocument (String playerId)
@@ -152,12 +141,11 @@ public class ServerSettings implements Comparable<ServerSettings>, IHighlightPro
 			listeners.remove(listener);
 	}
 	
-	public void load (String playerId)
+	public void load (String playerId, InputStream stream)
 	{
 		this.playerId = playerId;
 		
 		try {
-			FileInputStream stream = new FileInputStream(ConfigurationUtil.getConfigurationFile("serverSettings_" + playerId + ".xml"));
 			document = new StormFrontDocument(stream);
 			
 			loadPalette();
@@ -176,13 +164,13 @@ public class ServerSettings implements Comparable<ServerSettings>, IHighlightPro
 			loadIgnores();
 			
 			// initalize before we call the viewers
-			client.getStormFrontSkin().loadDefaultPresets(this, presets);
+//			client.getStormFrontSkin().loadDefaultPresets(this, presets);
 			
-			for (IWarlockClientViewer v : client.getViewers())
-			{
-				IStormFrontClientViewer viewer = (IStormFrontClientViewer) v;
-				viewer.loadServerSettings(this);
-			}
+//			for (IWarlockClientViewer v : client.getViewers())
+//			{
+//				IStormFrontClientViewer viewer = (IStormFrontClientViewer) v;
+//				viewer.loadServerSettings(this);
+//			}
 			
 			stream.close();
 			incrementMajorVersion();
@@ -366,7 +354,11 @@ public class ServerSettings implements Comparable<ServerSettings>, IHighlightPro
 		return highlightStrings.get(index);
 	}
 	
-	public Collection<? extends IHighlightString> getHighlightStrings ()
+	public IWarlockStyle getNamedStyle(String name) {
+		return presets.get(name).getStyle();
+	}
+	
+	public List<? extends IHighlightString> getHighlightStrings ()
 	{	
 		return highlightStrings;
 	}
@@ -646,7 +638,6 @@ public class ServerSettings implements Comparable<ServerSettings>, IHighlightPro
 	
 	public void sendInitialServerSettings ()
 	{
-		System.out.println("Sending initial server settings document...");
 		StormFrontDocument initialDoc = getInitialServerSettings();
 		sendSettingsDocument(initialDoc, true);
 		
@@ -654,9 +645,7 @@ public class ServerSettings implements Comparable<ServerSettings>, IHighlightPro
 		this.playerId = client.getPlayerId().get();
 		
 		saveLocalXml();
-		load(client.getPlayerId().get());
-		
-		System.out.println("Finished sending initial settings.");
+//		load(client.getPlayerId().get());
 	}
 	
 	protected String readStream (InputStream stream)
@@ -822,6 +811,11 @@ public class ServerSettings implements Comparable<ServerSettings>, IHighlightPro
 	public List<IgnoreSetting> getIgnores ()
 	{
 		return ignores;
+	}
+	
+	public Collection<WindowSettings> getAllWindowSettings ()
+	{
+		return windowSettings.values();
 	}
 	
 	public WindowSettings getWindowSettings (String windowId)

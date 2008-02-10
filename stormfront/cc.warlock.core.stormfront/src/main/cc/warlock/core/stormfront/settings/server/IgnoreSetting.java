@@ -19,40 +19,25 @@
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
-package cc.warlock.core.stormfront.serversettings.server;
+package cc.warlock.core.stormfront.settings.server;
 
-import java.util.ArrayList;
+import java.util.regex.Pattern;
 
-public class MacroKey extends ServerSetting {
+import cc.warlock.core.stormfront.xml.StormFrontElement;
 
-	protected String keyString;
-	protected String action;
-	protected String key;
-	protected ArrayList<String> modifiers = new ArrayList<String>();
+@Deprecated
+public class IgnoreSetting extends ServerSetting {
+
+	private String text;
+	private boolean matchPartialWord = false;
+	private boolean ignoreCase = false;
+	private Pattern regex;
 	
-	public MacroKey (ServerSettings settings, String keyString, String action)
+	public IgnoreSetting (ServerSettings settings, StormFrontElement ignoreElement)
 	{
-		super(settings);
+		super(settings, ignoreElement);
 		
-		setKeyString(keyString);
-		setAction(action);
-	}
-	
-	private void parseKeyString ()
-	{
-		modifiers.clear();
-		
-		String tokens[] = keyString.split("-");
-		if (tokens.length > 1)
-		{
-			for (int i = 0; i < tokens.length - 1; i++) {
-				modifiers.add(tokens[i]);
-			}
-			key = tokens[tokens.length-1];
-		}
-		else {
-			key = keyString;
-		}
+		this.text = ignoreElement.attributeValue("text");
 	}
 	
 	@Override
@@ -67,33 +52,33 @@ public class MacroKey extends ServerSetting {
 		return null;
 	}
 
-	public String getKey() {
-		return key;
+	public Pattern getRegex() {
+		if(regex == null) {
+			String regText = Pattern.quote(text);
+			if(!matchPartialWord)
+				regText = "\\b" + regText + "\\b";
+			int flags = 0;
+			if(ignoreCase)
+				flags |= Pattern.CASE_INSENSITIVE;
+			regex = Pattern.compile(regText, flags);
+		}
+
+		return regex;
 	}
 
-	public ArrayList<String> getModifiers() {
-		return modifiers;
+	public void setText(String text) {
+		this.text = text;
+		regex = null;
 	}
 
-	public String getKeyString() {
-		return keyString;
+	public void setMatchPartialWord(boolean matchPartialWord) {
+		this.matchPartialWord = matchPartialWord;
+		regex = null;
 	}
-	
-	public void setKeyString (String keyString)
-	{
-		this.keyString = keyString;
-		
-		parseKeyString();
-	}
-	
-	public String getAction ()
-	{
-		return action;
-	}
-	
-	public void setAction (String action)
-	{
-		this.action = action;
+
+	public void setIgnoreCase(boolean ignoreCase) {
+		this.ignoreCase = ignoreCase;
+		regex = null;
 	}
 
 }
