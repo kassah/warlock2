@@ -26,8 +26,8 @@ import java.util.regex.Pattern;
 
 import cc.warlock.core.client.WarlockString;
 import cc.warlock.core.client.internal.Stream;
-import cc.warlock.core.client.settings.IIgnore;
 import cc.warlock.core.stormfront.client.IStormFrontClient;
+import cc.warlock.core.stormfront.serversettings.server.IgnoreSetting;
 
 public class StormFrontStream extends Stream {
 	
@@ -49,9 +49,9 @@ public class StormFrontStream extends Stream {
 		if (client != null)
 		{
 			// Ignore text containing ignores
-			for (IIgnore ignore : client.getClientSettings().getAllIgnores())
+			for (IgnoreSetting ignore : ((IStormFrontClient)client).getServerSettings().getIgnores())
 			{
-				Pattern ignoreRegex = ignore.getPattern();
+				Pattern ignoreRegex = ignore.getRegex();
 				int pos = 0;
 				for(;;)
 				{

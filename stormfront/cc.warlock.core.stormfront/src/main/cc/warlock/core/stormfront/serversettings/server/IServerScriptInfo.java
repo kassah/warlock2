@@ -19,16 +19,20 @@
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
-package cc.warlock.core.stormfront.settings;
+package cc.warlock.core.stormfront.serversettings.server;
 
-import cc.warlock.core.client.WarlockColor;
-import cc.warlock.core.client.settings.IColorSetting;
-import cc.warlock.core.client.settings.IFontSetting;
+import cc.warlock.core.script.IScriptInfo;
+import cc.warlock.core.stormfront.client.IStormFrontClient;
 
-/**
- * @author marshall
- *
- */
-public interface ICommandLineSettings extends IColorSetting, IFontSetting {
-	public WarlockColor getBarColor();
+public interface IServerScriptInfo extends IScriptInfo {
+
+	public String getContents();
+	
+	public String getComment();
+	
+	public IStormFrontClient getClient();
+	
+	public IServerScriptProvider getProvider();
+	
+	public ServerScript getServerScript();
 }

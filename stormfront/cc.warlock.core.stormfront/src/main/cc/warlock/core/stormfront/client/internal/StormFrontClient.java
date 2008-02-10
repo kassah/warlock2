@@ -45,7 +45,6 @@ import cc.warlock.core.client.internal.CharacterStatus;
 import cc.warlock.core.client.internal.ClientProperty;
 import cc.warlock.core.client.internal.WarlockClient;
 import cc.warlock.core.client.internal.WarlockStyle;
-import cc.warlock.core.client.settings.IClientSettings;
 import cc.warlock.core.script.IScript;
 import cc.warlock.core.script.IScriptListener;
 import cc.warlock.core.script.ScriptEngineRegistry;
@@ -54,10 +53,10 @@ import cc.warlock.core.stormfront.IStormFrontProtocolHandler;
 import cc.warlock.core.stormfront.client.BarStatus;
 import cc.warlock.core.stormfront.client.IStormFrontClient;
 import cc.warlock.core.stormfront.network.StormFrontConnection;
-import cc.warlock.core.stormfront.settings.IStormFrontClientSettings;
-import cc.warlock.core.stormfront.settings.internal.StormFrontClientSettings;
-import cc.warlock.core.stormfront.settings.skin.DefaultSkin;
-import cc.warlock.core.stormfront.settings.skin.IStormFrontSkin;
+import cc.warlock.core.stormfront.serversettings.server.Preset;
+import cc.warlock.core.stormfront.serversettings.server.ServerSettings;
+import cc.warlock.core.stormfront.serversettings.skin.DefaultSkin;
+import cc.warlock.core.stormfront.serversettings.skin.IStormFrontSkin;
 
 import com.martiansoftware.jsap.CommandLineTokenizer;
 
@@ -76,7 +75,7 @@ public class StormFrontClient extends WarlockClient implements IStormFrontClient
 	protected StringBuffer buffer = new StringBuffer();
 	protected IStormFrontProtocolHandler handler;
 	protected ClientProperty<String> playerId, characterName, roomDescription;
-	protected StormFrontClientSettings clientSettings;
+	protected ServerSettings serverSettings;
 	private Timer timer;
 	protected SFTimerTask timerTask;
 	private double currentTime = 0.0;
@@ -104,8 +103,8 @@ public class StormFrontClient extends WarlockClient implements IStormFrontClient
 		characterName = new ClientProperty<String>(this, "characterName", null);
 		roomDescription = new ClientProperty<String>(this, "roomDescription", null);
 		mode = new ClientProperty<GameMode>(this, "gameMode", GameMode.Game);
-		clientSettings = new StormFrontClientSettings(this);
-		skin = new DefaultSkin(clientSettings);
+		serverSettings = new ServerSettings(this);
+		skin = new DefaultSkin(serverSettings);
 		timer = new Timer();
 		timerTask = new SFTimerTask();
 		timer.scheduleAtFixedRate(timerTask, 0, 100L);
@@ -113,11 +112,6 @@ public class StormFrontClient extends WarlockClient implements IStormFrontClient
 		scriptListeners = new ArrayList<IScriptListener>();
 		
 		WarlockClientRegistry.activateClient(this);
-	}
-	
-	@Override
-	protected IClientSettings createClientSettings() {
-		return new StormFrontClientSettings(this);
 	}
 	
 	@Override
@@ -239,16 +233,12 @@ public class StormFrontClient extends WarlockClient implements IStormFrontClient
 		return playerId;
 	}
 	
-	public IStormFrontClientSettings getStormFrontClientSettings() {
-		return clientSettings;
+	public ServerSettings getServerSettings() {
+		return serverSettings;
 	}
 	
 	public IProperty<String> getCharacterName() {
 		return characterName;
-	}
-	
-	public String getClientId() {
-		return characterName.get();
 	}
 	
 	public IProperty<String> getLeftHand() {
@@ -344,11 +334,11 @@ public class StormFrontClient extends WarlockClient implements IStormFrontClient
 	}
 	
 	public IWarlockStyle getCommandStyle() {
-		IWarlockStyle style = clientSettings.getNamedStyle(StormFrontClientSettings.PRESET_COMMAND);
-		if (style == null) {
+		Preset commandPreset = serverSettings.getPreset(Preset.PRESET_COMMAND);
+		if (commandPreset == null) {
 			return new WarlockStyle();
 		}
-		return style;
+		return commandPreset.getStyle();
 	}
 	
 	public long getTime() {

@@ -24,7 +24,7 @@ package cc.warlock.core.stormfront.client;
 import java.net.URL;
 
 import cc.warlock.core.client.IWarlockClientViewer;
-import cc.warlock.core.stormfront.settings.IStormFrontClientSettings;
+import cc.warlock.core.stormfront.serversettings.server.ServerSettings;
 
 
 public interface IStormFrontClientViewer extends IWarlockClientViewer {
@@ -60,7 +60,7 @@ public interface IStormFrontClientViewer extends IWarlockClientViewer {
 	public void receivedServerSetting(SettingType settingType);
 	public void finishedDownloadingServerSettings();
 	
-	public void loadStormFrontClientSettings(IStormFrontClientSettings settings);
+	public void loadServerSettings(ServerSettings settings);
 
 	/**
 	 * Append an image to this viewer

@@ -25,10 +25,8 @@ import cc.warlock.core.client.WarlockColor;
 
 /**
  * This class is intended to mimic SWT's RGB class so we can maintain separation.
- * Deprecated. Use WarlockColor instead
  * @author Marshall
  */
-@Deprecated
 public class StormFrontColor extends WarlockColor {
 
 	public static final StormFrontColor DEFAULT_COLOR = new StormFrontColor(-1, -1, -1);

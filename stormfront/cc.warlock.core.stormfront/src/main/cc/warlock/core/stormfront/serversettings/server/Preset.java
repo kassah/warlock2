@@ -19,13 +19,12 @@
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
-package cc.warlock.core.stormfront.settings.server;
+package cc.warlock.core.stormfront.serversettings.server;
 
 import cc.warlock.core.client.IWarlockStyle;
 import cc.warlock.core.client.internal.WarlockStyle;
 import cc.warlock.core.stormfront.xml.StormFrontElement;
 
-@Deprecated
 public class Preset extends ColorSetting {
 
 	public static final String PRESET_BOLD = "bold";
