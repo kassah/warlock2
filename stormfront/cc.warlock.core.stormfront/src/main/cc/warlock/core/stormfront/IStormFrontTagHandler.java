@@ -55,10 +55,23 @@ public interface IStormFrontTagHandler {
 	public void handleStart(StormFrontAttributeList attributes);
 	
 	/**
+	 * Handle a child tag (only happens if the child tag doesn't have a handler registered)
+	 * @param name The child tag name
+	 * @param attributes The child tag attributes
+	 */
+	public boolean handleChild(String name, StormFrontAttributeList attributes);
+	
+	/**
 	 * handle the end tag
 	 * @param
 	 */
 	public void handleEnd();
+	
+	/**
+	 * Handle the end of a child tag
+	 * @param name The child tag name
+	 */
+	public boolean handleEndChild(String name);
 	
 	/**
 	 * handle contents of the tag

@@ -46,6 +46,10 @@ public class SettingsInfoTagHandler extends DefaultTagHandler {
 		return new String[] { "settingsInfo" };
 	}
 	
+	public void setNewSettings(boolean newSettings) {
+		this.newSettings = newSettings;
+	}
+	
 	@Override
 	public void handleStart(StormFrontAttributeList attributes) {
 		
@@ -72,7 +76,7 @@ public class SettingsInfoTagHandler extends DefaultTagHandler {
 	@Override
 	public void handleEnd() {
 		if (newSettings) {
-
+			
 			// This is a character that has no server settings, we need to immediately send our own
 			handler.getClient().getServerSettings().sendInitialServerSettings();
 			

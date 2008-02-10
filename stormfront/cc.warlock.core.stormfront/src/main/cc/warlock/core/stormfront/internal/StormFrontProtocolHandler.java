@@ -225,6 +225,43 @@ public class StormFrontProtocolHandler implements IStormFrontProtocolHandler {
 		return tagHandler.handleCharacters(characters); 
 	}
 	
+	private boolean handleStartChild(Map<String, IStormFrontTagHandler> handlers,
+			int stackPosition, String childName, StormFrontAttributeList attributes)
+	{
+		if(stackPosition >= tagStack.size()) return false; // reached the end of the stack
+		String tagName = tagStack.get(stackPosition);
+		
+		if(handlers == null) return false;
+		
+		// if we have a handler, let it try to handle the characters
+		IStormFrontTagHandler tagHandler = handlers.get(tagName);
+		if(tagHandler == null) return false;
+		
+		if(handleStartChild(tagHandler.getTagHandlers(), stackPosition + 1, childName, attributes))
+			return true;
+		
+		tagHandler.setCurrentTag(tagName);
+		return tagHandler.handleChild(childName, attributes); 
+	}
+	
+	private boolean handleEndChild(Map<String, IStormFrontTagHandler> handlers, int stackPosition, String childName)
+	{
+		if(stackPosition >= tagStack.size()) return false; // reached the end of the stack
+		String tagName = tagStack.get(stackPosition);
+		
+		if(handlers == null) return false;
+		
+		// if we have a handler, let it try to handle the characters
+		IStormFrontTagHandler tagHandler = handlers.get(tagName);
+		if(tagHandler == null) return false;
+		
+		if(handleEndChild(tagHandler.getTagHandlers(), stackPosition + 1, childName))
+			return true;
+		
+		tagHandler.setCurrentTag(tagName);
+		return tagHandler.handleEndChild(childName); 
+	}
+	
 	/* (non-Javadoc)
 	 * @see org.xml.sax.ContentHandler#endElement(java.lang.String, java.lang.String, java.lang.String)
 	 */
@@ -261,9 +298,12 @@ public class StormFrontProtocolHandler implements IStormFrontProtocolHandler {
 				characters(newLine);
 			}
 		} else {
-			characters("</" + name + ">");
-			if(newLine != null && newLine.length() > 0) {
-				characters(newLine);
+			if (!handleEndChild(defaultTagHandlers, 0, name))
+			{
+				characters("</" + name + ">");
+				if(newLine != null && newLine.length() > 0) {
+					characters(newLine);
+				}
 			}
 		}
 	}
@@ -303,18 +343,21 @@ public class StormFrontProtocolHandler implements IStormFrontProtocolHandler {
 				characters(newLine);
 			}
 		} else {
-			String startTag = "<" + name;
-			if (attributes != null) {
-	            for (StormFrontAttribute attribute : attributes.getList())
-	            {
-	                startTag += " " + attribute.getName() + "=" +
-	                	attribute.getQuoteType() + attribute.getValue() + attribute.getQuoteType();
-	            }
-	        }
-			startTag += ">";
-			characters(startTag);
-			if(newLine != null && newLine.length() > 0) {
-				characters(newLine);
+			if(!handleStartChild(defaultTagHandlers, 0, name, attributes))
+			{
+				String startTag = "<" + name;
+				if (attributes != null) {
+		            for (StormFrontAttribute attribute : attributes.getList())
+		            {
+		                startTag += " " + attribute.getName() + "=" +
+		                	attribute.getQuoteType() + attribute.getValue() + attribute.getQuoteType();
+		            }
+		        }
+				startTag += ">";
+				characters(startTag);
+				if(newLine != null && newLine.length() > 0) {
+					characters(newLine);
+				}	
 			}
 		}
 	}

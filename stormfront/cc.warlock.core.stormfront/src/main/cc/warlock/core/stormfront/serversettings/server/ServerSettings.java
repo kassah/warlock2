@@ -646,6 +646,7 @@ public class ServerSettings implements Comparable<ServerSettings>, IHighlightPro
 	
 	public void sendInitialServerSettings ()
 	{
+		System.out.println("Sending initial server settings document...");
 		StormFrontDocument initialDoc = getInitialServerSettings();
 		sendSettingsDocument(initialDoc, true);
 		
@@ -654,6 +655,8 @@ public class ServerSettings implements Comparable<ServerSettings>, IHighlightPro
 		
 		saveLocalXml();
 		load(client.getPlayerId().get());
+		
+		System.out.println("Finished sending initial settings.");
 	}
 	
 	protected String readStream (InputStream stream)

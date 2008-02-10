@@ -21,14 +21,21 @@
  */
 package cc.warlock.core.stormfront.internal;
 
+import java.io.ByteArrayInputStream;
 import java.io.File;
-import java.io.FileOutputStream;
+import java.io.FileWriter;
+import java.io.IOException;
+import java.io.InputStream;
+
+import org.apache.commons.lang.StringEscapeUtils;
 
 import cc.warlock.core.client.IWarlockClientViewer;
 import cc.warlock.core.configuration.ConfigurationUtil;
 import cc.warlock.core.stormfront.IStormFrontProtocolHandler;
 import cc.warlock.core.stormfront.client.IStormFrontClientViewer;
+import cc.warlock.core.stormfront.xml.StormFrontAttribute;
 import cc.warlock.core.stormfront.xml.StormFrontAttributeList;
+import cc.warlock.core.stormfront.xml.StormFrontDocument;
 
 
 public class SettingsTagHandler extends DefaultTagHandler {
@@ -66,9 +73,12 @@ public class SettingsTagHandler extends DefaultTagHandler {
 	
 	@Override
 	public void handleStart(StormFrontAttributeList attributes) {
-
-		buffer.setLength(0);	
-		//handler.startSavingRawXML(buffer, "settings");
+		buffer.setLength(0);
+		
+		buffer.append("<settings crc=\"" + infoTagHandler.getCRC() +
+				"\" major=\"" + infoTagHandler.getMajorVersion() +
+				"\" client=\"" + infoTagHandler.getClientVersion() + "\">\n");
+		
 		visitViewers(new ViewerVisitor() {
 			public void visit(IStormFrontClientViewer viewer) {
 				viewer.startDownloadingServerSettings();
@@ -77,33 +87,53 @@ public class SettingsTagHandler extends DefaultTagHandler {
 	}
 
 	@Override
+	public boolean handleChild(String name, StormFrontAttributeList attributes) {
+		String startTag = "<" + name;
+		if (attributes != null) {
+            for (StormFrontAttribute attribute : attributes.getList())
+            {
+                startTag += " " + attribute.getName() + "=" +
+                	attribute.getQuoteType() + 
+                	StringEscapeUtils.escapeXml(attribute.getValue()) +
+                	attribute.getQuoteType();
+            }
+        }
+		startTag += ">";
+		buffer.append(startTag);
+		
+		return true;
+	}
+	
+	
+	@Override
+	public boolean handleEndChild(String name) {
+		
+		buffer.append("</" + name + ">");
+		
+		return true;
+	}
+	
+	@Override
 	public void handleEnd() {
-
-		handler.stopSavingRawXML();
-		buffer.insert(0, "<settings>\n");
 		buffer.append("</settings>");
-
-		String settings = "<settings>";
-		int index = buffer.indexOf(settings);
-		buffer = buffer.replace(index, index+settings.length(),
-				"<settings crc=\"" + infoTagHandler.getCRC() +
-				"\" major=\"" + infoTagHandler.getMajorVersion() +
-				"\" client=\"" + infoTagHandler.getClientVersion() + "\">");
-
+		
 		String playerId = handler.getClient().getPlayerId().get();
 		File serverSettings = ConfigurationUtil.getConfigurationFile("serverSettings_" + playerId + ".xml");
-
 		try {
+			FileWriter writer = new FileWriter(serverSettings);
 
-			FileOutputStream stream = new FileOutputStream(serverSettings);
-			stream.write(buffer.toString().getBytes());
-			stream.close();
-			buffer = null;
-		} catch (Exception e) {
+			InputStream inStream = new ByteArrayInputStream(buffer.toString().getBytes());
+			StormFrontDocument document = new StormFrontDocument(inStream);
+			document.saveTo(writer, true);
+			
+			inStream.close();
+			writer.close();
+			buffer.setLength(0);
+		} catch (IOException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
-
+		
 		handler.getClient().getServerSettings().load(handler.getClient().getPlayerId().get());
 		visitViewers(new ViewerVisitor() {
 			public void visit(IStormFrontClientViewer viewer) {
@@ -115,7 +145,7 @@ public class SettingsTagHandler extends DefaultTagHandler {
 	
 	@Override
 	public boolean handleCharacters(String characters) {
-		buffer.append(characters);
+		buffer.append(StringEscapeUtils.escapeXml(characters));
 		return true;
 	}
 }

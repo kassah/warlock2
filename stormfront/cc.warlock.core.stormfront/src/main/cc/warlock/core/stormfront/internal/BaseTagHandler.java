@@ -69,4 +69,12 @@ abstract public class BaseTagHandler implements IStormFrontTagHandler {
 	public boolean ignoreNewlines() {
 		return true;
 	}
+	
+	public boolean handleChild(String name, StormFrontAttributeList attributes) {
+		return false;
+	}
+	
+	public boolean handleEndChild(String name) {
+		return false;
+	}
 }
