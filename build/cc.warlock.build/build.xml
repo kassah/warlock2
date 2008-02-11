@@ -110,7 +110,7 @@
 			build.date=${DSTAMP}
 			build.time=${TSTAMP}
 			build.id=${warlock-version}
-			build.url=http://www.arcaner.com/warlock2-builds/${warlock-version}
+			build.url=http://build.warlock.cc/${warlock-version}
 		</echo>
 		
 		<echo file="${buildDirectory}/${buildLabel}/currentSnapshot.properties">
