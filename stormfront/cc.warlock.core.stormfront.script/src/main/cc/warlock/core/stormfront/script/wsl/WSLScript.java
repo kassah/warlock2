@@ -505,6 +505,14 @@ public class WSLScript extends AbstractScript {
 		globalVariables.remove(name.toLowerCase());
 	}
 	
+	public void setLocalVariable(String name, String value) {
+		setLocalVariable(name, new WSLString(value));
+	}
+	
+	public void setLocalVariable(String name, IWSLValue value) {
+		localVariables.put(name.toLowerCase(), value);
+	}
+	
 	protected class WSLSetVariable extends WSLCommandDefinition {
 		
 		private Pattern format = Pattern.compile("^([^\\s]+)(\\s+(.+)?)?$");
@@ -586,14 +594,6 @@ public class WSLScript extends AbstractScript {
 				scriptError("Invalid arguments to goto");
 			}
 		}
-	}
-	
-	public void setLocalVariable(String name, String value) {
-		setLocalVariable(name, new WSLString(value));
-	}
-	
-	public void setLocalVariable(String name, IWSLValue value) {
-		localVariables.put(name, value);
 	}
 	
 	protected void gosub (String label, String arguments)
