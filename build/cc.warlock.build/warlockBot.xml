@@ -7,6 +7,7 @@
 	
 	<target name="finished-build">
 		<property file="warlock-build.properties"/>
+		<property file="mainBuilder/build.properties"/>
 		<property file="${buildDirectory}/${buildLabel}/currentSnapshot.properties"/>
 		
 		<property name="message"
