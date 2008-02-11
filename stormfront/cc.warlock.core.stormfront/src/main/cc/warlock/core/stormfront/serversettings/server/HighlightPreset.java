@@ -179,7 +179,7 @@ public class HighlightPreset extends Preset implements IHighlightString {
 				return null;
 			// TODO test if we should compile this as a regex
 			try {
-				pattern = Pattern.compile(text, Pattern.LITERAL | Pattern.CASE_INSENSITIVE);
+				pattern = Pattern.compile("\b" + Pattern.quote(text) + "\b", Pattern.CASE_INSENSITIVE);
 			} catch(PatternSyntaxException e) {
 				System.err.println("Pattern error: " + e.getMessage());
 			}
