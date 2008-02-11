@@ -41,6 +41,8 @@ public class HighlightPreset extends Preset implements IHighlightString {
 	protected HighlightPreset originalString;
 	protected Pattern pattern;
 	protected int index;
+	protected boolean ignoreWordBoundary = false;
+	protected boolean ignoreCase = true;
 	
 	protected HighlightPreset (ServerSettings serverSettings, Palette palette, int index)
 	{
@@ -175,11 +177,24 @@ public class HighlightPreset extends Preset implements IHighlightString {
 	
 	public Pattern getPattern() {
 		if(pattern == null) {
-			if(text == null)
+			String patternText;
+			if(text == null) {
+				// TODO handle regex 
 				return null;
-			// TODO test if we should compile this as a regex
+			} else {
+				String quotedText = Pattern.quote(text);
+				if(ignoreWordBoundary) {
+					patternText = quotedText;
+				} else {
+					patternText = "\\b" + quotedText + "\\b";
+				}
+			}
+			
 			try {
-				pattern = Pattern.compile("\b" + Pattern.quote(text) + "\b", Pattern.CASE_INSENSITIVE);
+				int flags = 0;
+				if(ignoreCase)
+					flags |= Pattern.CASE_INSENSITIVE;
+				pattern = Pattern.compile(patternText, flags);
 			} catch(PatternSyntaxException e) {
 				System.err.println("Pattern error: " + e.getMessage());
 			}
