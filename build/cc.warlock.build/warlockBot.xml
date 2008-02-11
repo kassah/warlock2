@@ -4,4 +4,14 @@
 			${message}
 		</echo>
 	</target>
+	
+	<target name="finished-build">
+		<property file="warlock-build.properties"/>
+		<property file="${buildDirectory}/${buildLabel}/currentSnapshot.properties"/>
+		
+		<property name="message"
+			value="Warlock nightly build succesfully completed: http://xibar.warlock.cc/builds/${build.current.snapshot}"/>
+		
+		<antcall target="send-message"/>
+	</target>
 </project>
