@@ -11,7 +11,7 @@
 		<property file="${buildDirectory}/${buildLabel}/currentSnapshot.properties"/>
 		
 		<property name="message"
-			value="Warlock nightly build succesfully completed: http://build.warlock.cc/${build.current.snapshot}"/>
+			value="Warlock snapshot build succesfully completed: http://build.warlock.cc/${build.current.snapshot}"/>
 		
 		<antcall target="send-message"/>
 	</target>
