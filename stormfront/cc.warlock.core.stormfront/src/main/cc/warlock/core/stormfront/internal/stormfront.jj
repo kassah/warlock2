@@ -144,7 +144,7 @@ TOKEN: {
 	<TAG_END_OPEN: "</"> : IN_TAG_MODE |
 	
 	<ENTITY: "&" ("#")? (<LETTER> | <DIGIT>)+ ";"> { matchedToken.image = matchedToken.image.substring(1, matchedToken.image.length() - 1); } |
-	<PCDATA: (~["<","&"])+ | "&" > |
+	<PCDATA: (~["<","&"])+ | "&" | "<" ~["A"-"Z","a"-"z", "_"]> |
 	 <NAMECHAR: (<LETTER> | <DIGIT> | "." | "-" | "_" | ":")> |
 	 <DIGIT: (["0"-"9"])> |
 	 <LETTER: (["A"-"Z","a"-"z"])>
@@ -158,7 +158,7 @@ TOKEN: {
 	<ATTR_EQ: "="> |
 	<ATTR_VALUE: ( "\"" (~["\""])* ("\"" (~["\"", "=", ">"])*)* "\"" | "'" (~["'"])* ("'" (~["'", "=", ">"])*)* "'")> { quoteChar = matchedToken.image.charAt(0); matchedToken.image = matchedToken.image.substring(1, matchedToken.image.length() - 1); } |
 	
-	<GENERIC_ID: (<LETTER> | "_" | ":" ) (<NAMECHAR>)*> 
+	<GENERIC_ID: (<LETTER> | "_") (<NAMECHAR>)*> 
 }
 
 <IN_TAG_MODE> SKIP: {
