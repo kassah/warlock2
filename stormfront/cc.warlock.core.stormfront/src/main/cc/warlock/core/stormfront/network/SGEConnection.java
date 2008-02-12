@@ -77,7 +77,7 @@ public class SGEConnection extends Connection implements IConnectionListener {
 	protected int state, errorCode;
 	protected String passwordHash;
 	protected ArrayList<ISGEConnectionListener> sgeListeners;
-	protected boolean retrieveGameInfo = true;
+	protected boolean retrieveGameInfo = false;
 	
 	protected HashMap<String, String> characters, loginProperties;
 	protected ArrayList<SGEGame> games;
