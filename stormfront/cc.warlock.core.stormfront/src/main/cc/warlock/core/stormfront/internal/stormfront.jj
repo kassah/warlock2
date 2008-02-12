@@ -1,6 +1,8 @@
 PARSER_BEGIN(StormFrontProtocolParser)
 package cc.warlock.core.stormfront.internal;
 
+import java.io.IOException;
+
 import cc.warlock.core.stormfront.xml.IStormFrontXMLHandler;
 import cc.warlock.core.stormfront.xml.StormFrontAttribute;
 import cc.warlock.core.stormfront.xml.StormFrontAttributeList;
@@ -91,7 +93,18 @@ PARSER_END(StormFrontProtocolParser)
 
 void Document() : {}
 {
-	(Element())* <EOF>
+	(
+	try {
+		Element()
+	} catch (TokenMgrError e) {
+		System.err.println("Lexer error");
+		try {
+			while(jj_input_stream.readChar() != '\n') { }
+		} catch (IOException io_e) {
+			throw e;
+		}
+	}
+	)* <EOF>
 }
 
 void Element() : {Token data; String str; }
