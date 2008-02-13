@@ -803,10 +803,10 @@ public class WSLScript extends AbstractScript {
 
 		String operator = args[0].trim().toLowerCase();
 		
-		int operand;
+		double operand;
 		if (args.length > 1) {
 			try {
-				operand = Integer.parseInt(args[1].trim());
+				operand = Double.parseDouble(args[1].trim());
 			} catch (NumberFormatException e) {
 				scriptError("Operand must be a number");
 				return;
@@ -816,14 +816,14 @@ public class WSLScript extends AbstractScript {
 
 		if ("set".equalsIgnoreCase(operator))
 		{
-			setVariable(targetVar, Integer.toString(operand));
+			setVariable(targetVar, new WSLNumber(operand));
 			return;
 		}
 		
-		int value;
+		double value;
 		if(variableExists(targetVar)) {
 			try {
-				value = (int)getVariable(targetVar).toDouble();
+				value = getVariable(targetVar).toDouble();
 			} catch(NumberFormatException e) {
 				scriptError("The variable \"" + targetVar + "\" must be a number to do math with it");
 				return;
@@ -834,18 +834,18 @@ public class WSLScript extends AbstractScript {
 
 		if ("add".equalsIgnoreCase(operator))
 		{	
-			int newValue = value + operand;
-			setVariable(targetVar, Integer.toString(newValue));
+			double newValue = value + operand;
+			setVariable(targetVar, new WSLNumber(newValue));
 		}
 		else if ("subtract".equalsIgnoreCase(operator))
 		{
-			int newValue = value - operand;
-			setVariable(targetVar, Integer.toString(newValue));
+			double newValue = value - operand;
+			setVariable(targetVar, new WSLNumber(newValue));
 		}
 		else if ("multiply".equalsIgnoreCase(operator))
 		{
-			int newValue = value * operand;
-			setVariable(targetVar, Integer.toString(newValue));
+			double newValue = value * operand;
+			setVariable(targetVar, new WSLNumber(newValue));
 		}
 		else if ("divide".equalsIgnoreCase(operator))
 		{
@@ -853,13 +853,13 @@ public class WSLScript extends AbstractScript {
 				scriptError("Cannot divide by zero");
 				return;
 			}
-			int newValue = value / operand;
-			setVariable(targetVar, Integer.toString(newValue));
+			double newValue = value / operand;
+			setVariable(targetVar, new WSLNumber(newValue));
 		}
 		else if ("modulus".equalsIgnoreCase(operator))
 		{
-			int newValue = value % operand;
-			setVariable(targetVar, Integer.toString(newValue));
+			double newValue = value % operand;
+			setVariable(targetVar, new WSLNumber(newValue));
 		}
 		else
 		{
