@@ -1,8 +1,6 @@
 <project default="send-message">
 	<target name="send-message">
-		<echo file="/tmp/warlockbot.message">
-			${message}
-		</echo>
+		<echo file="/tmp/warlockbot.message">${message}</echo>
 	</target>
 	
 	<target name="finished-build">
