@@ -38,13 +38,10 @@ import org.eclipse.jface.viewers.DoubleClickEvent;
 import org.eclipse.jface.viewers.IDoubleClickListener;
 import org.eclipse.jface.viewers.ISelection;
 import org.eclipse.jface.viewers.ISelectionChangedListener;
-import org.eclipse.jface.viewers.IStructuredContentProvider;
 import org.eclipse.jface.viewers.IStructuredSelection;
 import org.eclipse.jface.viewers.LabelProvider;
 import org.eclipse.jface.viewers.SelectionChangedEvent;
 import org.eclipse.jface.viewers.TableViewer;
-import org.eclipse.jface.viewers.Viewer;
-import org.eclipse.jface.viewers.ViewerFilter;
 import org.eclipse.jface.wizard.IWizardPage;
 import org.eclipse.jface.wizard.WizardPage;
 import org.eclipse.swt.SWT;
@@ -118,7 +115,7 @@ public class GameSelectWizardPage extends WizardPage {
 				setVisible(false);
 			}
 		});
-		gamesViewer.addFilter(new ViewerFilter() {
+		/*gamesViewer.addFilter(new ViewerFilter() {
 			public boolean select(Viewer viewer, Object parentElement, Object element) {
 				ISGEGame game = (ISGEGame) element;
 				
@@ -129,7 +126,7 @@ public class GameSelectWizardPage extends WizardPage {
 				}
 				return false;
 			}
-		});
+		});*/
 		
 		setControl(controls);
 	}
