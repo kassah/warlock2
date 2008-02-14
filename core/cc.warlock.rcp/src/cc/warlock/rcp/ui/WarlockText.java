@@ -43,6 +43,8 @@ import org.eclipse.swt.events.MouseEvent;
 import org.eclipse.swt.events.MouseListener;
 import org.eclipse.swt.events.MouseMoveListener;
 import org.eclipse.swt.events.PaintListener;
+import org.eclipse.swt.events.SelectionAdapter;
+import org.eclipse.swt.events.SelectionEvent;
 import org.eclipse.swt.events.VerifyEvent;
 import org.eclipse.swt.events.VerifyListener;
 import org.eclipse.swt.graphics.Color;
@@ -57,6 +59,8 @@ import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Control;
 import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.Label;
+import org.eclipse.swt.widgets.Menu;
+import org.eclipse.swt.widgets.MenuItem;
 import org.eclipse.swt.widgets.ScrollBar;
 
 import cc.warlock.core.client.IWarlockClient;
@@ -89,6 +93,7 @@ public class WarlockText implements LineBackgroundListener {
 	private int doScrollDirection = SWT.UP;
 	private IWarlockClient client;
 	private WarlockCompass compass;
+	private Menu contextMenu;
 	
 	protected Hashtable<Integer, Color> lineBackgrounds = new Hashtable<Integer,Color>();
 	
@@ -101,6 +106,15 @@ public class WarlockText implements LineBackgroundListener {
 		handCursor = new Cursor(display, SWT.CURSOR_HAND);
 		defaultCursor = parent.getCursor();
 		vscroll = getVerticalBar ();
+		contextMenu = new Menu(textWidget);
+		MenuItem itemCopy = new MenuItem(contextMenu, SWT.PUSH);
+		itemCopy.addSelectionListener(new SelectionAdapter() {
+		            public void widgetSelected(SelectionEvent arg0) {
+		                textWidget.copy();
+		            }
+		        });
+		itemCopy.setText("Copy");
+		textWidget.setMenu(contextMenu);
 		
 		addVerifyListener(new VerifyListener()  {
 			public void verifyText(VerifyEvent e) {
