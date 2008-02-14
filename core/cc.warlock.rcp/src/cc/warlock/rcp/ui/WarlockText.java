@@ -25,6 +25,7 @@ import java.util.ArrayList;
 import java.util.Hashtable;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Map;
 
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.custom.ExtendedModifyListener;
@@ -556,7 +557,7 @@ public class WarlockText implements LineBackgroundListener {
 	
 	private boolean atBottom() {
 		return vscroll.getSelection() >= vscroll.getMaximum()
-				- vscroll.getPageIncrement();
+				- vscroll.getPageIncrement() - textWidget.getLineHeight(getCharCount());
 	}
 	
 	public void replaceTextRange(int start, int length, String text) {
@@ -581,24 +582,24 @@ public class WarlockText implements LineBackgroundListener {
 		// 'status' is a pointer that allows us to change the object in our parent..
 		// in this method... it is intentional.
 		if (lineLimit > 0) {
-			int len = getLineCount();
-			if (len > lineLimit) {
-				int top = getTopIndex();
-				int toRemove = len - lineLimit;
-				int offset = getOffsetAtLine(toRemove);
+			int lines = getLineCount();
+			if (lines > lineLimit) {
+				int linesToRemove = lines - lineLimit;
+				int charsToRemove = getOffsetAtLine(linesToRemove);
+				int pixelsToRemove = textWidget.getLinePixel(linesToRemove);
 				
 				// adjust ending status
-				status.caretOffset = status.caretOffset - offset;
+				status.caretOffset = status.caretOffset - charsToRemove;
 				if (status.caretOffset < 0) status.caretOffset = 0; // Don't let this go negative
-				status.selection.x = status.selection.x - offset;
+				status.selection.x = status.selection.x - charsToRemove;
 				if (status.selection.x < 0) status.selection.x = 0; // Don't let this go negative
-				status.selection.y = status.selection.y - offset;
+				status.selection.y = status.selection.y - charsToRemove;
 				if (status.selection.y < 0) status.selection.y = 0; // Don't let this go negative
 				
-				replaceTextRange(0,offset,"");
-				updateLineBackgrounds(toRemove);
-				if(!status.atBottom)
-					setTopIndex(top - toRemove);
+				replaceTextRange(0, charsToRemove, "");
+				updateLineBackgrounds(linesToRemove);
+				if(!status.atBottom && pixelsToRemove < 0)
+					textWidget.setTopPixel(-pixelsToRemove);
 			}
 		}
 		return status;
@@ -609,11 +610,11 @@ public class WarlockText implements LineBackgroundListener {
 		Hashtable<Integer, Color> copy = (Hashtable<Integer, Color>) lineBackgrounds.clone(); 
 		lineBackgrounds.clear();
 		
-		for (int lineIndex : copy.keySet())
+		for (Map.Entry<Integer, Color> line : copy.entrySet())
 		{
-			if (lineIndex > lines)
+			if (line.getKey() >= lines)
 			{
-				lineBackgrounds.put(lineIndex - lines, copy.get(lineIndex));
+				lineBackgrounds.put(line.getKey() - lines, line.getValue());
 			}
 		}
 	}
