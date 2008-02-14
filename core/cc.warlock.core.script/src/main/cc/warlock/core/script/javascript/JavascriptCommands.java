@@ -46,6 +46,8 @@ public class JavascriptCommands {
 	private int nextTimerID = 1;
 	private Timer timer = new Timer();
 	
+	public class StopException extends Error { }
+	
 	public JavascriptCommands(IScriptCommands commands, JavascriptScript script) {
 		this.commands = commands;
 		this.script = script;
@@ -53,7 +55,9 @@ public class JavascriptCommands {
 
 	protected void checkStop() {
 		if(!script.isRunning())
-			throw new Error();
+			throw new StopException();
+		if(commands.isSuspended())
+			commands.waitForResume();
 	}
 	
 	public void echo(String text) {

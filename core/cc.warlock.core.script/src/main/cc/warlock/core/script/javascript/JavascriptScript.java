@@ -37,7 +37,6 @@ import cc.warlock.core.script.AbstractScript;
 import cc.warlock.core.script.IScriptCommands;
 import cc.warlock.core.script.IScriptEngine;
 import cc.warlock.core.script.IScriptInfo;
-import cc.warlock.core.script.IScriptListener;
 
 /**
  * @author Marshall
@@ -48,45 +47,15 @@ import cc.warlock.core.script.IScriptListener;
 public class JavascriptScript extends AbstractScript {
 
 	private JavascriptEngine engine;
-	private boolean stopped;
 	private Context context;
 	private IScriptCommands commands;
-	IWarlockClient client;
 	
 	public JavascriptScript (JavascriptEngine engine, IScriptInfo info, IWarlockClient client, IScriptCommands commands)
 	{
-		super(info);
+		super(info, client);
 		
 		this.engine = engine;
-		this.client = client;
 		this.commands = commands;
-	}
-
-	public boolean isRunning() {
-		return !stopped;
-	}
-	
-	public void start () {
-		stopped = false;
-		client.getDefaultStream().echo("[script started: " + getName() + "]\n");
-		
-		for (IScriptListener listener : listeners) listener.scriptStarted(this);
-	}
-
-	public void stop() {
-		stopped = true;
-		super.stop();
-		commands.stop();
-	}
-	
-	public void suspend() {
-		// TODO Implement Suspend within JavaScript.
-		client.getDefaultStream().echo("[Pausing not yet supported in JavaScript.]\n");
-	}
-	
-	public void resume() {
-		// TODO Implement Resume within JavaScript.
-		client.getDefaultStream().echo("[Pausing not yet supported in JavaScript.]\n");
 	}
 
 	public IScriptCommands getCommands() {
@@ -111,10 +80,6 @@ public class JavascriptScript extends AbstractScript {
 	
 	public Reader getReader() {
 		return reader;
-	}
-	
-	public IWarlockClient getClient() {
-		return client;
 	}
 	
 	public void execute(String command) { }

@@ -29,9 +29,6 @@ import java.util.HashMap;
 import java.util.Random;
 import java.util.Stack;
 import java.util.concurrent.BlockingQueue;
-import java.util.concurrent.locks.Condition;
-import java.util.concurrent.locks.Lock;
-import java.util.concurrent.locks.ReentrantLock;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -42,9 +39,9 @@ import org.antlr.runtime.RecognitionException;
 import cc.warlock.core.client.internal.WarlockStyle;
 import cc.warlock.core.script.AbstractScript;
 import cc.warlock.core.script.IMatch;
+import cc.warlock.core.script.IScriptCommands;
 import cc.warlock.core.script.IScriptEngine;
 import cc.warlock.core.script.IScriptInfo;
-import cc.warlock.core.script.IScriptListener;
 import cc.warlock.core.script.internal.RegexMatch;
 import cc.warlock.core.script.internal.TextMatch;
 import cc.warlock.core.stormfront.client.IStormFrontClient;
@@ -53,7 +50,6 @@ import cc.warlock.core.stormfront.script.internal.StormFrontScriptCommands;
 
 public class WSLScript extends AbstractScript {
 	
-	protected boolean running, stopped;
 	protected boolean debugging = false;
 	protected HashMap<String, WSLAbstractCommand> labels = new HashMap<String, WSLAbstractCommand>();
 	protected WSLAbstractCommand nextCommand;
@@ -75,18 +71,15 @@ public class WSLScript extends AbstractScript {
 	
 	protected WSLEngine engine;
 	protected IStormFrontScriptCommands scriptCommands;
-	protected IStormFrontClient client;
-	
-	private final Lock lock = new ReentrantLock();
-	private final Condition gotResume = lock.newCondition();
+	protected IStormFrontClient sfClient;
 	
 	private static final String argSeparator = "\\s+";
 	
 	public WSLScript (WSLEngine engine, IScriptInfo info, IStormFrontClient client)
 	{
-		super(info);
+		super(info, client);
 		this.engine = engine;
-		this.client = client;
+		this.sfClient = client;
 		
 		scriptCommands = new StormFrontScriptCommands(client, this);
 		
@@ -151,10 +144,6 @@ public class WSLScript extends AbstractScript {
 		return localVariables.get(name.toLowerCase());
 	}
 	
-	public boolean isRunning() {
-		return running;
-	}
-	
 	private class WSLFrame {
 		private WSLAbstractCommand line;
 		private HashMap<String, IWSLValue> localVariables;
@@ -173,55 +162,55 @@ public class WSLScript extends AbstractScript {
 	
 	private class WSLMana extends WSLAbstractNumber {
 		public double toDouble() {
-			return client.getMana().get().getValue();
+			return sfClient.getMana().get().getValue();
 		}
 	}
 	
 	private class WSLHealth extends WSLAbstractNumber {
 		public double toDouble() {
-			return client.getHealth().get().getValue();
+			return sfClient.getHealth().get().getValue();
 		}
 	}
 	
 	private class WSLFatigue extends WSLAbstractNumber {
 		public double toDouble() {
-			return client.getFatigue().get().getValue();
+			return sfClient.getFatigue().get().getValue();
 		}
 	}
 	
 	private class WSLSpirit extends WSLAbstractNumber {
 		public double toDouble() {
-			return client.getSpirit().get().getValue();
+			return sfClient.getSpirit().get().getValue();
 		}
 	}
 	
 	private class WSLRoundTime extends WSLAbstractNumber {
 		public double toDouble() {
-			return client.getRoundtime().get();
+			return sfClient.getRoundtime().get();
 		}
 	}
 	
 	private class WSLLeftHand extends WSLAbstractString {
 		public String toString() {
-			return client.getLeftHand().get();
+			return sfClient.getLeftHand().get();
 		}
 	}
 	
 	private class WSLRightHand extends WSLAbstractString {
 		public String toString() {
-			return client.getRightHand().get();
+			return sfClient.getRightHand().get();
 		}
 	}
 	
 	private class WSLSpell extends WSLAbstractString {
 		public String toString() {
-			return client.getCurrentSpell().get();
+			return sfClient.getCurrentSpell().get();
 		}
 	}
 	
 	private class WSLRoomTitle extends WSLAbstractString {
 		public String toString() {
-			return client.getStream(IStormFrontClient.ROOM_STREAM_NAME).getTitle().get();
+			return sfClient.getStream(IStormFrontClient.ROOM_STREAM_NAME).getTitle().get();
 		}
 	}
 	
@@ -232,16 +221,36 @@ public class WSLScript extends AbstractScript {
 		}
 		
 		public String toString () {
-			return client.getComponent(componentName).get();
+			return sfClient.getComponent(componentName).get();
 		}
 	}
 	
 	private class ScriptRunner  implements Runnable {
 		public void run() {
-			doStart();
+			try {
+				Reader scriptReader = info.openReader();
+				
+				CharStream input = new ANTLRNoCaseReaderStream(scriptReader);
+				WSLLexer lex = new WSLLexer(input);
+				CommonTokenStream tokens = new CommonTokenStream(lex);
+				WSLParser parser = new WSLParser(tokens);
+
+				parser.setScript(WSLScript.this);
+
+				parser.script();
+			} catch(IOException e) {
+				e.printStackTrace();
+				return;
+			} catch (RecognitionException e) {
+				e.printStackTrace();
+				// TODO handle the exception
+			}
 			
-			while(curCommand != null && !stopped) {
-				waitForResume();
+			scriptCommands.waitForRoundtime();
+			curCommand = commands.get(0);
+			
+			while(curCommand != null && isRunning()) {
+				scriptCommands.waitForResume();
 				int index = commands.indexOf(curCommand) + 1;
 				if(index < commands.size())
 					nextCommand = commands.get(index);
@@ -254,20 +263,22 @@ public class WSLScript extends AbstractScript {
 				scriptCommands.clearInterrupt();
 			}
 			
-			if(!stopped)
+			if(isRunning())
 				stop();
 		}
 	}
 	
 	public void start (Collection<String> arguments)
 	{
-		StringBuffer totalargs = new StringBuffer();
+		super.start();
+		
+		StringBuffer totalArgs = new StringBuffer();
 		int i = 1;
 		for (String argument : arguments) {
 			setVariable(Integer.toString(i), argument);
 			if (i > 1)
-				totalargs.append(" ");
-			totalargs.append(argument);
+				totalArgs.append(" ");
+			totalArgs.append(argument);
 			i++;
 		}
 		// populate the rest of the argument variable
@@ -275,7 +286,7 @@ public class WSLScript extends AbstractScript {
 			setVariable(Integer.toString(i), "");
 		}
 		// set 0 to the entire list
-		setVariable("0", totalargs.toString());
+		setVariable("0", totalArgs.toString());
 		
 		for (String varName : scriptCommands.getStormFrontClient().getServerSettings().getVariableNames())
 		{
@@ -285,49 +296,6 @@ public class WSLScript extends AbstractScript {
 		scriptThread = new Thread(new ScriptRunner());
 		scriptThread.setName("Wizard Script: " + getName());
 		scriptThread.start();
-		
-		for (IScriptListener listener : listeners) listener.scriptStarted(this);
-	}
-	
-	protected void doStart ()
-	{
-		try {
-			Reader scriptReader = info.openReader();
-			
-			CharStream input = new ANTLRNoCaseReaderStream(scriptReader);
-			WSLLexer lex = new WSLLexer(input);
-			CommonTokenStream tokens = new CommonTokenStream(lex);
-			WSLParser parser = new WSLParser(tokens);
-
-			parser.setScript(this);
-
-			parser.script();
-		} catch(IOException e) {
-			e.printStackTrace();
-			return;
-		} catch (RecognitionException e) {
-			e.printStackTrace();
-			// TODO handle the exception
-		}
-
-		echo("[script started: " + getName() + "]");
-		running = true;
-		stopped = false;
-		scriptCommands.waitForRoundtime();
-		curCommand = commands.get(0);
-	}
-	
-	private void waitForResume() {
-		while(!running && !stopped) {
-			lock.lock();
-			try {
-				gotResume.await();
-			} catch(Exception e) {
-				e.printStackTrace();
-			} finally {
-				lock.unlock();
-			}
-		}
 	}
 	
 	public void addLabel(String label, WSLAbstractCommand line) {
@@ -342,7 +310,7 @@ public class WSLScript extends AbstractScript {
 			return -1;
 	}
 	
-	public void addCommand(WSLAbstractCommand command) {
+	protected void addCommand(WSLAbstractCommand command) {
 		commands.add(command);
 	}
 	
@@ -368,40 +336,7 @@ public class WSLScript extends AbstractScript {
 		}
 	}
 	
-	public void stop() {
-		running = false;
-		stopped = true;
-		scriptCommands.stop();
-		
-		echo("[script stopped: " + getName() + "]");
-		super.stop();
-	}
-
-	public void suspend() {
-		running = false;
-		
-		echo("[script paused: " + getName() + "]");
-		super.suspend();
-	}
-	
-	public void resume() {
-		running = true;
-		
-		echo("[script resumed: " + getName() + "]");
-
-		super.resume();
-		
-		lock.lock();
-		try {
-			gotResume.signalAll();
-		} catch(Exception e) {
-			e.printStackTrace();
-		} finally {
-			lock.unlock();
-		}
-	}
-	
-	protected void addCommandDefinition (String name, WSLCommandDefinition command) {
+	private void addCommandDefinition (String name, WSLCommandDefinition command) {
 		wslCommands.put(name, command);
 	}
 	
@@ -1098,12 +1033,15 @@ public class WSLScript extends AbstractScript {
 		}
 	}
 	
-	protected void echo(String message) {
-		client.getDefaultStream().echo(message + "\n");
-	}
-	
 	public IScriptEngine getScriptEngine() {
 		return engine;
 	}
 	
+	public IScriptCommands getCommands() {
+		return scriptCommands;
+	}
+	
+	protected void echo(String message) {
+		super.echo(message);
+	}
 }

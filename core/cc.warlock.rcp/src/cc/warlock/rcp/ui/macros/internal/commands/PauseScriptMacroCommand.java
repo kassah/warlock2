@@ -41,12 +41,7 @@ public class PauseScriptMacroCommand implements IMacroCommand {
 			IScript currentScript = runningScripts.get(runningScripts.size() - 1);
 			if (currentScript != null)
 			{
-				if (currentScript.isSuspended()) {
-					currentScript.resume();
-				}
-				else {
-					currentScript.suspend();
-				}
+				currentScript.suspendOrResume();
 			}
 		}
 	}

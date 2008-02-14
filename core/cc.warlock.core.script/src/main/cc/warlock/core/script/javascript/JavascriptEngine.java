@@ -48,6 +48,7 @@ import cc.warlock.core.script.IScriptFileInfo;
 import cc.warlock.core.script.IScriptInfo;
 import cc.warlock.core.script.ScriptCommandsFactory;
 import cc.warlock.core.script.configuration.ScriptConfiguration;
+import cc.warlock.core.script.javascript.JavascriptCommands.StopException;
 
 
 /**
@@ -136,7 +137,7 @@ public class JavascriptEngine implements IScriptEngine {
 	
 
 	
-	public IScript startScript(IScriptInfo info, IWarlockClient client, final String[] arguments) {
+	public IScript startScript(IScriptInfo info, final IWarlockClient client, final String[] arguments) {
 		// FIXME need to somehow get dependent IScriptCommands to pass into the following constructor
 		
 		IScriptCommands commands = ScriptCommandsFactory.getFactory().createScriptCommands(client, info.getScriptName());
@@ -166,33 +167,25 @@ public class JavascriptEngine implements IScriptEngine {
 					
 					Reader reader = script.getScriptInfo().openReader();
 					Object result = context.evaluateReader(scope, reader, script.getName(), 1, null);
-					System.out.println("script result: " + Context.toString(result));
-					script.getClient().getDefaultStream().echo("[script finished: " + script.getName() + "]\n");
+					System.err.println("script result: " + Context.toString(result));
 					reader.close();
 				}
 				catch (WrappedException e) {
 					if (!(e.getCause() instanceof Error))
 					{
 						e.printStackTrace();
-						script.getClient().getDefaultStream().echo(
-								"[JS " + e.details() + " at line " + e.lineNumber() + "]\n"
-								+ "[script terminated: "+ script.getName()+"]\n"
-							);
+						client.getDefaultStream().echo("[JS " + e.details() + " at line " + e.lineNumber() + "]\n");
 					}
 				}
 				catch (RhinoException e) {
-					script.getClient().getDefaultStream().echo(
-							"[JS " + e.details() + " at line " + e.lineNumber() + "]\n"
-							+ "[script terminated: "+ script.getName()+"]\n"
-						);
+					client.getDefaultStream().echo("[JS " + e.details() + " at line " + e.lineNumber() + "]\n");
 				}
-				catch(Error e) {
-					script.getClient().getDefaultStream().echo("[script terminated by user " + script.getName() + "]\n");
-					e.printStackTrace();
+				catch(StopException e) {
+					// normal exit, do nothing
 				}
 				catch (Exception e) {
 					e.printStackTrace();
-					script.getClient().getDefaultStream().echo("[script terminated with error: " + script.getName() + "]\n");
+					client.getDefaultStream().echo("[unhandled exception in script: " + script.getName() + "]\n");
 				}
 				finally {
 					if(script.isRunning()) {

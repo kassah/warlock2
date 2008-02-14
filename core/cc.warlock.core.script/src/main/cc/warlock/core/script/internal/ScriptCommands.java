@@ -45,8 +45,10 @@ public class ScriptCommands implements IScriptCommands, IStreamListener, IRoomLi
 
 	protected IWarlockClient client;
 	protected String scriptName;
+	private boolean suspended = false;
 	
 	protected final Lock lock = new ReentrantLock();
+	private final Condition gotResume = lock.newCondition();
 	
 	protected Collection<LinkedBlockingQueue<String>> textWaiters = Collections.synchronizedCollection(new ArrayList<LinkedBlockingQueue<String>>());
 	
@@ -302,6 +304,7 @@ public class ScriptCommands implements IScriptCommands, IStreamListener, IRoomLi
 			interrupted = true;
 			gotPromptCond.signalAll();
 			nextRoom.signalAll();
+			gotResume.signalAll();
 			synchronized(pausedThreads) {
 				for(Thread pausedThread : pausedThreads)
 					pausedThread.interrupt();
@@ -315,5 +318,39 @@ public class ScriptCommands implements IScriptCommands, IStreamListener, IRoomLi
 	
 	public void clearInterrupt() {
 		interrupted = false;
+	}
+	
+	public void resume() {
+		this.suspended = false;
+		
+		lock.lock();
+		try {
+			gotResume.signalAll();
+		} catch(Exception e) {
+			e.printStackTrace();
+		} finally {
+			lock.unlock();
+		}
+	}
+
+	public void suspend() {
+		this.suspended = true;
+	}
+	
+	public boolean isSuspended() {
+		return suspended;
+	}
+	
+	public void waitForResume() {
+		while(suspended) {
+			lock.lock();
+			try {
+				gotResume.await();
+			} catch(Exception e) {
+				e.printStackTrace();
+			} finally {
+				lock.unlock();
+			}
+		}
 	}
 }

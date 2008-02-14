@@ -24,38 +24,55 @@ package cc.warlock.core.script;
 import java.io.Reader;
 import java.util.ArrayList;
 
+import cc.warlock.core.client.IWarlockClient;
+
 public abstract class AbstractScript implements IScript {
 
 	protected ArrayList<IScriptListener> listeners;
-	protected boolean suspended;
+	private boolean stopped = true;
 	protected Reader reader;
 	protected IScriptInfo info;
+	private IWarlockClient client;
 	
-	public AbstractScript (IScriptInfo info)
+	public AbstractScript (IScriptInfo info, IWarlockClient client)
 	{
 		this.listeners = new ArrayList<IScriptListener>();
 		
 		this.info = info;
+		this.client = client;
 	}
 	
-	public void resume() {
-		this.suspended = false;
+	public void start () {
+		stopped = false;
+		echo("[script started: " + getName() + "]");
 		
-		for (IScriptListener listener : listeners) listener.scriptResumed(this);
+		for (IScriptListener listener : listeners) listener.scriptStarted(this);
 	}
-
+	
+	public boolean isRunning() {
+		return !stopped;
+	}
+	
 	public void stop() {
+		stopped = true;
+		echo("[script stopped: " + getName() + "]");
+		getCommands().stop();
+		
 		for (IScriptListener listener : listeners) listener.scriptStopped(this, true);
 	}
 
-	public void suspend() {
-		this.suspended = true;
-		
-		for (IScriptListener listener : listeners) listener.scriptPaused(this);
-	}
-	
-	public boolean isSuspended() {
-		return suspended;
+	public void suspendOrResume() {
+		if(!getCommands().isSuspended()) {
+			echo("[script paused: " + getName() + "]");
+			getCommands().suspend();
+
+			for (IScriptListener listener : listeners) listener.scriptPaused(this);
+		} else {
+			echo("[script resumed: " + getName() + "]");
+			getCommands().resume();
+			
+			for (IScriptListener listener : listeners) listener.scriptResumed(this);
+		}
 	}
 	
 	public void addScriptListener(IScriptListener listener) {
@@ -68,7 +85,6 @@ public abstract class AbstractScript implements IScript {
 	}
 	
 	public String getName() {
-		
 		return info.getScriptName();
 	}
 	
@@ -76,4 +92,13 @@ public abstract class AbstractScript implements IScript {
 		return info;
 	}
 	
+	protected void echo(String message) {
+		client.getDefaultStream().echo(message + "\n");
+	}
+	
+	public IWarlockClient getClient() {
+		return client;
+	}
+	
+	abstract public IScriptCommands getCommands();
 }

@@ -40,13 +40,10 @@ public interface IScript {
 	public String getName ();
 	
 	public boolean isRunning ();
-	public boolean isSuspended();
 	
 	public void stop();
 	
-	public void suspend();
-	
-	public void resume();
+	public void suspendOrResume();
 	
 	public void addScriptListener (IScriptListener listener);
 	
