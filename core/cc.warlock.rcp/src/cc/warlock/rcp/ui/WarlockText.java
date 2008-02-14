@@ -419,17 +419,16 @@ public class WarlockText implements LineBackgroundListener {
 	}
 	
 	public void append(String string) {
-		boolean atBottom = atBottom();
+		ControlStatus status = preTextChange();
 		
 		textWidget.append(string);
-		constrainLineLimit(atBottom);
+		status = constrainLineLimit(status);
 
-		if(atBottom)
-			scrollToBottom();
+		postTextChange(status);
 	}
 	
 	public void append(WarlockString string) {
-		boolean atBottom = atBottom();
+		ControlStatus status = preTextChange();
 		
 		int charCount = textWidget.getCharCount();
 		textWidget.append(string.toString());
@@ -486,10 +485,9 @@ public class WarlockText implements LineBackgroundListener {
 			textWidget.setStyleRange(style);
 		}
 		
-		constrainLineLimit(atBottom);
+		status = constrainLineLimit(status);
 
-		if(atBottom)
-			scrollToBottom();
+		postTextChange(status);
 	}
 	
 	/* find an element in styles that intersects with the first element of styles, starting at pos */
@@ -527,6 +525,27 @@ public class WarlockText implements LineBackgroundListener {
 		return styleRange;
 	}
 	
+	class ControlStatus {
+		boolean atBottom;
+		int caretOffset;	
+		Point selection;
+	}
+	
+	private ControlStatus preTextChange() {
+		ControlStatus status = new ControlStatus();
+		status.atBottom = atBottom();
+		status.caretOffset = getCaretOffset();
+		status.selection = textWidget.getSelection();
+		return status;
+	}
+	
+	private void postTextChange(ControlStatus status) {
+		if (status.atBottom) scrollToBottom();
+		if (status.selection.x != status.selection.y) // Only set it if there is something selected
+			textWidget.setSelectionRange(status.selection.x, status.selection.y - status.selection.x);
+		setCaretOffset(status.caretOffset);
+	}
+	
 	private void scrollToBottom() {
 		if (doScrollDirection == SWT.DOWN) {
 			textWidget.invokeAction(ST.TEXT_END);
@@ -541,10 +560,9 @@ public class WarlockText implements LineBackgroundListener {
 	}
 	
 	public void replaceTextRange(int start, int length, String text) {
-		boolean atBottom = atBottom();
+		ControlStatus status = preTextChange();
 		textWidget.replaceTextRange(start, length, text);
-		if(atBottom)
-			scrollToBottom();
+		postTextChange(status);
 	}
 	
 	public int getLineCount() {
@@ -559,7 +577,9 @@ public class WarlockText implements LineBackgroundListener {
 		return textWidget.getTopIndex();
 	}
 	
-	private void constrainLineLimit(boolean atBottom) {
+	private ControlStatus constrainLineLimit(ControlStatus status) {
+		// 'status' is a pointer that allows us to change the object in our parent..
+		// in this method... it is intentional.
 		if (lineLimit > 0) {
 			int len = getLineCount();
 			if (len > lineLimit) {
@@ -567,12 +587,21 @@ public class WarlockText implements LineBackgroundListener {
 				int toRemove = len - lineLimit;
 				int offset = getOffsetAtLine(toRemove);
 				
+				// adjust ending status
+				status.caretOffset = status.caretOffset - toRemove;
+				if (status.caretOffset < 0) status.caretOffset = 0; // Don't let this go negative
+				status.selection.x = status.selection.x - toRemove;
+				if (status.selection.x < 0) status.selection.x = 0; // Don't let this go negative
+				status.selection.y = status.selection.y - toRemove;
+				if (status.selection.y < 0) status.selection.y = 0; // Don't let this go negative
+				
 				replaceTextRange(0,offset,"");
 				updateLineBackgrounds(toRemove);
-				if(!atBottom)
+				if(!status.atBottom)
 					setTopIndex(top - toRemove);
 			}
 		}
+		return status;
 	}
 	
 	private void updateLineBackgrounds (int lines)
