@@ -555,8 +555,8 @@ public class WarlockText implements LineBackgroundListener {
 	}
 	
 	private boolean atBottom() {
-		return vscroll.getSelection() >= (vscroll.getMaximum()
-				- (vscroll.getPageIncrement() * 1.5));
+		return vscroll.getSelection() >= vscroll.getMaximum()
+				- vscroll.getPageIncrement();
 	}
 	
 	public void replaceTextRange(int start, int length, String text) {
