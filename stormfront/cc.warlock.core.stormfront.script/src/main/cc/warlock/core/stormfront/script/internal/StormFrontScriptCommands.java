@@ -69,7 +69,7 @@ public class StormFrontScriptCommands extends ScriptCommands implements IStormFr
 		if(!interrupted) {
 			try {
 				while(sfClient.getRoundtime().get() > 0 && !interrupted) {
-					Thread.sleep((sfClient.getRoundtime().get() + 1) * 1000);
+					super.pause(sfClient.getRoundtime().get() + 1);
 				}
 			} catch(Exception e) {
 				e.printStackTrace();

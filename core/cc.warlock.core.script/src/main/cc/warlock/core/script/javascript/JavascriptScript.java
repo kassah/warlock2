@@ -38,7 +38,6 @@ import cc.warlock.core.script.IScriptCommands;
 import cc.warlock.core.script.IScriptEngine;
 import cc.warlock.core.script.IScriptInfo;
 import cc.warlock.core.script.IScriptListener;
-import cc.warlock.core.script.internal.ScriptCommands;
 
 /**
  * @author Marshall
