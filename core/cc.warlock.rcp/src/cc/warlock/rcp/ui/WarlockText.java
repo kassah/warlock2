@@ -542,7 +542,7 @@ public class WarlockText implements LineBackgroundListener {
 	private void postTextChange(ControlStatus status) {
 		if (status.atBottom) scrollToBottom();
 		if (status.selection.x != status.selection.y) // Only set it if there is something selected
-			textWidget.setSelectionRange(status.selection.x, status.selection.y - status.selection.x);
+			textWidget.setSelection(status.selection);
 		setCaretOffset(status.caretOffset);
 	}
 	
@@ -588,11 +588,11 @@ public class WarlockText implements LineBackgroundListener {
 				int offset = getOffsetAtLine(toRemove);
 				
 				// adjust ending status
-				status.caretOffset = status.caretOffset - toRemove;
+				status.caretOffset = status.caretOffset - offset;
 				if (status.caretOffset < 0) status.caretOffset = 0; // Don't let this go negative
-				status.selection.x = status.selection.x - toRemove;
+				status.selection.x = status.selection.x - offset;
 				if (status.selection.x < 0) status.selection.x = 0; // Don't let this go negative
-				status.selection.y = status.selection.y - toRemove;
+				status.selection.y = status.selection.y - offset;
 				if (status.selection.y < 0) status.selection.y = 0; // Don't let this go negative
 				
 				replaceTextRange(0,offset,"");
