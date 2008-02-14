@@ -305,7 +305,21 @@ public abstract class GameView extends StreamView implements IWarlockClientViewe
 				e.printStackTrace();
 			}
 		}
-		
+		openViews.remove(this);
+		if (firstInstance == this) {
+			if (openViews.isEmpty()) {
+				firstInstance = null;
+				// Show connections page since we're getting rid of the main window
+				IWorkbenchPage page = PlatformUI.getWorkbench().getActiveWorkbenchWindow().getActivePage();
+				//IViewPart part = page.findView(ConnectionView.VIEW_ID);
+				try {
+					page.showView(ConnectionView.VIEW_ID);
+				} catch (PartInitException e) {
+					e.printStackTrace();
+				}
+			} else
+				firstInstance = openViews.get(0);
+		}
 		super.dispose();
 	}
 }
