@@ -546,7 +546,7 @@ public class WarlockText implements LineBackgroundListener {
 	private void postTextChange(ControlStatus status) {
 		if (status.atBottom) {
 			if (doScrollDirection == SWT.DOWN) {
-				textWidget.invokeAction(ST.TEXT_END);
+				textWidget.setTopPixel(textWidget.getLinePixel(textWidget.getLineCount() - 1));
 				if (compass != null)
 					compass.redraw();
 			}
