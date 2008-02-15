@@ -538,6 +538,7 @@ public class WarlockText implements LineBackgroundListener {
 		ControlStatus status = new ControlStatus();
 		status.atBottom = vscroll.getSelection() >= vscroll.getMaximum()
 				- vscroll.getPageIncrement();
+		//status.atBottom = textWidget.getLinePixel(textWidget.getLineCount() - 1) >= textWidget.getClientArea().height;
 		status.caretOffset = getCaretOffset();
 		status.selection = textWidget.getSelection();
 		return status;
@@ -546,7 +547,7 @@ public class WarlockText implements LineBackgroundListener {
 	private void postTextChange(ControlStatus status) {
 		if (status.atBottom) {
 			if (doScrollDirection == SWT.DOWN) {
-				textWidget.setTopPixel(textWidget.getLinePixel(textWidget.getLineCount() - 1));
+				textWidget.setTopPixel(textWidget.getTopPixel() + textWidget.getLinePixel(textWidget.getLineCount()));
 				if (compass != null)
 					compass.redraw();
 			}
