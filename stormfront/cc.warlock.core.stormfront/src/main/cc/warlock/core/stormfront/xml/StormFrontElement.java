@@ -158,7 +158,7 @@ public class StormFrontElement {
 	
 	public String getText ()
 	{
-		return getTextTrim();
+		return text.toString();
 	}
 	
 	public String getTextTrim ()
@@ -213,7 +213,7 @@ public class StormFrontElement {
 		}
 		
 		boolean hasContent = false;
-		if (elements.size() > 0 || getTextTrim().length() > 0)
+		if (elements.size() > 0 || getText().length() > 0)
 		{
 			hasContent = true;
 			
@@ -232,9 +232,9 @@ public class StormFrontElement {
 				}
 			}
 		}
-		if (getTextTrim().length()> 0)
+		if (getText().length()> 0)
 		{
-			xml.append(StringEscapeUtils.escapeXml(getTextTrim()));
+			xml.append(StringEscapeUtils.escapeXml(getText()));
 		}
 		
 		if (hasContent)
