@@ -403,8 +403,9 @@ public class WarlockText implements LineBackgroundListener {
 	
 	public void addLink (String url, String description)
 	{
+		ControlStatus status = preTextChange();
 		int start = getCurrentHolderOffset();
-		replaceTextRange(start, 1, description);
+		textWidget.replaceTextRange(start, 1, description);
 		
 		StyleRangeWithData range = new StyleRangeWithData();
 		range.foreground = linkColor;
@@ -413,6 +414,7 @@ public class WarlockText implements LineBackgroundListener {
 		range.length = description.length();
 		textWidget.setStyleRange(range);
 		range.data.put("link.url", url);
+		postTextChange(status);
 	}
 	
 	public void setLineLimit(int limit) {
@@ -534,36 +536,24 @@ public class WarlockText implements LineBackgroundListener {
 	
 	private ControlStatus preTextChange() {
 		ControlStatus status = new ControlStatus();
-		status.atBottom = atBottom();
+		status.atBottom = vscroll.getSelection() >= vscroll.getMaximum()
+				- vscroll.getPageIncrement() - textWidget.getLineHeight(getCharCount());
 		status.caretOffset = getCaretOffset();
 		status.selection = textWidget.getSelection();
 		return status;
 	}
 	
 	private void postTextChange(ControlStatus status) {
-		if (status.atBottom) scrollToBottom();
+		if (status.atBottom) {
+			if (doScrollDirection == SWT.DOWN) {
+				textWidget.invokeAction(ST.TEXT_END);
+				if (compass != null)
+					compass.redraw();
+			}
+		}
 		if (status.selection.x != status.selection.y) // Only set it if there is something selected
 			textWidget.setSelectionRange(status.selection.x, status.selection.y - status.selection.x);
 		setCaretOffset(status.caretOffset);
-	}
-	
-	private void scrollToBottom() {
-		if (doScrollDirection == SWT.DOWN) {
-			textWidget.invokeAction(ST.TEXT_END);
-			if (compass != null)
-				compass.redraw();
-		}
-	}
-	
-	private boolean atBottom() {
-		return vscroll.getSelection() >= vscroll.getMaximum()
-				- vscroll.getPageIncrement() - textWidget.getLineHeight(getCharCount());
-	}
-	
-	public void replaceTextRange(int start, int length, String text) {
-		ControlStatus status = preTextChange();
-		textWidget.replaceTextRange(start, length, text);
-		postTextChange(status);
 	}
 	
 	public int getLineCount() {
@@ -572,10 +562,6 @@ public class WarlockText implements LineBackgroundListener {
 	
 	public int getOffsetAtLine(int lineIndex) {
 		return textWidget.getOffsetAtLine(lineIndex);
-	}
-	
-	public int getTopIndex() {
-		return textWidget.getTopIndex();
 	}
 	
 	private ControlStatus constrainLineLimit(ControlStatus status) {
@@ -596,7 +582,7 @@ public class WarlockText implements LineBackgroundListener {
 				status.selection.y = status.selection.y - charsToRemove;
 				if (status.selection.y < 0) status.selection.y = 0; // Don't let this go negative
 				
-				replaceTextRange(0, charsToRemove, "");
+				textWidget.replaceTextRange(0, charsToRemove, "");
 				updateLineBackgrounds(linesToRemove);
 				if(!status.atBottom && pixelsToRemove < 0)
 					textWidget.setTopPixel(-pixelsToRemove);
