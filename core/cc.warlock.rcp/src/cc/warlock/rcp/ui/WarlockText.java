@@ -537,7 +537,7 @@ public class WarlockText implements LineBackgroundListener {
 	private ControlStatus preTextChange() {
 		ControlStatus status = new ControlStatus();
 		status.atBottom = vscroll.getSelection() >= vscroll.getMaximum()
-				- vscroll.getPageIncrement() - textWidget.getLineHeight(getCharCount());
+				- vscroll.getPageIncrement();
 		status.caretOffset = getCaretOffset();
 		status.selection = textWidget.getSelection();
 		return status;
