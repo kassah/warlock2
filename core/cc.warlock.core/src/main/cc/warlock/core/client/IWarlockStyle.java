@@ -39,8 +39,8 @@ public interface IWarlockStyle {
 	
 	public URL getLinkAddress();
 	
-	public WarlockColor getFGColor();
-	public WarlockColor getBGColor();
+	public WarlockColor getForegroundColor();
+	public WarlockColor getBackgroundColor();
 	public boolean isFullLine();
 	public String getName();
 	
@@ -48,8 +48,8 @@ public interface IWarlockStyle {
 
 	public void setLinkAddress(URL linkAddress);
 	
-	public void setFGColor(WarlockColor color);
-	public void setBGColor(WarlockColor color);
+	public void setForegroundColor(WarlockColor color);
+	public void setBackgroundColor(WarlockColor color);
 	public void setFullLine(boolean fullLine);
 	public void setName(String name);
 }

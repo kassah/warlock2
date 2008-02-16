@@ -35,8 +35,8 @@ public class WarlockStyle implements IWarlockStyle {
 
 	private URL linkAddress;
 	private Collection<StyleType> styleTypes;
-	private WarlockColor FGColor;
-	private WarlockColor BGColor;
+	private WarlockColor foregroundColor;
+	private WarlockColor backgroundColor;
 	private boolean fullLine;
 	private String name;
 	
@@ -81,14 +81,6 @@ public class WarlockStyle implements IWarlockStyle {
 		return styleTypes;
 	}
 	
-	public WarlockColor getFGColor() {
-		return FGColor;
-	}
-	
-	public WarlockColor getBGColor() {
-		return BGColor;
-	}
-	
 	public boolean isFullLine() {
 		return fullLine;
 	}
@@ -111,14 +103,6 @@ public class WarlockStyle implements IWarlockStyle {
 		}
 	}
 	
-	public void setFGColor(WarlockColor color) {
-		FGColor = color;
-	}
-	
-	public void setBGColor(WarlockColor color) {
-		BGColor = color;
-	}
-	
 	public void setFullLine(boolean fullLine) {
 		this.fullLine = fullLine;
 	}
@@ -129,5 +113,21 @@ public class WarlockStyle implements IWarlockStyle {
 	
 	public String getName() {
 		return name;
+	}
+
+	public WarlockColor getForegroundColor() {
+		return foregroundColor;
+	}
+
+	public void setForegroundColor(WarlockColor foregroundColor) {
+		this.foregroundColor = foregroundColor;
+	}
+
+	public WarlockColor getBackgroundColor() {
+		return backgroundColor;
+	}
+
+	public void setBackgroundColor(WarlockColor backgroundColor) {
+		this.backgroundColor = backgroundColor;
 	}
 }
