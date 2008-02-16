@@ -39,6 +39,8 @@ public class WarlockStyle implements IWarlockStyle {
 	private WarlockColor backgroundColor;
 	private boolean fullLine;
 	private String name;
+	private String command;
+	private boolean commandVisible;
 	
 	public WarlockStyle (StyleType[] styleTypes, URL linkAddress)
 	{
@@ -76,6 +78,14 @@ public class WarlockStyle implements IWarlockStyle {
 	public URL getLinkAddress() {
 		return linkAddress;
 	}
+	
+	public String getCommand() {
+		return command;
+	}
+	
+	public boolean commandVisible() {
+		return commandVisible;
+	}
 
 	public Collection<StyleType> getStyleTypes() {
 		return styleTypes;
@@ -92,6 +102,11 @@ public class WarlockStyle implements IWarlockStyle {
 
 	public void setLinkAddress(URL linkAddress) {
 		this.linkAddress = linkAddress;
+	}
+	
+	public void setCommand(String command, boolean visible) {
+		this.command = command;
+		this.commandVisible = visible;
 	}
 	
 	public void inheritFrom(IWarlockStyle style) {
