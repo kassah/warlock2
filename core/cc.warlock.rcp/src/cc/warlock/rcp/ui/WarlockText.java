@@ -32,7 +32,6 @@ import org.eclipse.swt.custom.ExtendedModifyListener;
 import org.eclipse.swt.custom.LineBackgroundEvent;
 import org.eclipse.swt.custom.LineBackgroundListener;
 import org.eclipse.swt.custom.PaintObjectListener;
-import org.eclipse.swt.custom.ST;
 import org.eclipse.swt.custom.StyleRange;
 import org.eclipse.swt.custom.StyledText;
 import org.eclipse.swt.custom.StyledTextContent;
@@ -87,9 +86,7 @@ public class WarlockText implements LineBackgroundListener {
 	private StyledText textWidget;
 	private Hashtable<Object, StyleRangeWithData> objects = new Hashtable<Object, StyleRangeWithData>();
 	private Hashtable<Control, Rectangle> anchoredControls = new Hashtable<Control, Rectangle>();
-	private Color linkColor;
 	private Cursor handCursor, defaultCursor;
-	private ScrollBar vscroll;
 	private int lineLimit = 5000;
 	private int doScrollDirection = SWT.UP;
 	private IWarlockClient client;
@@ -101,12 +98,9 @@ public class WarlockText implements LineBackgroundListener {
 	public WarlockText(Composite parent, int style, IWarlockClient client) {
 		textWidget = new StyledText(parent, style);
 		this.client = client;
-		
 		Display display = parent.getDisplay();
-		linkColor = new Color(display, 0xF0, 0x80, 0);
 		handCursor = new Cursor(display, SWT.CURSOR_HAND);
 		defaultCursor = parent.getCursor();
-		vscroll = getVerticalBar ();
 		contextMenu = new Menu(textWidget);
 		MenuItem itemCopy = new MenuItem(contextMenu, SWT.PUSH);
 		itemCopy.addSelectionListener(new SelectionAdapter() {
@@ -155,7 +149,7 @@ public class WarlockText implements LineBackgroundListener {
 						if (range != null && range instanceof StyleRangeWithData)
 						{
 							StyleRangeWithData range2 = (StyleRangeWithData) range;
-							if (range2.data.containsKey("link.url"))
+							if (range2.data.containsKey("link.url") | range2.data.containsKey("command"))
 							{
 								setCursor(handCursor);
 								return;
@@ -185,6 +179,9 @@ public class WarlockText implements LineBackgroundListener {
 						if (range2.data.containsKey("link.url"))
 						{
 							RCPUtil.openURL(range2.data.get("link.url"));
+						}
+						if (range2.data.containsKey("command")) {
+							WarlockText.this.getClient().send(range2.data.get("command"));
 						}
 					}
 				} catch (IllegalArgumentException ex) {
@@ -401,22 +398,6 @@ public class WarlockText implements LineBackgroundListener {
 		addControls (new Control[] { label });		
 	}
 	
-	public void addLink (String url, String description)
-	{
-		ControlStatus status = preTextChange();
-		int start = getCurrentHolderOffset();
-		textWidget.replaceTextRange(start, 1, description);
-		
-		StyleRangeWithData range = new StyleRangeWithData();
-		range.foreground = linkColor;
-		range.underline = true;
-		range.start = start;
-		range.length = description.length();
-		textWidget.setStyleRange(range);
-		range.data.put("link.url", url);
-		postTextChange(status);
-	}
-	
 	public void setLineLimit(int limit) {
 		lineLimit = limit;
 	}
@@ -475,6 +456,7 @@ public class WarlockText implements LineBackgroundListener {
 						style.fontStyle = nextStyle.fontStyle;
 					if(nextStyle.strikeout) style.strikeout = true;
 					if(nextStyle.underline) style.underline = true;
+					style.data.putAll(nextStyle.data);
 				}
 				style.start = charCount + pos;
 				style.length = nextPos - pos;
@@ -525,6 +507,13 @@ public class WarlockText implements LineBackgroundListener {
 			styleRange.start = offset + range.start;
 			styleRange.length = range.length;
 		}
+		if(range.style.getLinkAddress() != null)
+			styleRange.data.put("link.url", range.style.getLinkAddress().toString());
+		if(range.style.getCommand() != null) {
+			styleRange.data.put("command", range.style.getCommand());
+			if(!range.style.commandVisible())
+				styleRange.data.put("command.visibility", "false");
+		}
 		return styleRange;
 	}
 	
@@ -536,7 +525,6 @@ public class WarlockText implements LineBackgroundListener {
 	
 	private ControlStatus preTextChange() {
 		ControlStatus status = new ControlStatus();
-		//status.atBottom = vscroll.getSelection() >= vscroll.getMaximum() - vscroll.getPageIncrement();
 		status.atBottom = textWidget.getLinePixel(textWidget.getLineCount()) <= textWidget.getClientArea().height;
 		status.caretOffset = getCaretOffset();
 		status.selection = textWidget.getSelection();

@@ -21,10 +21,15 @@
  */
 package cc.warlock.core.stormfront.internal;
 
+import cc.warlock.core.client.IWarlockStyle.StyleType;
+import cc.warlock.core.client.internal.WarlockStyle;
 import cc.warlock.core.stormfront.IStormFrontProtocolHandler;
+import cc.warlock.core.stormfront.xml.StormFrontAttributeList;
 
 public class DTagHandler extends DefaultTagHandler {
 
+	WarlockStyle style;
+	
 	public DTagHandler(IStormFrontProtocolHandler handler) {
 		super(handler);
 	}
@@ -34,6 +39,26 @@ public class DTagHandler extends DefaultTagHandler {
 		return new String[] {"d"};
 	}
 
+	@Override
+	public void handleStart(StormFrontAttributeList attributes) {
+		if(style != null) {
+			handler.removeStyle(style);
+		}
+		String command = attributes.getValue("cmd");
+		if(command != null) {
+			style = new WarlockStyle(new StyleType[] { StyleType.UNDERLINE });
+			style.setCommand(command, true);
+			handler.addStyle(style);
+		}
+	}
+	
+	@Override
+	public void handleEnd() {
+		if(style != null) {
+			handler.removeStyle(style);
+		}
+	}
+	
 	@Override
 	public boolean ignoreNewlines() {
 		return false;
