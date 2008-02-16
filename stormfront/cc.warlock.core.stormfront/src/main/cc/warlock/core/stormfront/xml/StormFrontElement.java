@@ -67,7 +67,6 @@ public class StormFrontElement {
 		if (attr == null)
 		{
 			attr = new StormFrontAttribute();
-			attr.setQuoteType('"');
 			attributes.addAttribute(attr);
 		}
 		
@@ -203,9 +202,9 @@ public class StormFrontElement {
 				
 				xml.append(attribute.getName());
 				xml.append("=");
-				xml.append(attribute.getQuoteType());
+				xml.append("\"");
 				xml.append(StringEscapeUtils.escapeXml(attribute.getValue()));
-				xml.append(attribute.getQuoteType());
+				xml.append("\"");
 				
 				if (iter.hasNext())
 					xml.append(" ");

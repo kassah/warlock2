@@ -23,7 +23,7 @@ public class StormFrontProtocolParser {
 	
 	protected void startElement (String name, String newLine)
 	{
-		handler.startElement(name, currentAttributes, newLine);
+		handler.startElement(name, currentAttributes, token_source.tagBuffer.toString(), newLine);
 		currentAttributes.clear();
 	}
 	
@@ -32,15 +32,20 @@ public class StormFrontProtocolParser {
 		StormFrontAttribute attribute = new StormFrontAttribute();
 		attribute.setName(name);
 		attribute.setValue(value);
-		attribute.setQuoteType(token_source.quoteChar);
 		
 		currentAttributes.addAttribute(attribute);
 	}
 	
 	protected void endElement (String name, String newLine)
 	{
-		handler.endElement(name, newLine);
+		handler.endElement(name, token_source.tagBuffer.toString(), newLine);
+	}
+	
+	protected void emptyElement (String name, String newLine)
+	{
+		handler.startElement(name, currentAttributes, token_source.tagBuffer.toString(), newLine);
 		currentAttributes.clear();
+		handler.endElement(name, null, null);
 	}
 	
 	public void passThrough() {
@@ -119,7 +124,7 @@ void Element() : {Token data; String str; }
 
 void Tag() : {Token name, newLine; }
 {
-	<TAG_START_OPEN> name=<GENERIC_ID> (Attribute())* (newLine=<TAG_CLOSE> { startElement(name.image, newLine.image); } | newLine=<TAG_EMPTY_CLOSE> { startElement(name.image, null); endElement(name.image, newLine.image); })
+	<TAG_START_OPEN> name=<GENERIC_ID> (Attribute())* (newLine=<TAG_CLOSE> { startElement(name.image, newLine.image); } | newLine=<TAG_EMPTY_CLOSE> { emptyElement(name.image, newLine.image); })
 }
 
 void Attribute(): {Token name, value;}
@@ -147,35 +152,37 @@ String Entity(): { Token entity; }
 
 TOKEN_MGR_DECLS :
 {
-    // Required by SetState
-    void backup(int n) { input_stream.backup(n); } 
-  public char quoteChar;
+	// Required by SetState
+	void backup(int n) { input_stream.backup(n); }
+	
+	private void buffer(String str) { if(str != null) tagBuffer.append(str); }
+ 	public StringBuffer tagBuffer = new StringBuffer();
 }
 
 TOKEN: {
-	<TAG_START_OPEN: "<"> : IN_TAG_MODE |
-	<TAG_END_OPEN: "</"> : IN_TAG_MODE |
+	<TAG_START_OPEN: "<"> { tagBuffer.setLength(0); buffer(matchedToken.image); }: IN_TAG_MODE |
+	<TAG_END_OPEN: "</"> { tagBuffer.setLength(0); buffer(matchedToken.image); }: IN_TAG_MODE |
 	
-	<ENTITY: "&" ("#")? (<LETTER> | <DIGIT>)+ ";"> { matchedToken.image = matchedToken.image.substring(1, matchedToken.image.length() - 1); } |
-	<PCDATA: (~["<","&"])+ | "&" | "<" ~["A"-"Z","a"-"z", "_"]> |
+	<ENTITY: "&" ("#")? (<LETTER> | <DIGIT>)+ ";"> { buffer(matchedToken.image); matchedToken.image = matchedToken.image.substring(1, matchedToken.image.length() - 1); } |
+	<PCDATA: (~["<","&"])+ | "&" | "<" ~["A"-"Z","a"-"z", "_"]> { buffer(matchedToken.image); } |
 	 <NAMECHAR: (<LETTER> | <DIGIT> | "." | "-" | "_" | ":")> |
 	 <DIGIT: (["0"-"9"])> |
 	 <LETTER: (["A"-"Z","a"-"z"])>
 }
 
 <IN_TAG_MODE> TOKEN: {
-	<TAG_CLOSE: ">" (("\r")? "\n")?> {matchedToken.image = matchedToken.image.substring(1, matchedToken.image.length());}: DEFAULT |
-	<TAG_EMPTY_CLOSE: "/>" (("\r")? "\n")?> {matchedToken.image = matchedToken.image.substring(2, matchedToken.image.length());}: DEFAULT |
+	<TAG_CLOSE: ">" (("\r")? "\n")?> { buffer(matchedToken.image); matchedToken.image = matchedToken.image.substring(1, matchedToken.image.length());}: DEFAULT |
+	<TAG_EMPTY_CLOSE: "/>" (("\r")? "\n")?> { buffer(matchedToken.image); matchedToken.image = matchedToken.image.substring(2, matchedToken.image.length());}: DEFAULT |
 	
 		
-	<ATTR_EQ: "="> |
-	<ATTR_VALUE: ( "\"" (~["\""])* ("\"" (~["\"", "=", ">"])*)* "\"" | "'" (~["'"])* ("'" (~["'", "=", ">"])*)* "'")> { quoteChar = matchedToken.image.charAt(0); matchedToken.image = matchedToken.image.substring(1, matchedToken.image.length() - 1); } |
+	<ATTR_EQ: "="> { buffer(matchedToken.image); } |
+	<ATTR_VALUE: ( "\"" (~["\""])* ("\"" (~["\"", "=", ">"])*)* "\"" | "'" (~["'"])* ("'" (~["'", "=", ">"])*)* "'")> { buffer(matchedToken.image); matchedToken.image = matchedToken.image.substring(1, matchedToken.image.length() - 1); } |
 	
-	<GENERIC_ID: (<LETTER> | "_") (<NAMECHAR>)*> 
+	<GENERIC_ID: (<LETTER> | "_") (<NAMECHAR>)*> { buffer(matchedToken.image); }
 }
 
 <IN_TAG_MODE> SKIP: {
-	 <WS: ([" ","\r","\t","\n"])>
+	 <WS: ([" ","\r","\t","\n"])> { tagBuffer.append(image); }
 }
 
 <PASS_THRU> SKIP: {

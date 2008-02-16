@@ -59,7 +59,7 @@ public interface IStormFrontTagHandler {
 	 * @param name The child tag name
 	 * @param attributes The child tag attributes
 	 */
-	public boolean handleChild(String name, StormFrontAttributeList attributes);
+	public boolean handleStartChild(String name, StormFrontAttributeList attributes, String rawXML, String newLine);
 	
 	/**
 	 * handle the end tag
@@ -71,7 +71,7 @@ public interface IStormFrontTagHandler {
 	 * Handle the end of a child tag
 	 * @param name The child tag name
 	 */
-	public boolean handleEndChild(String name);
+	public boolean handleEndChild(String name, String rawXML, String newLine);
 	
 	/**
 	 * handle contents of the tag

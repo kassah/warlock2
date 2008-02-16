@@ -70,11 +70,11 @@ abstract public class BaseTagHandler implements IStormFrontTagHandler {
 		return true;
 	}
 	
-	public boolean handleChild(String name, StormFrontAttributeList attributes) {
+	public boolean handleStartChild(String name, StormFrontAttributeList attributes, String rawXML, String newLine) {
 		return false;
 	}
 	
-	public boolean handleEndChild(String name) {
+	public boolean handleEndChild(String name, String rawXML, String newLine) {
 		return false;
 	}
 }

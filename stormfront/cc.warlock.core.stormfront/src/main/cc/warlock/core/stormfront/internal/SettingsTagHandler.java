@@ -33,7 +33,6 @@ import cc.warlock.core.client.IWarlockClientViewer;
 import cc.warlock.core.configuration.ConfigurationUtil;
 import cc.warlock.core.stormfront.IStormFrontProtocolHandler;
 import cc.warlock.core.stormfront.client.IStormFrontClientViewer;
-import cc.warlock.core.stormfront.xml.StormFrontAttribute;
 import cc.warlock.core.stormfront.xml.StormFrontAttributeList;
 import cc.warlock.core.stormfront.xml.StormFrontDocument;
 
@@ -87,28 +86,18 @@ public class SettingsTagHandler extends DefaultTagHandler {
 	}
 
 	@Override
-	public boolean handleChild(String name, StormFrontAttributeList attributes) {
-		String startTag = "<" + name;
-		if (attributes != null) {
-            for (StormFrontAttribute attribute : attributes.getList())
-            {
-                startTag += " " + attribute.getName() + "=" +
-                	attribute.getQuoteType() + 
-                	StringEscapeUtils.escapeXml(attribute.getValue()) +
-                	attribute.getQuoteType();
-            }
-        }
-		startTag += ">";
-		buffer.append(startTag);
+	public boolean handleStartChild(String name, StormFrontAttributeList attributes,
+			String rawXML, String newLine) {
+		buffer.append(rawXML);
 		
 		return true;
 	}
 	
 	
 	@Override
-	public boolean handleEndChild(String name) {
+	public boolean handleEndChild(String name, String rawXML, String newLine) {
 		
-		buffer.append("</" + name + ">");
+		buffer.append(rawXML);
 		
 		return true;
 	}
@@ -145,6 +134,7 @@ public class SettingsTagHandler extends DefaultTagHandler {
 	
 	@Override
 	public boolean handleCharacters(String characters) {
+		System.out.print(characters);
 		buffer.append(StringEscapeUtils.escapeXml(characters));
 		return true;
 	}
