@@ -8,8 +8,13 @@
 		<property file="mainBuilder/build.properties"/>
 		<property file="${buildDirectory}/${buildLabel}/currentSnapshot.properties"/>
 		
-		<property name="message"
-			value="Warlock snapshot build succesfully completed: http://build.warlock.cc/${build.current.snapshot}"/>
+		<condition 
+			property="message"
+			value="Warlock snapshot build succesfully completed: http://build.warlock.cc/${build.current.snapshot}"
+			else="There was an error building the current snapshot, please see: http://hudson.warlock.cc">
+		
+			<isset property="build.current.snapshot"/>
+		</condition>
 		
 		<antcall target="send-message"/>
 	</target>
