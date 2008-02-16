@@ -33,6 +33,14 @@ public class WarlockColor {
 	protected int red, green, blue;
 	
 	public WarlockColor () { }
+	
+	public WarlockColor (WarlockColor other)
+	{
+		this.red = other.red;
+		this.green = other.green;
+		this.blue = other.blue;
+	}
+	
 	public WarlockColor (int red, int green, int blue)
 	{
 		this.red = red;
