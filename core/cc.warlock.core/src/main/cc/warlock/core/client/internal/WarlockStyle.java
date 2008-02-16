@@ -130,19 +130,19 @@ public class WarlockStyle implements IWarlockStyle {
 		return name;
 	}
 
-	public WarlockColor getForegroundColor() {
+	public WarlockColor getFGColor() {
 		return foregroundColor;
 	}
 
-	public void setForegroundColor(WarlockColor foregroundColor) {
+	public void setFGColor(WarlockColor foregroundColor) {
 		this.foregroundColor = foregroundColor;
 	}
 
-	public WarlockColor getBackgroundColor() {
+	public WarlockColor getBGColor() {
 		return backgroundColor;
 	}
 
-	public void setBackgroundColor(WarlockColor backgroundColor) {
+	public void setBGColor(WarlockColor backgroundColor) {
 		this.backgroundColor = backgroundColor;
 	}
 }

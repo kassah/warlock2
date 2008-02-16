@@ -41,8 +41,8 @@ public interface IWarlockStyle {
 	public String getCommand();
 	public boolean commandVisible();
 	
-	public WarlockColor getForegroundColor();
-	public WarlockColor getBackgroundColor();
+	public WarlockColor getFGColor();
+	public WarlockColor getBGColor();
 	public boolean isFullLine();
 	public String getName();
 	
@@ -51,8 +51,8 @@ public interface IWarlockStyle {
 	public void setLinkAddress(URL linkAddress);
 	public void setCommand(String command, boolean visible);
 	
-	public void setForegroundColor(WarlockColor color);
-	public void setBackgroundColor(WarlockColor color);
+	public void setFGColor(WarlockColor color);
+	public void setBGColor(WarlockColor color);
 	public void setFullLine(boolean fullLine);
 	public void setName(String name);
 }
