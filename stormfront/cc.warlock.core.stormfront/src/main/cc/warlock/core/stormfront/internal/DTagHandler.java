@@ -40,7 +40,7 @@ public class DTagHandler extends DefaultTagHandler {
 	}
 
 	@Override
-	public void handleStart(StormFrontAttributeList attributes) {
+	public void handleStart(StormFrontAttributeList attributes, String rawXML) {
 		if(style != null) {
 			handler.removeStyle(style);
 		}
@@ -53,7 +53,7 @@ public class DTagHandler extends DefaultTagHandler {
 	}
 	
 	@Override
-	public void handleEnd() {
+	public void handleEnd(String rawXML) {
 		if(style != null) {
 			handler.removeStyle(style);
 		}

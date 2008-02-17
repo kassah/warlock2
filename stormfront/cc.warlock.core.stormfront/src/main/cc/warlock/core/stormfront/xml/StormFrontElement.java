@@ -238,7 +238,7 @@ public class StormFrontElement {
 		
 		if (hasContent)
 		{
-			xml.append ("</"+ name + ">");
+			xml.append (/* FIXME can't do this because it gets passed on as content: prefix +*/ "</"+ name + ">");
 			if (prettyPrint)
 				xml.append("\n");
 		}

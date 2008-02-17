@@ -51,7 +51,7 @@ public class SettingsInfoTagHandler extends DefaultTagHandler {
 	}
 	
 	@Override
-	public void handleStart(StormFrontAttributeList attributes) {
+	public void handleStart(StormFrontAttributeList attributes, String rawXML) {
 		
 		if (attributes.getAttribute("space") != null
 			&& attributes.getAttribute("not") != null
@@ -74,7 +74,7 @@ public class SettingsInfoTagHandler extends DefaultTagHandler {
 	}
 	
 	@Override
-	public void handleEnd() {
+	public void handleEnd(String rawXML) {
 		if (newSettings) {
 			
 			// This is a character that has no server settings, we need to immediately send our own
@@ -99,38 +99,32 @@ public class SettingsInfoTagHandler extends DefaultTagHandler {
 		} else {
 			// check against crc to see if we're up to date
 			StormFrontDocument document = ServerSettings.getDocument(playerId);
-			String currentCRC = ServerSettings.getCRC(document);
+			//String currentCRC = ServerSettings.getCRC(document);
 			Integer currentMajorVersion = ServerSettings.getMajorVersion(document);
 			if (currentMajorVersion == null) currentMajorVersion = 0;
 			
-			if (currentCRC != null && crc.equals(currentCRC))
+				
+			handler.getClient().getServerSettings().load(playerId);
+			// 
+			if (currentMajorVersion > majorVersion)
 			{
-				boolean sendBlankLine = true;
-				
-				handler.getClient().getServerSettings().load(playerId);
-				// crcs match, if we have the bigger major version, override with our settings
-				if (currentMajorVersion > majorVersion)
-				{
-					handler.getClient().getServerSettings().sendAllSettings();
-					sendBlankLine = false;
-				}
-				
-				if (sendBlankLine)
-				{
-					try {
-						handler.getClient().getConnection().sendLine("");
-					} catch(IOException e) {
-						e.printStackTrace();
-					}
-				}
-			} else {
-				System.out.println("our crc is: " + currentCRC + ", their crc is: " + crc);
+				handler.getClient().getServerSettings().sendAllSettings();
+			} else if(currentMajorVersion < majorVersion) {
 				try {
 					handler.getClient().getConnection().send("<sendSettings/>\n");
 				} catch(IOException e) {
 					e.printStackTrace();
 				}
+			} else { // major versions are equal
+				try {
+					// increment our version
+					handler.getClient().getServerSettings().incrementMajorVersion();
+					handler.getClient().getConnection().sendLine("");
+				} catch(IOException e) {
+					e.printStackTrace();
+				}
 			}
+
 		}
 	}
 	

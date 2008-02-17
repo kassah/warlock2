@@ -21,7 +21,7 @@ public class StormFrontProtocolParser {
 		handler.characters(characters);
 	}
 	
-	protected void startElement (String name, String newLine)
+	protected void startElement (String name, boolean newLine)
 	{
 		handler.startElement(name, currentAttributes, token_source.tagBuffer.toString(), newLine);
 		currentAttributes.clear();
@@ -36,16 +36,16 @@ public class StormFrontProtocolParser {
 		currentAttributes.addAttribute(attribute);
 	}
 	
-	protected void endElement (String name, String newLine)
+	protected void endElement (String name, boolean newLine)
 	{
 		handler.endElement(name, token_source.tagBuffer.toString(), newLine);
 	}
 	
-	protected void emptyElement (String name, String newLine)
+	protected void emptyElement (String name, boolean newLine)
 	{
 		handler.startElement(name, currentAttributes, token_source.tagBuffer.toString(), newLine);
 		currentAttributes.clear();
-		handler.endElement(name, null, null);
+		handler.endElement(name, null, false);
 	}
 	
 	public void passThrough() {
@@ -124,7 +124,7 @@ void Element() : {Token data; String str; }
 
 void Tag() : {Token name, newLine; }
 {
-	<TAG_START_OPEN> name=<GENERIC_ID> (Attribute())* (newLine=<TAG_CLOSE> { startElement(name.image, newLine.image); } | newLine=<TAG_EMPTY_CLOSE> { emptyElement(name.image, newLine.image); })
+	<TAG_START_OPEN> name=<GENERIC_ID> (Attribute())* (newLine=<TAG_CLOSE> { startElement(name.image, newLine.image.length() > 1); } | newLine=<TAG_EMPTY_CLOSE> { emptyElement(name.image, newLine.image.length() > 2); })
 }
 
 void Attribute(): {Token name, value;}
@@ -134,7 +134,7 @@ void Attribute(): {Token name, value;}
 
 void EndTag(): {Token name, newLine;}
 {
-	<TAG_END_OPEN> name=<GENERIC_ID> newLine=<TAG_CLOSE> { endElement(name.image, newLine.image); }
+	<TAG_END_OPEN> name=<GENERIC_ID> newLine=<TAG_CLOSE> { endElement(name.image, newLine.image.length() > 1); }
 }
 
 String Entity(): { Token entity; }
@@ -171,8 +171,8 @@ TOKEN: {
 }
 
 <IN_TAG_MODE> TOKEN: {
-	<TAG_CLOSE: ">" (("\r")? "\n")?> { buffer(matchedToken.image); matchedToken.image = matchedToken.image.substring(1, matchedToken.image.length());}: DEFAULT |
-	<TAG_EMPTY_CLOSE: "/>" (("\r")? "\n")?> { buffer(matchedToken.image); matchedToken.image = matchedToken.image.substring(2, matchedToken.image.length());}: DEFAULT |
+	<TAG_CLOSE: ">" (("\r")? "\n")?> { buffer(matchedToken.image); }: DEFAULT |
+	<TAG_EMPTY_CLOSE: "/>" (("\r")? "\n")?> { buffer(matchedToken.image); }: DEFAULT |
 	
 		
 	<ATTR_EQ: "="> { buffer(matchedToken.image); } |

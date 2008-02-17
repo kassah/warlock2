@@ -47,7 +47,7 @@ public class SettingsElementsTagHandler extends DefaultTagHandler {
 	}
 	
 	@Override
-	public void handleEnd() {
+	public void handleEnd(String rawXML) {
 		IStormFrontClientViewer.SettingType setting = null;
 		if ("presets".equals(getCurrentTag())) setting = IStormFrontClientViewer.SettingType.Presets;
 		else if ("strings".equals(getCurrentTag())) setting = IStormFrontClientViewer.SettingType.Strings;

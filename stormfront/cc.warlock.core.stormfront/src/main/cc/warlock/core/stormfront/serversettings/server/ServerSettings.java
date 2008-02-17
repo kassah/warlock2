@@ -185,7 +185,7 @@ public class ServerSettings implements Comparable<ServerSettings>, IHighlightPro
 			}
 			
 			stream.close();
-			incrementMajorVersion();
+			//incrementMajorVersion();
 			
 			for (IServerSettingsListener listener : listeners) {
 				try {
@@ -329,7 +329,7 @@ public class ServerSettings implements Comparable<ServerSettings>, IHighlightPro
 		}
 	}
 	
-	protected void incrementMajorVersion ()
+	public void incrementMajorVersion ()
 	{
 		// Needed so our settings are validated by other Stormfront clients
 		
@@ -339,6 +339,8 @@ public class ServerSettings implements Comparable<ServerSettings>, IHighlightPro
 					"<settings client=\"" + clientVersion + "\" major=\"" + majorVersion + "\"></settings>" +
 					"<settings client=\"" + clientVersion + "\" major=\"" + (++majorVersion) + "\"></settings>" +
 					ServerSetting.UPDATE_SUFFIX + "\n");
+			document.getRootElement().setAttribute("major", ""+majorVersion);
+			saveLocalXml();
 		} catch(IOException e) {
 			e.printStackTrace();
 		}

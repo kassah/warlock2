@@ -39,7 +39,7 @@ public class StreamTagHandler extends DefaultTagHandler {
 	}
 
 	 @Override
-	public void handleStart(StormFrontAttributeList attributes) {
+	public void handleStart(StormFrontAttributeList attributes, String rawXML) {
 		 String id = attributes.getValue("id");
 		 if (id != null)
 		 {
@@ -50,7 +50,7 @@ public class StreamTagHandler extends DefaultTagHandler {
 	}
 	 
 	 @Override
-	public void handleEnd() {
+	public void handleEnd(String rawXML) {
 		 // TODO flush the buffer here manually
 		 // force append a new-line.. most of the use of <stream>xxx</stream> doesn't have newlines, so the buffer won't flush
 		 handler.characters("\n");

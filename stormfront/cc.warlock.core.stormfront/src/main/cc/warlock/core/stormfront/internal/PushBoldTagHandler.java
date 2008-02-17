@@ -43,7 +43,7 @@ public class PushBoldTagHandler extends DefaultTagHandler {
 	}
 	
 	@Override
-	public void handleEnd() {
+	public void handleEnd(String rawXML) {
 		if(style != null) {
 			handler.removeStyle(style);
 			style = null;
@@ -60,30 +60,6 @@ public class PushBoldTagHandler extends DefaultTagHandler {
 		//		handler.removeStyle(style);
 		//		style = null;
 		//	}
-			// we'll need to figure out another way to auto linkify http links
-//			IStyledString buffer = handler.peekBuffer();
-//			
-//			style.setLength(buffer.getBuffer().length());
-//			buffer.addStyle(style);
-//			
-//			String matchText = buffer.getBuffer().toString();
-//			
-//			Matcher linkMatcher = linkPattern.matcher(matchText.trim());
-//			if (linkMatcher.matches())
-//			{
-//				style.addStyleType(IWarlockStyle.StyleType.LINK);
-//				String address = linkMatcher.group();
-//				if (address.startsWith("www")) { address = "http://" + address; }
-//				
-//				try {
-//					style.setLinkAddress(new URL(address));
-//				} catch (MalformedURLException e) {
-//					e.printStackTrace();
-//				}
-//			}
-//			
-//			handler.sendAndPopBuffer();
-//		}
 	}
 	
 	@Override

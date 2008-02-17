@@ -43,7 +43,7 @@ public class AppTagHandler extends DefaultTagHandler {
 	}
 	
 	@Override
-	public void handleStart(StormFrontAttributeList attributes) {
+	public void handleStart(StormFrontAttributeList attributes, String rawXML) {
 		String characterName = attributes.getValue("char");
 		String gameName = attributes.getValue("game");
 		

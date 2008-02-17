@@ -71,12 +71,16 @@ public class SettingsTagHandler extends DefaultTagHandler {
 	}
 	
 	@Override
-	public void handleStart(StormFrontAttributeList attributes) {
+	public void handleStart(StormFrontAttributeList attributes, String rawXML) {
 		buffer.setLength(0);
 		
-		buffer.append("<settings crc=\"" + infoTagHandler.getCRC() +
-				"\" major=\"" + infoTagHandler.getMajorVersion() +
-				"\" client=\"" + infoTagHandler.getClientVersion() + "\">\n");
+		buffer.append(rawXML);
+		/*buffer.append("<settings");
+		String client = attributes.getValue("client");
+		if(client != null) buffer.append(" client=\"" + client + "\"");
+		String major = attributes.getValue("major");
+		if(major != null) buffer.append(" major=\"" + (Integer.parseInt(major) + 1) + "\"");
+		buffer.append(">\n");*/
 		
 		visitViewers(new ViewerVisitor() {
 			public void visit(IStormFrontClientViewer viewer) {
@@ -87,7 +91,7 @@ public class SettingsTagHandler extends DefaultTagHandler {
 
 	@Override
 	public boolean handleStartChild(String name, StormFrontAttributeList attributes,
-			String rawXML, String newLine) {
+			String rawXML, boolean newLine) {
 		buffer.append(rawXML);
 		
 		return true;
@@ -95,7 +99,7 @@ public class SettingsTagHandler extends DefaultTagHandler {
 	
 	
 	@Override
-	public boolean handleEndChild(String name, String rawXML, String newLine) {
+	public boolean handleEndChild(String name, String rawXML, boolean newLine) {
 		
 		buffer.append(rawXML);
 		
@@ -103,8 +107,8 @@ public class SettingsTagHandler extends DefaultTagHandler {
 	}
 	
 	@Override
-	public void handleEnd() {
-		buffer.append("</settings>");
+	public void handleEnd(String rawXML) {
+		buffer.append(rawXML);
 		
 		String playerId = handler.getClient().getPlayerId().get();
 		File serverSettings = ConfigurationUtil.getConfigurationFile("serverSettings_" + playerId + ".xml");

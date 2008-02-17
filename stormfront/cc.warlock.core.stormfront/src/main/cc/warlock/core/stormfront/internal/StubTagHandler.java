@@ -28,6 +28,7 @@ public class StubTagHandler extends DefaultTagHandler {
 	public StubTagHandler(IStormFrontProtocolHandler handler) {
 		super(handler);
 		addTagHandler(this); // recursive to handle stubs in stubs
+		//addTagHandler(new DialogDataTagHandler(handler));
 	}
 	
 	@Override

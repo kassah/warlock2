@@ -46,7 +46,7 @@ public class PromptTagHandler extends DefaultTagHandler {
 	}
 	
 	@Override
-	public void handleStart(StormFrontAttributeList attributes) {
+	public void handleStart(StormFrontAttributeList attributes, String rawXML) {
 		handler.clearStyles();
 		prompt.setLength(0);
 		
@@ -61,7 +61,7 @@ public class PromptTagHandler extends DefaultTagHandler {
 	}
 	
 	@Override
-	public void handleEnd() {
+	public void handleEnd(String rawXML) {
 		handler.getClient().getDefaultStream().prompt(prompt.toString());
 		
 		if (waitingForInitialStreams)
