@@ -31,6 +31,7 @@ import org.eclipse.ui.IWorkbenchPage;
 import org.eclipse.ui.PartInitException;
 import org.eclipse.ui.PlatformUI;
 
+import cc.warlock.core.client.IStream;
 import cc.warlock.core.client.IWarlockClient;
 import cc.warlock.core.client.IWarlockClientListener;
 import cc.warlock.core.client.WarlockClientRegistry;
@@ -93,6 +94,9 @@ public class UserStream extends StreamView implements IWarlockClientListener {
 	
 	public void clientConnected(IWarlockClient client) {	
 		setClient(client);
+		for (IStream x: client.getStreams()) {
+			x.getTitle().removeListener(propertyListenerWrapper);
+		}
 	}
 
 	public void clientDisconnected(IWarlockClient client) {
