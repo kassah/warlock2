@@ -109,6 +109,13 @@ public class WarlockText implements LineBackgroundListener {
 		            }
 		        });
 		itemCopy.setText("Copy");
+		MenuItem itemClear = new MenuItem(contextMenu, SWT.PUSH);
+		itemClear.addSelectionListener(new SelectionAdapter() {
+            public void widgetSelected(SelectionEvent arg0) {
+                textWidget.setText("");
+            }
+        });
+		itemClear.setText("Clear");
 		textWidget.setMenu(contextMenu);
 		
 		addVerifyListener(new VerifyListener()  {
