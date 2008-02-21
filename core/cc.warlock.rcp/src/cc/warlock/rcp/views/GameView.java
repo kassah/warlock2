@@ -158,7 +158,7 @@ public abstract class GameView extends StreamView implements IWarlockClientViewe
 		entryComposite.setLayoutData(new GridData(GridData.FILL, GridData.VERTICAL_ALIGN_END, true, false));
 		
 		this.client = Warlock2Plugin.getDefault().getCurrentClient();
-		this.entry = new WarlockEntry(entryComposite, wrapper); // Do this BEFORE getTextForClient! Var needs to be set for that
+		this.entry = new WarlockEntry(entryComposite, wrapper); // Do this BEFORE getTextForClient!
 		this.text = getTextForClient(this.client);
 		book.showPage(this.text.getTextWidget());
 		
@@ -271,6 +271,18 @@ public abstract class GameView extends StreamView implements IWarlockClientViewe
 	
 	public void paste() {
 		entry.getWidget().paste();
+	}
+	
+	public void pageUp() {
+		text.pageUp();
+	}
+	
+	public void pageDown() {
+		text.pageDown();
+	}
+	
+	public void copyDown() {
+		text.copy();
 	}
 	
 	public void setClient(IWarlockClient client) {

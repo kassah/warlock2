@@ -32,6 +32,7 @@ import org.eclipse.swt.custom.ExtendedModifyListener;
 import org.eclipse.swt.custom.LineBackgroundEvent;
 import org.eclipse.swt.custom.LineBackgroundListener;
 import org.eclipse.swt.custom.PaintObjectListener;
+import org.eclipse.swt.custom.ST;
 import org.eclipse.swt.custom.StyleRange;
 import org.eclipse.swt.custom.StyledText;
 import org.eclipse.swt.custom.StyledTextContent;
@@ -308,6 +309,17 @@ public class WarlockText implements LineBackgroundListener {
 		textWidget.copy();
 	}
 	
+	public void pageUp() {
+		if (isAtBottom()) {
+			textWidget.setCaretOffset(this.getCharCount());
+		}
+		textWidget.invokeAction(ST.PAGE_UP);
+	}
+	
+	public void pageDown() {
+		textWidget.invokeAction(ST.PAGE_DOWN);
+	}
+	
 	public void setFocus() {
 		textWidget.setFocus();
 	}
@@ -530,9 +542,13 @@ public class WarlockText implements LineBackgroundListener {
 		Point selection;
 	}
 	
+	private boolean isAtBottom() {
+		return textWidget.getLinePixel(textWidget.getLineCount()) <= textWidget.getClientArea().height;
+	}
+	
 	private ControlStatus preTextChange() {
 		ControlStatus status = new ControlStatus();
-		status.atBottom = textWidget.getLinePixel(textWidget.getLineCount()) <= textWidget.getClientArea().height;
+		status.atBottom = isAtBottom();
 		status.caretOffset = getCaretOffset();
 		status.selection = textWidget.getSelection();
 		return status;
