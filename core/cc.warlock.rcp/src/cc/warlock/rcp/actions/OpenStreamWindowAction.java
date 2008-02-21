@@ -48,7 +48,7 @@ public class OpenStreamWindowAction extends Action {
 		streamView.setViewTitle(title);
 		streamView.setAppendNewlines(false);
 		
-		GameView inFocus = GameView.getViewInFocus();
+		GameView inFocus = GameView.getGameViewInFocus();
 		if (inFocus != null) {
 			streamView.setClient(inFocus.getWarlockClient());
 		}

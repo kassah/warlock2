@@ -63,7 +63,7 @@ public abstract class GameView extends StreamView implements IWarlockClientViewe
 	protected static boolean firstInstanceIsUsed = false;
 	protected static ArrayList<GameView> openViews = new ArrayList<GameView>();
 	protected static ArrayList<IGameViewFocusListener> focusListeners = new ArrayList<IGameViewFocusListener>();
-	protected static GameView viewInFocus;
+	protected static GameView gameInFocus;
 	
 	protected WarlockText text;
 	protected WarlockEntry entry;
@@ -73,7 +73,7 @@ public abstract class GameView extends StreamView implements IWarlockClientViewe
 	public GameView () {
 		if (firstInstance == null) {
 			firstInstance = this;
-			viewInFocus = this;
+			gameInFocus = this;
 		}
 		
 		// currentCommand = "";
@@ -99,14 +99,14 @@ public abstract class GameView extends StreamView implements IWarlockClientViewe
 		return openViews;
 	}
 	
-	public static GameView getViewInFocus ()
+	public static GameView getGameViewInFocus ()
 	{
-		return viewInFocus;
+		return gameInFocus;
 	}
 	
 	public static void initializeGameView (GameView gameView)
 	{
-		viewInFocus = gameView;
+		gameInFocus = gameView;
 		
 		if (ConnectionView.closeAfterConnect)
 		{
@@ -176,7 +176,8 @@ public abstract class GameView extends StreamView implements IWarlockClientViewe
 	
 	
 	public void setFocus() {
-		viewInFocus = this;
+		super.setFocus();
+		gameInFocus = this;
 		for (IGameViewFocusListener listener : focusListeners)
 		{
 			listener.gameViewFocused(this);
@@ -273,14 +274,6 @@ public abstract class GameView extends StreamView implements IWarlockClientViewe
 		entry.getWidget().paste();
 	}
 	
-	public void pageUp() {
-		text.pageUp();
-	}
-	
-	public void pageDown() {
-		text.pageDown();
-	}
-	
 	public void copyDown() {
 		text.copy();
 	}
@@ -329,6 +322,9 @@ public abstract class GameView extends StreamView implements IWarlockClientViewe
 			}
 		}
 		openViews.remove(this);
+		if (gameInFocus == this) {
+			gameInFocus = null;
+		}
 		if (firstInstance == this) {
 			if (openViews.isEmpty()) {
 				firstInstance = null;

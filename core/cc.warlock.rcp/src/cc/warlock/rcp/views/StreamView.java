@@ -66,6 +66,7 @@ public class StreamView extends ViewPart implements IStreamListener, IGameViewFo
 	public static final String TOP_STREAM_PREFIX = "topStream.";
 	
 	protected static ArrayList<StreamView> openViews = new ArrayList<StreamView>();
+	protected static StreamView viewInFocus;
 	
 	protected IStream mainStream;
 	protected ArrayList<IStream> streams;
@@ -199,8 +200,12 @@ public class StreamView extends ViewPart implements IStreamListener, IGameViewFo
 	
 	@Override
 	public void setFocus() {
-		// TODO Auto-generated method stub
-
+		// Set View in Focus
+		viewInFocus = this;
+	}
+	
+	public static StreamView getViewInFocus() {
+		return viewInFocus;
 	}
 
 	public IStream getMainStream() {
@@ -407,6 +412,10 @@ public class StreamView extends ViewPart implements IStreamListener, IGameViewFo
 			openViews.remove(this);
 		}
 		
+		if (viewInFocus == this) {
+			viewInFocus = null;
+		}
+		
 		super.dispose();
 	}
 	
@@ -443,5 +452,13 @@ public class StreamView extends ViewPart implements IStreamListener, IGameViewFo
 	public void setBackground (IWarlockClient client, Color background)
 	{
 		getTextForClient(client).setBackground(background);
+	}
+	
+	public void pageUp() {
+		getTextForClient(client).pageUp();
+	}
+	
+	public void pageDown() {
+		getTextForClient(client).pageDown();
 	}
 }

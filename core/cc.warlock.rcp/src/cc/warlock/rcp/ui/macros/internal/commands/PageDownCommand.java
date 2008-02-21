@@ -23,6 +23,7 @@ package cc.warlock.rcp.ui.macros.internal.commands;
 
 import cc.warlock.core.client.IWarlockClientViewer;
 import cc.warlock.rcp.ui.macros.IMacroCommand;
+import cc.warlock.rcp.views.StreamView;
 
 /**
  * @author Will Robertson
@@ -35,7 +36,8 @@ public class PageDownCommand implements IMacroCommand {
 	 * @see cc.warlock.rcp.ui.macros.IMacroCommand#execute(cc.warlock.core.client.IWarlockClientViewer)
 	 */
 	public void execute(IWarlockClientViewer context) {
-		context.pageDown();
+		if (StreamView.getViewInFocus() != null)
+			StreamView.getViewInFocus().pageDown();
 	}
 
 	/* (non-Javadoc)
