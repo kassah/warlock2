@@ -148,13 +148,6 @@ public abstract class GameView extends StreamView implements IWarlockClientViewe
 	public void createPartControl(Composite parent) {
 		super.createPartControl(parent);
 		
-		this.client = Warlock2Plugin.getDefault().getCurrentClient();
-		this.text = getTextForClient(this.client);
-		book.showPage(this.text.getTextWidget());
-		
-		text.setLineLimit(GameViewConfiguration.instance().getBufferLines());
-		text.setScrollDirection(SWT.DOWN);
-		
 		entryComposite = new Composite(mainComposite, SWT.NONE);
 		GridLayout layout = new GridLayout(1, false);
 		layout.horizontalSpacing = 0;
@@ -164,7 +157,14 @@ public abstract class GameView extends StreamView implements IWarlockClientViewe
 		entryComposite.setLayout(layout);
 		entryComposite.setLayoutData(new GridData(GridData.FILL, GridData.VERTICAL_ALIGN_END, true, false));
 		
-		entry = new WarlockEntry(entryComposite, wrapper);
+		this.client = Warlock2Plugin.getDefault().getCurrentClient();
+		this.entry = new WarlockEntry(entryComposite, wrapper); // Do this BEFORE getTextForClient! Var needs to be set for that
+		this.text = getTextForClient(this.client);
+		book.showPage(this.text.getTextWidget());
+		
+		text.setLineLimit(GameViewConfiguration.instance().getBufferLines());
+		text.setScrollDirection(SWT.DOWN);
+		
 		Color background = ColorUtil.warlockColorToColor(GameViewConfiguration.instance().getDefaultBackground());
 		Color foreground = ColorUtil.warlockColorToColor(GameViewConfiguration.instance().getDefaultForeground());
 		
@@ -172,9 +172,6 @@ public abstract class GameView extends StreamView implements IWarlockClientViewe
 		entry.getWidget().setForeground(foreground);
 		
 		text.setBackgroundMode(SWT.INHERIT_DEFAULT);
-		
-		//text.getTextWidget().addKeyListener(entry);
-		text.getTextWidget().addVerifyKeyListener(entry);
 	}
 	
 	
