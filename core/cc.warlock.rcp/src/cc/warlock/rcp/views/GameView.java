@@ -135,6 +135,16 @@ public abstract class GameView extends StreamView implements IWarlockClientViewe
 		return null;
 	}
 	
+	public static GameView getGameViewForClient(IWarlockClient client) {
+		for (GameView view: openViews) {
+			if (view.client == client) {
+				return view;
+			}
+		}
+		// TODO: Make a GameView and return it. (Null is likely to cause problems in the long run)
+		return null;
+	}
+	
 	public void createPartControl(Composite parent) {
 		super.createPartControl(parent);
 		
@@ -292,6 +302,10 @@ public abstract class GameView extends StreamView implements IWarlockClientViewe
 	
 	public IWarlockClient getWarlockClient() {
 		return client;
+	}
+	
+	public WarlockEntry getWarlockEntry() {
+		return entry;
 	}
 	
 	@Override

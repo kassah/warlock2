@@ -157,6 +157,15 @@ public class StreamView extends ViewPart implements IStreamListener, IGameViewFo
 			text.setEditable(false);
 			text.setWordWrap(true);
 			text.getTextWidget().setIndent(1);
+			GameView game = GameView.getGameViewForClient(client);
+			if (game == null) {
+				System.out.println("Couldn't find a gameview for this client! This view won't be setup to send keys over.");
+			} else {
+				// if the getWarlockEntry is null, then we're prolly already in the gameview which means we'll be setup by GameView
+				// TODO: Stop the GameView from doing this for us.. and make it create the WarlockEntry before the View
+				if (game.getWarlockEntry() != null)
+					text.getTextWidget().addVerifyKeyListener(game.getWarlockEntry());
+			}
 			
 			Color background = ColorUtil.warlockColorToColor(GameViewConfiguration.instance().getDefaultBackground());
 			Color foreground = ColorUtil.warlockColorToColor(GameViewConfiguration.instance().getDefaultForeground());
