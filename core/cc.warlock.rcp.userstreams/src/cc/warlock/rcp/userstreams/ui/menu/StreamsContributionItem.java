@@ -54,6 +54,7 @@ public class StreamsContributionItem extends CompoundContributionItem  {
 		ArrayList<IContributionItem> items = new ArrayList<IContributionItem>();
 		items.add(createStreamContributionItem("Events"));
 		items.add(createStreamContributionItem("Conversations"));
+		items.add(createStreamContributionItem("Healing"));
 		
 		return items.toArray(new IContributionItem[items.size()]); 
 	}

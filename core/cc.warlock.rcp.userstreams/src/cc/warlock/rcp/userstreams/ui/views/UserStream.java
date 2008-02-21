@@ -122,6 +122,8 @@ public class UserStream extends StreamView implements IWarlockClientListener {
 			this.styles = new ArrayList<String>();
 			styles.add("speech");
 			styles.add("whisper");
+		} else if (streamName.equals("Healing")) {
+			this.filters = getHealingFilters();
 		} else {
 			System.err.println("Not a stream name we recognize! ("+streamName+")");
 		}
@@ -146,6 +148,16 @@ public class UserStream extends StreamView implements IWarlockClientListener {
 		filters.add(new StreamFilter("^\\w+ (nod|lean|stretch|smile|yawn|chuckle|chortle|beam|hug|applaud|babble|blink|bow|cackle|cringe|cower|weep|mumble|wave|ponder|peers quizzically|snort|snuggle|cuddle|smirk|laugh|grumble|dance|grin)s?( (at|to|with) \\w+)?\\.$", IStreamFilter.type.regex));
 		filters.add(new StreamFilter("^\\((?!You ).+\\)$", IStreamFilter.type.regex));	//act
 
+		return filters.toArray(new IStreamFilter[filters.size()]);
+	}
+	
+	protected IStreamFilter[] getHealingFilters ()
+	{
+		ArrayList<IStreamFilter> filters = new ArrayList<IStreamFilter>();
+		filters.add(new StreamFilter("^You sense that .+\\.", IStreamFilter.type.regex));
+		filters.add(new StreamFilter("^The bandages binding your .+\\.", IStreamFilter.type.regex));
+		filters.add(new StreamFilter("^You don't have enough experience to transfer .+\\.", IStreamFilter.type.regex));
+		
 		return filters.toArray(new IStreamFilter[filters.size()]);
 	}
 
