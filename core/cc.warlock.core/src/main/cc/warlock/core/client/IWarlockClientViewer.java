@@ -57,4 +57,8 @@ public interface IWarlockClientViewer extends IStreamListener {
 	public void copy();
 	
 	public void paste();
+	
+	public void pageUp();
+	
+	public void pageDown();
 }
