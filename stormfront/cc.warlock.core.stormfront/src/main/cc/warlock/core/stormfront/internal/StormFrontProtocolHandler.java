@@ -65,7 +65,9 @@ public class StormFrontProtocolHandler implements IStormFrontProtocolHandler {
 		// server settings handlers
 		new PlayerIDTagHandler(this);
 		new ModeTagHandler(this);
-		new SettingsTagHandler(this, new SettingsInfoTagHandler(this));
+		new SettingsTagHandler(this);
+		new SettingsInfoTagHandler(this);
+		new CmdtimestampTagHandler(this, new CmdlistTagHandler(this));
 		new SentSettingsTagHandler(this);
 		
 		// Register the handlers
@@ -92,13 +94,13 @@ public class StormFrontProtocolHandler implements IStormFrontProtocolHandler {
 		new StyleTagHandler(this);
 		new OutputTagHandler(this);
 		
-		new BTagHandler(this);
 		new PushBoldTagHandler(this);
 		new PresetTagHandler(this);
 		new IndicatorTagHandler(this);
 		new LaunchURLTagHandler(this);
 		new ResourceTagHandler(this);
 		new ATagHandler(this);
+		new BTagHandler(this);
 		new DTagHandler(this);
 		
 		new StubTagHandler(this); // handles knows tags that don't have an implementation.
@@ -309,15 +311,20 @@ public class StormFrontProtocolHandler implements IStormFrontProtocolHandler {
 		if(stackPosition < tagStack.size()) {
 			String tagName = tagStack.get(stackPosition);
 		
-			IStormFrontTagHandler tagHandler = tagHandlers.get(tagName);
-			if(tagHandler == null) return null;
+			IStormFrontTagHandler parentHandler = tagHandlers.get(tagName);
+			if(parentHandler == null) {
+				return tagHandlers.get(name);
+			}
 			
-			return getTagHandlerForElement(name, tagHandler.getTagHandlers(), stackPosition + 1);
+			IStormFrontTagHandler tagHandler = getTagHandlerForElement(name,
+					parentHandler.getTagHandlers(), stackPosition + 1);
+			if(tagHandler != null) {
+				return tagHandler;
+			} else {
+				return tagHandlers.get(name);
+			}
 		} else {
-			IStormFrontTagHandler tagHandler = tagHandlers.get(name);
-			if(tagHandler == null) return null;
-
-			return tagHandler;
+			return tagHandlers.get(name);
 		}
 	}
 	

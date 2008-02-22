@@ -45,9 +45,6 @@ public class CompDefTagHandler extends DefaultTagHandler {
 	
 	public CompDefTagHandler (IStormFrontProtocolHandler handler) {
 		super(handler);
-		
-		addTagHandler(new DTagHandler(handler));
-		addTagHandler(new BTagHandler(handler));
 	}
 	
 	@Override

@@ -22,18 +22,27 @@
 package cc.warlock.core.stormfront.internal;
 
 import cc.warlock.core.stormfront.IStormFrontProtocolHandler;
+import cc.warlock.core.stormfront.xml.StormFrontAttributeList;
 
-public class DialogDataTagHandler extends DefaultTagHandler {
+public class CmdtimestampTagHandler extends DefaultTagHandler {
 
-	DialogDataTagHandler(IStormFrontProtocolHandler handler) {
+	CmdlistTagHandler cmdList;
+	
+	public CmdtimestampTagHandler(IStormFrontProtocolHandler handler, CmdlistTagHandler cmdList) {
 		super(handler);
-		
-		addTagHandler(new BarTagHandler(handler));
+		this.cmdList = cmdList;
 	}
 	
 	@Override
 	public String[] getTagNames() {
-		return new String[] { "dialogData" };
+		return new String[] {"cmdtimestamp"};
 	}
 
+	@Override
+	public void handleStart(StormFrontAttributeList attributes, String rawXML) {
+		String timestamp = attributes.getValue("data");
+		if(timestamp != null) {
+			cmdList.writeOut(timestamp);
+		}
+	}
 }

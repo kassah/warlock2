@@ -43,6 +43,7 @@ public class DTagHandler extends DefaultTagHandler {
 	public void handleStart(StormFrontAttributeList attributes, String rawXML) {
 		if(style != null) {
 			handler.removeStyle(style);
+			style = null;
 		}
 		String command = attributes.getValue("cmd");
 		if(command != null) {
@@ -56,6 +57,7 @@ public class DTagHandler extends DefaultTagHandler {
 	public void handleEnd(String rawXML) {
 		if(style != null) {
 			handler.removeStyle(style);
+			style = null;
 		}
 	}
 	

@@ -29,68 +29,31 @@ import java.io.InputStream;
 
 import org.apache.commons.lang.StringEscapeUtils;
 
-import cc.warlock.core.client.IWarlockClientViewer;
 import cc.warlock.core.configuration.ConfigurationUtil;
 import cc.warlock.core.stormfront.IStormFrontProtocolHandler;
-import cc.warlock.core.stormfront.client.IStormFrontClientViewer;
 import cc.warlock.core.stormfront.xml.StormFrontAttributeList;
 import cc.warlock.core.stormfront.xml.StormFrontDocument;
 
 
-public class SettingsTagHandler extends DefaultTagHandler {
+public class CmdlistTagHandler extends DefaultTagHandler {
 
 	private StringBuffer buffer = new StringBuffer();
+	private int count = 0;
 	
-	public SettingsTagHandler(IStormFrontProtocolHandler handler) {
+	public CmdlistTagHandler(IStormFrontProtocolHandler handler) {
 		super(handler);
-		
-		//addTagHandler(new SettingsElementsTagHandler(handler, this));
 	}
 
-	protected static interface ViewerVisitor {
-		public void visit (IStormFrontClientViewer viewer);
-	}
-	
-	protected void visitViewers (ViewerVisitor visitor)
-	{
-		for (IWarlockClientViewer viewer : handler.getClient().getViewers())
-		{
-			if (viewer instanceof IStormFrontClientViewer)
-			{
-				IStormFrontClientViewer sfViewer = (IStormFrontClientViewer) viewer;
-				visitor.visit(sfViewer);
-			}
-		}
-	}
-	
 	@Override
 	public String[] getTagNames() {
-		return new String[] { "settings" };
-	}
-	
-	@Override
-	public void handleStart(StormFrontAttributeList attributes, String rawXML) {
-		buffer.setLength(0);
-		
-		buffer.append(rawXML);
-		/*buffer.append("<settings");
-		String client = attributes.getValue("client");
-		if(client != null) buffer.append(" client=\"" + client + "\"");
-		String major = attributes.getValue("major");
-		if(major != null) buffer.append(" major=\"" + (Integer.parseInt(major) + 1) + "\"");
-		buffer.append(">\n");*/
-		
-		visitViewers(new ViewerVisitor() {
-			public void visit(IStormFrontClientViewer viewer) {
-				viewer.startDownloadingServerSettings();
-			}
-		});
+		return new String[] { "cmdlist" };
 	}
 
 	@Override
 	public boolean handleStartChild(String name, StormFrontAttributeList attributes,
 			String rawXML, boolean newLine) {
 		buffer.append(rawXML);
+		count++;
 		
 		return true;
 	}
@@ -104,34 +67,27 @@ public class SettingsTagHandler extends DefaultTagHandler {
 		return true;
 	}
 	
-	@Override
-	public void handleEnd(String rawXML) {
-		buffer.append(rawXML);
+	public void writeOut(String timestamp) {
 		
-		String playerId = handler.getClient().getPlayerId().get();
-		File serverSettings = ConfigurationUtil.getConfigurationFile("serverSettings_" + playerId + ".xml");
+		File cmdList = ConfigurationUtil.getConfigurationFile("cmdlist1.xml");
 		try {
-			FileWriter writer = new FileWriter(serverSettings);
+			FileWriter writer = new FileWriter(cmdList);
 
+			buffer.insert(0, "<cmdlist timestamp=\"" + timestamp + "\" count=\"" + count + "\">");
+			buffer.append("</cmdlist>");
+			
 			InputStream inStream = new ByteArrayInputStream(buffer.toString().getBytes());
 			StormFrontDocument document = new StormFrontDocument(inStream);
 			document.saveTo(writer, true);
-			
 			inStream.close();
+			
 			writer.close();
 			buffer.setLength(0);
+			count = 0;
 		} catch (IOException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
-		
-		handler.getClient().getServerSettings().load(handler.getClient().getPlayerId().get());
-		visitViewers(new ViewerVisitor() {
-			public void visit(IStormFrontClientViewer viewer) {
-				viewer.finishedDownloadingServerSettings();
-			}
-		});
-
 	}
 	
 	@Override
