@@ -383,9 +383,13 @@ public class StreamView extends ViewPart implements IStreamListener, IGameViewFo
 	{
 		this.client = client;
 		book.showPage(getTextForClient(client).getTextWidget());
-		
-		if (mainStream == null)
-			setMainStream(client.getStream(mainStreamName));
+		if (multiClient) {
+			if (!streams.contains(client.getStream(mainStreamName)))
+				addStream(client.getStream(mainStreamName));
+		} else {
+			if (mainStream == null)
+				setMainStream(client.getStream(mainStreamName));
+		}
 
 		if (StyleProviders.getStyleProvider(client) == null)
 			StyleProviders.setStyleProvider(client, DefaultStyleProvider.instance());
