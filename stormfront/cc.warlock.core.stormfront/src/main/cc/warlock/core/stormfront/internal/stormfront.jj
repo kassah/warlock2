@@ -106,7 +106,7 @@ void Document() : {}
 		try {
 			while(jj_input_stream.readChar() != '\n') { }
 		} catch (IOException io_e) {
-			throw e;
+			throw io_e;
 		}
 	}
 	)* <EOF>
