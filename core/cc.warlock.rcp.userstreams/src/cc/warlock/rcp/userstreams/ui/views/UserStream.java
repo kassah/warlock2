@@ -94,6 +94,7 @@ public class UserStream extends StreamView implements IWarlockClientListener {
 	
 	public void clientConnected(IWarlockClient client) {	
 		setClient(client);
+		addStream(client.getDefaultStream());
 		for (IStream x: client.getStreams()) {
 			x.getTitle().removeListener(propertyListenerWrapper);
 		}
