@@ -28,8 +28,6 @@ import java.io.IOException;
 import java.net.Socket;
 import java.util.ArrayList;
 
-import org.javacc.parser.TokenMgrError;
-
 import cc.warlock.core.client.IWarlockClient;
 import cc.warlock.core.client.IWarlockStyle;
 import cc.warlock.core.client.WarlockString;
@@ -37,6 +35,7 @@ import cc.warlock.core.client.internal.WarlockStyle;
 import cc.warlock.core.network.IConnection;
 import cc.warlock.core.network.IConnectionListener;
 import cc.warlock.core.stormfront.client.IStormFrontClient;
+import cc.warlock.core.stormfront.internal.ParseException;
 import cc.warlock.core.stormfront.internal.StormFrontProtocolHandler;
 import cc.warlock.core.stormfront.internal.StormFrontProtocolParser;
 
@@ -146,16 +145,15 @@ public class StormFrontConnection implements IConnection
 				parser = new StormFrontProtocolParser(reader);
 				parser.setHandler(handler);
 				
-				for(int i = 0; i < 100; i++) {
+				while(socket.isConnected()) {
 					try {
 						parser.Document();
-					} catch (Exception e) {
+						break;
+					} catch (ParseException e) {
 						e.printStackTrace();
 						client.getDefaultStream().flush();
 						client.getDefaultStream().echo("\n*** Parse error ***\n");
-						// while(reader.read() != '\n' && reader.ready()) { }
-						parser = new StormFrontProtocolParser(reader);
-						parser.setHandler(handler);
+						parser.ReInit(reader);
 					}
 				}
 				
