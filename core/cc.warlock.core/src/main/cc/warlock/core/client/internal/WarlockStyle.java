@@ -21,8 +21,6 @@
  */
 package cc.warlock.core.client.internal;
 
-import java.net.MalformedURLException;
-import java.net.URL;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
@@ -33,7 +31,6 @@ import cc.warlock.core.client.WarlockColor;
 
 public class WarlockStyle implements IWarlockStyle {
 
-	private URL linkAddress;
 	private Collection<StyleType> styleTypes;
 	private WarlockColor foregroundColor;
 	private WarlockColor backgroundColor;
@@ -41,41 +38,18 @@ public class WarlockStyle implements IWarlockStyle {
 	private String name;
 	private Runnable action;
 	
-	public WarlockStyle (StyleType[] styleTypes, URL linkAddress)
-	{
-		this.linkAddress = linkAddress;
+	public WarlockStyle (StyleType[] styleTypes) {
 		this.styleTypes = new ArrayList<StyleType>();
 		this.styleTypes.addAll(Arrays.asList(styleTypes));
 	}
 	
-	public WarlockStyle (StyleType[] styleTypes) {
-		this(styleTypes, null);
-	}
-	
 	public WarlockStyle () {
-		this(new StyleType[] { });
-	}
-	
-	public WarlockStyle (IWarlockStyle other)
-	{
-		try {
-			this.linkAddress = other.getLinkAddress() == null ? null : new URL(other.getLinkAddress().toExternalForm());
-		} catch (MalformedURLException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
-		
-		this.styleTypes  = new ArrayList<StyleType>();
-		if (other.getStyleTypes() != null) styleTypes.addAll(other.getStyleTypes());
+		this.styleTypes = new ArrayList<StyleType>();
 	}
 	
 	public static WarlockStyle createBoldStyle ()
 	{
-		return new WarlockStyle(new StyleType[] { StyleType.BOLD }, null);
-	}
-	
-	public URL getLinkAddress() {
-		return linkAddress;
+		return new WarlockStyle(new StyleType[] { StyleType.BOLD });
 	}
 	
 	public Runnable getAction() {
@@ -93,10 +67,6 @@ public class WarlockStyle implements IWarlockStyle {
 	public void addStyleType (StyleType styleType)
 	{
 		styleTypes.add(styleType);
-	}
-
-	public void setLinkAddress(URL linkAddress) {
-		this.linkAddress = linkAddress;
 	}
 	
 	public void setAction(Runnable action) {

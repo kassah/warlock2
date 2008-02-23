@@ -56,7 +56,7 @@ public class ComponentTagHandler extends DefaultTagHandler {
 	@Override
 	public void handleEnd(String rawXML) {
 		if (id != null) {
-			((StormFrontClient)handler.getClient()).setComponent(id, componentText.toString());
+			((StormFrontClient)handler.getClient()).updateComponent(id, componentText.toString());
 		}
 	}
 

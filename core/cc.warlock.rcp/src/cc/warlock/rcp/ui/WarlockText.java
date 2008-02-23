@@ -525,8 +525,6 @@ public class WarlockText implements LineBackgroundListener {
 			styleRange.start = offset + range.start;
 			styleRange.length = range.length;
 		}
-		if(range.style.getLinkAddress() != null)
-			styleRange.action = new UrlOpener(range.style.getLinkAddress().toString());
 		if(range.style.getAction() != null)
 			styleRange.action = range.style.getAction();
 		return styleRange;
@@ -561,6 +559,12 @@ public class WarlockText implements LineBackgroundListener {
 		if (status.selection.x != status.selection.y) // Only set it if there is something selected
 			textWidget.setSelectionRange(status.selection.x, status.selection.y - status.selection.x);
 		setCaretOffset(status.caretOffset);
+	}
+	
+	public void replaceTextRange(int start, int length, String text) {
+		ControlStatus status = preTextChange();
+		textWidget.replaceTextRange(start, length, text);
+		postTextChange(status);
 	}
 	
 	public int getLineCount() {

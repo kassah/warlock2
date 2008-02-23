@@ -209,6 +209,7 @@ public class ServerSettings implements Comparable<ServerSettings>, IHighlightPro
 	private void loadWindowSettings()
 	{
 		streamElement = document.getRootElement().element("stream");
+		if(streamElement == null) return;
 		
 		for (StormFrontElement wElement : streamElement.elements())
 		{

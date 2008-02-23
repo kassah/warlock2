@@ -317,21 +317,19 @@ public class StormFrontClient extends WarlockClient implements IStormFrontClient
 		return getStream(FAMILIAR_STREAM_NAME);
 	}
 	
-	public void setComponent (String componentName, String value)
+	public void setComponent (String name, String value)
 	{
-		if (!components.containsKey(componentName)) {
-			components.put(componentName, new ClientProperty<String>(this, componentName, value));
-		}
-		else {
-			components.get(componentName).set(value);
-		}
+		components.put(name, new ClientProperty<String>(this, name, value));
 	}
 	
-	public IProperty<String> getComponent(String componentName) {
-		if (components.containsKey(componentName))
-			return components.get(componentName);
-		
-		return null;
+    public void updateComponent (String name, String value) {
+    	ClientProperty<String> component = components.get(name);
+    	if(component != null)
+    		component.set(value);
+    }
+    
+	public IProperty<String> getComponent(String name) {
+		return components.get(name);
 	}
 	
 	@Override

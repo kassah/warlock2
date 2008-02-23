@@ -21,7 +21,6 @@
  */
 package cc.warlock.core.client;
 
-import java.net.URL;
 import java.util.Collection;
 
 /**
@@ -37,7 +36,6 @@ public interface IWarlockStyle {
 	
 	public Collection<StyleType> getStyleTypes();
 	
-	public URL getLinkAddress();
 	public Runnable getAction();
 	
 	public WarlockColor getFGColor();
@@ -47,7 +45,6 @@ public interface IWarlockStyle {
 	
 	public void addStyleType (StyleType styleType);
 
-	public void setLinkAddress(URL linkAddress);
 	public void setAction(Runnable action);
 	
 	public void setFGColor(WarlockColor color);
