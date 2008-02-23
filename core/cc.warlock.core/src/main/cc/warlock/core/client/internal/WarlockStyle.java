@@ -47,11 +47,6 @@ public class WarlockStyle implements IWarlockStyle {
 		this.styleTypes = new ArrayList<StyleType>();
 	}
 	
-	public static WarlockStyle createBoldStyle ()
-	{
-		return new WarlockStyle(new StyleType[] { StyleType.BOLD });
-	}
-	
 	public Runnable getAction() {
 		return action;
 	}
