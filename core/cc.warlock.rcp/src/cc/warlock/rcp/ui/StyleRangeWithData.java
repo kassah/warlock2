@@ -99,7 +99,7 @@ public class StyleRangeWithData extends StyleRange
 	@Override
 	public Object clone() {
 		StyleRangeWithData style = (StyleRangeWithData)super.clone();
-		style.data = (HashMap<String, String>)this.data.clone();
+		style.data = this.data;
 		style.tooltip = this.tooltip;
 		style.action = this.action;
 		return style;

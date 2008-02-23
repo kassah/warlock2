@@ -496,18 +496,6 @@ public class WarlockText implements LineBackgroundListener {
 		return nextPos;
 	}
 	
-	private class UrlOpener implements Runnable {
-		private String url;
-		
-		private UrlOpener(String url) {
-			this.url = url;
-		}
-		
-		public void run() {
-			RCPUtil.openURL(url);
-		}
-	}
-	
 	private StyleRangeWithData warlockStringStyleRangeToStyleRange(WarlockStringStyleRange range, int offset) {
 		StyleRangeWithData styleRange = (StyleRangeWithData)StyleProviders.getStyleProvider(client).getStyleRange(range.style);
 		if(styleRange == null)
@@ -527,6 +515,8 @@ public class WarlockText implements LineBackgroundListener {
 		}
 		if(range.style.getAction() != null)
 			styleRange.action = range.style.getAction();
+		if(range.style.getName() != null)
+			styleRange.data.put("name", range.style.getName());
 		return styleRange;
 	}
 	
@@ -633,10 +623,6 @@ public class WarlockText implements LineBackgroundListener {
 	
 	public int getLineAtOffset(int offset) {
 		return textWidget.getLineAtOffset(offset);
-	}
-	
-	public void setTopIndex(int topIndex) {
-		textWidget.setTopIndex(topIndex);
 	}
 	
 	public void setScrollDirection(int dir) {

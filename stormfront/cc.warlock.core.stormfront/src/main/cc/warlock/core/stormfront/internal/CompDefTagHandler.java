@@ -65,6 +65,7 @@ public class CompDefTagHandler extends DefaultTagHandler {
 		buffer.setLength(0);
 		this.id = attributes.getValue("id");
 		style.setName(this.id);
+		handler.addStyle(style);
 	}
 	
 	@Override
