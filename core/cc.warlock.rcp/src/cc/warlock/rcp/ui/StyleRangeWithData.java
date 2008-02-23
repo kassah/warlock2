@@ -48,6 +48,7 @@ public class StyleRangeWithData extends StyleRange
 		new StyleRange(start, length, foreground, background, fontStyle);
 	}
 	
+	@Override
 	public boolean isUnstyled() {
 		if(data != null) return false;
 		if(tooltip != null) return false;
@@ -97,10 +98,7 @@ public class StyleRangeWithData extends StyleRange
 	
 	@Override
 	public Object clone() {
-		StyleRangeWithData style = new StyleRangeWithData(start, length,
-				foreground, background, fontStyle);
-		style.underline = this.underline;
-		style.strikeout = this.strikeout;
+		StyleRangeWithData style = (StyleRangeWithData)super.clone();
 		style.data = (HashMap<String, String>)this.data.clone();
 		style.tooltip = this.tooltip;
 		style.action = this.action;
