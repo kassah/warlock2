@@ -175,7 +175,7 @@ public class StormFrontProtocolHandler implements IStormFrontProtocolHandler {
 	public void characters(String characters) {
 		// if there was no handler or it couldn't handle the characters,
 		// take a default action
-		if(!handleCharacters(defaultTagHandlers, 0, characters)) {
+		if(!handleCharacters(characters)) {
 			WarlockString str = new WarlockString(characters);
 			for(IWarlockStyle style : styles) {
 				str.addStyle(style);
@@ -198,22 +198,21 @@ public class StormFrontProtocolHandler implements IStormFrontProtocolHandler {
 		}
 	}
 	
-	private boolean handleCharacters(Map<String, IStormFrontTagHandler> handlers,
-			int stackPosition, String characters) {
-		if(stackPosition >= tagStack.size()) return false; // reached the end of the stack
-		String tagName = tagStack.get(stackPosition);
+	private boolean handleCharacters(String characters) {
+		// Start looking for handlers at the highest level tag
+		for(int pos = tagStack.size() - 1; pos >= 0; pos--) {
+			String tagName = tagStack.get(pos);
 		
-		if(handlers == null) return false;
-		
-		// if we have a handler, let it try to handle the characters
-		IStormFrontTagHandler tagHandler = handlers.get(tagName);
-		if(tagHandler == null) return false;
-		
-		if(handleCharacters(tagHandler.getTagHandlers(), stackPosition + 1, characters))
-			return true;
-		
-		tagHandler.setCurrentTag(tagName);
-		return tagHandler.handleCharacters(characters); 
+			IStormFrontTagHandler tagHandler = getTagHandlerForElement(tagName,
+					defaultTagHandlers, 0);
+			if(tagHandler != null) {
+				tagHandler.setCurrentTag(tagName);
+				// if the handler handled the characters, we're done
+				if(tagHandler.handleCharacters(characters))
+					return true;
+			}
+		}
+		return false;
 	}
 	
 	private boolean handleStartChild(Map<String, IStormFrontTagHandler> handlers,
@@ -266,7 +265,6 @@ public class StormFrontProtocolHandler implements IStormFrontProtocolHandler {
 		} else {
 			tagStack.pop();
 		}
-		
 		
 		// call the method for the object
 		IStormFrontTagHandler tagHandler = getTagHandlerForElement(name, defaultTagHandlers, 0);
