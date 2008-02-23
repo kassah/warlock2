@@ -122,6 +122,23 @@ public class SWTStreamListener implements IStreamListener {
 		}
 	}
 	
+	private class ComponentUpdatedWrapper implements Runnable
+	{
+		private IStream stream;
+		private String id;
+		private String text;
+		
+		public ComponentUpdatedWrapper(IStream stream, String id, String text) {
+			this.stream = stream;
+			this.id = id;
+			this.text = text;
+		}
+		
+		public void run() {
+			listener.componentUpdated(stream, id, text);
+		}
+	}
+	
 	protected void run(Runnable runnable)
 	{
 		Display.getDefault().asyncExec(runnable);
@@ -149,5 +166,9 @@ public class SWTStreamListener implements IStreamListener {
 	
 	public void streamFlush(IStream stream) {
 		run(new FlushWrapper(stream));
+	}
+	
+	public void componentUpdated(IStream stream, String id, String text) {
+		run(new ComponentUpdatedWrapper(stream, id, text));
 	}
 }
