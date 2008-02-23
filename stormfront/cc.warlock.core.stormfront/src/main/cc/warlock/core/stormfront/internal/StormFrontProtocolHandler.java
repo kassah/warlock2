@@ -203,8 +203,7 @@ public class StormFrontProtocolHandler implements IStormFrontProtocolHandler {
 		for(int pos = tagStack.size() - 1; pos >= 0; pos--) {
 			String tagName = tagStack.get(pos);
 		
-			IStormFrontTagHandler tagHandler = getTagHandlerForElement(tagName,
-					defaultTagHandlers, 0);
+			IStormFrontTagHandler tagHandler = getTagHandlerForElement(tagName, null, 0);
 			if(tagHandler != null) {
 				tagHandler.setCurrentTag(tagName);
 				// if the handler handled the characters, we're done
@@ -213,46 +212,6 @@ public class StormFrontProtocolHandler implements IStormFrontProtocolHandler {
 			}
 		}
 		return false;
-	}
-	
-	private boolean handleStartChild(Map<String, IStormFrontTagHandler> handlers,
-			int stackPosition, String childName,
-			StormFrontAttributeList attributes, String rawXML, boolean newLine)
-	{
-		if(stackPosition >= tagStack.size()) return false; // reached the end of the stack
-		String tagName = tagStack.get(stackPosition);
-		
-		if(handlers == null) return false;
-		
-		// if we have a handler, let it try to handle the characters
-		IStormFrontTagHandler tagHandler = handlers.get(tagName);
-		if(tagHandler == null) return false;
-		
-		if(handleStartChild(tagHandler.getTagHandlers(), stackPosition + 1,
-				childName, attributes, rawXML, newLine))
-			return true;
-		
-		tagHandler.setCurrentTag(tagName);
-		return tagHandler.handleStartChild(childName, attributes, rawXML, newLine); 
-	}
-	
-	private boolean handleEndChild(Map<String, IStormFrontTagHandler> handlers,
-			int stackPosition, String childName, String rawXML, boolean newLine)
-	{
-		if(stackPosition >= tagStack.size()) return false; // reached the end of the stack
-		String tagName = tagStack.get(stackPosition);
-		
-		if(handlers == null) return false;
-		
-		// if we have a handler, let it try to handle the characters
-		IStormFrontTagHandler tagHandler = handlers.get(tagName);
-		if(tagHandler == null) return false;
-		
-		if(handleEndChild(tagHandler.getTagHandlers(), stackPosition + 1, childName, rawXML, newLine))
-			return true;
-		
-		tagHandler.setCurrentTag(tagName);
-		return tagHandler.handleEndChild(childName, rawXML, newLine); 
 	}
 	
 	/* (non-Javadoc)
@@ -267,7 +226,7 @@ public class StormFrontProtocolHandler implements IStormFrontProtocolHandler {
 		}
 		
 		// call the method for the object
-		IStormFrontTagHandler tagHandler = getTagHandlerForElement(name, defaultTagHandlers, 0);
+		IStormFrontTagHandler tagHandler = getTagHandlerForElement(name, null, 0);
 		if(tagHandler != null) {
 			
 			tagHandler.setCurrentTag(name);
@@ -276,7 +235,7 @@ public class StormFrontProtocolHandler implements IStormFrontProtocolHandler {
 				characters("\n");
 			}
 		} else {
-			if (rawXML != null && !handleEndChild(defaultTagHandlers, 0, name, rawXML, newLine))
+			if (rawXML != null)
 				characters(rawXML);
 		}
 	}
@@ -287,7 +246,7 @@ public class StormFrontProtocolHandler implements IStormFrontProtocolHandler {
 	public void startElement(String name, StormFrontAttributeList attributes, String rawXML, boolean newLine) {
 		
 		// call the method for the object
-		IStormFrontTagHandler tagHandler = getTagHandlerForElement(name, defaultTagHandlers, 0);
+		IStormFrontTagHandler tagHandler = getTagHandlerForElement(name, null, 0);
 		
 		if(tagHandler != null) {
 			
@@ -298,31 +257,35 @@ public class StormFrontProtocolHandler implements IStormFrontProtocolHandler {
 				characters("\n");
 			}
 		} else {
-			if(rawXML != null && !handleStartChild(defaultTagHandlers, 0, name, attributes, rawXML, newLine))
+			if(rawXML != null)
 				characters(rawXML);
 		}
 	}
 	
-	private IStormFrontTagHandler getTagHandlerForElement(String name, Map<String, IStormFrontTagHandler> tagHandlers, int stackPosition) {
-		if(tagHandlers == null) return null;
-		
+	private IStormFrontTagHandler getTagHandlerForElement(String name,
+			IStormFrontTagHandler parentHandler, int stackPosition) {
 		if(stackPosition < tagStack.size()) {
 			String tagName = tagStack.get(stackPosition);
-		
-			IStormFrontTagHandler parentHandler = tagHandlers.get(tagName);
-			if(parentHandler == null) {
-				return tagHandlers.get(name);
-			}
 			
+			// next handler is the child the parent
+			IStormFrontTagHandler nextHandler;
+			if(parentHandler != null) nextHandler = parentHandler.getTagHandler(tagName);
+			else nextHandler = defaultTagHandlers.get(tagName);
+			// If there was no match, use the current parent
+			if(nextHandler == null) nextHandler = parentHandler;
+			
+			// see if there is a valid handler further down the tree.
 			IStormFrontTagHandler tagHandler = getTagHandlerForElement(name,
-					parentHandler.getTagHandlers(), stackPosition + 1);
+					nextHandler, stackPosition + 1);
 			if(tagHandler != null) {
 				return tagHandler;
 			} else {
-				return tagHandlers.get(name);
+				if(parentHandler != null) return parentHandler.getTagHandler(name);
+				else return defaultTagHandlers.get(name);
 			}
 		} else {
-			return tagHandlers.get(name);
+			if(parentHandler != null) return parentHandler.getTagHandler(name);
+			else return defaultTagHandlers.get(name);
 		}
 	}
 	

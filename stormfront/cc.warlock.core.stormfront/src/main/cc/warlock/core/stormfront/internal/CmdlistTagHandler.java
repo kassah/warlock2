@@ -31,14 +31,12 @@ import org.apache.commons.lang.StringEscapeUtils;
 
 import cc.warlock.core.configuration.ConfigurationUtil;
 import cc.warlock.core.stormfront.IStormFrontProtocolHandler;
-import cc.warlock.core.stormfront.xml.StormFrontAttributeList;
 import cc.warlock.core.stormfront.xml.StormFrontDocument;
 
 
 public class CmdlistTagHandler extends DefaultTagHandler {
 
 	private StringBuffer buffer = new StringBuffer();
-	private int count = 0;
 	
 	public CmdlistTagHandler(IStormFrontProtocolHandler handler) {
 		super(handler);
@@ -48,24 +46,6 @@ public class CmdlistTagHandler extends DefaultTagHandler {
 	public String[] getTagNames() {
 		return new String[] { "cmdlist" };
 	}
-
-	@Override
-	public boolean handleStartChild(String name, StormFrontAttributeList attributes,
-			String rawXML, boolean newLine) {
-		buffer.append(rawXML);
-		count++;
-		
-		return true;
-	}
-	
-	
-	@Override
-	public boolean handleEndChild(String name, String rawXML, boolean newLine) {
-		
-		buffer.append(rawXML);
-		
-		return true;
-	}
 	
 	public void writeOut(String timestamp) {
 		
@@ -73,7 +53,7 @@ public class CmdlistTagHandler extends DefaultTagHandler {
 		try {
 			FileWriter writer = new FileWriter(cmdList);
 
-			buffer.insert(0, "<cmdlist timestamp=\"" + timestamp + "\" count=\"" + count + "\">");
+			buffer.insert(0, "<cmdlist timestamp=\"" + timestamp + "\">");
 			buffer.append("</cmdlist>");
 			
 			InputStream inStream = new ByteArrayInputStream(buffer.toString().getBytes());
@@ -83,7 +63,6 @@ public class CmdlistTagHandler extends DefaultTagHandler {
 			
 			writer.close();
 			buffer.setLength(0);
-			count = 0;
 		} catch (IOException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();

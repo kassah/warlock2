@@ -672,4 +672,8 @@ public class WarlockText implements LineBackgroundListener {
 	public IWarlockClient getClient() {
 		return client;
 	}
+	
+	public StyleRange[] getStyleRanges() {
+		return textWidget.getStyleRanges();
+	}
 }

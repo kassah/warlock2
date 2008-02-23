@@ -32,6 +32,7 @@ import org.apache.commons.lang.StringEscapeUtils;
 import cc.warlock.core.client.IWarlockClientViewer;
 import cc.warlock.core.configuration.ConfigurationUtil;
 import cc.warlock.core.stormfront.IStormFrontProtocolHandler;
+import cc.warlock.core.stormfront.IStormFrontTagHandler;
 import cc.warlock.core.stormfront.client.IStormFrontClientViewer;
 import cc.warlock.core.stormfront.xml.StormFrontAttributeList;
 import cc.warlock.core.stormfront.xml.StormFrontDocument;
@@ -40,11 +41,12 @@ import cc.warlock.core.stormfront.xml.StormFrontDocument;
 public class SettingsTagHandler extends DefaultTagHandler {
 
 	private StringBuffer buffer = new StringBuffer();
+	private IStormFrontTagHandler subElements;
 	
 	public SettingsTagHandler(IStormFrontProtocolHandler handler) {
 		super(handler);
 		
-		//addTagHandler(new SettingsElementsTagHandler(handler, this));
+		subElements = new SettingsElementsTagHandler(handler, this);
 	}
 
 	protected static interface ViewerVisitor {
@@ -86,23 +88,6 @@ public class SettingsTagHandler extends DefaultTagHandler {
 			}
 		});
 	}
-
-	@Override
-	public boolean handleStartChild(String name, StormFrontAttributeList attributes,
-			String rawXML, boolean newLine) {
-		buffer.append(rawXML);
-		
-		return true;
-	}
-	
-	
-	@Override
-	public boolean handleEndChild(String name, String rawXML, boolean newLine) {
-		
-		buffer.append(rawXML);
-		
-		return true;
-	}
 	
 	@Override
 	public void handleEnd(String rawXML) {
@@ -115,7 +100,7 @@ public class SettingsTagHandler extends DefaultTagHandler {
 
 			InputStream inStream = new ByteArrayInputStream(buffer.toString().getBytes());
 			StormFrontDocument document = new StormFrontDocument(inStream);
-			document.saveTo(writer, true);
+			document.saveTo(writer, false);
 			
 			inStream.close();
 			writer.close();
@@ -139,5 +124,14 @@ public class SettingsTagHandler extends DefaultTagHandler {
 		System.out.print(characters);
 		buffer.append(StringEscapeUtils.escapeXml(characters));
 		return true;
+	}
+	
+	public void append(String text) {
+		buffer.append(text);
+	}
+	
+	@Override
+	public IStormFrontTagHandler getTagHandler(String tagName) {
+		return subElements;
 	}
 }

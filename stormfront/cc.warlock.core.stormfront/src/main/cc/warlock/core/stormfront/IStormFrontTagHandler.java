@@ -46,7 +46,7 @@ public interface IStormFrontTagHandler {
 	public String getCurrentTag();
 	public void setCurrentTag(String tagName);
 	
-	public Map<String, IStormFrontTagHandler> getTagHandlers();
+	public IStormFrontTagHandler getTagHandler(String tagName);
 	
 	/**
 	 * Handle the start tag 
@@ -55,23 +55,10 @@ public interface IStormFrontTagHandler {
 	public void handleStart(StormFrontAttributeList attributes, String rawXML);
 	
 	/**
-	 * Handle a child tag (only happens if the child tag doesn't have a handler registered)
-	 * @param name The child tag name
-	 * @param attributes The child tag attributes
-	 */
-	public boolean handleStartChild(String name, StormFrontAttributeList attributes, String rawXML, boolean newLine);
-	
-	/**
 	 * handle the end tag
 	 * @param
 	 */
 	public void handleEnd(String rawXML);
-	
-	/**
-	 * Handle the end of a child tag
-	 * @param name The child tag name
-	 */
-	public boolean handleEndChild(String name, String rawXML, boolean newLine);
 	
 	/**
 	 * handle contents of the tag

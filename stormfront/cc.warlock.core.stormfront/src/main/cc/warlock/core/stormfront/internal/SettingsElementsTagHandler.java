@@ -24,6 +24,7 @@ package cc.warlock.core.stormfront.internal;
 import cc.warlock.core.stormfront.IStormFrontProtocolHandler;
 import cc.warlock.core.stormfront.client.IStormFrontClientViewer;
 import cc.warlock.core.stormfront.internal.SettingsTagHandler.ViewerVisitor;
+import cc.warlock.core.stormfront.xml.StormFrontAttributeList;
 
 public class SettingsElementsTagHandler extends DefaultTagHandler {
 
@@ -44,6 +45,11 @@ public class SettingsElementsTagHandler extends DefaultTagHandler {
 				"font", "columnFont", "detach", "ignores", "builtin",
 				"group", "toggles", "app", "display"
 				};
+	}
+	
+	@Override
+	public void handleStart(StormFrontAttributeList attributes, String rawXML) {
+		settings.append(rawXML);
 	}
 	
 	@Override
@@ -72,6 +78,7 @@ public class SettingsElementsTagHandler extends DefaultTagHandler {
 				}
 			});
 		}
+		settings.append(rawXML);
 	}
 
 }

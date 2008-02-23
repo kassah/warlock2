@@ -41,4 +41,6 @@ public interface IStreamListener {
 	public void streamCleared (IStream stream);
 	
 	public void streamFlush (IStream stream);
+	
+	public void componentUpdated(IStream stream, String id, String value);
 }

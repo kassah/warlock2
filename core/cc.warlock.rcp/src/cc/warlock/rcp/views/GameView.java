@@ -69,6 +69,7 @@ public abstract class GameView extends StreamView implements IWarlockClientViewe
 	protected WarlockEntry entry;
 	protected SWTWarlockClientViewer wrapper;
 	protected Composite entryComposite;
+	protected IWarlockClient client;
 	
 	public GameView () {
 		if (firstInstance == null) {

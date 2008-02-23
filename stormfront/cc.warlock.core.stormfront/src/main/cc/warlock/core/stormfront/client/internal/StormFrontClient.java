@@ -89,7 +89,8 @@ public class StormFrontClient extends WarlockClient implements IStormFrontClient
 	protected ArrayList<IScript> runningScripts;
 	protected ArrayList<IScriptListener> scriptListeners;
 	protected DefaultSkin skin;
-	protected Hashtable<String, ClientProperty<String>> components = new Hashtable<String, ClientProperty<String>>();
+	protected HashMap<String, ClientProperty<String>> components = new HashMap<String, ClientProperty<String>>();
+	protected HashMap<String, IStream> componentStreams = new HashMap<String, IStream>();
 	protected ClientProperty<GameMode> mode;
 	protected HashMap<String, String> commands;
 	
@@ -317,19 +318,19 @@ public class StormFrontClient extends WarlockClient implements IStormFrontClient
 		return getStream(FAMILIAR_STREAM_NAME);
 	}
 	
-	public void setComponent (String name, String value)
+	public void setComponent (String name, String value, IStream stream)
 	{
 		components.put(name, new ClientProperty<String>(this, name, value));
+		componentStreams.put(name, stream);
 	}
 	
-    public void updateComponent (String name, String value) {
-    	ClientProperty<String> component = components.get(name);
-    	if(component != null)
-    		component.set(value);
-    }
-    
-	public IProperty<String> getComponent(String name) {
-		return components.get(name);
+	public void updateComponent(String name, String value) {
+		components.get(name).set(value);
+		componentStreams.get(name).updateComponent(name, value);
+	}
+	
+	public IProperty<String> getComponent(String componentName) {
+		return components.get(componentName);
 	}
 	
 	@Override

@@ -24,6 +24,7 @@
  */
 package cc.warlock.core.stormfront.internal;
 
+import cc.warlock.core.client.IWarlockClient;
 import cc.warlock.core.client.internal.WarlockStyle;
 import cc.warlock.core.stormfront.IStormFrontProtocolHandler;
 import cc.warlock.core.stormfront.client.internal.StormFrontClient;
@@ -63,6 +64,7 @@ public class CompDefTagHandler extends DefaultTagHandler {
 		style = new WarlockStyle();
 		buffer.setLength(0);
 		this.id = attributes.getValue("id");
+		style.setName(this.id);
 	}
 	
 	@Override
@@ -80,8 +82,9 @@ public class CompDefTagHandler extends DefaultTagHandler {
 			handler.removeStyle(style);
 			style = null;
 		}
-		StormFrontClient client = (StormFrontClient) handler.getClient();
-		client.setComponent(id, buffer.toString());
+		IWarlockClient client = handler.getClient();
+		if(client instanceof StormFrontClient)
+			((StormFrontClient)client).setComponent(id, buffer.toString(), handler.getCurrentStream());
 	}
 	
 	@Override

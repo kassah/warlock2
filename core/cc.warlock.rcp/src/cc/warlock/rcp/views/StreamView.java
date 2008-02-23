@@ -25,7 +25,6 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.Hashtable;
-import java.util.WeakHashMap;
 import java.util.regex.MatchResult;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -46,15 +45,14 @@ import org.eclipse.ui.part.ViewPart;
 
 import cc.warlock.core.client.IHighlightString;
 import cc.warlock.core.client.IProperty;
-import cc.warlock.core.client.IPropertyListener;
 import cc.warlock.core.client.IStream;
 import cc.warlock.core.client.IStreamListener;
 import cc.warlock.core.client.IWarlockClient;
 import cc.warlock.core.client.IWarlockStyle;
 import cc.warlock.core.client.PropertyListener;
 import cc.warlock.core.client.WarlockString;
-import cc.warlock.core.client.internal.ClientProperty;
 import cc.warlock.rcp.configuration.GameViewConfiguration;
+import cc.warlock.rcp.ui.StyleRangeWithData;
 import cc.warlock.rcp.ui.WarlockText;
 import cc.warlock.rcp.ui.client.SWTPropertyListener;
 import cc.warlock.rcp.ui.client.SWTStreamListener;
@@ -62,7 +60,7 @@ import cc.warlock.rcp.ui.style.DefaultStyleProvider;
 import cc.warlock.rcp.ui.style.StyleProviders;
 import cc.warlock.rcp.util.ColorUtil;
 
-public class StreamView extends ViewPart implements IStreamListener, IGameViewFocusListener, IPropertyListener<String> {
+public class StreamView extends ViewPart implements IStreamListener, IGameViewFocusListener {
 	
 	public static final String STREAM_VIEW_PREFIX = "cc.warlock.rcp.views.stream.";
 	
@@ -74,11 +72,10 @@ public class StreamView extends ViewPart implements IStreamListener, IGameViewFo
 	
 	protected IStream mainStream;
 	protected ArrayList<IStream> streams;
-	protected IWarlockClient client;
+	protected WarlockText currentText;
 	protected Composite mainComposite;
 	protected PageBook book;
 	protected Hashtable<IWarlockClient, WarlockText> clientStreams = new Hashtable<IWarlockClient, WarlockText>();
-	private WeakHashMap<IProperty<String>, StyleRange> components = new WeakHashMap<IProperty<String>, StyleRange>();
 	
 	// This name is the 'suffix' part of the stream... so we will install listeners for each client
 	protected String mainStreamName;
@@ -386,8 +383,8 @@ public class StreamView extends ViewPart implements IStreamListener, IGameViewFo
 	
 	public void setClient (IWarlockClient client)
 	{
-		this.client = client;
-		book.showPage(getTextForClient(client).getTextWidget());
+		currentText = getTextForClient(client);
+		book.showPage(currentText.getTextWidget());
 		//if (multiClient) {
 		//	if (!streams.contains(client.getStream(mainStreamName)))
 		//		addStream(client.getStream(mainStreamName));
@@ -449,7 +446,7 @@ public class StreamView extends ViewPart implements IStreamListener, IGameViewFo
 		WarlockString bufferedText = textBuffers.get(stream.getClient());
 		if(bufferedText != null) {
 			appendText(stream.getClient(), bufferedText);
-			textBuffers.remove(client);
+			textBuffers.remove(stream.getClient());
 		}
 	}
 	
@@ -464,33 +461,25 @@ public class StreamView extends ViewPart implements IStreamListener, IGameViewFo
 	}
 	
 	public void pageUp() {
-		getTextForClient(client).pageUp();
+		currentText.pageUp();
 	}
 	
 	public void pageDown() {
-		getTextForClient(client).pageDown();
+		currentText.pageDown();
 	}
 	
-	public void setComponentRange(ClientProperty<String> component, StyleRange range) {
-		components.put(component, range);
-	}
-	
-	public void propertyChanged(IProperty<String> component, String value) {
-		String text = component.get();
-		StyleRange style = components.get(component);
+	public void componentUpdated(IStream stream, String id, String value) {
+		WarlockText text = getTextForClient(stream.getClient());
+		StyleRange[] ranges = text.getStyleRanges();
+		StyleRange style = null;
+		for(StyleRange cur : ranges) {
+			if(cur instanceof StyleRangeWithData
+					&& ((StyleRangeWithData)cur).data.get("name").equals(id)) {
+				style = cur;
+				break;
+			}
+		}
 		if(style == null) return;
-		ClientProperty<String> property;
-		if(component instanceof ClientProperty) property = (ClientProperty<String>)component;
-		else return;
-		if(text == null) text = "";
-		getTextForClient(property.getClient()).replaceTextRange(style.start, style.length, text);
-	}
-	
-	public void propertyCleared(IProperty<String> component, String text) {
-		components.remove(component);
-	}
-	
-	public void propertyActivated(IProperty<String> component) {
-		
+		text.replaceTextRange(style.start, style.length, value);
 	}
 }
