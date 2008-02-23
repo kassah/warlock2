@@ -27,9 +27,12 @@
  */
 package cc.warlock.core.stormfront.client.internal;
 
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.HashMap;
 import java.util.Hashtable;
 import java.util.Timer;
 import java.util.TimerTask;
@@ -45,6 +48,7 @@ import cc.warlock.core.client.internal.CharacterStatus;
 import cc.warlock.core.client.internal.ClientProperty;
 import cc.warlock.core.client.internal.WarlockClient;
 import cc.warlock.core.client.internal.WarlockStyle;
+import cc.warlock.core.configuration.ConfigurationUtil;
 import cc.warlock.core.script.IScript;
 import cc.warlock.core.script.IScriptListener;
 import cc.warlock.core.script.ScriptEngineRegistry;
@@ -57,6 +61,8 @@ import cc.warlock.core.stormfront.serversettings.server.Preset;
 import cc.warlock.core.stormfront.serversettings.server.ServerSettings;
 import cc.warlock.core.stormfront.serversettings.skin.DefaultSkin;
 import cc.warlock.core.stormfront.serversettings.skin.IStormFrontSkin;
+import cc.warlock.core.stormfront.xml.StormFrontDocument;
+import cc.warlock.core.stormfront.xml.StormFrontElement;
 
 import com.martiansoftware.jsap.CommandLineTokenizer;
 
@@ -85,6 +91,7 @@ public class StormFrontClient extends WarlockClient implements IStormFrontClient
 	protected DefaultSkin skin;
 	protected Hashtable<String, ClientProperty<String>> components = new Hashtable<String, ClientProperty<String>>();
 	protected ClientProperty<GameMode> mode;
+	protected HashMap<String, String> commands;
 	
 	public StormFrontClient() {
 		super();
@@ -350,5 +357,36 @@ public class StormFrontClient extends WarlockClient implements IStormFrontClient
 			currentTime = time + 0.9;
 		else if(time > (long)currentTime)
 			currentTime = time;
+	}
+	
+	public void loadCmdlist()
+	{
+		try {
+			commands  = new HashMap<String, String>();
+			FileInputStream stream = new FileInputStream(ConfigurationUtil.getConfigurationFile("cmdlist1.xml"));
+			StormFrontDocument document = new StormFrontDocument(stream);
+			stream.close();
+			
+			StormFrontElement cmdlist = document.getRootElement();
+			for (StormFrontElement cliElement : cmdlist.elements())
+			{
+				if(cliElement.getName().equals("cli")) {
+					String coord = cliElement.attributeValue("coord");
+					String command = cliElement.attributeValue("command");
+
+					if(coord != null && command != null)
+						commands.put(coord, command);
+				}
+			}
+		} catch (FileNotFoundException e) {
+			e.printStackTrace();
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+	}
+	
+	public String getCommand(String coord) {
+		if(commands == null) return null;
+		return commands.get(coord);
 	}
 }

@@ -152,12 +152,12 @@ public class WarlockText implements LineBackgroundListener {
 					if (!isDisposed() && isVisible())
 					{
 						Point point = new Point(e.x, e.y);
-						int offset = getOffsetAtLocation(point);
-						StyleRange range = getStyleRangeAtOffset(offset);
+						int offset = textWidget.getOffsetAtLocation(point);
+						StyleRange range = textWidget.getStyleRangeAtOffset(offset);
 						if (range != null && range instanceof StyleRangeWithData)
 						{
 							StyleRangeWithData range2 = (StyleRangeWithData) range;
-							if (range2.data.containsKey("link.url") | range2.data.containsKey("command"))
+							if (range2.action != null)
 							{
 								setCursor(handCursor);
 								return;
@@ -179,17 +179,14 @@ public class WarlockText implements LineBackgroundListener {
 			public void mouseUp(MouseEvent e) {
 				try {
 					Point point = new Point(e.x, e.y);
-					int offset = getOffsetAtLocation(point);
-					StyleRange range = getStyleRangeAtOffset(offset);
+					int offset = textWidget.getOffsetAtLocation(point);
+					StyleRange range = textWidget.getStyleRangeAtOffset(offset);
 					if (range != null && range instanceof StyleRangeWithData)
 					{
 						StyleRangeWithData range2 = (StyleRangeWithData) range;
-						if (range2.data.containsKey("link.url"))
+						if (range2.action != null)
 						{
-							RCPUtil.openURL(range2.data.get("link.url"));
-						}
-						if (range2.data.containsKey("command")) {
-							WarlockText.this.getClient().send(range2.data.get("command"));
+							range2.action.run();
 						}
 					}
 				} catch (IllegalArgumentException ex) {
@@ -285,15 +282,8 @@ public class WarlockText implements LineBackgroundListener {
 		textWidget.setCursor(cursor);
 	}
 	
-	public int getOffsetAtLocation(Point point) {
-		return textWidget.getOffsetAtLocation(point);
-	}
-	
-	public StyleRange getStyleRangeAtOffset(int offset) {
-		return textWidget.getStyleRangeAtOffset(offset);
-	}
-	
 	public void redraw() {
+		// FIXME redraw all widgets
 		textWidget.redraw();
 	}
 	
@@ -362,11 +352,6 @@ public class WarlockText implements LineBackgroundListener {
 	
 	public int getCharCount() {
 		return textWidget.getCharCount();
-	}
-	
-	private int getCurrentHolderOffset ()
-	{
-		return getHolderOffset(objects.keySet().size());
 	}
 	
 	public String getText() {
@@ -476,6 +461,8 @@ public class WarlockText implements LineBackgroundListener {
 					if(nextStyle.strikeout) style.strikeout = true;
 					if(nextStyle.underline) style.underline = true;
 					style.data.putAll(nextStyle.data);
+					style.action = nextStyle.action;
+					style.tooltip = nextStyle.tooltip;
 				}
 				style.start = charCount + pos;
 				style.length = nextPos - pos;
@@ -509,6 +496,18 @@ public class WarlockText implements LineBackgroundListener {
 		return nextPos;
 	}
 	
+	private class UrlOpener implements Runnable {
+		private String url;
+		
+		private UrlOpener(String url) {
+			this.url = url;
+		}
+		
+		public void run() {
+			RCPUtil.openURL(url);
+		}
+	}
+	
 	private StyleRangeWithData warlockStringStyleRangeToStyleRange(WarlockStringStyleRange range, int offset) {
 		StyleRangeWithData styleRange = (StyleRangeWithData)StyleProviders.getStyleProvider(client).getStyleRange(range.style);
 		if(styleRange == null)
@@ -527,12 +526,9 @@ public class WarlockText implements LineBackgroundListener {
 			styleRange.length = range.length;
 		}
 		if(range.style.getLinkAddress() != null)
-			styleRange.data.put("link.url", range.style.getLinkAddress().toString());
-		if(range.style.getCommand() != null) {
-			styleRange.data.put("command", range.style.getCommand());
-			if(!range.style.commandVisible())
-				styleRange.data.put("command.visibility", "false");
-		}
+			styleRange.action = new UrlOpener(range.style.getLinkAddress().toString());
+		if(range.style.getAction() != null)
+			styleRange.action = range.style.getAction();
 		return styleRange;
 	}
 	

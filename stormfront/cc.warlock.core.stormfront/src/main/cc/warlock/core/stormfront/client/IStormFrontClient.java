@@ -180,5 +180,9 @@ public interface IStormFrontClient extends IWarlockClient, IRoomListener {
 	public long getTime();
 	
 	public void setTime(long time);
+	
+	public void loadCmdlist();
+	
+	public String getCommand(String coord);
 
 }

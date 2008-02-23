@@ -38,8 +38,7 @@ public interface IWarlockStyle {
 	public Collection<StyleType> getStyleTypes();
 	
 	public URL getLinkAddress();
-	public String getCommand();
-	public boolean commandVisible();
+	public Runnable getAction();
 	
 	public WarlockColor getFGColor();
 	public WarlockColor getBGColor();
@@ -49,7 +48,7 @@ public interface IWarlockStyle {
 	public void addStyleType (StyleType styleType);
 
 	public void setLinkAddress(URL linkAddress);
-	public void setCommand(String command, boolean visible);
+	public void setAction(Runnable action);
 	
 	public void setFGColor(WarlockColor color);
 	public void setBGColor(WarlockColor color);

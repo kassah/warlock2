@@ -88,6 +88,7 @@ public class CmdlistTagHandler extends DefaultTagHandler {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
+		handler.getClient().loadCmdlist();
 	}
 	
 	@Override
