@@ -34,7 +34,6 @@ import cc.warlock.core.script.IScriptInfo;
 import cc.warlock.core.script.IScriptListener;
 import cc.warlock.core.script.configuration.ScriptConfiguration;
 import cc.warlock.core.stormfront.client.IStormFrontClient;
-import cc.warlock.core.stormfront.serversettings.server.IServerScriptInfo;
 
 
 public class WSLEngine implements IScriptEngine, IScriptListener {
@@ -72,10 +71,6 @@ public class WSLEngine implements IScriptEngine, IScriptListener {
 					return true;
 				}
 			}
-		}
-		else if (scriptInfo instanceof IServerScriptInfo)
-		{
-			return true;
 		}
 		
 		return false;

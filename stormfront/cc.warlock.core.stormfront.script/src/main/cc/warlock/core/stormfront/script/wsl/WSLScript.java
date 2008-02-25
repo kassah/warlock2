@@ -37,6 +37,7 @@ import org.antlr.runtime.CommonTokenStream;
 import org.antlr.runtime.RecognitionException;
 
 import cc.warlock.core.client.internal.WarlockStyle;
+import cc.warlock.core.client.settings.IVariable;
 import cc.warlock.core.script.AbstractScript;
 import cc.warlock.core.script.IMatch;
 import cc.warlock.core.script.IScriptCommands;
@@ -288,9 +289,9 @@ public class WSLScript extends AbstractScript {
 		// set 0 to the entire list
 		setVariable("0", totalArgs.toString());
 		
-		for (String varName : scriptCommands.getStormFrontClient().getServerSettings().getVariableNames())
+		for (IVariable var : scriptCommands.getClient().getClientSettings().getAllVariables())
 		{
-			setVariable(varName, scriptCommands.getStormFrontClient().getServerSettings().getVariable(varName));
+			setVariable(var.getIdentifier(), var.getValue());
 		}
 		
 		scriptThread = new Thread(new ScriptRunner());
