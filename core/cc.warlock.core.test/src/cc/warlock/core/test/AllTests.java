@@ -33,7 +33,7 @@ public class AllTests {
 		
 		suite.addTest(new JUnit4TestAdapter(StreamTest.class));
 		suite.addTest(new JUnit4TestAdapter(SGETest.class));
-		suite.addTest(new JUnit4TestAdapter(ServerScriptTest.class));
+//		suite.addTest(new JUnit4TestAdapter(ServerScriptTest.class));
 		return suite;
 	}
 }

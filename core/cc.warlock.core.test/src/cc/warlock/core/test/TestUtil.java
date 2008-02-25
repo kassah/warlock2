@@ -31,7 +31,6 @@ import cc.warlock.core.configuration.Profile;
 import cc.warlock.core.stormfront.client.internal.StormFrontClient;
 import cc.warlock.core.stormfront.network.ISGEConnectionListener;
 import cc.warlock.core.stormfront.network.SGEConnection;
-import cc.warlock.core.stormfront.serversettings.server.IServerSettingsListener;
 
 // the purpose of this class is to open connections / clients for unit tests and cache them so we don't
 // login to our test profiles more than once in a given unit test session
@@ -50,15 +49,13 @@ public class TestUtil {
 		return profileProperties.get(profile);
 	}
 	
-	public static StormFrontClient autoConnectToClient (Profile profile, IServerSettingsListener listener)
+	public static StormFrontClient autoConnectToClient (Profile profile)
 	{
 		if (!clients.containsKey(profile))
 		{
 			Map<String,String> loginProperties = autoLogin(profile, null);
 		
 			StormFrontClient client = new StormFrontClient();
-			if (listener != null)
-				client.getServerSettings().addServerSettingsListener(listener);
 			
 			int port = Integer.parseInt(loginProperties.get(SGEConnection.PROPERTY_GAMEPORT));
 			
