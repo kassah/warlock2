@@ -40,7 +40,7 @@ public class ClearStreamTagHandler extends DefaultTagHandler {
 	}
 	
 	@Override
-	public void handleStart(StormFrontAttributeList attributes) {
+	public void handleStart(StormFrontAttributeList attributes, String rawXML) {
 		String id = attributes.getValue("id");
 		
 		handler.getClient().getStream(id).clear();

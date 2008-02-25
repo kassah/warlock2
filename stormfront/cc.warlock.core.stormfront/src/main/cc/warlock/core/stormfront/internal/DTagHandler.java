@@ -21,10 +21,33 @@
  */
 package cc.warlock.core.stormfront.internal;
 
+import cc.warlock.core.client.IWarlockClient;
+import cc.warlock.core.client.IWarlockStyle.StyleType;
+import cc.warlock.core.client.internal.WarlockStyle;
 import cc.warlock.core.stormfront.IStormFrontProtocolHandler;
+import cc.warlock.core.stormfront.xml.StormFrontAttributeList;
 
 public class DTagHandler extends DefaultTagHandler {
 
+	WarlockStyle style;
+	String command;
+	boolean gotCommand = false;
+	
+	private class CommandRunner implements Runnable {
+		private IWarlockClient client;
+		private String command;
+		
+		CommandRunner(IWarlockClient client, String command) {
+			this.client = client;
+			this.command = command;
+		}
+		
+		public void run() {
+			client.send(command);
+		}
+
+	}
+	
 	public DTagHandler(IStormFrontProtocolHandler handler) {
 		super(handler);
 	}
@@ -34,6 +57,47 @@ public class DTagHandler extends DefaultTagHandler {
 		return new String[] {"d"};
 	}
 
+	@Override
+	public void handleStart(StormFrontAttributeList attributes, String rawXML) {
+		if(style != null) {
+			handler.removeStyle(style);
+			style = null;
+		}
+		command = null;
+		String cmd = attributes.getValue("cmd");
+		style = new WarlockStyle(new StyleType[] { StyleType.UNDERLINE });
+		if(cmd != null) {
+			style.setAction(new CommandRunner(handler.getClient(), cmd));
+			gotCommand = true;
+		} else {
+			gotCommand = false;
+		}
+		handler.addStyle(style);
+	}
+	
+	@Override
+	public boolean handleCharacters(String characters) {
+		if(!gotCommand) {
+			if(command == null)
+				command = characters;
+			else
+				command += characters;
+		}
+		return false;
+	}
+	
+	@Override
+	public void handleEnd(String rawXML) {
+		if(style != null) {
+			if(command != null) {
+				style.setAction(new CommandRunner(handler.getClient(), command));
+			}
+			handler.removeStyle(style);
+			style = null;
+		}
+		
+	}
+	
 	@Override
 	public boolean ignoreNewlines() {
 		return false;

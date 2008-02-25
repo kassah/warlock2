@@ -22,22 +22,27 @@
 package cc.warlock.core.stormfront.internal;
 
 import cc.warlock.core.stormfront.IStormFrontProtocolHandler;
+import cc.warlock.core.stormfront.xml.StormFrontAttributeList;
 
+public class CmdtimestampTagHandler extends DefaultTagHandler {
 
-public class NavTagHandler extends DefaultTagHandler {
-
-	public NavTagHandler(IStormFrontProtocolHandler handler) {
+	CmdlistTagHandler cmdList;
+	
+	public CmdtimestampTagHandler(IStormFrontProtocolHandler handler, CmdlistTagHandler cmdList) {
 		super(handler);
-	}
-
-	@Override
-	public String[] getTagNames() {
-		return new String[] { "nav" };
+		this.cmdList = cmdList;
 	}
 	
 	@Override
-	public void handleEnd(String rawXML) {
-		handler.getClient().nextRoom();
+	public String[] getTagNames() {
+		return new String[] {"cmdtimestamp"};
 	}
 
+	@Override
+	public void handleStart(StormFrontAttributeList attributes, String rawXML) {
+		String timestamp = attributes.getValue("data");
+		if(timestamp != null) {
+			cmdList.writeOut(timestamp);
+		}
+	}
 }

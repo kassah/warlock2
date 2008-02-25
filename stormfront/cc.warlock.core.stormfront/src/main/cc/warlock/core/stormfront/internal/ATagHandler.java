@@ -21,10 +21,40 @@
  */
 package cc.warlock.core.stormfront.internal;
 
+import cc.warlock.core.client.IWarlockStyle.StyleType;
+import cc.warlock.core.client.internal.WarlockStyle;
 import cc.warlock.core.stormfront.IStormFrontProtocolHandler;
+import cc.warlock.core.stormfront.client.IStormFrontClient;
+import cc.warlock.core.stormfront.xml.StormFrontAttributeList;
 
 public class ATagHandler extends DefaultTagHandler {
 
+	WarlockStyle style;
+	boolean requestedList = false;
+	
+	private class CommandRunner implements Runnable {
+		private IStormFrontClient client;
+		private String coord;
+		private String noun;
+		
+		CommandRunner(IStormFrontClient client, String coord, String noun) {
+			this.client = client;
+			this.coord = coord;
+			this.noun = noun;
+		}
+		
+		public void run() {
+			String command = client.getCommand(coord);
+			if(command != null) {
+				if(noun != null) {
+					command = command.replaceAll("@", noun);
+				}
+				client.send(command);
+			}
+		}
+
+	}
+	
 	public ATagHandler(IStormFrontProtocolHandler handler) {
 		super(handler);
 	}
@@ -34,6 +64,34 @@ public class ATagHandler extends DefaultTagHandler {
 		return new String[] {"a"};
 	}
 
+	@Override
+	public void handleStart(StormFrontAttributeList attributes, String rawXML) {
+		if(style != null) {
+			handler.removeStyle(style);
+			style = null;
+		}
+		String coord = attributes.getValue("coord");
+
+		style = new WarlockStyle(new StyleType[] { StyleType.UNDERLINE });
+		if(coord != null) {
+			String noun = attributes.getValue("noun");
+			style.setAction(new CommandRunner(handler.getClient(), coord, noun));
+			if(!requestedList) {
+				handler.getClient().send("_menu update 1");
+				requestedList = true;
+			}
+		}
+		handler.addStyle(style);
+
+	}
+	
+	@Override
+	public void handleEnd(String rawXML) {
+		if(style != null) {
+			handler.removeStyle(style);
+			style = null;
+		}
+	}
 	@Override
 	public boolean ignoreNewlines() {
 		return false;

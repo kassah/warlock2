@@ -21,8 +21,6 @@
  */
 package cc.warlock.core.client.settings.internal;
 
-import java.net.MalformedURLException;
-import java.net.URL;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
@@ -125,15 +123,6 @@ public class HighlightConfigurationProvider extends ClientConfigurationProvider 
 			style.setName(stringValue(sElement, "name"));
 		}
 		
-		if (sElement.attributeValue("link") != null) {
-			try {
-				style.setLinkAddress(new URL(stringValue(sElement, "link")));
-			} catch (MalformedURLException e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
-			}
-		}
-		
 		for (Element typeElement : (List<Element>) sElement.elements()) {
 			String text = typeElement.getTextTrim();
 			style.addStyleType(IWarlockStyle.StyleType.valueOf(text));
@@ -162,8 +151,6 @@ public class HighlightConfigurationProvider extends ClientConfigurationProvider 
 		
 		element.addAttribute("background", colorString(style.getBackgroundColor()));
 		element.addAttribute("foreground", colorString(style.getForegroundColor()));
-		if (style.getLinkAddress() != null) 
-			element.addAttribute("link", style.getLinkAddress().toString());
 		
 		for (IWarlockStyle.StyleType styleType : style.getStyleTypes())
 		{

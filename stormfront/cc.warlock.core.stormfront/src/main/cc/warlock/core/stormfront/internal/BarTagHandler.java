@@ -48,7 +48,7 @@ public class BarTagHandler extends BaseTagHandler {
 	}
 
 	@Override
-	public void handleStart(StormFrontAttributeList attributes) {
+	public void handleStart(StormFrontAttributeList attributes, String rawXML) {
     	String id = attributes.getValue("id");
     	int value = Integer.parseInt(attributes.getValue("value"));
     	String text = attributes.getValue("text");

@@ -51,7 +51,7 @@ public class StormFrontDocument implements IStormFrontXMLHandler {
 		}
 	}
 	
-	public void startElement(String name, StormFrontAttributeList attributes, String newLine) {
+	public void startElement(String name, StormFrontAttributeList attributes, String rawXML, boolean newLine) {
 		StormFrontElement currentElement = new StormFrontElement(name);
 		for (StormFrontAttribute attribute : attributes.getList())
 		{
@@ -79,7 +79,7 @@ public class StormFrontDocument implements IStormFrontXMLHandler {
 		element.appendText(characters);
 	}
 	
-	public void endElement(String name, String newLine) {
+	public void endElement(String name, String rawXML, boolean newLine) {
 		elementStack.pop();
 	}
 	

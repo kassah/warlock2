@@ -43,7 +43,7 @@ public class PushBoldTagHandler extends DefaultTagHandler {
 	}
 	
 	@Override
-	public void handleEnd() {
+	public void handleEnd(String rawXML) {
 		if(style != null) {
 			handler.removeStyle(style);
 			style = null;

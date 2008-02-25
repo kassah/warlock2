@@ -27,10 +27,12 @@
  */
 package cc.warlock.core.stormfront.client.internal;
 
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collection;
-import java.util.Hashtable;
+import java.util.HashMap;
 import java.util.Timer;
 import java.util.TimerTask;
 
@@ -46,6 +48,7 @@ import cc.warlock.core.client.internal.ClientProperty;
 import cc.warlock.core.client.internal.WarlockClient;
 import cc.warlock.core.client.internal.WarlockStyle;
 import cc.warlock.core.client.settings.IClientSettings;
+import cc.warlock.core.configuration.ConfigurationUtil;
 import cc.warlock.core.script.IScript;
 import cc.warlock.core.script.IScriptListener;
 import cc.warlock.core.script.ScriptEngineRegistry;
@@ -59,6 +62,8 @@ import cc.warlock.core.stormfront.settings.StormFrontServerSettings;
 import cc.warlock.core.stormfront.settings.internal.StormFrontClientSettings;
 import cc.warlock.core.stormfront.settings.skin.DefaultSkin;
 import cc.warlock.core.stormfront.settings.skin.IStormFrontSkin;
+import cc.warlock.core.stormfront.xml.StormFrontDocument;
+import cc.warlock.core.stormfront.xml.StormFrontElement;
 
 import com.martiansoftware.jsap.CommandLineTokenizer;
 
@@ -85,8 +90,10 @@ public class StormFrontClient extends WarlockClient implements IStormFrontClient
 	protected ArrayList<IScript> runningScripts;
 	protected ArrayList<IScriptListener> scriptListeners;
 	protected DefaultSkin skin;
-	protected Hashtable<String, ClientProperty<String>> components = new Hashtable<String, ClientProperty<String>>();
+	protected HashMap<String, ClientProperty<String>> components = new HashMap<String, ClientProperty<String>>();
+	protected HashMap<String, IStream> componentStreams = new HashMap<String, IStream>();
 	protected ClientProperty<GameMode> mode;
+	protected HashMap<String, String> commands;
 	
 	public StormFrontClient() {
 		super();
@@ -324,21 +331,19 @@ public class StormFrontClient extends WarlockClient implements IStormFrontClient
 		return getStream(FAMILIAR_STREAM_NAME);
 	}
 	
-	public void setComponent (String componentName, String value)
+	public void setComponent (String name, String value, IStream stream)
 	{
-		if (!components.containsKey(componentName)) {
-			components.put(componentName, new ClientProperty<String>(this, componentName, value));
-		}
-		else {
-			components.get(componentName).set(value);
-		}
+		components.put(name, new ClientProperty<String>(this, name, value));
+		componentStreams.put(name, stream);
+	}
+	
+	public void updateComponent(String name, String value) {
+		components.get(name).set(value);
+		componentStreams.get(name).updateComponent(name, value);
 	}
 	
 	public IProperty<String> getComponent(String componentName) {
-		if (components.containsKey(componentName))
-			return components.get(componentName);
-		
-		return null;
+		return components.get(componentName);
 	}
 	
 	@Override
@@ -365,7 +370,37 @@ public class StormFrontClient extends WarlockClient implements IStormFrontClient
 		else if(time > (long)currentTime)
 			currentTime = time;
 	}
-
+	
+	public void loadCmdlist()
+	{
+		try {
+			commands  = new HashMap<String, String>();
+			FileInputStream stream = new FileInputStream(ConfigurationUtil.getConfigurationFile("cmdlist1.xml"));
+			StormFrontDocument document = new StormFrontDocument(stream);
+			stream.close();
+			
+			StormFrontElement cmdlist = document.getRootElement();
+			for (StormFrontElement cliElement : cmdlist.elements())
+			{
+				if(cliElement.getName().equals("cli")) {
+					String coord = cliElement.attributeValue("coord");
+					String command = cliElement.attributeValue("command");
+					
+					if(coord != null && command != null)
+						commands.put(coord, command);
+				}
+			}
+		} catch (FileNotFoundException e) {
+			e.printStackTrace();
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+	}
+	
+	public String getCommand(String coord) {
+		if(commands == null) return null;
+		return commands.get(coord);
+	}
 	/* Internal only.. meant for importing/exporting stormfront's savings */
 	public StormFrontServerSettings getServerSettings() {
 		return StormFrontServerSettings.instance();

@@ -34,10 +34,10 @@ import org.apache.commons.lang.StringEscapeUtils;
 import cc.warlock.core.client.IWarlockClientViewer;
 import cc.warlock.core.configuration.ConfigurationUtil;
 import cc.warlock.core.stormfront.IStormFrontProtocolHandler;
+import cc.warlock.core.stormfront.IStormFrontTagHandler;
 import cc.warlock.core.stormfront.client.IStormFrontClientViewer;
 import cc.warlock.core.stormfront.client.internal.StormFrontClient;
 import cc.warlock.core.stormfront.settings.internal.StormFrontClientSettings;
-import cc.warlock.core.stormfront.xml.StormFrontAttribute;
 import cc.warlock.core.stormfront.xml.StormFrontAttributeList;
 import cc.warlock.core.stormfront.xml.StormFrontDocument;
 
@@ -45,13 +45,12 @@ import cc.warlock.core.stormfront.xml.StormFrontDocument;
 public class SettingsTagHandler extends DefaultTagHandler {
 
 	private StringBuffer buffer = new StringBuffer();
-	private SettingsInfoTagHandler infoTagHandler;
+	private IStormFrontTagHandler subElements;
 	
-	public SettingsTagHandler(IStormFrontProtocolHandler handler, SettingsInfoTagHandler infoTagHandler) {
+	public SettingsTagHandler(IStormFrontProtocolHandler handler) {
 		super(handler);
-		this.infoTagHandler = infoTagHandler;
 		
-		//addTagHandler(new SettingsElementsTagHandler(handler, this));
+		subElements = new SettingsElementsTagHandler(handler, this);
 	}
 
 	protected static interface ViewerVisitor {
@@ -76,12 +75,16 @@ public class SettingsTagHandler extends DefaultTagHandler {
 	}
 	
 	@Override
-	public void handleStart(StormFrontAttributeList attributes) {
+	public void handleStart(StormFrontAttributeList attributes, String rawXML) {
 		buffer.setLength(0);
 		
-		buffer.append("<settings crc=\"" + infoTagHandler.getCRC() +
-				"\" major=\"" + infoTagHandler.getMajorVersion() +
-				"\" client=\"" + infoTagHandler.getClientVersion() + "\">\n");
+		buffer.append(rawXML);
+		/*buffer.append("<settings");
+		String client = attributes.getValue("client");
+		if(client != null) buffer.append(" client=\"" + client + "\"");
+		String major = attributes.getValue("major");
+		if(major != null) buffer.append(" major=\"" + (Integer.parseInt(major) + 1) + "\"");
+		buffer.append(">\n");*/
 		
 		visitViewers(new ViewerVisitor() {
 			public void visit(IStormFrontClientViewer viewer) {
@@ -89,37 +92,10 @@ public class SettingsTagHandler extends DefaultTagHandler {
 			}
 		});
 	}
-
-	@Override
-	public boolean handleChild(String name, StormFrontAttributeList attributes) {
-		String startTag = "<" + name;
-		if (attributes != null) {
-            for (StormFrontAttribute attribute : attributes.getList())
-            {
-                startTag += " " + attribute.getName() + "=" +
-                	attribute.getQuoteType() + 
-                	StringEscapeUtils.escapeXml(attribute.getValue()) +
-                	attribute.getQuoteType();
-            }
-        }
-		startTag += ">";
-		buffer.append(startTag);
-		
-		return true;
-	}
-	
 	
 	@Override
-	public boolean handleEndChild(String name) {
-		
-		buffer.append("</" + name + ">");
-		
-		return true;
-	}
-	
-	@Override
-	public void handleEnd() {
-		buffer.append("</settings>");
+	public void handleEnd(String rawXML) {
+		buffer.append(rawXML);
 		
 		String playerId = handler.getClient().getPlayerId().get();
 		File serverSettings = ConfigurationUtil.getConfigurationFile("serverSettings_" + playerId + ".xml");
@@ -166,5 +142,14 @@ public class SettingsTagHandler extends DefaultTagHandler {
 	public boolean handleCharacters(String characters) {
 		buffer.append(StringEscapeUtils.escapeXml(characters));
 		return true;
+	}
+	
+	public void append(String text) {
+		buffer.append(text);
+	}
+	
+	@Override
+	public IStormFrontTagHandler getTagHandler(String tagName) {
+		return subElements;
 	}
 }

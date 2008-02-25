@@ -43,7 +43,7 @@ public class PresetTagHandler extends DefaultTagHandler {
 	}
 	
 	@Override
-	public void handleStart(StormFrontAttributeList attributes) {
+	public void handleStart(StormFrontAttributeList attributes, String rawXML) {
 		String id = attributes.getValue("id");
 		IWarlockStyle style = handler.getClient().getClientSettings().getNamedStyle(id);
 		if (style == null)
@@ -55,7 +55,7 @@ public class PresetTagHandler extends DefaultTagHandler {
 	}
 	
 	@Override
-	public void handleEnd() {
+	public void handleEnd(String rawXML) {
 		IWarlockStyle style = styles.pop();
 		handler.removeStyle(style);
 	}

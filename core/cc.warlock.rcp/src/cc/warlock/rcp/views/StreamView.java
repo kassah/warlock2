@@ -30,6 +30,7 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 import org.eclipse.swt.SWT;
+import org.eclipse.swt.custom.StyleRange;
 import org.eclipse.swt.graphics.Color;
 import org.eclipse.swt.graphics.Font;
 import org.eclipse.swt.layout.GridData;
@@ -51,6 +52,7 @@ import cc.warlock.core.client.PropertyListener;
 import cc.warlock.core.client.WarlockString;
 import cc.warlock.core.client.settings.IHighlightString;
 import cc.warlock.rcp.configuration.GameViewConfiguration;
+import cc.warlock.rcp.ui.StyleRangeWithData;
 import cc.warlock.rcp.ui.WarlockText;
 import cc.warlock.rcp.ui.client.SWTPropertyListener;
 import cc.warlock.rcp.ui.client.SWTStreamListener;
@@ -66,10 +68,11 @@ public class StreamView extends ViewPart implements IStreamListener, IGameViewFo
 	public static final String TOP_STREAM_PREFIX = "topStream.";
 	
 	protected static ArrayList<StreamView> openViews = new ArrayList<StreamView>();
+	protected static StreamView viewInFocus;
 	
 	protected IStream mainStream;
 	protected ArrayList<IStream> streams;
-	protected IWarlockClient client;
+	protected WarlockText currentText;
 	protected Composite mainComposite;
 	protected PageBook book;
 	protected Hashtable<IWarlockClient, WarlockText> clientStreams = new Hashtable<IWarlockClient, WarlockText>();
@@ -157,6 +160,17 @@ public class StreamView extends ViewPart implements IStreamListener, IGameViewFo
 			text.setEditable(false);
 			text.setWordWrap(true);
 			text.getTextWidget().setIndent(1);
+			GameView game;
+			if (this instanceof GameView) { // Only setup this
+				game = (GameView) this;
+			} else {
+				game = GameView.getGameViewForClient(client);
+			}
+			if (game == null) {
+				System.out.println("Couldn't find a gameview for this client! This view won't be setup to send keys over.");
+			} else {
+				text.getTextWidget().addVerifyKeyListener(game.getWarlockEntry());
+			}
 			
 			Color background = ColorUtil.warlockColorToColor(GameViewConfiguration.instance().getDefaultBackground());
 			Color foreground = ColorUtil.warlockColorToColor(GameViewConfiguration.instance().getDefaultForeground());
@@ -188,8 +202,12 @@ public class StreamView extends ViewPart implements IStreamListener, IGameViewFo
 	
 	@Override
 	public void setFocus() {
-		// TODO Auto-generated method stub
-
+		// Set View in Focus
+		viewInFocus = this;
+	}
+	
+	public static StreamView getViewInFocus() {
+		return viewInFocus;
 	}
 
 	public IStream getMainStream() {
@@ -365,11 +383,15 @@ public class StreamView extends ViewPart implements IStreamListener, IGameViewFo
 	
 	public void setClient (IWarlockClient client)
 	{
-		this.client = client;
-		book.showPage(getTextForClient(client).getTextWidget());
-		
-		if (mainStream == null)
-			setMainStream(client.getStream(mainStreamName));
+		currentText = getTextForClient(client);
+		book.showPage(currentText.getTextWidget());
+		//if (multiClient) {
+		//	if (!streams.contains(client.getStream(mainStreamName)))
+		//		addStream(client.getStream(mainStreamName));
+		//} else {
+			if (mainStream == null)
+				setMainStream(client.getStream(mainStreamName));
+		//}
 
 		if (StyleProviders.getStyleProvider(client) == null)
 			StyleProviders.setStyleProvider(client, DefaultStyleProvider.instance());
@@ -396,6 +418,10 @@ public class StreamView extends ViewPart implements IStreamListener, IGameViewFo
 			openViews.remove(this);
 		}
 		
+		if (viewInFocus == this) {
+			viewInFocus = null;
+		}
+		
 		super.dispose();
 	}
 	
@@ -420,7 +446,7 @@ public class StreamView extends ViewPart implements IStreamListener, IGameViewFo
 		WarlockString bufferedText = textBuffers.get(stream.getClient());
 		if(bufferedText != null) {
 			appendText(stream.getClient(), bufferedText);
-			textBuffers.remove(client);
+			textBuffers.remove(stream.getClient());
 		}
 	}
 	
@@ -432,5 +458,28 @@ public class StreamView extends ViewPart implements IStreamListener, IGameViewFo
 	public void setBackground (IWarlockClient client, Color background)
 	{
 		getTextForClient(client).setBackground(background);
+	}
+	
+	public void pageUp() {
+		currentText.pageUp();
+	}
+	
+	public void pageDown() {
+		currentText.pageDown();
+	}
+	
+	public void componentUpdated(IStream stream, String id, String value) {
+		WarlockText text = getTextForClient(stream.getClient());
+		StyleRange[] ranges = text.getStyleRanges();
+		StyleRange style = null;
+		for(StyleRange cur : ranges) {
+			if(cur instanceof StyleRangeWithData
+					&& ((StyleRangeWithData)cur).data.get("name").equals(id)) {
+				style = cur;
+				break;
+			}
+		}
+		if(style == null) return;
+		text.replaceTextRange(style.start, style.length, value);
 	}
 }

@@ -40,7 +40,7 @@ public class DirTagHandler extends DefaultTagHandler {
 	}
 
 	@Override
-	public void handleStart(StormFrontAttributeList attributes) {
+	public void handleStart(StormFrontAttributeList attributes, String rawXML) {
 		String dir = attributes.getValue("value");
 		if(dir != null)
 			compass.addDirection(dir);

@@ -45,7 +45,7 @@ public class PushStreamTagHandler extends DefaultTagHandler {
 	}
 	
 	@Override
-	public void handleStart(StormFrontAttributeList attributes) {
+	public void handleStart(StormFrontAttributeList attributes, String rawXML) {
 		String id = attributes.getValue("id");
 		
 		String closedStyle = attributes.getValue("ifClosedStyle");

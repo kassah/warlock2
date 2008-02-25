@@ -39,7 +39,7 @@ public class SpellTagHandler extends DefaultTagHandler {
 	}
 	
 	@Override
-	public void handleStart(StormFrontAttributeList atts) {
+	public void handleStart(StormFrontAttributeList atts, String rawXML) {
 		spellText = new StringBuffer();
 	}
 
@@ -50,7 +50,7 @@ public class SpellTagHandler extends DefaultTagHandler {
 	}
 	
 	@Override
-	public void handleEnd() {
+	public void handleEnd(String rawXML) {
 		handler.getClient().getCurrentSpell().set(spellText.toString());
 		
 		spellText = null;

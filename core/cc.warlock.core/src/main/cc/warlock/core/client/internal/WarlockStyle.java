@@ -21,8 +21,6 @@
  */
 package cc.warlock.core.client.internal;
 
-import java.net.MalformedURLException;
-import java.net.URL;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
@@ -33,45 +31,32 @@ import cc.warlock.core.client.WarlockColor;
 
 public class WarlockStyle implements IWarlockStyle {
 
-	private URL linkAddress;
 	private Collection<StyleType> styleTypes;
 	private WarlockColor foregroundColor = WarlockColor.DEFAULT_COLOR;
 	private WarlockColor backgroundColor = WarlockColor.DEFAULT_COLOR;
 	private boolean fullLine;
 	private String name;
-	private String command;
-	private boolean commandVisible;
+	private Runnable action;
 	private IWarlockStyle originalStyle;
 	private boolean needsUpdate;
 	
-	public WarlockStyle (StyleType[] styleTypes, URL linkAddress)
+	public WarlockStyle (StyleType[] styleTypes)
 	{
-		this.linkAddress = linkAddress;
 		this.styleTypes = new ArrayList<StyleType>();
 		this.styleTypes.addAll(Arrays.asList(styleTypes));
 	}
 	
-	public WarlockStyle (StyleType[] styleTypes) {
-		this(styleTypes, null);
-	}
-	
 	public WarlockStyle () {
-		this(new StyleType[] { });
+		this.styleTypes = new ArrayList<StyleType>();
 	}
 	
 	public WarlockStyle (IWarlockStyle other)
 	{
-		try {
-			this.linkAddress = other.getLinkAddress() == null ? null : new URL(other.getLinkAddress().toExternalForm());
-		} catch (MalformedURLException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
 		
 		this.backgroundColor = new WarlockColor(other.getBackgroundColor());
 		this.foregroundColor = new WarlockColor(other.getForegroundColor());
 		this.name = other.getName() == null ? null : new String(other.getName());
-		this.command = other.getCommand() == null ? null : new String(other.getCommand());
+		this.action = other.getAction();
 		
 		this.styleTypes  = new ArrayList<StyleType>();
 		if (other.getStyleTypes() != null) styleTypes.addAll(other.getStyleTypes());
@@ -79,23 +64,17 @@ public class WarlockStyle implements IWarlockStyle {
 		this.originalStyle = other;
 	}
 	
-	public static WarlockStyle createBoldStyle ()
-	{
-		return new WarlockStyle(new StyleType[] { StyleType.BOLD }, null);
+	public Runnable getAction() {
+		return action;
 	}
 	
-	public URL getLinkAddress() {
-		return linkAddress;
+	public void setAction(Runnable action) {
+		if (action != this.action)
+			needsUpdate = true;
+			
+		this.action = action;
 	}
 	
-	public String getCommand() {
-		return command;
-	}
-	
-	public boolean commandVisible() {
-		return commandVisible;
-	}
-
 	public Collection<StyleType> getStyleTypes() {
 		return styleTypes;
 	}
@@ -109,21 +88,6 @@ public class WarlockStyle implements IWarlockStyle {
 		needsUpdate = true;
 		
 		styleTypes.add(styleType);
-	}
-
-	public void setLinkAddress(URL linkAddress) {
-		if (!linkAddress.equals(this.linkAddress))
-			needsUpdate = true;
-		
-		this.linkAddress = linkAddress;
-	}
-	
-	public void setCommand(String command, boolean visible) {
-		if (!command.equals(this.command) || visible != this.commandVisible)
-			needsUpdate = true;
-		
-		this.command = command;
-		this.commandVisible = visible;
 	}
 	
 	public void inheritFrom(IWarlockStyle style) {

@@ -63,17 +63,18 @@ public abstract class GameView extends StreamView implements IWarlockClientViewe
 	protected static boolean firstInstanceIsUsed = false;
 	protected static ArrayList<GameView> openViews = new ArrayList<GameView>();
 	protected static ArrayList<IGameViewFocusListener> focusListeners = new ArrayList<IGameViewFocusListener>();
-	protected static GameView viewInFocus;
+	protected static GameView gameInFocus;
 	
 	protected WarlockText text;
 	protected WarlockEntry entry;
 	protected SWTWarlockClientViewer wrapper;
 	protected Composite entryComposite;
+	protected IWarlockClient client;
 	
 	public GameView () {
 		if (firstInstance == null) {
 			firstInstance = this;
-			viewInFocus = this;
+			gameInFocus = this;
 		}
 		
 		// currentCommand = "";
@@ -99,14 +100,14 @@ public abstract class GameView extends StreamView implements IWarlockClientViewe
 		return openViews;
 	}
 	
-	public static GameView getViewInFocus ()
+	public static GameView getGameViewInFocus ()
 	{
-		return viewInFocus;
+		return gameInFocus;
 	}
 	
 	public static void initializeGameView (GameView gameView)
 	{
-		viewInFocus = gameView;
+		gameInFocus = gameView;
 		
 		if (ConnectionView.closeAfterConnect)
 		{
@@ -135,15 +136,18 @@ public abstract class GameView extends StreamView implements IWarlockClientViewe
 		return null;
 	}
 	
+	public static GameView getGameViewForClient(IWarlockClient client) {
+		for (GameView view: openViews) {
+			if (view.client == client) {
+				return view;
+			}
+		}
+		// TODO: Make a GameView and return it. (Null is likely to cause problems in the long run)
+		return null;
+	}
+	
 	public void createPartControl(Composite parent) {
 		super.createPartControl(parent);
-		
-		this.client = Warlock2Plugin.getDefault().getCurrentClient();
-		this.text = getTextForClient(this.client);
-		book.showPage(this.text.getTextWidget());
-		
-		text.setLineLimit(GameViewConfiguration.instance().getBufferLines());
-		text.setScrollDirection(SWT.DOWN);
 		
 		entryComposite = new Composite(mainComposite, SWT.NONE);
 		GridLayout layout = new GridLayout(1, false);
@@ -154,7 +158,14 @@ public abstract class GameView extends StreamView implements IWarlockClientViewe
 		entryComposite.setLayout(layout);
 		entryComposite.setLayoutData(new GridData(GridData.FILL, GridData.VERTICAL_ALIGN_END, true, false));
 		
-		entry = new WarlockEntry(entryComposite, wrapper);
+		this.client = Warlock2Plugin.getDefault().getCurrentClient();
+		this.entry = new WarlockEntry(entryComposite, wrapper); // Do this BEFORE getTextForClient!
+		this.text = getTextForClient(this.client);
+		book.showPage(this.text.getTextWidget());
+		
+		text.setLineLimit(GameViewConfiguration.instance().getBufferLines());
+		text.setScrollDirection(SWT.DOWN);
+		
 		Color background = ColorUtil.warlockColorToColor(GameViewConfiguration.instance().getDefaultBackground());
 		Color foreground = ColorUtil.warlockColorToColor(GameViewConfiguration.instance().getDefaultForeground());
 		
@@ -162,14 +173,12 @@ public abstract class GameView extends StreamView implements IWarlockClientViewe
 		entry.getWidget().setForeground(foreground);
 		
 		text.setBackgroundMode(SWT.INHERIT_DEFAULT);
-		
-		//text.getTextWidget().addKeyListener(entry);
-		text.getTextWidget().addVerifyKeyListener(entry);
 	}
 	
 	
 	public void setFocus() {
-		viewInFocus = this;
+		super.setFocus();
+		gameInFocus = this;
 		for (IGameViewFocusListener listener : focusListeners)
 		{
 			listener.gameViewFocused(this);
@@ -266,6 +275,10 @@ public abstract class GameView extends StreamView implements IWarlockClientViewe
 		entry.getWidget().paste();
 	}
 	
+	public void copyDown() {
+		text.copy();
+	}
+	
 	public void setClient(IWarlockClient client) {
 		this.client = client;
 		book.showPage(getTextForClient(client).getTextWidget());
@@ -294,6 +307,10 @@ public abstract class GameView extends StreamView implements IWarlockClientViewe
 		return client;
 	}
 	
+	public WarlockEntry getWarlockEntry() {
+		return entry;
+	}
+	
 	@Override
 	public void dispose() {
 		if (client != null && client.getConnection() != null && client.getConnection().isConnected())
@@ -305,7 +322,24 @@ public abstract class GameView extends StreamView implements IWarlockClientViewe
 				e.printStackTrace();
 			}
 		}
-		
+		openViews.remove(this);
+		if (gameInFocus == this) {
+			gameInFocus = null;
+		}
+		if (firstInstance == this) {
+			if (openViews.isEmpty()) {
+				firstInstance = null;
+				// Show connections page since we're getting rid of the main window
+				IWorkbenchPage page = PlatformUI.getWorkbench().getActiveWorkbenchWindow().getActivePage();
+				//IViewPart part = page.findView(ConnectionView.VIEW_ID);
+				try {
+					page.showView(ConnectionView.VIEW_ID);
+				} catch (PartInitException e) {
+					e.printStackTrace();
+				}
+			} else
+				firstInstance = openViews.get(0);
+		}
 		super.dispose();
 	}
 }

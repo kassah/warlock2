@@ -42,7 +42,7 @@ public class OutputTagHandler extends DefaultTagHandler {
 	}
 
 	@Override
-	public void handleStart(StormFrontAttributeList attributes) {
+	public void handleStart(StormFrontAttributeList attributes, String rawXML) {
 		if(currentStyle != null) {
 			handler.removeStyle(currentStyle);
 		}

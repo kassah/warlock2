@@ -19,25 +19,32 @@
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
-package cc.warlock.core.stormfront.internal;
+package cc.warlock.rcp.ui.macros.internal.commands;
 
-import cc.warlock.core.stormfront.IStormFrontProtocolHandler;
+import cc.warlock.core.client.IWarlockClientViewer;
+import cc.warlock.core.client.settings.macro.IMacroCommand;
+import cc.warlock.rcp.views.StreamView;
 
+/**
+ * @author Will Robertson
+ *
+ * Handles PageDown Macro (normally assigned to the PageDown Key)
+ */
+public class PageDownCommand implements IMacroCommand {
 
-public class NavTagHandler extends DefaultTagHandler {
-
-	public NavTagHandler(IStormFrontProtocolHandler handler) {
-		super(handler);
+	/* (non-Javadoc)
+	 * @see cc.warlock.rcp.ui.macros.IMacroCommand#execute(cc.warlock.core.client.IWarlockClientViewer)
+	 */
+	public void execute(IWarlockClientViewer context) {
+		if (StreamView.getViewInFocus() != null)
+			StreamView.getViewInFocus().pageDown();
 	}
 
-	@Override
-	public String[] getTagNames() {
-		return new String[] { "nav" };
-	}
-	
-	@Override
-	public void handleEnd(String rawXML) {
-		handler.getClient().nextRoom();
+	/* (non-Javadoc)
+	 * @see cc.warlock.rcp.ui.macros.IMacroCommand#getIdentifier()
+	 */
+	public String getIdentifier() {
+		return "PageDown";
 	}
 
 }

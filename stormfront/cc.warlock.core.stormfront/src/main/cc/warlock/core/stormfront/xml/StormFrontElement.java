@@ -67,7 +67,6 @@ public class StormFrontElement {
 		if (attr == null)
 		{
 			attr = new StormFrontAttribute();
-			attr.setQuoteType('"');
 			attributes.addAttribute(attr);
 		}
 		
@@ -158,7 +157,7 @@ public class StormFrontElement {
 	
 	public String getText ()
 	{
-		return getTextTrim();
+		return text.toString();
 	}
 	
 	public String getTextTrim ()
@@ -203,9 +202,9 @@ public class StormFrontElement {
 				
 				xml.append(attribute.getName());
 				xml.append("=");
-				xml.append(attribute.getQuoteType());
+				xml.append("\"");
 				xml.append(StringEscapeUtils.escapeXml(attribute.getValue()));
-				xml.append(attribute.getQuoteType());
+				xml.append("\"");
 				
 				if (iter.hasNext())
 					xml.append(" ");
@@ -213,7 +212,7 @@ public class StormFrontElement {
 		}
 		
 		boolean hasContent = false;
-		if (elements.size() > 0 || getTextTrim().length() > 0)
+		if (elements.size() > 0 || getText().length() > 0)
 		{
 			hasContent = true;
 			
@@ -232,14 +231,14 @@ public class StormFrontElement {
 				}
 			}
 		}
-		if (getTextTrim().length()> 0)
+		if (getText().length()> 0)
 		{
-			xml.append(StringEscapeUtils.escapeXml(getTextTrim()));
+			xml.append(StringEscapeUtils.escapeXml(getText()));
 		}
 		
 		if (hasContent)
 		{
-			xml.append ("</"+ name + ">");
+			xml.append (/* FIXME can't do this because it gets passed on as content: prefix +*/ "</"+ name + ">");
 			if (prettyPrint)
 				xml.append("\n");
 		}

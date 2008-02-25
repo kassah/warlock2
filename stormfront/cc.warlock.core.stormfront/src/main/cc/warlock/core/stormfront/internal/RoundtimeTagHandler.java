@@ -49,7 +49,7 @@ public class RoundtimeTagHandler extends DefaultTagHandler {
 	}
 	
 	@Override
-	public void handleStart(StormFrontAttributeList attributes) {
+	public void handleStart(StormFrontAttributeList attributes, String rawXML) {
 		long rtEnd = Long.parseLong(attributes.getValue("value"));
 		long rtLength = rtEnd - handler.getClient().getTime();
 		/* sometimes we're poorly synced and end up with a RT < 1,

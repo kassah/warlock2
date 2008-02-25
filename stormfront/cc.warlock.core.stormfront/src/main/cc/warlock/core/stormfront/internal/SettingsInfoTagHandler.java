@@ -52,7 +52,7 @@ public class SettingsInfoTagHandler extends DefaultTagHandler {
 	}
 	
 	@Override
-	public void handleStart(StormFrontAttributeList attributes) {
+	public void handleStart(StormFrontAttributeList attributes, String rawXML) {
 		
 		if (attributes.getAttribute("space") != null
 			&& attributes.getAttribute("not") != null
@@ -76,7 +76,7 @@ public class SettingsInfoTagHandler extends DefaultTagHandler {
 	}
 	
 	@Override
-	public void handleEnd() {
+	public void handleEnd(String rawXML) {
 		if (newSettings) {
 			
 			// This is a character that has no server settings, we need to immediately send our own

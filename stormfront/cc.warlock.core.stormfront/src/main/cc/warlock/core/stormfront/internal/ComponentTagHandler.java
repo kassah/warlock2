@@ -21,6 +21,7 @@
  */
 package cc.warlock.core.stormfront.internal;
 
+import cc.warlock.core.client.IWarlockClient;
 import cc.warlock.core.stormfront.IStormFrontProtocolHandler;
 import cc.warlock.core.stormfront.client.internal.StormFrontClient;
 import cc.warlock.core.stormfront.xml.StormFrontAttributeList;
@@ -33,8 +34,6 @@ public class ComponentTagHandler extends DefaultTagHandler {
 	
 	public ComponentTagHandler(IStormFrontProtocolHandler handler) {
 		super(handler);
-		
-		addTagHandler(new BTagHandler(handler));
 	}
 	
 	@Override
@@ -43,7 +42,7 @@ public class ComponentTagHandler extends DefaultTagHandler {
 	}
 	
 	@Override
-	public void handleStart(StormFrontAttributeList attributes) {
+	public void handleStart(StormFrontAttributeList attributes, String rawXML) {
 		id = attributes.getValue("id");
 		componentText.setLength(0);
 	}
@@ -56,9 +55,11 @@ public class ComponentTagHandler extends DefaultTagHandler {
 	}
 	
 	@Override
-	public void handleEnd() {
+	public void handleEnd(String rawXML) {
 		if (id != null) {
-			((StormFrontClient)handler.getClient()).setComponent(id, componentText.toString());
+			IWarlockClient client = handler.getClient();
+			if(client instanceof StormFrontClient)
+				((StormFrontClient)client).updateComponent(id, componentText.toString());
 		}
 	}
 
