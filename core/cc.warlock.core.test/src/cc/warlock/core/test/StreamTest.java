@@ -41,12 +41,12 @@ public class StreamTest {
 	}
 	
 	protected static class Listener implements IStreamListener {
-		public boolean cleared, receivedText, receivedCommand, prompted, echoed, donePrompting, flushed;
+		public boolean cleared, receivedText, receivedCommand, prompted, echoed, donePrompting, flushed, componentUpdated;
 		public String echo, prompt, command;
 		public WarlockString text;
 		
 		protected void handleEvent() {
-			cleared = receivedText = receivedCommand = prompted = echoed = donePrompting = flushed = false;
+			cleared = receivedText = receivedCommand = prompted = echoed = donePrompting = flushed = componentUpdated = false;
 			text = null;
 			echo = prompt = null;
 		}
@@ -88,6 +88,11 @@ public class StreamTest {
 		public void streamFlush(IStream stream) {
 			handleEvent();
 			flushed = true;
+		}
+		
+		public void componentUpdated(IStream stream, String id, String value) {
+			handleEvent();
+			componentUpdated = true;
 		}
 	}
 	
