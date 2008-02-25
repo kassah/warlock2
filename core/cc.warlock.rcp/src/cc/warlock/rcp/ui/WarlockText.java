@@ -25,7 +25,6 @@ import java.util.ArrayList;
 import java.util.Hashtable;
 import java.util.Iterator;
 import java.util.List;
-import java.util.Map;
 
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.custom.ExtendedModifyListener;
@@ -44,8 +43,6 @@ import org.eclipse.swt.events.MouseEvent;
 import org.eclipse.swt.events.MouseListener;
 import org.eclipse.swt.events.MouseMoveListener;
 import org.eclipse.swt.events.PaintListener;
-import org.eclipse.swt.events.SelectionAdapter;
-import org.eclipse.swt.events.SelectionEvent;
 import org.eclipse.swt.events.VerifyEvent;
 import org.eclipse.swt.events.VerifyListener;
 import org.eclipse.swt.graphics.Color;
@@ -60,8 +57,6 @@ import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Control;
 import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.Label;
-import org.eclipse.swt.widgets.Menu;
-import org.eclipse.swt.widgets.MenuItem;
 import org.eclipse.swt.widgets.ScrollBar;
 
 import cc.warlock.core.client.IWarlockClient;
@@ -87,37 +82,25 @@ public class WarlockText implements LineBackgroundListener {
 	private StyledText textWidget;
 	private Hashtable<Object, StyleRangeWithData> objects = new Hashtable<Object, StyleRangeWithData>();
 	private Hashtable<Control, Rectangle> anchoredControls = new Hashtable<Control, Rectangle>();
+	private Color linkColor;
 	private Cursor handCursor, defaultCursor;
+	private ScrollBar vscroll;
 	private int lineLimit = 5000;
 	private int doScrollDirection = SWT.UP;
 	private IWarlockClient client;
 	private WarlockCompass compass;
-	private Menu contextMenu;
 	
 	protected Hashtable<Integer, Color> lineBackgrounds = new Hashtable<Integer,Color>();
 	
 	public WarlockText(Composite parent, int style, IWarlockClient client) {
 		textWidget = new StyledText(parent, style);
 		this.client = client;
+		
 		Display display = parent.getDisplay();
+		linkColor = new Color(display, 0xF0, 0x80, 0);
 		handCursor = new Cursor(display, SWT.CURSOR_HAND);
 		defaultCursor = parent.getCursor();
-		contextMenu = new Menu(textWidget);
-		MenuItem itemCopy = new MenuItem(contextMenu, SWT.PUSH);
-		itemCopy.addSelectionListener(new SelectionAdapter() {
-		            public void widgetSelected(SelectionEvent arg0) {
-		                textWidget.copy();
-		            }
-		        });
-		itemCopy.setText("Copy");
-		MenuItem itemClear = new MenuItem(contextMenu, SWT.PUSH);
-		itemClear.addSelectionListener(new SelectionAdapter() {
-            public void widgetSelected(SelectionEvent arg0) {
-                textWidget.setText("");
-            }
-        });
-		itemClear.setText("Clear");
-		textWidget.setMenu(contextMenu);
+		vscroll = getVerticalBar ();
 		
 		addVerifyListener(new VerifyListener()  {
 			public void verifyText(VerifyEvent e) {
@@ -152,12 +135,12 @@ public class WarlockText implements LineBackgroundListener {
 					if (!isDisposed() && isVisible())
 					{
 						Point point = new Point(e.x, e.y);
-						int offset = textWidget.getOffsetAtLocation(point);
-						StyleRange range = textWidget.getStyleRangeAtOffset(offset);
+						int offset = getOffsetAtLocation(point);
+						StyleRange range = getStyleRangeAtOffset(offset);
 						if (range != null && range instanceof StyleRangeWithData)
 						{
 							StyleRangeWithData range2 = (StyleRangeWithData) range;
-							if (range2.action != null)
+							if (range2.data.containsKey("link.url"))
 							{
 								setCursor(handCursor);
 								return;
@@ -179,14 +162,14 @@ public class WarlockText implements LineBackgroundListener {
 			public void mouseUp(MouseEvent e) {
 				try {
 					Point point = new Point(e.x, e.y);
-					int offset = textWidget.getOffsetAtLocation(point);
-					StyleRange range = textWidget.getStyleRangeAtOffset(offset);
+					int offset = getOffsetAtLocation(point);
+					StyleRange range = getStyleRangeAtOffset(offset);
 					if (range != null && range instanceof StyleRangeWithData)
 					{
 						StyleRangeWithData range2 = (StyleRangeWithData) range;
-						if (range2.action != null)
+						if (range2.data.containsKey("link.url"))
 						{
-							range2.action.run();
+							RCPUtil.openURL(range2.data.get("link.url"));
 						}
 					}
 				} catch (IllegalArgumentException ex) {
@@ -282,8 +265,15 @@ public class WarlockText implements LineBackgroundListener {
 		textWidget.setCursor(cursor);
 	}
 	
+	public int getOffsetAtLocation(Point point) {
+		return textWidget.getOffsetAtLocation(point);
+	}
+	
+	public StyleRange getStyleRangeAtOffset(int offset) {
+		return textWidget.getStyleRangeAtOffset(offset);
+	}
+	
 	public void redraw() {
-		// FIXME redraw all widgets
 		textWidget.redraw();
 	}
 	
@@ -297,17 +287,6 @@ public class WarlockText implements LineBackgroundListener {
 	
 	public void copy() {
 		textWidget.copy();
-	}
-	
-	public void pageUp() {
-		if (isAtBottom()) {
-			textWidget.setCaretOffset(this.getCharCount());
-		}
-		textWidget.invokeAction(ST.PAGE_UP);
-	}
-	
-	public void pageDown() {
-		textWidget.invokeAction(ST.PAGE_DOWN);
 	}
 	
 	public void setFocus() {
@@ -352,6 +331,11 @@ public class WarlockText implements LineBackgroundListener {
 	
 	public int getCharCount() {
 		return textWidget.getCharCount();
+	}
+	
+	private int getCurrentHolderOffset ()
+	{
+		return getHolderOffset(objects.keySet().size());
 	}
 	
 	public String getText() {
@@ -402,21 +386,36 @@ public class WarlockText implements LineBackgroundListener {
 		addControls (new Control[] { label });		
 	}
 	
+	public void addLink (String url, String description)
+	{
+		int start = getCurrentHolderOffset();
+		replaceTextRange(start, 1, description);
+		
+		StyleRangeWithData range = new StyleRangeWithData();
+		range.foreground = linkColor;
+		range.underline = true;
+		range.start = start;
+		range.length = description.length();
+		textWidget.setStyleRange(range);
+		range.data.put("link.url", url);
+	}
+	
 	public void setLineLimit(int limit) {
 		lineLimit = limit;
 	}
 	
 	public void append(String string) {
-		ControlStatus status = preTextChange();
+		boolean atBottom = atBottom();
 		
 		textWidget.append(string);
-		status = constrainLineLimit(status);
+		constrainLineLimit(atBottom);
 
-		postTextChange(status);
+		if(atBottom)
+			scrollToBottom();
 	}
 	
 	public void append(WarlockString string) {
-		ControlStatus status = preTextChange();
+		boolean atBottom = atBottom();
 		
 		int charCount = textWidget.getCharCount();
 		textWidget.append(string.toString());
@@ -460,9 +459,6 @@ public class WarlockText implements LineBackgroundListener {
 						style.fontStyle = nextStyle.fontStyle;
 					if(nextStyle.strikeout) style.strikeout = true;
 					if(nextStyle.underline) style.underline = true;
-					style.data.putAll(nextStyle.data);
-					style.action = nextStyle.action;
-					style.tooltip = nextStyle.tooltip;
 				}
 				style.start = charCount + pos;
 				style.length = nextPos - pos;
@@ -476,9 +472,10 @@ public class WarlockText implements LineBackgroundListener {
 			textWidget.setStyleRange(style);
 		}
 		
-		status = constrainLineLimit(status);
+		constrainLineLimit(atBottom);
 
-		postTextChange(status);
+		if(atBottom)
+			scrollToBottom();
 	}
 	
 	/* find an element in styles that intersects with the first element of styles, starting at pos */
@@ -497,13 +494,13 @@ public class WarlockText implements LineBackgroundListener {
 	}
 	
 	private StyleRangeWithData warlockStringStyleRangeToStyleRange(WarlockStringStyleRange range, int offset) {
-		StyleRangeWithData styleRange = (StyleRangeWithData)StyleProviders.getStyleProvider(client).getStyleRange(range.style);
+		StyleRangeWithData styleRange = (StyleRangeWithData)StyleProviders.getStyleProvider(client).getStyleRange(client, range.style);
 		if(styleRange == null)
 			return null;
-		if(range.style.getFGColor() != null)
-			styleRange.foreground = ColorUtil.warlockColorToColor(range.style.getFGColor());
-		if(range.style.getBGColor() != null)
-			styleRange.background = ColorUtil.warlockColorToColor(range.style.getBGColor());
+		if(range.style.getForegroundColor() != null && styleRange.foreground == null)
+			styleRange.foreground = ColorUtil.warlockColorToColor(range.style.getForegroundColor());
+		if(range.style.getBackgroundColor() != null && styleRange.background == null)
+			styleRange.background = ColorUtil.warlockColorToColor(range.style.getBackgroundColor());
 		if(range.style.isFullLine()) {
 			int lineNum = textWidget.getLineAtOffset(offset + range.start);
 			styleRange.start = textWidget.getOffsetAtLine(lineNum);
@@ -513,48 +510,27 @@ public class WarlockText implements LineBackgroundListener {
 			styleRange.start = offset + range.start;
 			styleRange.length = range.length;
 		}
-		if(range.style.getAction() != null)
-			styleRange.action = range.style.getAction();
-		if(range.style.getName() != null)
-			styleRange.data.put("name", range.style.getName());
 		return styleRange;
 	}
 	
-	class ControlStatus {
-		boolean atBottom;
-		int caretOffset;	
-		Point selection;
-	}
-	
-	private boolean isAtBottom() {
-		return textWidget.getLinePixel(textWidget.getLineCount()) <= textWidget.getClientArea().height;
-	}
-	
-	private ControlStatus preTextChange() {
-		ControlStatus status = new ControlStatus();
-		status.atBottom = isAtBottom();
-		status.caretOffset = getCaretOffset();
-		status.selection = textWidget.getSelection();
-		return status;
-	}
-	
-	private void postTextChange(ControlStatus status) {
-		if (status.atBottom) {
-			if (doScrollDirection == SWT.DOWN) {
-				textWidget.setTopPixel(textWidget.getTopPixel() + textWidget.getLinePixel(textWidget.getLineCount()));
-				if (compass != null)
-					compass.redraw();
-			}
+	private void scrollToBottom() {
+		if (doScrollDirection == SWT.DOWN) {
+			textWidget.invokeAction(ST.TEXT_END);
+			if (compass != null)
+				compass.redraw();
 		}
-		if (status.selection.x != status.selection.y) // Only set it if there is something selected
-			textWidget.setSelectionRange(status.selection.x, status.selection.y - status.selection.x);
-		setCaretOffset(status.caretOffset);
+	}
+	
+	private boolean atBottom() {
+		return vscroll.getSelection() >= (vscroll.getMaximum()
+				- (vscroll.getPageIncrement() * 1.5));
 	}
 	
 	public void replaceTextRange(int start, int length, String text) {
-		ControlStatus status = preTextChange();
+		boolean atBottom = atBottom();
 		textWidget.replaceTextRange(start, length, text);
-		postTextChange(status);
+		if(atBottom)
+			scrollToBottom();
 	}
 	
 	public int getLineCount() {
@@ -565,43 +541,37 @@ public class WarlockText implements LineBackgroundListener {
 		return textWidget.getOffsetAtLine(lineIndex);
 	}
 	
-	private ControlStatus constrainLineLimit(ControlStatus status) {
-		// 'status' is a pointer that allows us to change the object in our parent..
-		// in this method... it is intentional.
-		if (lineLimit > 0) {
-			int lines = getLineCount();
-			if (lines > lineLimit) {
-				int linesToRemove = lines - lineLimit;
-				int charsToRemove = getOffsetAtLine(linesToRemove);
-				int pixelsToRemove = textWidget.getLinePixel(linesToRemove);
-				
-				// adjust ending status
-				status.caretOffset = status.caretOffset - charsToRemove;
-				if (status.caretOffset < 0) status.caretOffset = 0; // Don't let this go negative
-				status.selection.x = status.selection.x - charsToRemove;
-				if (status.selection.x < 0) status.selection.x = 0; // Don't let this go negative
-				status.selection.y = status.selection.y - charsToRemove;
-				if (status.selection.y < 0) status.selection.y = 0; // Don't let this go negative
-				
-				textWidget.replaceTextRange(0, charsToRemove, "");
-				updateLineBackgrounds(linesToRemove);
-				if(!status.atBottom && pixelsToRemove < 0)
-					textWidget.setTopPixel(-pixelsToRemove);
-			}
-		}
-		return status;
+	public int getTopIndex() {
+		return textWidget.getTopIndex();
 	}
 	
+	private void constrainLineLimit(boolean atBottom) {
+		if (lineLimit > 0) {
+			int len = getLineCount();
+			if (len > lineLimit) {
+				int top = getTopIndex();
+				int toRemove = len - lineLimit;
+				int offset = getOffsetAtLine(toRemove);
+				
+				replaceTextRange(0,offset,"");
+				updateLineBackgrounds(toRemove);
+				if(!atBottom)
+					setTopIndex(top - toRemove);
+			}
+		}
+	}
+	
+	@SuppressWarnings("unchecked")
 	private void updateLineBackgrounds (int lines)
 	{
 		Hashtable<Integer, Color> copy = (Hashtable<Integer, Color>) lineBackgrounds.clone(); 
 		lineBackgrounds.clear();
 		
-		for (Map.Entry<Integer, Color> line : copy.entrySet())
+		for (int lineIndex : copy.keySet())
 		{
-			if (line.getKey() >= lines)
+			if (lineIndex > lines)
 			{
-				lineBackgrounds.put(line.getKey() - lines, line.getValue());
+				lineBackgrounds.put(lineIndex - lines, copy.get(lineIndex));
 			}
 		}
 	}
@@ -623,6 +593,10 @@ public class WarlockText implements LineBackgroundListener {
 	
 	public int getLineAtOffset(int offset) {
 		return textWidget.getLineAtOffset(offset);
+	}
+	
+	public void setTopIndex(int topIndex) {
+		textWidget.setTopIndex(topIndex);
 	}
 	
 	public void setScrollDirection(int dir) {
@@ -657,9 +631,5 @@ public class WarlockText implements LineBackgroundListener {
 	
 	public IWarlockClient getClient() {
 		return client;
-	}
-	
-	public StyleRange[] getStyleRanges() {
-		return textWidget.getStyleRanges();
 	}
 }

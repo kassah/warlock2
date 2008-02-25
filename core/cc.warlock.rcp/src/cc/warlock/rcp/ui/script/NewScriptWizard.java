@@ -53,7 +53,7 @@ public class NewScriptWizard extends Wizard {
 	
 	@Override
 	public boolean performFinish() {
-		File scriptFile = new File(page1.getScriptDir(), page1.getScriptName() + page1.getScriptExt());
+		File scriptFile = new File(page1.getScriptDir(), page1.getScriptName() + "." + page1.getScriptExt());
 		
 		try {
 			File dir = scriptFile.getParentFile();

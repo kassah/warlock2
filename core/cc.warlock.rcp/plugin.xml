@@ -64,8 +64,6 @@
       <macroCommand classname="cc.warlock.rcp.ui.macros.internal.commands.RepeatSecondToLastMacroCommand"/>
       <macroCommand classname="cc.warlock.rcp.ui.macros.internal.commands.CopyMacroCommand"/>
       <macroCommand classname="cc.warlock.rcp.ui.macros.internal.commands.PasteMacroCommand"/>
-      <macroCommand classname="cc.warlock.rcp.ui.macros.internal.commands.PageUpCommand"/>
-      <macroCommand classname="cc.warlock.rcp.ui.macros.internal.commands.PageDownCommand"/>
    </extension>
    <extension
          id="product"

@@ -26,10 +26,11 @@ import java.util.List;
 import org.eclipse.swt.SWT;
 
 import cc.warlock.core.client.IWarlockClientViewer;
+import cc.warlock.core.client.settings.macro.IMacro;
+import cc.warlock.core.client.settings.macro.IMacroHandler;
 import cc.warlock.core.script.IScript;
 import cc.warlock.core.script.ScriptEngineRegistry;
-import cc.warlock.rcp.ui.macros.IMacro;
-import cc.warlock.rcp.ui.macros.IMacroHandler;
+import cc.warlock.rcp.ui.macros.MacroRegistry;
 
 public class SystemMacroHandler implements IMacroHandler {
 
@@ -37,11 +38,8 @@ public class SystemMacroHandler implements IMacroHandler {
 	
 	public SystemMacroHandler ()
 	{
-		sendMacro = new Macro(SWT.CR);
-		sendMacro.addHandler(this);
-		
-		stopScript = new Macro(SWT.ESC);
-		stopScript.addHandler(this);
+		sendMacro = MacroRegistry.createMacro(SWT.CR, this);
+		stopScript = MacroRegistry.createMacro(SWT.ESC, this);
 	}
 	
 	public IMacro[] getMacros ()

@@ -117,7 +117,7 @@ public class DebugView extends ViewPart implements IConnectionListener, IGameVie
 			}
 		});
 		entry.setLayoutData(new GridData(GridData.FILL, GridData.FILL, true, false));
-		GameView view = GameView.getGameViewInFocus();
+		GameView view = GameView.getViewInFocus();
 		if(view != null) {
 			setClient(view.getWarlockClient());
 		}

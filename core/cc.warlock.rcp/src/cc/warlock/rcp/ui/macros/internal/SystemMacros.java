@@ -26,7 +26,7 @@ package cc.warlock.rcp.ui.macros.internal;
 
 import java.util.ArrayList;
 
-import cc.warlock.rcp.ui.macros.IMacro;
+import cc.warlock.core.client.settings.macro.IMacro;
 
 /**
  * @author Marshall

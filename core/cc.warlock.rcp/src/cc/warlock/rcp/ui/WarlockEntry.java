@@ -35,8 +35,7 @@ import org.eclipse.swt.widgets.Composite;
 
 import cc.warlock.core.client.ICommand;
 import cc.warlock.core.client.IWarlockClientViewer;
-import cc.warlock.rcp.ui.macros.IMacro;
-import cc.warlock.rcp.ui.macros.MacroRegistry;
+import cc.warlock.core.client.settings.macro.IMacro;
 
 public class WarlockEntry implements VerifyKeyListener {
 
@@ -92,22 +91,30 @@ public class WarlockEntry implements VerifyKeyListener {
 		return widget;
 	}
 	
+	protected boolean checkAndExecuteMacro (IMacro macro, VerifyEvent e)
+	{
+		if (macro.getKeyCode() == e.keyCode && macro.getModifiers() == e.stateMask)
+		{
+			try {
+				leaveSearchMode();
+				macro.execute(viewer);
+				//keyHandled = true;
+			} catch (Exception ex) {
+				// TODO Auto-generated catch block
+				ex.printStackTrace();
+			}
+
+			e.doit = false;
+			return true;
+		}
+		return false;
+	}
+	
 	public void verifyKey(VerifyEvent e) {
 		//System.out.println("got char \"" + e.character + "\"");
-		for (IMacro macro : MacroRegistry.instance().getMacros())
+		for (IMacro macro : viewer.getWarlockClient().getClientSettings().getAllMacros())
 		{
-			if (macro.getKeyCode() == e.keyCode && macro.getModifiers() == e.stateMask)
-			{
-				try {
-					leaveSearchMode();
-					macro.execute(viewer);
-					//keyHandled = true;
-				} catch (Exception ex) {
-					// TODO Auto-generated catch block
-					ex.printStackTrace();
-				}
-
-				e.doit = false;
+			if (checkAndExecuteMacro(macro, e)) {
 				return;
 			}
 		}

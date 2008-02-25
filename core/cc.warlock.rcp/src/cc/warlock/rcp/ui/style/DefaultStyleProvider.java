@@ -24,9 +24,12 @@ package cc.warlock.rcp.ui.style;
 import org.eclipse.jface.resource.JFaceResources;
 import org.eclipse.swt.SWT;
 
+import cc.warlock.core.client.IWarlockClient;
 import cc.warlock.core.client.IWarlockStyle;
+import cc.warlock.core.client.WarlockColor;
 import cc.warlock.rcp.ui.IStyleProvider;
 import cc.warlock.rcp.ui.StyleRangeWithData;
+import cc.warlock.rcp.util.ColorUtil;
 
 public class DefaultStyleProvider implements IStyleProvider {
 	
@@ -41,7 +44,7 @@ public class DefaultStyleProvider implements IStyleProvider {
 		return _instance;
 	}
 	
-	public StyleRangeWithData getStyleRange (IWarlockStyle style)
+	public StyleRangeWithData getStyleRange (IWarlockClient client, IWarlockStyle style)
 	{	
 		StyleRangeWithData range = new StyleRangeWithData();
 		range.fontStyle = 0;
@@ -59,6 +62,21 @@ public class DefaultStyleProvider implements IStyleProvider {
 				range.font = JFaceResources.getTextFont();
 			}
 		}
+		
+		WarlockColor foreground =
+			style.getForegroundColor().equals(WarlockColor.DEFAULT_COLOR) ?
+			client.getClientSettings().getMainWindowSettings().getForegroundColor() :
+			style.getForegroundColor();
+			
+		WarlockColor background =
+			style.getBackgroundColor().equals(WarlockColor.DEFAULT_COLOR) ?
+			client.getClientSettings().getMainWindowSettings().getBackgroundColor() :
+			style.getBackgroundColor();;
+		
+		if (foreground != null && foreground != WarlockColor.DEFAULT_COLOR)
+			range.foreground = ColorUtil.warlockColorToColor(foreground);
+		if (background != null && background != WarlockColor.DEFAULT_COLOR)
+			range.background = ColorUtil.warlockColorToColor(background);
 		
 		return range;
 	}

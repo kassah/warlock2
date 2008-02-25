@@ -30,16 +30,25 @@ package cc.warlock.rcp.ui.macros;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Hashtable;
-import java.util.Map;
-import java.util.prefs.Preferences;
+import java.util.List;
 
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IConfigurationElement;
 import org.eclipse.core.runtime.IExtension;
 import org.eclipse.core.runtime.InvalidRegistryObjectException;
 
+import cc.warlock.core.client.IWarlockClient;
+import cc.warlock.core.client.IWarlockClientListener;
+import cc.warlock.core.client.WarlockClientRegistry;
+import cc.warlock.core.client.settings.IClientSetting;
+import cc.warlock.core.client.settings.macro.CommandMacroHandler;
+import cc.warlock.core.client.settings.macro.IMacro;
+import cc.warlock.core.client.settings.macro.IMacroCommand;
+import cc.warlock.core.client.settings.macro.IMacroHandler;
+import cc.warlock.core.client.settings.macro.IMacroProvider;
+import cc.warlock.core.client.settings.macro.IMacroVariable;
+import cc.warlock.core.client.settings.macro.internal.Macro;
 import cc.warlock.rcp.plugin.Warlock2Plugin;
-import cc.warlock.rcp.ui.macros.internal.Macro;
 import cc.warlock.rcp.ui.macros.internal.SystemMacros;
 
 
@@ -49,14 +58,7 @@ import cc.warlock.rcp.ui.macros.internal.SystemMacros;
  * TODO To change the template for this generated type comment go to
  * Window - Preferences - Java - Code Style - Code Templates
  */
-public class MacroRegistry {
-
-	private static Preferences prefs = Preferences.userNodeForPackage(IMacro.class);
-	
-	private static final String PREF_NUM_MACROS = "num-macros";
-	private static final String PREF_MACRO_PREFIX = "macro-";
-	private static final String PREF_MACRO_KEYCODE = "-keycode";
-	private static final String PREF_MACRO_COMMAND = "-command";
+public class MacroRegistry implements IMacroProvider {
 	private static MacroRegistry instance;
 	
 	private ArrayList<IMacro> macros;
@@ -67,7 +69,9 @@ public class MacroRegistry {
 		macros = new ArrayList<IMacro>();
 		variables = new Hashtable<String,IMacroVariable>();
 		commands = new Hashtable<String,IMacroCommand>();
-		
+	}
+	
+	protected void init() {
 		loadMacros();
 		loadVariables();
 		loadCommands();
@@ -75,8 +79,19 @@ public class MacroRegistry {
 	
 	public static MacroRegistry instance ()
 	{
-		if (instance == null)
+		if (instance == null) {
 			instance = new MacroRegistry();
+			instance.init();
+			
+			WarlockClientRegistry.addWarlockClientListener(new IWarlockClientListener() {
+				public void clientActivated(IWarlockClient client) {}
+				public void clientConnected(IWarlockClient client) {
+					client.getClientSettings().addClientSettingProvider(instance);
+				}
+				public void clientDisconnected(IWarlockClient client) {}
+				public void clientRemoved(IWarlockClient client) {}
+			});
+		}
 		
 		return instance;
 	}
@@ -98,25 +113,24 @@ public class MacroRegistry {
 	
 	public static IMacro createMacro (int keyCode, int modifiers, IMacroHandler handler)
 	{
-		Macro macro = new Macro(keyCode, modifiers);
+		Macro macro = new Macro(instance(), keyCode, modifiers);
 		macro.addHandler(handler);
 		
 		return macro;
 	}
 	
-	public Collection<IMacro> getMacros ()
+	public List<IMacro> getMacros ()
 	{
 		return macros;
 	}
 	
-	public Map<String,IMacroVariable> getMacroVariables ()
+	public Collection<IMacroVariable> getMacroVariables ()
 	{
-		return variables;
+		return variables.values();
 	}
 	
-	public Map<String,IMacroCommand> getMacroCommands ()
-	{
-		return commands;
+	public Collection<IMacroCommand> getMacroCommands() {
+		return commands.values();
 	}
 	
 	public void addMacro (int keycode, String command)
@@ -129,39 +143,33 @@ public class MacroRegistry {
 		macros.add(macro);
 	}
 	
-	public void save ()
-	{
-		prefs.putInt(PREF_NUM_MACROS, macros.size());
-		
-		int i = 0;
-		for (IMacro macro : macros)
-		{
-			for (IMacroHandler handler : macro.getHandlers())
-			{
-				if (handler instanceof CommandMacroHandler)
-				{
-					prefs.putInt(PREF_MACRO_PREFIX + i + PREF_MACRO_KEYCODE, macro.getKeyCode());
-					prefs.put(PREF_MACRO_PREFIX + i + PREF_MACRO_COMMAND, ((CommandMacroHandler)handler).getCommand());
-					i++;
-				}
-			}
-		}
-	}
-	
 	private void loadMacros () {
-		int numberOfMacros = prefs.getInt(PREF_NUM_MACROS, 0);
-		for (int i = 0; i < numberOfMacros; i++)
-		{
-			int keycode = prefs.getInt(PREF_MACRO_PREFIX + i + PREF_MACRO_KEYCODE, 0);
-			String command = prefs.get(PREF_MACRO_PREFIX + i + PREF_MACRO_COMMAND, null);
-			
-			addMacro(keycode, command);
-		}
-		
 		for (IMacro macro : SystemMacros.getSystemMacros())
 		{
 			macros.add(macro);
 		}
+	}
+	
+	public IMacro getMacro(int keycode, int modifiers) {
+		for (IMacro macro : macros)
+		{
+			if (macro.getKeyCode() == keycode && macro.getModifiers() == modifiers) {
+				return macro;
+			}
+		}
+		return null;
+	}
+	
+	public IMacroVariable getMacroVariable(String id) {
+		return variables.get(id);
+	}
+	
+	public IMacroCommand getMacroCommand(String id) {
+		return commands.get(id);
+	}
+	
+	public List<? extends IClientSetting> getSettings() {
+		return macros;
 	}
 	
 	private void loadCommands () {
@@ -211,4 +219,6 @@ public class MacroRegistry {
 			e.printStackTrace();
 		}
 	}
+	
+	
 }

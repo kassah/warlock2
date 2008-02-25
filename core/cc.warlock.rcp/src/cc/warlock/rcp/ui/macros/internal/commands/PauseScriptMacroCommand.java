@@ -24,9 +24,9 @@ package cc.warlock.rcp.ui.macros.internal.commands;
 import java.util.List;
 
 import cc.warlock.core.client.IWarlockClientViewer;
+import cc.warlock.core.client.settings.macro.IMacroCommand;
 import cc.warlock.core.script.IScript;
 import cc.warlock.core.script.ScriptEngineRegistry;
-import cc.warlock.rcp.ui.macros.IMacroCommand;
 
 public class PauseScriptMacroCommand implements IMacroCommand {
 	

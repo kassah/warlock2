@@ -22,7 +22,7 @@
 package cc.warlock.rcp.ui.macros.internal.commands;
 
 import cc.warlock.core.client.IWarlockClientViewer;
-import cc.warlock.rcp.ui.macros.IMacroCommand;
+import cc.warlock.core.client.settings.macro.IMacroCommand;
 
 public class RepeatLastMacroCommand implements IMacroCommand {
 	

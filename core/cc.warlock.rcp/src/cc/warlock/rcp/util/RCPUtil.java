@@ -53,4 +53,16 @@ public class RCPUtil {
 		page.setPerspective(perspective);
 	}
 	
+	public static int getPixelSizeInPoints (int pixelSize)
+	{
+		double points = pixelSize * (72.0/96.0);
+		return (int) Math.round(points);
+	}
+	
+	public static int getPointSizeInPixels (int pointSize)
+	{
+		double pixels = pointSize * (96.0/72.0);
+		
+		return (int) Math.round(pixels);
+	}
 }
