@@ -53,7 +53,7 @@ public class StreamWindowContributionItem extends CompoundContributionItem {
 			try {
 				DebugView view = (DebugView)
 				PlatformUI.getWorkbench().getActiveWorkbenchWindow().getActivePage().showView(DebugView.VIEW_ID, null, IWorkbenchPage.VIEW_VISIBLE);
-				GameView inFocus = GameView.getGameViewInFocus();
+				GameView inFocus = GameView.getViewInFocus();
 				if (inFocus != null) {
 					view.setClient(inFocus.getWarlockClient());
 				}

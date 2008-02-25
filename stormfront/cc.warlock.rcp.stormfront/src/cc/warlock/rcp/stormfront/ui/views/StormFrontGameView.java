@@ -24,7 +24,6 @@ package cc.warlock.rcp.stormfront.ui.views;
 import java.net.URL;
 
 import org.eclipse.core.runtime.IProgressMonitor;
-import org.eclipse.core.runtime.Platform;
 import org.eclipse.jface.dialogs.ProgressMonitorDialog;
 import org.eclipse.jface.resource.JFaceResources;
 import org.eclipse.swt.SWT;
@@ -49,19 +48,18 @@ import org.eclipse.ui.PlatformUI;
 
 import cc.warlock.core.client.IProperty;
 import cc.warlock.core.client.IWarlockClient;
+import cc.warlock.core.client.IWarlockClientListener;
 import cc.warlock.core.client.PropertyListener;
+import cc.warlock.core.client.WarlockClientRegistry;
 import cc.warlock.core.client.WarlockColor;
+import cc.warlock.core.client.WarlockFont;
 import cc.warlock.core.configuration.Profile;
-import cc.warlock.core.network.IConnection;
-import cc.warlock.core.network.IConnectionListener;
 import cc.warlock.core.stormfront.ProfileConfiguration;
 import cc.warlock.core.stormfront.client.IStormFrontClient;
 import cc.warlock.core.stormfront.client.IStormFrontClientViewer;
-import cc.warlock.core.stormfront.client.StormFrontColor;
-import cc.warlock.core.stormfront.serversettings.server.ServerSettings;
+import cc.warlock.core.stormfront.settings.IStormFrontClientSettings;
 import cc.warlock.rcp.stormfront.StormFrontGameViewConfiguration;
 import cc.warlock.rcp.stormfront.adapters.SWTStormFrontClientViewer;
-import cc.warlock.rcp.stormfront.ui.StormFrontMacros;
 import cc.warlock.rcp.stormfront.ui.StormFrontSharedImages;
 import cc.warlock.rcp.stormfront.ui.StormFrontStatus;
 import cc.warlock.rcp.stormfront.ui.actions.ProfileConnectAction;
@@ -269,10 +267,26 @@ public class StormFrontGameView extends GameView implements IStormFrontClientVie
 			addStream(client.getStream(IStormFrontClient.DEATH_STREAM_NAME));
 			sfClient = (IStormFrontClient) client;
 
-			StyleProviders.setStyleProvider(client, new StormFrontStyleProvider(sfClient.getServerSettings()));
+			StyleProviders.setStyleProvider(client, new StormFrontStyleProvider(sfClient.getStormFrontClientSettings()));
 			
-			if (status != null)
+			if (status != null) {
 				status.setActiveClient(sfClient);
+			}
+			
+			loadStormFrontClientSettings(sfClient.getStormFrontClientSettings());
+			
+			WarlockClientRegistry.addWarlockClientListener(new IWarlockClientListener () {
+				public void clientActivated(IWarlockClient client) {}
+				public void clientConnected(IWarlockClient client) {}
+				public void clientRemoved(IWarlockClient client) {}
+				public void clientDisconnected(IWarlockClient client) {
+					Display.getDefault().asyncExec(new Runnable() {
+						public void run () { 
+							StormFrontGameView.this.disconnected();
+						}
+					});
+				}
+			});
 		}
 	}
 	
@@ -288,20 +302,8 @@ public class StormFrontGameView extends GameView implements IStormFrontClientVie
 
 	private Button reconnect;
 	
-	public void loadServerSettings (ServerSettings settings)
-	{
-		sfClient.getConnection().addConnectionListener(new IConnectionListener () {
-			public void connected(IConnection connection) {};
-			public void dataReady(IConnection connection, String line) {};
-			public void disconnected(IConnection connection) {
-				Display.getDefault().asyncExec(new Runnable() {
-					public void run () { 
-						StormFrontGameView.this.disconnected();
-					}
-				});
-			}
-		});
-		
+	public void loadStormFrontClientSettings(IStormFrontClientSettings settings)
+	{		
 		sfClient.getCharacterName().addListener(new PropertyListener<String>() {
 			public void propertyChanged(IProperty<String> property, String oldValue) {
 				String viewId = getViewSite().getId() + ":" + getViewSite().getSecondaryId();
@@ -323,36 +325,34 @@ public class StormFrontGameView extends GameView implements IStormFrontClientVie
 		WarlockColor bg = settings.getMainWindowSettings().getBackgroundColor();
 		WarlockColor fg = settings.getMainWindowSettings().getForegroundColor();
 		
-		String fontFace = settings.getMainWindowSettings().getFontFace();
-		int fontSize = settings.getMainWindowSettings().getFontSizeInPoints();
-		if (Platform.getOS().equals(Platform.OS_MACOSX)) {
-			fontSize = settings.getMainWindowSettings().getFontSizeInPixels();
-		}
+		WarlockFont mainFont = settings.getMainWindowSettings().getFont();
+		String fontFace = mainFont.getFamilyName();
+		int fontSize = mainFont.getSize();
+//		if (Platform.getOS().equals(Platform.OS_MACOSX)) {
+//			fontSize = settings.getMainWindowSettings().getFontSizeInPixels();
+//		}
 		
-		boolean fontFaceEmpty = (fontFace == null || fontFace.length() == 0);
-		normalFont = fontFaceEmpty ? JFaceResources.getDefaultFont() : new Font(getSite().getShell().getDisplay(), fontFace, fontSize, SWT.NONE);
+		normalFont = mainFont.isDefaultFont() ? JFaceResources.getDefaultFont() : new Font(getSite().getShell().getDisplay(), fontFace, fontSize, SWT.NONE);
 		text.setFont(normalFont);
 		
 		WarlockColor entryBG = settings.getCommandLineSettings().getBackgroundColor();
 		WarlockColor entryFG = settings.getCommandLineSettings().getForegroundColor();
 		WarlockColor entryBarColor = settings.getCommandLineSettings().getBarColor();
 		
-		entry.getWidget().setForeground(ColorUtil.warlockColorToColor(entryFG.equals(StormFrontColor.DEFAULT_COLOR) ? fg  : entryFG));
-		entry.getWidget().setBackground(ColorUtil.warlockColorToColor(entryBG.equals(StormFrontColor.DEFAULT_COLOR) ? bg : entryBG));
+		entry.getWidget().setForeground(ColorUtil.warlockColorToColor(entryFG.equals(WarlockColor.DEFAULT_COLOR) ? fg  : entryFG));
+		entry.getWidget().setBackground(ColorUtil.warlockColorToColor(entryBG.equals(WarlockColor.DEFAULT_COLOR) ? bg : entryBG));
 		entry.getWidget().redraw();
 		
-		Caret newCaret = createCaret(1, ColorUtil.warlockColorToColor(entryBarColor));
+		Caret newCaret = createCaret(1, ColorUtil.warlockColorToColor(entryBarColor.equals(WarlockColor.DEFAULT_COLOR) ? fg : entryBarColor));
 		entry.getWidget().setCaret(newCaret);
 		
 		text.setBackground(ColorUtil.warlockColorToColor(bg));
 		text.setForeground(ColorUtil.warlockColorToColor(fg));
 		text.getTextWidget().redraw();
 		
-		StormFrontMacros.addMacrosFromServerSettings(settings);
-		
 		if (HandsView.getDefault() != null)
 		{
-			HandsView.getDefault().loadServerSettings(settings);
+			HandsView.getDefault().loadSettings(settings);
 		}
 		
 		for (StreamView streamView : StreamView.getOpenViews())
@@ -364,8 +364,9 @@ public class StormFrontGameView extends GameView implements IStormFrontClientVie
 			}
 		}
 		
-		if (status != null)
-			status.loadServerSettings(settings);
+		if (status != null) {
+			status.loadSettings(settings);
+		}
 	}
 	
 	public void launchURL(final URL url) {

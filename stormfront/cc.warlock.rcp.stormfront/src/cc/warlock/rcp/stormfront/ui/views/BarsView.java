@@ -256,7 +256,7 @@ public class BarsView extends ViewPart {
 		public void propertyCleared(IProperty<BarStatus> property, BarStatus oldValue) { }
 		
 		public void propertyChanged(IProperty<BarStatus> property, BarStatus oldValue) {
-			if (property == null || property.getName() == null) return;
+			if (property == null || property.get() == null || property.getName() == null) return;
 
 			if (property instanceof ClientProperty)
 			{

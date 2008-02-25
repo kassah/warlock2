@@ -22,8 +22,10 @@
 package cc.warlock.rcp.stormfront.ui.prefs;
 
 import java.util.ArrayList;
+import java.util.regex.Pattern;
 
 import org.eclipse.core.runtime.IAdaptable;
+import org.eclipse.jface.preference.ColorSelector;
 import org.eclipse.jface.util.IPropertyChangeListener;
 import org.eclipse.jface.util.PropertyChangeEvent;
 import org.eclipse.jface.viewers.ArrayContentProvider;
@@ -37,8 +39,6 @@ import org.eclipse.jface.viewers.ITableLabelProvider;
 import org.eclipse.jface.viewers.SelectionChangedEvent;
 import org.eclipse.jface.viewers.TableViewer;
 import org.eclipse.jface.viewers.TextCellEditor;
-import org.eclipse.jface.viewers.Viewer;
-import org.eclipse.jface.viewers.ViewerFilter;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.SelectionAdapter;
 import org.eclipse.swt.events.SelectionEvent;
@@ -58,10 +58,11 @@ import org.eclipse.swt.widgets.TableItem;
 import org.eclipse.ui.IWorkbenchPropertyPage;
 import org.eclipse.ui.dialogs.PropertyPage;
 
+import cc.warlock.core.client.WarlockColor;
+import cc.warlock.core.client.settings.IHighlightString;
+import cc.warlock.core.client.settings.internal.HighlightString;
 import cc.warlock.core.stormfront.client.IStormFrontClient;
-import cc.warlock.core.stormfront.client.StormFrontColor;
-import cc.warlock.core.stormfront.serversettings.server.HighlightPreset;
-import cc.warlock.rcp.stormfront.ui.PaletteColorSelector;
+import cc.warlock.core.stormfront.settings.internal.StormFrontClientSettings;
 import cc.warlock.rcp.ui.WarlockSharedImages;
 import cc.warlock.rcp.util.ColorUtil;
 
@@ -73,19 +74,23 @@ public class HighlightStringsPreferencePage extends PropertyPage implements
 	
 	protected TableViewer stringTable;
 	protected Button fillLineButton;
-	protected PaletteColorSelector customBGSelector, customFGSelector;
+	protected ColorSelector customBGSelector, customFGSelector;
 	protected Button defaultBG, customBG, defaultFG, customFG;
 	protected Button addString, removeString;
 	protected IStormFrontClient client;
-	protected HighlightPreset selectedString;
-	protected ArrayList<HighlightPreset> highlightStrings = new ArrayList<HighlightPreset>();
+	protected StormFrontClientSettings settings;
+	protected HighlightString selectedString;
+	protected ArrayList<HighlightString> highlightStrings = new ArrayList<HighlightString>();
 	
 	private void copyHighlightStrings ()
 	{
 		highlightStrings.clear();
-		for (HighlightPreset string : client.getServerSettings().getHighlightPresets())
+		for (IHighlightString string : client.getClientSettings().getAllHighlightStrings())
 		{
-			highlightStrings.add(new HighlightPreset(string));
+			if (string instanceof HighlightString)
+			{
+				highlightStrings.add(new HighlightString((HighlightString)string));
+			}
 		}
 	}
 	
@@ -176,14 +181,15 @@ public class HighlightStringsPreferencePage extends PropertyPage implements
 			}
 
 			public Object getValue(Object element, String property) {
-				return ((HighlightPreset)element).getText();
+				return ((HighlightString)element).getPattern().pattern();
 			}
 
 			public void modify(Object element, String property, Object value) {
 				TableItem item = (TableItem)element;
-				HighlightPreset string = (HighlightPreset)item.getData();
+				HighlightString string = (HighlightString)item.getData();
+				String pattern = ((String)value).trim();
 				
-				string.setText(((String)value).trim());
+				string.setPattern(Pattern.compile(pattern, Pattern.LITERAL | Pattern.CASE_INSENSITIVE));
 				stringTable.refresh(string);
 			}
 		});
@@ -191,7 +197,7 @@ public class HighlightStringsPreferencePage extends PropertyPage implements
 		stringTable.setLabelProvider(new StringsLabelProvider());
 		stringTable.setContentProvider(new ArrayContentProvider());
 		stringTable.setInput(highlightStrings);
-		stringTable.addFilter(getViewerFilter());
+//		stringTable.addFilter(getViewerFilter());
 		
 		int listHeight = stringTable.getTable().getItemHeight() * 8;
 		Rectangle trim = stringTable.getTable().computeTrim(0, 0, 0, listHeight);
@@ -202,7 +208,7 @@ public class HighlightStringsPreferencePage extends PropertyPage implements
 		stringTable.addSelectionChangedListener(new ISelectionChangedListener () {
 			public void selectionChanged(SelectionChangedEvent event) {
 				IStructuredSelection selection = (IStructuredSelection) event.getSelection();
-				HighlightPreset string = (HighlightPreset) selection.getFirstElement();
+				HighlightString string = (HighlightString) selection.getFirstElement();
 				
 				if (string != selectedString)
 				{
@@ -252,7 +258,7 @@ public class HighlightStringsPreferencePage extends PropertyPage implements
 		defaultFG = new Button(fgColorComposite, SWT.RADIO);
 		defaultFG.setText("Default");
 		customFG = new Button(fgColorComposite, SWT.RADIO);
-		customFGSelector = new PaletteColorSelector(fgColorComposite, client.getServerSettings().getPalette());
+		customFGSelector = new ColorSelector(fgColorComposite);
 		
 		
 		new Label(optionsGroup, SWT.NONE).setText("Background Color: ");
@@ -261,7 +267,7 @@ public class HighlightStringsPreferencePage extends PropertyPage implements
 		defaultBG = new Button(bgColorComposite, SWT.RADIO);
 		defaultBG.setText("Default");
 		customBG = new Button(bgColorComposite, SWT.RADIO);
-		customBGSelector = new PaletteColorSelector(bgColorComposite, client.getServerSettings().getPalette());
+		customBGSelector = new ColorSelector(bgColorComposite);
 		
 		fillLineButton = new Button(optionsGroup, SWT.CHECK);
 		fillLineButton.setText("Fill Entire Line");
@@ -272,34 +278,22 @@ public class HighlightStringsPreferencePage extends PropertyPage implements
 		return "Highlight Strings";
 	}
 	
-	protected ViewerFilter getViewerFilter ()
+	protected HighlightString createHighlightString ()
 	{
-		return new ViewerFilter ()
-		{
-			@Override
-			public boolean select(Viewer viewer, Object parentElement, Object element) {
-				return !((HighlightPreset)element).isName();
-			}
-		};
+		return new HighlightString(
+			settings.getHighlightConfigurationProvider(), "<Highlight Text>", true, false, null);
 	}
 	
-	protected HighlightPreset createHighlightString ()
-	{
-		 HighlightPreset newString = client.getServerSettings().createHighlightString(false);
-		 newString.setText("<Highlight Text>");
-		 return newString;
-	}
-	
-	private void highlightStringSelected (HighlightPreset string)
+	private void highlightStringSelected (HighlightString string)
 	{
 		selectedString = string;
 		if (string == null) return;
 		
-		StormFrontColor fgColor = string.getForegroundColor();
-		StormFrontColor bgColor = string.getBackgroundColor();
+		WarlockColor fgColor = string.getStyle().getForegroundColor();
+		WarlockColor bgColor = string.getStyle().getBackgroundColor();
 
-		boolean fgIsDefault = fgColor.isSkinColor() || fgColor.equals(string.getDefaultForegroundColor());
-		boolean bgIsDefault = bgColor.isSkinColor() || bgColor.equals(string.getDefaultBackgroundColor());
+		boolean fgIsDefault = fgColor.equals(settings.getMainWindowSettings().getForegroundColor());
+		boolean bgIsDefault = bgColor.equals(settings.getMainWindowSettings().getBackgroundColor());
 		
 		defaultFG.setSelection(fgIsDefault);
 		customFG.setSelection(!fgIsDefault);
@@ -311,52 +305,52 @@ public class HighlightStringsPreferencePage extends PropertyPage implements
 		
 		customFGSelector.setColorValue(ColorUtil.warlockColorToRGB(fgColor));
 		customBGSelector.setColorValue(ColorUtil.warlockColorToRGB(bgColor));
-		fillLineButton.setSelection(string.isFillEntireLine());
+		fillLineButton.setSelection(string.getStyle().isFullLine());
 	}
 	
 	private void defaultForegroundSelected ()
 	{
-		selectedString.setDefaultForegroundColor();
+		selectedString.getStyle().setForegroundColor(settings.getMainWindowSettings().getForegroundColor());
 		customFGSelector.setEnabled(false);
-		customFGSelector.setColorValue(ColorUtil.warlockColorToRGB(selectedString.getForegroundColor()));
+		customFGSelector.setColorValue(ColorUtil.warlockColorToRGB(selectedString.getStyle().getForegroundColor()));
 		stringTable.update(selectedString, null);
 		setValid(true);
 	}
 	
 	private void customForegroundChanged ()
 	{
-		selectedString.setForegroundColor(customFGSelector.getStormFrontColor());
+		selectedString.getStyle().setForegroundColor(ColorUtil.rgbToWarlockColor(customFGSelector.getColorValue()));
 		stringTable.update(selectedString, null);
 		setValid(true);
 	}
 	
 	private void defaultBackgroundSelected ()
 	{
-		selectedString.setDefaultBackgroundColor();
+		selectedString.getStyle().setBackgroundColor(settings.getMainWindowSettings().getBackgroundColor());
 		customBGSelector.setEnabled(false);
-		customBGSelector.setColorValue(ColorUtil.warlockColorToRGB(selectedString.getBackgroundColor()));
+		customBGSelector.setColorValue(ColorUtil.warlockColorToRGB(selectedString.getStyle().getBackgroundColor()));
 		stringTable.update(selectedString, null);	
 		setValid(true);
 	}
 	
 	private void customBackgroundChanged ()
 	{
-		selectedString.setBackgroundColor(customBGSelector.getStormFrontColor());
+		selectedString.getStyle().setBackgroundColor(ColorUtil.rgbToWarlockColor(customBGSelector.getColorValue()));
 		stringTable.update(selectedString, null);
 		setValid(true);
 	}
 	
 	private void removeStringClicked() {
-		HighlightPreset string = selectedString;
+		HighlightString string = selectedString;
 		
-		client.getServerSettings().deleteHighlightString(string);
+		settings.getHighlightConfigurationProvider().removeHighlightString(string.getOriginalHighlightString());
 		
 		highlightStrings.remove(string);
 		stringTable.remove(string);
 	}
 
 	private void addStringClicked() {
-		HighlightPreset newString = createHighlightString();
+		HighlightString newString = createHighlightString();
 		highlightStrings.add(newString);
 		
 		selectedString = newString;
@@ -366,7 +360,7 @@ public class HighlightStringsPreferencePage extends PropertyPage implements
 	}
 	
 	private void fillLineClicked () {
-		selectedString.setFillEntireLine(fillLineButton.getSelection());
+		selectedString.getStyle().setFullLine(fillLineButton.getSelection());
 	}
 	
 	protected class StringsLabelProvider implements ITableLabelProvider, ITableColorProvider
@@ -378,7 +372,7 @@ public class HighlightStringsPreferencePage extends PropertyPage implements
 		}
 
 		public String getColumnText(Object element, int columnIndex) {
-			return ((HighlightPreset)element).getText();
+			return ((HighlightString)element).getPattern().pattern();
 		}
 
 		public void addListener(ILabelProviderListener listener) {	}
@@ -393,14 +387,14 @@ public class HighlightStringsPreferencePage extends PropertyPage implements
 
 		public Color getBackground(Object element, int columnIndex) {
 			Color c = new Color(HighlightStringsPreferencePage.this.getShell().getDisplay(),
-					ColorUtil.warlockColorToRGB(((HighlightPreset)element).getBackgroundColor()));
+					ColorUtil.warlockColorToRGB(((HighlightString)element).getStyle().getBackgroundColor()));
 			
 			return c;
 		}
 
 		public Color getForeground(Object element, int columnIndex) {
 			Color c = new Color(HighlightStringsPreferencePage.this.getShell().getDisplay(),
-					ColorUtil.warlockColorToRGB(((HighlightPreset)element).getForegroundColor()));
+					ColorUtil.warlockColorToRGB(((HighlightString)element).getStyle().getForegroundColor()));
 			
 			return c;
 		}
@@ -409,6 +403,7 @@ public class HighlightStringsPreferencePage extends PropertyPage implements
 	@Override
 	public void setElement(IAdaptable element) {
 		client = (IStormFrontClient)element.getAdapter(IStormFrontClient.class);
+		settings = (StormFrontClientSettings) client.getStormFrontClientSettings();
 		
 		if (highlightStrings.isEmpty())
 			copyHighlightStrings();
@@ -424,20 +419,21 @@ public class HighlightStringsPreferencePage extends PropertyPage implements
 	public boolean performOk() {
 //		client.getServerSettings().clearHighlightStrings();
 		
-		for (HighlightPreset string : highlightStrings) {
+		for (HighlightString string : highlightStrings) {
 			if (string.needsUpdate()) {
-				client.getServerSettings().updateHighlightString(string);
+				settings.getHighlightConfigurationProvider().removeHighlightString(string.getOriginalHighlightString());
+				settings.getHighlightConfigurationProvider().addHighlightString(string);
 			}
 		}
 		
 		// God save us all
-		saveSettings();
+//		saveSettings();
 		
 		return true;
 	}
 	
-	protected void saveSettings ()
-	{
-		client.getServerSettings().saveHighlightStrings();
-	}
+//	protected void saveSettings ()
+//	{
+//		client.getServerSettings().saveHighlightStrings();
+//	}
 }

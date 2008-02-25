@@ -139,22 +139,6 @@
          </enabledWhen>
       </page>
       <page
-            category="cc.warlock.rcp.stormfront.ui.prefs.characterPrefs"
-            class="cc.warlock.rcp.stormfront.ui.prefs.HighlightNamesPreferencePage"
-            id="cc.warlock.rcp.stormfront.ui.prefs.highlightNames"
-            name="Highlight Names">
-         <enabledWhen>
-            <and>
-               <adapt
-                     type="cc.warlock.core.stormfront.client.IStormFrontClient">
-               </adapt>
-               <test
-                     property="cc.warlock.rcp.stormfront.clientConnected">
-               </test>
-            </and>
-         </enabledWhen>
-      </page>
-      <page
             category="cc.warlock.rcp.warlockPrefs"
             class="cc.warlock.rcp.stormfront.ui.prefs.AccountsPreferencePage"
             id="cc.warlock.rcp.stormfront.ui.prefs.accountsAndProfiles"
@@ -195,66 +179,6 @@
             properties="clientConnected,settingsLoaded"
             type="cc.warlock.rcp.ui.client.WarlockClientAdaptable">
       </propertyTester>
-   </extension>
-   <extension
-         point="org.eclipse.ui.navigator.navigatorContent">
-      <navigatorContent
-            contentProvider="cc.warlock.rcp.stormfront.ui.script.StormfrontScriptContentProvider"
-            icon="images/stormfront_scripts.gif"
-            id="cc.warlock.rcp.stormfront.navigator.stormfrontScripts"
-            labelProvider="cc.warlock.rcp.stormfront.ui.script.StormfrontScriptLabelProvider"
-            name="Stormfront Scripts">
-         <triggerPoints>
-            <or>
-               <instanceof
-                     value="cc.warlock.rcp.application.WarlockApplication">
-               </instanceof>
-               <instanceof
-                     value="cc.warlock.core.stormfront.serversettings.server.IServerScriptInfo">
-               </instanceof>
-            </or>
-         </triggerPoints>
-         <possibleChildren>
-            <or>
-               <instanceof
-                     value="cc.warlock.core.stormfront.serversettings.server.IServerScriptInfo">
-               </instanceof>
-            </or>
-         </possibleChildren>
-         <actionProvider
-               class="cc.warlock.rcp.stormfront.ui.script.StormfrontScriptActionProvider">
-         </actionProvider>
-         <commonSorter
-               class="cc.warlock.rcp.stormfront.ui.script.ServerScriptSorter"
-               id="cc.warlock.rcp.stormfront.navigator.stormfrontScriptSorter">
-         </commonSorter>
-      </navigatorContent>
-   </extension>
-   <extension
-         point="org.eclipse.ui.navigator.viewer">
-      <viewerContentBinding
-            viewerId="cc.warlock.rcp.views.scriptNavigatorView">
-         <includes>
-            <contentExtension
-                  pattern="cc.warlock.rcp.stormfront.navigator.stormfrontScripts">
-            </contentExtension></includes>
-      </viewerContentBinding>
-   </extension>
-   <extension
-         point="org.eclipse.ui.elementFactories">
-      <factory
-            class="cc.warlock.rcp.stormfront.ui.script.ServerScriptPersistableFactory"
-            id="cc.warlock.rcp.stormfront.serverScriptPersistableFactory">
-      </factory>
-   </extension>
-   <extension
-         point="org.eclipse.ui.editors.documentProviders">
-      <provider
-            class="cc.warlock.rcp.stormfront.ui.script.ServerScriptDocumentProvider"
-            extensions="cmd,wiz"
-            id="cc.warlock.rcp.stormfront.ui.script.ServerScriptDocumentProvider"
-            inputTypes="cc.warlock.rcp.stormfront.ui.script.ServerScriptEditorInput">
-      </provider>
    </extension>
 
 </plugin>

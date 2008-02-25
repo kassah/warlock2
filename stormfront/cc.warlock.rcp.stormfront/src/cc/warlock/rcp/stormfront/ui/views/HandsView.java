@@ -45,9 +45,9 @@ import cc.warlock.core.client.IWarlockClient;
 import cc.warlock.core.client.WarlockClientAdapter;
 import cc.warlock.core.client.WarlockClientRegistry;
 import cc.warlock.core.client.internal.ClientProperty;
+import cc.warlock.core.client.settings.IWindowSettings;
 import cc.warlock.core.stormfront.client.IStormFrontClient;
-import cc.warlock.core.stormfront.serversettings.server.ServerSettings;
-import cc.warlock.core.stormfront.serversettings.server.WindowSettings;
+import cc.warlock.core.stormfront.settings.IStormFrontClientSettings;
 import cc.warlock.rcp.stormfront.ui.StormFrontSharedImages;
 import cc.warlock.rcp.ui.client.SWTPropertyListener;
 import cc.warlock.rcp.util.ColorUtil;
@@ -232,7 +232,7 @@ public class HandsView extends ViewPart implements IPropertyListener<String>
 			propertyChanged(client.getLeftHand(), null);
 			propertyChanged(client.getRightHand(), null);
 			propertyChanged(client.getCurrentSpell(), null);
-			loadServerSettings(client.getServerSettings());
+			loadSettings(client.getStormFrontClientSettings());
 		}
 	}
 
@@ -248,11 +248,11 @@ public class HandsView extends ViewPart implements IPropertyListener<String>
 		spellInfo.setForeground(fg);
 	}
 	
-	public void loadServerSettings (ServerSettings settings)
+	public void loadSettings (IStormFrontClientSettings settings)
 	{
 		if(settings == null)
 			return;
-		WindowSettings mainSettings = settings.getMainWindowSettings();
+		IWindowSettings mainSettings = settings.getMainWindowSettings();
 		if(mainSettings == null)
 			return;
 		Color bg = ColorUtil.warlockColorToColor(mainSettings.getBackgroundColor());

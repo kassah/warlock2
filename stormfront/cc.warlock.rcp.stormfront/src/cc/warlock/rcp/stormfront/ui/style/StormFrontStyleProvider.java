@@ -21,56 +21,68 @@
  */
 package cc.warlock.rcp.stormfront.ui.style;
 
-import org.eclipse.core.runtime.Platform;
 import org.eclipse.jface.resource.JFaceResources;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.graphics.Font;
 import org.eclipse.swt.widgets.Display;
 
+import cc.warlock.core.client.IWarlockClient;
 import cc.warlock.core.client.IWarlockStyle;
 import cc.warlock.core.client.WarlockColor;
-import cc.warlock.core.stormfront.serversettings.server.ServerSettings;
+import cc.warlock.core.client.WarlockFont;
+import cc.warlock.core.stormfront.client.IStormFrontClient;
+import cc.warlock.core.stormfront.settings.IStormFrontClientSettings;
 import cc.warlock.rcp.ui.StyleRangeWithData;
 import cc.warlock.rcp.ui.style.DefaultStyleProvider;
 import cc.warlock.rcp.util.ColorUtil;
 
 public class StormFrontStyleProvider extends DefaultStyleProvider {
 
-	protected ServerSettings settings;
+	protected IStormFrontClientSettings settings;
 	
-	public StormFrontStyleProvider (ServerSettings settings)
+	public StormFrontStyleProvider (IStormFrontClientSettings settings)
 	{
 		this.settings = settings;
 	}
 	
-	public StyleRangeWithData getStyleRange (IWarlockStyle style)
+	public StyleRangeWithData getStyleRange (IWarlockClient client, IWarlockStyle style)
 	{
 		Display display = Display.getDefault();
-		StyleRangeWithData range = super.getStyleRange(style);
+		StyleRangeWithData range = super.getStyleRange(client, style);
+		
+		IStormFrontClient sfClient = (IStormFrontClient)client;
+		
+		if (style.getName() != null)
+		{
+			if (style.getBackgroundColor().equals(WarlockColor.DEFAULT_COLOR)) {
+				WarlockColor color = sfClient.getStormFrontSkin().getDefaultBackgroundColor(style.getName());
+				if (color != WarlockColor.DEFAULT_COLOR)
+					range.background = ColorUtil.warlockColorToColor(color);
+			}
+			if (style.getForegroundColor().equals(WarlockColor.DEFAULT_COLOR)) {
+				WarlockColor color = sfClient.getStormFrontSkin().getDefaultForegroundColor(style.getName());
+				if (color != WarlockColor.DEFAULT_COLOR)
+					range.foreground = ColorUtil.warlockColorToColor(color);
+			}
+		}
 		
 		if (style.getStyleTypes().contains(IWarlockStyle.StyleType.MONOSPACE))
 		{
-			String monoFontFace = settings.getMainWindowSettings().getColumnFontFace();
-			int monoFontSize = settings.getMainWindowSettings().getColumnFontSizeInPoints();
-			if (Platform.getOS().equals(Platform.OS_MACOSX)) {
-				monoFontSize = settings.getMainWindowSettings().getColumnFontSizeInPixels();
-			}
-			if (monoFontFace != null)
+			WarlockFont columnFont = settings.getMainWindowSettings().getColumnFont();
+//			if (Platform.getOS().equals(Platform.OS_MACOSX)) {
+//				monoFontSize = settings.getMainWindowSettings().getColumnFontSizeInPixels();
+//			}
+			if (columnFont != null)
 			{
-				if (JFaceResources.getFontRegistry().hasValueFor(monoFontFace))
+				String monoFontFace = columnFont.getFamilyName();
+				int monoFontSize = columnFont.getSize();
+				
+				if (!columnFont.isDefaultFont() && JFaceResources.getFontRegistry().hasValueFor(monoFontFace))
 				{
 					range.font = new Font(display, monoFontFace, monoFontSize, SWT.NONE);
 				}
 			}
 		}
-		
-		WarlockColor foreground = style.getFGColor();
-		WarlockColor background = style.getBGColor();
-		
-		if (foreground != null && foreground != WarlockColor.DEFAULT_COLOR)
-			range.foreground = ColorUtil.warlockColorToColor(foreground);
-		if (background != null && background != WarlockColor.DEFAULT_COLOR)
-			range.background = ColorUtil.warlockColorToColor(background);
 		
 		return range;
 	}

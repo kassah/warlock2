@@ -37,7 +37,7 @@ import cc.warlock.core.client.ICharacterStatus;
 import cc.warlock.core.client.IProperty;
 import cc.warlock.core.client.IPropertyListener;
 import cc.warlock.core.stormfront.client.IStormFrontClient;
-import cc.warlock.core.stormfront.serversettings.server.ServerSettings;
+import cc.warlock.core.stormfront.settings.IStormFrontClientSettings;
 import cc.warlock.rcp.ui.client.SWTPropertyListener;
 import cc.warlock.rcp.util.ColorUtil;
 
@@ -181,7 +181,7 @@ public class StormFrontStatus implements IPropertyListener<String> {
 		}
 	}
 	
-	public void loadServerSettings (ServerSettings settings)
+	public void loadSettings (IStormFrontClientSettings settings)
 	{
 		if (settings.getMainWindowSettings() == null) return;
 		
@@ -207,6 +207,6 @@ public class StormFrontStatus implements IPropertyListener<String> {
 			propertyChanged(client.getCharacterStatus(), null);
 		}
 		
-		loadServerSettings(client.getServerSettings());
+		loadSettings(client.getStormFrontClientSettings());
 	}
 }
