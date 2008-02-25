@@ -27,6 +27,7 @@ package cc.warlock.core.client;
 import java.io.IOException;
 import java.util.Collection;
 
+import cc.warlock.core.client.settings.IClientSettings;
 import cc.warlock.core.network.IConnection;
 
 /**
@@ -112,23 +113,6 @@ public interface IWarlockClient extends IRoomListener {
 	 */
 	public IWarlockStyle getCommandStyle();
 	
-	/**
-	 * add a highlight provider
-	 * @param highlightProvider provider to add
-	 */
-	public void addHighlightProvider(IHighlightProvider highlightProvider);
-	
-	/**
-	 * remove a highlight provider
-	 * @param highlightProvider
-	 */
-	public void removeHighlightProvider(IHighlightProvider highlightProvider);
-	
-	/**
-	 * @return combination of highlight strings from all of the highlight providers
-	 */
-	public Collection<IHighlightString> getHighlightStrings();
-	
 	public void flushStreams();
 	
 	/**
@@ -136,7 +120,16 @@ public interface IWarlockClient extends IRoomListener {
 	 */
 	public Collection<IStream> getStreams();
 	
+	/**
+	 * Listen when the client has received a "nextRoom" event
+	 * @param roomListener 
+	 */
 	public void addRoomListener(IRoomListener roomListener);
+	
+	/**
+	 * Remove a room listener
+	 * @param roomListener
+	 */
 	public void removeRoomListener(IRoomListener roomListener);
 	
 	/**
@@ -144,4 +137,14 @@ public interface IWarlockClient extends IRoomListener {
 	 */
 	public IProperty<ICompass> getCompass();
 	
+	/**
+	 * see IClientSettings 
+	 * @return the settings for this client 
+	 */
+	public IClientSettings getClientSettings();
+	
+	/**
+	 * @return A unique string identifying this client (this string should be a constant that can be restored from at a later time)
+	 */
+	public IProperty<String> getClientId();
 }

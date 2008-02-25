@@ -107,4 +107,9 @@ public class WarlockColor {
 		}
 		return super.equals(obj);
 	}
+	
+	@Override
+	public String toString() {
+		return toHexString() + " (r: " + red + ", g: " + green + ", b: " + blue +")";
+	}
 }

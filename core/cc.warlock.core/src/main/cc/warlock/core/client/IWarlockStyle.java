@@ -21,6 +21,7 @@
  */
 package cc.warlock.core.client;
 
+import java.net.URL;
 import java.util.Collection;
 
 /**
@@ -36,19 +37,22 @@ public interface IWarlockStyle {
 	
 	public Collection<StyleType> getStyleTypes();
 	
-	public Runnable getAction();
+	public URL getLinkAddress();
+	public String getCommand();
+	public boolean commandVisible();
 	
-	public WarlockColor getFGColor();
-	public WarlockColor getBGColor();
+	public WarlockColor getForegroundColor();
+	public WarlockColor getBackgroundColor();
 	public boolean isFullLine();
 	public String getName();
 	
 	public void addStyleType (StyleType styleType);
 
-	public void setAction(Runnable action);
+	public void setLinkAddress(URL linkAddress);
+	public void setCommand(String command, boolean visible);
 	
-	public void setFGColor(WarlockColor color);
-	public void setBGColor(WarlockColor color);
+	public void setForegroundColor(WarlockColor color);
+	public void setBackgroundColor(WarlockColor color);
 	public void setFullLine(boolean fullLine);
 	public void setName(String name);
 }

@@ -21,6 +21,8 @@
  */
 package cc.warlock.core.client.internal;
 
+import java.net.MalformedURLException;
+import java.net.URL;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
@@ -31,24 +33,67 @@ import cc.warlock.core.client.WarlockColor;
 
 public class WarlockStyle implements IWarlockStyle {
 
+	private URL linkAddress;
 	private Collection<StyleType> styleTypes;
-	private WarlockColor foregroundColor;
-	private WarlockColor backgroundColor;
+	private WarlockColor foregroundColor = WarlockColor.DEFAULT_COLOR;
+	private WarlockColor backgroundColor = WarlockColor.DEFAULT_COLOR;
 	private boolean fullLine;
 	private String name;
-	private Runnable action;
+	private String command;
+	private boolean commandVisible;
+	private IWarlockStyle originalStyle;
+	private boolean needsUpdate;
 	
-	public WarlockStyle (StyleType[] styleTypes) {
+	public WarlockStyle (StyleType[] styleTypes, URL linkAddress)
+	{
+		this.linkAddress = linkAddress;
 		this.styleTypes = new ArrayList<StyleType>();
 		this.styleTypes.addAll(Arrays.asList(styleTypes));
 	}
 	
-	public WarlockStyle () {
-		this.styleTypes = new ArrayList<StyleType>();
+	public WarlockStyle (StyleType[] styleTypes) {
+		this(styleTypes, null);
 	}
 	
-	public Runnable getAction() {
-		return action;
+	public WarlockStyle () {
+		this(new StyleType[] { });
+	}
+	
+	public WarlockStyle (IWarlockStyle other)
+	{
+		try {
+			this.linkAddress = other.getLinkAddress() == null ? null : new URL(other.getLinkAddress().toExternalForm());
+		} catch (MalformedURLException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		
+		this.backgroundColor = new WarlockColor(other.getBackgroundColor());
+		this.foregroundColor = new WarlockColor(other.getForegroundColor());
+		this.name = other.getName() == null ? null : new String(other.getName());
+		this.command = other.getCommand() == null ? null : new String(other.getCommand());
+		
+		this.styleTypes  = new ArrayList<StyleType>();
+		if (other.getStyleTypes() != null) styleTypes.addAll(other.getStyleTypes());
+		
+		this.originalStyle = other;
+	}
+	
+	public static WarlockStyle createBoldStyle ()
+	{
+		return new WarlockStyle(new StyleType[] { StyleType.BOLD }, null);
+	}
+	
+	public URL getLinkAddress() {
+		return linkAddress;
+	}
+	
+	public String getCommand() {
+		return command;
+	}
+	
+	public boolean commandVisible() {
+		return commandVisible;
 	}
 
 	public Collection<StyleType> getStyleTypes() {
@@ -61,11 +106,24 @@ public class WarlockStyle implements IWarlockStyle {
 	
 	public void addStyleType (StyleType styleType)
 	{
+		needsUpdate = true;
+		
 		styleTypes.add(styleType);
 	}
+
+	public void setLinkAddress(URL linkAddress) {
+		if (!linkAddress.equals(this.linkAddress))
+			needsUpdate = true;
+		
+		this.linkAddress = linkAddress;
+	}
 	
-	public void setAction(Runnable action) {
-		this.action = action;
+	public void setCommand(String command, boolean visible) {
+		if (!command.equals(this.command) || visible != this.commandVisible)
+			needsUpdate = true;
+		
+		this.command = command;
+		this.commandVisible = visible;
 	}
 	
 	public void inheritFrom(IWarlockStyle style) {
@@ -73,15 +131,23 @@ public class WarlockStyle implements IWarlockStyle {
 		if (style.getStyleTypes().contains(StyleType.MONOSPACE)
 			&& !styleTypes.contains(StyleType.MONOSPACE))
 		{
+			needsUpdate = true;
+			
 			styleTypes.add(StyleType.MONOSPACE);
 		}
 	}
 	
 	public void setFullLine(boolean fullLine) {
+		if (fullLine != this.fullLine)
+			needsUpdate = true;
+		
 		this.fullLine = fullLine;
 	}
 	
 	public void setName(String name) {
+		if (!name.equals(this.name))
+			needsUpdate = true;
+		
 		this.name = name;
 	}
 	
@@ -89,19 +155,35 @@ public class WarlockStyle implements IWarlockStyle {
 		return name;
 	}
 
-	public WarlockColor getFGColor() {
+	public WarlockColor getForegroundColor() {
 		return foregroundColor;
 	}
 
-	public void setFGColor(WarlockColor foregroundColor) {
+	public void setForegroundColor(WarlockColor foregroundColor) {
+		if (!foregroundColor.equals(this.foregroundColor))
+			needsUpdate = true;
+		
 		this.foregroundColor = foregroundColor;
 	}
 
-	public WarlockColor getBGColor() {
+	public WarlockColor getBackgroundColor() {
 		return backgroundColor;
 	}
 
-	public void setBGColor(WarlockColor backgroundColor) {
+	public void setBackgroundColor(WarlockColor backgroundColor) {
+		if (!backgroundColor.equals(this.backgroundColor))
+			needsUpdate = true;
+		
 		this.backgroundColor = backgroundColor;
+	}
+	
+	public boolean needsUpdate ()
+	{
+		return needsUpdate;
+	}
+	
+	public IWarlockStyle getOriginalStyle ()
+	{
+		return originalStyle;
 	}
 }

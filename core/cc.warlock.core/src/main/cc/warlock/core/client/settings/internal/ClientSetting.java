@@ -19,26 +19,47 @@
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
-/*
- * Created on Jan 16, 2005
- */
-package cc.warlock.core.client;
+package cc.warlock.core.client.settings.internal;
 
+import cc.warlock.core.client.settings.IClientSetting;
+import cc.warlock.core.client.settings.IClientSettingProvider;
 
 /**
- * @author Marshall
- *
- * IStreamListener implementations will subscribe to an IStream and receive an event when the Stream receives new data.
+ * The base implementation class for all client settings
+ * @author marshall
  */
-public interface IStreamListener {
-	public void streamReceivedText (IStream stream, WarlockString text);
+public class ClientSetting implements IClientSetting {
+
+	protected IClientSettingProvider provider;
+	protected ClientSetting originalSetting;
+	protected boolean needsUpdate;
 	
-	public void streamPrompted (IStream stream, String prompt);
-	public void streamReceivedCommand (IStream stream, String text);
+	public ClientSetting (IClientSettingProvider provider)
+	{
+		this.provider = provider;
+	}
 	
-	public void streamEchoed (IStream stream, String text);
+	public ClientSetting (ClientSetting other)
+	{
+		this.provider = other.provider;
+		this.originalSetting = other;
+	}
 	
-	public void streamCleared (IStream stream);
+	/* (non-Javadoc)
+	 * @see cc.warlock.core.client.settings.IClientSetting#getProvider()
+	 */
+	public IClientSettingProvider getProvider() {
+		return provider;
+	}
 	
-	public void streamFlush (IStream stream);
+	public ClientSetting getOriginalSetting ()
+	{
+		return originalSetting;
+	}
+	
+	public boolean needsUpdate ()
+	{
+		return needsUpdate;
+	}
+
 }

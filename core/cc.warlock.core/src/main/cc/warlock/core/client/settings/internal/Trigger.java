@@ -19,26 +19,40 @@
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
-/*
- * Created on Jan 16, 2005
- */
-package cc.warlock.core.client;
+package cc.warlock.core.client.settings.internal;
 
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
-/**
- * @author Marshall
- *
- * IStreamListener implementations will subscribe to an IStream and receive an event when the Stream receives new data.
- */
-public interface IStreamListener {
-	public void streamReceivedText (IStream stream, WarlockString text);
+import cc.warlock.core.client.settings.ITrigger;
+import cc.warlock.core.client.settings.ITriggerProvider;
+
+public class Trigger extends PatternSetting implements ITrigger {
+
+	protected Pattern triggerPattern;
 	
-	public void streamPrompted (IStream stream, String prompt);
-	public void streamReceivedCommand (IStream stream, String text);
+	public Trigger (ITriggerProvider provider, String pattern, boolean literal, boolean caseSensitive)
+	{
+		super(provider, pattern, literal, caseSensitive);
+	}
 	
-	public void streamEchoed (IStream stream, String text);
+	public Trigger (ITriggerProvider provider, Pattern triggerPattern)
+	{
+		super(provider, triggerPattern);
+	}
 	
-	public void streamCleared (IStream stream);
+	public Trigger (Trigger other)
+	{
+		super(other);
+	}
 	
-	public void streamFlush (IStream stream);
+	public boolean isTriggered(String text) {
+		Matcher matcher = triggerPattern.matcher(text);
+		return matcher.find();
+	}
+
+	public Trigger getOriginalTrigger ()
+	{
+		return (Trigger) originalSetting;
+	}
 }

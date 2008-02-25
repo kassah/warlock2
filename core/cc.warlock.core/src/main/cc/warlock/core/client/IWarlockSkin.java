@@ -41,4 +41,10 @@ public interface IWarlockSkin {
 	public WarlockColor getColor (ColorType type);
 	
 	public String getFontFace (FontFaceType type);
+	
+	public WarlockColor getDefaultWindowForeground();
+	public WarlockColor getDefaultWindowBackground();
+	
+	public WarlockColor getDefaultForegroundColor (String styleName);
+	public WarlockColor getDefaultBackgroundColor (String styleName);
 }

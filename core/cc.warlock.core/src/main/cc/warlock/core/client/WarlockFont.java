@@ -19,26 +19,41 @@
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
-/*
- * Created on Jan 16, 2005
- */
 package cc.warlock.core.client;
 
+public class WarlockFont {
 
-/**
- * @author Marshall
- *
- * IStreamListener implementations will subscribe to an IStream and receive an event when the Stream receives new data.
- */
-public interface IStreamListener {
-	public void streamReceivedText (IStream stream, WarlockString text);
+	public static final WarlockFont DEFAULT_FONT = new WarlockFont();
+	static {
+		DEFAULT_FONT.setFamilyName("default");
+		DEFAULT_FONT.setSize(-1);
+	}
 	
-	public void streamPrompted (IStream stream, String prompt);
-	public void streamReceivedCommand (IStream stream, String text);
+	protected String familyName;
+	protected int size;
 	
-	public void streamEchoed (IStream stream, String text);
+	public WarlockFont () { }
+	public WarlockFont (WarlockFont other)
+	{
+		this.familyName = new String(other.familyName);
+		this.size = other.size;
+	}
 	
-	public void streamCleared (IStream stream);
+	public String getFamilyName() {
+		return familyName;
+	}
+	public void setFamilyName(String familyName) {
+		this.familyName = familyName;
+	}
+	public int getSize() {
+		return size;
+	}
+	public void setSize(int size) {
+		this.size = size;
+	}
 	
-	public void streamFlush (IStream stream);
+	public boolean isDefaultFont()
+	{
+		return this == DEFAULT_FONT;
+	}
 }

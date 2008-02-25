@@ -54,6 +54,4 @@ public interface IStream {
 	public void removeStreamListener(IStreamListener listener);
 	
 	public IWarlockClient getClient();
-	
-	public void updateComponent(String id, String text);
 }

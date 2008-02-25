@@ -19,10 +19,11 @@
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
-package cc.warlock.core.client;
+package cc.warlock.core.client.settings;
 
-import java.util.Collection;
+import java.util.List;
 
-public interface IHighlightProvider {
-	public Collection<? extends IHighlightString> getHighlightStrings();
+public interface ITriggerProvider extends IClientSettingProvider {
+
+	public List<? extends ITrigger> getTriggers();
 }

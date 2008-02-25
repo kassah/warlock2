@@ -19,26 +19,22 @@
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
-/*
- * Created on Jan 16, 2005
- */
-package cc.warlock.core.client;
+package cc.warlock.core.client.settings.macro;
+
+import java.util.Collection;
+import java.util.List;
+
+import cc.warlock.core.client.settings.IClientSettingProvider;
 
 
-/**
- * @author Marshall
- *
- * IStreamListener implementations will subscribe to an IStream and receive an event when the Stream receives new data.
- */
-public interface IStreamListener {
-	public void streamReceivedText (IStream stream, WarlockString text);
+public interface IMacroProvider extends IClientSettingProvider {
+	public List<? extends IMacro> getMacros();
 	
-	public void streamPrompted (IStream stream, String prompt);
-	public void streamReceivedCommand (IStream stream, String text);
+	public IMacro getMacro (int keycode, int modifiers);
+
+	public IMacroVariable getMacroVariable (String id);
+	public Collection<IMacroVariable> getMacroVariables();
 	
-	public void streamEchoed (IStream stream, String text);
-	
-	public void streamCleared (IStream stream);
-	
-	public void streamFlush (IStream stream);
+	public IMacroCommand getMacroCommand (String id);
+	public Collection<IMacroCommand> getMacroCommands();
 }

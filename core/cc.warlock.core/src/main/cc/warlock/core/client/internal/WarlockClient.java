@@ -28,17 +28,16 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
-import java.util.HashSet;
 
 import cc.warlock.core.client.ICommandHistory;
 import cc.warlock.core.client.ICompass;
-import cc.warlock.core.client.IHighlightProvider;
-import cc.warlock.core.client.IHighlightString;
 import cc.warlock.core.client.IProperty;
 import cc.warlock.core.client.IRoomListener;
 import cc.warlock.core.client.IStream;
 import cc.warlock.core.client.IWarlockClient;
 import cc.warlock.core.client.IWarlockClientViewer;
+import cc.warlock.core.client.settings.IClientSettings;
+import cc.warlock.core.client.settings.internal.ClientSettings;
 import cc.warlock.core.network.IConnection;
 
 
@@ -51,13 +50,20 @@ public abstract class WarlockClient implements IWarlockClient {
 	protected ArrayList<IWarlockClientViewer> viewers;
 	protected ICommandHistory commandHistory = new CommandHistory();
 	protected String streamPrefix;
-	protected HashSet<IHighlightProvider> highlightProviders = new HashSet<IHighlightProvider>();
 	private Collection<IRoomListener> roomListeners = Collections.synchronizedCollection(new ArrayList<IRoomListener>());
 	protected ClientProperty<ICompass> compass = new ClientProperty<ICompass>(this, "compass", null);
+	protected IClientSettings clientSettings;
 	
 	public WarlockClient () {
 		viewers = new ArrayList<IWarlockClientViewer>();
 		streamPrefix = "client:" + hashCode() + ":";
+		
+		clientSettings = createClientSettings();
+	}
+	
+	protected IClientSettings createClientSettings ()
+	{
+		return new ClientSettings(this);
 	}
 	
 	// IWarlockClient methods
@@ -116,24 +122,6 @@ public abstract class WarlockClient implements IWarlockClient {
 		return connection;
 	}
 	
-	public void addHighlightProvider(IHighlightProvider highlightProvider) {
-		highlightProviders.add(highlightProvider);
-	}
-	
-	public void removeHighlightProvider(IHighlightProvider highlightProvider) {
-		highlightProviders.remove(highlightProvider);
-	}
-	
-	public Collection<IHighlightString> getHighlightStrings() {
-		ArrayList<IHighlightString> strings = new ArrayList<IHighlightString>();
-		
-		for(IHighlightProvider highlightProvider : highlightProviders) {
-			strings.addAll(highlightProvider.getHighlightStrings());
-		}
-		
-		return strings;
-	}
-	
 	public Collection<IStream> getStreams() {
 		Collection<IStream> streams = new ArrayList<IStream>();
 		for(IStream stream : Stream.getStreams()) {
@@ -171,6 +159,10 @@ public abstract class WarlockClient implements IWarlockClient {
 	
 	public IProperty<ICompass> getCompass() {
 		return compass;
+	}
+	
+	public IClientSettings getClientSettings() {
+		return clientSettings;
 	}
 	
 }

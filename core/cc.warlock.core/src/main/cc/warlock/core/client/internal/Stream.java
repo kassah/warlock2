@@ -27,7 +27,6 @@ package cc.warlock.core.client.internal;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Hashtable;
-import java.util.WeakHashMap;
 import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReentrantReadWriteLock;
 
@@ -212,21 +211,5 @@ public class Stream implements IStream {
 	
 	public void setView(boolean view) {
 		hasView = view;
-	}
-	
-	public void updateComponent(String id, String text) {
-		readLock.lock();
-		try {
-			for (IStreamListener listener : listeners)
-			{
-				try {
-					listener.componentUpdated(this, id, text);
-				} catch (Throwable t) {
-					t.printStackTrace();
-				}
-			}
-		} finally {
-			readLock.unlock();
-		}
 	}
 }

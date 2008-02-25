@@ -19,26 +19,10 @@
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
-/*
- * Created on Jan 16, 2005
- */
-package cc.warlock.core.client;
+package cc.warlock.core.client.settings;
 
+import cc.warlock.core.client.IWarlockStyle;
 
-/**
- * @author Marshall
- *
- * IStreamListener implementations will subscribe to an IStream and receive an event when the Stream receives new data.
- */
-public interface IStreamListener {
-	public void streamReceivedText (IStream stream, WarlockString text);
-	
-	public void streamPrompted (IStream stream, String prompt);
-	public void streamReceivedCommand (IStream stream, String text);
-	
-	public void streamEchoed (IStream stream, String text);
-	
-	public void streamCleared (IStream stream);
-	
-	public void streamFlush (IStream stream);
+public interface IHighlightString extends IPatternSetting {
+	public IWarlockStyle getStyle();
 }

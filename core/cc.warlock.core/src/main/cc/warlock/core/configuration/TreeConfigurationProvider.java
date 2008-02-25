@@ -49,13 +49,24 @@ public abstract class TreeConfigurationProvider implements
 	{
 		childProviders.add(provider);
 		
-		for (Iterator<Element> iter = unhandledElements.iterator(); iter.hasNext(); )
+		parseUnhandledElements();
+	}
+	
+	protected void parseUnhandledElements ()
+	{
+		if (handleChildren)
 		{
-			Element element = iter.next();
-			if (provider.supportsElement(element))
+			for (Iterator<Element> iter = unhandledElements.iterator(); iter.hasNext(); )
 			{
-				provider.parseElement(element);
-				iter.remove();
+				Element element = iter.next();
+				for (IConfigurationProvider provider : childProviders)
+				{
+					if (provider.supportsElement(element))
+					{
+						provider.parseElement(element);
+						iter.remove();
+					}
+				}
 			}
 		}
 	}
@@ -74,15 +85,7 @@ public abstract class TreeConfigurationProvider implements
 			{
 				unhandledElements.add(subElement);
 				
-				for (IConfigurationProvider provider : childProviders)
-				{
-					if (provider.supportsElement(subElement))
-					{
-						provider.parseElement(subElement);
-						unhandledElements.remove(subElement);
-						break;
-					}
-				}
+				parseUnhandledElements();
 			} else {
 				parseChild(subElement);
 			}

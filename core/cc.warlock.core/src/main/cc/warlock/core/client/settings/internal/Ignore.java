@@ -19,26 +19,40 @@
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
-/*
- * Created on Jan 16, 2005
- */
-package cc.warlock.core.client;
+package cc.warlock.core.client.settings.internal;
 
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
-/**
- * @author Marshall
- *
- * IStreamListener implementations will subscribe to an IStream and receive an event when the Stream receives new data.
- */
-public interface IStreamListener {
-	public void streamReceivedText (IStream stream, WarlockString text);
+import cc.warlock.core.client.settings.IIgnore;
+import cc.warlock.core.client.settings.IIgnoreProvider;
+
+public class Ignore extends PatternSetting implements IIgnore {
+
+	protected Pattern ignorePattern;
 	
-	public void streamPrompted (IStream stream, String prompt);
-	public void streamReceivedCommand (IStream stream, String text);
+	public Ignore (IIgnoreProvider provider, String pattern, boolean literal, boolean caseSensitive)
+	{
+		super(provider, pattern, literal, caseSensitive);
+	}
 	
-	public void streamEchoed (IStream stream, String text);
+	public Ignore (IIgnoreProvider provider, Pattern pattern)
+	{
+		super(provider, pattern);
+	}
 	
-	public void streamCleared (IStream stream);
+	public Ignore (Ignore other)
+	{
+		super(other);
+	}
 	
-	public void streamFlush (IStream stream);
+	public boolean isIgnored(String text) {
+		Matcher matcher = ignorePattern.matcher(text);
+		return matcher.find();
+	}
+	
+	public Ignore getOriginalIgnore ()
+	{
+		return (Ignore) originalSetting;
+	}
 }
