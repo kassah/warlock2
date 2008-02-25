@@ -497,10 +497,10 @@ public class WarlockText implements LineBackgroundListener {
 		StyleRangeWithData styleRange = (StyleRangeWithData)StyleProviders.getStyleProvider(client).getStyleRange(client, range.style);
 		if(styleRange == null)
 			return null;
-		if(range.style.getForegroundColor() != null && styleRange.foreground == null)
-			styleRange.foreground = ColorUtil.warlockColorToColor(range.style.getForegroundColor());
-		if(range.style.getBackgroundColor() != null && styleRange.background == null)
-			styleRange.background = ColorUtil.warlockColorToColor(range.style.getBackgroundColor());
+//		if(range.style.getForegroundColor() != null && styleRange.foreground == null)
+//			styleRange.foreground = ColorUtil.warlockColorToColor(range.style.getForegroundColor());
+//		if(range.style.getBackgroundColor() != null && styleRange.background == null)
+//			styleRange.background = ColorUtil.warlockColorToColor(range.style.getBackgroundColor());
 		if(range.style.isFullLine()) {
 			int lineNum = textWidget.getLineAtOffset(offset + range.start);
 			styleRange.start = textWidget.getOffsetAtLine(lineNum);
