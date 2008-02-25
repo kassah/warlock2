@@ -322,8 +322,15 @@ public class StormFrontGameView extends GameView implements IStormFrontClientVie
 			}
 		});
 		
-		WarlockColor bg = settings.getMainWindowSettings().getBackgroundColor();
-		WarlockColor fg = settings.getMainWindowSettings().getForegroundColor();
+		WarlockColor bg =
+			settings.getMainWindowSettings().getBackgroundColor() == WarlockColor.DEFAULT_COLOR ?
+			client.getSkin().getDefaultWindowBackground() :
+			settings.getMainWindowSettings().getBackgroundColor();
+			
+		WarlockColor fg =
+			settings.getMainWindowSettings().getForegroundColor() == WarlockColor.DEFAULT_COLOR ?
+			client.getSkin().getDefaultWindowForeground() :
+			settings.getMainWindowSettings().getForegroundColor();
 		
 		WarlockFont mainFont = settings.getMainWindowSettings().getFont();
 		String fontFace = mainFont.getFamilyName();

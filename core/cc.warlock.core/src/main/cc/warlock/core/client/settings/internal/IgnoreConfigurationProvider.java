@@ -67,7 +67,6 @@ public class IgnoreConfigurationProvider extends ClientConfigurationProvider
 			iElement.addAttribute("pattern", ignore.getPattern().pattern());
 			iElement.addAttribute("literal", ""+ignore.isLiteral());
 			iElement.addAttribute("caseSensitive", ""+ignore.isCaseSensitive());
-			elements.add(iElement);
 		}
 		
 		elements.add(ignoresElement);
