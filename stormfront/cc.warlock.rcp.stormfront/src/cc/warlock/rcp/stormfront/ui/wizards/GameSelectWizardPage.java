@@ -118,18 +118,18 @@ public class GameSelectWizardPage extends WizardPage {
 				setVisible(false);
 			}
 		});
-		gamesViewer.addFilter(new ViewerFilter() {
-			public boolean select(Viewer viewer, Object parentElement, Object element) {
-				ISGEGame game = (ISGEGame) element;
-				
-				if (game.getAccountStatus() == ISGEGame.AccountStatus.Normal
-					|| game.getAccountStatus() == ISGEGame.AccountStatus.Trial)
-				{
-					return true;
-				}
-				return false;
-			}
-		});
+//		gamesViewer.addFilter(new ViewerFilter() {
+//			public boolean select(Viewer viewer, Object parentElement, Object element) {
+//				ISGEGame game = (ISGEGame) element;
+//				
+//				if (game.getAccountStatus() == ISGEGame.AccountStatus.Normal
+//					|| game.getAccountStatus() == ISGEGame.AccountStatus.Trial)
+//				{
+//					return true;
+//				}
+//				return false;
+//			}
+//		});
 		
 		setControl(controls);
 	}
