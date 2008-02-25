@@ -39,7 +39,7 @@ public class LeftTagHandler extends DefaultTagHandler {
 	}
 
 	@Override
-	public void handleStart(StormFrontAttributeList attributes, String rawXML) {
+	public void handleStart(StormFrontAttributeList attributes) {
 		leftHandText = new StringBuffer();
 	}
 	
@@ -51,7 +51,7 @@ public class LeftTagHandler extends DefaultTagHandler {
 	}
 	
 	@Override
-	public void handleEnd(String rawXML) {
+	public void handleEnd() {
 		handler.getClient().getLeftHand().set(leftHandText.toString());
 		
 		leftHandText = null;

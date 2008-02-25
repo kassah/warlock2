@@ -43,14 +43,14 @@ public class PushBoldTagHandler extends DefaultTagHandler {
 	}
 	
 	@Override
-	public void handleEnd(String rawXML) {
+	public void handleEnd() {
 		if(style != null) {
 			handler.removeStyle(style);
 			style = null;
 		}
 		if (getCurrentTag().equals("pushBold"))
 		{
-			style = handler.getClient().getServerSettings().getPreset("bold").getStyle();
+			style = handler.getClient().getClientSettings().getNamedStyle("bold");
 			handler.addStyle(style);
 		}
 		
@@ -60,6 +60,30 @@ public class PushBoldTagHandler extends DefaultTagHandler {
 		//		handler.removeStyle(style);
 		//		style = null;
 		//	}
+			// we'll need to figure out another way to auto linkify http links
+//			IStyledString buffer = handler.peekBuffer();
+//			
+//			style.setLength(buffer.getBuffer().length());
+//			buffer.addStyle(style);
+//			
+//			String matchText = buffer.getBuffer().toString();
+//			
+//			Matcher linkMatcher = linkPattern.matcher(matchText.trim());
+//			if (linkMatcher.matches())
+//			{
+//				style.addStyleType(IWarlockStyle.StyleType.LINK);
+//				String address = linkMatcher.group();
+//				if (address.startsWith("www")) { address = "http://" + address; }
+//				
+//				try {
+//					style.setLinkAddress(new URL(address));
+//				} catch (MalformedURLException e) {
+//					e.printStackTrace();
+//				}
+//			}
+//			
+//			handler.sendAndPopBuffer();
+//		}
 	}
 	
 	@Override

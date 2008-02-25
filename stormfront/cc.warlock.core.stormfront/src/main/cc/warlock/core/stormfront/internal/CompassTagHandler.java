@@ -54,7 +54,7 @@ public class CompassTagHandler extends DefaultTagHandler {
 	}
 
 	@Override
-	public void handleStart(StormFrontAttributeList attributes, String rawXML) {
+	public void handleStart(StormFrontAttributeList attributes) {
 		compass = new Compass();
 	}
 	
@@ -66,7 +66,7 @@ public class CompassTagHandler extends DefaultTagHandler {
 	}
 	
 	@Override
-	public void handleEnd(String rawXML) {
+	public void handleEnd() {
 		handler.getClient().getCompass().set(compass);
 	}
 }

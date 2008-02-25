@@ -19,15 +19,13 @@
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
-package cc.warlock.core.stormfront.serversettings.server;
+package cc.warlock.core.stormfront.settings.server;
 
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.io.InputStream;
-import java.io.InputStreamReader;
-import java.net.URL;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
@@ -37,25 +35,29 @@ import java.util.List;
 import java.util.ListIterator;
 import java.util.Map;
 
-import cc.warlock.core.client.IHighlightProvider;
-import cc.warlock.core.client.IHighlightString;
-import cc.warlock.core.client.IWarlockClientViewer;
+import cc.warlock.core.client.IWarlockStyle;
+import cc.warlock.core.client.settings.IHighlightString;
 import cc.warlock.core.configuration.ConfigurationUtil;
 import cc.warlock.core.script.ScriptEngineRegistry;
 import cc.warlock.core.stormfront.client.IStormFrontClient;
-import cc.warlock.core.stormfront.client.IStormFrontClientViewer;
-import cc.warlock.core.stormfront.serversettings.skin.IStormFrontSkin;
+import cc.warlock.core.stormfront.settings.StormFrontServerSettings;
+import cc.warlock.core.stormfront.settings.skin.IStormFrontSkin;
 import cc.warlock.core.stormfront.xml.StormFrontDocument;
 import cc.warlock.core.stormfront.xml.StormFrontElement;
 
-
-public class ServerSettings implements Comparable<ServerSettings>, IHighlightProvider
+@Deprecated
+public class ServerSettings implements Comparable<ServerSettings>
 {
 	public static final String WINDOW_MAIN = "smain";
 	public static final String WINDOW_INVENTORY = "sinv";
 	public static final String WINDOW_SPELLS = "sSpells";
 	public static final String WINDOW_DEATHS = "sdeath";
 	public static final String WINDOW_THOUGHTS = "sthoughts";
+	public static final String WINDOW_ROOM = "sroom";
+	public static final String WINDOW_NEWS = "snews";
+	public static final String WINDOW_CHAR_SHEET = "scharsheet";
+	public static final String WINDOW_FAMILIAR = "sfamiliar";
+	public static final String WINDOW_CONTAINER_STOW = "cstow";
 	
 	public static final String SETTING_UPDATE_PREFIX = "<stgupd>";
 	public static final String IGNORES_TEXT = "<<m><ignores disable=\"n\"></ignores><ignores disable=\"n\"></ignores></<m>";
@@ -89,15 +91,6 @@ public class ServerSettings implements Comparable<ServerSettings>, IHighlightPro
 		
 		scriptProvider = new ServerScriptProvider(client);
 		ScriptEngineRegistry.addScriptProvider(scriptProvider);
-		
-		client.addHighlightProvider(this);
-	}
-	
-	public ServerSettings (IStormFrontClient client, String playerId)
-	{
-		this(client);
-		
-		load(playerId);
 	}
 	
 	public static StormFrontDocument getDocument (String playerId)
@@ -152,12 +145,11 @@ public class ServerSettings implements Comparable<ServerSettings>, IHighlightPro
 			listeners.remove(listener);
 	}
 	
-	public void load (String playerId)
+	public void load (String playerId, InputStream stream)
 	{
 		this.playerId = playerId;
 		
 		try {
-			FileInputStream stream = new FileInputStream(ConfigurationUtil.getConfigurationFile("serverSettings_" + playerId + ".xml"));
 			document = new StormFrontDocument(stream);
 			
 			loadPalette();
@@ -176,16 +168,16 @@ public class ServerSettings implements Comparable<ServerSettings>, IHighlightPro
 			loadIgnores();
 			
 			// initalize before we call the viewers
-			client.getStormFrontSkin().loadDefaultPresets(this, presets);
+//			client.getStormFrontSkin().loadDefaultPresets(this, presets);
 			
-			for (IWarlockClientViewer v : client.getViewers())
-			{
-				IStormFrontClientViewer viewer = (IStormFrontClientViewer) v;
-				viewer.loadServerSettings(this);
-			}
+//			for (IWarlockClientViewer v : client.getViewers())
+//			{
+//				IStormFrontClientViewer viewer = (IStormFrontClientViewer) v;
+//				viewer.loadServerSettings(this);
+//			}
 			
 			stream.close();
-			//incrementMajorVersion();
+			incrementMajorVersion();
 			
 			for (IServerSettingsListener listener : listeners) {
 				try {
@@ -209,7 +201,6 @@ public class ServerSettings implements Comparable<ServerSettings>, IHighlightPro
 	private void loadWindowSettings()
 	{
 		streamElement = document.getRootElement().element("stream");
-		if(streamElement == null) return;
 		
 		for (StormFrontElement wElement : streamElement.elements())
 		{
@@ -330,7 +321,7 @@ public class ServerSettings implements Comparable<ServerSettings>, IHighlightPro
 		}
 	}
 	
-	public void incrementMajorVersion ()
+	protected void incrementMajorVersion ()
 	{
 		// Needed so our settings are validated by other Stormfront clients
 		
@@ -340,8 +331,6 @@ public class ServerSettings implements Comparable<ServerSettings>, IHighlightPro
 					"<settings client=\"" + clientVersion + "\" major=\"" + majorVersion + "\"></settings>" +
 					"<settings client=\"" + clientVersion + "\" major=\"" + (++majorVersion) + "\"></settings>" +
 					ServerSetting.UPDATE_SUFFIX + "\n");
-			document.getRootElement().setAttribute("major", ""+majorVersion);
-			saveLocalXml();
 		} catch(IOException e) {
 			e.printStackTrace();
 		}
@@ -369,7 +358,11 @@ public class ServerSettings implements Comparable<ServerSettings>, IHighlightPro
 		return highlightStrings.get(index);
 	}
 	
-	public Collection<? extends IHighlightString> getHighlightStrings ()
+	public IWarlockStyle getNamedStyle(String name) {
+		return presets.get(name).getStyle();
+	}
+	
+	public List<? extends IHighlightString> getHighlightStrings ()
 	{	
 		return highlightStrings;
 	}
@@ -644,100 +637,7 @@ public class ServerSettings implements Comparable<ServerSettings>, IHighlightPro
 	
 	public void sendAllSettings ()
 	{
-		sendSettingsDocument(this.document, true);
-	}
-	
-	public void sendInitialServerSettings ()
-	{
-		System.out.println("Sending initial server settings document...");
-		StormFrontDocument initialDoc = getInitialServerSettings();
-		sendSettingsDocument(initialDoc, true);
-		
-		this.document = initialDoc;
-		this.playerId = client.getPlayerId().get();
-		
-		saveLocalXml();
-		load(client.getPlayerId().get());
-		
-		System.out.println("Finished sending initial settings.");
-	}
-	
-	protected String readStream (InputStream stream)
-	{
-		try {
-			InputStreamReader reader = new InputStreamReader(stream);
-			
-			char chunk[] = new char[1024];
-			StringBuffer buffer = new StringBuffer();
-			
-			while (reader.ready())
-			{
-				int read = reader.read(chunk);
-				buffer.append(chunk, 0, read);
-			}
-			stream.close();
-			
-			return buffer.toString();
-		} catch (IOException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
-		return null;
-	}
-	
-	public StormFrontDocument getInitialServerSettings()
-	{
-		try {
-			URL initialServerSettingsURL = getClass().getClassLoader().getResource(
-				"cc/warlock/core/stormfront/serversettings/server/initialServerSettings.xml");
-			InputStream stream = initialServerSettingsURL.openStream();
-			
-			StormFrontDocument document = new StormFrontDocument(stream);
-			stream.close();
-			
-			return document;
-		} catch (IOException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
-		return null;
-	}
-	
-	public void sendSettingsDocument (StormFrontDocument document, boolean setCRC)
-	{
-		StormFrontElement settingsElement = document.getRootElement();
-		if (settingsElement.attribute("crc") != null)
-			settingsElement.removeAttribute("crc");
-		
-		String settingsDoc = settingsElement.toXML("", false, true);
-		settingsDoc = "<c>\n<db>" + settingsDoc + "\n";
-		
-		try {
-			client.getConnection().send(settingsDoc);
-		} catch (IOException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
-
-		if (setCRC)
-			settingsElement.setAttribute("crc", crc);
-	}
-	
-	public void sendInitialStreamWindows ()
-	{
-		try {
-			URL initialStreamWindowsURL = getClass().getClassLoader().getResource(
-				"cc/warlock/core/stormfront/serversettings/server/initialStreamWindows.xml");
-			InputStream stream = initialStreamWindowsURL.openStream();
-			
-			String initialStreamWindows = readStream(stream);
-			initialStreamWindows += "\n";
-			
-			client.getConnection().send(initialStreamWindows);
-		} catch (IOException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
+		StormFrontServerSettings.sendSettingsDocument(this.client, this.document);
 	}
 	
 	public Preset createPreset ()
@@ -827,6 +727,11 @@ public class ServerSettings implements Comparable<ServerSettings>, IHighlightPro
 		return ignores;
 	}
 	
+	public Collection<WindowSettings> getAllWindowSettings ()
+	{
+		return windowSettings.values();
+	}
+	
 	public WindowSettings getWindowSettings (String windowId)
 	{
 		if (windowSettings.containsKey(windowId)) {
@@ -863,5 +768,13 @@ public class ServerSettings implements Comparable<ServerSettings>, IHighlightPro
 	public CommandLineSettings getCommandLineSettings ()
 	{
 		return commandLineSettings;
+	}
+
+	public String getCrc() {
+		return crc;
+	}
+
+	public IStormFrontClient getClient() {
+		return client;
 	}
 }

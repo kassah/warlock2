@@ -19,45 +19,44 @@
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
-/*
- * Created on Jan 16, 2005
- */
-package cc.warlock.core.stormfront.internal;
+package cc.warlock.core.stormfront.settings.internal;
 
-import cc.warlock.core.stormfront.IStormFrontProtocolHandler;
-import cc.warlock.core.stormfront.xml.StormFrontAttributeList;
-
+import cc.warlock.core.client.WarlockColor;
+import cc.warlock.core.client.settings.internal.ColorFontSetting;
+import cc.warlock.core.stormfront.settings.ICommandLineSettings;
+import cc.warlock.core.stormfront.settings.ICommandLineSettingsProvider;
 
 /**
- * @author Sean Proctor
- * 
- * A handler for pushStream elements
+ * @author marshall
+ *
  */
-public class PushStreamTagHandler extends DefaultTagHandler {
+public class CommandLineSettings extends ColorFontSetting implements ICommandLineSettings {
 
-	public PushStreamTagHandler(IStormFrontProtocolHandler handler) {
-		super(handler);
-	}
-
-	@Override
-	public String[] getTagNames() {
-		return new String[] { "pushStream" };
+	protected WarlockColor barColor = WarlockColor.DEFAULT_COLOR;
+	
+	public CommandLineSettings (ICommandLineSettingsProvider provider)
+	{
+		super(provider);
 	}
 	
-	@Override
-	public void handleStart(StormFrontAttributeList attributes) {
-		String id = attributes.getValue("id");
-		
-		String closedStyle = attributes.getValue("ifClosedStyle");
-		boolean watch = false;
-		if(closedStyle != null && closedStyle.equals("watching"))
-			watch = true;
-		
-		handler.pushStream(id, watch);
+	public CommandLineSettings (CommandLineSettings other)
+	{
+		super(other);
 	}
 	
-	@Override
-	public boolean ignoreNewlines() {
-		return false;
+	public WarlockColor getBarColor() {
+		return barColor;
+	}
+
+	public void setBarColor(WarlockColor barColor) {
+		if (!barColor.equals(this.barColor))
+			needsUpdate = true;
+		
+		this.barColor = barColor;
+	}
+	
+	public CommandLineSettings getOriginalCommandLineSettings ()
+	{
+		return (CommandLineSettings)originalSetting;
 	}
 }

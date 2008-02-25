@@ -25,6 +25,7 @@
 package cc.warlock.core.stormfront.internal;
 
 import cc.warlock.core.stormfront.IStormFrontProtocolHandler;
+import cc.warlock.core.stormfront.settings.StormFrontServerSettings;
 import cc.warlock.core.stormfront.xml.StormFrontAttributeList;
 
 
@@ -46,7 +47,7 @@ public class PromptTagHandler extends DefaultTagHandler {
 	}
 	
 	@Override
-	public void handleStart(StormFrontAttributeList attributes, String rawXML) {
+	public void handleStart(StormFrontAttributeList attributes) {
 		handler.clearStyles();
 		prompt.setLength(0);
 		
@@ -61,12 +62,12 @@ public class PromptTagHandler extends DefaultTagHandler {
 	}
 	
 	@Override
-	public void handleEnd(String rawXML) {
+	public void handleEnd() {
 		handler.getClient().getDefaultStream().prompt(prompt.toString());
 		
 		if (waitingForInitialStreams)
 		{
-			handler.getClient().getServerSettings().sendInitialStreamWindows();
+			StormFrontServerSettings.sendInitialStreamWindows(handler.getClient());
 			waitingForInitialStreams = false;
 		}
 	}

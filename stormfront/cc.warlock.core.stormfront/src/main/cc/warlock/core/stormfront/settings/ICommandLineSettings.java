@@ -19,30 +19,17 @@
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
-package cc.warlock.core.stormfront.internal;
+package cc.warlock.core.stormfront.settings;
 
-import cc.warlock.core.stormfront.IStormFrontProtocolHandler;
-import cc.warlock.core.stormfront.xml.StormFrontAttributeList;
+import cc.warlock.core.client.WarlockColor;
+import cc.warlock.core.client.settings.IColorSetting;
+import cc.warlock.core.client.settings.IFontSetting;
 
-public class CmdtimestampTagHandler extends DefaultTagHandler {
-
-	CmdlistTagHandler cmdList;
-	
-	public CmdtimestampTagHandler(IStormFrontProtocolHandler handler, CmdlistTagHandler cmdList) {
-		super(handler);
-		this.cmdList = cmdList;
-	}
-	
-	@Override
-	public String[] getTagNames() {
-		return new String[] {"cmdtimestamp"};
-	}
-
-	@Override
-	public void handleStart(StormFrontAttributeList attributes, String rawXML) {
-		String timestamp = attributes.getValue("data");
-		if(timestamp != null) {
-			cmdList.writeOut(timestamp);
-		}
-	}
+/**
+ * @author marshall
+ *
+ */
+public interface ICommandLineSettings extends IColorSetting, IFontSetting {
+	public WarlockColor getBarColor();
+	public void setBarColor(WarlockColor color);
 }

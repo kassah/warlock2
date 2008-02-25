@@ -34,12 +34,15 @@ import java.util.Iterator;
 import java.util.Map;
 import java.util.Stack;
 
+import org.apache.commons.lang.StringEscapeUtils;
+
 import cc.warlock.core.client.IStream;
 import cc.warlock.core.client.IWarlockStyle;
 import cc.warlock.core.client.WarlockString;
 import cc.warlock.core.stormfront.IStormFrontProtocolHandler;
 import cc.warlock.core.stormfront.IStormFrontTagHandler;
 import cc.warlock.core.stormfront.client.IStormFrontClient;
+import cc.warlock.core.stormfront.xml.StormFrontAttribute;
 import cc.warlock.core.stormfront.xml.StormFrontAttributeList;
 
 
@@ -56,6 +59,8 @@ public class StormFrontProtocolHandler implements IStormFrontProtocolHandler {
 	protected Stack<StreamMarker> streamStack = new Stack<StreamMarker>();
 	protected Stack<String> tagStack = new Stack<String>();
 	protected ArrayList<IWarlockStyle> styles = new ArrayList<IWarlockStyle>();
+	protected StringBuffer rawXMLBuffer;
+	protected String rawXMLEndOnTag;
 	protected int currentSpacing = 0;
 	
  	public StormFrontProtocolHandler(IStormFrontClient client) {
@@ -65,9 +70,7 @@ public class StormFrontProtocolHandler implements IStormFrontProtocolHandler {
 		// server settings handlers
 		new PlayerIDTagHandler(this);
 		new ModeTagHandler(this);
-		new SettingsTagHandler(this);
-		new SettingsInfoTagHandler(this);
-		new CmdtimestampTagHandler(this, new CmdlistTagHandler(this));
+		new SettingsTagHandler(this, new SettingsInfoTagHandler(this));
 		new SentSettingsTagHandler(this);
 		
 		// Register the handlers
@@ -94,13 +97,13 @@ public class StormFrontProtocolHandler implements IStormFrontProtocolHandler {
 		new StyleTagHandler(this);
 		new OutputTagHandler(this);
 		
+		new BTagHandler(this);
 		new PushBoldTagHandler(this);
 		new PresetTagHandler(this);
 		new IndicatorTagHandler(this);
 		new LaunchURLTagHandler(this);
 		new ResourceTagHandler(this);
 		new ATagHandler(this);
-		new BTagHandler(this);
 		new DTagHandler(this);
 		
 		new StubTagHandler(this); // handles knows tags that don't have an implementation.
@@ -173,9 +176,15 @@ public class StormFrontProtocolHandler implements IStormFrontProtocolHandler {
 	 * @see org.xml.sax.ContentHandler#characters(char[], int, int)
 	 */
 	public void characters(String characters) {
+		
+		if (rawXMLBuffer != null)
+		{
+			rawXMLBuffer.append(StringEscapeUtils.escapeXml(characters));
+		}
+		
 		// if there was no handler or it couldn't handle the characters,
 		// take a default action
-		if(!handleCharacters(characters)) {
+		if(!handleCharacters(defaultTagHandlers, 0, characters)) {
 			WarlockString str = new WarlockString(characters);
 			for(IWarlockStyle style : styles) {
 				str.addStyle(style);
@@ -198,26 +207,79 @@ public class StormFrontProtocolHandler implements IStormFrontProtocolHandler {
 		}
 	}
 	
-	private boolean handleCharacters(String characters) {
-		// Start looking for handlers at the highest level tag
-		for(int pos = tagStack.size() - 1; pos >= 0; pos--) {
-			String tagName = tagStack.get(pos);
+	private boolean handleCharacters(Map<String, IStormFrontTagHandler> handlers,
+			int stackPosition, String characters) {
+		if(stackPosition >= tagStack.size()) return false; // reached the end of the stack
+		String tagName = tagStack.get(stackPosition);
 		
-			IStormFrontTagHandler tagHandler = getTagHandlerForElement(tagName, null, 0);
-			if(tagHandler != null) {
-				tagHandler.setCurrentTag(tagName);
-				// if the handler handled the characters, we're done
-				if(tagHandler.handleCharacters(characters))
-					return true;
-			}
-		}
-		return false;
+		if(handlers == null) return false;
+		
+		// if we have a handler, let it try to handle the characters
+		IStormFrontTagHandler tagHandler = handlers.get(tagName);
+		if(tagHandler == null) return false;
+		
+		if(handleCharacters(tagHandler.getTagHandlers(), stackPosition + 1, characters))
+			return true;
+		
+		tagHandler.setCurrentTag(tagName);
+		return tagHandler.handleCharacters(characters); 
+	}
+	
+	private boolean handleStartChild(Map<String, IStormFrontTagHandler> handlers,
+			int stackPosition, String childName, StormFrontAttributeList attributes)
+	{
+		if(stackPosition >= tagStack.size()) return false; // reached the end of the stack
+		String tagName = tagStack.get(stackPosition);
+		
+		if(handlers == null) return false;
+		
+		// if we have a handler, let it try to handle the characters
+		IStormFrontTagHandler tagHandler = handlers.get(tagName);
+		if(tagHandler == null) return false;
+		
+		if(handleStartChild(tagHandler.getTagHandlers(), stackPosition + 1, childName, attributes))
+			return true;
+		
+		tagHandler.setCurrentTag(tagName);
+		return tagHandler.handleChild(childName, attributes); 
+	}
+	
+	private boolean handleEndChild(Map<String, IStormFrontTagHandler> handlers, int stackPosition, String childName)
+	{
+		if(stackPosition >= tagStack.size()) return false; // reached the end of the stack
+		String tagName = tagStack.get(stackPosition);
+		
+		if(handlers == null) return false;
+		
+		// if we have a handler, let it try to handle the characters
+		IStormFrontTagHandler tagHandler = handlers.get(tagName);
+		if(tagHandler == null) return false;
+		
+		if(handleEndChild(tagHandler.getTagHandlers(), stackPosition + 1, childName))
+			return true;
+		
+		tagHandler.setCurrentTag(tagName);
+		return tagHandler.handleEndChild(childName); 
 	}
 	
 	/* (non-Javadoc)
 	 * @see org.xml.sax.ContentHandler#endElement(java.lang.String, java.lang.String, java.lang.String)
 	 */
-	public void endElement(String name, String rawXML, boolean newLine) {
+	public void endElement(String name, String newLine) {
+		
+		if (rawXMLBuffer != null)
+		{
+			if (name.equals(rawXMLEndOnTag))
+			{
+				rawXMLBuffer = null;
+			} else {
+				rawXMLBuffer.append(repeat("\t", currentSpacing) + "</" + name + ">\n");
+				currentSpacing -= 1;
+			}
+		}
+		
+		//System.out.print("</" + name + ">");
+		
 		// Get the tag name off the stack
 		if(tagStack.size() == 0 || !name.equals(tagStack.peek())) {
 			System.err.println("Unexpected close tag \"" + name + "\". Probably an unsupported tag.");
@@ -225,72 +287,120 @@ public class StormFrontProtocolHandler implements IStormFrontProtocolHandler {
 			tagStack.pop();
 		}
 		
+		
 		// call the method for the object
-		IStormFrontTagHandler tagHandler = getTagHandlerForElement(name, null, 0);
+		IStormFrontTagHandler tagHandler = getTagHandlerForElement(name, defaultTagHandlers, 0);
 		if(tagHandler != null) {
 			
 			tagHandler.setCurrentTag(name);
-			tagHandler.handleEnd(rawXML);
-			if(newLine && !tagHandler.ignoreNewlines()) {
-				characters("\n");
+			tagHandler.handleEnd();
+			if(!tagHandler.ignoreNewlines() && newLine != null && newLine.length() > 0) {
+				characters(newLine);
 			}
 		} else {
-			if (rawXML != null)
-				characters(rawXML);
+			if (!handleEndChild(defaultTagHandlers, 0, name))
+			{
+				characters("</" + name + ">");
+				if(newLine != null && newLine.length() > 0) {
+					characters(newLine);
+				}
+			}
 		}
 	}
 	
 	/* (non-Javadoc)
 	 * @see org.xml.sax.ContentHandler#startElement(java.lang.String, java.lang.String, java.lang.String, org.xml.sax.Attributes)
 	 */
-	public void startElement(String name, StormFrontAttributeList attributes, String rawXML, boolean newLine) {
+	public void startElement(String name, StormFrontAttributeList attributes, String newLine) {
+		
+		//System.out.print("<" + name);
+		if (rawXMLBuffer != null)
+		{
+			String startTag = "<" + name;
+			if (attributes != null) {
+	            for (StormFrontAttribute attribute : attributes.getList())
+	            {
+	                startTag += " " + attribute.getName() + "=" +
+	                	attribute.getQuoteType() + attribute.getValue() + attribute.getQuoteType();
+	            }
+	        }
+			startTag += ">";
+			rawXMLBuffer.append(repeat("\t", currentSpacing) + startTag + "\n");
+			
+			currentSpacing += 1;
+		}
+        //System.out.println(">");
 		
 		// call the method for the object
-		IStormFrontTagHandler tagHandler = getTagHandlerForElement(name, null, 0);
+		IStormFrontTagHandler tagHandler = getTagHandlerForElement(name, defaultTagHandlers, 0);
 		
 		if(tagHandler != null) {
 			
 			tagStack.push(name);
 			tagHandler.setCurrentTag(name);
-			tagHandler.handleStart(attributes, rawXML);
-			if(newLine && !tagHandler.ignoreNewlines()) {
-				characters("\n");
+			tagHandler.handleStart(attributes);
+			if(!tagHandler.ignoreNewlines() && newLine != null && newLine.length() > 0) {
+				characters(newLine);
 			}
 		} else {
-			if(rawXML != null)
-				characters(rawXML);
+			if(!handleStartChild(defaultTagHandlers, 0, name, attributes))
+			{
+				String startTag = "<" + name;
+				if (attributes != null) {
+		            for (StormFrontAttribute attribute : attributes.getList())
+		            {
+		                startTag += " " + attribute.getName() + "=" +
+		                	attribute.getQuoteType() + attribute.getValue() + attribute.getQuoteType();
+		            }
+		        }
+				startTag += ">";
+				characters(startTag);
+				if(newLine != null && newLine.length() > 0) {
+					characters(newLine);
+				}	
+			}
 		}
 	}
 	
-	private IStormFrontTagHandler getTagHandlerForElement(String name,
-			IStormFrontTagHandler parentHandler, int stackPosition) {
+	private IStormFrontTagHandler getTagHandlerForElement(String name, Map<String, IStormFrontTagHandler> tagHandlers, int stackPosition) {
+		if(tagHandlers == null) return null;
+		
 		if(stackPosition < tagStack.size()) {
 			String tagName = tagStack.get(stackPosition);
+		
+			IStormFrontTagHandler tagHandler = tagHandlers.get(tagName);
+			if(tagHandler == null) return null;
 			
-			// next handler is the child the parent
-			IStormFrontTagHandler nextHandler;
-			if(parentHandler != null) nextHandler = parentHandler.getTagHandler(tagName);
-			else nextHandler = defaultTagHandlers.get(tagName);
-			// If there was no match, use the current parent
-			if(nextHandler == null) nextHandler = parentHandler;
-			
-			// see if there is a valid handler further down the tree.
-			IStormFrontTagHandler tagHandler = getTagHandlerForElement(name,
-					nextHandler, stackPosition + 1);
-			if(tagHandler != null) {
-				return tagHandler;
-			} else {
-				if(parentHandler != null) return parentHandler.getTagHandler(name);
-				else return defaultTagHandlers.get(name);
-			}
+			return getTagHandlerForElement(name, tagHandler.getTagHandlers(), stackPosition + 1);
 		} else {
-			if(parentHandler != null) return parentHandler.getTagHandler(name);
-			else return defaultTagHandlers.get(name);
+			IStormFrontTagHandler tagHandler = tagHandlers.get(name);
+			if(tagHandler == null) return null;
+
+			return tagHandler;
 		}
+	}	
+	
+	public void startSavingRawXML(StringBuffer buffer, String endOnTag) {
+		rawXMLBuffer = buffer;
+		rawXMLEndOnTag = endOnTag;
+	}
+	
+	public void stopSavingRawXML() {
+		rawXMLBuffer = null;
+		rawXMLEndOnTag = null;
+	}
+	
+	private String repeat (String toRepeat, int times)
+	{
+		String str = "";
+		for (int i = 0; i < times; i++)
+			str += toRepeat;
+		return str;
 	}
 	
 	public void addStyle(IWarlockStyle style) {
-		styles.add(style);
+		if (style != null)
+			styles.add(style);
 	}
 	
 	public void removeStyle(IWarlockStyle style) {

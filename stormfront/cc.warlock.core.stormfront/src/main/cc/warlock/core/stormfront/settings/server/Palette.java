@@ -19,7 +19,7 @@
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
-package cc.warlock.core.stormfront.serversettings.server;
+package cc.warlock.core.stormfront.settings.server;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -30,6 +30,7 @@ import java.util.List;
 import cc.warlock.core.stormfront.client.StormFrontColor;
 import cc.warlock.core.stormfront.xml.StormFrontElement;
 
+@Deprecated
 public class Palette extends ServerSetting {
 
 	public static final String STORMFRONT_MARKUP_PREFIX = "<palette><<m>";

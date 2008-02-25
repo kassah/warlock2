@@ -51,5 +51,8 @@ public interface IStormFrontProtocolHandler extends IStormFrontXMLHandler {
 	public void removeStyle(IWarlockStyle style);
 	public void clearStyles();
 	
+	public void startSavingRawXML(StringBuffer buffer, String endOnTag);
+	public void stopSavingRawXML();
+	
 	public IStormFrontTagHandler getTagHandler(Class<? extends IStormFrontTagHandler> handlerType);
 }

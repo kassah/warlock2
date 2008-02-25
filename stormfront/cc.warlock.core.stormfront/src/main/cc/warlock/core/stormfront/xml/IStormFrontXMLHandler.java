@@ -34,11 +34,11 @@ public interface IStormFrontXMLHandler {
 	 * @param name The name of the element
 	 * @param attributes The element's attributes
 	 */
-	public void startElement(String name, StormFrontAttributeList attributes, String rawXML, boolean newLine);
+	public void startElement(String name, StormFrontAttributeList attributes, String newLine);
 	
 	/**
 	 * Finish parsing an element
 	 * @param name The name of the element
 	 */
-	public void endElement(String name, String rawXML, boolean newLine);
+	public void endElement(String name, String newLine);
 }

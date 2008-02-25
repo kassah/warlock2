@@ -29,6 +29,7 @@ public class DialogDataTagHandler extends DefaultTagHandler {
 		super(handler);
 		
 		addTagHandler(new BarTagHandler(handler));
+		addTagHandler(new StubTagHandler(handler));
 	}
 	
 	@Override

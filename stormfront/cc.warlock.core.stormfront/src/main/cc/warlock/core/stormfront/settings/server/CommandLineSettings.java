@@ -19,7 +19,7 @@
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
-package cc.warlock.core.stormfront.serversettings.server;
+package cc.warlock.core.stormfront.settings.server;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -27,10 +27,12 @@ import java.util.HashMap;
 import java.util.Map;
 
 import cc.warlock.core.client.IWarlockSkin;
+import cc.warlock.core.client.WarlockColor;
 import cc.warlock.core.stormfront.client.StormFrontColor;
 import cc.warlock.core.stormfront.xml.StormFrontAttribute;
 import cc.warlock.core.stormfront.xml.StormFrontElement;
 
+@Deprecated
 public class CommandLineSettings extends ColorSetting {
 
 	protected String fontFace;
@@ -143,13 +145,13 @@ public class CommandLineSettings extends ColorSetting {
 	{
 		if (this.barColor != null && "skin".equals(this.barColor))
 		{
-			return (StormFrontColor) serverSettings.getDefaultSkin().getColor(IWarlockSkin.ColorType.CommandLine_BarColor);
+			return new StormFrontColor(serverSettings.getDefaultSkin().getColor(IWarlockSkin.ColorType.CommandLine_BarColor));
 		}
 		else return getColorFromString(KEY_BARCOLOR, barColor, true);
 	}
 	
-	public void setBarColor (StormFrontColor barColor)
+	public void setBarColor (WarlockColor barColor)
 	{
-		this.barColor = assignColor(barColor, this.barColor);
+		this.barColor = assignColor(new StormFrontColor(barColor), this.barColor);
 	}
 }

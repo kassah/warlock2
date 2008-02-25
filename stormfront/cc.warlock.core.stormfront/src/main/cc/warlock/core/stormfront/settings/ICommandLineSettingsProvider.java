@@ -19,13 +19,14 @@
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
-package cc.warlock.core.stormfront.serversettings.server;
+package cc.warlock.core.stormfront.settings;
 
-import cc.warlock.core.script.IScriptProvider;
-import cc.warlock.core.stormfront.client.IStormFrontClient;
+import cc.warlock.core.client.settings.IClientSettingProvider;
 
-public interface IServerScriptProvider extends IScriptProvider {
-
-	public IStormFrontClient getClient();
-	
+/**
+ * @author marshall
+ *
+ */
+public interface ICommandLineSettingsProvider extends IClientSettingProvider {
+	public ICommandLineSettings getCommandLineSettings(); 
 }

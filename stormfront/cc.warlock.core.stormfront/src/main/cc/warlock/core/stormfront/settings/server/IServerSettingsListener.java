@@ -19,23 +19,10 @@
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
-package cc.warlock.core.stormfront.serversettings.skin;
+package cc.warlock.core.stormfront.settings.server;
 
-import java.util.Map;
+@Deprecated
+public interface IServerSettingsListener {
 
-import cc.warlock.core.client.IWarlockSkin;
-import cc.warlock.core.stormfront.client.StormFrontColor;
-import cc.warlock.core.stormfront.serversettings.server.ColorSetting;
-import cc.warlock.core.stormfront.serversettings.server.Preset;
-import cc.warlock.core.stormfront.serversettings.server.ServerSettings;
-
-public interface IStormFrontSkin extends IWarlockSkin {
-
-	public void loadDefaultPresets (ServerSettings settings, Map<String, Preset> presets);
-	
-	public StormFrontColor getDefaultWindowBackground();
-	public StormFrontColor getDefaultWindowForeground();
-	
-	public StormFrontColor getSkinForegroundColor (ColorSetting setting);
-	public StormFrontColor getSkinBackgroundColor (ColorSetting setting);
+	public void serverSettingsLoaded (ServerSettings settings);
 }

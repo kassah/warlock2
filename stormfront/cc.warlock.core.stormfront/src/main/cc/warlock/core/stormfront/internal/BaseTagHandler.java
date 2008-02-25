@@ -33,9 +33,9 @@ abstract public class BaseTagHandler implements IStormFrontTagHandler {
 	
 	public abstract String[] getTagNames();
 	
-	public void handleStart(StormFrontAttributeList attributes, String rawXML) { }
+	public void handleStart(StormFrontAttributeList attributes) { }
 
-	public void handleEnd(String rawXML) { }
+	public void handleEnd() { }
 
 	public boolean handleCharacters(String characters) {
 		return false;
@@ -62,12 +62,19 @@ abstract public class BaseTagHandler implements IStormFrontTagHandler {
 		}
 	}
 	
-	public IStormFrontTagHandler getTagHandler(String tagName) {
-		if(tagHandlers == null) return null;
-		return tagHandlers.get(tagName);
+	public Map<String, IStormFrontTagHandler> getTagHandlers() {
+		return tagHandlers;
 	}
 	
 	public boolean ignoreNewlines() {
 		return true;
+	}
+	
+	public boolean handleChild(String name, StormFrontAttributeList attributes) {
+		return false;
+	}
+	
+	public boolean handleEndChild(String name) {
+		return false;
 	}
 }

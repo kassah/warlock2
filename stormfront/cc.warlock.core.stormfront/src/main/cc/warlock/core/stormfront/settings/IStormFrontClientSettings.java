@@ -19,29 +19,18 @@
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
-package cc.warlock.core.stormfront.style;
+package cc.warlock.core.stormfront.settings;
 
-import cc.warlock.core.client.internal.WarlockStyle;
-import cc.warlock.core.stormfront.serversettings.server.HighlightPreset;
+import cc.warlock.core.client.settings.IClientSettings;
+import cc.warlock.core.stormfront.client.IStormFrontClient;
 
-public class HighlightStringStyle extends WarlockStyle implements
-		IHighlightStringStyle {
-	
-	protected HighlightPreset string;
-	
-	public HighlightStringStyle (HighlightPreset string)
-	{
-		super();
-		
-		this.string = string;
-	}
+/**
+ * @author marshall
+ *
+ */
+public interface IStormFrontClientSettings extends IClientSettings {
 
-	public HighlightPreset getHighlightString() {
-		return string;
-	}
+	public IStormFrontClient getStormFrontClient();
 	
-	@Override
-	public boolean isFullLine() {
-		return string.isFillEntireLine();
-	}
+	public ICommandLineSettings getCommandLineSettings();
 }

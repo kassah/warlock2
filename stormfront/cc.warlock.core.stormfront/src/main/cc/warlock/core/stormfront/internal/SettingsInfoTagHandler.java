@@ -22,13 +22,14 @@
 package cc.warlock.core.stormfront.internal;
 
 import java.io.File;
+import java.io.FileInputStream;
 import java.io.IOException;
 
 import cc.warlock.core.configuration.ConfigurationUtil;
 import cc.warlock.core.stormfront.IStormFrontProtocolHandler;
-import cc.warlock.core.stormfront.serversettings.server.ServerSettings;
+import cc.warlock.core.stormfront.settings.StormFrontServerSettings;
+import cc.warlock.core.stormfront.settings.internal.StormFrontClientSettings;
 import cc.warlock.core.stormfront.xml.StormFrontAttributeList;
-import cc.warlock.core.stormfront.xml.StormFrontDocument;
 
 
 public class SettingsInfoTagHandler extends DefaultTagHandler {
@@ -51,7 +52,7 @@ public class SettingsInfoTagHandler extends DefaultTagHandler {
 	}
 	
 	@Override
-	public void handleStart(StormFrontAttributeList attributes, String rawXML) {
+	public void handleStart(StormFrontAttributeList attributes) {
 		
 		if (attributes.getAttribute("space") != null
 			&& attributes.getAttribute("not") != null
@@ -69,16 +70,17 @@ public class SettingsInfoTagHandler extends DefaultTagHandler {
 		}
 		
 		clientVersion = attributes.getValue("client");
-		if(clientVersion != null)
-			handler.getClient().getServerSettings().setClientVersion(clientVersion);
+		if(clientVersion != null) {
+//			handler.getClient().getServerSettings().setClientVersion(clientVersion);
+		}
 	}
 	
 	@Override
-	public void handleEnd(String rawXML) {
+	public void handleEnd() {
 		if (newSettings) {
 			
 			// This is a character that has no server settings, we need to immediately send our own
-			handler.getClient().getServerSettings().sendInitialServerSettings();
+			StormFrontServerSettings.sendInitialServerSettings(handler.getClient());
 			
 			PromptTagHandler promptHandler = (PromptTagHandler) handler.getTagHandler(PromptTagHandler.class);
 			promptHandler.setWaitingForInitialStreams(true);
@@ -97,34 +99,58 @@ public class SettingsInfoTagHandler extends DefaultTagHandler {
 				e.printStackTrace();
 			}
 		} else {
-			// check against crc to see if we're up to date
-			StormFrontDocument document = ServerSettings.getDocument(playerId);
-			//String currentCRC = ServerSettings.getCRC(document);
-			Integer currentMajorVersion = ServerSettings.getMajorVersion(document);
-			if (currentMajorVersion == null) currentMajorVersion = 0;
-			
+			try {
+				handler.getClient().getConnection().sendLine("");
 				
-			handler.getClient().getServerSettings().load(playerId);
-			// 
-			if (currentMajorVersion > majorVersion)
-			{
-				handler.getClient().getServerSettings().sendAllSettings();
-			} else if(currentMajorVersion < majorVersion) {
-				try {
-					handler.getClient().getConnection().send("<sendSettings/>\n");
-				} catch(IOException e) {
-					e.printStackTrace();
+				if (StormFrontServerSettings.instance().getClientVersion() == null)
+				{
+					FileInputStream stream = new FileInputStream(serverSettings);
+					StormFrontClientSettings settings =
+						(StormFrontClientSettings)handler.getClient().getStormFrontClientSettings();
+					
+					StormFrontServerSettings.instance().importServerSettings(
+							stream, settings);					
+					stream.close();
 				}
-			} else { // major versions are equal
-				try {
-					// increment our version
-					handler.getClient().getServerSettings().incrementMajorVersion();
-					handler.getClient().getConnection().sendLine("");
-				} catch(IOException e) {
-					e.printStackTrace();
-				}
+			} catch(IOException e) {
+				e.printStackTrace();
 			}
-
+			
+			// TODO we will need to un-comment this later when we add code to support merging of stormfront's settings
+			// check against crc to see if we're up to date
+//			StormFrontDocument document = ServerSettings.getDocument(playerId);
+//			String currentCRC = ServerSettings.getCRC(document);
+//			Integer currentMajorVersion = ServerSettings.getMajorVersion(document);
+//			if (currentMajorVersion == null) currentMajorVersion = 0;
+//			
+//			if (currentCRC != null && crc.equals(currentCRC))
+//			{
+//				boolean sendBlankLine = true;
+//				
+//				handler.getClient().getServerSettings().load(playerId);
+//				// crcs match, if we have the bigger major version, override with our settings
+//				if (currentMajorVersion > majorVersion)
+//				{
+//					handler.getClient().getServerSettings().sendAllSettings();
+//					sendBlankLine = false;
+//				}
+//				
+//				if (sendBlankLine)
+//				{
+//					try {
+//						handler.getClient().getConnection().sendLine("");
+//					} catch(IOException e) {
+//						e.printStackTrace();
+//					}
+//				}
+//			} else {
+//				System.out.println("our crc is: " + currentCRC + ", their crc is: " + crc);
+//				try {
+//					handler.getClient().getConnection().send("<sendSettings/>\n");
+//				} catch(IOException e) {
+//					e.printStackTrace();
+//				}
+//			}
 		}
 	}
 	

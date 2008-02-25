@@ -19,12 +19,16 @@
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
- package cc.warlock.core.stormfront.serversettings.server;
+ package cc.warlock.core.stormfront.settings.server;
 
+import cc.warlock.core.client.WarlockColor;
+import cc.warlock.core.client.settings.IClientSettingProvider;
+import cc.warlock.core.client.settings.IColorSetting;
 import cc.warlock.core.stormfront.client.StormFrontColor;
 import cc.warlock.core.stormfront.xml.StormFrontElement;
 
-public abstract class ColorSetting extends ServerSetting implements Comparable<ColorSetting> {
+@Deprecated
+public abstract class ColorSetting extends ServerSetting implements Comparable<ColorSetting>, IColorSetting {
 
 	protected String foregroundColor, backgroundColor;
 	protected Palette palette;
@@ -52,26 +56,29 @@ public abstract class ColorSetting extends ServerSetting implements Comparable<C
 	
 	public StormFrontColor getDefaultForegroundColor ()
 	{
-		if (this == serverSettings.getMainWindowSettings())
-		{
-			return serverSettings.getDefaultSkin().getDefaultWindowForeground();
-		}
-		else
-		{
-			return serverSettings.getMainWindowSettings().getForegroundColor();
-		}
+		return StormFrontColor.DEFAULT_COLOR;
+//		if (this == serverSettings.getMainWindowSettings())
+//		{
+//			return new StormFrontColor(serverSettings.getDefaultSkin().getDefaultWindowForeground());
+//		}
+//		else
+//		{
+//			return serverSettings.getMainWindowSettings().getForegroundColor();
+//		}
 	}
 	
 	public StormFrontColor getDefaultBackgroundColor ()
 	{
-		if (this == serverSettings.getMainWindowSettings())
-		{
-			return serverSettings.getDefaultSkin().getDefaultWindowBackground();
-		}
-		else
-		{
-			return serverSettings.getMainWindowSettings().getBackgroundColor();
-		}
+		return StormFrontColor.DEFAULT_COLOR;
+//		
+//		if (this == serverSettings.getMainWindowSettings())
+//		{
+//			return new StormFrontColor(serverSettings.getDefaultSkin().getDefaultWindowBackground());
+//		}
+//		else
+//		{
+//			return serverSettings.getMainWindowSettings().getBackgroundColor();
+//		}
 	}
 	
 	public StormFrontColor getForegroundColor() {
@@ -90,6 +97,13 @@ public abstract class ColorSetting extends ServerSetting implements Comparable<C
 	public StormFrontColor getBackgroundColor (boolean skinFallback)
 	{
 		return getColorFromString(KEY_BGCOLOR, backgroundColor, skinFallback);
+	}
+	
+	protected StormFrontColor skinColor (WarlockColor color)
+	{
+		StormFrontColor sfColor = new StormFrontColor(color);
+		sfColor.setSkinColor(true);
+		return sfColor;
 	}
 	
 	protected StormFrontColor getColorFromString (String key, String color, boolean skinFallback)
@@ -114,9 +128,9 @@ public abstract class ColorSetting extends ServerSetting implements Comparable<C
 				return StormFrontColor.DEFAULT_COLOR;
 			
 			if (KEY_FGCOLOR.equals(key) || foregroundKey.equals(key))
-				return serverSettings.getDefaultSkin().getSkinForegroundColor(this);
+				return skinColor(serverSettings.getDefaultSkin().getDefaultForegroundColor(getId()));
 			else if (KEY_BGCOLOR.equals(key))
-				return serverSettings.getDefaultSkin().getSkinBackgroundColor(this);
+				return skinColor(serverSettings.getDefaultSkin().getDefaultBackgroundColor(getId()));
 		}
 		
 		return new StormFrontColor(color);
@@ -141,8 +155,16 @@ public abstract class ColorSetting extends ServerSetting implements Comparable<C
 		this.palette = palette;
 	}
 
+	public void setForegroundColor(WarlockColor foreground) {
+		setForegroundColor(new StormFrontColor(foreground.toHexString()));
+	}
+	
 	public void setForegroundColor(StormFrontColor foregroundColor) {
 		this.foregroundColor = assignColor(foregroundColor, this.foregroundColor);
+	}
+	
+	public void setBackgroundColor(WarlockColor background) {
+		setBackgroundColor(new StormFrontColor(background.toHexString()));
 	}
 	
 	public void setBackgroundColor(StormFrontColor backgroundColor) {
@@ -186,4 +208,9 @@ public abstract class ColorSetting extends ServerSetting implements Comparable<C
 	public int compareTo(ColorSetting o) {
 		return foregroundColor.compareTo(o.foregroundColor);
 	}
+	
+	public IClientSettingProvider getProvider() {
+		return null;
+	}
+	
 }

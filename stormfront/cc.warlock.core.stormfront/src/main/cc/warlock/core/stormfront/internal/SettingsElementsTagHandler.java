@@ -24,7 +24,6 @@ package cc.warlock.core.stormfront.internal;
 import cc.warlock.core.stormfront.IStormFrontProtocolHandler;
 import cc.warlock.core.stormfront.client.IStormFrontClientViewer;
 import cc.warlock.core.stormfront.internal.SettingsTagHandler.ViewerVisitor;
-import cc.warlock.core.stormfront.xml.StormFrontAttributeList;
 
 public class SettingsElementsTagHandler extends DefaultTagHandler {
 
@@ -48,12 +47,7 @@ public class SettingsElementsTagHandler extends DefaultTagHandler {
 	}
 	
 	@Override
-	public void handleStart(StormFrontAttributeList attributes, String rawXML) {
-		settings.append(rawXML);
-	}
-	
-	@Override
-	public void handleEnd(String rawXML) {
+	public void handleEnd() {
 		IStormFrontClientViewer.SettingType setting = null;
 		if ("presets".equals(getCurrentTag())) setting = IStormFrontClientViewer.SettingType.Presets;
 		else if ("strings".equals(getCurrentTag())) setting = IStormFrontClientViewer.SettingType.Strings;
@@ -78,7 +72,6 @@ public class SettingsElementsTagHandler extends DefaultTagHandler {
 				}
 			});
 		}
-		settings.append(rawXML);
 	}
 
 }

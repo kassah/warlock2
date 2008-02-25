@@ -40,12 +40,12 @@ public class PopStreamTagHandler extends DefaultTagHandler {
 	}
 	
 	@Override
-	public void handleStart(StormFrontAttributeList attributes, String rawXML) {
+	public void handleStart(StormFrontAttributeList attributes) {
 		handler.popStream();
 	}
 	
 	@Override
 	public boolean ignoreNewlines() {
-		return true;
+		return false;
 	}
 }

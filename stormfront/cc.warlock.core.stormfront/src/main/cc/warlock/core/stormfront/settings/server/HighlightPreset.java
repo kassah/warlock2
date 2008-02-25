@@ -19,14 +19,16 @@
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
-package cc.warlock.core.stormfront.serversettings.server;
+package cc.warlock.core.stormfront.settings.server;
 
 import java.util.regex.Pattern;
 import java.util.regex.PatternSyntaxException;
 
-import cc.warlock.core.client.IHighlightString;
+import cc.warlock.core.client.settings.IClientSettingProvider;
+import cc.warlock.core.client.settings.IHighlightString;
 import cc.warlock.core.stormfront.xml.StormFrontElement;
 
+@Deprecated
 public class HighlightPreset extends Preset implements IHighlightString {
 
 	public static final String KEY_TEXT = "text";
@@ -41,8 +43,6 @@ public class HighlightPreset extends Preset implements IHighlightString {
 	protected HighlightPreset originalString;
 	protected Pattern pattern;
 	protected int index;
-	protected boolean ignoreWordBoundary = false;
-	protected boolean ignoreCase = true;
 	
 	protected HighlightPreset (ServerSettings serverSettings, Palette palette, int index)
 	{
@@ -177,24 +177,11 @@ public class HighlightPreset extends Preset implements IHighlightString {
 	
 	public Pattern getPattern() {
 		if(pattern == null) {
-			String patternText;
-			if(text == null) {
-				// TODO handle regex 
+			if(text == null)
 				return null;
-			} else {
-				String quotedText = Pattern.quote(text);
-				if(ignoreWordBoundary) {
-					patternText = quotedText;
-				} else {
-					patternText = "\\b" + quotedText + "\\b";
-				}
-			}
-			
+			// TODO test if we should compile this as a regex
 			try {
-				int flags = 0;
-				if(ignoreCase)
-					flags |= Pattern.CASE_INSENSITIVE;
-				pattern = Pattern.compile(patternText, flags);
+				pattern = Pattern.compile(text, Pattern.LITERAL | Pattern.CASE_INSENSITIVE);
 			} catch(PatternSyntaxException e) {
 				System.err.println("Pattern error: " + e.getMessage());
 			}
@@ -230,5 +217,17 @@ public class HighlightPreset extends Preset implements IHighlightString {
 		String tagSuffix = isName ? HighlightPreset.NAMES_SUFFIX : HighlightPreset.STRINGS_SUFFIX;
 		
 		return tagPrefix + childMarkup + tagSuffix;
+	}
+	
+	public boolean isCaseSensitive() {
+		return false;
+	}
+	
+	public boolean isLiteral() {
+		return true;
+	}
+	
+	public IClientSettingProvider getProvider() {
+		return null;
 	}
 }

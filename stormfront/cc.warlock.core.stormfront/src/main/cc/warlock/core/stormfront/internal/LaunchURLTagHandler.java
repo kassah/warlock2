@@ -44,12 +44,12 @@ public class LaunchURLTagHandler extends DefaultTagHandler {
 	}
 	
 	@Override
-	public void handleStart(StormFrontAttributeList attributes, String rawXML) {
+	public void handleStart(StormFrontAttributeList attributes) {
 		this.url = "http://www.play.net" + attributes.getValue("src");
 	}
 	
 	@Override
-	public void handleEnd(String rawXML) {
+	public void handleEnd() {
 		for (IWarlockClientViewer viewer : handler.getClient().getViewers())
 		{
 			if (viewer instanceof IStormFrontClientViewer)

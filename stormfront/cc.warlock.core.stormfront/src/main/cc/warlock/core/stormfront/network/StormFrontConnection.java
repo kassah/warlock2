@@ -35,7 +35,6 @@ import cc.warlock.core.client.internal.WarlockStyle;
 import cc.warlock.core.network.IConnection;
 import cc.warlock.core.network.IConnectionListener;
 import cc.warlock.core.stormfront.client.IStormFrontClient;
-import cc.warlock.core.stormfront.internal.ParseException;
 import cc.warlock.core.stormfront.internal.StormFrontProtocolHandler;
 import cc.warlock.core.stormfront.internal.StormFrontProtocolParser;
 
@@ -144,22 +143,11 @@ public class StormFrontConnection implements IConnection
 				reader = new StormFrontReader(StormFrontConnection.this, socket.getInputStream());
 				parser = new StormFrontProtocolParser(reader);
 				parser.setHandler(handler);
-				
-				while(socket.isConnected()) {
-					try {
-						parser.Document();
-						break;
-					} catch (ParseException e) {
-						e.printStackTrace();
-						client.getDefaultStream().flush();
-						client.getDefaultStream().echo("\n*** Parse error ***\n");
-						parser.ReInit(reader);
-					}
-				}
+				parser.Document();
 				
 				disconnected();
-			} catch (IOException e) {
-				e.printStackTrace();
+			} catch (Throwable t) {
+				t.printStackTrace();
 			}
 		}
 	}

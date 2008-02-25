@@ -41,7 +41,7 @@ public class ResourceTagHandler extends DefaultTagHandler {
 	}
 	
 	@Override
-	public void handleStart(StormFrontAttributeList attributes, String rawXML) {
+	public void handleStart(StormFrontAttributeList attributes) {
 		String pictureId = null;
 		
 		if (attributes.getValue("picture") != null)

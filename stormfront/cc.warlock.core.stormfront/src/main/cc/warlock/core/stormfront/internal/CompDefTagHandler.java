@@ -24,8 +24,6 @@
  */
 package cc.warlock.core.stormfront.internal;
 
-import cc.warlock.core.client.IWarlockClient;
-import cc.warlock.core.client.internal.WarlockStyle;
 import cc.warlock.core.stormfront.IStormFrontProtocolHandler;
 import cc.warlock.core.stormfront.client.internal.StormFrontClient;
 import cc.warlock.core.stormfront.xml.StormFrontAttributeList;
@@ -44,10 +42,12 @@ public class CompDefTagHandler extends DefaultTagHandler {
 	
 	protected String id;
 	protected StringBuffer buffer = new StringBuffer();
-	protected WarlockStyle style;
 	
 	public CompDefTagHandler (IStormFrontProtocolHandler handler) {
 		super(handler);
+		
+		addTagHandler(new DTagHandler(handler));
+		addTagHandler(new BTagHandler(handler));
 	}
 	
 	@Override
@@ -56,16 +56,9 @@ public class CompDefTagHandler extends DefaultTagHandler {
 	}
 
 	@Override
-	public void handleStart(StormFrontAttributeList attributes, String rawXML) {
-		if(style != null) {
-			handler.removeStyle(style);
-			style = null;
-		}
-		style = new WarlockStyle();
+	public void handleStart(StormFrontAttributeList attributes) {
 		buffer.setLength(0);
 		this.id = attributes.getValue("id");
-		style.setName(this.id);
-		handler.addStyle(style);
 	}
 	
 	@Override
@@ -78,19 +71,11 @@ public class CompDefTagHandler extends DefaultTagHandler {
 	}
 	
 	@Override
-	public void handleEnd(String rawXML) {
-		if(style != null) {
-			handler.removeStyle(style);
-			style = null;
-		}
-		IWarlockClient client = handler.getClient();
-		if(client instanceof StormFrontClient)
-			((StormFrontClient)client).setComponent(id, buffer.toString(), handler.getCurrentStream());
-	}
-	
-	@Override
-	public boolean ignoreNewlines() {
-		return false;
+	public void handleEnd() {
+		handler.getCurrentStream().send("\n");
+
+		StormFrontClient client = (StormFrontClient) handler.getClient();
+		client.setComponent(id, buffer.toString());
 	}
 }
 
