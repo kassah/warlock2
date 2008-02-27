@@ -31,6 +31,7 @@ import org.dom4j.Element;
 public abstract class TreeConfigurationProvider implements
 		IConfigurationProvider {
 	
+	protected TreeConfigurationProvider parentProvider = null;
 	protected ArrayList<IConfigurationProvider> childProviders = new ArrayList<IConfigurationProvider>();
 	protected ArrayList<Element> unhandledElements = new ArrayList<Element>();
 	protected String elementName;
@@ -48,6 +49,10 @@ public abstract class TreeConfigurationProvider implements
 	public void addChildProvider(IConfigurationProvider provider)
 	{
 		childProviders.add(provider);
+		
+		if (provider instanceof TreeConfigurationProvider) {
+			((TreeConfigurationProvider)provider).parentProvider = this;
+		}
 		
 		parseUnhandledElements();
 	}
