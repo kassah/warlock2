@@ -21,7 +21,6 @@
  */
 package cc.warlock.core.configuration;
 
-import java.awt.color.ProfileDataException;
 import java.io.UnsupportedEncodingException;
 import java.security.InvalidAlgorithmParameterException;
 import java.security.InvalidKeyException;

@@ -51,9 +51,7 @@ import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Table;
 
 import cc.warlock.core.configuration.Account;
-import cc.warlock.core.configuration.ConfigurationUtil;
 import cc.warlock.core.configuration.Profile;
-import cc.warlock.core.configuration.WarlockConfiguration;
 import cc.warlock.core.stormfront.ProfileConfiguration;
 import cc.warlock.core.stormfront.network.SGEConnection;
 import cc.warlock.core.stormfront.network.SGEConnectionListener;
