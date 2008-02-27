@@ -21,6 +21,8 @@
  */
 package cc.warlock.core.stormfront.internal;
 
+import org.apache.commons.lang.StringEscapeUtils;
+
 import cc.warlock.core.stormfront.IStormFrontProtocolHandler;
 import cc.warlock.core.stormfront.client.IStormFrontClientViewer;
 import cc.warlock.core.stormfront.internal.SettingsTagHandler.ViewerVisitor;
@@ -53,6 +55,12 @@ public class SettingsElementsTagHandler extends DefaultTagHandler {
 	}
 	
 	@Override
+	public boolean handleCharacters(String characters) {
+		settings.append(StringEscapeUtils.escapeXml(characters));
+		return true;
+	}
+	
+	@Override
 	public void handleEnd(String rawXML) {
 		IStormFrontClientViewer.SettingType setting = null;
 		if ("presets".equals(getCurrentTag())) setting = IStormFrontClientViewer.SettingType.Presets;
@@ -78,7 +86,11 @@ public class SettingsElementsTagHandler extends DefaultTagHandler {
 				}
 			});
 		}
-		settings.append(rawXML);
+		
+		if (rawXML != null)
+		{
+			settings.append(rawXML);
+		}
 	}
 
 }
