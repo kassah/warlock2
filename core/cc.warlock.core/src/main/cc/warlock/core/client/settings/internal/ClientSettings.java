@@ -124,20 +124,15 @@ public class ClientSettings extends TreeConfigurationProvider implements IClient
 	
 	@Override
 	public boolean supportsElement(Element element) {
-		return (element.getName().equals("client-settings")
-				&& client.getClientId() != null && client.getClientId().get() != null);
-	}
-	
-	@Override
-	public void parseElement(Element element) {
 		if (element.getName().equals("client-settings")
-			&& client.getClientId() != null && client.getClientId().get() != null)
+				&& client.getClientId() != null && client.getClientId().get() != null)
 		{
 			String clientId = element.attributeValue("client-id");
 			if (clientId.equals(client.getClientId().get())) {
-				super.parseElement(element);
+				return true;
 			}
 		}
+		return false;
 	}
 	
 	@Override
