@@ -47,6 +47,7 @@ import cc.warlock.core.client.settings.internal.Ignore;
 import cc.warlock.core.client.settings.internal.Variable;
 import cc.warlock.core.client.settings.internal.WindowSettings;
 import cc.warlock.core.configuration.ConfigurationUtil;
+import cc.warlock.core.configuration.WarlockConfiguration;
 import cc.warlock.core.script.configuration.ScriptConfiguration;
 import cc.warlock.core.stormfront.client.IStormFrontClient;
 import cc.warlock.core.stormfront.client.IStormFrontClientViewer;
@@ -218,6 +219,8 @@ public class StormFrontServerSettings extends ClientConfigurationProvider {
 		{
 			importMacro(macro, settings);
 		}
+		
+		WarlockConfiguration.getWarlockConfiguration(ClientSettings.CLIENT_SETTINGS).save();
 		
 		for (IWarlockClientViewer viewer : settings.getStormFrontClient().getViewers())
 		{
