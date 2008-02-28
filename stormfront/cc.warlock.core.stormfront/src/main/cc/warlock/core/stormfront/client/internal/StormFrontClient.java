@@ -335,6 +335,7 @@ public class StormFrontClient extends WarlockClient implements IStormFrontClient
 	{
 		components.put(name, new ClientProperty<String>(this, name, value));
 		componentStreams.put(name, stream);
+		//stream.addComponent(name);
 	}
 	
 	public void updateComponent(String name, String value) {

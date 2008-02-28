@@ -30,7 +30,6 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 import org.eclipse.swt.SWT;
-import org.eclipse.swt.custom.StyleRange;
 import org.eclipse.swt.graphics.Color;
 import org.eclipse.swt.graphics.Font;
 import org.eclipse.swt.layout.GridData;
@@ -52,7 +51,6 @@ import cc.warlock.core.client.PropertyListener;
 import cc.warlock.core.client.WarlockString;
 import cc.warlock.core.client.settings.IHighlightString;
 import cc.warlock.rcp.configuration.GameViewConfiguration;
-import cc.warlock.rcp.ui.StyleRangeWithData;
 import cc.warlock.rcp.ui.WarlockText;
 import cc.warlock.rcp.ui.client.SWTPropertyListener;
 import cc.warlock.rcp.ui.client.SWTStreamListener;
@@ -470,16 +468,6 @@ public class StreamView extends ViewPart implements IStreamListener, IGameViewFo
 	
 	public void componentUpdated(IStream stream, String id, String value) {
 		WarlockText text = getTextForClient(stream.getClient());
-		StyleRange[] ranges = text.getStyleRanges();
-		StyleRange style = null;
-		for(StyleRange cur : ranges) {
-			if(cur instanceof StyleRangeWithData
-					&& ((StyleRangeWithData)cur).data.get("name").equals(id)) {
-				style = cur;
-				break;
-			}
-		}
-		if(style == null) return;
-		text.replaceTextRange(style.start, style.length, value);
+		text.replaceMarker(id, value);
 	}
 }

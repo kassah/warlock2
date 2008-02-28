@@ -27,10 +27,10 @@
  */
 package cc.warlock.core.stormfront.internal;
 
-import java.util.ArrayList;
 import java.util.EmptyStackException;
 import java.util.HashMap;
 import java.util.Iterator;
+import java.util.Map;
 import java.util.Stack;
 
 import cc.warlock.core.client.IStream;
@@ -54,7 +54,7 @@ public class StormFrontProtocolHandler implements IStormFrontProtocolHandler {
 	protected HashMap<String, IStormFrontTagHandler> defaultTagHandlers = new HashMap<String, IStormFrontTagHandler>();
 	protected Stack<StreamMarker> streamStack = new Stack<StreamMarker>();
 	protected Stack<String> tagStack = new Stack<String>();
-	protected ArrayList<IWarlockStyle> styles = new ArrayList<IWarlockStyle>();
+	protected HashMap<IWarlockStyle, Boolean> styles = new HashMap<IWarlockStyle, Boolean>();
 	protected int currentSpacing = 0;
 	
  	public StormFrontProtocolHandler(IStormFrontClient client) {
@@ -176,8 +176,9 @@ public class StormFrontProtocolHandler implements IStormFrontProtocolHandler {
 		// take a default action
 		if(!handleCharacters(characters)) {
 			WarlockString str = new WarlockString(characters);
-			for(IWarlockStyle style : styles) {
-				str.addStyle(style);
+			for(Map.Entry<IWarlockStyle, Boolean> style : styles.entrySet()) {
+				str.addStyle(style.getKey());
+				style.setValue(true);
 			}
 			
 			IStream stream;
@@ -289,11 +290,26 @@ public class StormFrontProtocolHandler implements IStormFrontProtocolHandler {
 	}
 	
 	public void addStyle(IWarlockStyle style) {
-		styles.add(style);
+		styles.put(style, false);
 	}
 	
 	public void removeStyle(IWarlockStyle style) {
+		Boolean sent = styles.get(style);
 		styles.remove(style);
+		if(sent != null && !sent.booleanValue()) {
+			WarlockString str = new WarlockString();
+			str.addStyle(style);
+
+			IStream stream;
+			try {
+				StreamMarker marker = streamStack.peek();
+				stream = marker.stream;
+			} catch(EmptyStackException e) {
+				stream = client.getDefaultStream();
+			}
+			
+			stream.send(str);
+		}
 	}
 	
 	public void clearStyles() {

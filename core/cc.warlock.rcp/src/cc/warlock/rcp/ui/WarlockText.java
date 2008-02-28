@@ -22,7 +22,8 @@
 package cc.warlock.rcp.ui;
 
 import java.util.ArrayList;
-import java.util.Hashtable;
+import java.util.HashMap;
+import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
@@ -83,16 +84,27 @@ public class WarlockText implements LineBackgroundListener {
 	public static final char OBJECT_HOLDER = '\uFFFc';
 	
 	private StyledText textWidget;
-	private Hashtable<Object, StyleRangeWithData> objects = new Hashtable<Object, StyleRangeWithData>();
-	private Hashtable<Control, Rectangle> anchoredControls = new Hashtable<Control, Rectangle>();
+	private HashMap<Object, StyleRangeWithData> objects = new HashMap<Object, StyleRangeWithData>();
+	private HashMap<Control, Rectangle> anchoredControls = new HashMap<Control, Rectangle>();
 	private Cursor handCursor, defaultCursor;
 	private int lineLimit = 5000;
 	private int doScrollDirection = SWT.UP;
 	private IWarlockClient client;
 	private WarlockCompass compass;
 	private Menu contextMenu;
+	private HashMap<String, WarlockTextMarker> markers;
 	
-	protected Hashtable<Integer, Color> lineBackgrounds = new Hashtable<Integer,Color>();
+	protected HashMap<Integer, Color> lineBackgrounds = new HashMap<Integer,Color>();
+	
+	private class WarlockTextMarker {
+		public int offset;
+		public int length;
+		
+		public WarlockTextMarker(int offset, int length) {
+			this.offset = offset;
+			this.length = length;
+		}
+	}
 	
 	public WarlockText(Composite parent, int style, IWarlockClient client) {
 		textWidget = new StyledText(parent, style);
@@ -420,12 +432,20 @@ public class WarlockText implements LineBackgroundListener {
 		int charCount = textWidget.getCharCount();
 		textWidget.append(string.toString());
 		
+		List<WarlockStringStyleRange> styles = string.getStyles();
+		
+		// add a marker for each style with a name
+		for(WarlockStringStyleRange style : styles) {
+			if(style.style.getName() != null) {
+				this.addMarker(style.style.getName(), charCount + style.start, style.length);
+			}
+		}
+		
 		/* Break up the ranges and merge overlapping styles because SWT only
 		 * allows 1 style per section
 		 */
 		ArrayList<WarlockStringStyleRange> currentStyles = new ArrayList<WarlockStringStyleRange>();
 		ArrayList<StyleRangeWithData> finishedStyles = new ArrayList<StyleRangeWithData>();
-		List<WarlockStringStyleRange> styles = string.getStyles();
 		int pos = 0;
 		while(pos >= 0) {
 			// update current styles
@@ -550,28 +570,53 @@ public class WarlockText implements LineBackgroundListener {
 		setCaretOffset(status.caretOffset);
 	}
 	
-	public void replaceTextRange(int start, int length, String text) {
+	// Don't not call this function on append, only replace/remove/insert
+	private void updateMarkers(int offset, int delta) {
+		for(Iterator<Map.Entry<String, WarlockTextMarker>> iter = markers.entrySet().iterator();
+		iter.hasNext(); )
+		{
+			Map.Entry<String, WarlockTextMarker> entry = iter.next();
+			WarlockTextMarker marker = entry.getValue();
+			// If the replaced text contains us, remove us (replaced text must
+			// remove a character before and after (can't get rid of markers on
+			// borders, unfortunately) this shouldn't happen much, if ever.
+			if(offset < marker.offset && marker.offset - offset + delta < 0) {
+				iter.remove();
+				continue;
+			}
+			// move us accordingly
+			if(marker.offset > offset)
+				marker.offset += delta;
+			else if(marker.offset == offset)
+				marker.length += delta;
+		}
+	}
+	
+	public void addMarker(String name, int offset, int length) {
+		if(markers == null)
+			markers = new HashMap<String, WarlockTextMarker>();
+		markers.put(name, new WarlockTextMarker(offset, length));
+	}
+	
+	public void replaceMarker(String name, String text) {
+		WarlockTextMarker marker = markers.get(name);
+		if(marker == null) return;
+		int start = marker.offset;
+		int length = marker.length;
 		ControlStatus status = preTextChange();
 		textWidget.replaceTextRange(start, length, text);
+		updateMarkers(start, text.length() - length);
 		postTextChange(status);
-	}
-	
-	public int getLineCount() {
-		return textWidget.getLineCount();
-	}
-	
-	public int getOffsetAtLine(int lineIndex) {
-		return textWidget.getOffsetAtLine(lineIndex);
 	}
 	
 	private ControlStatus constrainLineLimit(ControlStatus status) {
 		// 'status' is a pointer that allows us to change the object in our parent..
 		// in this method... it is intentional.
 		if (lineLimit > 0) {
-			int lines = getLineCount();
+			int lines = textWidget.getLineCount();
 			if (lines > lineLimit) {
 				int linesToRemove = lines - lineLimit;
-				int charsToRemove = getOffsetAtLine(linesToRemove);
+				int charsToRemove = textWidget.getOffsetAtLine(linesToRemove);
 				int pixelsToRemove = textWidget.getLinePixel(linesToRemove);
 				
 				// adjust ending status
@@ -583,6 +628,7 @@ public class WarlockText implements LineBackgroundListener {
 				if (status.selection.y < 0) status.selection.y = 0; // Don't let this go negative
 				
 				textWidget.replaceTextRange(0, charsToRemove, "");
+				updateMarkers(0, -charsToRemove);
 				updateLineBackgrounds(linesToRemove);
 				if(!status.atBottom && pixelsToRemove < 0)
 					textWidget.setTopPixel(-pixelsToRemove);
@@ -594,7 +640,7 @@ public class WarlockText implements LineBackgroundListener {
 	@SuppressWarnings("unchecked")
 	private void updateLineBackgrounds (int lines)
 	{
-		Hashtable<Integer, Color> copy = (Hashtable<Integer, Color>) lineBackgrounds.clone(); 
+		HashMap<Integer, Color> copy = (HashMap<Integer, Color>) lineBackgrounds.clone(); 
 		lineBackgrounds.clear();
 		
 		for (Map.Entry<Integer, Color> line : copy.entrySet())
@@ -657,9 +703,5 @@ public class WarlockText implements LineBackgroundListener {
 	
 	public IWarlockClient getClient() {
 		return client;
-	}
-	
-	public StyleRange[] getStyleRanges() {
-		return textWidget.getStyleRanges();
 	}
 }
