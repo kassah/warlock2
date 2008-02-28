@@ -27,6 +27,12 @@
             id="cc.warlock.rcp.views.scriptNavigatorView"
             name="Script Navigator">
       </view>
+      <view
+            allowMultiple="true"
+            class="cc.warlock.rcp.userstreams.ui.views.UserStream"
+            id="cc.warlock.rcp.userstreams.rightView.userStream"
+            name="Stream">
+      </view>
    </extension>
    <extension
          id="warlock"
@@ -188,6 +194,17 @@
             </command>
          </menu>
      </menuContribution>
+      <menuContribution
+            locationURI="menu:cc.warlock.rcp.menu.window">
+         <dynamic
+               class="cc.warlock.rcp.userstreams.ui.menu.StreamsContributionItem"
+               id="cc.warlock.rcp.userstreams.dynamicStreams">
+         </dynamic>
+         <separator
+               name="cc.warlock.rcp.userstreams.window.seperator"
+               visible="true">
+         </separator>
+      </menuContribution>
    </extension>
    <extension
          point="org.eclipse.ui.commands">
