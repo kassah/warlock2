@@ -44,7 +44,6 @@
 		<replace-versions id="cc.warlock.core.stormfront.script"/>
 		<replace-versions id="cc.warlock.rcp"/>
 		<replace-versions id="cc.warlock.rcp.stormfront"/>
-		<replace-versions id="cc.warlock.rcp.userstreams"/>
 	</target>
 	
 </project>
