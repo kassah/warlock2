@@ -9,7 +9,6 @@ Require-Bundle: org.eclipse.core.runtime,
  cc.warlock.core.script
 Eclipse-LazyStart: true
 Bundle-ClassPath: warlock2-stormfront-core.jar,
- lib/javacc.jar,
  warlock2-stormfront-core-eclipse.jar
 Export-Package: cc.warlock.core.stormfront,
  cc.warlock.core.stormfront.client,

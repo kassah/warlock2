@@ -3,7 +3,6 @@
 	<classpathentry kind="src" path="src/main"/>
 	<classpathentry kind="src" path="src/javacc"/>
 	<classpathentry kind="src" path="src/eclipse"/>
-	<classpathentry exported="true" kind="lib" path="lib/javacc.jar"/>
 	<classpathentry kind="con" path="org.eclipse.jdt.launching.JRE_CONTAINER"/>
 	<classpathentry kind="con" path="org.eclipse.pde.core.requiredPlugins"/>
 	<classpathentry kind="output" path="bin"/>
