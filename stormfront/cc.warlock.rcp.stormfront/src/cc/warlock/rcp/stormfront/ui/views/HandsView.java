@@ -255,8 +255,9 @@ public class HandsView extends ViewPart implements IPropertyListener<String>
 		IWindowSettings mainSettings = settings.getMainWindowSettings();
 		if(mainSettings == null)
 			return;
-		Color bg = ColorUtil.warlockColorToColor(mainSettings.getBackgroundColor());
-		Color fg = ColorUtil.warlockColorToColor(mainSettings.getForegroundColor());
+		
+		Color bg = ColorUtil.warlockColorToColor(settings.getStormFrontClient().getStormFrontSkin().getMainBackground());
+		Color fg = ColorUtil.warlockColorToColor(settings.getStormFrontClient().getStormFrontSkin().getMainForeground());
 		
 		setColors(fg, bg);
 	}

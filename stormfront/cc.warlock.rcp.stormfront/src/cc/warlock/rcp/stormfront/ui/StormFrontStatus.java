@@ -185,8 +185,8 @@ public class StormFrontStatus implements IPropertyListener<String> {
 	{
 		if (settings.getMainWindowSettings() == null) return;
 		
-		Color bg = ColorUtil.warlockColorToColor(settings.getMainWindowSettings().getBackgroundColor());
-		Color fg = ColorUtil.warlockColorToColor(settings.getMainWindowSettings().getForegroundColor());
+		Color bg = ColorUtil.warlockColorToColor(settings.getStormFrontClient().getStormFrontSkin().getMainBackground());
+		Color fg = ColorUtil.warlockColorToColor(settings.getStormFrontClient().getStormFrontSkin().getMainForeground());
 		
 		setColors(fg, bg);
 	}
