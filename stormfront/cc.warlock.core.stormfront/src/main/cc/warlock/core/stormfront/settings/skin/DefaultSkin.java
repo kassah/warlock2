@@ -81,13 +81,13 @@ public class DefaultSkin implements IStormFrontSkin {
 		defaultWindowBackground = new WarlockColor("191932");
 	}
 	
-	protected WarlockColor getMainForeground () {
+	public WarlockColor getMainForeground () {
 		WarlockColor mainFG = settings.getMainWindowSettings().getForegroundColor();
 		mainFG = mainFG.equals(WarlockColor.DEFAULT_COLOR) ? defaultWindowForeground : mainFG;
 		return mainFG;
 	}
 	
-	protected WarlockColor getMainBackground () {
+	public WarlockColor getMainBackground () {
 		WarlockColor mainBG = settings.getMainWindowSettings().getBackgroundColor();
 		mainBG = mainBG.equals(WarlockColor.DEFAULT_COLOR) ? defaultWindowBackground: mainBG;
 		return mainBG;

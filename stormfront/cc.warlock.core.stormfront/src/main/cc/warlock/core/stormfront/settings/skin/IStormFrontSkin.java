@@ -22,9 +22,13 @@
 package cc.warlock.core.stormfront.settings.skin;
 
 import cc.warlock.core.client.IWarlockSkin;
+import cc.warlock.core.client.WarlockColor;
 import cc.warlock.core.client.settings.IHighlightProvider;
 
 public interface IStormFrontSkin extends IWarlockSkin {
 
 	public void loadDefaultStyles (IHighlightProvider provider);
+	
+	public WarlockColor getMainBackground ();
+	public WarlockColor getMainForeground ();
 }
