@@ -154,5 +154,9 @@ public abstract class TreeConfigurationProvider implements
 		return elements;
 	}
 	
+	public TreeConfigurationProvider getParentProvider() {
+		return parentProvider;
+	}
+	
 	protected abstract void saveTo(List<Element> elements);
 }
