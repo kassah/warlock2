@@ -23,7 +23,6 @@ package cc.warlock.rcp.ui;
 
 import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
@@ -64,6 +63,9 @@ import org.eclipse.swt.widgets.Label;
 import org.eclipse.swt.widgets.Menu;
 import org.eclipse.swt.widgets.MenuItem;
 import org.eclipse.swt.widgets.ScrollBar;
+import org.eclipse.ui.ISharedImages;
+import org.eclipse.ui.PlatformUI;
+import org.eclipse.ui.ide.IDE;
 
 import cc.warlock.core.client.IWarlockClient;
 import cc.warlock.core.client.WarlockString;
@@ -109,6 +111,7 @@ public class WarlockText implements LineBackgroundListener {
 	public WarlockText(Composite parent, int style, IWarlockClient client) {
 		textWidget = new StyledText(parent, style);
 		this.client = client;
+		ISharedImages images = PlatformUI.getWorkbench().getSharedImages();
 		
 		Display display = parent.getDisplay();
 		handCursor = new Cursor(display, SWT.CURSOR_HAND);
@@ -122,6 +125,7 @@ public class WarlockText implements LineBackgroundListener {
 		            }
 		        });
 		itemCopy.setText("Copy");
+		itemCopy.setImage(images.getImage(ISharedImages.IMG_TOOL_COPY));
 		MenuItem itemClear = new MenuItem(contextMenu, SWT.PUSH);
 		itemClear.addSelectionListener(new SelectionAdapter() {
             public void widgetSelected(SelectionEvent arg0) {
@@ -129,6 +133,7 @@ public class WarlockText implements LineBackgroundListener {
             }
         });
 		itemClear.setText("Clear");
+		itemClear.setImage(images.getImage(ISharedImages.IMG_TOOL_DELETE));
 		textWidget.setMenu(contextMenu);
 		
 		addVerifyListener(new VerifyListener()  {
