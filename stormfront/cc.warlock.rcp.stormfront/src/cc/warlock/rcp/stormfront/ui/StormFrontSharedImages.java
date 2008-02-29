@@ -44,11 +44,15 @@ public class StormFrontSharedImages {
 	public static final String IMG_STATUS_PRONE = "/images/status/standard/prone.png";
 	public static final String IMG_STATUS_SITTING = "/images/status/standard/sitting.png";
 	public static final String IMG_STATUS_STANDING = "/images/status/standard/standing.png";
+	public static final String IMG_STATUS_INVIS_KNEELING = "/images/status/standard/inviskneeling.png";
+	public static final String IMG_STATUS_INVIS_PRONE = "/images/status/standard/invisprone.png";
+	public static final String IMG_STATUS_INVIS_SITTING = "/images/status/standard/invissitting.png";
+	public static final String IMG_STATUS_INVIS_STANDING = "/images/status/standard/invisstanding.png";
 	public static final String IMG_STATUS_DEAD = "/images/status/standard/dead.png";
 	public static final String IMG_STATUS_JOINED = "/images/status/standard/joined.png";
 	public static final String IMG_STATUS_STUNNED = "/images/status/standard/stunned.png";
 	public static final String IMG_STATUS_BLEEDING = "/images/status/standard/bleeding.png";
-	public static final String IMG_STATUS_WEBBED = "/images/status/standard/webbed.png";
+	public static final String IMG_STATUS_WEBBED = "/images/status/standard/webbed.svg";
 	
 	public static final String IMG_LEFT_HAND = "/images/left_hand.gif";
 	public static final String IMG_RIGHT_HAND = "/images/right_hand.gif";

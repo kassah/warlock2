@@ -128,21 +128,41 @@ public class StormFrontStatus implements IPropertyListener<String> {
 		{
 			ICharacterStatus status = activeClient.getCharacterStatus();
 			
-			if (status.getStatus().get(ICharacterStatus.StatusType.Standing))
+			if (status.getStatus().get(ICharacterStatus.StatusType.Invisible)) 
 			{
-				setStatusImage(0, StormFrontSharedImages.IMG_STATUS_STANDING);
-			}
-			else if (status.getStatus().get(ICharacterStatus.StatusType.Sitting))
-			{
-				setStatusImage(0, StormFrontSharedImages.IMG_STATUS_SITTING);
-			}
-			else if (status.getStatus().get(ICharacterStatus.StatusType.Kneeling))
-			{
-				setStatusImage(0, StormFrontSharedImages.IMG_STATUS_KNEELING);
-			}
-			else if (status.getStatus().get(ICharacterStatus.StatusType.Prone))
-			{
-				setStatusImage(0, StormFrontSharedImages.IMG_STATUS_PRONE);
+				if (status.getStatus().get(ICharacterStatus.StatusType.Standing))
+				{
+					setStatusImage(0, StormFrontSharedImages.IMG_STATUS_INVIS_STANDING);
+				}
+				else if (status.getStatus().get(ICharacterStatus.StatusType.Sitting))
+				{
+					setStatusImage(0, StormFrontSharedImages.IMG_STATUS_INVIS_SITTING);
+				}
+				else if (status.getStatus().get(ICharacterStatus.StatusType.Kneeling))
+				{
+					setStatusImage(0, StormFrontSharedImages.IMG_STATUS_INVIS_KNEELING);
+				}
+				else if (status.getStatus().get(ICharacterStatus.StatusType.Prone))
+				{
+					setStatusImage(0, StormFrontSharedImages.IMG_STATUS_INVIS_PRONE);
+				}
+			} else {
+				if (status.getStatus().get(ICharacterStatus.StatusType.Standing))
+				{
+					setStatusImage(0, StormFrontSharedImages.IMG_STATUS_STANDING);
+				}
+				else if (status.getStatus().get(ICharacterStatus.StatusType.Sitting))
+				{
+					setStatusImage(0, StormFrontSharedImages.IMG_STATUS_SITTING);
+				}
+				else if (status.getStatus().get(ICharacterStatus.StatusType.Kneeling))
+				{
+					setStatusImage(0, StormFrontSharedImages.IMG_STATUS_KNEELING);
+				}
+				else if (status.getStatus().get(ICharacterStatus.StatusType.Prone))
+				{
+					setStatusImage(0, StormFrontSharedImages.IMG_STATUS_PRONE);
+				}
 			}
 			
 			if (status.getStatus().get(ICharacterStatus.StatusType.Joined))
@@ -153,8 +173,7 @@ public class StormFrontStatus implements IPropertyListener<String> {
 				setStatusImage(1, StormFrontSharedImages.IMG_STATUS_BLANK);
 			}
 			
-			if (status.getStatus().get(ICharacterStatus.StatusType.Hidden)
-				|| status.getStatus().get(ICharacterStatus.StatusType.Invisible))
+			if (status.getStatus().get(ICharacterStatus.StatusType.Hidden))
 			{
 				setStatusImage(2, StormFrontSharedImages.IMG_STATUS_HIDDEN);
 			}
