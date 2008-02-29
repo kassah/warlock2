@@ -164,10 +164,14 @@ TOKEN: {
 	<TAG_END_OPEN: "</"> { tagBuffer.setLength(0); buffer(matchedToken.image); }: IN_TAG_MODE |
 	
 	<ENTITY: "&" ("#")? (<LETTER> | <DIGIT>)+ ";"> { buffer(matchedToken.image); matchedToken.image = matchedToken.image.substring(1, matchedToken.image.length() - 1); } |
-	<PCDATA: (~["<","&"])+ | "&" | "<" ~["A"-"Z","a"-"z", "_"]> { buffer(matchedToken.image); } |
+	<PCDATA: (~["<","&","\07"])+ | "&" | "<" ~["A"-"Z","a"-"z", "_"]> { buffer(matchedToken.image); } |
 	 <NAMECHAR: (<LETTER> | <DIGIT> | "." | "-" | "_" | ":")> |
 	 <DIGIT: (["0"-"9"])> |
 	 <LETTER: (["A"-"Z","a"-"z"])>
+}
+
+SKIP: {
+	<BELL: "\07"> { java.awt.Toolkit.getDefaultToolkit().beep(); }
 }
 
 <IN_TAG_MODE> TOKEN: {
