@@ -1,0 +1,1 @@
+Issue $issue.getKey() deleted by $event.getRemoteUser().getFullName()

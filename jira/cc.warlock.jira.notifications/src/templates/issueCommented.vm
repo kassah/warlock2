@@ -1,0 +1,3 @@
+Comment on $issue.getKey() by $event.getRemoteUser().getFullName()
+$comment_text
+Link: $base_url/browse/$issue.getKey()#action_$comment.getId()

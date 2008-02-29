@@ -1,0 +1,5 @@
+Issue $issue.getKey() resolved by $event.getRemoteUser().getFullName(), Resolution: $issue.getResolutionObject().getDescription()
+#if($comment)
+$comment_text
+#end
+Link: $base_url/browse/$issue.getKey()

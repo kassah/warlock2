@@ -1,0 +1,2 @@
+Issue $issue.getKey() closed by $event.getRemoteUser().getFullName()
+Link: $base_url/browse/$issue.getKey()
