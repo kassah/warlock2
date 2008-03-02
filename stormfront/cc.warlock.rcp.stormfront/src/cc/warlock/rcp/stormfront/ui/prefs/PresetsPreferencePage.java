@@ -60,6 +60,7 @@ import cc.warlock.core.client.internal.WarlockStyle;
 import cc.warlock.core.client.settings.internal.WindowSettings;
 import cc.warlock.core.stormfront.client.IStormFrontClient;
 import cc.warlock.core.stormfront.settings.internal.StormFrontClientSettings;
+import cc.warlock.rcp.stormfront.ui.views.StormFrontGameView;
 import cc.warlock.rcp.util.ColorUtil;
 import cc.warlock.rcp.util.FontSelector;
 import cc.warlock.rcp.util.RCPUtil;
@@ -162,20 +163,32 @@ public class PresetsPreferencePage extends PropertyPage implements
 	protected Color getWorkingBackgroundColor (IWarlockStyle style)
 	{
 		WarlockColor color = style.getBackgroundColor();
-		if (color.equals(settings.getMainWindowSettings().getBackgroundColor()))
+		if (color.isDefault())
 		{
-			color = mainWindow.getBackgroundColor();
+			if (style.getName() != null) {
+				color = settings.getStormFrontClient().getStormFrontSkin().getDefaultBackgroundColor(style.getName());
+			}
 		}
+		if (color.isDefault()) {
+			color = ColorUtil.rgbToWarlockColor(mainBGSelector.getColorValue());
+		}
+		
 		return ColorUtil.warlockColorToColor(color);
 	}
 	
 	protected Color getWorkingForegroundColor (IWarlockStyle style)
 	{
 		WarlockColor color = style.getForegroundColor();
-		if (color.equals(settings.getMainWindowSettings().getForegroundColor()))
+		if (color.isDefault())
 		{
-			color = mainWindow.getForegroundColor();
+			if (style.getName() != null) {
+				color = settings.getStormFrontClient().getStormFrontSkin().getDefaultForegroundColor(style.getName());
+			}
 		}
+		if (color.isDefault()) {
+			color = ColorUtil.rgbToWarlockColor(mainFGSelector.getColorValue());
+		}
+		
 		return ColorUtil.warlockColorToColor(color);
 	}
 	
@@ -247,8 +260,8 @@ public class PresetsPreferencePage extends PropertyPage implements
 	{
 		currentStyle = (IWarlockStyle) selection.getFirstElement();
 		
-		bgSelector.setColorValue(ColorUtil.warlockColorToRGB(currentStyle.getBackgroundColor()));
-		fgSelector.setColorValue(ColorUtil.warlockColorToRGB(currentStyle.getForegroundColor()));
+		bgSelector.setColorValue(getWorkingBackgroundColor(currentStyle).getRGB());
+		fgSelector.setColorValue(getWorkingForegroundColor(currentStyle).getRGB());
 	}
 
 	private ColorSelector colorSelectorWithLabel (Composite parent, String text)
@@ -468,8 +481,8 @@ public class PresetsPreferencePage extends PropertyPage implements
 		updatePresetColors(StormFrontClientSettings.PRESET_WHISPER, whisperStyleRange);
 		updatePresetColors(StormFrontClientSettings.PRESET_THOUGHT, thoughtStyleRange);
 		
-		roomNameStyleRange.background = ColorUtil.warlockColorToColor(styles.get(StormFrontClientSettings.PRESET_ROOM_NAME).getBackgroundColor());
-		roomNameStyleRange.foreground = ColorUtil.warlockColorToColor(styles.get(StormFrontClientSettings.PRESET_ROOM_NAME).getForegroundColor());
+//		roomNameStyleRange.background = ColorUtil.warlockColorToColor(styles.get(StormFrontClientSettings.PRESET_ROOM_NAME).getBackgroundColor());
+//		roomNameStyleRange.foreground = ColorUtil.warlockColorToColor(styles.get(StormFrontClientSettings.PRESET_ROOM_NAME).getForegroundColor());
 		
 		columnStyleRange.background = mainBG;
 		columnStyleRange.foreground = mainFG;
@@ -483,10 +496,13 @@ public class PresetsPreferencePage extends PropertyPage implements
 	@Override
 	public boolean performOk() {
 		
+		boolean updateView = false;
+		
 		for (WarlockStyle style: styles.values())
 		{
 			if (style.needsUpdate())
 			{
+				updateView = true;
 				settings.getHighlightConfigurationProvider().removeNamedStyle(style.getOriginalStyle().getName());
 				settings.getHighlightConfigurationProvider().addNamedStyle(style.getName(), style);
 			}
@@ -494,8 +510,14 @@ public class PresetsPreferencePage extends PropertyPage implements
 		
 		if (mainWindow.needsUpdate())
 		{
+			updateView = true;
 			settings.getWindowSettingsProvider().removeWindowSettings(mainWindow.getOriginalWindowSettings());
 			settings.getWindowSettingsProvider().addWindowSettings(mainWindow);
+		}
+		
+		if (updateView) {
+			StormFrontGameView view = (StormFrontGameView) StormFrontGameView.getGameViewForClient(settings.getClient());
+			view.loadStormFrontClientSettings(settings);
 		}
 		
 		return true;
