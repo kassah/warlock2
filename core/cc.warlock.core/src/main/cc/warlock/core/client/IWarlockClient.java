@@ -27,6 +27,7 @@ package cc.warlock.core.client;
 import java.io.IOException;
 import java.util.Collection;
 
+import cc.warlock.core.client.logging.IClientLogger;
 import cc.warlock.core.client.settings.IClientSettings;
 import cc.warlock.core.network.IConnection;
 
@@ -147,4 +148,14 @@ public interface IWarlockClient extends IRoomListener {
 	 * @return A unique string identifying this client (this string should be a constant that can be restored from at a later time)
 	 */
 	public IProperty<String> getClientId();
+	
+	/**
+	 * @return The current character's name (this is used in various places)
+	 */
+	public IProperty<String> getCharacterName();
+	
+	/**
+	 * @return This client's logger (for use by streams etc)
+	 */
+	public IClientLogger getLogger();
 }

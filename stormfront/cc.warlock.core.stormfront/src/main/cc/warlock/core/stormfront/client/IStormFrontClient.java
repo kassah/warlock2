@@ -121,12 +121,7 @@ public interface IStormFrontClient extends IWarlockClient, IRoomListener {
 	 * @return The character status
 	 */
 	public ICharacterStatus getCharacterStatus();
-	
-	/**
-	 * @return The name of the character associated with this client.
-	 */
-	public IProperty<String> getCharacterName();
-	
+		
 	/**
 	 * @return A list of currently running scripts
 	 */

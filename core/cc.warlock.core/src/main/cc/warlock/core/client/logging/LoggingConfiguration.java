@@ -19,7 +19,7 @@
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
-package cc.warlock.rcp.configuration;
+package cc.warlock.core.client.logging;
 
 import java.io.File;
 import java.util.Arrays;
@@ -31,6 +31,7 @@ import org.dom4j.Element;
 import cc.warlock.core.configuration.ConfigurationUtil;
 import cc.warlock.core.configuration.IConfigurationProvider;
 import cc.warlock.core.configuration.WarlockConfiguration;
+
 
 public class LoggingConfiguration implements IConfigurationProvider {
 
@@ -51,9 +52,9 @@ public class LoggingConfiguration implements IConfigurationProvider {
 	
 	protected LoggingConfiguration ()
 	{
-		logFormat = LOG_FORMAT_HTML;
+		logFormat = LOG_FORMAT_TEXT;
 		enableLogging = true;
-		logDirectory = ConfigurationUtil.getConfigurationDirectory("logs", false);
+		logDirectory = ConfigurationUtil.getConfigurationDirectory("logs", true);
 		
 		WarlockConfiguration.getMainConfiguration().addConfigurationProvider(this);
 	}
@@ -73,7 +74,7 @@ public class LoggingConfiguration implements IConfigurationProvider {
 	public void parseElement(Element element) {
 		if (element.getName().equals("logging"))
 		{
-			enableLogging = Boolean.parseBoolean(element.attributeValue("enable"));
+			enableLogging = Boolean.parseBoolean(element.attributeValue("enabled"));
 			logFormat = element.attributeValue("format");
 			
 			Element dir = element.element("dir");

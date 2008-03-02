@@ -30,6 +30,7 @@ import java.util.ArrayList;
 
 import cc.warlock.core.client.IWarlockClient;
 import cc.warlock.core.client.IWarlockStyle;
+import cc.warlock.core.client.WarlockClientRegistry;
 import cc.warlock.core.client.WarlockString;
 import cc.warlock.core.client.internal.WarlockStyle;
 import cc.warlock.core.network.IConnection;
@@ -133,6 +134,8 @@ public class StormFrontConnection implements IConnection
 		{
 			listener.disconnected(this);
 		}
+		
+		WarlockClientRegistry.clientDisconnected(client);
 	}
 	
 	class SFParser implements Runnable {

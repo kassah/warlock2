@@ -54,6 +54,7 @@ public class Stream implements IStream {
 	private Lock writeLock = lock.writeLock();
 	protected boolean isPrompting = false;
 	private boolean hasView = false;
+	protected boolean isLogging = false;
 	
 	protected Stream (IWarlockClient client, String streamName) {
 		this.client = client;
@@ -113,6 +114,10 @@ public class Stream implements IStream {
 	public void send(WarlockString text) {
 		readLock.lock();
 		try {
+			if (isLogging && client.getLogger() != null) {
+				client.getLogger().logText(text);
+			}
+			
 			for(IStreamListener listener : listeners) {
 				try {
 					listener.streamReceivedText(this, text);
@@ -132,6 +137,10 @@ public class Stream implements IStream {
 		
 		readLock.lock();
 		try {
+			if (isLogging && client.getLogger() != null) {
+				client.getLogger().logPrompt(prompt);
+			}
+			
 			for (IStreamListener listener : listeners)
 			{
 				try {
@@ -148,6 +157,10 @@ public class Stream implements IStream {
 	public void sendCommand(String text) {
 		readLock.lock();
 		try {
+			if (isLogging && client.getLogger() != null) {
+				client.getLogger().logEcho(text);
+			}
+			
 			for (IStreamListener listener : listeners)
 			{
 				listener.streamReceivedCommand(this, text);
@@ -166,6 +179,10 @@ public class Stream implements IStream {
 	public void echo(String text) {
 		readLock.lock();
 		try {
+			if (isLogging && client.getLogger() != null) {
+				client.getLogger().logEcho(text);
+			}
+			
 			for (IStreamListener listener : listeners)
 			{
 				try {
@@ -188,7 +205,13 @@ public class Stream implements IStream {
 		if (streams.containsKey(name))
 			return streams.get(name);
 		
-		else return new Stream(client, name);
+		else {
+			Stream stream = new Stream(client, name);
+			if (name.contains(IWarlockClient.DEFAULT_STREAM_NAME)) {
+				stream.setLogging(true);
+			}
+			return stream;
+		}
 	}
 	
 	public static Collection<Stream> getStreams ()
@@ -227,5 +250,9 @@ public class Stream implements IStream {
 		} finally {
 			readLock.unlock();
 		}
+	}
+	
+	public void setLogging (boolean logging) {
+		this.isLogging = logging;
 	}
 }

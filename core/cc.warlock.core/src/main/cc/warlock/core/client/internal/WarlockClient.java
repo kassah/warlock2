@@ -36,6 +36,11 @@ import cc.warlock.core.client.IRoomListener;
 import cc.warlock.core.client.IStream;
 import cc.warlock.core.client.IWarlockClient;
 import cc.warlock.core.client.IWarlockClientViewer;
+import cc.warlock.core.client.WarlockClientAdapter;
+import cc.warlock.core.client.WarlockClientRegistry;
+import cc.warlock.core.client.logging.IClientLogger;
+import cc.warlock.core.client.logging.LoggingConfiguration;
+import cc.warlock.core.client.logging.SimpleLogger;
 import cc.warlock.core.client.settings.IClientSettings;
 import cc.warlock.core.client.settings.internal.ClientSettings;
 import cc.warlock.core.network.IConnection;
@@ -53,12 +58,27 @@ public abstract class WarlockClient implements IWarlockClient {
 	private Collection<IRoomListener> roomListeners = Collections.synchronizedCollection(new ArrayList<IRoomListener>());
 	protected ClientProperty<ICompass> compass = new ClientProperty<ICompass>(this, "compass", null);
 	protected IClientSettings clientSettings;
+	protected IClientLogger logger;
 	
 	public WarlockClient () {
 		viewers = new ArrayList<IWarlockClientViewer>();
 		streamPrefix = "client:" + hashCode() + ":";
 		
 		clientSettings = createClientSettings();
+		
+		if (LoggingConfiguration.instance().getLogFormat().equals(LoggingConfiguration.LOG_FORMAT_TEXT))
+		{
+			logger = new SimpleLogger(this);
+		}
+		
+		WarlockClientRegistry.addWarlockClientListener(new WarlockClientAdapter() {
+			@Override
+			public void clientDisconnected(IWarlockClient client) {
+				if (client == WarlockClient.this && logger != null) {
+					logger.flush();
+				}
+			}
+		});
 	}
 	
 	protected IClientSettings createClientSettings ()
@@ -163,6 +183,10 @@ public abstract class WarlockClient implements IWarlockClient {
 	
 	public IClientSettings getClientSettings() {
 		return clientSettings;
+	}
+
+	public IClientLogger getLogger() {
+		return logger;
 	}
 	
 }
