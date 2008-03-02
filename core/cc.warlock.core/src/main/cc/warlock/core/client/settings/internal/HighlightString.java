@@ -30,7 +30,6 @@ import cc.warlock.core.client.settings.IHighlightString;
 
 public class HighlightString extends PatternSetting implements IHighlightString {
 
-	protected Pattern pattern;
 	protected IWarlockStyle style;
 	
 	public HighlightString (IHighlightProvider provider, String pattern, boolean literal, boolean caseSensitive, IWarlockStyle style) {	
