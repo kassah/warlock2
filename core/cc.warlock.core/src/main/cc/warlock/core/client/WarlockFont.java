@@ -52,8 +52,18 @@ public class WarlockFont {
 		this.size = size;
 	}
 	
+	@Override
+	public boolean equals(Object obj) {
+		if (obj instanceof WarlockFont) {
+			WarlockFont other = (WarlockFont)obj;
+			
+			return (familyName.equals(other.familyName) && size == other.size);
+		}
+		return super.equals(obj);
+	}
+	
 	public boolean isDefaultFont()
 	{
-		return this == DEFAULT_FONT;
+		return this.equals(DEFAULT_FONT);
 	}
 }
