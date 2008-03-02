@@ -59,10 +59,12 @@ import org.eclipse.ui.IWorkbenchPropertyPage;
 import org.eclipse.ui.dialogs.PropertyPage;
 
 import cc.warlock.core.client.WarlockColor;
+import cc.warlock.core.client.internal.WarlockStyle;
 import cc.warlock.core.client.settings.IHighlightString;
 import cc.warlock.core.client.settings.internal.HighlightString;
 import cc.warlock.core.stormfront.client.IStormFrontClient;
 import cc.warlock.core.stormfront.settings.internal.StormFrontClientSettings;
+import cc.warlock.core.stormfront.settings.skin.IStormFrontSkin;
 import cc.warlock.rcp.ui.WarlockSharedImages;
 import cc.warlock.rcp.util.ColorUtil;
 
@@ -78,9 +80,11 @@ public class HighlightStringsPreferencePage extends PropertyPage implements
 	protected Button defaultBG, customBG, defaultFG, customFG;
 	protected Button addString, removeString;
 	protected IStormFrontClient client;
+	protected IStormFrontSkin skin;
 	protected StormFrontClientSettings settings;
 	protected HighlightString selectedString;
 	protected ArrayList<HighlightString> highlightStrings = new ArrayList<HighlightString>();
+
 	
 	private void copyHighlightStrings ()
 	{
@@ -292,8 +296,8 @@ public class HighlightStringsPreferencePage extends PropertyPage implements
 		WarlockColor fgColor = string.getStyle().getForegroundColor();
 		WarlockColor bgColor = string.getStyle().getBackgroundColor();
 
-		boolean fgIsDefault = fgColor.equals(settings.getMainWindowSettings().getForegroundColor());
-		boolean bgIsDefault = bgColor.equals(settings.getMainWindowSettings().getBackgroundColor());
+		boolean fgIsDefault = fgColor.isDefault();
+		boolean bgIsDefault = bgColor.isDefault();
 		
 		defaultFG.setSelection(fgIsDefault);
 		customFG.setSelection(!fgIsDefault);
@@ -303,14 +307,23 @@ public class HighlightStringsPreferencePage extends PropertyPage implements
 		customBG.setSelection(!bgIsDefault);
 		customBGSelector.setEnabled(!bgIsDefault);
 		
-		customFGSelector.setColorValue(ColorUtil.warlockColorToRGB(fgColor));
-		customBGSelector.setColorValue(ColorUtil.warlockColorToRGB(bgColor));
+		if (fgIsDefault) {
+			customFGSelector.setColorValue(ColorUtil.warlockColorToRGB(skin.getMainForeground()));
+		} else {
+			customFGSelector.setColorValue(ColorUtil.warlockColorToRGB(fgColor));
+		}
+		
+		if (bgIsDefault) {
+			customBGSelector.setColorValue(ColorUtil.warlockColorToRGB(skin.getMainBackground()));
+		} else {
+			customBGSelector.setColorValue(ColorUtil.warlockColorToRGB(bgColor));
+		}
 		fillLineButton.setSelection(string.getStyle().isFullLine());
 	}
 	
 	private void defaultForegroundSelected ()
 	{
-		selectedString.getStyle().setForegroundColor(settings.getMainWindowSettings().getForegroundColor());
+		selectedString.getStyle().setForegroundColor(skin.getMainForeground());
 		customFGSelector.setEnabled(false);
 		customFGSelector.setColorValue(ColorUtil.warlockColorToRGB(selectedString.getStyle().getForegroundColor()));
 		stringTable.update(selectedString, null);
@@ -326,7 +339,7 @@ public class HighlightStringsPreferencePage extends PropertyPage implements
 	
 	private void defaultBackgroundSelected ()
 	{
-		selectedString.getStyle().setBackgroundColor(settings.getMainWindowSettings().getBackgroundColor());
+		selectedString.getStyle().setBackgroundColor(skin.getMainBackground());
 		customBGSelector.setEnabled(false);
 		customBGSelector.setColorValue(ColorUtil.warlockColorToRGB(selectedString.getStyle().getBackgroundColor()));
 		stringTable.update(selectedString, null);	
@@ -386,15 +399,17 @@ public class HighlightStringsPreferencePage extends PropertyPage implements
 		public void removeListener(ILabelProviderListener listener) {}
 
 		public Color getBackground(Object element, int columnIndex) {
+			HighlightString string = (HighlightString)element;
 			Color c = new Color(HighlightStringsPreferencePage.this.getShell().getDisplay(),
-					ColorUtil.warlockColorToRGB(((HighlightString)element).getStyle().getBackgroundColor()));
+					ColorUtil.warlockColorToRGB(skin.getBackgroundColor(string)));
 			
 			return c;
 		}
 
 		public Color getForeground(Object element, int columnIndex) {
-			Color c = new Color(HighlightStringsPreferencePage.this.getShell().getDisplay(),
-					ColorUtil.warlockColorToRGB(((HighlightString)element).getStyle().getForegroundColor()));
+			HighlightString string = (HighlightString)element;
+			Color c = new Color(HighlightStringsPreferencePage.this.getShell().getDisplay(), 
+					ColorUtil.warlockColorToRGB(skin.getForegroundColor(string)));
 			
 			return c;
 		}
@@ -404,6 +419,7 @@ public class HighlightStringsPreferencePage extends PropertyPage implements
 	public void setElement(IAdaptable element) {
 		client = (IStormFrontClient)element.getAdapter(IStormFrontClient.class);
 		settings = (StormFrontClientSettings) client.getStormFrontClientSettings();
+		skin = settings.getStormFrontClient().getStormFrontSkin();
 		
 		if (highlightStrings.isEmpty())
 			copyHighlightStrings();
@@ -420,9 +436,9 @@ public class HighlightStringsPreferencePage extends PropertyPage implements
 //		client.getServerSettings().clearHighlightStrings();
 		
 		for (HighlightString string : highlightStrings) {
-			if (string.needsUpdate()) {
-				settings.getHighlightConfigurationProvider().removeHighlightString(string.getOriginalHighlightString());
-				settings.getHighlightConfigurationProvider().addHighlightString(string);
+			WarlockStyle style = (WarlockStyle) string.getStyle();
+			if (string.needsUpdate() || style.needsUpdate()) {
+				settings.getHighlightConfigurationProvider().replaceHighlightString(string.getOriginalHighlightString(), string);
 			}
 		}
 		
