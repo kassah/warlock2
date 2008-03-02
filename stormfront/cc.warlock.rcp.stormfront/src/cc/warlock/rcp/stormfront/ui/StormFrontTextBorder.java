@@ -153,7 +153,7 @@ public class StormFrontTextBorder implements PaintListener, IPropertyListener<St
 
 	private void drawBorder(GC gc) {
 		if (highlighted) {
-			gc.setLineWidth(4);
+			gc.setLineWidth(6);
 			gc.setForeground(color);
 			gc.drawRectangle(textWidget.getBounds());
 		}
