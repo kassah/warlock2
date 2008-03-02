@@ -286,7 +286,7 @@ public class HighlightStringsPreferencePage extends PropertyPage implements
 	protected HighlightString createHighlightString ()
 	{
 		return new HighlightString(
-			settings.getHighlightConfigurationProvider(), "<Highlight Text>", true, false, null);
+			settings.getHighlightConfigurationProvider(), "<Highlight Text>", true, false, new WarlockStyle());
 	}
 	
 	private void highlightStringSelected (HighlightString string)
