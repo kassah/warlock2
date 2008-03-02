@@ -27,6 +27,7 @@ import cc.warlock.core.client.IWarlockStyle;
 import cc.warlock.core.client.WarlockColor;
 import cc.warlock.core.client.internal.WarlockStyle;
 import cc.warlock.core.client.settings.IHighlightProvider;
+import cc.warlock.core.client.settings.IHighlightString;
 import cc.warlock.core.stormfront.settings.IStormFrontClientSettings;
 import cc.warlock.core.stormfront.settings.internal.StormFrontClientSettings;
 
@@ -83,13 +84,13 @@ public class DefaultSkin implements IStormFrontSkin {
 	
 	public WarlockColor getMainForeground () {
 		WarlockColor mainFG = settings.getMainWindowSettings().getForegroundColor();
-		mainFG = mainFG.equals(WarlockColor.DEFAULT_COLOR) ? defaultWindowForeground : mainFG;
+		mainFG = mainFG.isDefault() ? defaultWindowForeground : mainFG;
 		return mainFG;
 	}
 	
 	public WarlockColor getMainBackground () {
 		WarlockColor mainBG = settings.getMainWindowSettings().getBackgroundColor();
-		mainBG = mainBG.equals(WarlockColor.DEFAULT_COLOR) ? defaultWindowBackground: mainBG;
+		mainBG = mainBG.isDefault() ? defaultWindowBackground: mainBG;
 		return mainBG;
 	}
 	
@@ -105,7 +106,7 @@ public class DefaultSkin implements IStormFrontSkin {
 		else if (type == ColorType.CommandLine_BarColor)
 			return commandLineBarColor;
 		
-		return WarlockColor.DEFAULT_COLOR;
+		return new WarlockColor(WarlockColor.DEFAULT_COLOR);
 	}
 	
 	public WarlockColor getStormFrontColor(ColorType type) {
@@ -129,7 +130,7 @@ public class DefaultSkin implements IStormFrontSkin {
 	// At any rate -- these look to be the right "default" settings for stormfront..
 	public WarlockColor getDefaultForegroundColor (String styleName)
 	{
-		WarlockColor color = WarlockColor.DEFAULT_COLOR;
+		WarlockColor color = new WarlockColor(WarlockColor.DEFAULT_COLOR);
 		
 		if (fgColors.containsKey(styleName))
 		{
@@ -146,7 +147,7 @@ public class DefaultSkin implements IStormFrontSkin {
 	
 	public WarlockColor getDefaultBackgroundColor (String styleName)
 	{
-		WarlockColor color = WarlockColor.DEFAULT_COLOR;
+		WarlockColor color = new WarlockColor(WarlockColor.DEFAULT_COLOR);
 		
 		if (bgColors.containsKey(styleName))
 		{
@@ -196,5 +197,21 @@ public class DefaultSkin implements IStormFrontSkin {
 
 	public WarlockColor getDefaultWindowForeground() {
 		return defaultWindowForeground;
+	}
+	
+	public WarlockColor getBackgroundColor(IHighlightString string) {
+		WarlockColor background = string.getStyle().getBackgroundColor();
+		if (background.isDefault()) {
+			background = getMainBackground();
+		}
+		return background;
+	}
+	
+	public WarlockColor getForegroundColor(IHighlightString string) {
+		WarlockColor foreground = string.getStyle().getForegroundColor();
+		if (foreground.isDefault()) {
+			foreground = getMainForeground();
+		}
+		return foreground;
 	}
 }
