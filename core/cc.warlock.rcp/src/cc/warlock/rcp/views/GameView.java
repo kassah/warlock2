@@ -333,7 +333,8 @@ public abstract class GameView extends StreamView implements IWarlockClientViewe
 				IWorkbenchPage page = PlatformUI.getWorkbench().getActiveWorkbenchWindow().getActivePage();
 				//IViewPart part = page.findView(ConnectionView.VIEW_ID);
 				try {
-					page.showView(ConnectionView.VIEW_ID);
+					if (page != null) 
+						page.showView(ConnectionView.VIEW_ID);
 				} catch (PartInitException e) {
 					e.printStackTrace();
 				}
