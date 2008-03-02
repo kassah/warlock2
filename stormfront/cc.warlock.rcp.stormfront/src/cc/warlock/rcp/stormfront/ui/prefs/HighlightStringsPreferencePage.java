@@ -84,6 +84,8 @@ public class HighlightStringsPreferencePage extends PropertyPage implements
 	protected IStormFrontSkin skin;
 	protected StormFrontClientSettings settings;
 	protected HighlightString selectedString;
+	protected ArrayList<HighlightString> addedStrings = new ArrayList<HighlightString>();
+	protected ArrayList<HighlightString> removedStrings = new ArrayList<HighlightString>();
 	protected ArrayList<HighlightString> highlightStrings = new ArrayList<HighlightString>();
 
 	
@@ -358,8 +360,12 @@ public class HighlightStringsPreferencePage extends PropertyPage implements
 	
 	private void removeStringClicked() {
 		HighlightString string = selectedString;
-		
-		settings.getHighlightConfigurationProvider().removeHighlightString(string.getOriginalHighlightString());
+		if (addedStrings.contains(string)) {
+			addedStrings.remove(string);
+		}
+		else {
+			removedStrings.add(string);
+		}
 		
 		highlightStrings.remove(string);
 		stringTable.remove(string);
@@ -368,6 +374,7 @@ public class HighlightStringsPreferencePage extends PropertyPage implements
 	private void addStringClicked() {
 		HighlightString newString = createHighlightString();
 		highlightStrings.add(newString);
+		addedStrings.add(newString);
 		
 		selectedString = newString;
 		
@@ -440,8 +447,22 @@ public class HighlightStringsPreferencePage extends PropertyPage implements
 		
 		for (HighlightString string : highlightStrings) {
 			WarlockStyle style = (WarlockStyle) string.getStyle();
-			if (string.needsUpdate() || style.needsUpdate()) {
+			
+			if (addedStrings.contains(string)) {
+				settings.getHighlightConfigurationProvider().addHighlightString(string);
+				addedStrings.remove(string);
+			}
+			else if (string.needsUpdate() || style.needsUpdate()) {
 				settings.getHighlightConfigurationProvider().replaceHighlightString(string.getOriginalHighlightString(), string);
+			}
+		}
+		
+		for (HighlightString string : removedStrings)
+		{
+			if (string.getOriginalHighlightString() != null) {
+				settings.getHighlightConfigurationProvider().removeHighlightString(string.getOriginalHighlightString());
+			} else {
+				settings.getHighlightConfigurationProvider().removeHighlightString(string);
 			}
 		}
 		
