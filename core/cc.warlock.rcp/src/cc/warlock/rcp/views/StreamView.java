@@ -274,27 +274,22 @@ public class StreamView extends ViewPart implements IStreamListener, IGameViewFo
 	
 	protected void highlightText (IWarlockClient client, WarlockString text)
 	{	
-		for (IHighlightString hstring : client.getClientSettings().getAllHighlightStrings())
+		for (IHighlightString highlight : client.getClientSettings().getAllHighlightStrings())
 		{
-			findHighlight(hstring, text);
-		}
-	}
-	
-	protected void findHighlight (IHighlightString highlight, WarlockString text)
-	{
-		Pattern p = highlight.getPattern();
-		if(p == null)
-			return;
-		Matcher matcher = p.matcher(text.toString());
-		
-		while (matcher.find())
-		{
-			MatchResult result = matcher.toMatchResult();
-			int start = result.start();
-			int length = result.end() - start;
+			Pattern p = highlight.getPattern();
+			if(p == null)
+				return;
+			Matcher matcher = p.matcher(text.toString());
 			
-			IWarlockStyle style = highlight.getStyle();
-			text.addStyle(start, length, style);
+			while (matcher.find())
+			{
+				MatchResult result = matcher.toMatchResult();
+				int start = result.start();
+				int length = result.end() - start;
+				
+				IWarlockStyle style = highlight.getStyle();
+				text.addStyle(start, length, style);
+			}
 		}
 	}
 	
