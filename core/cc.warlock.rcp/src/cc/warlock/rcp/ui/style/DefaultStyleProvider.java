@@ -27,9 +27,11 @@ import org.eclipse.swt.SWT;
 import cc.warlock.core.client.IWarlockClient;
 import cc.warlock.core.client.IWarlockStyle;
 import cc.warlock.core.client.WarlockColor;
+import cc.warlock.core.client.WarlockFont;
 import cc.warlock.rcp.ui.IStyleProvider;
 import cc.warlock.rcp.ui.StyleRangeWithData;
 import cc.warlock.rcp.util.ColorUtil;
+import cc.warlock.rcp.util.FontUtil;
 
 public class DefaultStyleProvider implements IStyleProvider {
 	
@@ -59,7 +61,13 @@ public class DefaultStyleProvider implements IStyleProvider {
 				range.underline = true;
 			else if (styleType.equals(IWarlockStyle.StyleType.MONOSPACE))
 			{
-				range.font = JFaceResources.getTextFont();
+				WarlockFont font = client.getClientSettings().getMainWindowSettings().getColumnFont();
+				if (font.isDefaultFont())
+				{
+					range.font = JFaceResources.getTextFont();
+				} else {
+					range.font = FontUtil.warlockFontToFont(font);
+				}
 			}
 		}
 		
