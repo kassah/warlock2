@@ -180,9 +180,22 @@ public class HighlightConfigurationProvider extends ClientConfigurationProvider 
 		highlights.add(string);
 	}
 	
+	public void insertHighlightString(int index, IHighlightString string) {
+		highlights.add(index, string);
+	}
+	
 	public void removeHighlightString (IHighlightString string)
 	{
 		if (highlights.contains(string))
 			highlights.remove(string);
+	}
+	
+	public void replaceHighlightString(IHighlightString originalString,
+			IHighlightString newString) {
+		
+		int index = highlights.indexOf(originalString);
+		if (index > -1) {
+			highlights.set(index, newString);
+		}
 	}
 }
