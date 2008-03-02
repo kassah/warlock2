@@ -62,7 +62,7 @@ public class FontSelector {
 					font = new Font(button.getDisplay(), fontData);
 					
 					for (IPropertyChangeListener listener : listeners)
-						listener.propertyChange(new PropertyChangeEvent(e.getSource(), "fontData", oldData, fontData));
+						listener.propertyChange(new PropertyChangeEvent(FontSelector.this, "fontData", oldData, fontData));
 				}
 			}
 		});
