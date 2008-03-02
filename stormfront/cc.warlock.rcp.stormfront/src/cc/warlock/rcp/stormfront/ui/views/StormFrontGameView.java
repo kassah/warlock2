@@ -339,11 +339,11 @@ public class StormFrontGameView extends GameView implements IStormFrontClientVie
 		WarlockColor entryFG = settings.getCommandLineSettings().getForegroundColor();
 		WarlockColor entryBarColor = settings.getCommandLineSettings().getBarColor();
 		
-		entry.getWidget().setForeground(ColorUtil.warlockColorToColor(entryFG.equals(WarlockColor.DEFAULT_COLOR) ? fg  : entryFG));
-		entry.getWidget().setBackground(ColorUtil.warlockColorToColor(entryBG.equals(WarlockColor.DEFAULT_COLOR) ? bg : entryBG));
+		entry.getWidget().setForeground(ColorUtil.warlockColorToColor(entryFG.isDefault() ? fg  : entryFG));
+		entry.getWidget().setBackground(ColorUtil.warlockColorToColor(entryBG.isDefault() ? bg : entryBG));
 		entry.getWidget().redraw();
 		
-		Caret newCaret = createCaret(1, ColorUtil.warlockColorToColor(entryBarColor.equals(WarlockColor.DEFAULT_COLOR) ? fg : entryBarColor));
+		Caret newCaret = createCaret(1, ColorUtil.warlockColorToColor(entryBarColor.isDefault() ? fg : entryBarColor));
 		entry.getWidget().setCaret(newCaret);
 		
 		text.setBackground(ColorUtil.warlockColorToColor(bg));
