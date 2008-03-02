@@ -41,7 +41,8 @@ public class WindowSettingsConfigurationProvider extends ClientConfigurationProv
 	}
 	
 	public void addWindowSettings(IWindowSettings settings) {
-		windowSettings.add(settings);
+		if (getWindowSettings(settings.getId()) == null)
+			windowSettings.add(settings);
 	}
 
 	public Collection<? extends IWindowSettings> getWindowSettings() {
@@ -72,8 +73,10 @@ public class WindowSettingsConfigurationProvider extends ClientConfigurationProv
 		if (child.getName().equals("window"))
 		{
 			WindowSettings settings = (WindowSettings)getWindowSettings(child.attributeValue("id"));
+			boolean add = false;
 			if (settings == null){
 				settings = new WindowSettings(this);
+				add = true;
 			}
 			
 			settings.setBackgroundColor(colorValue(child, "background"));
@@ -82,7 +85,9 @@ public class WindowSettingsConfigurationProvider extends ClientConfigurationProv
 			settings.setColumnFont(elementToFont(child.element("columnFont")));
 			settings.setId(child.attributeValue("id"));
 			
-			windowSettings.add(settings);
+			if (add) {
+				windowSettings.add(settings);
+			}
 		}
 	}
 	

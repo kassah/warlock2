@@ -37,6 +37,9 @@ public class WindowSettings extends ColorFontSetting implements IWindowSettings 
 	public WindowSettings (WindowSettings other)
 	{
 		super(other);
+		
+		this.id = other.id == null ? null : new String(other.id);
+		this.columnFont = other.columnFont == null ? null : new WarlockFont(other.columnFont);
 	}
 	
 	public WarlockFont getColumnFont() {
@@ -64,5 +67,10 @@ public class WindowSettings extends ColorFontSetting implements IWindowSettings 
 	public WindowSettings getOriginalWindowSettings ()
 	{
 		return (WindowSettings) originalSetting;
+	}
+	
+	@Override
+	public String toString() {
+		return "[" + id + "]";
 	}
 }
