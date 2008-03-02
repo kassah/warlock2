@@ -21,24 +21,23 @@
  */
 package cc.warlock.rcp.stormfront.settings;
 
-import java.io.InputStream;
-import java.util.ArrayList;
 import java.util.Hashtable;
+import java.util.List;
 
 import org.eclipse.swt.SWT;
 
 import cc.warlock.core.client.settings.macro.CommandMacroHandler;
 import cc.warlock.core.client.settings.macro.internal.Macro;
-import cc.warlock.core.stormfront.settings.StormFrontServerSettings;
+import cc.warlock.core.stormfront.settings.IStormFrontClientSettings;
+import cc.warlock.core.stormfront.settings.IStormFrontMacroImporter;
 import cc.warlock.core.stormfront.settings.internal.StormFrontClientSettings;
-import cc.warlock.core.stormfront.settings.server.MacroKey;
 
 /**
  * @author marshall
  *
  */
 @SuppressWarnings("deprecation")
-public class StormFrontSWTSettings extends StormFrontServerSettings {
+public class StormFrontSWTSettings implements IStormFrontMacroImporter {
 
 	public static Hashtable<String, Integer> keys = new Hashtable<String, Integer>();
 	public static Hashtable<String, Integer> mods = new Hashtable<String, Integer>();
@@ -88,7 +87,7 @@ public class StormFrontSWTSettings extends StormFrontServerSettings {
 		mods.put("Shift", SWT.SHIFT);
 	}
 	
-	public static int modifierListToInt (ArrayList<String> modifiers)
+	public static int modifierListToInt (List<String> modifiers)
 	{
 		int intMods = 0;
 		
@@ -103,43 +102,29 @@ public class StormFrontSWTSettings extends StormFrontServerSettings {
 		return intMods;
 	}
 	
-	public static StormFrontServerSettings instance() {
-		if (StormFrontServerSettings._instance == null || !(StormFrontServerSettings._instance instanceof StormFrontSWTSettings)) {
-			StormFrontServerSettings._instance = new StormFrontSWTSettings();
-		}
-		return StormFrontServerSettings._instance;
-	}
-	
-	public static void importSettings (InputStream stream, StormFrontClientSettings settings)
-	{
-		instance().importServerSettings(stream, settings);
-	}
-	
-	@Override
-	protected void importMacro(MacroKey macroKey, StormFrontClientSettings settings) {
-		String keyString = macroKey.getKey();
-		if (keys.containsKey(keyString))
+	public void importMacro(IStormFrontClientSettings s, String key, List<String> modifiers, String action) {
+		StormFrontClientSettings settings = (StormFrontClientSettings)s;
+		if (keys.containsKey(key))
 		{
-			int keyCode = keys.get(keyString);
-			int mods = modifierListToInt(macroKey.getModifiers());
-			
+			int keyCode = keys.get(key);
+			int mods = modifierListToInt(modifiers);
 			
 			Macro macro = new Macro(settings.getMacroConfigurationProvider(), keyCode, mods);
-			macro.addHandler(new CommandMacroHandler(macroKey.getAction()));
+			macro.addHandler(new CommandMacroHandler(action));
 			
 			settings.getMacroConfigurationProvider().addMacro(macro);
 		}
 		else {
-			if (keyString.length() == 1)
+			if (key.length() == 1)
 			{
-				char k = macroKey.getKey().toLowerCase().charAt(0);
+				char k = key.toLowerCase().charAt(0);
 				
 				if ((k >= 'a' && k <= 'z') || (k >= '0' && k <= '9'))
 				{
-					int mods = modifierListToInt(macroKey.getModifiers());
+					int mods = modifierListToInt(modifiers);
 					
 					Macro macro = new Macro(settings.getMacroConfigurationProvider(), k, mods);
-					macro.addHandler(new CommandMacroHandler(macroKey.getAction()));
+					macro.addHandler(new CommandMacroHandler(action));
 					
 					settings.getMacroConfigurationProvider().addMacro(macro);
 				}

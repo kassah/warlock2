@@ -75,15 +75,7 @@ import cc.warlock.core.stormfront.xml.StormFrontElement;
 public class StormFrontServerSettings extends ClientConfigurationProvider {
 	
 	protected String clientVersion, majorVersion, crc;
-
-	protected static StormFrontServerSettings _instance;
-	
-	public static StormFrontServerSettings instance() {
-		if (_instance == null) {
-			_instance = new StormFrontServerSettings();
-		}
-		return _instance;
-	}
+	protected IStormFrontMacroImporter macroImporter;
 	
 	public StormFrontServerSettings ()
 	{
@@ -234,7 +226,7 @@ public class StormFrontServerSettings extends ClientConfigurationProvider {
 	
 	protected WarlockColor stormfrontColorToWarlockColor (StormFrontColor color)
 	{
-		if (color.equals(StormFrontColor.DEFAULT_COLOR) || color.isSkinColor()) return WarlockColor.DEFAULT_COLOR;
+		if (color.equals(StormFrontColor.DEFAULT_COLOR) || color.isSkinColor()) return new WarlockColor(WarlockColor.DEFAULT_COLOR);
 		else return new WarlockColor(color.toHexString());
 	}
 	
@@ -342,7 +334,9 @@ public class StormFrontServerSettings extends ClientConfigurationProvider {
 	
 	protected void importMacro (MacroKey macro, StormFrontClientSettings settings)
 	{
-		
+		if (macroImporter != null) {
+			macroImporter.importMacro(settings, macro.getKey(), macro.getModifiers(), macro.getAction());
+		}
 	}
 	
 	protected void importScript (ServerScript script, StormFrontClientSettings settings)
@@ -405,5 +399,13 @@ public class StormFrontServerSettings extends ClientConfigurationProvider {
 
 	public void setMajorVersion(String majorVersion) {
 		this.majorVersion = majorVersion;
+	}
+
+	public IStormFrontMacroImporter getMacroImporter() {
+		return macroImporter;
+	}
+
+	public void setMacroImporter(IStormFrontMacroImporter macroImporter) {
+		this.macroImporter = macroImporter;
 	}
 }

@@ -83,6 +83,7 @@ public class StormFrontClient extends WarlockClient implements IStormFrontClient
 	protected IStormFrontProtocolHandler handler;
 	protected ClientProperty<String> playerId, characterName, roomDescription;
 	protected StormFrontClientSettings clientSettings;
+	protected StormFrontServerSettings serverSettings;
 	private Timer timer;
 	protected SFTimerTask timerTask;
 	private double currentTime = 0.0;
@@ -128,6 +129,10 @@ public class StormFrontClient extends WarlockClient implements IStormFrontClient
 
 		skin = new DefaultSkin(clientSettings);
 		skin.loadDefaultStyles(clientSettings.getHighlightConfigurationProvider());
+		
+		serverSettings = new StormFrontServerSettings();
+		clientSettings.addChildProvider(serverSettings);
+		
 		return clientSettings;
 	}
 	
@@ -404,6 +409,6 @@ public class StormFrontClient extends WarlockClient implements IStormFrontClient
 	}
 	/* Internal only.. meant for importing/exporting stormfront's savings */
 	public StormFrontServerSettings getServerSettings() {
-		return StormFrontServerSettings.instance();
+		return serverSettings;
 	}
 }

@@ -114,7 +114,7 @@ public class LoginUtil {
 		}
 		else 
 		{
-			Warlock2Plugin.getDefault().addNextClient(new StormFrontClient());
+			Warlock2Plugin.getDefault().addNextClient(StormFrontClientFactory.createStormFrontClient());
 			connect(GameView.createNext(StormFrontGameView.VIEW_ID, characterName), loginProperties);
 		}
 	}

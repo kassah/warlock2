@@ -34,6 +34,7 @@ import cc.warlock.rcp.plugin.Warlock2Plugin;
 import cc.warlock.rcp.stormfront.adapters.StormFrontClientAdapterFactory;
 import cc.warlock.rcp.stormfront.settings.StormFrontSWTSettings;
 import cc.warlock.rcp.stormfront.ui.actions.ProfileConnectAction;
+import cc.warlock.rcp.stormfront.ui.util.StormFrontClientFactory;
 import cc.warlock.rcp.ui.client.WarlockClientAdaptable;
 
 /**
@@ -64,11 +65,8 @@ public class StormFrontRCPPlugin extends AbstractUIPlugin {
 		// i think this is the best place for this to go?
 		new StormFrontJavascriptVars();
 		
-		// load our settings instance so macro importing works correctly
-		StormFrontSWTSettings.instance();
-		
 		// force-load our initial client so we can do offline scripting
-		Warlock2Plugin.getDefault().addClient(new StormFrontClient());
+		Warlock2Plugin.getDefault().addClient(StormFrontClientFactory.createStormFrontClient());
 		
 		Platform.getAdapterManager().registerAdapters(new StormFrontClientAdapterFactory(), WarlockClientAdaptable.class);
 		

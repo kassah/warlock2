@@ -27,6 +27,7 @@ import java.io.IOException;
 
 import cc.warlock.core.configuration.ConfigurationUtil;
 import cc.warlock.core.stormfront.IStormFrontProtocolHandler;
+import cc.warlock.core.stormfront.client.internal.StormFrontClient;
 import cc.warlock.core.stormfront.settings.StormFrontServerSettings;
 import cc.warlock.core.stormfront.settings.internal.StormFrontClientSettings;
 import cc.warlock.core.stormfront.xml.StormFrontAttributeList;
@@ -102,14 +103,14 @@ public class SettingsInfoTagHandler extends DefaultTagHandler {
 			try {
 				handler.getClient().getConnection().sendLine("");
 				
-				if (StormFrontServerSettings.instance().getClientVersion() == null)
+				StormFrontClient client = (StormFrontClient)handler.getClient();
+				if (client.getServerSettings().getClientVersion() == null)
 				{
 					FileInputStream stream = new FileInputStream(serverSettings);
 					StormFrontClientSettings settings =
 						(StormFrontClientSettings)handler.getClient().getStormFrontClientSettings();
 					
-					StormFrontServerSettings.instance().importServerSettings(
-							stream, settings);					
+					client.getServerSettings().importServerSettings(stream, settings);					
 					stream.close();
 				}
 			} catch(IOException e) {
