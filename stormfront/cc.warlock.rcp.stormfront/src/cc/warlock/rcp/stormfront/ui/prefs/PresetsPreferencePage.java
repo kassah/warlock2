@@ -60,6 +60,7 @@ import cc.warlock.core.client.internal.WarlockStyle;
 import cc.warlock.core.client.settings.internal.WindowSettings;
 import cc.warlock.core.stormfront.client.IStormFrontClient;
 import cc.warlock.core.stormfront.settings.internal.StormFrontClientSettings;
+import cc.warlock.core.stormfront.settings.skin.IStormFrontSkin;
 import cc.warlock.rcp.stormfront.ui.views.StormFrontGameView;
 import cc.warlock.rcp.util.ColorUtil;
 import cc.warlock.rcp.util.FontSelector;
@@ -113,6 +114,7 @@ public class PresetsPreferencePage extends PropertyPage implements
 	private StyleRange whisperStyleRange, thoughtStyleRange;
 	
 	private StormFrontClientSettings settings;
+	private IStormFrontSkin skin;
 	private WindowSettings mainWindow;
 	private HashMap<String, WarlockStyle> styles = new HashMap<String, WarlockStyle>();
 	
@@ -351,6 +353,7 @@ public class PresetsPreferencePage extends PropertyPage implements
 		if (client != null)
 		{
 			this.settings = (StormFrontClientSettings) client.getStormFrontClientSettings();
+			this.skin = this.settings.getStormFrontClient().getStormFrontSkin();
 		}
 	}
 	
@@ -402,10 +405,10 @@ public class PresetsPreferencePage extends PropertyPage implements
 			}
 			
 			mainBGSelector.setColorValue(
-				ColorUtil.warlockColorToRGB(settings.getMainWindowSettings().getBackgroundColor()));
+				ColorUtil.warlockColorToRGB(skin.getMainBackground()));
 			
 			mainFGSelector.setColorValue(
-				ColorUtil.warlockColorToRGB(settings.getMainWindowSettings().getForegroundColor()));
+				ColorUtil.warlockColorToRGB(skin.getMainForeground()));
 			
 //			mainFontSelector.setFontData(getDefaultFont());
 //			columnFontSelector.setFontData(getDefaultColumnFont());
