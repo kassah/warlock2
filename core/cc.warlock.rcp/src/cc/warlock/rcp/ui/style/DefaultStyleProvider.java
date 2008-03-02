@@ -64,18 +64,18 @@ public class DefaultStyleProvider implements IStyleProvider {
 		}
 		
 		WarlockColor foreground =
-			style.getForegroundColor().equals(WarlockColor.DEFAULT_COLOR) ?
+			style.getForegroundColor().isDefault() ?
 			client.getClientSettings().getMainWindowSettings().getForegroundColor() :
 			style.getForegroundColor();
 			
 		WarlockColor background =
-			style.getBackgroundColor().equals(WarlockColor.DEFAULT_COLOR) ?
+			style.getBackgroundColor().isDefault() ?
 			client.getClientSettings().getMainWindowSettings().getBackgroundColor() :
 			style.getBackgroundColor();;
 		
-		if (foreground != null && foreground != WarlockColor.DEFAULT_COLOR)
+		if (foreground != null && !foreground.isDefault())
 			range.foreground = ColorUtil.warlockColorToColor(foreground);
-		if (background != null && background != WarlockColor.DEFAULT_COLOR)
+		if (background != null && !background.isDefault())
 			range.background = ColorUtil.warlockColorToColor(background);
 		
 		return range;
