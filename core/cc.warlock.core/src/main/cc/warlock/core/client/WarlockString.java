@@ -84,18 +84,6 @@ public class WarlockString {
 	}
 	
 	public void addStyle(int start, int length, IWarlockStyle style) {
-		for(WarlockStringStyleRange curStyle : styles) {
-			if(curStyle.style.equals(style)) {
-				// check if the new style is contained by an old style, or is overlapping the end of an old style
-				if(start >= curStyle.start && start <= curStyle.start + curStyle.length) {
-					curStyle.length = Math.max(curStyle.length, start - curStyle.start + length);
-					return;
-				} else if(curStyle.start >= start && curStyle.start <= start + length) {
-					curStyle.length = Math.max(length, curStyle.start - start + curStyle.length);
-					curStyle.start = start;
-				}
-			}
-		}
 		styles.add(new WarlockStringStyleRange(start, length, style));
 	}
 	
