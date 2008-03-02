@@ -56,7 +56,14 @@ public class WarlockFont {
 	public boolean equals(Object obj) {
 		if (obj instanceof WarlockFont) {
 			WarlockFont other = (WarlockFont)obj;
-			
+			// Catch null, as doing a comparison without it will cause a NPE
+			if (familyName == null) {
+				if (other.familyName == null) {
+					return true;
+				} else {
+					return false;
+				}
+			}
 			return (familyName.equals(other.familyName) && size == other.size);
 		}
 		return super.equals(obj);
