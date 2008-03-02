@@ -62,6 +62,7 @@ public class WarlockStyle implements IWarlockStyle {
 		if (other.getStyleTypes() != null) styleTypes.addAll(other.getStyleTypes());
 		
 		this.originalStyle = other;
+		this.fullLine = other.isFullLine();
 	}
 	
 	public Runnable getAction() {
