@@ -92,22 +92,6 @@
          point="org.eclipse.ui.propertyPages">
       <page
             category="cc.warlock.rcp.warlockPrefs"
-            class="cc.warlock.rcp.stormfront.ui.prefs.CharacterPreferencesPage"
-            id="cc.warlock.rcp.stormfront.ui.prefs.characterPrefs"
-            name="Character Preferences">
-         <enabledWhen>
-            <and>
-               <adapt
-                     type="cc.warlock.core.stormfront.client.IStormFrontClient">
-               </adapt>
-               <test
-                     property="cc.warlock.rcp.stormfront.clientConnected">
-               </test>
-            </and>
-         </enabledWhen>
-      </page>
-      <page
-            category="cc.warlock.rcp.stormfront.ui.prefs.characterPrefs"
             class="cc.warlock.rcp.stormfront.ui.prefs.PresetsPreferencePage"
             id="cc.warlock.rcp.stormfront.ui.prefs.presets"
             name="Colors and Presets">
@@ -123,7 +107,7 @@
          </enabledWhen>
       </page>
       <page
-            category="cc.warlock.rcp.stormfront.ui.prefs.characterPrefs"
+            category="cc.warlock.rcp.warlockPrefs"
             class="cc.warlock.rcp.stormfront.ui.prefs.HighlightStringsPreferencePage"
             id="cc.warlock.rcp.stormfront.ui.prefs.highlightStrings"
             name="Highlight Strings">
