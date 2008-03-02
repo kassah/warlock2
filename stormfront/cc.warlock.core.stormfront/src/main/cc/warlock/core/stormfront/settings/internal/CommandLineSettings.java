@@ -32,7 +32,7 @@ import cc.warlock.core.stormfront.settings.ICommandLineSettingsProvider;
  */
 public class CommandLineSettings extends ColorFontSetting implements ICommandLineSettings {
 
-	protected WarlockColor barColor = WarlockColor.DEFAULT_COLOR;
+	protected WarlockColor barColor = new WarlockColor(WarlockColor.DEFAULT_COLOR);
 	
 	public CommandLineSettings (ICommandLineSettingsProvider provider)
 	{

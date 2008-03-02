@@ -32,8 +32,8 @@ import cc.warlock.core.client.WarlockColor;
 public class WarlockStyle implements IWarlockStyle {
 
 	private Collection<StyleType> styleTypes;
-	private WarlockColor foregroundColor = WarlockColor.DEFAULT_COLOR;
-	private WarlockColor backgroundColor = WarlockColor.DEFAULT_COLOR;
+	private WarlockColor foregroundColor = new WarlockColor(WarlockColor.DEFAULT_COLOR);
+	private WarlockColor backgroundColor = new WarlockColor(WarlockColor.DEFAULT_COLOR);
 	private boolean fullLine;
 	private String name;
 	private Runnable action;

@@ -33,7 +33,8 @@ import cc.warlock.core.client.settings.IFontSetting;
  */
 public abstract class ColorFontSetting extends ClientSetting implements IColorSetting, IFontSetting {
 
-	protected WarlockColor foregroundColor = WarlockColor.DEFAULT_COLOR, backgroundColor = WarlockColor.DEFAULT_COLOR;
+	protected WarlockColor foregroundColor = new WarlockColor(WarlockColor.DEFAULT_COLOR);
+	protected WarlockColor backgroundColor = new WarlockColor(WarlockColor.DEFAULT_COLOR);
 	protected WarlockFont font = WarlockFont.DEFAULT_FONT;
 	
 	public ColorFontSetting (ColorFontSetting other)

@@ -68,7 +68,7 @@ public abstract class ClientConfigurationProvider extends TreeConfigurationProvi
 
 	protected String colorString (WarlockColor color)
 	{
-		if (color == null || color == WarlockColor.DEFAULT_COLOR) return "default";
+		if (color == null || color.isDefault()) return "default";
 		return color.toHexString();
 	}
 	
@@ -81,7 +81,7 @@ public abstract class ClientConfigurationProvider extends TreeConfigurationProvi
 		if (value == null) return null;
 		
 		if (value.equals("default")) {
-			return WarlockColor.DEFAULT_COLOR;
+			return new WarlockColor(WarlockColor.DEFAULT_COLOR);
 		}
 		return new WarlockColor(value);
 	}
