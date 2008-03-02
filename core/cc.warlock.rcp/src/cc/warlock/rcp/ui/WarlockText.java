@@ -65,7 +65,6 @@ import org.eclipse.swt.widgets.MenuItem;
 import org.eclipse.swt.widgets.ScrollBar;
 import org.eclipse.ui.ISharedImages;
 import org.eclipse.ui.PlatformUI;
-import org.eclipse.ui.ide.IDE;
 
 import cc.warlock.core.client.IWarlockClient;
 import cc.warlock.core.client.WarlockString;
@@ -130,6 +129,7 @@ public class WarlockText implements LineBackgroundListener {
 		itemClear.addSelectionListener(new SelectionAdapter() {
             public void widgetSelected(SelectionEvent arg0) {
                 textWidget.setText("");
+                lineBackgrounds.clear();
             }
         });
 		itemClear.setText("Clear");
