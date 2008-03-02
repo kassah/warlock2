@@ -112,4 +112,9 @@ public class WarlockColor {
 	public String toString() {
 		return toHexString() + " (r: " + red + ", g: " + green + ", b: " + blue +")";
 	}
+	
+	public boolean isDefault ()
+	{
+		return this.equals(DEFAULT_COLOR);
+	}
 }
