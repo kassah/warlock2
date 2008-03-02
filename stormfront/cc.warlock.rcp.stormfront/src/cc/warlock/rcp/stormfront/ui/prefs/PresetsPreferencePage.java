@@ -40,6 +40,7 @@ import org.eclipse.swt.SWT;
 import org.eclipse.swt.custom.StyleRange;
 import org.eclipse.swt.custom.StyledText;
 import org.eclipse.swt.graphics.Color;
+import org.eclipse.swt.graphics.Font;
 import org.eclipse.swt.graphics.FontData;
 import org.eclipse.swt.graphics.Image;
 import org.eclipse.swt.graphics.RGB;
@@ -64,7 +65,6 @@ import cc.warlock.core.stormfront.settings.skin.IStormFrontSkin;
 import cc.warlock.rcp.stormfront.ui.views.StormFrontGameView;
 import cc.warlock.rcp.util.ColorUtil;
 import cc.warlock.rcp.util.FontSelector;
-import cc.warlock.rcp.util.RCPUtil;
 
 /**
  * 
@@ -139,8 +139,8 @@ public class PresetsPreferencePage extends PropertyPage implements
 		
 		mainBGSelector = colorSelectorWithLabel(main, "Main window background color:");
 		mainFGSelector = colorSelectorWithLabel(main, "Main window foreground color:");
-//		mainFontSelector = fontSelectorWithLabel(main, "Main window font:");
-//		columnFontSelector = fontSelectorWithLabel(main, "Column font:");
+		mainFontSelector = fontSelectorWithLabel(main, "Main window font:");
+		columnFontSelector = fontSelectorWithLabel(main, "Column font:");
 		
 		createPresetsTable(main);
 		
@@ -333,7 +333,7 @@ public class PresetsPreferencePage extends PropertyPage implements
 	{
 		WarlockFont font = new WarlockFont();
 		font.setFamilyName(fontData.getName());
-		font.setSize(RCPUtil.getPointSizeInPixels(fontData.getHeight()));
+		font.setSize(fontData.getHeight());
 		
 		if (source == mainFontSelector)
 		{
@@ -359,37 +359,55 @@ public class PresetsPreferencePage extends PropertyPage implements
 	
 	private FontData getDefaultFont ()
 	{
-		String fontFace = settings.getMainWindowSettings().getFont().getFamilyName();
+		if (settings.getMainWindowSettings().getFont().isDefaultFont())
+		{
+			return JFaceResources.getDefaultFont().getFontData()[0];
+		}
+
+		WarlockFont font = settings.getMainWindowSettings().getFont();
 		FontData datas[] = new FontData[0];
 		
-		if (fontFace != null)
-			datas = getShell().getDisplay().getFontList(fontFace, true);
+		if (font.getFamilyName() != null)
+			datas = getShell().getDisplay().getFontList(font.getFamilyName(), true);
 		
+		FontData data = new FontData();
 		if (datas.length == 0)
 		{
 			return JFaceResources.getDefaultFont().getFontData()[0];
 		}
 		else
 		{
-			return datas[0];
+			data.setName(font.getFamilyName());
+			data.setHeight(font.getSize());
+			
+			return data;
 		}
 	}
 	
 	private FontData getDefaultColumnFont ()
 	{
-		String fontFace = settings.getMainWindowSettings().getColumnFont().getFamilyName();
+		if (settings.getMainWindowSettings().getColumnFont().isDefaultFont())
+		{
+			return JFaceResources.getTextFont().getFontData()[0];
+		}
+
+		WarlockFont font = settings.getMainWindowSettings().getColumnFont();
 		FontData datas[] = new FontData[0];
 		
-		if (fontFace != null)
-			datas = getShell().getDisplay().getFontList(fontFace, true);
+		if (font.getFamilyName() != null)
+			datas = getShell().getDisplay().getFontList(font.getFamilyName(), true);
 		
+		FontData data = new FontData();
 		if (datas.length == 0)
 		{
 			return JFaceResources.getTextFont().getFontData()[0];
 		}
 		else
 		{
-			return datas[0];
+			data.setName(font.getFamilyName());
+			data.setHeight(font.getSize());
+			
+			return data;
 		}
 	}
 	
@@ -410,8 +428,8 @@ public class PresetsPreferencePage extends PropertyPage implements
 			mainFGSelector.setColorValue(
 				ColorUtil.warlockColorToRGB(skin.getMainForeground()));
 			
-//			mainFontSelector.setFontData(getDefaultFont());
-//			columnFontSelector.setFontData(getDefaultColumnFont());
+			mainFontSelector.setFontData(getDefaultFont());
+			columnFontSelector.setFontData(getDefaultColumnFont());
 			
 			stylesTable.setInput(styles.values());
 			stylesTable.getTable().setBackground(new Color(getShell().getDisplay(), getColor(mainBGSelector)));
@@ -475,7 +493,7 @@ public class PresetsPreferencePage extends PropertyPage implements
 		
 		preview.setBackground(mainBG);
 		preview.setForeground(mainFG);
-//		preview.setFont(new Font(getShell().getDisplay(), mainFontSelector.getFontData()));
+		preview.setFont(new Font(getShell().getDisplay(), mainFontSelector.getFontData()));
 		
 		updatePresetColors(StormFrontClientSettings.PRESET_ROOM_NAME, roomNameStyleRange);
 		updatePresetColors(StormFrontClientSettings.PRESET_BOLD, boldStyleRange);
@@ -489,7 +507,7 @@ public class PresetsPreferencePage extends PropertyPage implements
 		
 		columnStyleRange.background = mainBG;
 		columnStyleRange.foreground = mainFG;
-//		columnStyleRange.font = new Font(getShell().getDisplay(), columnFontSelector.getFontData());
+		columnStyleRange.font = new Font(getShell().getDisplay(), columnFontSelector.getFontData());
 		
 		preview.setStyleRanges(new StyleRange[] { roomNameStyleRange, boldStyleRange, commandStyleRange, speechStyleRange, whisperStyleRange, thoughtStyleRange, columnStyleRange });
 		preview.update();
