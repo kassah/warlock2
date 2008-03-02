@@ -23,6 +23,7 @@ package cc.warlock.rcp.ui.style;
 
 import org.eclipse.jface.resource.JFaceResources;
 import org.eclipse.swt.SWT;
+import org.eclipse.swt.widgets.Display;
 
 import cc.warlock.core.client.IWarlockClient;
 import cc.warlock.core.client.IWarlockStyle;
@@ -66,7 +67,12 @@ public class DefaultStyleProvider implements IStyleProvider {
 				{
 					range.font = JFaceResources.getTextFont();
 				} else {
-					range.font = FontUtil.warlockFontToFont(font);
+					if (Display.getDefault().getFontList(font.getFamilyName(), true).length > 0)
+					{
+						range.font = FontUtil.warlockFontToFont(font);
+					} else {
+						range.font = JFaceResources.getTextFont();
+					}
 				}
 			}
 		}
