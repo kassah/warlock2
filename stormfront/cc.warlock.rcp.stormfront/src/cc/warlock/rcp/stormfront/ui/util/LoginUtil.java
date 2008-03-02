@@ -166,4 +166,10 @@ public class LoginUtil {
 		
 		return null;
 	}
+	
+	public static void showRefusedError ()
+	{
+		MessageDialog.openError(Display.getDefault().getActiveShell(), "Connection to SGE Refused", 
+			"The connection to eaccess.play.net was refused. This could be caused by a server outage, or a firewall blocking access.");
+	}
 }

@@ -34,4 +34,5 @@ public interface IConnectionListener {
 	public void dataReady (IConnection connection, String line);
 	public void disconnected (IConnection connection);
 	
+	public void connectionRefused (IConnection connection);
 }

@@ -32,6 +32,8 @@ import java.lang.reflect.InvocationTargetException;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.jface.operation.IRunnableWithProgress;
 
+import cc.warlock.core.network.IConnection;
+import cc.warlock.core.network.IConnectionListener;
 import cc.warlock.core.stormfront.network.SGEConnection;
 import cc.warlock.rcp.wizards.WizardWithNotification;
 
@@ -78,6 +80,7 @@ public class SGEConnectWizard extends WizardWithNotification {
 		// TODO Auto-generated method stub
 		
 		sgeConnection = new SGEConnection();
+		
 		page1 = new AccountWizardPage(sgeConnection);
 		page2 = new GameSelectWizardPage(sgeConnection);
 		page3 = new CharacterSelectWizardPage(sgeConnection);

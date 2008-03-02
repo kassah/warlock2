@@ -151,6 +151,10 @@ public class DebugView extends ViewPart implements IConnectionListener, IGameVie
 	public void disconnected(IConnection connection) {
 		debug (connection.getClient(), "disconnected");
 	}
+	
+	public void connectionRefused(IConnection connection) {
+		debug (connection.getClient(), "refused");
+	}
 
 	public void gameViewFocused(GameView gameView) {
 		setClient(gameView.getWarlockClient());

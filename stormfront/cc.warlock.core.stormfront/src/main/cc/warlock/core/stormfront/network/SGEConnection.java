@@ -473,4 +473,6 @@ public class SGEConnection extends Connection implements IConnectionListener {
 		this.retrieveGameInfo = retrieveGameInfo;
 	}
 
+	public void connectionRefused(IConnection connection) {
+	}
 }

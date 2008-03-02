@@ -88,4 +88,18 @@ public class SWTConnectionListenerAdapter implements IConnectionListener {
 		Display.getDefault().asyncExec(disconnectedRunnable);
 	}
 
+	private class ConnectionRefusedRunnable implements Runnable
+	{
+		public IConnection connection;
+		
+		public void run () {
+			listener.connectionRefused(connection);
+		}
+	}
+	
+	public void connectionRefused(IConnection connection) {
+		ConnectionRefusedRunnable runnable = new ConnectionRefusedRunnable();
+		runnable.connection = connection;
+		Display.getDefault().asyncExec(runnable);
+	}
 }

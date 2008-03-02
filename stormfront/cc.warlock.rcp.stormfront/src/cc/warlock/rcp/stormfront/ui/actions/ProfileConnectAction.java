@@ -32,6 +32,8 @@ import org.eclipse.jface.action.Action;
 import org.eclipse.swt.widgets.Display;
 
 import cc.warlock.core.configuration.Profile;
+import cc.warlock.core.network.IConnection;
+import cc.warlock.core.network.IConnectionListener;
 import cc.warlock.core.stormfront.network.ISGEConnectionListener;
 import cc.warlock.core.stormfront.network.ISGEGame;
 import cc.warlock.core.stormfront.network.SGEConnection;
@@ -39,9 +41,10 @@ import cc.warlock.rcp.plugin.Warlock2Plugin;
 import cc.warlock.rcp.stormfront.adapters.SWTSGEConnectionListenerAdapter;
 import cc.warlock.rcp.stormfront.ui.StormFrontSharedImages;
 import cc.warlock.rcp.stormfront.ui.util.LoginUtil;
+import cc.warlock.rcp.ui.network.SWTConnectionListenerAdapter;
 import cc.warlock.rcp.views.GameView;
 
-public class ProfileConnectAction extends Action implements ISGEConnectionListener {
+public class ProfileConnectAction extends Action implements ISGEConnectionListener, IConnectionListener {
 	private Profile profile;
 	private IProgressMonitor monitor;
 	private boolean finished;
@@ -66,6 +69,7 @@ public class ProfileConnectAction extends Action implements ISGEConnectionListen
 				
 				SGEConnection connection = new SGEConnection();
 				connection.setRetrieveGameInfo(false);
+				connection.addConnectionListener(new SWTConnectionListenerAdapter(ProfileConnectAction.this));
 				connection.addSGEConnectionListener(new SWTSGEConnectionListenerAdapter(ProfileConnectAction.this));
 				monitor.beginTask("Logging into profile \"" + profile.getName() + "\"...", 5);
 
@@ -151,4 +155,13 @@ public class ProfileConnectAction extends Action implements ISGEConnectionListen
 		return profile;
 	}
 
+	public void connectionRefused(IConnection connection) {
+		LoginUtil.showRefusedError();
+	}
+
+	public void connected(IConnection connection) {}
+	public void dataReady(IConnection connection, String line) {}
+	public void disconnected(IConnection connection) {}
+
+	
 }
