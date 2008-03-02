@@ -45,6 +45,7 @@ import org.eclipse.swt.events.SelectionEvent;
 import org.eclipse.swt.events.SelectionListener;
 import org.eclipse.swt.graphics.Color;
 import org.eclipse.swt.graphics.Image;
+import org.eclipse.swt.graphics.RGB;
 import org.eclipse.swt.graphics.Rectangle;
 import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.layout.GridLayout;
@@ -332,7 +333,9 @@ public class HighlightStringsPreferencePage extends PropertyPage implements
 	
 	private void customForegroundChanged ()
 	{
-		selectedString.getStyle().setForegroundColor(ColorUtil.rgbToWarlockColor(customFGSelector.getColorValue()));
+		RGB selectedColor = customFGSelector.getColorValue();
+		WarlockColor newColor = ColorUtil.rgbToWarlockColor(selectedColor);
+		selectedString.getStyle().setForegroundColor(newColor);
 		stringTable.update(selectedString, null);
 		setValid(true);
 	}
