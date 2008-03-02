@@ -87,7 +87,7 @@ public class WarlockString {
 		for(WarlockStringStyleRange curStyle : styles) {
 			if(curStyle.style.equals(style)) {
 				// check if the new style is contained by an old style, or is overlapping the end of an old style
-				if(start >= curStyle.start && curStyle.start + curStyle.length <= start) {
+				if(start >= curStyle.start && curStyle.start + curStyle.length >= start) {
 					curStyle.length = Math.max(curStyle.length, start - curStyle.start + length);
 					return;
 				}
