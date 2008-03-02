@@ -62,6 +62,7 @@ import cc.warlock.rcp.stormfront.StormFrontGameViewConfiguration;
 import cc.warlock.rcp.stormfront.adapters.SWTStormFrontClientViewer;
 import cc.warlock.rcp.stormfront.ui.StormFrontSharedImages;
 import cc.warlock.rcp.stormfront.ui.StormFrontStatus;
+import cc.warlock.rcp.stormfront.ui.StormFrontTextBorder;
 import cc.warlock.rcp.stormfront.ui.actions.ProfileConnectAction;
 import cc.warlock.rcp.stormfront.ui.style.StormFrontStyleProvider;
 import cc.warlock.rcp.stormfront.ui.wizards.SGEConnectWizard;
@@ -82,6 +83,7 @@ public class StormFrontGameView extends GameView implements IStormFrontClientVie
 	protected IStormFrontClient sfClient;
 	protected StormFrontStatus status;
 	protected WarlockPopupAction reconnectPopup;
+	protected StormFrontTextBorder textBorder;
 	
 	public StormFrontGameView ()
 	{
@@ -95,6 +97,8 @@ public class StormFrontGameView extends GameView implements IStormFrontClientVie
 		super.createPartControl(parent);
 		
 		text.addCompass();
+		textBorder = new StormFrontTextBorder(text);
+		
 		
 		((GridLayout)entryComposite.getLayout()).numColumns = 2;
 		status = new StormFrontStatus(entryComposite);
@@ -271,6 +275,7 @@ public class StormFrontGameView extends GameView implements IStormFrontClientVie
 			
 			if (status != null) {
 				status.setActiveClient(sfClient);
+				textBorder.setActiveClient(sfClient);
 			}
 			
 			loadStormFrontClientSettings(sfClient.getStormFrontClientSettings());
