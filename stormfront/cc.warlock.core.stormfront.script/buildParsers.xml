@@ -1,28 +1,13 @@
 <project default="build-parsers">
 	
 	<target name="build-parsers">
-		<!--<mkdir dir="src/javacc/cc/warlock/core/stormfront/script/wsl"/>-->
 		<mkdir dir="src/antlr/cc/warlock/core/stormfront/script/wsl"/>
 		
-		<!--<antcall target="javacc">
-			<param name="arguments" value="&quot;-OUTPUT_DIRECTORY:${basedir}/src/javacc/cc/warlock/core/stormfront/script/wsl&quot; -STATIC:false"/>
-			<param name="grammar-file" value="&quot;${basedir}/src/main/cc/warlock/core/stormfront/script/wsl/WSL.jj&quot;"/>
-		</antcall>-->
 		<antcall target="build-grammar">
 			<param name="grammar-file" value="cc/warlock/core/stormfront/script/wsl/WSL.g3"/>
 			<param name="lib-dir" value="cc/warlock/core/stormfront/script/wsl"/>
 		</antcall>
 	</target>
-	
-	<!--<target name="javacc">
-		<java classname="javacc">
-			<classpath>
-				<fileset file="../cc.warlock.core.stormfront/lib/javacc.jar"/>
-			</classpath>
-			<arg line="${arguments}"/>
-			<arg line="${grammar-file}"/>
-		</java>
-	</target>-->
 	
 	<target name="build-grammar" >
 		<java classname="org.antlr.Tool" fork="true" dir="${basedir}/src/main">
