@@ -21,7 +21,6 @@
  */
 package cc.warlock.core.client;
 
-import java.net.URL;
 import java.util.Collection;
 
 /**

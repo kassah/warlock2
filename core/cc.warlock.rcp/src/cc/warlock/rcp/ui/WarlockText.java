@@ -442,7 +442,7 @@ public class WarlockText implements LineBackgroundListener {
 		// add a marker for each style with a name
 		for(WarlockStringStyleRange style : styles) {
 			if(style.style.getName() != null) {
-				this.addMarker(style.style.getName(), charCount + style.start, style.length);
+				this.addMarker(style.style.getName(), charCount + style.getStart(), style.getLength());
 			}
 		}
 		
@@ -455,15 +455,15 @@ public class WarlockText implements LineBackgroundListener {
 		while(pos >= 0) {
 			// update current styles
 			for(WarlockStringStyleRange style : styles) {
-				if(style.start == pos) {
+				if(style.getStart() == pos) {
 					currentStyles.add(style);
-				} else if(style.start + style.length == pos) {
+				} else if(style.getStart() + style.getLength() == pos) {
 					currentStyles.remove(style);
 				}
 			}
 			
 			// create style segment for pos to next pos
-			int foundPos = findNextEvent(styles, pos + 1);
+			int foundPos = findNextEvent(string, pos + 1);
 			int nextPos;
 			if(foundPos < 0)
 				nextPos = string.length() - 1;
@@ -506,15 +506,18 @@ public class WarlockText implements LineBackgroundListener {
 	}
 	
 	/* find an element in styles that intersects with the first element of styles, starting at pos */
-	private int findNextEvent(List<WarlockStringStyleRange> styles, int pos) {
+	
+	private int findNextEvent(WarlockString string, int pos) {
 		int nextPos = -1;
-		for(WarlockStringStyleRange style : styles) {
-			if(style.start >= pos) {
-				if(nextPos < 0 || style.start < nextPos)
-					nextPos = style.start;
-			} else if(style.start + style.length >= pos) {
-				if(nextPos < 0 || style.start + style.length < nextPos)
-					nextPos = style.start + style.length;
+		for(WarlockStringStyleRange style : string.getStyles()) {
+			int start = style.getStart();
+			int end = start + style.getLength();
+			if(start >= pos) {
+				if(nextPos < 0 || start < nextPos)
+					nextPos = start;
+			} else if(end >= pos) {
+				if(nextPos < 0 || end < nextPos)
+					nextPos = end;
 			}
 		}
 		return nextPos;
@@ -528,15 +531,10 @@ public class WarlockText implements LineBackgroundListener {
 //			styleRange.foreground = ColorUtil.warlockColorToColor(range.style.getForegroundColor());
 //		if(range.style.getBackgroundColor() != null && styleRange.background == null)
 //			styleRange.background = ColorUtil.warlockColorToColor(range.style.getBackgroundColor());
-		if(range.style.isFullLine()) {
-			int lineNum = textWidget.getLineAtOffset(offset + range.start);
-			styleRange.start = textWidget.getOffsetAtLine(lineNum);
-			styleRange.length = textWidget.getOffsetAtLine(lineNum + 1) - styleRange.start;
-			setLineBackground(lineNum, styleRange.background);
-		} else {
-			styleRange.start = offset + range.start;
-			styleRange.length = range.length;
-		}
+		styleRange.start = offset + range.getStart();
+		styleRange.length = range.getLength();
+		if(range.style.isFullLine())
+			setLineBackground(textWidget.getLineAtOffset(styleRange.start), styleRange.background);
 		if(range.style.getAction() != null)
 			styleRange.action = range.style.getAction();
 		if(range.style.getName() != null)

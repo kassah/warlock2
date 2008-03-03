@@ -30,16 +30,66 @@ public class WarlockString {
 
 	private StringBuffer text = new StringBuffer();
 	private ArrayList<WarlockStringStyleRange> styles = new ArrayList<WarlockStringStyleRange>();
+	final static private Pattern eolPattern = Pattern.compile("\r?\n");
 	
 	public class WarlockStringStyleRange {
-		public int start;
-		public int length;
 		public IWarlockStyle style;
 		
+		private int givenStart;
+		private int givenLength;
+		
+		private int computedStart = -1;
+		private int computedLength = -1;
+		
 		public WarlockStringStyleRange(int start, int length, IWarlockStyle style) {
-			this.start = start;
-			this.length = length;
+			this.givenStart = start;
+			this.givenLength = length;
 			this.style = style;
+		}
+		
+		public int getStart() {
+			if(this.computedStart < 0) {
+				if(style.isFullLine()) {
+					int start = 0;
+					int end = WarlockString.this.text.length();
+					Matcher m = eolPattern.matcher(WarlockString.this.text.toString());
+					while(m.find()) {
+						end = m.end();
+						if(end > this.givenStart) {
+							break;
+						} else {
+							start = end;
+						}
+					}
+					this.computedStart = start;
+				} else {
+					this.computedStart = this.givenStart;
+				}
+			}
+			
+			return this.computedStart;
+		}
+		
+		public int getLength() {
+			if(this.computedLength < 0) {
+				if(style.isFullLine()) {
+					int start = 0;
+					int end = WarlockString.this.text.length();
+					Matcher m = eolPattern.matcher(WarlockString.this.text.toString());
+					while(m.find()) {
+						end = m.end();
+						if(end > this.givenStart) {
+							break;
+						} else {
+							start = end;
+						}
+					}
+					this.computedLength = end - start;
+				} else {
+					this.computedLength = this.givenLength;
+				}
+			}
+			return this.computedLength;
 		}
 	}
 	
@@ -75,7 +125,7 @@ public class WarlockString {
 		int charCount = text.length();
 		text.append(string.toString());
 		for(WarlockStringStyleRange range : string.getStyles()) {
-			addStyle(charCount + range.start, range.length, range.style);
+			addStyle(charCount + range.getStart(), range.getLength(), range.style);
 		}
 	}
 	
@@ -107,9 +157,11 @@ public class WarlockString {
 	public WarlockString substring(int start, int end) {
 		WarlockString substring = new WarlockString(text.substring(start, end));
 		for(WarlockStringStyleRange style : styles) {
-			if(style.start + style.length > start && style.start < end) {
-				int styleLength = Math.min(style.length - Math.max(0, start - style.start), end - Math.max(style.start, start));
-				int styleStart = Math.max(0, style.start - start);
+			if(style.getStart() + style.getLength() > start && style.getStart() < end) {
+				int styleLength = Math.min(style.getLength()
+						- Math.max(0, start - style.getStart()),
+						end - Math.max(style.getStart(), start));
+				int styleStart = Math.max(0, style.getStart() - start);
 				substring.addStyle(styleStart, styleLength, style.style);
 			}
 		}
