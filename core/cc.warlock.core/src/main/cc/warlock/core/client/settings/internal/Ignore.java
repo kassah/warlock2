@@ -31,9 +31,9 @@ public class Ignore extends PatternSetting implements IIgnore {
 
 	protected Pattern ignorePattern;
 	
-	public Ignore (IIgnoreProvider provider, String pattern, boolean literal, boolean caseSensitive)
+	public Ignore (IIgnoreProvider provider, String pattern, boolean literal, boolean caseSensitive, boolean fullWordMatch)
 	{
-		super(provider, pattern, literal, caseSensitive);
+		super(provider, pattern, literal, caseSensitive, fullWordMatch);
 	}
 	
 	public Ignore (IIgnoreProvider provider, Pattern pattern)

@@ -31,9 +31,9 @@ public class Trigger extends PatternSetting implements ITrigger {
 
 	protected Pattern triggerPattern;
 	
-	public Trigger (ITriggerProvider provider, String pattern, boolean literal, boolean caseSensitive)
+	public Trigger (ITriggerProvider provider, String pattern, boolean literal, boolean caseSensitive, boolean fullWordMatch)
 	{
-		super(provider, pattern, literal, caseSensitive);
+		super(provider, pattern, literal, caseSensitive, fullWordMatch);
 	}
 	
 	public Trigger (ITriggerProvider provider, Pattern triggerPattern)

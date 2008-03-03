@@ -223,8 +223,36 @@ public class HighlightPreset extends Preset implements IHighlightString {
 		return false;
 	}
 	
+	public void setCaseSensitive(boolean caseSensitive) {
+		// TODO Auto-generated method stub
+		
+	}
+	
 	public boolean isLiteral() {
 		return true;
+	}
+	
+	public void setLiteral(boolean literal) {
+		// TODO Auto-generated method stub
+		
+	}
+	
+	public boolean isFullWordMatch() {
+		return true;
+	}
+	
+	public void setFullWordMatch(boolean fullWordMatch) {
+		// TODO Auto-generated method stub
+		
+	}
+	
+	public void setPattern(Pattern pattern) {
+		// TODO Auto-generated method stub
+		
+	}
+	
+	public String getFullWordPattern() {
+		return pattern.pattern();
 	}
 	
 	public IClientSettingProvider getProvider() {

@@ -238,7 +238,8 @@ public class StormFrontServerSettings extends ClientConfigurationProvider {
 		style.setForegroundColor(stormfrontColorToWarlockColor(string.getForegroundColor()));
 		style.setFullLine(string.isFillEntireLine());
 		
-		HighlightString newString = new HighlightString(settings.getHighlightConfigurationProvider(), pattern, style);
+		HighlightString newString = new HighlightString(
+			settings.getHighlightConfigurationProvider(), pattern.pattern(), false, true, true, style);
 		settings.getHighlightConfigurationProvider().addHighlightString(newString);
 	}
 	
@@ -322,7 +323,7 @@ public class StormFrontServerSettings extends ClientConfigurationProvider {
 		Pattern pattern = ignore.getRegex();
 		
 		settings.getIgnoreConfigurationProvider().addIgnore(
-			new Ignore(settings.getIgnoreConfigurationProvider(), pattern));
+			new Ignore(settings.getIgnoreConfigurationProvider(), pattern.pattern(), false, true, true));
 		
 	}
 	

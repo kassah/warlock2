@@ -30,7 +30,7 @@ import org.dom4j.Element;
 import cc.warlock.core.client.settings.IIgnore;
 import cc.warlock.core.client.settings.IIgnoreProvider;
 
-public class IgnoreConfigurationProvider extends ClientConfigurationProvider
+public class IgnoreConfigurationProvider extends PatternConfigurationProvider
 		implements IIgnoreProvider {
 
 	protected ArrayList<IIgnore> ignores = new ArrayList<IIgnore>();
@@ -49,11 +49,10 @@ public class IgnoreConfigurationProvider extends ClientConfigurationProvider
 	protected void parseChild(Element child) {
 		if (child.getName().equals("ignore"))
 		{
-			String pattern = stringValue(child, "pattern");
-			boolean literal = booleanValue(child, "literal");
-			boolean caseSensitive = booleanValue(child, "caseSensitive");
+			Ignore ignore = new Ignore(this, null);
+			fillSetting(ignore, child);
 			
-			ignores.add(new Ignore(this, pattern, literal, caseSensitive));
+			ignores.add(ignore);
 		}
 	}
 	
@@ -64,9 +63,7 @@ public class IgnoreConfigurationProvider extends ClientConfigurationProvider
 		for (IIgnore ignore : ignores)
 		{
 			Element iElement = ignoresElement.addElement("ignore");
-			iElement.addAttribute("pattern", ignore.getPattern().pattern());
-			iElement.addAttribute("literal", ""+ignore.isLiteral());
-			iElement.addAttribute("caseSensitive", ""+ignore.isCaseSensitive());
+			fillElement(iElement, ignore);
 		}
 		
 		elements.add(ignoresElement);

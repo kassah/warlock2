@@ -36,7 +36,7 @@ import cc.warlock.core.client.settings.IHighlightProvider;
 import cc.warlock.core.client.settings.IHighlightString;
 
 @SuppressWarnings("unchecked")
-public class HighlightConfigurationProvider extends ClientConfigurationProvider implements IHighlightProvider
+public class HighlightConfigurationProvider extends PatternConfigurationProvider implements IHighlightProvider
 {
 	protected ArrayList<IHighlightString> highlights = new ArrayList<IHighlightString>();
 	protected HashMap<String, IWarlockStyle> namedStyles = new HashMap<String, IWarlockStyle>();
@@ -71,17 +71,15 @@ public class HighlightConfigurationProvider extends ClientConfigurationProvider 
 	protected void parseChild(Element child) {
 		if (child.getName().equals("highlight"))
 		{
-			String pattern = stringValue(child, "pattern");
-			boolean literal = booleanValue(child, "literal");
-			boolean caseSensitive = booleanValue(child, "caseSensitive");
-			
 			IWarlockStyle style = null;
 			if (child.elements().size() > 0 && child.element("style") != null) {
 				Element sElement = child.element("style");
 				style = createStyle(sElement);
 			}
 			
-			highlights.add(new HighlightString(this, pattern, literal, caseSensitive, style));
+			HighlightString string = new HighlightString(this, null, style);
+			fillSetting(string, child);
+			highlights.add(string);
 		}
 		else if (child.getName().equals("style"))
 		{
@@ -98,9 +96,7 @@ public class HighlightConfigurationProvider extends ClientConfigurationProvider 
 		for (IHighlightString string : highlights)
 		{
 			Element hElement = highlightsElement.addElement("highlight");
-			hElement.addAttribute("pattern", string.getPattern().pattern());
-			hElement.addAttribute("literal", ""+string.isLiteral());
-			hElement.addAttribute("caseSensitive", ""+string.isCaseSensitive());
+			fillElement(hElement, string);
 			
 			createStyleElement (hElement, string.getStyle());
 		}

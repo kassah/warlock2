@@ -26,8 +26,15 @@ import java.util.regex.Pattern;
 public interface IPatternSetting extends IClientSetting {
 
 	public Pattern getPattern();
+	public void setPattern(Pattern pattern);
 	
 	public boolean isCaseSensitive();
+	public void setCaseSensitive(boolean caseSensitive);
+	
 	public boolean isLiteral();
-
+	public void setLiteral(boolean literal);
+	
+	public boolean isFullWordMatch();
+	public void setFullWordMatch(boolean fullWordMatch);
+	public String getFullWordPattern();
 }

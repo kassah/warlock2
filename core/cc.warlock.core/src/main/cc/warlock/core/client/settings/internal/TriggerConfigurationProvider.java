@@ -30,7 +30,7 @@ import org.dom4j.Element;
 import cc.warlock.core.client.settings.ITrigger;
 import cc.warlock.core.client.settings.ITriggerProvider;
 
-public class TriggerConfigurationProvider extends ClientConfigurationProvider
+public class TriggerConfigurationProvider extends PatternConfigurationProvider
 		implements ITriggerProvider {
 
 	protected ArrayList<ITrigger> triggers = new ArrayList<ITrigger>();
@@ -49,11 +49,10 @@ public class TriggerConfigurationProvider extends ClientConfigurationProvider
 	protected void parseChild(Element child) {
 		if (child.getName().equals("trigger"))
 		{
-			String pattern = stringValue(child, "pattern");
-			boolean literal = booleanValue(child, "literal");
-			boolean caseSensitive = booleanValue(child, "caseSensitive");
+			Trigger trigger = new Trigger(this, null);
+			fillSetting(trigger, child);
 			
-			triggers.add(new Trigger(this, pattern, literal, caseSensitive));
+			triggers.add(trigger);
 		}
 	}
 	
@@ -64,9 +63,7 @@ public class TriggerConfigurationProvider extends ClientConfigurationProvider
 		for (ITrigger trigger : triggers)
 		{
 			Element tElement = triggersElement.addElement("trigger");
-			tElement.addAttribute("pattern", trigger.getPattern().pattern());
-			tElement.addAttribute("literal", ""+trigger.isLiteral());
-			tElement.addAttribute("caseSensitive", ""+trigger.isCaseSensitive());
+			fillElement(tElement, trigger);
 			
 			elements.add(tElement);
 		}

@@ -32,8 +32,8 @@ public class HighlightString extends PatternSetting implements IHighlightString 
 
 	protected IWarlockStyle style;
 	
-	public HighlightString (IHighlightProvider provider, String pattern, boolean literal, boolean caseSensitive, IWarlockStyle style) {	
-		super(provider, pattern, literal, caseSensitive);
+	public HighlightString (IHighlightProvider provider, String pattern, boolean literal, boolean caseSensitive, boolean fullWordMatch, IWarlockStyle style) {	
+		super(provider, pattern, literal, caseSensitive, fullWordMatch);
 		this.style = style;
 	}
 	
