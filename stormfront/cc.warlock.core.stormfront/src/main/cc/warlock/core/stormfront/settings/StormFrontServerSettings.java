@@ -219,7 +219,7 @@ public class StormFrontServerSettings extends ClientConfigurationProvider {
 			if (viewer instanceof IStormFrontClientViewer)
 			{
 				IStormFrontClientViewer sfViewer = (IStormFrontClientViewer) viewer;
-				sfViewer.loadStormFrontClientSettings(settings);
+				sfViewer.loadClientSettings(settings);
 			}
 		}
 	}

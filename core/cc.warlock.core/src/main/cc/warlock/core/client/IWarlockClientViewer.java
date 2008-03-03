@@ -24,6 +24,9 @@
  */
 package cc.warlock.core.client;
 
+import cc.warlock.core.client.settings.IClientSettings;
+
+
 
 /**
  * @author Marshall
@@ -57,4 +60,6 @@ public interface IWarlockClientViewer extends IStreamListener {
 	public void copy();
 	
 	public void paste();
+
+	public void loadClientSettings(IClientSettings settings);
 }

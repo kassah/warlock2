@@ -54,17 +54,18 @@ import org.eclipse.swt.widgets.TableColumn;
 import org.eclipse.ui.IWorkbenchPropertyPage;
 import org.eclipse.ui.dialogs.PropertyPage;
 
+import cc.warlock.core.client.IWarlockClient;
+import cc.warlock.core.client.IWarlockSkin;
 import cc.warlock.core.client.IWarlockStyle;
 import cc.warlock.core.client.WarlockColor;
 import cc.warlock.core.client.WarlockFont;
 import cc.warlock.core.client.internal.WarlockStyle;
+import cc.warlock.core.client.settings.internal.ClientSettings;
 import cc.warlock.core.client.settings.internal.WindowSettings;
-import cc.warlock.core.stormfront.client.IStormFrontClient;
 import cc.warlock.core.stormfront.settings.internal.StormFrontClientSettings;
-import cc.warlock.core.stormfront.settings.skin.IStormFrontSkin;
-import cc.warlock.rcp.stormfront.ui.views.StormFrontGameView;
 import cc.warlock.rcp.util.ColorUtil;
 import cc.warlock.rcp.util.FontSelector;
+import cc.warlock.rcp.views.GameView;
 
 /**
  * 
@@ -113,8 +114,8 @@ public class PresetsPreferencePage extends PropertyPage implements
 	private StyleRange commandStyleRange, speechStyleRange;
 	private StyleRange whisperStyleRange, thoughtStyleRange;
 	
-	private StormFrontClientSettings settings;
-	private IStormFrontSkin skin;
+	private ClientSettings settings;
+	private IWarlockSkin skin;
 	private WindowSettings mainWindow;
 	private HashMap<String, WarlockStyle> styles = new HashMap<String, WarlockStyle>();
 	
@@ -168,7 +169,7 @@ public class PresetsPreferencePage extends PropertyPage implements
 		if (color.isDefault())
 		{
 			if (style.getName() != null) {
-				color = settings.getStormFrontClient().getStormFrontSkin().getDefaultBackgroundColor(style.getName());
+				color = skin.getDefaultBackgroundColor(style.getName());
 			}
 		}
 		if (color.isDefault()) {
@@ -184,7 +185,7 @@ public class PresetsPreferencePage extends PropertyPage implements
 		if (color.isDefault())
 		{
 			if (style.getName() != null) {
-				color = settings.getStormFrontClient().getStormFrontSkin().getDefaultForegroundColor(style.getName());
+				color = skin.getDefaultForegroundColor(style.getName());
 			}
 		}
 		if (color.isDefault()) {
@@ -349,11 +350,11 @@ public class PresetsPreferencePage extends PropertyPage implements
 	
 	@Override
 	public void setElement(IAdaptable element) {
-		IStormFrontClient client = (IStormFrontClient) element.getAdapter(IStormFrontClient.class);
+		IWarlockClient client = (IWarlockClient) element.getAdapter(IWarlockClient.class);
 		if (client != null)
 		{
-			this.settings = (StormFrontClientSettings) client.getStormFrontClientSettings();
-			this.skin = this.settings.getStormFrontClient().getStormFrontSkin();
+			this.settings = (ClientSettings) client.getClientSettings();
+			this.skin = settings.getClient().getSkin();
 		}
 	}
 	
@@ -537,8 +538,8 @@ public class PresetsPreferencePage extends PropertyPage implements
 		}
 		
 		if (updateView) {
-			StormFrontGameView view = (StormFrontGameView) StormFrontGameView.getGameViewForClient(settings.getClient());
-			view.loadStormFrontClientSettings(settings);
+			GameView view = GameView.getGameViewForClient(settings.getClient());
+			view.loadClientSettings(settings);
 		}
 		
 		return true;

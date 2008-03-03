@@ -53,6 +53,7 @@ import cc.warlock.core.client.PropertyListener;
 import cc.warlock.core.client.WarlockClientRegistry;
 import cc.warlock.core.client.WarlockColor;
 import cc.warlock.core.client.WarlockFont;
+import cc.warlock.core.client.settings.IClientSettings;
 import cc.warlock.core.configuration.Profile;
 import cc.warlock.core.stormfront.ProfileConfiguration;
 import cc.warlock.core.stormfront.client.IStormFrontClient;
@@ -278,7 +279,7 @@ public class StormFrontGameView extends GameView implements IStormFrontClientVie
 				textBorder.setActiveClient(sfClient);
 			}
 			
-			loadStormFrontClientSettings(sfClient.getStormFrontClientSettings());
+			loadClientSettings(sfClient.getStormFrontClientSettings());
 			
 			WarlockClientRegistry.addWarlockClientListener(new IWarlockClientListener () {
 				public void clientActivated(IWarlockClient client) {}
@@ -307,8 +308,10 @@ public class StormFrontGameView extends GameView implements IStormFrontClientVie
 
 	private Button reconnect;
 	
-	public void loadStormFrontClientSettings(IStormFrontClientSettings settings)
-	{		
+	public void loadClientSettings(IClientSettings clientSettings)
+	{
+		IStormFrontClientSettings settings = (IStormFrontClientSettings) clientSettings;
+		
 		sfClient.getCharacterName().addListener(new PropertyListener<String>() {
 			public void propertyChanged(IProperty<String> property, String oldValue) {
 				String viewId = getViewSite().getId() + ":" + getViewSite().getSecondaryId();

@@ -19,7 +19,7 @@
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
-package cc.warlock.rcp.stormfront.ui.prefs;
+package cc.warlock.rcp.prefs;
 
 import java.util.ArrayList;
 import java.util.regex.Pattern;
@@ -59,13 +59,13 @@ import org.eclipse.swt.widgets.TableItem;
 import org.eclipse.ui.IWorkbenchPropertyPage;
 import org.eclipse.ui.dialogs.PropertyPage;
 
+import cc.warlock.core.client.IWarlockClient;
+import cc.warlock.core.client.IWarlockSkin;
 import cc.warlock.core.client.WarlockColor;
 import cc.warlock.core.client.internal.WarlockStyle;
 import cc.warlock.core.client.settings.IHighlightString;
+import cc.warlock.core.client.settings.internal.ClientSettings;
 import cc.warlock.core.client.settings.internal.HighlightString;
-import cc.warlock.core.stormfront.client.IStormFrontClient;
-import cc.warlock.core.stormfront.settings.internal.StormFrontClientSettings;
-import cc.warlock.core.stormfront.settings.skin.IStormFrontSkin;
 import cc.warlock.rcp.ui.WarlockSharedImages;
 import cc.warlock.rcp.util.ColorUtil;
 
@@ -80,9 +80,9 @@ public class HighlightStringsPreferencePage extends PropertyPage implements
 	protected ColorSelector customBGSelector, customFGSelector;
 	protected Button defaultBG, customBG, defaultFG, customFG;
 	protected Button addString, removeString;
-	protected IStormFrontClient client;
-	protected IStormFrontSkin skin;
-	protected StormFrontClientSettings settings;
+	protected IWarlockClient client;
+	protected IWarlockSkin skin;
+	protected ClientSettings settings;
 	protected HighlightString selectedString;
 	protected ArrayList<HighlightString> addedStrings = new ArrayList<HighlightString>();
 	protected ArrayList<HighlightString> removedStrings = new ArrayList<HighlightString>();
@@ -427,9 +427,9 @@ public class HighlightStringsPreferencePage extends PropertyPage implements
 	
 	@Override
 	public void setElement(IAdaptable element) {
-		client = (IStormFrontClient)element.getAdapter(IStormFrontClient.class);
-		settings = (StormFrontClientSettings) client.getStormFrontClientSettings();
-		skin = settings.getStormFrontClient().getStormFrontSkin();
+		client = (IWarlockClient)element.getAdapter(IWarlockClient.class);
+		settings = (ClientSettings) client.getClientSettings();
+		skin = settings.getClient().getSkin();
 		
 		if (highlightStrings.isEmpty())
 			copyHighlightStrings();

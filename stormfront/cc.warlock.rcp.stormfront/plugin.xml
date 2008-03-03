@@ -101,23 +101,7 @@
                      type="cc.warlock.core.stormfront.client.IStormFrontClient">
                </adapt>
                <test
-                     property="cc.warlock.rcp.stormfront.clientConnected">
-               </test>
-            </and>
-         </enabledWhen>
-      </page>
-      <page
-            category="cc.warlock.rcp.warlockPrefs"
-            class="cc.warlock.rcp.stormfront.ui.prefs.HighlightStringsPreferencePage"
-            id="cc.warlock.rcp.stormfront.ui.prefs.highlightStrings"
-            name="Highlight Strings">
-         <enabledWhen>
-            <and>
-               <adapt
-                     type="cc.warlock.core.stormfront.client.IStormFrontClient">
-               </adapt>
-               <test
-                     property="cc.warlock.rcp.stormfront.clientConnected">
+                     property="cc.warlock.rcp.clientConnected">
                </test>
             </and>
          </enabledWhen>
@@ -153,16 +137,6 @@
             id="cc.warlock.stormfrontPerspective"
             name="Stormfront Perspective">
       </perspective>
-   </extension>
-   <extension
-         point="org.eclipse.core.expressions.propertyTesters">
-      <propertyTester
-            class="cc.warlock.rcp.stormfront.StormFrontClientPropertyTester"
-            id="cc.warlock.rcp.stormfront.tester"
-            namespace="cc.warlock.rcp.stormfront"
-            properties="clientConnected,settingsLoaded"
-            type="cc.warlock.rcp.ui.client.WarlockClientAdaptable">
-      </propertyTester>
    </extension>
 
 </plugin>

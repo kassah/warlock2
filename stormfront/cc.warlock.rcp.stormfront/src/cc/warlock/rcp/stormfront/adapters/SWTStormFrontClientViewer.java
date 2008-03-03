@@ -25,7 +25,6 @@ import java.net.URL;
 
 import cc.warlock.core.stormfront.client.IStormFrontClient;
 import cc.warlock.core.stormfront.client.IStormFrontClientViewer;
-import cc.warlock.core.stormfront.settings.IStormFrontClientSettings;
 import cc.warlock.rcp.ui.client.SWTWarlockClientViewer;
 
 
@@ -41,21 +40,19 @@ public class SWTStormFrontClientViewer extends SWTWarlockClientViewer implements
 	}
 	
 	private static enum EventType {
-		LoadClientSettings, StartDownloadingServerSettings, ReceivedServerSetting,
+		StartDownloadingServerSettings, ReceivedServerSetting,
 		FinishedDownloadingServerSettings, LaunchURL, AppendImage
 	};
 	
 	private class ListenerWrapper implements Runnable
 	{
 		private EventType eventType;
-		private IStormFrontClientSettings settings;
 		private SettingType settingType;
 		private URL url;
 		
 		public void run() {
 			switch (eventType)
 			{
-				case LoadClientSettings: viewer.loadStormFrontClientSettings(settings); break;
 				case StartDownloadingServerSettings: viewer.startDownloadingServerSettings(); break;
 				case ReceivedServerSetting: viewer.receivedServerSetting(settingType);
 				case FinishedDownloadingServerSettings: viewer.finishedDownloadingServerSettings(); break;
@@ -63,15 +60,8 @@ public class SWTStormFrontClientViewer extends SWTWarlockClientViewer implements
 				case AppendImage: viewer.appendImage(url); break;
 			}
 			
-			settings = null;
 			url = null;
 		}
-	}
-	
-	public void loadStormFrontClientSettings(IStormFrontClientSettings settings) {
-		wrapper.settings = settings;
-		wrapper.eventType = EventType.LoadClientSettings;
-		run(wrapper);
 	}
 
 	public IStormFrontClient getStormFrontClient() {

@@ -29,6 +29,7 @@ package cc.warlock.rcp.ui.client;
 
 import cc.warlock.core.client.IWarlockClient;
 import cc.warlock.core.client.IWarlockClientViewer;
+import cc.warlock.core.client.settings.IClientSettings;
 
 /**
  * @author Marshall
@@ -117,6 +118,17 @@ public class SWTWarlockClientViewer extends SWTStreamListener implements IWarloc
 		}
 	}
 	
+	private class LoadClientSettingsWrapper implements Runnable {
+		public IClientSettings settings;
+		public LoadClientSettingsWrapper(IClientSettings settings) {
+			this.settings = settings;
+		}
+		
+		public void run () {
+			viewer.loadClientSettings(settings);
+		}
+	}
+	
 	public String getCurrentCommand() {
 		return viewer.getCurrentCommand();
 	}
@@ -163,5 +175,9 @@ public class SWTWarlockClientViewer extends SWTStreamListener implements IWarloc
 	
 	public void paste() {
 		run(new PasteWrapper());
+	}
+	
+	public void loadClientSettings(IClientSettings settings) {
+		run(new LoadClientSettingsWrapper(settings));
 	}
 }

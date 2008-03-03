@@ -253,6 +253,22 @@
       </page>
       <page
             category="cc.warlock.rcp.warlockPrefs"
+            class="cc.warlock.rcp.prefs.HighlightStringsPreferencePage"
+            id="cc.warlock.rcp.prefs.highlightStrings"
+            name="Highlight Strings">
+         <enabledWhen>
+            <and>
+               <adapt
+                     type="cc.warlock.core.client.IWarlockClient">
+               </adapt>
+               <test
+                     property="cc.warlock.rcp.clientConnected">
+               </test>
+            </and>
+         </enabledWhen>
+      </page>
+      <page
+            category="cc.warlock.rcp.warlockPrefs"
             class="cc.warlock.rcp.prefs.ScriptingPreferencePage"
             id="cc.warlock.rcp.prefs.scriptingPrefs"
             name="Scripting">
@@ -348,6 +364,16 @@
       <config
             class="cc.warlock.rcp.help.WarlockHelpUI">
       </config>
+   </extension>
+   <extension
+         point="org.eclipse.core.expressions.propertyTesters">
+      <propertyTester
+            class="cc.warlock.rcp.WarlockClientPropertyTester"
+            id="cc.warlock.rcp.client.tester"
+            namespace="cc.warlock.rcp"
+            properties="clientConnected,settingsLoaded"
+            type="cc.warlock.rcp.ui.client.WarlockClientAdaptable">
+      </propertyTester>
    </extension>
 
 </plugin>
