@@ -239,7 +239,7 @@ public class StormFrontServerSettings extends ClientConfigurationProvider {
 		style.setFullLine(string.isFillEntireLine());
 		
 		HighlightString newString = new HighlightString(
-			settings.getHighlightConfigurationProvider(), pattern.pattern(), false, true, true, style);
+			settings.getHighlightConfigurationProvider(), Pattern.quote(pattern.pattern()), false, true, true, style);
 		settings.getHighlightConfigurationProvider().addHighlightString(newString);
 	}
 	
@@ -323,7 +323,7 @@ public class StormFrontServerSettings extends ClientConfigurationProvider {
 		Pattern pattern = ignore.getRegex();
 		
 		settings.getIgnoreConfigurationProvider().addIgnore(
-			new Ignore(settings.getIgnoreConfigurationProvider(), pattern.pattern(), false, true, true));
+			new Ignore(settings.getIgnoreConfigurationProvider(), Pattern.quote(pattern.pattern()), false, true, true));
 		
 	}
 	
