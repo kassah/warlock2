@@ -26,8 +26,6 @@ import java.util.regex.Pattern;
 
 import org.eclipse.core.runtime.IAdaptable;
 import org.eclipse.jface.preference.ColorSelector;
-import org.eclipse.jface.util.IPropertyChangeListener;
-import org.eclipse.jface.util.PropertyChangeEvent;
 import org.eclipse.jface.viewers.ArrayContentProvider;
 import org.eclipse.jface.viewers.CellEditor;
 import org.eclipse.jface.viewers.ICellModifier;
@@ -40,9 +38,6 @@ import org.eclipse.jface.viewers.SelectionChangedEvent;
 import org.eclipse.jface.viewers.TableViewer;
 import org.eclipse.jface.viewers.TextCellEditor;
 import org.eclipse.swt.SWT;
-import org.eclipse.swt.events.SelectionAdapter;
-import org.eclipse.swt.events.SelectionEvent;
-import org.eclipse.swt.events.SelectionListener;
 import org.eclipse.swt.graphics.Color;
 import org.eclipse.swt.graphics.Image;
 import org.eclipse.swt.graphics.RGB;
@@ -57,7 +52,6 @@ import org.eclipse.swt.widgets.Label;
 import org.eclipse.swt.widgets.TableColumn;
 import org.eclipse.swt.widgets.TableItem;
 import org.eclipse.ui.IWorkbenchPropertyPage;
-import org.eclipse.ui.dialogs.PropertyPage;
 
 import cc.warlock.core.client.IWarlockClient;
 import cc.warlock.core.client.IWarlockSkin;
@@ -70,13 +64,13 @@ import cc.warlock.rcp.ui.WarlockSharedImages;
 import cc.warlock.rcp.util.ColorUtil;
 
 
-public class HighlightStringsPreferencePage extends PropertyPage implements
+public class HighlightStringsPreferencePage extends WarlockPreferencePage implements
 		IWorkbenchPropertyPage {
 
 	public static final String PAGE_ID = "cc.warlock.rcp.prefs.highlightStrings";
 	
 	protected TableViewer stringTable;
-	protected Button fillLineButton;
+	protected Button fillLineButton, literalButton, fullWordMatchButton, caseSensitiveButton;
 	protected ColorSelector customBGSelector, customFGSelector;
 	protected Button defaultBG, customBG, defaultFG, customFG;
 	protected Button addString, removeString;
@@ -88,7 +82,6 @@ public class HighlightStringsPreferencePage extends PropertyPage implements
 	protected ArrayList<HighlightString> removedStrings = new ArrayList<HighlightString>();
 	protected ArrayList<HighlightString> highlightStrings = new ArrayList<HighlightString>();
 
-	
 	private void copyHighlightStrings ()
 	{
 		highlightStrings.clear();
@@ -108,57 +101,6 @@ public class HighlightStringsPreferencePage extends PropertyPage implements
 		
 		createStringsTable(main);
 		createOptions(main);
-		
-		defaultFG.addSelectionListener(new SelectionListener () {
-			public void widgetDefaultSelected(SelectionEvent e) {
-				widgetSelected(e);
-			}
-			public void widgetSelected(SelectionEvent e) {
-				defaultForegroundSelected();
-			}
-		});
-		
-		customFG.addSelectionListener(new SelectionAdapter () {
-			@Override
-			public void widgetSelected(SelectionEvent e) {
-				customFGSelector.setEnabled(true);
-			}
-		});
-		
-		customFGSelector.addListener(new IPropertyChangeListener () {
-			public void propertyChange(PropertyChangeEvent event) {
-				customForegroundChanged();
-			}
-		});
-		
-		defaultBG.addSelectionListener(new SelectionListener () {
-			public void widgetDefaultSelected(SelectionEvent e) {
-				widgetSelected(e);
-			}
-			public void widgetSelected(SelectionEvent e) {
-				defaultBackgroundSelected();
-			}
-		});
-		
-		customBG.addSelectionListener(new SelectionAdapter () {
-			@Override
-			public void widgetSelected(SelectionEvent e) {
-				customBGSelector.setEnabled(true);
-			}
-		});
-		
-		customBGSelector.addListener(new IPropertyChangeListener () {
-			public void propertyChange(PropertyChangeEvent event) {
-				customBackgroundChanged();
-			}
-		});
-		
-		fillLineButton.addSelectionListener(new SelectionAdapter () {
-			@Override
-			public void widgetSelected(SelectionEvent e) {
-				fillLineClicked();
-			}
-		});
 		
 		return main;
 	}
@@ -188,7 +130,7 @@ public class HighlightStringsPreferencePage extends PropertyPage implements
 			}
 
 			public Object getValue(Object element, String property) {
-				return ((HighlightString)element).getPattern().pattern();
+				return ((HighlightString)element).getFullWordPattern();
 			}
 
 			public void modify(Object element, String property, Object value) {
@@ -204,7 +146,6 @@ public class HighlightStringsPreferencePage extends PropertyPage implements
 		stringTable.setLabelProvider(new StringsLabelProvider());
 		stringTable.setContentProvider(new ArrayContentProvider());
 		stringTable.setInput(highlightStrings);
-//		stringTable.addFilter(getViewerFilter());
 		
 		int listHeight = stringTable.getTable().getItemHeight() * 8;
 		Rectangle trim = stringTable.getTable().computeTrim(0, 0, 0, listHeight);
@@ -230,26 +171,12 @@ public class HighlightStringsPreferencePage extends PropertyPage implements
 		buttonsComposite.setLayout(new GridLayout(1, true));
 		buttonsComposite.setLayoutData(new GridData(GridData.CENTER, GridData.BEGINNING, true, true));
 		
-		addString = new Button(buttonsComposite, SWT.LEFT | SWT.PUSH);
-		addString.setText("Add");
+		addString = createButton(buttonsComposite, "Add", SWT.LEFT | SWT.PUSH);
 		addString.setImage(WarlockSharedImages.getImage(WarlockSharedImages.IMG_ADD));
-		addString.addSelectionListener(new SelectionAdapter() {
-			@Override
-			public void widgetSelected(SelectionEvent e) {
-				addStringClicked();
-			}
-		});
 		addString.setLayoutData(new GridData(GridData.FILL_BOTH));
 		
-		removeString = new Button(buttonsComposite, SWT.LEFT | SWT.PUSH);
-		removeString.setText("Remove");
+		removeString = createButton(buttonsComposite, "Remove", SWT.LEFT | SWT.PUSH);
 		removeString.setImage(WarlockSharedImages.getImage(WarlockSharedImages.IMG_REMOVE));
-		removeString.addSelectionListener(new SelectionAdapter() {
-			@Override
-			public void widgetSelected(SelectionEvent e) {
-				removeStringClicked();
-			}
-		});
 	}
 
 	private void createOptions (Composite main)
@@ -262,22 +189,31 @@ public class HighlightStringsPreferencePage extends PropertyPage implements
 		new Label(optionsGroup, SWT.NONE).setText("Foreground Color: ");
 		Composite fgColorComposite = new Composite(optionsGroup, SWT.NONE);
 		fgColorComposite.setLayout(new GridLayout(3, false));
-		defaultFG = new Button(fgColorComposite, SWT.RADIO);
-		defaultFG.setText("Default");
-		customFG = new Button(fgColorComposite, SWT.RADIO);
-		customFGSelector = new ColorSelector(fgColorComposite);
-		
+		defaultFG = createRadio(fgColorComposite, "Default");
+		defaultFG.setEnabled(false);
+		customFG = createRadio(fgColorComposite);
+		customFG.setEnabled(false);
+		customFGSelector = createColorSelector(fgColorComposite);
+		customFGSelector.setEnabled(false);
 		
 		new Label(optionsGroup, SWT.NONE).setText("Background Color: ");
 		Composite bgColorComposite = new Composite(optionsGroup, SWT.NONE);
 		bgColorComposite.setLayout(new GridLayout(3, false));
-		defaultBG = new Button(bgColorComposite, SWT.RADIO);
-		defaultBG.setText("Default");
-		customBG = new Button(bgColorComposite, SWT.RADIO);
-		customBGSelector = new ColorSelector(bgColorComposite);
+		defaultBG = createRadio(bgColorComposite, "Default");
+		defaultBG.setEnabled(false);
+		customBG = createRadio(bgColorComposite);
+		customBG.setEnabled(false);
+		customBGSelector = createColorSelector(bgColorComposite);
+		customBGSelector.setEnabled(false);
 		
-		fillLineButton = new Button(optionsGroup, SWT.CHECK);
-		fillLineButton.setText("Fill Entire Line");
+		literalButton = createCheckbox(optionsGroup, "Match literally (disable regex)");
+		literalButton.setEnabled(false);
+		fillLineButton = createCheckbox(optionsGroup, "Fill Entire Line");
+		fillLineButton.setEnabled(false);
+		caseSensitiveButton = createCheckbox(optionsGroup, "Case Sensitive");
+		caseSensitiveButton.setEnabled(false);
+		fullWordMatchButton = createCheckbox(optionsGroup, "Match full word (word boundary)");
+		fullWordMatchButton.setEnabled(false);
 	}
 	
 	protected String getDisplayName ()
@@ -303,11 +239,15 @@ public class HighlightStringsPreferencePage extends PropertyPage implements
 		boolean bgIsDefault = bgColor.isDefault();
 		
 		defaultFG.setSelection(fgIsDefault);
+		defaultFG.setEnabled(true);
 		customFG.setSelection(!fgIsDefault);
+		customFG.setEnabled(true);
 		customFGSelector.setEnabled(!fgIsDefault);
 		
 		defaultBG.setSelection(bgIsDefault);
+		defaultBG.setEnabled(true);
 		customBG.setSelection(!bgIsDefault);
+		customBG.setEnabled(true);
 		customBGSelector.setEnabled(!bgIsDefault);
 		
 		if (fgIsDefault) {
@@ -321,7 +261,52 @@ public class HighlightStringsPreferencePage extends PropertyPage implements
 		} else {
 			customBGSelector.setColorValue(ColorUtil.warlockColorToRGB(bgColor));
 		}
+		
+		literalButton.setSelection(string.isLiteral());
+		literalButton.setEnabled(!string.isFullWordMatch());
+		
 		fillLineButton.setSelection(string.getStyle().isFullLine());
+		fillLineButton.setEnabled(true);
+		
+		caseSensitiveButton.setSelection(string.isCaseSensitive());
+		caseSensitiveButton.setEnabled(true);
+		
+		fullWordMatchButton.setSelection(string.isFullWordMatch());
+		fullWordMatchButton.setEnabled(!string.isLiteral());
+	}
+	
+	@Override
+	protected void buttonPressed(Button button) {
+		if (button == removeString) {
+			removeStringSelected();
+		} else if (button == addString) {
+			addStringSelected();
+		} else if (button == defaultBG) {
+			defaultBackgroundSelected();
+		} else if (button == defaultFG) {
+			defaultForegroundSelected();
+		} else if (button == customBG) {
+			customBGSelector.setEnabled(true);
+		} else if (button == customFG) {
+			customFGSelector.setEnabled(true);
+		} else if (button == fillLineButton) {
+			fillLineSelected();
+		} else if (button == fullWordMatchButton) {
+			fullWordMatchSelected();
+		} else if (button == caseSensitiveButton) {
+			caseSensitiveSelected();
+		} else if (button == literalButton) {
+			literalSelected();
+		}
+	}
+	
+	@Override
+	protected void colorSelectorChanged(ColorSelector selector) {
+		if (selector == customBGSelector) {
+			customBackgroundChanged();
+		} else if (selector == customFGSelector) {
+			customForegroundChanged();
+		}
 	}
 	
 	private void defaultForegroundSelected ()
@@ -358,7 +343,7 @@ public class HighlightStringsPreferencePage extends PropertyPage implements
 		setValid(true);
 	}
 	
-	private void removeStringClicked() {
+	private void removeStringSelected() {
 		HighlightString string = selectedString;
 		if (addedStrings.contains(string)) {
 			addedStrings.remove(string);
@@ -371,7 +356,7 @@ public class HighlightStringsPreferencePage extends PropertyPage implements
 		stringTable.remove(string);
 	}
 
-	private void addStringClicked() {
+	private void addStringSelected() {
 		HighlightString newString = createHighlightString();
 		highlightStrings.add(newString);
 		addedStrings.add(newString);
@@ -382,20 +367,33 @@ public class HighlightStringsPreferencePage extends PropertyPage implements
 		stringTable.editElement(newString, 0);
 	}
 	
-	private void fillLineClicked () {
+	private void fillLineSelected () {
 		selectedString.getStyle().setFullLine(fillLineButton.getSelection());
+	}
+	
+	private void fullWordMatchSelected () {
+		selectedString.setFullWordMatch(fullWordMatchButton.getSelection());
+		literalButton.setEnabled(!fullWordMatchButton.getSelection());
+	}
+	
+	private void caseSensitiveSelected () {
+		selectedString.setCaseSensitive(caseSensitiveButton.getSelection());
+	}
+	
+	private void literalSelected () {
+		selectedString.setLiteral(literalButton.getSelection());
+		fullWordMatchButton.setEnabled(!literalButton.getSelection());
 	}
 	
 	protected class StringsLabelProvider implements ITableLabelProvider, ITableColorProvider
 	{
-		
 		public Image getColumnImage(Object element, int columnIndex) {
 			// TODO Auto-generated method stub
 			return null;
 		}
 
 		public String getColumnText(Object element, int columnIndex) {
-			return ((HighlightString)element).getPattern().pattern();
+			return ((HighlightString)element).getFullWordPattern();
 		}
 
 		public void addListener(ILabelProviderListener listener) {	}
@@ -443,8 +441,6 @@ public class HighlightStringsPreferencePage extends PropertyPage implements
 	
 	@Override
 	public boolean performOk() {
-//		client.getServerSettings().clearHighlightStrings();
-		
 		for (HighlightString string : highlightStrings) {
 			WarlockStyle style = (WarlockStyle) string.getStyle();
 			
@@ -466,14 +462,6 @@ public class HighlightStringsPreferencePage extends PropertyPage implements
 			}
 		}
 		
-		// God save us all
-//		saveSettings();
-		
 		return true;
 	}
-	
-//	protected void saveSettings ()
-//	{
-//		client.getServerSettings().saveHighlightStrings();
-//	}
 }
