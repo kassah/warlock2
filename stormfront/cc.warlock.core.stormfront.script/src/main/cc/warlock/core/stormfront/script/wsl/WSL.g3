@@ -271,34 +271,36 @@ CLEAR
 	: { state == State.action }?=> 'clear' { state = State.variableReplace; }
 	;
 TRUE
-	: { state == State.condition || state == State.action }?=> 'true'
+	: { state == State.condition }?=> 'true'
 	;
 FALSE
-	: { state == State.condition || state == State.action }?=> 'false'
+	: { state == State.condition }?=> 'false'
 	;
 NUMBER
-	: { state == State.condition || state == State.action }?=> '-'? (DIGIT)+ ('.' (DIGIT)+)?
+	: { state == State.condition }?=> '-'? (DIGIT)+ ('.' (DIGIT)+)?
 	;
 STRING
-	: { state == State.variableReplace }?=> (~('%'|'$'|'\n'|'\r'))+
+	: { state == State.variableReplace }?=> ((~('%'|'$'|'\n'|'\r'))+ | '%' | '$')
+	| { state == State.variableReplace || state == State.action }?=> ('%%'|'$$')
+		{
+			setText(getText().substring(0,1));
+		}
 	| { state == State.base }?=> WORD
 		{
 			state = State.variableReplace;
 			atStart = false;
 		}
-	| ('%%'|'$$')
+	| { state == State.action }?=> ((~(WS|'%'|'$'|'\n'|'\r'))+ | WS+ | '%' | '$')
+	| { state == State.condition }?=> '"'
 		{
-			setText(getText().substring(0,1));
-			if(state == State.base) { state = State.variableReplace; atStart = false; }
+			state = State.quoted;
+			setText("");
 		}
-	| ('%'|'$')
+	| { state == State.quoted }?=> '"'
 		{
-			if(state == State.base) { state = State.variableReplace; atStart = false; }
+			state = State.condition;
+			channel = HIDDEN;
 		}
-	| { state == State.condition }?=> WORD
-	| { state == State.action }?=> (~(WS|'%'|'$'|'\n'|'\r'))+ | WS+
-	| { state == State.condition }?=> '"' { state = State.quoted; setText(""); }
-	| { state == State.quoted }?=> '"' { state = State.condition; channel = HIDDEN; }
 	| { state == State.quoted }?=> (~('"'|'%'|'$'|'\n'|'\r'|'\\'))+ | ('\\' str=ANY { setText($str.text); })
 	;
 LABEL
