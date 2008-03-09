@@ -21,10 +21,9 @@
  */
 package cc.warlock.core.client.settings.internal;
 
-import java.util.regex.Pattern;
-
 import cc.warlock.core.client.IWarlockStyle;
 import cc.warlock.core.client.internal.WarlockStyle;
+import cc.warlock.core.client.settings.IClientSettingProvider;
 import cc.warlock.core.client.settings.IHighlightProvider;
 import cc.warlock.core.client.settings.IHighlightString;
 
@@ -32,14 +31,14 @@ public class HighlightString extends PatternSetting implements IHighlightString 
 
 	protected IWarlockStyle style;
 	
-	public HighlightString (IHighlightProvider provider, String pattern, boolean literal, boolean caseSensitive, boolean fullWordMatch, IWarlockStyle style) {	
-		super(provider, pattern, literal, caseSensitive, fullWordMatch);
+	public HighlightString (IClientSettingProvider provider, String pattern, IWarlockStyle style)
+	{
+		super(provider, pattern);
 		this.style = style;
 	}
 	
-	public HighlightString (IHighlightProvider provider, Pattern pattern, IWarlockStyle style)
-	{
-		super(provider, pattern);
+	public HighlightString (IHighlightProvider provider, String pattern, boolean literal, boolean caseSensitive, boolean fullWordMatch, IWarlockStyle style) {	
+		super(provider, pattern, literal, caseSensitive, fullWordMatch);
 		this.style = style;
 	}
 

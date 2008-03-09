@@ -22,21 +22,18 @@
 package cc.warlock.core.client.settings.internal;
 
 import java.util.regex.Matcher;
-import java.util.regex.Pattern;
 
 import cc.warlock.core.client.settings.ITrigger;
 import cc.warlock.core.client.settings.ITriggerProvider;
 
 public class Trigger extends PatternSetting implements ITrigger {
-
-	protected Pattern triggerPattern;
 	
 	public Trigger (ITriggerProvider provider, String pattern, boolean literal, boolean caseSensitive, boolean fullWordMatch)
 	{
 		super(provider, pattern, literal, caseSensitive, fullWordMatch);
 	}
 	
-	public Trigger (ITriggerProvider provider, Pattern triggerPattern)
+	public Trigger (ITriggerProvider provider, String triggerPattern)
 	{
 		super(provider, triggerPattern);
 	}
@@ -47,7 +44,7 @@ public class Trigger extends PatternSetting implements ITrigger {
 	}
 	
 	public boolean isTriggered(String text) {
-		Matcher matcher = triggerPattern.matcher(text);
+		Matcher matcher = pattern.matcher(text);
 		return matcher.find();
 	}
 

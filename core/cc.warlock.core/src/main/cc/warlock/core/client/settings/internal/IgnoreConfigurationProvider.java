@@ -49,7 +49,7 @@ public class IgnoreConfigurationProvider extends PatternConfigurationProvider
 	protected void parseChild(Element child) {
 		if (child.getName().equals("ignore"))
 		{
-			Ignore ignore = new Ignore(this, null);
+			Ignore ignore = new Ignore(this);
 			fillSetting(ignore, child);
 			
 			ignores.add(ignore);

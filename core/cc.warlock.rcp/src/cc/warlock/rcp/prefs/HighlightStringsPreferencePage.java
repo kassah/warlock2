@@ -22,7 +22,6 @@
 package cc.warlock.rcp.prefs;
 
 import java.util.ArrayList;
-import java.util.regex.Pattern;
 
 import org.eclipse.core.runtime.IAdaptable;
 import org.eclipse.jface.preference.ColorSelector;
@@ -70,7 +69,7 @@ public class HighlightStringsPreferencePage extends WarlockPreferencePage implem
 	public static final String PAGE_ID = "cc.warlock.rcp.prefs.highlightStrings";
 	
 	protected TableViewer stringTable;
-	protected Button fillLineButton, literalButton, fullWordMatchButton, caseSensitiveButton;
+	protected Button fillLineButton, regexButton, fullWordMatchButton, caseSensitiveButton;
 	protected ColorSelector customBGSelector, customFGSelector;
 	protected Button defaultBG, customBG, defaultFG, customFG;
 	protected Button addString, removeString;
@@ -130,7 +129,7 @@ public class HighlightStringsPreferencePage extends WarlockPreferencePage implem
 			}
 
 			public Object getValue(Object element, String property) {
-				return ((HighlightString)element).getFullWordPattern();
+				return ((HighlightString)element).getText();
 			}
 
 			public void modify(Object element, String property, Object value) {
@@ -138,7 +137,7 @@ public class HighlightStringsPreferencePage extends WarlockPreferencePage implem
 				HighlightString string = (HighlightString)item.getData();
 				String pattern = ((String)value).trim();
 				
-				string.setPattern(Pattern.compile(pattern, Pattern.LITERAL | Pattern.CASE_INSENSITIVE));
+				string.setText(pattern);
 				stringTable.refresh(string);
 			}
 		});
@@ -206,9 +205,9 @@ public class HighlightStringsPreferencePage extends WarlockPreferencePage implem
 		customBGSelector = createColorSelector(bgColorComposite);
 		customBGSelector.setEnabled(false);
 		
-		literalButton = createCheckbox(optionsGroup, "Match literally (disable regex)");
-		literalButton.setEnabled(false);
-		fillLineButton = createCheckbox(optionsGroup, "Fill Entire Line");
+		regexButton = createCheckbox(optionsGroup, "Regular expression");
+		regexButton.setEnabled(true);
+		fillLineButton = createCheckbox(optionsGroup, "Highlight Entire Line");
 		fillLineButton.setEnabled(false);
 		caseSensitiveButton = createCheckbox(optionsGroup, "Case Sensitive");
 		caseSensitiveButton.setEnabled(false);
@@ -262,8 +261,8 @@ public class HighlightStringsPreferencePage extends WarlockPreferencePage implem
 			customBGSelector.setColorValue(ColorUtil.warlockColorToRGB(bgColor));
 		}
 		
-		literalButton.setSelection(string.isLiteral());
-		literalButton.setEnabled(!string.isFullWordMatch());
+		regexButton.setSelection(!string.isLiteral());
+		regexButton.setEnabled(true);
 		
 		fillLineButton.setSelection(string.getStyle().isFullLine());
 		fillLineButton.setEnabled(true);
@@ -272,7 +271,7 @@ public class HighlightStringsPreferencePage extends WarlockPreferencePage implem
 		caseSensitiveButton.setEnabled(true);
 		
 		fullWordMatchButton.setSelection(string.isFullWordMatch());
-		fullWordMatchButton.setEnabled(!string.isLiteral());
+		fullWordMatchButton.setEnabled(true);
 	}
 	
 	@Override
@@ -295,8 +294,8 @@ public class HighlightStringsPreferencePage extends WarlockPreferencePage implem
 			fullWordMatchSelected();
 		} else if (button == caseSensitiveButton) {
 			caseSensitiveSelected();
-		} else if (button == literalButton) {
-			literalSelected();
+		} else if (button == regexButton) {
+			regexSelected();
 		}
 	}
 	
@@ -373,16 +372,14 @@ public class HighlightStringsPreferencePage extends WarlockPreferencePage implem
 	
 	private void fullWordMatchSelected () {
 		selectedString.setFullWordMatch(fullWordMatchButton.getSelection());
-		literalButton.setEnabled(!fullWordMatchButton.getSelection());
 	}
 	
 	private void caseSensitiveSelected () {
 		selectedString.setCaseSensitive(caseSensitiveButton.getSelection());
 	}
 	
-	private void literalSelected () {
-		selectedString.setLiteral(literalButton.getSelection());
-		fullWordMatchButton.setEnabled(!literalButton.getSelection());
+	private void regexSelected () {
+		selectedString.setLiteral(!regexButton.getSelection());
 	}
 	
 	protected class StringsLabelProvider implements ITableLabelProvider, ITableColorProvider
@@ -393,7 +390,7 @@ public class HighlightStringsPreferencePage extends WarlockPreferencePage implem
 		}
 
 		public String getColumnText(Object element, int columnIndex) {
-			return ((HighlightString)element).getFullWordPattern();
+			return ((HighlightString)element).getText();
 		}
 
 		public void addListener(ILabelProviderListener listener) {	}

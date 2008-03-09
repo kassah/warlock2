@@ -21,8 +21,6 @@
  */
 package cc.warlock.core.client.settings.internal;
 
-import java.util.regex.Pattern;
-
 import org.dom4j.Element;
 
 import cc.warlock.core.client.settings.IPatternSetting;
@@ -40,7 +38,7 @@ public abstract class PatternConfigurationProvider extends ClientConfigurationPr
 	
 	protected void fillElement (Element element, IPatternSetting setting)
 	{
-		element.addAttribute("pattern", setting.getFullWordPattern());	
+		element.addAttribute("pattern", setting.getText());	
 		element.addAttribute("literal", ""+setting.isLiteral());
 		element.addAttribute("caseSensitive", ""+setting.isCaseSensitive());
 		element.addAttribute("fullWordMatch", ""+setting.isFullWordMatch());
@@ -62,7 +60,7 @@ public abstract class PatternConfigurationProvider extends ClientConfigurationPr
 			literal = false;
 		}
 		
-		setting.setPattern(Pattern.compile(pattern));
+		setting.setText(pattern);
 		setting.setLiteral(literal);
 		setting.setCaseSensitive(caseSensitive);
 		setting.setFullWordMatch(fullWordMatch);
