@@ -156,7 +156,7 @@ equalityExpression returns [IWSLValue cond]
 	;
 
 equalityOp returns [EqualityOperator op]
-	: ('=' | '==')		{ op = EqualityOperator.equals; }
+	: '=' '='?		{ op = EqualityOperator.equals; }
 	| ('!=' | '<>')		{ op = EqualityOperator.notequals; }
 	;
 	
