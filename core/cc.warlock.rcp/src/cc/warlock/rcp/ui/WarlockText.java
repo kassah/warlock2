@@ -485,8 +485,10 @@ public class WarlockText implements LineBackgroundListener {
 					if(nextStyle.strikeout) style.strikeout = true;
 					if(nextStyle.underline) style.underline = true;
 					style.data.putAll(nextStyle.data);
-					style.action = nextStyle.action;
-					style.tooltip = nextStyle.tooltip;
+					if(nextStyle.action != null)
+						style.action = nextStyle.action;
+					if(nextStyle.tooltip != null)
+						style.tooltip = nextStyle.tooltip;
 				}
 				style.start = charCount + pos;
 				style.length = nextPos - pos;
@@ -506,7 +508,6 @@ public class WarlockText implements LineBackgroundListener {
 	}
 	
 	/* find an element in styles that intersects with the first element of styles, starting at pos */
-	
 	private int findNextEvent(WarlockString string, int pos) {
 		int nextPos = -1;
 		for(WarlockStringStyleRange style : string.getStyles()) {
