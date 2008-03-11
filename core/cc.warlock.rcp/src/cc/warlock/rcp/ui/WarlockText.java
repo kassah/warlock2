@@ -27,6 +27,7 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 
+import org.eclipse.core.runtime.Platform;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.custom.ExtendedModifyListener;
 import org.eclipse.swt.custom.LineBackgroundEvent;
@@ -572,6 +573,9 @@ public class WarlockText implements LineBackgroundListener {
 		if (status.selection.x != status.selection.y) // Only set it if there is something selected
 			textWidget.setSelectionRange(status.selection.x, status.selection.y - status.selection.x);
 		setCaretOffset(status.caretOffset);
+		if (Platform.getOS().equals(Platform.OS_MACOSX)) {
+			redraw();
+		}
 	}
 	
 	// Don't not call this function on append, only replace/remove/insert
