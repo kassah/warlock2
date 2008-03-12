@@ -28,6 +28,7 @@ import org.eclipse.swt.widgets.Display;
 
 import cc.warlock.core.network.IConnection;
 import cc.warlock.core.network.IConnectionListener;
+import cc.warlock.core.network.IConnection.ErrorType;
 
 /**
  * @author Marshall
@@ -91,15 +92,17 @@ public class SWTConnectionListenerAdapter implements IConnectionListener {
 	private class ConnectionRefusedRunnable implements Runnable
 	{
 		public IConnection connection;
+		public ErrorType errorType;
 		
 		public void run () {
-			listener.connectionRefused(connection);
+			listener.connectionError(connection, errorType);
 		}
 	}
 	
-	public void connectionRefused(IConnection connection) {
+	public void connectionError(IConnection connection, ErrorType errorType) {
 		ConnectionRefusedRunnable runnable = new ConnectionRefusedRunnable();
 		runnable.connection = connection;
+		runnable.errorType = errorType;
 		Display.getDefault().asyncExec(runnable);
 	}
 }

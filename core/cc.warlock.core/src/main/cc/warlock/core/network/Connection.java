@@ -29,6 +29,7 @@ import java.io.IOException;
 import java.io.InputStreamReader;
 import java.net.ConnectException;
 import java.net.Socket;
+import java.net.UnknownHostException;
 import java.util.ArrayList;
 
 import cc.warlock.core.client.IWarlockClient;
@@ -67,14 +68,19 @@ public class Connection implements IConnection {
 			
 			new Thread(new EventPollThread()).start();
 		} catch (IOException e) {
-			if (e instanceof ConnectException && e.getMessage().contains("refused"))
-			{
-				for (IConnectionListener listener : connectionListeners)
-				{
-					listener.connectionRefused(this);
-				}
-			}
-			else throw e;
+			if (e instanceof ConnectException && e.getMessage().contains("refused")) {
+				connectionError(ErrorType.ConnectionRefused);
+			} else if (e instanceof UnknownHostException) {
+				connectionError(ErrorType.UnknownHost);
+			} else throw e;
+		}
+	}
+	
+	protected void connectionError (ErrorType errorType)
+	{
+		for (IConnectionListener listener : connectionListeners)
+		{
+			listener.connectionError(this, errorType);
 		}
 	}
 	

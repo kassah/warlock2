@@ -39,6 +39,10 @@ import cc.warlock.core.client.IWarlockClient;
  */
 public interface IConnection {
 	
+	public static enum ErrorType {
+		ConnectionRefused, UnknownHost
+	};
+	
 	public void connect(String host, int port) throws IOException;
 	public void disconnect() throws IOException;
 	public void addConnectionListener(IConnectionListener listener);

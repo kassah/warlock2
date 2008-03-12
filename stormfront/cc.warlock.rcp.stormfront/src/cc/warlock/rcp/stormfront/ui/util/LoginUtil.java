@@ -34,7 +34,7 @@ import cc.warlock.core.client.IWarlockClient;
 import cc.warlock.core.client.IWarlockStyle;
 import cc.warlock.core.client.WarlockString;
 import cc.warlock.core.client.internal.WarlockStyle;
-import cc.warlock.core.stormfront.client.internal.StormFrontClient;
+import cc.warlock.core.network.IConnection.ErrorType;
 import cc.warlock.core.stormfront.network.SGEConnection;
 import cc.warlock.rcp.plugin.Warlock2Plugin;
 import cc.warlock.rcp.stormfront.ui.StormFrontPerspectiveFactory;
@@ -167,9 +167,18 @@ public class LoginUtil {
 		return null;
 	}
 	
-	public static void showRefusedError ()
+	public static void showConnectionError (ErrorType errorType)
 	{
-		MessageDialog.openError(Display.getDefault().getActiveShell(), "Connection to SGE Refused", 
-			"The connection to eaccess.play.net was refused. This could be caused by a server outage, or a firewall blocking access.");
+		switch (errorType) {
+			case ConnectionRefused: {
+				MessageDialog.openError(Display.getDefault().getActiveShell(), "Connection to SGE Refused", 
+					"The connection to eaccess.play.net was refused. This could be caused by a server outage, or a firewall blocking access.");
+			} break;
+			case UnknownHost: {
+				MessageDialog.openError(Display.getDefault().getActiveShell(), "Error connecting to SGE", 
+					"There was an error connecting to SGE: The server: \"eaccess.play.net\" was returned as unknown by your DNS.");
+			} break;
+			default: break;
+		}
 	}
 }

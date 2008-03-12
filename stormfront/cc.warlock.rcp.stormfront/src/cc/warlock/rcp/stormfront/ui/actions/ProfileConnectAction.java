@@ -34,6 +34,7 @@ import org.eclipse.swt.widgets.Display;
 import cc.warlock.core.configuration.Profile;
 import cc.warlock.core.network.IConnection;
 import cc.warlock.core.network.IConnectionListener;
+import cc.warlock.core.network.IConnection.ErrorType;
 import cc.warlock.core.stormfront.network.ISGEConnectionListener;
 import cc.warlock.core.stormfront.network.ISGEGame;
 import cc.warlock.core.stormfront.network.SGEConnection;
@@ -155,8 +156,8 @@ public class ProfileConnectAction extends Action implements ISGEConnectionListen
 		return profile;
 	}
 
-	public void connectionRefused(IConnection connection) {
-		LoginUtil.showRefusedError();
+	public void connectionError(IConnection connection, ErrorType errorType) {
+		LoginUtil.showConnectionError(errorType);
 	}
 
 	public void connected(IConnection connection) {}

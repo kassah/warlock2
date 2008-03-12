@@ -47,6 +47,7 @@ import org.eclipse.swt.widgets.Text;
 import cc.warlock.core.configuration.Account;
 import cc.warlock.core.network.IConnection;
 import cc.warlock.core.network.IConnectionListener;
+import cc.warlock.core.network.IConnection.ErrorType;
 import cc.warlock.core.stormfront.ProfileConfiguration;
 import cc.warlock.core.stormfront.network.ISGEGame;
 import cc.warlock.core.stormfront.network.SGEConnection;
@@ -211,10 +212,9 @@ public class AccountWizardPage extends WizardPageWithNotification implements ICo
 	}
 	
 	
-	public void connectionRefused(IConnection connection) {
+	public void connectionError(IConnection connection, ErrorType errorType) {
 		getWizard().getContainer().showPage(this);
-		
-		LoginUtil.showRefusedError();
+		LoginUtil.showConnectionError(errorType);	
 	}
 	
 	public void connected(IConnection connection) {}
