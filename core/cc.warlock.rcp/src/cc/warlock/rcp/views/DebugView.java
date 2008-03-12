@@ -43,6 +43,7 @@ import cc.warlock.core.client.WarlockClientAdapter;
 import cc.warlock.core.client.WarlockClientRegistry;
 import cc.warlock.core.network.IConnection;
 import cc.warlock.core.network.IConnectionListener;
+import cc.warlock.core.network.IConnection.ErrorType;
 import cc.warlock.rcp.ui.WarlockText;
 import cc.warlock.rcp.ui.network.SWTConnectionListenerAdapter;
 
@@ -152,10 +153,10 @@ public class DebugView extends ViewPart implements IConnectionListener, IGameVie
 		debug (connection.getClient(), "disconnected");
 	}
 	
-	public void connectionRefused(IConnection connection) {
-		debug (connection.getClient(), "refused");
+	public void connectionError(IConnection connection, ErrorType errorType) {
+		debug (connection.getClient(), "error: " + errorType.toString());
 	}
-
+	
 	public void gameViewFocused(GameView gameView) {
 		setClient(gameView.getWarlockClient());
 	}
