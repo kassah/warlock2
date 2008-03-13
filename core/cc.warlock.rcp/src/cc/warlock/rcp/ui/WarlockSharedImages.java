@@ -54,7 +54,7 @@ public class WarlockSharedImages {
 	public static final String IMG_REFRESH = "/images/refresh.png";
 	public static final String IMG_STOP= "/images/stop.png";
 	
-	public static final String IMG_WIZBAN_WARLOCK = "/images/warlock-wizard-icon.png";
+	public static final String IMG_WIZBAN_WARLOCK = "/images/warlock_64.png";
 	public static final String IMG_CHARACTER = "/images/character.gif";
 	public static final String IMG_NEW_CHARACTER = "/images/new_character.gif";
 	
