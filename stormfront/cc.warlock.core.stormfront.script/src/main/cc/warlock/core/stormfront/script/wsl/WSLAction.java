@@ -21,6 +21,8 @@
  */
 package cc.warlock.core.stormfront.script.wsl;
 
+import java.util.regex.PatternSyntaxException;
+
 import cc.warlock.core.script.internal.RegexMatch;
 
 public class WSLAction extends WSLAbstractCommand {
@@ -46,8 +48,12 @@ public class WSLAction extends WSLAbstractCommand {
 	}
 	
 	public void execute() {
-		match = new RegexMatch(when.toString().trim());
-		script.scriptCommands.addAction(new WSLActionAdapter(), match);
+		try {
+			match = new RegexMatch(when.toString().trim());
+			script.scriptCommands.addAction(new WSLActionAdapter(), match);
+		} catch(PatternSyntaxException e) {
+			script.scriptError("Bad regex \"" + when.toString().trim() + "\" in action");
+		}
 	}
 
 }

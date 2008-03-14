@@ -25,6 +25,7 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
+import java.util.regex.PatternSyntaxException;
 
 import cc.warlock.core.script.IMatch;
 
@@ -33,11 +34,11 @@ public class RegexMatch implements IMatch {
 	Pattern regex;
 	ArrayList<String> groups = new ArrayList<String>();
 	
-	public RegexMatch(String text) {
+	public RegexMatch(String text) throws PatternSyntaxException {
 		this(text, false);
 	}
 	
-	public RegexMatch(String text, boolean ignoreCase) {
+	public RegexMatch(String text, boolean ignoreCase) throws PatternSyntaxException {
 		
 		int flags = 0;
 		if(ignoreCase) flags |= Pattern.CASE_INSENSITIVE;

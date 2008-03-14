@@ -341,7 +341,7 @@ public class WSLScript extends AbstractScript {
 		wslCommands.put(name, command);
 	}
 	
-	private void scriptError(String message) {
+	protected void scriptError(String message) {
 		echo("Script error on line " + curCommand.getLineNumber() + " (" + curLine + "): " + message);
 		stop();
 	}
