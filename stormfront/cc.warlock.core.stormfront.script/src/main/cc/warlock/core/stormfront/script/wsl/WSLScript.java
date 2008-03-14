@@ -461,7 +461,8 @@ public class WSLScript extends AbstractScript {
 				String value = m.group(3);
 				if(value == null)
 					value = " ";
-				scriptCommands.echo("setVariable: " + name + "=" + value);
+				// Removed, please add again with a debug flag mode (so we're not spamming all the time)
+				//scriptCommands.echo("setVariable: " + name + "=" + value);
 				setVariable(name, value);
 			} else {
 				scriptWarning("Invalid arguments to setvariable");
@@ -481,7 +482,8 @@ public class WSLScript extends AbstractScript {
 				String value = m.group(3);
 				if(value == null)
 					value = " ";
-				scriptCommands.echo("setLocalVariable: " + name + "=" + value);
+				// Removed, please add again with a debug flag mode (so we're not spamming all the time)
+				// scriptCommands.echo("setLocalVariable: " + name + "=" + value);
 				setLocalVariable(name, value);
 			} else {
 				scriptError("Invalid arguments to setLocalVariable");
