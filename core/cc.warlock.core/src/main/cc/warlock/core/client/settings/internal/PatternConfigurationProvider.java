@@ -56,10 +56,6 @@ public abstract class PatternConfigurationProvider extends ClientConfigurationPr
 			fullWordMatch = booleanValue(element, "fullWordMatch");
 		}
 		
-		if (fullWordMatch && literal) {
-			literal = false;
-		}
-		
 		setting.setText(pattern);
 		setting.setLiteral(literal);
 		setting.setCaseSensitive(caseSensitive);
