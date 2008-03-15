@@ -157,7 +157,8 @@ public class HandsView extends ViewPart implements IPropertyListener<String>
 			
 			e.gc.setForeground(foreground);
 			e.gc.drawImage(image, tabPadding/2, tabPadding/2);
-			e.gc.drawText(text, imageBounds.width + tabPadding, tabPadding, true);
+			if (text != null)
+				e.gc.drawText(text, imageBounds.width + tabPadding, tabPadding, true);
 		}
 		
 		public void setText(String text) {

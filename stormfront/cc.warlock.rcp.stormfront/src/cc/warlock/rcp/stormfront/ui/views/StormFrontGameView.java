@@ -250,6 +250,10 @@ public class StormFrontGameView extends GameView implements IStormFrontClientVie
 	
 	public void receivedServerSetting(SettingType settingType)
 	{
+		if (settingsProgressDialog == null) {
+			Display.getDefault().readAndDispatch();
+		}
+		
 		IProgressMonitor monitor = settingsProgressDialog.getProgressMonitor();
 		monitor.subTask("Downloading " + settingType.toString() + "...");
 		
