@@ -52,6 +52,7 @@ import cc.warlock.core.stormfront.script.internal.StormFrontScriptCommands;
 public class WSLScript extends AbstractScript {
 	
 	protected boolean debugging = false;
+	protected int debugLevel = 1;
 	protected HashMap<String, WSLAbstractCommand> labels = new HashMap<String, WSLAbstractCommand>();
 	protected WSLAbstractCommand nextCommand;
 	protected WSLAbstractCommand curCommand;
@@ -87,6 +88,8 @@ public class WSLScript extends AbstractScript {
 		// add command handlers
 		addCommandDefinition("counter", new WSLCounter());
 		addCommandDefinition("deletevariable", new WSLDeleteVariable());
+		addCommandDefinition("debug", new WSLDebug());
+		addCommandDefinition("debuglevel", new WSLDebugLevel());
 		addCommandDefinition("echo", new WSLEcho());
 		addCommandDefinition("else", new WSLElse());
 		addCommandDefinition("exit", new WSLExit());
@@ -329,7 +332,7 @@ public class WSLScript extends AbstractScript {
 		
 		WSLCommandDefinition command = wslCommands.get(commandName);
 		if(command != null) {
-			if (debugging) scriptCommands.echo("Debug: " + line);
+			scriptDebug(2, "Debug: " + line);
 			command.execute(arguments);
 		} else {
 			//TODO output the line number here
@@ -348,6 +351,14 @@ public class WSLScript extends AbstractScript {
 	
 	private void scriptWarning(String message) {
 		echo("Script warning on line " + curCommand.getLineNumber() + " (" + curLine + "): " + message);
+	}
+	
+	
+	protected void scriptDebug (int level, String message)
+	{
+		if (level <= debugLevel && debugging) {
+			echo(message);
+		}
 	}
 	
 	private class ScriptTimer extends WSLAbstractNumber {
@@ -390,6 +401,31 @@ public class WSLScript extends AbstractScript {
 		}
 	}
 
+	protected class WSLDebug extends WSLCommandDefinition {
+		public void execute(String arguments) {
+			if (arguments == null || arguments.length() == 0)
+			{
+				debugging = true;
+			}
+			else {
+				String onoff = arguments.split(argSeparator)[0];
+				
+				debugging = (onoff.equalsIgnoreCase("on") || onoff.equalsIgnoreCase("true") || onoff.equalsIgnoreCase("yes"));
+			}
+		}
+	}
+	
+	protected class WSLDebugLevel extends WSLCommandDefinition {
+		private Pattern format = Pattern.compile("^(\\d+)$");
+		
+		public void execute(String arguments) {
+			Matcher m = format.matcher(arguments);
+			if (m.find()) {
+				debugLevel = Integer.parseInt(m.group(1));
+			}
+		}
+	}
+	
 	protected class WSLShift extends WSLCommandDefinition {
 		
 		public void execute (String arguments) {
@@ -461,8 +497,8 @@ public class WSLScript extends AbstractScript {
 				String value = m.group(3);
 				if(value == null)
 					value = " ";
-				// Removed, please add again with a debug flag mode (so we're not spamming all the time)
-				//scriptCommands.echo("setVariable: " + name + "=" + value);
+				
+				scriptDebug(1, "setVariable: " + name + "=" + value);
 				setVariable(name, value);
 			} else {
 				scriptWarning("Invalid arguments to setvariable");
@@ -482,8 +518,8 @@ public class WSLScript extends AbstractScript {
 				String value = m.group(3);
 				if(value == null)
 					value = " ";
-				// Removed, please add again with a debug flag mode (so we're not spamming all the time)
-				// scriptCommands.echo("setLocalVariable: " + name + "=" + value);
+				
+				scriptDebug(1, "setLocalVariable: " + name + "=" + value);
 				setLocalVariable(name, value);
 			} else {
 				scriptError("Invalid arguments to setLocalVariable");
