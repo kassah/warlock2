@@ -29,6 +29,7 @@ import cc.warlock.core.client.IWarlockClientViewer;
 public interface IMacroCommand {
 
 	public String getIdentifier ();
+	public String getDescription();
 	public void execute (IWarlockClientViewer context);
 
 }
