@@ -143,6 +143,19 @@ public class MacroRegistry implements IMacroProvider {
 		macros.add(macro);
 	}
 	
+	public void removeMacro(IMacro macro) {
+		if (macros.contains(macro)) {
+			macros.remove(macro);
+		}
+	}
+	
+	public void replaceMacro(IMacro originalMacro, IMacro newMacro) {
+		int index = macros.indexOf(originalMacro);
+		if (index > -1) {
+			macros.set(index, newMacro);
+		}
+	}
+	
 	private void loadMacros () {
 		for (IMacro macro : SystemMacros.getSystemMacros())
 		{
@@ -160,12 +173,32 @@ public class MacroRegistry implements IMacroProvider {
 		return null;
 	}
 	
+	public void setMacroVariable(String id, IMacroVariable variable) {
+		variables.put(id, variable);
+	}
+	
 	public IMacroVariable getMacroVariable(String id) {
 		return variables.get(id);
 	}
 	
+	public void removeMacroVariable(IMacroVariable variable) {
+		if (variables.containsKey(variable.getIdentifier())) {
+			variables.remove(variable.getIdentifier());
+		}
+	}
+	
+	public void addMacroCommand(IMacroCommand command) {
+		commands.put(command.getIdentifier(), command);
+	}
+	
 	public IMacroCommand getMacroCommand(String id) {
 		return commands.get(id);
+	}
+	
+	public void removeMacroCommand(IMacroCommand command) {
+		if (commands.containsKey(command.getIdentifier())) {
+			commands.remove(command.getIdentifier());
+		}
 	}
 	
 	public List<? extends IClientSetting> getSettings() {
