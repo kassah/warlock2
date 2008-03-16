@@ -54,7 +54,11 @@ import org.eclipse.swt.widgets.Button;
 import org.eclipse.swt.widgets.Combo;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Control;
+import org.eclipse.swt.widgets.Event;
 import org.eclipse.swt.widgets.Label;
+import org.eclipse.swt.widgets.Listener;
+import org.eclipse.swt.widgets.Menu;
+import org.eclipse.swt.widgets.MenuItem;
 import org.eclipse.swt.widgets.Text;
 import org.eclipse.ui.IWorkbenchPropertyPage;
 import org.eclipse.ui.part.PageBook;
@@ -99,7 +103,8 @@ public class MacrosPreferencePage extends WarlockPreferencePage implements
 
 	protected Text commandText;
 	protected KeyStrokeText keyComboText;
-	protected Combo filterCombo;
+	protected Menu filterMenu;
+	protected boolean filterByCommand = true;
 	
 	@Override
 	protected Control createContents(Composite parent) {
@@ -107,29 +112,14 @@ public class MacrosPreferencePage extends WarlockPreferencePage implements
 		main.setLayout(new GridLayout(2, false));
 		
 		Composite filterComposite = new Composite(main, SWT.NONE);
-		GridLayout layout = new GridLayout(2, false);
+		GridLayout layout = new GridLayout(3, false);
 		layout.marginWidth = layout.marginHeight = 0;
 		filterComposite.setLayout(layout);
 		GridData data = new GridData(SWT.FILL, SWT.FILL, true, false);
 //		data.horizontalSpan = 2;
 		filterComposite.setLayoutData(data);
 		
-		filterCombo = new Combo(filterComposite, SWT.NONE);
-		filterCombo.add("Filter by command");
-		filterCombo.add("Filter by key combo");
-		filterCombo.setBackground(parent.getBackground());
-		filterCombo.select(0);
-		filterCombo.addSelectionListener(new SelectionAdapter() {
-			public void widgetSelected(SelectionEvent e) {
-				if (filterCombo.getSelectionIndex() == 0) {
-					filterBook.showPage(commandText);
-				} else {
-					filterBook.showPage(keyComboText.getText());
-				}
-				macroTable.refresh();
-			}
-		});
-		filterCombo.setLayoutData(new GridData(SWT.BEGINNING, SWT.FILL, false, false));
+		new Label(filterComposite, SWT.NONE).setText("Filter: ");
 	
 		filterBook = new PageBook(filterComposite, SWT.NONE);
 		filterBook.setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, false));
@@ -152,6 +142,36 @@ public class MacrosPreferencePage extends WarlockPreferencePage implements
 		});
 		
 		filterBook.showPage(commandText);
+
+		Button filterButton = new Button(filterComposite, SWT.ARROW | SWT.DOWN);
+		filterMenu = new Menu(filterButton);
+		filterButton.addListener(SWT.Selection, new Listener() {
+			public void handleEvent(Event event) {
+				filterMenu.setVisible(true);
+			}
+		});
+		
+		MenuItem filterByCommand = new MenuItem(filterMenu, SWT.RADIO);
+		filterByCommand.setText("Filter by command");
+		filterByCommand.setSelection(true);
+		filterByCommand.addSelectionListener(new SelectionAdapter() {
+			public void widgetSelected(SelectionEvent e) {
+				MacrosPreferencePage.this.filterByCommand = true;
+				filterBook.showPage(commandText);
+				macroTable.refresh();
+			}
+		});
+		
+		MenuItem filterByKeyCombo= new MenuItem(filterMenu, SWT.RADIO);
+		filterByKeyCombo.setText("Filter by key combo");
+		filterByKeyCombo.addSelectionListener(new SelectionAdapter() {
+			public void widgetSelected(SelectionEvent e) {
+				MacrosPreferencePage.this.filterByCommand = false;
+				filterBook.showPage(keyComboText.getText());
+				macroTable.refresh();
+			}
+		});
+		filterButton.setLayoutData(new GridData(SWT.BEGINNING, SWT.FILL, false, false));
 		
 		new Label(main, SWT.NONE);
 		macroTable = new TableViewer(main, SWT.SINGLE | SWT.BORDER | SWT.V_SCROLL);
@@ -243,7 +263,7 @@ public class MacrosPreferencePage extends WarlockPreferencePage implements
 		public boolean select(Viewer viewer, Object parentElement, Object element) {
 			IMacro macro = (IMacro)element;
 			
-			if (MacrosPreferencePage.this.filterCombo.getSelectionIndex() == 0) {
+			if (filterByCommand) {
 				String command = getCommandMacroHandler(macro).getCommand();
 				
 				if (command.equals("")) {
