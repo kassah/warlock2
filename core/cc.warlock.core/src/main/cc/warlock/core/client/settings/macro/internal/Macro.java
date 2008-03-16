@@ -32,6 +32,7 @@ import java.util.Collection;
 
 import cc.warlock.core.client.IWarlockClientViewer;
 import cc.warlock.core.client.settings.internal.ClientSetting;
+import cc.warlock.core.client.settings.macro.CommandMacroHandler;
 import cc.warlock.core.client.settings.macro.IMacro;
 import cc.warlock.core.client.settings.macro.IMacroHandler;
 import cc.warlock.core.client.settings.macro.IMacroProvider;
@@ -57,11 +58,29 @@ public class Macro extends ClientSetting implements IMacro
 		this.handlers = new ArrayList<IMacroHandler>();
 	}
 	
+	public Macro (Macro other) {
+		super(other);
+		
+		this.keycode = other.keycode;
+		this.modifiers = other.modifiers;
+		this.handlers = new ArrayList<IMacroHandler>();
+		
+		for (IMacroHandler handler : other.handlers) {
+			if (handler instanceof CommandMacroHandler)
+			{
+				this.handlers.add(new CommandMacroHandler(((CommandMacroHandler)handler).getCommand()));
+			}
+		}
+	}
+	
 	public int getKeyCode() {
 		return this.keycode;
 	}
 	
 	public void setKeyCode(int keycode) {
+		if (keycode != this.keycode)
+			needsUpdate = true;
+		
 		this.keycode = keycode;
 	}
 	
@@ -70,16 +89,23 @@ public class Macro extends ClientSetting implements IMacro
 	}
 	
 	public void setModifiers(int modifiers) {
+		if (modifiers != this.modifiers)
+			needsUpdate = true;
+		
 		this.modifiers = modifiers;
 	}
 	
 	public void addHandler(IMacroHandler handler) {
+		needsUpdate = true;
+		
 		this.handlers.add(handler);
 	}
 	
 	public void removeHandler(IMacroHandler handler) {
-		if (this.handlers.contains(handler))
+		if (this.handlers.contains(handler)) {
+			needsUpdate = true;
 			this.handlers.remove(handler);
+		}
 	}
 	
 	public Collection<IMacroHandler> getHandlers() {
@@ -121,5 +147,10 @@ public class Macro extends ClientSetting implements IMacro
 			return (keycode == other.getKeyCode() && modifiers == other.getModifiers());
 		}
 		return super.equals(obj);
+	}
+	
+	public Macro getOriginalMacro ()
+	{
+		return (Macro)getOriginalSetting();
 	}
 }
