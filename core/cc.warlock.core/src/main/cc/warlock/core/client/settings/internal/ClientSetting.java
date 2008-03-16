@@ -61,5 +61,9 @@ public class ClientSetting implements IClientSetting {
 	{
 		return needsUpdate;
 	}
+	
+	public void setNeedsUpdate (boolean needsUpdate) {
+		this.needsUpdate = needsUpdate;
+	}
 
 }
