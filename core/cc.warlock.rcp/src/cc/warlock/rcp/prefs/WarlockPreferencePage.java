@@ -29,13 +29,20 @@ import org.eclipse.swt.events.SelectionEvent;
 import org.eclipse.swt.events.SelectionListener;
 import org.eclipse.swt.widgets.Button;
 import org.eclipse.swt.widgets.Composite;
+import org.eclipse.swt.widgets.Control;
 import org.eclipse.ui.IWorkbenchPropertyPage;
 import org.eclipse.ui.dialogs.PropertyPage;
 
 import cc.warlock.rcp.util.FontSelector;
 
-public abstract class WarlockPreferencePage extends PropertyPage implements
+public class WarlockPreferencePage extends PropertyPage implements
 		IWorkbenchPropertyPage, SelectionListener, IPropertyChangeListener {
+	
+	protected Control createContents(Composite parent) {
+		Composite main = new Composite (parent, SWT.NONE);
+		
+		return main;
+	}
 	
 	public Button createButton(Composite parent, int flags)
 	{
