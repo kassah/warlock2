@@ -36,7 +36,11 @@ import org.eclipse.jface.viewers.ITableLabelProvider;
 import org.eclipse.jface.viewers.SelectionChangedEvent;
 import org.eclipse.jface.viewers.TableViewer;
 import org.eclipse.jface.viewers.TextCellEditor;
+import org.eclipse.jface.viewers.Viewer;
+import org.eclipse.jface.viewers.ViewerFilter;
 import org.eclipse.swt.SWT;
+import org.eclipse.swt.events.ModifyEvent;
+import org.eclipse.swt.events.ModifyListener;
 import org.eclipse.swt.graphics.Color;
 import org.eclipse.swt.graphics.Image;
 import org.eclipse.swt.graphics.RGB;
@@ -50,6 +54,7 @@ import org.eclipse.swt.widgets.Group;
 import org.eclipse.swt.widgets.Label;
 import org.eclipse.swt.widgets.TableColumn;
 import org.eclipse.swt.widgets.TableItem;
+import org.eclipse.swt.widgets.Text;
 import org.eclipse.ui.IWorkbenchPropertyPage;
 
 import cc.warlock.core.client.IWarlockClient;
@@ -73,6 +78,7 @@ public class HighlightStringsPreferencePage extends WarlockPreferencePage implem
 	protected ColorSelector customBGSelector, customFGSelector;
 	protected Button defaultBG, customBG, defaultFG, customFG;
 	protected Button addString, removeString;
+	protected Text filterText;
 	protected IWarlockClient client;
 	protected IWarlockSkin skin;
 	protected ClientSettings settings;
@@ -80,7 +86,7 @@ public class HighlightStringsPreferencePage extends WarlockPreferencePage implem
 	protected ArrayList<HighlightString> addedStrings = new ArrayList<HighlightString>();
 	protected ArrayList<HighlightString> removedStrings = new ArrayList<HighlightString>();
 	protected ArrayList<HighlightString> highlightStrings = new ArrayList<HighlightString>();
-
+	
 	private void copyHighlightStrings ()
 	{
 		highlightStrings.clear();
@@ -110,6 +116,22 @@ public class HighlightStringsPreferencePage extends WarlockPreferencePage implem
 		stringsGroup.setLayout(new GridLayout(2, false));
 		stringsGroup.setText(getDisplayName());
 		stringsGroup.setLayoutData(new GridData(GridData.FILL, GridData.FILL, true, false));
+
+		Composite filterComposite = new Composite(stringsGroup, SWT.NONE);
+		GridLayout layout = new GridLayout(2, false);
+		layout.marginWidth = layout.marginHeight = 0;
+		filterComposite.setLayout(layout);
+		filterComposite.setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, false));
+		
+		new Label(filterComposite, SWT.NONE).setText("Filter: ");
+		filterText = new Text(filterComposite, SWT.BORDER);
+		filterText.addModifyListener(new ModifyListener() {
+			public void modifyText(ModifyEvent e) {
+				stringTable.refresh();
+			}
+		});
+		filterText.setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, false));
+		new Label(stringsGroup, SWT.NONE);
 		
 		stringTable = new TableViewer(stringsGroup, SWT.SINGLE | SWT.BORDER | SWT.V_SCROLL );
 		TableColumn column = new TableColumn(stringTable.getTable(), SWT.NONE, 0);
@@ -139,6 +161,18 @@ public class HighlightStringsPreferencePage extends WarlockPreferencePage implem
 				
 				string.setText(pattern);
 				stringTable.refresh(string);
+			}
+		});
+		
+		stringTable.addFilter(new ViewerFilter () {
+			public boolean select(Viewer viewer, Object parentElement, Object element) {
+				
+				HighlightString string = (HighlightString) element;
+				String str = string.getText();
+				
+				if (str.equals("")) return true;
+				
+				return (str.toLowerCase().contains(filterText.getText().toLowerCase()));
 			}
 		});
 		
