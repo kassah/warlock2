@@ -31,10 +31,17 @@ public interface IMacroProvider extends IClientSettingProvider {
 	public List<? extends IMacro> getMacros();
 	
 	public IMacro getMacro (int keycode, int modifiers);
-
+	public void addMacro (IMacro macro);
+	public void removeMacro (IMacro macro);
+	public void replaceMacro (IMacro originalMacro, IMacro newMacro);
+	
 	public IMacroVariable getMacroVariable (String id);
 	public Collection<IMacroVariable> getMacroVariables();
+	public void setMacroVariable (String id, IMacroVariable variable);
+	public void removeMacroVariable (IMacroVariable variable);
 	
 	public IMacroCommand getMacroCommand (String id);
 	public Collection<IMacroCommand> getMacroCommands();
+	public void addMacroCommand (IMacroCommand command);
+	public void removeMacroCommand (IMacroCommand command);
 }

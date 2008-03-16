@@ -78,6 +78,13 @@ public class MacroConfigurationProvider extends ClientConfigurationProvider impl
 			macros.remove(macro);
 		}
 	}
+	
+	public void replaceMacro(IMacro originalMacro, IMacro newMacro) {
+		int index = macros.indexOf(originalMacro);
+		if (index > -1) {
+			macros.set(index, newMacro);
+		}
+	}
 
 	public void addMacroVariable(IMacroVariable var) {
 		setMacroVariable(var.getIdentifier(), var);
@@ -88,6 +95,12 @@ public class MacroConfigurationProvider extends ClientConfigurationProvider impl
 			return variables.get(id);
 		}
 		return null;
+	}
+	
+	public void removeMacroVariable(IMacroVariable variable) {
+		if (variables.containsKey(variable.getIdentifier())) {
+			variables.remove(variable.getIdentifier());
+		}
 	}
 
 	public Collection<IMacroVariable> getMacroVariables() {
@@ -145,6 +158,12 @@ public class MacroConfigurationProvider extends ClientConfigurationProvider impl
 
 	public Collection<IMacroCommand> getMacroCommands() {
 		return commands.values();
+	}
+	
+	public void removeMacroCommand(IMacroCommand command) {
+		if (commands.containsKey(command.getIdentifier())) {
+			commands.remove(command.getIdentifier());
+		}
 	}
 	
 	public IMacroCommand getMacroCommand(String id) {
