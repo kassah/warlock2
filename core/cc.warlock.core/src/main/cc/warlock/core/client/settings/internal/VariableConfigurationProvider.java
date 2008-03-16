@@ -72,7 +72,7 @@ public class VariableConfigurationProvider extends ClientConfigurationProvider i
 	protected void parseChild(Element child) {
 		if (child.getName().equals("variable"))
 		{
-			String name = child.attributeValue("name");
+			String name = child.attributeValue("id");
 			String value = child.getStringValue();
 			
 			Variable variable = new Variable(this, name, value);
