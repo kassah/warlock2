@@ -48,8 +48,10 @@ import cc.warlock.core.client.IStreamListener;
 import cc.warlock.core.client.IWarlockClient;
 import cc.warlock.core.client.IWarlockStyle;
 import cc.warlock.core.client.PropertyListener;
+import cc.warlock.core.client.WarlockFont;
 import cc.warlock.core.client.WarlockString;
 import cc.warlock.core.client.settings.IHighlightString;
+import cc.warlock.core.client.settings.IWindowSettings;
 import cc.warlock.rcp.configuration.GameViewConfiguration;
 import cc.warlock.rcp.ui.WarlockText;
 import cc.warlock.rcp.ui.client.SWTPropertyListener;
@@ -57,6 +59,7 @@ import cc.warlock.rcp.ui.client.SWTStreamListener;
 import cc.warlock.rcp.ui.style.DefaultStyleProvider;
 import cc.warlock.rcp.ui.style.StyleProviders;
 import cc.warlock.rcp.util.ColorUtil;
+import cc.warlock.rcp.util.FontUtil;
 
 public class StreamView extends ViewPart implements IStreamListener, IGameViewFocusListener {
 	
@@ -170,16 +173,32 @@ public class StreamView extends ViewPart implements IStreamListener, IGameViewFo
 				text.getTextWidget().addVerifyKeyListener(game.getWarlockEntry());
 			}
 			
-			Color background = ColorUtil.warlockColorToColor(GameViewConfiguration.instance().getDefaultBackground());
-			Color foreground = ColorUtil.warlockColorToColor(GameViewConfiguration.instance().getDefaultForeground());
-			
+			Color background = ColorUtil.warlockColorToColor(client.getSkin().getMainBackground());
+			Color foreground = ColorUtil.warlockColorToColor(client.getSkin().getMainForeground());
+			WarlockFont font = client.getClientSettings().getMainWindowSettings().getFont();
+			if (!mainStreamName.equals(IWarlockClient.DEFAULT_STREAM_NAME)) {
+				IWindowSettings settings = client.getClientSettings().getWindowSettings(mainStreamName);
+				if (settings != null) {
+					if (!settings.getBackgroundColor().isDefault())
+						background = ColorUtil.warlockColorToColor(settings.getBackgroundColor());
+					if (!settings.getForegroundColor().isDefault())
+						foreground = ColorUtil.warlockColorToColor(settings.getForegroundColor());
+					if (!settings.getFont().isDefaultFont())
+						font = settings.getFont();
+				}
+			}
 			text.setBackground(background);
 			text.setForeground(foreground);
 			
-			String fontFace = GameViewConfiguration.instance().getDefaultFontFace();
-			int fontSize = GameViewConfiguration.instance().getDefaultFontSize();
+			String defaultFontFace = GameViewConfiguration.instance().getDefaultFontFace();
+			int defaultFontSize = GameViewConfiguration.instance().getDefaultFontSize();
 			
-			text.setFont(new Font(Display.getDefault(), fontFace, fontSize, SWT.NORMAL));
+			if (font.isDefaultFont()) {
+				text.setFont(new Font(Display.getDefault(), defaultFontFace, defaultFontSize, SWT.NORMAL));
+			} else {
+				text.setFont(FontUtil.warlockFontToFont(font));
+			}
+			
 			text.setScrollDirection(SWT.DOWN);
 			
 			clientStreams.put(client, text);
