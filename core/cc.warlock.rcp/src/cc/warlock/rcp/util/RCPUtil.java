@@ -37,11 +37,19 @@ import javax.sound.sampled.LineListener;
 import javax.sound.sampled.LineUnavailableException;
 import javax.sound.sampled.UnsupportedAudioFileException;
 
+import org.eclipse.jface.preference.PreferenceDialog;
 import org.eclipse.swt.widgets.Display;
 import org.eclipse.ui.IPerspectiveDescriptor;
 import org.eclipse.ui.IWorkbenchPage;
 import org.eclipse.ui.PartInitException;
 import org.eclipse.ui.PlatformUI;
+import org.eclipse.ui.dialogs.PreferencesUtil;
+
+import cc.warlock.core.client.IWarlockClient;
+import cc.warlock.rcp.plugin.Warlock2Plugin;
+import cc.warlock.rcp.prefs.HighlightStringsPreferencePage;
+import cc.warlock.rcp.ui.client.WarlockClientAdaptable;
+import cc.warlock.rcp.views.GameView;
 
 public class RCPUtil {
 	
@@ -132,5 +140,22 @@ public class RCPUtil {
 		} catch (InterruptedException e) {
 			e.printStackTrace();
 		}
+	}
+	
+	public static void openPreferences (String pageId)
+	{
+		IWarlockClient activeClient = Warlock2Plugin.getDefault().getCurrentClient();
+		GameView inFocus = GameView.getGameViewInFocus();
+		if (inFocus != null)
+		{
+			activeClient = inFocus.getWarlockClient();
+		}
+		
+		PreferenceDialog dialog = PreferencesUtil.createPropertyDialogOn(Display.getDefault().getActiveShell(),
+				new WarlockClientAdaptable(activeClient), pageId, null, null);
+		
+		dialog.getTreeViewer().expandToLevel(2);
+		
+		int response = dialog.open();
 	}
 }
