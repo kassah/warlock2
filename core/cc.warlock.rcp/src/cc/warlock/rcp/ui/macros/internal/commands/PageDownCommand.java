@@ -23,7 +23,7 @@ package cc.warlock.rcp.ui.macros.internal.commands;
 
 import cc.warlock.core.client.IWarlockClientViewer;
 import cc.warlock.core.client.settings.macro.IMacroCommand;
-import cc.warlock.rcp.views.StreamView;
+import cc.warlock.rcp.views.GameView;
 
 /**
  * @author Will Robertson
@@ -36,8 +36,8 @@ public class PageDownCommand implements IMacroCommand {
 	 * @see cc.warlock.rcp.ui.macros.IMacroCommand#execute(cc.warlock.core.client.IWarlockClientViewer)
 	 */
 	public void execute(IWarlockClientViewer context) {
-		if (StreamView.getViewInFocus() != null)
-			StreamView.getViewInFocus().pageDown();
+		if (GameView.getViewInFocus() != null)
+			GameView.getViewInFocus().pageDown();
 	}
 
 	/* (non-Javadoc)
@@ -47,4 +47,7 @@ public class PageDownCommand implements IMacroCommand {
 		return "PageDown";
 	}
 
+	public String getDescription() {
+		return "Scroll a page down in the current game view";
+	}
 }

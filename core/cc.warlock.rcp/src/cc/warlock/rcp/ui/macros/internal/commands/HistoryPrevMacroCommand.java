@@ -33,4 +33,8 @@ public class HistoryPrevMacroCommand implements IMacroCommand {
 	public void execute(IWarlockClientViewer viewer) {
 		viewer.prevCommand();
 	}
+	
+	public String getDescription() {
+		return "Show the previous command from the command history";
+	}
 }

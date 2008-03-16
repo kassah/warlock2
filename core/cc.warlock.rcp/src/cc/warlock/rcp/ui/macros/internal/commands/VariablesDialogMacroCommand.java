@@ -23,32 +23,25 @@ package cc.warlock.rcp.ui.macros.internal.commands;
 
 import cc.warlock.core.client.IWarlockClientViewer;
 import cc.warlock.core.client.settings.macro.IMacroCommand;
-import cc.warlock.rcp.views.GameView;
+import cc.warlock.rcp.prefs.VariablesPreferencePage;
+import cc.warlock.rcp.util.RCPUtil;
 
 /**
- * @author Will Robertson
+ * 
+ * @author Marshall Culpepper
  *
- * Handles PageUp Macro (normally assigned to the PageUp Key)
  */
-public class PageUpCommand implements IMacroCommand {
+public class VariablesDialogMacroCommand implements IMacroCommand {
 
-	/* (non-Javadoc)
-	 * @see cc.warlock.rcp.ui.macros.IMacroCommand#execute(cc.warlock.core.client.IWarlockClientViewer)
-	 */
 	public void execute(IWarlockClientViewer context) {
-		if (GameView.getViewInFocus() != null)
-			GameView.getViewInFocus().pageUp();
+		RCPUtil.openPreferences(VariablesPreferencePage.PAGE_ID);
 	}
-
-	/* (non-Javadoc)
-	 * @see cc.warlock.rcp.ui.macros.IMacroCommand#getIdentifier()
-	 */
+	
 	public String getIdentifier() {
-		return "PageUp";
+		return "VariablesDialog";
 	}
 	
 	public String getDescription() {
-		return "Scroll a page up in the current game view";
+		return "Open the Variables preference page";
 	}
-
 }

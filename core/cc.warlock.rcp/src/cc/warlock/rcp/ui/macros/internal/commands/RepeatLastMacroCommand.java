@@ -33,4 +33,8 @@ public class RepeatLastMacroCommand implements IMacroCommand {
 	public void execute(IWarlockClientViewer viewer) {
 		viewer.repeatLastCommand();
 	}
+	
+	public String getDescription() {
+		return "Repeat the last command in the command history";
+	}
 }

@@ -33,5 +33,9 @@ public class CopyMacroCommand implements IMacroCommand {
 	public String getIdentifier() {
 		return "Copy";
 	}
+	
+	public String getDescription() {
+		return "Copy the currently selected text onto the clipboard";
+	}
 
 }

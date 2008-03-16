@@ -36,4 +36,8 @@ public class ReturnOrRepeatLastMacroCommand implements IMacroCommand {
 		else
 			viewer.repeatLastCommand();
 	}
+	
+	public String getDescription() {
+		return "Send the current command, or repeat the last command in the command history";
+	}
 }

@@ -45,4 +45,8 @@ public class PauseScriptMacroCommand implements IMacroCommand {
 			}
 		}
 	}
+	
+	public String getDescription() {
+		return "Pause the the most recent running script";
+	}
 }
