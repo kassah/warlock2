@@ -308,6 +308,10 @@ public abstract class GameView extends StreamView implements IWarlockClientViewe
 		return client;
 	}
 	
+	public WarlockText getWarlockText () {
+		return text;
+	}
+	
 	public WarlockEntry getWarlockEntry() {
 		return entry;
 	}
