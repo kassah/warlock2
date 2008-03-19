@@ -46,6 +46,10 @@ public class VariableConfigurationProvider extends ClientConfigurationProvider i
 	public void addVariable(IVariable variable) {
 		variables.put(variable.getIdentifier(), variable);
 	}
+	
+	public void setVariable(String id, IVariable variable) {
+		variables.put(id, variable);
+	}
 
 	public IVariable getVariable(String identifier) {
 		if (variables.containsKey(identifier)) {
@@ -82,13 +86,15 @@ public class VariableConfigurationProvider extends ClientConfigurationProvider i
 	
 	@Override
 	protected void saveTo(List<Element> elements) {
+		Element varsElement = DocumentHelper.createElement("variables");
+		
 		for (Map.Entry<String, IVariable> entry : variables.entrySet())
 		{
-			Element element = DocumentHelper.createElement("variable");
+			Element element = varsElement.addElement("variable");
 			element.addAttribute("id", entry.getKey());
 			element.addText(entry.getValue().getValue());
 			
-			elements.add(element);
 		}
+		elements.add(varsElement);
 	}
 }
