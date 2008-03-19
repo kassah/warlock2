@@ -131,17 +131,19 @@ public class BarsView extends ViewPart {
 	 * @see org.eclipse.ui.IWorkbenchPart#createPartControl(org.eclipse.swt.widgets.Composite)
 	 */
 	public void createPartControl(Composite parent) {
+		parent.setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, true));
+		
 		Composite top = new Composite (parent, SWT.NONE);
 		GridLayout layout = new GridLayout(1, false);
 		layout.marginWidth = layout.marginHeight = layout.horizontalSpacing = 0;
 		top.setLayout(layout);
-		top.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
+		top.setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, true));
 		
 		Composite barComposite = new Composite(top, SWT.NONE);
 		layout = new GridLayout(4, false);
 		layout.marginWidth = layout.marginHeight = layout.horizontalSpacing = 0;
 		barComposite.setLayout(layout);
-		barComposite.setLayoutData(new GridData(GridData.FILL, GridData.FILL, true, true));
+		barComposite.setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, true));
 		
 //		roundtime.setSize(150, 15);
 		
@@ -149,30 +151,30 @@ public class BarsView extends ViewPart {
 		
 //		new Label(barComposite, SWT.NONE).setText("roundtime: ");
 		roundtime = new WarlockProgressBar(barComposite, SWT.NONE);
-		roundtime.setLayoutData(new GridData(GridData.FILL, GridData.VERTICAL_ALIGN_END, true, true, 7, 1));
+		roundtime.setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, true, 7, 1));
 		
 //		new Label(barComposite, SWT.NONE).setText("health: ");
 		health = new WarlockProgressBar(barComposite, SWT.NONE);
 		health.setMinimum(0); health.setMaximum(100); health.setSelection(100); health.setLabel("health 100%");
-		health.setLayoutData(new GridData(GridData.FILL, GridData.VERTICAL_ALIGN_END, true, true));
+		health.setLayoutData(new GridData(GridData.FILL, GridData.FILL, true, true));
 		health.setBackground(healthBG); health.setForeground(healthFG); health.setBorderColor(healthBorder);
 		
 //		new Label(barComposite, SWT.NONE).setText("mana: ");
 		mana = new WarlockProgressBar(barComposite, SWT.NONE);
 		mana.setMinimum(0); mana.setMaximum(100); mana.setSelection(100); mana.setLabel("mana 100%");
-		mana.setLayoutData(new GridData(GridData.FILL, GridData.VERTICAL_ALIGN_END, true, true));
+		mana.setLayoutData(new GridData(GridData.FILL, GridData.FILL, true, true));
 		mana.setBackground(manaBG); mana.setForeground(manaFG); mana.setBorderColor(manaBorder);
 		
 //		new Label(barComposite, SWT.NONE).setText("fatigue: ");
 		fatigue = new WarlockProgressBar(barComposite, SWT.NONE);
 		fatigue.setMinimum(0); fatigue.setMaximum(100); fatigue.setSelection(100); fatigue.setLabel("fatigue 100%");
-		fatigue.setLayoutData(new GridData(GridData.FILL, GridData.VERTICAL_ALIGN_END, true, true));
+		fatigue.setLayoutData(new GridData(GridData.FILL, GridData.FILL, true, true));
 		fatigue.setBackground(fatigueBG); fatigue.setForeground(fatigueFG); fatigue.setBorderColor(fatigueBorder);
 		
 //		new Label(barComposite, SWT.NONE).setText("spirit: ");
 		spirit = new WarlockProgressBar(barComposite, SWT.NONE);
 		spirit.setMinimum(0); spirit.setMaximum(100); spirit.setSelection(100); spirit.setLabel("spirit 100%");
-		spirit.setLayoutData(new GridData(GridData.FILL, GridData.VERTICAL_ALIGN_END, true, true));
+		spirit.setLayoutData(new GridData(GridData.FILL, GridData.FILL, true, true));
 		spirit.setBackground(spiritBG); spirit.setForeground(fatigueFG); spirit.setBorderColor(spiritBorder);
 		
 		roundtime.setMinimum(0); roundtime.setMaximum(0); roundtime.setLabel("roundtime: 0");
