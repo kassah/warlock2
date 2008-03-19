@@ -302,9 +302,9 @@ public class MacrosPreferencePage extends WarlockPreferencePage implements
 			addedMacros.remove(selectedMacro);
 		}
 		else if (macros.contains(selectedMacro)) {
-			macros.remove(selectedMacro);
 			removedMacros.add(selectedMacro);
 		}
+		macros.remove(selectedMacro);
 		
 		macroTable.remove(selectedMacro);
 	}
