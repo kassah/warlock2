@@ -146,6 +146,8 @@ public class WarlockProgressBar extends Canvas
 	public void setSize(int width, int height) {
 		this.width = width;
 		this.height = height;
+		
+		redraw();
 	}
 	
 	public Point computeSize(int wHint, int hHint, boolean changed) {
