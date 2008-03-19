@@ -28,4 +28,6 @@ public interface IVariableProvider extends IClientSettingProvider {
 	public Collection<? extends IVariable> getVariables();
 	
 	public IVariable getVariable(String identifier);
+	public void setVariable(String id, IVariable variable);
+	public void removeVariable(IVariable variable);
 }
