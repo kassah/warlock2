@@ -122,6 +122,7 @@ public class WSLScript extends AbstractScript {
 		setVariable("fatigue", new WSLFatigue());
 		setVariable("spirit", new WSLSpirit());
 		setVariable("rt", new WSLRoundTime());
+		setVariable("monstercount", new WSLMonsterCount());
 		setVariable("lhand", new WSLLeftHand());
 		setVariable("rhand", new WSLRightHand());
 		setVariable("spell", new WSLSpell());
@@ -191,6 +192,12 @@ public class WSLScript extends AbstractScript {
 	private class WSLRoundTime extends WSLAbstractNumber {
 		public double toDouble() {
 			return sfClient.getRoundtime().get();
+		}
+	}
+	
+	private class WSLMonsterCount extends WSLAbstractNumber {
+		public double toDouble() {
+			return sfClient.getMonsterCount().get();
 		}
 	}
 	
