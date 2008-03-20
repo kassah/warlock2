@@ -281,7 +281,7 @@ NUMBER
 	;
 STRING
 	: { state == State.variableReplace }?=> ((~('%'|'$'|'\n'|'\r'))+ | '%' | '$')
-	| { state == State.variableReplace || state == State.action }?=> ('%%'|'$$')
+	| { state == State.variableReplace || state == State.action || state == State.quoted }?=> ('%%'|'$$')
 		{
 			setText(getText().substring(0,1));
 		}
@@ -301,7 +301,7 @@ STRING
 			state = State.condition;
 			channel = HIDDEN;
 		}
-	| { state == State.quoted }?=> (~('"'|'%'|'$'|'\n'|'\r'|'\\'))+ | ('\\' str=ANY { setText($str.text); })
+	| { state == State.quoted }?=> ((~('"'|'%'|'$'|'\n'|'\r'|'\\'))+ | ('\\' str=ANY { setText($str.text); }) | '%' | '$' )
 	;
 LABEL
 	: label=LABEL_STRING ':'			{ setText($label.text); atStart = false; }
