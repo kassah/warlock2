@@ -441,33 +441,50 @@ public class WSLScript extends AbstractScript {
 	protected class WSLShift extends WSLCommandDefinition {
 		
 		public void execute (String arguments) {
+			boolean local = arguments.trim().equalsIgnoreCase("local");
+			
 			StringBuffer zeroarg = new StringBuffer();
 			for (int i = 1; ; i++) {
-				if (!variableExists(Integer.toString(i+1)))
+				String nextVar = Integer.toString(i+1);
+				boolean exists = local ? localVariableExists(nextVar) : variableExists(nextVar);
+				if (!exists)
 				{
 					zeroarg.deleteCharAt(zeroarg.length() - 1);
-					setVariable("0",zeroarg.toString());
-					setVariable(Integer.toString(i), "");
+					if (local) {
+						setLocalVariable("0",zeroarg.toString());
+						deleteLocalVariable(Integer.toString(i));
+					} else {
+						setVariable("0",zeroarg.toString());
+						setVariable(Integer.toString(i), "");
+					}
 					break;
 				}
 				else
 				{
-					String arg = getVariable(Integer.toString(i+1)).toString();
+					String arg = local ? getLocalVariable(nextVar).toString() : getVariable(nextVar).toString();
 					if (arg == null) {
 						zeroarg.deleteCharAt(zeroarg.length() - 1);
-						setVariable("0",zeroarg.toString());
-
-						setVariable(Integer.toString(i), "");
+						
+						if (local) {
+							setLocalVariable("0",zeroarg.toString());
+							deleteLocalVariable(Integer.toString(i));
+//							setLocalVariable(Integer.toString(i), "");
+						} else {
+							setVariable("0",zeroarg.toString());
+							setVariable(Integer.toString(i), "");
+						}
 						break;
 					}
 					zeroarg.append(arg + " ");
-					setVariable(Integer.toString(i), arg);
+					if (local) {
+						setLocalVariable(Integer.toString(i), arg);
+					} else {
+						setVariable(Integer.toString(i), arg);
+					}
 				}
 			}
 		}
 	}
-
-
 
 	protected class WSLDeleteVariable extends WSLCommandDefinition {
 		
@@ -488,6 +505,10 @@ public class WSLScript extends AbstractScript {
 	
 	private void deleteVariable(String name) {
 		globalVariables.remove(name.toLowerCase());
+	}
+	
+	private void deleteLocalVariable(String name) {
+		localVariables.remove(name.toLowerCase());
 	}
 	
 	public void setLocalVariable(String name, String value) {
