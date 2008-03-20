@@ -580,6 +580,8 @@ public class WarlockText implements LineBackgroundListener {
 	
 	// Don't not call this function on append, only replace/remove/insert
 	private void updateMarkers(int offset, int delta) {
+		if(markers == null)
+			return;
 		for(Iterator<Map.Entry<String, WarlockTextMarker>> iter = markers.entrySet().iterator();
 		iter.hasNext(); )
 		{
@@ -607,6 +609,7 @@ public class WarlockText implements LineBackgroundListener {
 	}
 	
 	public void replaceMarker(String name, String text) {
+		if(markers == null) return;
 		WarlockTextMarker marker = markers.get(name);
 		if(marker == null) return;
 		int start = marker.offset;
