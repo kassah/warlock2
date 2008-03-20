@@ -65,6 +65,14 @@ public class ResetServerSettings {
 				});
 				
 				client.connect(loginProperties.get(SGEConnection.PROPERTY_GAMEHOST), port, loginProperties.get(SGEConnection.PROPERTY_KEY));
+				
+				System.out.println(">> Sleeping for 10 seconds while listeners and the connection events happen (probably a better way to poll for this) <<");
+				try {
+					Thread.sleep((long)1000*10);
+				} catch (InterruptedException e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+				}
 			} catch (IOException e) {
 				Assert.fail(e.getMessage());
 			}
