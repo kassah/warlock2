@@ -47,6 +47,10 @@ public class VariableConfigurationProvider extends ClientConfigurationProvider i
 		variables.put(variable.getIdentifier(), variable);
 	}
 	
+	public void addVariable(String identifier, String value) {
+		addVariable(new Variable(this, identifier, value));
+	}
+	
 	public void setVariable(String id, IVariable variable) {
 		variables.put(id, variable);
 	}
@@ -66,6 +70,12 @@ public class VariableConfigurationProvider extends ClientConfigurationProvider i
 		if (variables.containsKey(variable.getIdentifier()))
 		{
 			variables.remove(variable.getIdentifier());
+		}
+	}
+	
+	public void removeVariable(String identifier) {
+		if (variables.containsKey(identifier)) {
+			variables.remove(identifier);
 		}
 	}
 	

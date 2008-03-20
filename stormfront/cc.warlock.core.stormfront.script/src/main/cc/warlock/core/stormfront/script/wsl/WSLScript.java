@@ -38,6 +38,7 @@ import org.antlr.runtime.RecognitionException;
 
 import cc.warlock.core.client.internal.WarlockStyle;
 import cc.warlock.core.client.settings.IVariable;
+import cc.warlock.core.client.settings.internal.ClientSettings;
 import cc.warlock.core.script.AbstractScript;
 import cc.warlock.core.script.IMatch;
 import cc.warlock.core.script.IScriptCommands;
@@ -131,6 +132,10 @@ public class WSLScript extends AbstractScript {
 		setVariable("roomplayers", new WSLComponent(IStormFrontClient.COMPONENT_ROOM_PLAYERS));
 		setVariable("roomobjects", new WSLComponent(IStormFrontClient.COMPONENT_ROOM_OBJECTS));
 		setVariable("roomtitle", new WSLRoomTitle());
+		
+		for(IVariable var : client.getClientSettings().getAllVariables()) {
+			setVariable(var.getIdentifier(), new WSLString(var.getValue()));
+		}
 	}
 
 	public IWSLValue getVariable(String name) {
@@ -467,8 +472,9 @@ public class WSLScript extends AbstractScript {
 	protected class WSLDeleteVariable extends WSLCommandDefinition {
 		
 		public void execute (String arguments) {
-			String var = arguments.split(argSeparator)[0];
-			deleteVariable(var);
+			String name = arguments.split(argSeparator)[0];
+			deleteVariable(name);
+			((ClientSettings)sfClient.getClientSettings()).getVariableConfigurationProvider().removeVariable(name);
 		}
 	}
 
@@ -507,6 +513,7 @@ public class WSLScript extends AbstractScript {
 				
 				scriptDebug(1, "setVariable: " + name + "=" + value);
 				setVariable(name, value);
+				((ClientSettings)sfClient.getClientSettings()).getVariableConfigurationProvider().addVariable(name, value);
 			} else {
 				scriptWarning("Invalid arguments to setvariable");
 			}
