@@ -118,6 +118,11 @@ public interface IStormFrontClient extends IWarlockClient, IRoomListener {
 	public IProperty<String> getCurrentSpell();
 	
 	/**
+	 * @return The current mounter count property
+	 */
+	public IProperty<Integer> getMonsterCount();
+	
+	/**
 	 * @return The character status
 	 */
 	public ICharacterStatus getCharacterStatus();

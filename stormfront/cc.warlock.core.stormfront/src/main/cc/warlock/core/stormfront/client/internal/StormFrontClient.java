@@ -76,7 +76,7 @@ import com.martiansoftware.jsap.CommandLineTokenizer;
 public class StormFrontClient extends WarlockClient implements IStormFrontClient, IScriptListener, IRoomListener {
 
 	protected ICharacterStatus status;
-	protected ClientProperty<Integer> roundtime;
+	protected ClientProperty<Integer> roundtime, monsterCount;
 	protected ClientProperty<BarStatus> health, mana, fatigue, spirit;
 	protected ClientProperty<String> leftHand, rightHand, currentSpell;
 	protected StringBuffer buffer = new StringBuffer();
@@ -112,6 +112,7 @@ public class StormFrontClient extends WarlockClient implements IStormFrontClient
 		playerId = new ClientProperty<String>(this, "playerId", null);
 		characterName = new ClientProperty<String>(this, "characterName", null);
 		roomDescription = new ClientProperty<String>(this, "roomDescription", null);
+		monsterCount = new ClientProperty<Integer>(this, "monsterCount", null);
 		mode = new ClientProperty<GameMode>(this, "gameMode", GameMode.Game);
 
 		timer = new Timer();
@@ -198,6 +199,10 @@ public class StormFrontClient extends WarlockClient implements IStormFrontClient
 	
 	public IProperty<Integer> getRoundtime() {
 		return roundtime;
+	}
+	
+	public IProperty<Integer> getMonsterCount() {
+		return monsterCount;
 	}
 
 	private class SFTimerTask extends TimerTask

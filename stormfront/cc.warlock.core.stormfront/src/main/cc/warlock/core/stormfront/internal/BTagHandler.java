@@ -37,6 +37,12 @@ public class BTagHandler extends DefaultTagHandler {
 	}
 	
 	@Override
+	public void handleEnd(String rawXML) {
+		// this will be off if we get nested b's.
+		handler.incrementMonsterCount();
+	}
+	
+	@Override
 	public boolean ignoreNewlines() {
 		return false;
 	}

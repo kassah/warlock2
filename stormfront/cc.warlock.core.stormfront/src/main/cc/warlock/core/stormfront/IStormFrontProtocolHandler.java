@@ -51,5 +51,9 @@ public interface IStormFrontProtocolHandler extends IStormFrontXMLHandler {
 	public void removeStyle(IWarlockStyle style);
 	public void clearStyles();
 	
+	public void resetMonsterCount();
+	public void incrementMonsterCount();
+	public int getMonsterCount();
+	
 	public IStormFrontTagHandler getTagHandler(Class<? extends IStormFrontTagHandler> handlerType);
 }

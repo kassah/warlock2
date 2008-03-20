@@ -66,6 +66,8 @@ public class CompDefTagHandler extends DefaultTagHandler {
 		this.id = attributes.getValue("id");
 		style.setName(this.id);
 		handler.addStyle(style);
+		if(id != null && id.equals("room objs"))
+			handler.resetMonsterCount();
 	}
 	
 	@Override
@@ -83,6 +85,16 @@ public class CompDefTagHandler extends DefaultTagHandler {
 			handler.removeStyle(style);
 			style = null;
 		}
+		
+		if(id == null)
+			return;
+		
+		if(id.equals("room objs")) {
+			int count = handler.getMonsterCount();
+			handler.getClient().getMonsterCount().set(count);
+		}
+		
+		
 		IWarlockClient client = handler.getClient();
 		if(client instanceof StormFrontClient)
 			((StormFrontClient)client).setComponent(id, buffer.toString(), handler.getCurrentStream());

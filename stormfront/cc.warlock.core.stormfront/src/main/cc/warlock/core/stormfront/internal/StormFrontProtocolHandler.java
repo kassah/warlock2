@@ -56,6 +56,7 @@ public class StormFrontProtocolHandler implements IStormFrontProtocolHandler {
 	protected Stack<String> tagStack = new Stack<String>();
 	protected HashMap<IWarlockStyle, Boolean> styles = new HashMap<IWarlockStyle, Boolean>();
 	protected int currentSpacing = 0;
+	protected int monsterCount = 0;
 	
  	public StormFrontProtocolHandler(IStormFrontClient client) {
 		
@@ -324,5 +325,17 @@ public class StormFrontProtocolHandler implements IStormFrontProtocolHandler {
 				return handler;
 		}
 		return null;
+	}
+	
+	public void resetMonsterCount() {
+		monsterCount = 0;
+	}
+	
+	public void incrementMonsterCount() {
+		monsterCount++;
+	}
+	
+	public int getMonsterCount() {
+		return monsterCount;
 	}
 }
