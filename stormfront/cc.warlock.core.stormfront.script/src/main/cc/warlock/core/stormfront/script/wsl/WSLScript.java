@@ -89,6 +89,7 @@ public class WSLScript extends AbstractScript {
 		// add command handlers
 		addCommandDefinition("counter", new WSLCounter());
 		addCommandDefinition("deletevariable", new WSLDeleteVariable());
+		addCommandDefinition("deletelocalvariable", new WSLDeleteLocalVariable());
 		addCommandDefinition("debug", new WSLDebug());
 		addCommandDefinition("debuglevel", new WSLDebugLevel());
 		addCommandDefinition("echo", new WSLEcho());
@@ -443,18 +444,17 @@ public class WSLScript extends AbstractScript {
 		public void execute (String arguments) {
 			boolean local = arguments.trim().equalsIgnoreCase("local");
 			
-			StringBuffer zeroarg = new StringBuffer();
+			StringBuffer allArgs = new StringBuffer();
 			for (int i = 1; ; i++) {
-				String nextVar = Integer.toString(i+1);
+				String nextVar = Integer.toString(i + 1);
 				boolean exists = local ? localVariableExists(nextVar) : variableExists(nextVar);
 				if (!exists)
 				{
-					zeroarg.deleteCharAt(zeroarg.length() - 1);
 					if (local) {
-						setLocalVariable("0",zeroarg.toString());
+						setLocalVariable("0", allArgs.toString());
 						deleteLocalVariable(Integer.toString(i));
 					} else {
-						setVariable("0",zeroarg.toString());
+						setVariable("0", allArgs.toString());
 						setVariable(Integer.toString(i), "");
 					}
 					break;
@@ -462,20 +462,11 @@ public class WSLScript extends AbstractScript {
 				else
 				{
 					String arg = local ? getLocalVariable(nextVar).toString() : getVariable(nextVar).toString();
-					if (arg == null) {
-						zeroarg.deleteCharAt(zeroarg.length() - 1);
-						
-						if (local) {
-							setLocalVariable("0",zeroarg.toString());
-							deleteLocalVariable(Integer.toString(i));
-//							setLocalVariable(Integer.toString(i), "");
-						} else {
-							setVariable("0",zeroarg.toString());
-							setVariable(Integer.toString(i), "");
-						}
-						break;
-					}
-					zeroarg.append(arg + " ");
+					if (arg == null)
+						scriptError("String error in arguments.");
+					if(allArgs.length() > 0)
+						allArgs.append(" ");
+					allArgs.append(arg);
 					if (local) {
 						setLocalVariable(Integer.toString(i), arg);
 					} else {
@@ -492,6 +483,14 @@ public class WSLScript extends AbstractScript {
 			String name = arguments.split(argSeparator)[0];
 			deleteVariable(name);
 			((ClientSettings)sfClient.getClientSettings()).getVariableConfigurationProvider().removeVariable(name);
+		}
+	}
+	
+	protected class WSLDeleteLocalVariable extends WSLCommandDefinition {
+		
+		public void execute (String arguments) {
+			String name = arguments.split(argSeparator)[0];
+			deleteLocalVariable(name);
 		}
 	}
 
