@@ -28,6 +28,7 @@ import java.util.Hashtable;
 import java.util.regex.MatchResult;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
+import java.util.regex.PatternSyntaxException;
 
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.graphics.Color;
@@ -295,9 +296,14 @@ public class StreamView extends ViewPart implements IStreamListener, IGameViewFo
 	{	
 		for (IHighlightString highlight : client.getClientSettings().getAllHighlightStrings())
 		{
-			Pattern p = highlight.getPattern();
+			Pattern p;
+			try {
+				p = highlight.getPattern();
+			} catch(PatternSyntaxException e) {
+				continue;
+			}
 			if(p == null)
-				return;
+				continue;
 			Matcher matcher = p.matcher(text.toString());
 			
 			while (matcher.find())

@@ -23,6 +23,7 @@ package cc.warlock.core.stormfront.client.internal;
 
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
+import java.util.regex.PatternSyntaxException;
 
 import cc.warlock.core.client.IWarlockClient;
 import cc.warlock.core.client.WarlockString;
@@ -58,7 +59,16 @@ public class StormFrontStream extends Stream {
 			// Ignore text containing ignores
 			for (IIgnore ignore : client.getClientSettings().getAllIgnores())
 			{
-				Pattern ignoreRegex = ignore.getPattern();
+				Pattern ignoreRegex;
+				try {
+					ignoreRegex = ignore.getPattern();
+				} catch(PatternSyntaxException e) {
+					e.printStackTrace();
+					continue;
+				}
+				if(ignoreRegex == null)
+					continue;
+				
 				int pos = 0;
 				for(;;)
 				{
