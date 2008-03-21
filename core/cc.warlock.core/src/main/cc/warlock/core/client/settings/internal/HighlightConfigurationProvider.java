@@ -26,6 +26,7 @@ import java.util.Collection;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.regex.PatternSyntaxException;
 
 import org.dom4j.DocumentHelper;
 import org.dom4j.Element;
@@ -77,9 +78,13 @@ public class HighlightConfigurationProvider extends PatternConfigurationProvider
 				style = createStyle(sElement);
 			}
 			
-			HighlightString string = new HighlightString(this, null, style);
-			fillSetting(string, child);
-			highlights.add(string);
+			try {
+				HighlightString string = new HighlightString(this, null, style);
+				fillSetting(string, child);
+				highlights.add(string);
+			} catch(PatternSyntaxException e) {
+				e.printStackTrace();
+			}
 		}
 		else if (child.getName().equals("style"))
 		{

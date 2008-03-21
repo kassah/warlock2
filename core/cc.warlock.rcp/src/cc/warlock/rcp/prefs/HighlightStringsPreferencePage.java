@@ -22,6 +22,7 @@
 package cc.warlock.rcp.prefs;
 
 import java.util.ArrayList;
+import java.util.regex.PatternSyntaxException;
 
 import org.eclipse.core.runtime.IAdaptable;
 import org.eclipse.jface.preference.ColorSelector;
@@ -159,7 +160,11 @@ public class HighlightStringsPreferencePage extends WarlockPreferencePage implem
 				HighlightString string = (HighlightString)item.getData();
 				String pattern = ((String)value).trim();
 				
-				string.setText(pattern);
+				try {
+					string.setText(pattern);
+				} catch(PatternSyntaxException e) {
+					e.printStackTrace();
+				}
 				stringTable.refresh(string);
 			}
 		});

@@ -22,6 +22,7 @@
 package cc.warlock.core.client.settings.internal;
 
 import java.util.regex.Pattern;
+import java.util.regex.PatternSyntaxException;
 
 import cc.warlock.core.client.settings.IClientSettingProvider;
 import cc.warlock.core.client.settings.IPatternSetting;
@@ -45,31 +46,31 @@ public class PatternSetting extends ClientSetting implements IPatternSetting {
 		this.caseSensitive = other.caseSensitive;
 	}
 	
-	public PatternSetting (IClientSettingProvider provider, String pattern)
+	public PatternSetting (IClientSettingProvider provider, String pattern) throws PatternSyntaxException
 	{
 		this(provider, pattern, false);
 	}
 	
-	public PatternSetting (IClientSettingProvider provider, String pattern, boolean literal)
+	public PatternSetting (IClientSettingProvider provider, String pattern, boolean literal) throws PatternSyntaxException
 	{
 		this(provider, pattern, literal, false);
 	}
 	
-	public PatternSetting (IClientSettingProvider provider, String pattern, boolean literal, boolean caseSensitive) {
+	public PatternSetting (IClientSettingProvider provider, String pattern, boolean literal, boolean caseSensitive) throws PatternSyntaxException {
 		this(provider, pattern, literal, caseSensitive, true);
 	}
 	
-	public PatternSetting (IClientSettingProvider provider, String pattern, boolean literal, boolean caseSensitive, boolean fullWordMatch) {
+	public PatternSetting (IClientSettingProvider provider, String pattern, boolean literal, boolean caseSensitive, boolean fullWordMatch) throws PatternSyntaxException {
 		super(provider);
 		
 		this.text = pattern;
 		this.literal = literal;
 		this.caseSensitive = caseSensitive;
 		this.fullWord = fullWordMatch;
-		this.needsUpdate = true;
+		update();
 	}
 	
-	protected void update() {
+	protected void update() throws PatternSyntaxException {
 		String s = this.text;
 		int flags = 0;
 		if (literal) {
@@ -86,7 +87,7 @@ public class PatternSetting extends ClientSetting implements IPatternSetting {
 		this.needsUpdate = false;
 	}
 	
-	public Pattern getPattern() {
+	public Pattern getPattern() throws PatternSyntaxException{
 		if(needsUpdate())
 			update();
 		return pattern;
@@ -96,16 +97,16 @@ public class PatternSetting extends ClientSetting implements IPatternSetting {
 		return text;
 	}
 	
-	public void setText(String text) {
+	public void setText(String text) throws PatternSyntaxException {
 		this.text = text;
-		needsUpdate = true;
+		update();
 	}
 	
-	public void setLiteral (boolean literal)
+	public void setLiteral (boolean literal) throws PatternSyntaxException
 	{
 		if (literal != isLiteral()) {
-			needsUpdate = true;
 			this.literal = literal;
+			update();
 		}
 	}
 	
