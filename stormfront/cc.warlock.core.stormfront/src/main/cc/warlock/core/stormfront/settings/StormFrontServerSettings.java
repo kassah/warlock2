@@ -30,6 +30,7 @@ import java.net.URL;
 import java.util.List;
 import java.util.Set;
 import java.util.regex.Pattern;
+import java.util.regex.PatternSyntaxException;
 
 import org.dom4j.DocumentHelper;
 import org.dom4j.Element;
@@ -238,9 +239,13 @@ public class StormFrontServerSettings extends ClientConfigurationProvider {
 		style.setForegroundColor(stormfrontColorToWarlockColor(string.getForegroundColor()));
 		style.setFullLine(string.isFillEntireLine());
 		
-		HighlightString newString = new HighlightString(
-			settings.getHighlightConfigurationProvider(), pattern.pattern(), true, true, true, style);
-		settings.getHighlightConfigurationProvider().addHighlightString(newString);
+		try {
+			HighlightString newString = new HighlightString(
+					settings.getHighlightConfigurationProvider(), pattern.pattern(), true, true, true, style);
+			settings.getHighlightConfigurationProvider().addHighlightString(newString);
+		} catch(PatternSyntaxException e) {
+			e.printStackTrace();
+		}
 	}
 	
 	protected void importPreset (Preset preset, StormFrontClientSettings settings)
