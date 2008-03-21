@@ -1,2 +1,2 @@
-Issue $issue.getKey() assigned to $issue.getAssignee.getFullName()
+Issue $issue.getKey() assigned to $issue.getAssignee().getFullName()
 Link: $base_url/browse/$issue.getKey()
