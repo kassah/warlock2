@@ -70,7 +70,7 @@ public class SystemMacroHandler implements IMacroHandler {
 
 	private void handleStopScript(IWarlockClientViewer viewer)
 	{
-		List<IScript> runningScripts = ScriptEngineRegistry.getRunningScripts();
+		List<IScript> runningScripts = ScriptEngineRegistry.getRunningScripts(viewer.getWarlockClient());
 		if (runningScripts.size() > 0)
 		{
 			IScript currentScript = runningScripts.get(runningScripts.size() - 1);

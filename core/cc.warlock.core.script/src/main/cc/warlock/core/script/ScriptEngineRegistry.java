@@ -108,12 +108,25 @@ public class ScriptEngineRegistry {
 		return null;
 	}
 	
-	public static List<IScript> getRunningScripts ()
-	{
+	public static List<IScript> getRunningScripts() {
 		ArrayList<IScript> scripts = new ArrayList<IScript>();
 		for (IScriptEngine engine : engines)
 		{
 			scripts.addAll(engine.getRunningScripts());
+		}
+		return scripts;
+	}
+	
+	public static List<IScript> getRunningScripts (IWarlockClient client) {
+		ArrayList<IScript> scripts = new ArrayList<IScript>();
+		for (IScriptEngine engine : engines)
+		{
+			// Append only if script is apart of the client
+			for (IScript script: engine.getRunningScripts()) {
+				if (script.getClient() == client) {
+					scripts.add(script);
+				}
+			}
 		}
 		return scripts;
 	}
