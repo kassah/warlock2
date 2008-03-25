@@ -131,8 +131,8 @@ public class StreamView extends ViewPart implements IStreamListener, IGameViewFo
 		return null;
 	}
 	
-	@Override
-	public void createPartControl(Composite parent) {
+	protected void createMainComposite(Composite parent)
+	{
 		mainComposite = new Composite (parent, SWT.NONE);
 		GridLayout layout = new GridLayout(1, false);
 		layout.marginHeight = 0;
@@ -140,7 +140,10 @@ public class StreamView extends ViewPart implements IStreamListener, IGameViewFo
 		layout.horizontalSpacing = 0;
 		layout.verticalSpacing = 0;
 		mainComposite.setLayout(layout);
-		
+	}
+	
+	protected void createPageBook ()
+	{
 		book = new PageBook(mainComposite, SWT.NONE);
 		book.setLayoutData(new GridData(GridData.FILL, GridData.FILL, true, true));
 
@@ -149,6 +152,12 @@ public class StreamView extends ViewPart implements IStreamListener, IGameViewFo
 			String streamName = getViewSite().getId().substring(getViewSite().getId().lastIndexOf('.')+1);
 			setStreamName(streamName);
 		}
+	}
+	
+	@Override
+	public void createPartControl(Composite parent) {
+		createMainComposite(parent);
+		createPageBook();
 	}
 	
 	protected WarlockText getTextForClient (IWarlockClient client)

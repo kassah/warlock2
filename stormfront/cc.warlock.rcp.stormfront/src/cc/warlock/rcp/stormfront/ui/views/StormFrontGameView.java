@@ -123,7 +123,7 @@ public class StormFrontGameView extends GameView implements IStormFrontClientVie
 	
 	protected void createReconnectPopup()
 	{
-		reconnectPopup = new WarlockPopupAction(text.getTextWidget(), SWT.NONE);
+		reconnectPopup = createPopup();
 		reconnectPopup.setLayout(new GridLayout(2, false));
 		reconnectLabel = new Label(reconnectPopup, SWT.WRAP);
 		
@@ -168,7 +168,8 @@ public class StormFrontGameView extends GameView implements IStormFrontClientVie
 			public void widgetSelected(SelectionEvent e) {
 				ProfileConnectAction action = new ProfileConnectAction(profile);
 				action.run();
-				reconnectPopup.setVisible(false);
+				hidePopup(reconnectPopup);
+//				reconnectPopup.setVisible(false);
 			}
 		};
 		
@@ -217,7 +218,8 @@ public class StormFrontGameView extends GameView implements IStormFrontClientVie
 				public void widgetSelected(SelectionEvent e) {
 					ProfileConnectAction action = new ProfileConnectAction(profile);
 					action.run();
-					reconnectPopup.setVisible(false);
+					hidePopup(reconnectPopup);
+//					reconnectPopup.setVisible(false);
 				}
 			});
 		}
@@ -270,7 +272,8 @@ public class StormFrontGameView extends GameView implements IStormFrontClientVie
 	public void setClient(IWarlockClient client) {
 		super.setClient(client);
 		
-		reconnectPopup.setVisible(false);
+		hidePopup(reconnectPopup);
+//		reconnectPopup.setVisible(false);
 		if (client instanceof IStormFrontClient)
 		{
 			addStream(client.getStream(IStormFrontClient.DEATH_STREAM_NAME));
@@ -304,7 +307,8 @@ public class StormFrontGameView extends GameView implements IStormFrontClientVie
 	{
 		super.disconnected();
 		
-		reconnectPopup.setVisible(true);
+		showPopup(reconnectPopup);
+//		reconnectPopup.setVisible(true);
 		removeStream(client.getStream(IStormFrontClient.DEATH_STREAM_NAME));
 	}
 	

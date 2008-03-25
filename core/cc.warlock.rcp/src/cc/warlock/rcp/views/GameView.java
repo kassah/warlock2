@@ -40,16 +40,19 @@ import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.widgets.Caret;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Display;
+import org.eclipse.swt.widgets.Label;
 import org.eclipse.ui.IViewPart;
 import org.eclipse.ui.IWorkbenchPage;
 import org.eclipse.ui.PartInitException;
 import org.eclipse.ui.PlatformUI;
+import org.eclipse.ui.part.PageBook;
 
 import cc.warlock.core.client.IWarlockClient;
 import cc.warlock.core.client.IWarlockClientViewer;
 import cc.warlock.rcp.configuration.GameViewConfiguration;
 import cc.warlock.rcp.plugin.Warlock2Plugin;
 import cc.warlock.rcp.ui.WarlockEntry;
+import cc.warlock.rcp.ui.WarlockPopupAction;
 import cc.warlock.rcp.ui.WarlockText;
 import cc.warlock.rcp.ui.client.SWTWarlockClientViewer;
 import cc.warlock.rcp.util.ColorUtil;
@@ -65,6 +68,8 @@ public abstract class GameView extends StreamView implements IWarlockClientViewe
 	protected static ArrayList<IGameViewFocusListener> focusListeners = new ArrayList<IGameViewFocusListener>();
 	protected static GameView gameInFocus;
 	
+	protected PageBook popupPageBook;
+	protected Label emptyPopup;
 	protected WarlockText text;
 	protected WarlockEntry entry;
 	protected SWTWarlockClientViewer wrapper;
@@ -149,6 +154,27 @@ public abstract class GameView extends StreamView implements IWarlockClientViewe
 	public void createPartControl(Composite parent) {
 		super.createPartControl(parent);
 		
+		createEntry();
+		initColors();
+	}
+	
+	@Override
+	protected void createPageBook() {
+		popupPageBook = new PageBook(mainComposite, SWT.NONE);
+		GridData data = new GridData(SWT.FILL, SWT.FILL, true, false);
+		data.exclude = true;
+		popupPageBook.setLayoutData(data);
+		
+		emptyPopup = new Label(popupPageBook, SWT.NONE);
+		
+		popupPageBook.showPage(emptyPopup);
+		popupPageBook.setVisible(false);
+		
+		super.createPageBook();
+	}
+	
+	protected void createEntry ()
+	{
 		entryComposite = new Composite(mainComposite, SWT.NONE);
 		GridLayout layout = new GridLayout(1, false);
 		layout.horizontalSpacing = 0;
@@ -165,7 +191,10 @@ public abstract class GameView extends StreamView implements IWarlockClientViewe
 		
 		text.setLineLimit(GameViewConfiguration.instance().getBufferLines());
 		text.setScrollDirection(SWT.DOWN);
-		
+	}
+	
+	protected void initColors()
+	{
 		Color background = ColorUtil.warlockColorToColor(GameViewConfiguration.instance().getDefaultBackground());
 		Color foreground = ColorUtil.warlockColorToColor(GameViewConfiguration.instance().getDefaultForeground());
 		
@@ -314,6 +343,34 @@ public abstract class GameView extends StreamView implements IWarlockClientViewe
 	
 	public WarlockEntry getWarlockEntry() {
 		return entry;
+	}
+	
+	public WarlockPopupAction createPopup ()
+	{
+		WarlockPopupAction popup = new WarlockPopupAction(popupPageBook, SWT.NONE);
+//		popup.moveAbove(book);
+//		popup.setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, false));
+//		popup.setVisible(false);
+		
+		return popup;
+	}
+	
+	public void showPopup (WarlockPopupAction popup)
+	{
+		popupPageBook.showPage(popup);
+		popupPageBook.setVisible(true);
+		((GridData)popupPageBook.getLayoutData()).exclude = false;
+		
+		mainComposite.layout();
+	}
+	
+	public void hidePopup (WarlockPopupAction popup)
+	{
+		popupPageBook.showPage(emptyPopup);		
+		popupPageBook.setVisible(false);
+		((GridData)popupPageBook.getLayoutData()).exclude = true;
+		
+		mainComposite.layout();
 	}
 	
 	@Override
