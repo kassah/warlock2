@@ -591,10 +591,23 @@ public class WarlockText implements LineBackgroundListener {
 					compass.redraw();
 			}
 		}
-		if (status.selection.x != status.selection.y) {// Only set it if there is something selected
-			textWidget.setSelectionRange(status.selection.x, status.selection.y - status.selection.x);
-		}
+		
 		setCaretOffset(status.caretOffset);
+		
+		if (status.selection.x != status.selection.y) {// Only set it if there is something selected
+			if (status.caretOffset == status.selection.y) {
+				textWidget.setSelectionRange(status.selection.x, status.selection.y - status.selection.x);
+			} else if (status.caretOffset == status.selection.x) {
+				textWidget.setSelectionRange(status.selection.y, status.selection.x - status.selection.y);
+			} else {
+				// Proboly never reached, but who knows, better to have fallback behavior
+				textWidget.setSelectionRange(status.selection.x, status.selection.y - status.selection.x);
+				setCaretOffset(status.caretOffset);
+			}
+		}
+		
+		
+		
 		if (Platform.getOS().equals(Platform.OS_MACOSX)) {
 			redraw();
 		}
