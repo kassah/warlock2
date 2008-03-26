@@ -22,7 +22,7 @@
 /**
  * 
  */
-package cc.warlock.rcp.userstreams.ui.views;
+package cc.warlock.rcp.views;
 
 import java.util.ArrayList;
 
@@ -32,15 +32,14 @@ import org.eclipse.ui.PartInitException;
 import org.eclipse.ui.PlatformUI;
 
 import cc.warlock.core.client.IStream;
+import cc.warlock.core.client.IStreamFilter;
 import cc.warlock.core.client.IWarlockClient;
 import cc.warlock.core.client.IWarlockClientListener;
 import cc.warlock.core.client.WarlockClientRegistry;
 import cc.warlock.core.client.WarlockString;
 import cc.warlock.core.client.WarlockString.WarlockStringStyleRange;
+import cc.warlock.core.client.internal.StreamFilter;
 import cc.warlock.rcp.ui.client.SWTWarlockClientListener;
-import cc.warlock.rcp.userstreams.IStreamFilter;
-import cc.warlock.rcp.userstreams.internal.StreamFilter;
-import cc.warlock.rcp.views.StreamView;
 
 /**
  * @author Will Robertson
@@ -48,7 +47,7 @@ import cc.warlock.rcp.views.StreamView;
  * ViewPart/Stream View Class that shows user configurable content filtered from the main window.
  */
 public class UserStream extends StreamView implements IWarlockClientListener {
-	public static final String VIEW_ID = "cc.warlock.rcp.userstreams.rightView.userStream";
+	public static final String VIEW_ID = "cc.warlock.rcp.views.rightView.userStream";
 	protected static ArrayList<UserStream> openStreams = new ArrayList<UserStream>();
 	private IStreamFilter[] filters = null;
 	private String name = "Stream";

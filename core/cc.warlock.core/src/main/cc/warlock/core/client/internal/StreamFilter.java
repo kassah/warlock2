@@ -22,13 +22,13 @@
 /**
  * 
  */
-package cc.warlock.rcp.userstreams.internal;
+package cc.warlock.core.client.internal;
 
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+import cc.warlock.core.client.IStreamFilter;
 import cc.warlock.core.client.WarlockString;
-import cc.warlock.rcp.userstreams.IStreamFilter;
 
 /**
  * @author Will Robertson

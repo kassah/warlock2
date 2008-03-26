@@ -22,14 +22,14 @@
 /**
  * 
  */
-package cc.warlock.rcp.userstreams.ui.actions;
+package cc.warlock.rcp.actions;
 
 import java.util.Random;
 
 import org.eclipse.jface.action.Action;
 
 import cc.warlock.rcp.ui.WarlockSharedImages;
-import cc.warlock.rcp.userstreams.ui.views.UserStream;
+import cc.warlock.rcp.views.UserStream;
 
 /**
  * @author Will Robertson

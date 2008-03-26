@@ -29,7 +29,7 @@
       </view>
       <view
             allowMultiple="true"
-            class="cc.warlock.rcp.userstreams.ui.views.UserStream"
+            class="cc.warlock.rcp.views.UserStream"
             id="cc.warlock.rcp.userstreams.rightView.userStream"
             name="Stream">
       </view>
@@ -212,7 +212,7 @@
       <menuContribution
             locationURI="menu:cc.warlock.rcp.menu.window">
          <dynamic
-               class="cc.warlock.rcp.userstreams.ui.menu.StreamsContributionItem"
+               class="cc.warlock.rcp.menu.StreamsContributionItem"
                id="cc.warlock.rcp.userstreams.dynamicStreams">
          </dynamic>
          <separator

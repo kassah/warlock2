@@ -22,9 +22,8 @@
 /**
  * 
  */
-package cc.warlock.rcp.userstreams;
+package cc.warlock.core.client;
 
-import cc.warlock.core.client.WarlockString;
 
 /**
  * @author Will Robertson

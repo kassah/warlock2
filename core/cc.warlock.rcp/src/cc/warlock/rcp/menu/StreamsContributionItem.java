@@ -22,7 +22,7 @@
 /**
  * 
  */
-package cc.warlock.rcp.userstreams.ui.menu;
+package cc.warlock.rcp.menu;
 
 import java.util.ArrayList;
 
@@ -30,7 +30,7 @@ import org.eclipse.jface.action.ActionContributionItem;
 import org.eclipse.jface.action.IContributionItem;
 import org.eclipse.ui.actions.CompoundContributionItem;
 
-import cc.warlock.rcp.userstreams.ui.actions.StreamShowAction;
+import cc.warlock.rcp.actions.StreamShowAction;
 
 /**
  * @author Will Robertson
