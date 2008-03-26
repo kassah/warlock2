@@ -544,7 +544,8 @@ public class WarlockText implements LineBackgroundListener {
 		return styleRange;
 	}
 	
-	class ControlStatus {
+	public class ControlStatus {
+		// TODO: Make ControlStatus Private (see postTextChange for explination)
 		boolean atBottom;
 		int caretOffset;	
 		Point selection;
@@ -554,7 +555,10 @@ public class WarlockText implements LineBackgroundListener {
 		return textWidget.getLinePixel(textWidget.getLineCount()) <= textWidget.getClientArea().height;
 	}
 	
-	private ControlStatus preTextChange() {
+	public ControlStatus preTextChange() {
+		// TODO: Make preTextChange private
+		// Explination: right now we can't listen for the before and after of our resize, so this must be called
+		//     before an action that will cause a resize.
 		ControlStatus status = new ControlStatus();
 		status.atBottom = isAtBottom();
 		status.caretOffset = getCaretOffset();
@@ -562,7 +566,10 @@ public class WarlockText implements LineBackgroundListener {
 		return status;
 	}
 	
-	private void postTextChange(ControlStatus status) {
+	public void postTextChange(ControlStatus status) {
+		// TODO: Make preTextChange private
+		// Explination: right now we can't listen for the before and after of our resize, so this must be called
+		//     after an action that will cause a resize.
 		if (status.atBottom) {
 			if (doScrollDirection == SWT.DOWN) {
 				textWidget.setTopPixel(textWidget.getTopPixel() + textWidget.getLinePixel(textWidget.getLineCount()));
