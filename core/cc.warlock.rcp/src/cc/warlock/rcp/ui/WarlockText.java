@@ -547,16 +547,9 @@ public class WarlockText implements LineBackgroundListener {
 	public class ControlStatus {
 		// TODO: Make ControlStatus Private (see postTextChange for explination)
 		boolean atBottom;
-		int caretOffset;	
-		Point selection;
 		
 		public Boolean equals(ControlStatus status) {
-			if (
-					atBottom != status.atBottom
-					|| caretOffset != status.caretOffset
-					|| selection.x != status.selection.x
-					|| selection.y != status.selection.y
-					) 
+			if (atBottom != status.atBottom) 
 				return false;
 			else
 				return true;
@@ -573,8 +566,6 @@ public class WarlockText implements LineBackgroundListener {
 		//     before an action that will cause a resize.
 		ControlStatus status = new ControlStatus();
 		status.atBottom = isAtBottom();
-		status.caretOffset = getCaretOffset();
-		status.selection = textWidget.getSelection();
 		return status;
 	}
 	
@@ -591,23 +582,7 @@ public class WarlockText implements LineBackgroundListener {
 					compass.redraw();
 			}
 		}
-		
-		setCaretOffset(status.caretOffset);
-		
-		if (status.selection.x != status.selection.y) {// Only set it if there is something selected
-			if (status.caretOffset == status.selection.y) {
-				textWidget.setSelectionRange(status.selection.x, status.selection.y - status.selection.x);
-			} else if (status.caretOffset == status.selection.x) {
-				textWidget.setSelectionRange(status.selection.y, status.selection.x - status.selection.y);
-			} else {
-				// Proboly never reached, but who knows, better to have fallback behavior
-				textWidget.setSelectionRange(status.selection.x, status.selection.y - status.selection.x);
-				setCaretOffset(status.caretOffset);
-			}
-		}
-		
-		
-		
+
 		if (Platform.getOS().equals(Platform.OS_MACOSX)) {
 			redraw();
 		}
@@ -664,14 +639,6 @@ public class WarlockText implements LineBackgroundListener {
 				int linesToRemove = lines - lineLimit;
 				int charsToRemove = textWidget.getOffsetAtLine(linesToRemove);
 				int pixelsToRemove = textWidget.getLinePixel(linesToRemove);
-				
-				// adjust ending status
-				status.caretOffset = status.caretOffset - charsToRemove;
-				if (status.caretOffset < 0) status.caretOffset = 0; // Don't let this go negative
-				status.selection.x = status.selection.x - charsToRemove;
-				if (status.selection.x < 0) status.selection.x = 0; // Don't let this go negative
-				status.selection.y = status.selection.y - charsToRemove;
-				if (status.selection.y < 0) status.selection.y = 0; // Don't let this go negative
 				
 				textWidget.replaceTextRange(0, charsToRemove, "");
 				updateMarkers(0, -charsToRemove);
