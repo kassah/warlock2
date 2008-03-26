@@ -549,6 +549,18 @@ public class WarlockText implements LineBackgroundListener {
 		boolean atBottom;
 		int caretOffset;	
 		Point selection;
+		
+		public Boolean equals(ControlStatus status) {
+			if (
+					atBottom != status.atBottom
+					|| caretOffset != status.caretOffset
+					|| selection.x != status.selection.x
+					|| selection.y != status.selection.y
+					) 
+				return false;
+			else
+				return true;
+		}
 	}
 	
 	private boolean isAtBottom() {
@@ -567,6 +579,8 @@ public class WarlockText implements LineBackgroundListener {
 	}
 	
 	public void postTextChange(ControlStatus status) {
+		if (status.equals(preTextChange())) return; // If we don't need to do anything, don't.
+		
 		// TODO: Make preTextChange private
 		// Explination: right now we can't listen for the before and after of our resize, so this must be called
 		//     after an action that will cause a resize.
@@ -577,8 +591,9 @@ public class WarlockText implements LineBackgroundListener {
 					compass.redraw();
 			}
 		}
-		if (status.selection.x != status.selection.y) // Only set it if there is something selected
+		if (status.selection.x != status.selection.y) {// Only set it if there is something selected
 			textWidget.setSelectionRange(status.selection.x, status.selection.y - status.selection.x);
+		}
 		setCaretOffset(status.caretOffset);
 		if (Platform.getOS().equals(Platform.OS_MACOSX)) {
 			redraw();
