@@ -266,13 +266,26 @@ public class StreamView extends ViewPart implements IStreamListener, IGameViewFo
 	}
 	
 	public void addStream (IStream stream) {
-		stream.addStreamListener(streamListenerWrapper);
 		streams.add(stream);
+		stream.addStreamListener(streamListenerWrapper);
+		if (propertyListenerWrapper == null) {
+			propertyListenerWrapper = new SWTPropertyListener<String>(new PropertyListener<String>() {
+				@Override
+				public void propertyChanged(IProperty<String> property, String oldValue) {
+					if (property.getName().equals("streamTitle"))
+					{
+						setPartName(property.get());
+					}
+				}
+			});
+		}
+		stream.getTitle().addListener(propertyListenerWrapper);
 		stream.setView(true);
 	}
 	
 	public void removeStream (IStream stream) {
 		stream.removeStreamListener(streamListenerWrapper);
+		stream.getTitle().removeListener(propertyListenerWrapper);
 		streams.remove(stream);
 		stream.setView(false);
 	}
@@ -435,6 +448,7 @@ public class StreamView extends ViewPart implements IStreamListener, IGameViewFo
 		for (IStream stream : streams)
 		{
 			stream.removeStreamListener(streamListenerWrapper);
+			stream.getTitle().removeListener(propertyListenerWrapper);
 			stream.setView(false);
 		}
 		
