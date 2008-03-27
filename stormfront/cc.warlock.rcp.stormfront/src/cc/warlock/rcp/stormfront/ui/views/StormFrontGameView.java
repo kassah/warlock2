@@ -173,6 +173,7 @@ public class StormFrontGameView extends GameView implements IStormFrontClientVie
 			}
 		};
 		
+		showPopup(reconnectPopup);
 		reconnect.addSelectionListener(currentListener);
 	}
 	
@@ -190,7 +191,7 @@ public class StormFrontGameView extends GameView implements IStormFrontClientVie
 						new SGEConnectWizard());
 			
 				int response = dialog.open();
-				reconnectPopup.setVisible(false);
+				hidePopup(reconnectPopup);
 			}
 		};
 		
