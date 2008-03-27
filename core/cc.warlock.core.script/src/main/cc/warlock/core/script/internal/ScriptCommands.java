@@ -79,20 +79,6 @@ public class ScriptCommands implements IScriptCommands, IStreamListener, IRoomLi
 		client.getDefaultStream().echo("[" + scriptName + "]: " + text + "\n");
 	}
 	
-	protected void assertPrompt() {
-		if (!gotPrompt) {
-			lock.lock();
-			try {
-				while(!interrupted && !gotPrompt)
-					gotPromptCond.await();
-			} catch(Exception e) {
-				e.printStackTrace();
-			} finally {
-				lock.unlock();
-			}
-		}
-	}
-	
 	public BlockingQueue<String> getLineQueue() {
 		LinkedBlockingQueue<String> queue = new LinkedBlockingQueue<String>();
 		synchronized(textWaiters) {
@@ -159,7 +145,6 @@ public class ScriptCommands implements IScriptCommands, IStreamListener, IRoomLi
 			roomWaiting = false;
 			lock.unlock();
 		}
-		assertPrompt();
 	}
 
 	public void pause (double seconds) {
@@ -179,8 +164,6 @@ public class ScriptCommands implements IScriptCommands, IStreamListener, IRoomLi
 	}
 	
 	public void put (String text) {
-		assertPrompt();
-		
 		client.send("[" + scriptName + "]: ", text);
 	}
 
