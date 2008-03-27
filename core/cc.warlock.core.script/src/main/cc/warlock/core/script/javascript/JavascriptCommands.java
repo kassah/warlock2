@@ -65,6 +65,12 @@ public class JavascriptCommands {
 		
 		commands.echo(text);
 	}
+	
+	public void echo() {
+		checkStop();
+		
+		commands.echo("");
+	}
 
 	public void include (String otherScript)
 	{
@@ -109,6 +115,12 @@ public class JavascriptCommands {
 		checkStop();
 		
 		commands.pause(seconds);
+	}
+	
+	public void pause() {
+		checkStop();
+		
+		commands.pause(1);
 	}
 
 	public void put(String text) {
