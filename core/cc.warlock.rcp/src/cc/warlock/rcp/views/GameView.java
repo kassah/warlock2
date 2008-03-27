@@ -357,24 +357,24 @@ public abstract class GameView extends StreamView implements IWarlockClientViewe
 	
 	public void showPopup (WarlockPopupAction popup)
 	{
-		WarlockText.ControlStatus status = text.preTextChange();
+		boolean atBottom = text.isAtBottom();
 		popupPageBook.showPage(popup);
 		popupPageBook.setVisible(true);
 		((GridData)popupPageBook.getLayoutData()).exclude = false;
 		
 		mainComposite.layout();
-		text.postTextChange(status);
+		text.postTextChange(atBottom);
 	}
 	
 	public void hidePopup (WarlockPopupAction popup)
 	{
-		WarlockText.ControlStatus status = text.preTextChange();
+		boolean atBottom = text.isAtBottom();
 		popupPageBook.showPage(emptyPopup);		
 		popupPageBook.setVisible(false);
 		((GridData)popupPageBook.getLayoutData()).exclude = true;
 		
 		mainComposite.layout();
-		text.postTextChange(status);
+		text.postTextChange(atBottom);
 	}
 	
 	@Override

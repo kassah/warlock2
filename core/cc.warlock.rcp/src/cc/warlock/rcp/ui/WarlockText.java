@@ -215,7 +215,7 @@ public class WarlockText implements LineBackgroundListener {
 		
 		addLineBackgroundListener(this);
 		addControlListener(new ControlListener () {
-			public void controlMoved(ControlEvent e) {}
+			public void controlMoved(ControlEvent e) { }
 			public void controlResized(ControlEvent e) {
 				redraw();
 			}
@@ -424,16 +424,16 @@ public class WarlockText implements LineBackgroundListener {
 	}
 	
 	public void append(String string) {
-		ControlStatus status = preTextChange();
+		boolean atBottom = isAtBottom();
 		
 		textWidget.append(string);
-		status = constrainLineLimit(status);
+		constrainLineLimit(atBottom);
 
-		postTextChange(status);
+		postTextChange(atBottom);
 	}
 	
 	public void append(WarlockString string) {
-		ControlStatus status = preTextChange();
+		boolean atBottom = isAtBottom();
 		
 		int charCount = textWidget.getCharCount();
 		textWidget.append(string.toString());
@@ -503,9 +503,9 @@ public class WarlockText implements LineBackgroundListener {
 			textWidget.setStyleRange(style);
 		}
 		
-		status = constrainLineLimit(status);
+		constrainLineLimit(atBottom);
 
-		postTextChange(status);
+		postTextChange(atBottom);
 	}
 	
 	/* find an element in styles that intersects with the first element of styles, starting at pos */
@@ -544,47 +544,25 @@ public class WarlockText implements LineBackgroundListener {
 		return styleRange;
 	}
 	
-	public class ControlStatus {
-		// TODO: Make ControlStatus Private (see postTextChange for explination)
-		boolean atBottom;
-		
-		public Boolean equals(ControlStatus status) {
-			if (atBottom != status.atBottom) 
-				return false;
-			else
-				return true;
-		}
-	}
-	
-	private boolean isAtBottom() {
+	public boolean isAtBottom() {
 		return textWidget.getLinePixel(textWidget.getLineCount()) <= textWidget.getClientArea().height;
 	}
 	
-	public ControlStatus preTextChange() {
-		// TODO: Make preTextChange private
-		// Explination: right now we can't listen for the before and after of our resize, so this must be called
-		//     before an action that will cause a resize.
-		ControlStatus status = new ControlStatus();
-		status.atBottom = isAtBottom();
-		return status;
-	}
-	
-	public void postTextChange(ControlStatus status) {
-		if (status.equals(preTextChange())) return; // If we don't need to do anything, don't.
-		
+	public void postTextChange(boolean atBottom) {
 		// TODO: Make preTextChange private
 		// Explination: right now we can't listen for the before and after of our resize, so this must be called
 		//     after an action that will cause a resize.
-		if (status.atBottom) {
+		if (atBottom && !isAtBottom()) {
 			if (doScrollDirection == SWT.DOWN) {
 				textWidget.setTopPixel(textWidget.getTopPixel() + textWidget.getLinePixel(textWidget.getLineCount()));
 				if (compass != null)
 					compass.redraw();
 			}
-		}
-
-		if (Platform.getOS().equals(Platform.OS_MACOSX)) {
-			redraw();
+			
+			// FIXME: is this still needed?
+			if (Platform.getOS().equals(Platform.OS_MACOSX)) {
+				redraw();
+			}
 		}
 	}
 	
@@ -624,13 +602,13 @@ public class WarlockText implements LineBackgroundListener {
 		if(marker == null) return;
 		int start = marker.offset;
 		int length = marker.length;
-		ControlStatus status = preTextChange();
+		boolean atBottom = isAtBottom();
 		textWidget.replaceTextRange(start, length, text);
 		updateMarkers(start, text.length() - length);
-		postTextChange(status);
+		postTextChange(atBottom);
 	}
 	
-	private ControlStatus constrainLineLimit(ControlStatus status) {
+	private void constrainLineLimit(boolean atBottom) {
 		// 'status' is a pointer that allows us to change the object in our parent..
 		// in this method... it is intentional.
 		if (lineLimit > 0) {
@@ -643,11 +621,10 @@ public class WarlockText implements LineBackgroundListener {
 				textWidget.replaceTextRange(0, charsToRemove, "");
 				updateMarkers(0, -charsToRemove);
 				updateLineBackgrounds(linesToRemove);
-				if(!status.atBottom && pixelsToRemove < 0)
+				if(!atBottom && pixelsToRemove < 0)
 					textWidget.setTopPixel(-pixelsToRemove);
 			}
 		}
-		return status;
 	}
 	
 	@SuppressWarnings("unchecked")
