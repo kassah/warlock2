@@ -35,6 +35,7 @@ public class PatternSetting extends ClientSetting implements IPatternSetting {
 	protected boolean literal = false;
 	protected boolean fullWord = true;
 	protected boolean caseSensitive = false;
+	protected boolean updateDeferred = true;
 	
 	public PatternSetting (PatternSetting other)
 	{
@@ -72,23 +73,27 @@ public class PatternSetting extends ClientSetting implements IPatternSetting {
 	
 	protected void update() throws PatternSyntaxException {
 		String s = this.text;
-		int flags = 0;
-		if (literal) {
-			s = Pattern.quote(s);
+		if (s != null) {
+			int flags = 0;
+			if (literal) {
+				s = Pattern.quote(s);
+			}
+			if (!caseSensitive) {
+				flags |= Pattern.CASE_INSENSITIVE;
+			}
+			if (fullWord) {
+				s = "\\b" + s + "\\b";
+			}
+			
+			pattern = Pattern.compile(s, flags);
+		} else {
+			pattern = null;
 		}
-		if (!caseSensitive) {
-			flags |= Pattern.CASE_INSENSITIVE;
-		}
-		if (fullWord) {
-			s = "\\b" + s + "\\b";
-		}
-		
-		this.pattern = Pattern.compile(s, flags);
-		this.needsUpdate = false;
+		updateDeferred = false;
 	}
 	
 	public Pattern getPattern() throws PatternSyntaxException{
-		if(needsUpdate())
+		if (updateDeferred)
 			update();
 		return pattern;
 	}
@@ -98,21 +103,26 @@ public class PatternSetting extends ClientSetting implements IPatternSetting {
 	}
 	
 	public void setText(String text) throws PatternSyntaxException {
+		if (!text.equals(this.text)) {
+			updateDeferred = true;
+			needsUpdate = true;
+		}
 		this.text = text;
-		update();
 	}
 	
 	public void setLiteral (boolean literal) throws PatternSyntaxException
 	{
-		if (literal != isLiteral()) {
+		if (literal != this.literal) {
+			updateDeferred = true;
+			needsUpdate = true;
 			this.literal = literal;
-			update();
 		}
 	}
 	
 	public void setCaseSensitive (boolean caseSensitive)
 	{
-		if (caseSensitive != isCaseSensitive()) {
+		if (caseSensitive != this.caseSensitive) {
+			updateDeferred = true;
 			needsUpdate = true;
 			this.caseSensitive = caseSensitive;
 		}
@@ -120,7 +130,8 @@ public class PatternSetting extends ClientSetting implements IPatternSetting {
 	
 	public void setFullWordMatch (boolean fullWordMatch)
 	{
-		if (fullWordMatch != isFullWordMatch()) {
+		if (fullWordMatch != this.fullWord) {
+			updateDeferred = true;
 			needsUpdate = true;
 			this.fullWord = fullWordMatch;
 		}
