@@ -33,8 +33,6 @@ import org.eclipse.swt.events.SelectionEvent;
 import org.eclipse.swt.events.SelectionListener;
 import org.eclipse.swt.graphics.Color;
 import org.eclipse.swt.graphics.GC;
-import org.eclipse.swt.widgets.Label;
-
 import cc.warlock.core.client.ICharacterStatus;
 import cc.warlock.core.client.IProperty;
 import cc.warlock.core.client.IPropertyListener;

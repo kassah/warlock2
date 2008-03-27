@@ -27,12 +27,10 @@ import org.osgi.framework.BundleContext;
 
 import cc.warlock.core.configuration.Profile;
 import cc.warlock.core.stormfront.ProfileConfiguration;
-import cc.warlock.core.stormfront.client.internal.StormFrontClient;
 import cc.warlock.core.stormfront.script.javascript.StormFrontJavascriptVars;
 import cc.warlock.rcp.application.WarlockApplication;
 import cc.warlock.rcp.plugin.Warlock2Plugin;
 import cc.warlock.rcp.stormfront.adapters.StormFrontClientAdapterFactory;
-import cc.warlock.rcp.stormfront.settings.StormFrontSWTSettings;
 import cc.warlock.rcp.stormfront.ui.actions.ProfileConnectAction;
 import cc.warlock.rcp.stormfront.ui.util.StormFrontClientFactory;
 import cc.warlock.rcp.ui.client.WarlockClientAdaptable;

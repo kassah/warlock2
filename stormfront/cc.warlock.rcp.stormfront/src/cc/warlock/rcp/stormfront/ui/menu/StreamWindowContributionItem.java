@@ -28,12 +28,8 @@ import org.eclipse.ui.IWorkbenchPage;
 import org.eclipse.ui.PlatformUI;
 import org.eclipse.ui.actions.CompoundContributionItem;
 
-import cc.warlock.core.client.IWarlockClient;
 import cc.warlock.core.stormfront.client.IStormFrontClient;
-import cc.warlock.core.stormfront.network.StormFrontConnection;
 import cc.warlock.rcp.actions.OpenStreamWindowAction;
-import cc.warlock.rcp.plugin.Warlock2Plugin;
-import cc.warlock.rcp.ui.network.SWTConnectionListenerAdapter;
 import cc.warlock.rcp.views.DebugView;
 import cc.warlock.rcp.views.GameView;
 import cc.warlock.rcp.views.StreamView;

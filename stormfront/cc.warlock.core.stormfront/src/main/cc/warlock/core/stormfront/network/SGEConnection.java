@@ -35,7 +35,6 @@ import cc.warlock.core.configuration.Profile;
 import cc.warlock.core.network.Connection;
 import cc.warlock.core.network.IConnection;
 import cc.warlock.core.network.IConnectionListener;
-import cc.warlock.core.network.IConnection.ErrorType;
 import cc.warlock.core.stormfront.network.ISGEGame.AccountStatus;
 import cc.warlock.core.stormfront.network.ISGEGame.GameURL;
 

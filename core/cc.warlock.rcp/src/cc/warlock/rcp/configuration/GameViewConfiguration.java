@@ -26,7 +26,6 @@ import java.util.List;
 
 import org.dom4j.DocumentHelper;
 import org.dom4j.Element;
-import org.eclipse.core.runtime.Platform;
 import org.eclipse.jface.resource.JFaceResources;
 
 import cc.warlock.core.client.WarlockColor;

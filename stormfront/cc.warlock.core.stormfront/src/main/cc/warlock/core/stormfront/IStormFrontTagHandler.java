@@ -24,8 +24,6 @@
  */
 package cc.warlock.core.stormfront;
 
-import java.util.Map;
-
 import cc.warlock.core.stormfront.xml.StormFrontAttributeList;
 
 
