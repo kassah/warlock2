@@ -85,6 +85,7 @@ public class StreamView extends ViewPart implements IStreamListener, IGameViewFo
 	protected SWTPropertyListener<String> propertyListenerWrapper;
 	protected boolean appendNewlines = false;
 	protected boolean isPrompting = false;
+	protected String prompt;
 	protected boolean multiClient = false;
 	
 	protected HashMap<IWarlockClient, WarlockString> textBuffers = new HashMap<IWarlockClient, WarlockString>();
@@ -385,15 +386,22 @@ public class StreamView extends ViewPart implements IStreamListener, IGameViewFo
 			
 			string.addStyle(0, text.length(), client.getCommandStyle());
 			
-			isPrompting = false;
+			if(!isPrompting)
+				appendText(client, new WarlockString(prompt));
+			else
+				isPrompting = false;
 			appendText(client, string);
 		}
 	}
 	
 	public void streamPrompted(IStream stream, String prompt) {
-		if ((!isPrompting) &&
-				(this.mainStream.equals(stream) || this.streams.contains(stream)))
+		if (!(this.mainStream.equals(stream) || this.streams.contains(stream)))
+			return;
+		
+		if(!isPrompting)
 		{
+			this.prompt = prompt;
+			
 			IWarlockClient client = stream.getClient();
 			
 			WarlockString text = new WarlockString();
@@ -405,14 +413,15 @@ public class StreamView extends ViewPart implements IStreamListener, IGameViewFo
 				textBuffers.remove(client);
 			}
 			
-			if(isPrompting) {
-				text.append("\n");
-			} else {
-				isPrompting = true;
-			}
+			isPrompting = true;
 				
 			text.append(prompt);
 			appendText(client, text);
+		} else {
+			if(!this.prompt.equals(prompt)) {
+				appendText(stream.getClient(), new WarlockString("\n" + prompt));
+			}
+			this.prompt = prompt;
 		}
 	}
 
