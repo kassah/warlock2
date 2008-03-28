@@ -112,11 +112,11 @@ public class StormFrontGameView extends GameView implements IStormFrontClientVie
 		
 		if (profile != null) {
 			setReconnectProfile(profile);
+			showPopup(reconnectPopup);
 		}
 		else {			
 			setNoReconnectProfile(characterName);
 		}
-		
 	}
 	
 	protected Label reconnectLabel;
@@ -173,7 +173,6 @@ public class StormFrontGameView extends GameView implements IStormFrontClientVie
 			}
 		};
 		
-		showPopup(reconnectPopup);
 		reconnect.addSelectionListener(currentListener);
 	}
 	
