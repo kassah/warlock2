@@ -65,7 +65,7 @@ import cc.warlock.rcp.ui.WarlockSharedImages;
  * @author Marshall Culpepper
  *
  */
-public class VariablesPreferencePage extends WarlockPreferencePage {
+public class VariablesPreferencePage extends PreferencePageUtils {
 
 	public static final String PAGE_ID = "cc.warlock.rcp.prefs.variables";
 	

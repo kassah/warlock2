@@ -69,7 +69,7 @@ import cc.warlock.rcp.ui.WarlockSharedImages;
 import cc.warlock.rcp.util.ColorUtil;
 
 
-public class HighlightStringsPreferencePage extends WarlockPreferencePage implements
+public class HighlightStringsPreferencePage extends PreferencePageUtils implements
 		IWorkbenchPropertyPage {
 
 	public static final String PAGE_ID = "cc.warlock.rcp.prefs.highlightStrings";

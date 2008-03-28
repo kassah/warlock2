@@ -413,9 +413,11 @@ public class StreamView extends ViewPart implements IStreamListener, IGameViewFo
 				textBuffers.remove(client);
 			}
 			
-			isPrompting = true;
+			if (!GameViewConfiguration.instance().getSuppressPrompt()) {
+				isPrompting = true;
 				
-			text.append(prompt);
+				text.append(prompt);
+			}
 			appendText(client, text);
 		} else {
 			if(!this.prompt.equals(prompt)) {

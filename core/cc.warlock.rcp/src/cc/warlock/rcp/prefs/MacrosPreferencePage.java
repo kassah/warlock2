@@ -80,7 +80,7 @@ import cc.warlock.rcp.ui.KeyStrokeText.KeyStrokeLockListener;
  *
  * @author Marshall Culpepper
  */
-public class MacrosPreferencePage extends WarlockPreferencePage implements
+public class MacrosPreferencePage extends PreferencePageUtils implements
 		IWorkbenchPropertyPage {
 
 	public static final String PAGE_ID = "cc.warlock.rcp.prefs.macros";

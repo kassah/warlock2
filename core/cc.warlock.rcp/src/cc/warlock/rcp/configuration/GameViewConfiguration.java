@@ -38,6 +38,7 @@ public class GameViewConfiguration implements IConfigurationProvider {
 	protected WarlockColor defaultBackground, defaultForeground, defaultEchoBackground, defaultEchoForeground;
 	protected String defaultFontFace;
 	protected int defaultFontSize;
+	protected boolean suppressPrompt;
 	
 	protected static GameViewConfiguration _instance;
 	
@@ -57,6 +58,8 @@ public class GameViewConfiguration implements IConfigurationProvider {
 		defaultEchoBackground = new WarlockColor(64, 64, 64);
 		defaultEchoForeground = new WarlockColor(255, 255, 255);
 		
+		suppressPrompt = false;
+		
 		WarlockConfiguration.getMainConfiguration().addConfigurationProvider(this);
 	}
 	
@@ -64,6 +67,7 @@ public class GameViewConfiguration implements IConfigurationProvider {
 		ArrayList<Element> elements = new ArrayList<Element>();
 		Element gameView = DocumentHelper.createElement("game-view");
 		gameView.addAttribute("buffer", bufferLines+"");
+		gameView.addAttribute("suppressPrompt", suppressPrompt+"");
 		
 		Element defaultColors = DocumentHelper.createElement("default-colors");
 		gameView.add(defaultColors);
@@ -86,6 +90,7 @@ public class GameViewConfiguration implements IConfigurationProvider {
 		if (element.getName().equals("game-view"))
 		{
 			bufferLines = Integer.parseInt(element.attributeValue("buffer"));
+			suppressPrompt = Boolean.parseBoolean(element.attributeValue("suppressPrompt"));
 			
 			for (Element e : (List<Element>)element.elements())
 			{
@@ -169,4 +174,11 @@ public class GameViewConfiguration implements IConfigurationProvider {
 		this.defaultFontSize = defaultFontSize;
 	}
 
+	public boolean getSuppressPrompt() {
+		return suppressPrompt;
+	}
+	
+	public void setSuppressPrompt(boolean suppressPrompt) {
+		this.suppressPrompt = suppressPrompt;
+	}
 }
