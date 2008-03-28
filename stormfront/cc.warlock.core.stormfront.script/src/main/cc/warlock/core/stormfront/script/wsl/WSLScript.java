@@ -263,11 +263,11 @@ public class WSLScript extends AbstractScript {
 				// TODO handle the exception
 			}
 			
-			scriptCommands.waitForRoundtime();
 			curCommand = commands.get(0);
 			
 			while(curCommand != null && isRunning()) {
 				scriptCommands.waitForResume();
+				scriptCommands.waitForRoundtime();
 				int index = commands.indexOf(curCommand) + 1;
 				if(index < commands.size())
 					nextCommand = commands.get(index);
@@ -683,12 +683,9 @@ public class WSLScript extends AbstractScript {
 			if (match != null)
 			{
 				matchData.get(match).run();
-				scriptCommands.waitForRoundtime();
 			}
 			matches.clear();
 			matchData.clear();
-			
-			scriptCommands.waitForRoundtime();
 		}
 	}
 

@@ -77,37 +77,6 @@ public class StormFrontScriptCommands extends ScriptCommands implements IStormFr
 		}
 	}
 	
-	@Override
-	public void waitNextRoom() {
-		super.waitNextRoom();
-		waitForRoundtime();
-	}
-	
-	@Override
-	public void pause(double seconds) {
-		super.pause(seconds);
-		waitForRoundtime();
-	}
-	
-	@Override
-	public void waitFor(IMatch match) {
-		try {
-			super.waitFor(match);
-		} finally {
-			waitForRoundtime();
-		}
-	}
-	
-	@Override
-	public void waitForPrompt() {
-		try {
-			super.waitForPrompt();
-		} finally {
-			waitForRoundtime();
-		}
-	}
-	
-	
 	public void propertyActivated(IProperty<Integer> property) {}
 	public void propertyChanged(IProperty<Integer> property, Integer oldValue) {
 		if (property.getName().equals("roundtime"))

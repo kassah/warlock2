@@ -139,6 +139,10 @@ public class ScriptCommands implements IScriptCommands, IStreamListener, IRoomLi
 			while (!interrupted && roomWaiting) {
 				nextRoom.await();
 			}
+			roomWaiting = false;
+			while(!interrupted && !gotPrompt) {
+				gotPromptCond.await();
+			}
 		} catch(Exception e) {
 			e.printStackTrace();
 		} finally {
