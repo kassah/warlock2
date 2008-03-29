@@ -115,10 +115,4 @@ public class StormFrontJavascriptCommands extends JavascriptCommands
 		super.pause(seconds);
 		sfCommands.waitForRoundtime();
 	}
-	
-	@Override
-	public void pause() {
-		super.pause();
-		sfCommands.waitForRoundtime();
-	}
 }

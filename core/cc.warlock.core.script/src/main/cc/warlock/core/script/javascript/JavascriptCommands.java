@@ -116,12 +116,6 @@ public class JavascriptCommands {
 		
 		commands.pause(seconds);
 	}
-	
-	public void pause() {
-		checkStop();
-		
-		commands.pause(1);
-	}
 
 	public void put(String text) {
 		checkStop();
