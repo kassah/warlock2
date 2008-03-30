@@ -29,6 +29,7 @@ import java.util.concurrent.TimeUnit;
 
 import cc.warlock.core.client.IProperty;
 import cc.warlock.core.client.IPropertyListener;
+import cc.warlock.core.client.IStream;
 import cc.warlock.core.script.IMatch;
 import cc.warlock.core.script.IScript;
 import cc.warlock.core.script.internal.ScriptCommands;
@@ -39,6 +40,7 @@ public class StormFrontScriptCommands extends ScriptCommands implements IStormFr
 
 	protected IStormFrontClient sfClient;
 	protected IScript script;
+	private int typeAhead = 0;
 	
 	public StormFrontScriptCommands (IStormFrontClient client, String name)
 	{
@@ -61,6 +63,21 @@ public class StormFrontScriptCommands extends ScriptCommands implements IStormFr
 	
 	public IStormFrontClient getStormFrontClient() {
 		return sfClient;
+	}
+	
+	@Override
+	public void put(String text) {
+		if(typeAhead >= 2)
+			this.waitForPrompt();
+		typeAhead++;
+		super.put(text);
+	}
+	
+	@Override
+	public void streamPrompted(IStream stream, String prompt) {
+		if(typeAhead > 0)
+			typeAhead--;
+		super.streamPrompted(stream, prompt);
 	}
 	
 	protected boolean waitingForRoundtime;
