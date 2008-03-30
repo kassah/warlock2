@@ -252,28 +252,12 @@ public class ConnectionView extends ViewPart {
 	protected static boolean checkedForUpdates = false;
 	
 	@Override
-	public void setFocus() {
-		if (!checkedForUpdates)
-		{
-			if (WarlockUpdates.autoUpdate())
-			{
-				TimerTask updateTask = new TimerTask() {
-					public void run ()
-					{
-						WarlockUpdates.checkForUpdates(new NullProgressMonitor());
-					}
-				};
-				// check semi-immediately, then once per hour
-				WarlockApplication.instance().getTimer().schedule(updateTask, 5000, 1000 * 60 * 60);
-			}
-			checkedForUpdates = true;
-		}
-	}
-	
-	@Override
 	public void dispose() {
 		toolkit.dispose();
 		super.dispose();
 	}
 
+	@Override
+	public void setFocus() {
+	}
 }

@@ -25,17 +25,14 @@
 package cc.warlock.rcp.application;
 
 import java.util.Map;
-import java.util.Timer;
 
 import org.eclipse.core.runtime.IAdaptable;
 import org.eclipse.equinox.app.IApplication;
 import org.eclipse.equinox.app.IApplicationContext;
-import org.eclipse.swt.graphics.Point;
 import org.eclipse.swt.widgets.Display;
+import org.eclipse.ui.IWorkbenchWindow;
 import org.eclipse.ui.PlatformUI;
-import org.eclipse.ui.application.IWorkbenchConfigurer;
 import org.eclipse.ui.application.IWorkbenchWindowConfigurer;
-import org.eclipse.ui.application.WorkbenchAdvisor;
 
 import cc.warlock.core.configuration.WarlockConfiguration;
 
@@ -47,15 +44,10 @@ import com.martiansoftware.jsap.JSAPResult;
 /**
  * @author Marshall
  */
-public class WarlockApplication extends WorkbenchAdvisor implements IApplication, IAdaptable {
-	
+public class WarlockApplication implements IApplication, IAdaptable {
 	private String startWithProfile = null;
 	private static WarlockApplication _instance;
-	private Timer timer = new Timer();
-	private boolean showMenus = true;
-	private String windowTitle = null;
-	private Point initialSize = null;
-	private boolean showCoolBar = false;
+	private WarlockWorkbenchAdvisor advisor;
 	
 	public WarlockApplication ()
 	{
@@ -65,43 +57,6 @@ public class WarlockApplication extends WorkbenchAdvisor implements IApplication
 	public static WarlockApplication instance()
 	{
 		return _instance;
-	}
-	
-	public String getInitialWindowPerspectiveId ()
-	{
-		return WarlockPerspectiveFactory.WARLOCK_PERSPECTIVE_ID;
-	}
-	
-	public void preWindowOpen(IWorkbenchWindowConfigurer configurer)
-	{
-		configurer.setShowPerspectiveBar(false);
-		configurer.setShowProgressIndicator(false);
-		configurer.setShowFastViewBars(false);
-		configurer.setShowCoolBar(showCoolBar);
-		configurer.setShowStatusLine(false);
-		configurer.setShowMenuBar(showMenus);
-		if (windowTitle != null)
-			configurer.setTitle(windowTitle);
-		if (initialSize != null)
-			configurer.setInitialSize(initialSize);
-	}
-	
-	@Override
-	public void initialize(IWorkbenchConfigurer configurer) {
-		configurer.setSaveAndRestore(true);
-	}
-	
-	@Override
-	public IAdaptable getDefaultPageInput() {
-		return this;
-	}
-	
-	public Object getAdapter(Class adapter) {
-		if (adapter.equals(getClass()))
-		{
-			return this;
-		}
-		return null;
 	}
 	
 	private void parseArguments (String[] arguments)
@@ -124,24 +79,6 @@ public class WarlockApplication extends WorkbenchAdvisor implements IApplication
 		}
 	}
 	
-	@Override
-	public void preStartup() {
-		WarlockConfiguration.getMainConfiguration().addConfigurationProvider(WarlockPerspectiveLayout.instance());
-	}
-	
-	@Override
-	public void postStartup() {
-		WarlockPerspectiveLayout.instance().loadBounds();
-	}
-	
-	@Override
-	public boolean preShutdown() {
-		timer.cancel();
-		
-		WarlockPerspectiveLayout.instance().saveLayout();
-		return true;
-	}
-	
 	public Object start(IApplicationContext context) throws Exception {
 		Map args = context.getArguments();
 		String arguments[] = (String[]) args.get(IApplicationContext.APPLICATION_ARGS);
@@ -149,7 +86,8 @@ public class WarlockApplication extends WorkbenchAdvisor implements IApplication
 		parseArguments(arguments);
 		
 		Display display = PlatformUI.createDisplay();
-		int ret = PlatformUI.createAndRunWorkbench(display, this);
+		advisor = new WarlockWorkbenchAdvisor();
+		int ret = PlatformUI.createAndRunWorkbench(display, advisor);
 		
 		//save configuration
 		WarlockConfiguration.saveAll();
@@ -168,24 +106,18 @@ public class WarlockApplication extends WorkbenchAdvisor implements IApplication
 		return startWithProfile;
 	}
 	
-	public Timer getTimer ()
-	{
-		return timer;
+	// This exists solely so that ScriptsWindowHandler can configure the
+	// workbench window it creates.
+	public IWorkbenchWindowConfigurer getWindowConfigurer(IWorkbenchWindow w) {
+		return advisor.getWindowConfigurer(w);
 	}
 
-	public void setShowMenus(boolean showMenus) {
-		this.showMenus = showMenus;
-	}
-
-	public void setWindowTitle(String windowTitle) {
-		this.windowTitle = windowTitle;
-	}
-
-	public void setInitialSize(Point initialSize) {
-		this.initialSize = initialSize;
-	}
-	
-	public void setShowCoolBar(boolean showCoolBar) {
-		this.showCoolBar = showCoolBar;
+	// Generic getAdapter because this is used as a model for the CNF-based
+	// script view.
+	public Object getAdapter(Class adapter) {
+		if (adapter.isInstance(this))
+			return this;
+		else
+			return null;
 	}
 }

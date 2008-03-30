@@ -30,6 +30,7 @@ import org.eclipse.swt.graphics.Point;
 import org.eclipse.ui.IWorkbenchWindow;
 import org.eclipse.ui.PlatformUI;
 import org.eclipse.ui.WorkbenchException;
+import org.eclipse.ui.application.IWorkbenchWindowConfigurer;
 
 import cc.warlock.core.client.IWarlockClient;
 import cc.warlock.rcp.application.ScriptsPerspectiveFactory;
@@ -41,43 +42,40 @@ public class ScriptsWindowHandler extends SimpleCommandHandler implements
 		IHandler {
 	
 	protected static IWorkbenchWindow window;
+	
+	public static void activate() {
+		window.getShell().forceActive();
+	}
+	
+	public static boolean blockClose(IWorkbenchWindow other) {
+		return window != null && !window.equals(other);
+	}
 
 	public Object execute(ExecutionEvent event) throws ExecutionException {
-		IWarlockClient activeClient = Warlock2Plugin.getDefault().getCurrentClient();
-		GameView inFocus = GameView.getGameViewInFocus();
-		if (inFocus != null)
-		{
-			activeClient = inFocus.getWarlockClient();
+		if (window != null) {
+			activate();
+			return null;
 		}
 		
-		if (window == null) {
-			try {
-				WarlockApplication.instance().setShowMenus(false);
-				WarlockApplication.instance().setWindowTitle("Warlock Scripts");
-				WarlockApplication.instance().setInitialSize(new Point(800, 600));
-				WarlockApplication.instance().setShowCoolBar(true);
-				
-				window = 
-					PlatformUI.getWorkbench().openWorkbenchWindow(ScriptsPerspectiveFactory.PERSPECTIVE_ID, WarlockApplication.instance());
-				
-				// Add Dispose Listener, so that if the window closes, we can clear our static variable
-				DisposeListener listener = new DisposeListener() {
-				    public void widgetDisposed(DisposeEvent event) {
-				        window = null;
-				    }
-				};
-				
-				window.getShell().addDisposeListener(listener);
-				
-				WarlockApplication.instance().setShowMenus(true);
-				
-			} catch (WorkbenchException e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
-			}
-		} else {
-			window.getShell().setFocus();
+		try {
+			window = PlatformUI.getWorkbench().openWorkbenchWindow(ScriptsPerspectiveFactory.PERSPECTIVE_ID, WarlockApplication.instance());
+		} catch (WorkbenchException e) {
+			throw new ExecutionException("Unable to create script editor window", e);
 		}
+		IWorkbenchWindowConfigurer c = WarlockApplication.instance().getWindowConfigurer(window);
+		c.setShowMenuBar(false);
+		c.setTitle("Warlock Scripts");
+		c.setInitialSize(new Point(600, 400));
+		c.setShowCoolBar(true);
+		
+		// Add Dispose Listener, so that if the window closes, we can clear our static variable
+		DisposeListener listener = new DisposeListener() {
+		    public void widgetDisposed(DisposeEvent event) {
+		        window = null;
+		    }
+		};
+		
+		window.getShell().addDisposeListener(listener);
 		
 		return null;
 	}

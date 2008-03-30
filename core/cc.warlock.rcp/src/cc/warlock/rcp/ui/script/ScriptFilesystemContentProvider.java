@@ -87,11 +87,7 @@ public class ScriptFilesystemContentProvider implements ITreeContentProvider
 		}
 		else if (element.equals(LOCAL_SCRIPTS))
 		{
-			IFilesystemScriptProvider provider = getFilesystemScriptProvider();
-			if (provider != null)
-			{
-				return true;
-			}
+			return (getFilesystemScriptProvider() != null);
 		}
 		
 		return false;

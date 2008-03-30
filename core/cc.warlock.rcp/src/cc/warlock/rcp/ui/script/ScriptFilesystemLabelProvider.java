@@ -66,7 +66,7 @@ public class ScriptFilesystemLabelProvider implements ILabelProvider
 	public void dispose() {	}
 
 	public boolean isLabelProperty(Object element, String property) {
-		return true;
+		return false;
 	}
 
 	public void removeListener(ILabelProviderListener listener) {	}
