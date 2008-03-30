@@ -352,7 +352,7 @@
                      value="cc.warlock.core.script.IScriptInfo">
                </instanceof>
                <instanceof
-                     value="cc.warlock.rcp.application.WarlockApplication">
+                     value="java.lang.String">
                </instanceof>
             </or>
          </possibleChildren>
