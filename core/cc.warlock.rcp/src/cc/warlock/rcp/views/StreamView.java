@@ -23,8 +23,10 @@ package cc.warlock.rcp.views;
 
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.Hashtable;
+import java.util.Map;
 import java.util.regex.MatchResult;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -88,7 +90,7 @@ public class StreamView extends ViewPart implements IStreamListener, IGameViewFo
 	protected String prompt;
 	protected boolean multiClient = false;
 	
-	protected HashMap<IWarlockClient, WarlockString> textBuffers = new HashMap<IWarlockClient, WarlockString>();
+	private Map<IWarlockClient, WarlockString> textBuffers = Collections.synchronizedMap(new HashMap<IWarlockClient, WarlockString>());
 	
 	public StreamView() {
 		openViews.add(this);
@@ -300,10 +302,13 @@ public class StreamView extends ViewPart implements IStreamListener, IGameViewFo
 	
 	protected void bufferText (IWarlockClient client, WarlockString string)
 	{
-		WarlockString bufferedText = textBuffers.get(client);
-		if(bufferedText == null) {
-			bufferedText = new WarlockString();
-			textBuffers.put(client, bufferedText);
+		WarlockString bufferedText;
+		synchronized(textBuffers) {
+			bufferedText = textBuffers.get(client);
+			if(bufferedText == null) {
+				bufferedText = new WarlockString();
+				textBuffers.put(client, bufferedText);
+			}
 		}
 
 		bufferedText.append(string);
@@ -405,12 +410,15 @@ public class StreamView extends ViewPart implements IStreamListener, IGameViewFo
 			IWarlockClient client = stream.getClient();
 			
 			WarlockString text = new WarlockString();
-			WarlockString bufferedText = textBuffers.get(client);
 			
-			if (bufferedText != null)
-			{
-				text.append(bufferedText);
-				textBuffers.remove(client);
+			WarlockString bufferedText;
+			synchronized(textBuffers) {
+				bufferedText = textBuffers.get(client);
+				if (bufferedText != null)
+				{
+					text.append(bufferedText);
+					textBuffers.remove(client);
+				}
 			}
 			
 			if (!GameViewConfiguration.instance().getSuppressPrompt()) {
@@ -495,10 +503,12 @@ public class StreamView extends ViewPart implements IStreamListener, IGameViewFo
 	}
 	
 	public void streamFlush(IStream stream) {
-		WarlockString bufferedText = textBuffers.get(stream.getClient());
-		if(bufferedText != null) {
-			appendText(stream.getClient(), bufferedText);
-			textBuffers.remove(stream.getClient());
+		synchronized(textBuffers) {
+			WarlockString bufferedText = textBuffers.get(stream.getClient());
+			if(bufferedText != null) {
+				appendText(stream.getClient(), bufferedText);
+				textBuffers.remove(stream.getClient());
+			}
 		}
 	}
 	
