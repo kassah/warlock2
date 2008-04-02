@@ -45,7 +45,7 @@ public class MatchList extends ScriptableObject {
 	public void jsConstructor() {
 		JavascriptCommands jsCommands = (JavascriptCommands)this.getParentScope().get("script", this.getParentScope());
 		script = jsCommands.getScript();
-		queue = script.getCommands().getLineQueue();
+		queue = script.getCommands().createLineQueue();
 	}
 	
 	private class JSMatchData implements Runnable {

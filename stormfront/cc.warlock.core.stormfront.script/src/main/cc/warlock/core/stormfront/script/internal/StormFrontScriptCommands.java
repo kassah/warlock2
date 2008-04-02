@@ -132,7 +132,9 @@ public class StormFrontScriptCommands extends ScriptCommands implements IStormFr
 					}
 				}
 			}
-			textWaiters.remove(queue);
+			synchronized(textWaiters) {
+				textWaiters.remove(queue);
+			}
 		}
 	}
 	

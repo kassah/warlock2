@@ -734,7 +734,7 @@ public class WSLScript extends AbstractScript {
 				matches.add(match);
 				matchData.put(match, new WSLRegexMatchData(m.group(1), match));
 				if(matchQueue == null) {
-					matchQueue = scriptCommands.getLineQueue();
+					matchQueue = scriptCommands.createLineQueue();
 				}
 			} else {
 				scriptError("Invalid arguments to matchre");
@@ -764,7 +764,7 @@ public class WSLScript extends AbstractScript {
 				matches.add(match);
 				matchData.put(match, new WSLTextMatchData(m.group(1)));
 				if(matchQueue == null) {
-					matchQueue = scriptCommands.getLineQueue();
+					matchQueue = scriptCommands.createLineQueue();
 				}
 			} else {
 				scriptError("Invalid arguments to match");

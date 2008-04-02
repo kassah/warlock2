@@ -39,7 +39,7 @@ public interface IScriptCommands extends IRoomListener {
 	
 	public void waitNextRoom ();
 	
-	public BlockingQueue<String> getLineQueue();
+	public BlockingQueue<String> createLineQueue();
 	
 	public IMatch matchWait (Collection<IMatch> matches, BlockingQueue<String> matchQueue, double timeout);
 	

@@ -79,7 +79,7 @@ public class ScriptCommands implements IScriptCommands, IStreamListener, IRoomLi
 		client.getDefaultStream().echo("[" + scriptName + "]: " + text + "\n");
 	}
 	
-	public BlockingQueue<String> getLineQueue() {
+	public BlockingQueue<String> createLineQueue() {
 		LinkedBlockingQueue<String> queue = new LinkedBlockingQueue<String>();
 		synchronized(textWaiters) {
 			if(!textWaiters.contains(queue)) {
@@ -230,6 +230,7 @@ public class ScriptCommands implements IScriptCommands, IStreamListener, IRoomLi
 		} finally {
 			lock.unlock();
 		}
+		receiveLine(prompt);
 	}
 	
 	public void streamReceivedCommand (IStream stream, String text) {
