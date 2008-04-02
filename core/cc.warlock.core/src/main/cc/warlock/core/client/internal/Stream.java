@@ -26,7 +26,7 @@ package cc.warlock.core.client.internal;
 
 import java.util.ArrayList;
 import java.util.Collection;
-import java.util.Hashtable;
+import java.util.HashMap;
 import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReentrantReadWriteLock;
 
@@ -44,7 +44,7 @@ import cc.warlock.core.client.WarlockString;
  */
 public class Stream implements IStream {
 	
-	protected static Hashtable<String, Stream> streams = new Hashtable<String, Stream>();
+	protected static final HashMap<String, Stream> streams = new HashMap<String, Stream>();
 	protected IWarlockClient client;
 	
 	protected IProperty<String> streamName, streamTitle;
