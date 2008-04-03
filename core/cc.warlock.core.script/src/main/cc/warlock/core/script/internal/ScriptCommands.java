@@ -56,6 +56,7 @@ public class ScriptCommands implements IScriptCommands, IStreamListener, IRoomLi
 	
 	protected final Condition nextRoom = lock.newCondition();
 	protected final Condition gotPromptCond = lock.newCondition();
+	protected boolean gotPrompt;
 	
 	private List<Thread> scriptThreads = Collections.synchronizedList(new ArrayList<Thread>());
 	
@@ -63,6 +64,7 @@ public class ScriptCommands implements IScriptCommands, IStreamListener, IRoomLi
 	{
 		this.client = client;
 		this.scriptName = scriptName;
+		this.gotPrompt = client.getDefaultStream().isPrompting();
 
 		client.getDefaultStream().addStreamListener(this);
 		client.addRoomListener(this);
@@ -121,7 +123,8 @@ public class ScriptCommands implements IScriptCommands, IStreamListener, IRoomLi
 		lock.lock();
 		try {
 			nextRoom.await();
-			gotPromptCond.await();
+			if(!gotPrompt)
+				gotPromptCond.await();
 		} finally {
 			lock.unlock();
 		}
@@ -175,6 +178,7 @@ public class ScriptCommands implements IScriptCommands, IStreamListener, IRoomLi
 	public void streamPrompted(IStream stream, String prompt) {
 		lock.lock();
 		try {
+			gotPrompt = true;
 			gotPromptCond.signalAll();
 		} finally {
 			lock.unlock();
@@ -183,10 +187,12 @@ public class ScriptCommands implements IScriptCommands, IStreamListener, IRoomLi
 	}
 	
 	public void streamReceivedCommand (IStream stream, String text) {
+		gotPrompt = false;
 		receiveText(text);
 	}
 	
 	public void streamReceivedText(IStream stream, WarlockString text) {
+		gotPrompt = false;
 		receiveText(text.toString());
 	}
 	
@@ -217,6 +223,9 @@ public class ScriptCommands implements IScriptCommands, IStreamListener, IRoomLi
 	public void nextRoom() {
 		lock.lock();
 		try {
+			// TODO we should probably set gotPrompt to false whenever we get
+			// a tag. This is just to fix the case for moving between rooms.
+			gotPrompt = false;
 			nextRoom.signalAll();
 		} finally {
 			lock.unlock();
@@ -245,13 +254,7 @@ public class ScriptCommands implements IScriptCommands, IStreamListener, IRoomLi
 	
 	public void resume() {
 		this.suspended = false;
-		
-		lock.lock();
-		try {
-			gotResume.signalAll();
-		} finally {
-			lock.unlock();
-		}
+		gotResume.signalAll();
 	}
 
 	public void suspend() {
