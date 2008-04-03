@@ -52,18 +52,17 @@ import cc.warlock.core.stormfront.script.internal.StormFrontScriptCommands;
 
 public class WSLScript extends AbstractScript {
 	
-	protected boolean debugging = false;
-	protected int debugLevel = 1;
-	protected HashMap<String, WSLAbstractCommand> labels = new HashMap<String, WSLAbstractCommand>();
-	protected WSLAbstractCommand nextCommand;
-	protected WSLAbstractCommand curCommand;
+	private boolean debugging = false;
+	private int debugLevel = 1;
+	private HashMap<String, WSLAbstractCommand> labels = new HashMap<String, WSLAbstractCommand>();
+	private WSLAbstractCommand nextCommand;
+	private WSLAbstractCommand curCommand;
 	private String curLine;
-	protected HashMap<String, IWSLValue> globalVariables = new HashMap<String, IWSLValue>();
-	protected HashMap<String, IWSLValue> localVariables = new HashMap<String, IWSLValue>();
-	protected Stack<WSLFrame> callstack = new Stack<WSLFrame>();
-	protected HashMap<String, WSLCommandDefinition> wslCommands = new HashMap<String, WSLCommandDefinition>();
-	protected int pauseLine;
-	protected Thread scriptThread;
+	private HashMap<String, IWSLValue> globalVariables = new HashMap<String, IWSLValue>();
+	private HashMap<String, IWSLValue> localVariables = new HashMap<String, IWSLValue>();
+	private Stack<WSLFrame> callstack = new Stack<WSLFrame>();
+	private HashMap<String, WSLCommandDefinition> wslCommands = new HashMap<String, WSLCommandDefinition>();
+	private Thread scriptThread;
 	private Pattern commandPattern = Pattern.compile("^([\\w]+)(\\s+(.*))?");
 
 	private boolean lastCondition = false;
@@ -267,10 +266,14 @@ public class WSLScript extends AbstractScript {
 			curCommand = commands.get(0);
 			
 			// crazy dance to make sure we're not suspended and not in a roundtime
-			scriptCommands.waitForRoundtime();
-			while(scriptCommands.isSuspended()) {
-				scriptCommands.waitForResume();
+			try {
 				scriptCommands.waitForRoundtime();
+				while(scriptCommands.isSuspended()) {
+					scriptCommands.waitForResume();
+					scriptCommands.waitForRoundtime();
+				}
+			} catch(InterruptedException e) {
+				// Nothing to do
 			}
 			while(curCommand != null && isRunning()) {
 				int index = commands.indexOf(curCommand) + 1;
@@ -279,15 +282,24 @@ public class WSLScript extends AbstractScript {
 				else
 					nextCommand = null;
 				
-				curCommand.execute();
+				try {
+					curCommand.execute();
+				} catch(InterruptedException e) {
+					if(!isRunning())
+						break;
+				}
 				
 				curCommand = nextCommand;
 				
 				// crazy dance to make sure we're not suspended and not in a roundtime
-				scriptCommands.waitForRoundtime();
-				while(scriptCommands.isSuspended()) {
-					scriptCommands.waitForResume();
+				try {
 					scriptCommands.waitForRoundtime();
+					while(scriptCommands.isSuspended()) {
+						scriptCommands.waitForResume();
+						scriptCommands.waitForRoundtime();
+					}
+				} catch(InterruptedException e) {
+					// Nothing to do
 				}
 			}
 			
@@ -342,7 +354,7 @@ public class WSLScript extends AbstractScript {
 		commands.add(command);
 	}
 	
-	public void execute(String line) {
+	protected void execute(String line) throws InterruptedException {
 		curLine = line;
 		Matcher m = commandPattern.matcher(line);
 		
@@ -414,7 +426,7 @@ public class WSLScript extends AbstractScript {
 	
 	abstract protected class WSLCommandDefinition {
 		
-		abstract public void execute(String arguments);
+		abstract public void execute(String arguments) throws InterruptedException;
 		
 	}
 	
@@ -672,7 +684,7 @@ public class WSLScript extends AbstractScript {
 	
 	protected class WSLMatchWait extends WSLCommandDefinition {
 		
-		public void execute (String arguments) {
+		public void execute (String arguments) throws InterruptedException {
 			double time;
 			
 			if(arguments.trim().length() > 0) {
@@ -887,7 +899,7 @@ public class WSLScript extends AbstractScript {
 
 		private Pattern format = Pattern.compile("^/([^/]*)/(\\w*)");
 
-		public void execute (String arguments) {
+		public void execute (String arguments) throws InterruptedException {
 			Matcher m = format.matcher(arguments);
 			
 			if (m.find())
@@ -912,7 +924,7 @@ public class WSLScript extends AbstractScript {
 	
 	protected class WSLWaitFor extends WSLCommandDefinition {
 		
-		public void execute (String arguments) {
+		public void execute (String arguments) throws InterruptedException {
 			if (arguments.length() >= 1)
 			{
 				IMatch match = new TextMatch(arguments);
@@ -926,14 +938,14 @@ public class WSLScript extends AbstractScript {
 
 	protected class WSLWait extends WSLCommandDefinition {
 		
-		public void execute (String arguments) {
+		public void execute (String arguments) throws InterruptedException {
 			scriptCommands.waitForPrompt();
 		}
 	}
 	
 	protected class WSLPut extends WSLCommandDefinition {
 		
-		public void execute(String arguments) {
+		public void execute(String arguments) throws InterruptedException {
 			scriptCommands.put(arguments);
 		}
 	}
@@ -948,7 +960,7 @@ public class WSLScript extends AbstractScript {
 	
 	protected class WSLPause extends WSLCommandDefinition {
 		
-		public void execute (String arguments)
+		public void execute (String arguments) throws InterruptedException
 		{
 			double time;
 			
@@ -970,7 +982,7 @@ public class WSLScript extends AbstractScript {
 	
 	protected class WSLMove extends WSLCommandDefinition {
 		
-		public void execute (String arguments)
+		public void execute (String arguments) throws InterruptedException
 		{
 			scriptCommands.move(arguments);
 		}
@@ -978,7 +990,7 @@ public class WSLScript extends AbstractScript {
 	
 	protected class WSLNextRoom extends WSLCommandDefinition {
 		
-		public void execute (String arguments)
+		public void execute (String arguments) throws InterruptedException
 		{
 			scriptCommands.waitNextRoom();
 		}
@@ -999,7 +1011,7 @@ public class WSLScript extends AbstractScript {
 			this.variableName = variableName;
 		}
 		
-		public void execute (String arguments) {
+		public void execute (String arguments) throws InterruptedException {
 			if (variableExists(variableName) && getVariable(variableName).toString().length() > 0)
 			{
 				WSLScript.this.execute(arguments);
@@ -1106,7 +1118,7 @@ public class WSLScript extends AbstractScript {
 	
 	private class WSLElse extends WSLCommandDefinition {
 		
-		public void execute (String arguments) {
+		public void execute (String arguments) throws InterruptedException {
 			if (!lastCondition)
 			{
 				WSLScript.this.execute(arguments);

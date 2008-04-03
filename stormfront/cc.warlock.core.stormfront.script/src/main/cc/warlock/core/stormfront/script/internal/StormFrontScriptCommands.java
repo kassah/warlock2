@@ -62,7 +62,7 @@ public class StormFrontScriptCommands extends ScriptCommands implements IStormFr
 	}
 	
 	@Override
-	public void put(String text) {
+	public void put(String text) throws InterruptedException {
 		if(typeAhead >= 2)
 			this.waitForPrompt();
 		typeAhead++;
@@ -76,14 +76,10 @@ public class StormFrontScriptCommands extends ScriptCommands implements IStormFr
 		super.streamPrompted(stream, prompt);
 	}
 	
-	public void waitForRoundtime ()
+	public void waitForRoundtime () throws InterruptedException
 	{
-		try {
-			while(sfClient.getRoundtime().get() > 0 && script.isRunning())
-				Thread.sleep((sfClient.getRoundtime().get() + 1) * 1000L);
-		} catch(InterruptedException e) {
-			// we really don't care
-		}
+		while(sfClient.getRoundtime().get() > 0)
+			Thread.sleep((sfClient.getRoundtime().get() + 1) * 1000L);
 	}
 	
 	private Map<IMatch, Runnable> actions = Collections.synchronizedMap(new HashMap<IMatch, Runnable>());

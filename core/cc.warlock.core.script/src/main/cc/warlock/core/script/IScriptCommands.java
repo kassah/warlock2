@@ -29,23 +29,23 @@ import cc.warlock.core.client.IWarlockClient;
 
 public interface IScriptCommands extends IRoomListener {
 
-	public void put (String text);
+	public void put (String text) throws InterruptedException;
 	
 	public void echo (String text);
 	
-	public void move (String direction);
+	public void move (String direction) throws InterruptedException;
 	
-	public void waitFor (IMatch match);
+	public void waitFor (IMatch match) throws InterruptedException;
 	
-	public void waitNextRoom ();
+	public void waitNextRoom () throws InterruptedException;
 	
 	public BlockingQueue<String> createLineQueue();
 	
-	public IMatch matchWait (Collection<IMatch> matches, BlockingQueue<String> matchQueue, double timeout);
+	public IMatch matchWait (Collection<IMatch> matches, BlockingQueue<String> matchQueue, double timeout) throws InterruptedException;
 	
-	public void pause (double seconds);
+	public void pause (double seconds) throws InterruptedException;
 	
-	public void waitForPrompt ();
+	public void waitForPrompt () throws InterruptedException;
 	
 	public IWarlockClient getClient();
 	
@@ -58,5 +58,5 @@ public interface IScriptCommands extends IRoomListener {
 	public void suspend();
 	public void resume();
 	public boolean isSuspended();
-	public void waitForResume();
+	public void waitForResume() throws InterruptedException;
 }

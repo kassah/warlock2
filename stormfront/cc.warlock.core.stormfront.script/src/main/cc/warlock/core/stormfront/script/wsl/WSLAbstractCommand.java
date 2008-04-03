@@ -33,6 +33,6 @@ abstract public class WSLAbstractCommand {
 		return lineNumber;
 	}
 	
-	abstract public void execute();
+	abstract public void execute() throws InterruptedException;
 
 }

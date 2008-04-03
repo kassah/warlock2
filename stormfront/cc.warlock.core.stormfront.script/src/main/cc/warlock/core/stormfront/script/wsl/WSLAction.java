@@ -43,7 +43,11 @@ public class WSLAction extends WSLAbstractCommand {
 		
 		public void run() {
 			script.setVariablesFromMatch((RegexMatch)match);
-			command.execute();
+			try {
+				command.execute();
+			} catch(InterruptedException e) {
+				// TODO - what to do here?
+			}
 		}
 	}
 	

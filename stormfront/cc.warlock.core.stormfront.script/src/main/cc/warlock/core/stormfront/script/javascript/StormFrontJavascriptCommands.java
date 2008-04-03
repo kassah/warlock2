@@ -72,7 +72,7 @@ public class StormFrontJavascriptCommands extends JavascriptCommands
 	
 	// IStormFrontScriptCommands delegated methods
 	public void addAction(Function action, String text) {
-		checkStop();
+		script.checkStop();
 		
 		RegexMatch match = new RegexMatch(text);
 		JSActionHandler command = new JSActionHandler(action, match);
@@ -80,39 +80,51 @@ public class StormFrontJavascriptCommands extends JavascriptCommands
 	}
 
 	public void removeAction(String text) {
-		checkStop();
+		script.checkStop();
 		
 		sfCommands.removeAction(text);
 	}
 	
 	public void removeAction(IMatch action)
 	{
-		checkStop();
+		script.checkStop();
 		
 		sfCommands.removeAction(action);
 	}
 
 	public void clearActions() {
-		checkStop();
+		script.checkStop();
 		
 		sfCommands.clearActions();
 	}
 
 	public void waitForRoundtime() {
-		checkStop();
+		script.checkStop();
 		
-		sfCommands.waitForRoundtime();
+		try {
+			sfCommands.waitForRoundtime();
+		} catch(InterruptedException e) {
+			script.checkStop();
+		}
 	}
 
 	public void waitNextRoom() {
-		checkStop();
+		script.checkStop();
 		
-		sfCommands.waitNextRoom();
+		try {
+			sfCommands.waitNextRoom();
+		} catch(InterruptedException e) {
+			script.checkStop();
+		}
 	}
 
 	@Override
 	public void pause(double seconds) {
 		super.pause(seconds);
-		sfCommands.waitForRoundtime();
+		try {
+			sfCommands.waitForRoundtime();
+		} catch(InterruptedException e) {
+			script.checkStop();
+		}
 	}
 }

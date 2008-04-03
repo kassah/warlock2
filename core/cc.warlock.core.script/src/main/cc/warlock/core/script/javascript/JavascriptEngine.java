@@ -48,7 +48,7 @@ import cc.warlock.core.script.IScriptFileInfo;
 import cc.warlock.core.script.IScriptInfo;
 import cc.warlock.core.script.ScriptCommandsFactory;
 import cc.warlock.core.script.configuration.ScriptConfiguration;
-import cc.warlock.core.script.javascript.JavascriptCommands.StopException;
+import cc.warlock.core.script.javascript.JavascriptScript.StopException;
 
 
 /**

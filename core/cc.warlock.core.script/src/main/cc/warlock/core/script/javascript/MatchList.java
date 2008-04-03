@@ -108,9 +108,8 @@ public class MatchList extends ScriptableObject {
 	}
 	
 	public IMatch jsFunction_matchRe(String regex, Object f) {
-		if(!script.isRunning()) {
-			throw new Error();
-		}
+		script.checkStop();
+		
 		RegexMatch match = new RegexMatch(regex);
 		Function function = null;
 		if (function != null && function instanceof Function)
@@ -122,18 +121,22 @@ public class MatchList extends ScriptableObject {
 	}
 	
 	public IMatch jsFunction_matchWait() {
-		if(!script.isRunning()) {
-			throw new Error();
-		}
-		IMatch match = script.getCommands().matchWait(matches.keySet(), queue, 0.0);
+		script.checkStop();
 		
-		if (match != null)
-		{
-//			script.getCommands().echo("Got a match!");
-			matches.get(match).run();
-		}
+		try {
+			IMatch match = script.getCommands().matchWait(matches.keySet(), queue, 0.0);
 		
-		return match;
+			if (match != null)
+			{
+//				script.getCommands().echo("Got a match!");
+				matches.get(match).run();
+			}
+
+			return match;
+		} catch(InterruptedException e) {
+			script.checkStop();
+			return null;
+		}
 	}
 	
 	@Override

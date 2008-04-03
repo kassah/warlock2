@@ -54,12 +54,8 @@ public class ScriptCommands implements IScriptCommands, IStreamListener, IRoomLi
 	
 	protected Collection<IMatch> matches = new ArrayList<IMatch>();
 	
-	
 	protected final Condition nextRoom = lock.newCondition();
-	protected boolean roomWaiting = false;
-	
 	protected final Condition gotPromptCond = lock.newCondition();
-	protected boolean gotPrompt = false;
 	
 	private List<Thread> scriptThreads = Collections.synchronizedList(new ArrayList<Thread>());
 	
@@ -67,7 +63,6 @@ public class ScriptCommands implements IScriptCommands, IStreamListener, IRoomLi
 	{
 		this.client = client;
 		this.scriptName = scriptName;
-		this.gotPrompt = client.getDefaultStream().isPrompting();
 
 		client.getDefaultStream().addStreamListener(this);
 		client.addRoomListener(this);
@@ -87,7 +82,7 @@ public class ScriptCommands implements IScriptCommands, IStreamListener, IRoomLi
 		return queue;
 	}
 	
-	public IMatch matchWait (Collection<IMatch> matches, BlockingQueue<String> matchQueue, double timeout) {
+	public IMatch matchWait (Collection<IMatch> matches, BlockingQueue<String> matchQueue, double timeout) throws InterruptedException {
 		try {
 			boolean ignoreTimeout = timeout <= 0.0;
 			// run until we get a match or are told to stop
@@ -110,60 +105,41 @@ public class ScriptCommands implements IScriptCommands, IStreamListener, IRoomLi
 					}
 				}
 			}
-		} catch(InterruptedException e) {
-			// Nothing to do
 		} finally {
-			synchronized(textWaiters) {
-				textWaiters.remove(matchQueue);
-			}
+			textWaiters.remove(matchQueue);
 		}
 
 		return null;
 	}
 
-	public void move (String direction) {
+	public void move (String direction) throws InterruptedException {
 		put(direction);
 		waitNextRoom();
 	}
 
-	public void waitNextRoom () {
+	public void waitNextRoom () throws InterruptedException {
 		lock.lock();
 		try {
-			roomWaiting = true;
-			while (roomWaiting) {
-				nextRoom.await();
-			}
-			roomWaiting = false;
-			while(!gotPrompt) {
-				gotPromptCond.await();
-			}
-		} catch(InterruptedException e) {
-			// don't care
+			nextRoom.await();
+			gotPromptCond.await();
 		} finally {
-			roomWaiting = false;
 			lock.unlock();
 		}
 	}
 
-	public void pause (double seconds) {
-		try {
-			Thread.sleep((long)(seconds * 1000.0));
-		} catch(InterruptedException e) {
-			// we really don't care
-		}
+	public void pause (double seconds) throws InterruptedException {
+		Thread.sleep((long)(seconds * 1000.0));
 	}
 	
-	public void put (String text) {
+	public void put (String text) throws InterruptedException {
 		client.send("[" + scriptName + "]: ", text);
 	}
 
-	public void waitFor (IMatch match) {
+	public void waitFor (IMatch match) throws InterruptedException {
 		LinkedBlockingQueue<String> queue = new LinkedBlockingQueue<String>();
 		String text = null;
 
-		synchronized(textWaiters) {
-			textWaiters.add(queue);
-		}
+		textWaiters.add(queue);
 		try {
 			while(true) {
 				while(text == null) {
@@ -174,21 +150,15 @@ public class ScriptCommands implements IScriptCommands, IStreamListener, IRoomLi
 				}
 				text = null;
 			}
-		} catch(InterruptedException e) {
-			// Nothing to do
 		} finally {
-			synchronized(textWaiters) {
-				textWaiters.remove(queue);
-			}
+			textWaiters.remove(queue);
 		}
 	}
 
-	public void waitForPrompt () {
+	public void waitForPrompt () throws InterruptedException {
 		lock.lock();
 		try {
 			gotPromptCond.await();
-		} catch(Exception e) {
-			e.printStackTrace();
 		} finally {
 			lock.unlock();
 		}
@@ -203,12 +173,9 @@ public class ScriptCommands implements IScriptCommands, IStreamListener, IRoomLi
 	public void streamFlush(IStream stream) {}
 	
 	public void streamPrompted(IStream stream, String prompt) {
-		gotPrompt = true;
 		lock.lock();
 		try {
 			gotPromptCond.signalAll();
-		} catch(Exception e) {
-			e.printStackTrace();
 		} finally {
 			lock.unlock();
 		}
@@ -216,12 +183,10 @@ public class ScriptCommands implements IScriptCommands, IStreamListener, IRoomLi
 	}
 	
 	public void streamReceivedCommand (IStream stream, String text) {
-		gotPrompt = false;
 		receiveText(text);
 	}
 	
 	public void streamReceivedText(IStream stream, WarlockString text) {
-		gotPrompt = false;
 		receiveText(text.toString());
 	}
 	
@@ -252,10 +217,6 @@ public class ScriptCommands implements IScriptCommands, IStreamListener, IRoomLi
 	public void nextRoom() {
 		lock.lock();
 		try {
-			// TODO we should probably set gotPrompt to false whenever we get
-			// a tag. This is just to fix the case for moving between rooms.
-			gotPrompt = false;
-			roomWaiting = false;
 			nextRoom.signalAll();
 		} finally {
 			lock.unlock();
@@ -277,8 +238,6 @@ public class ScriptCommands implements IScriptCommands, IStreamListener, IRoomLi
 				for(Thread scriptThread : scriptThreads)
 					scriptThread.interrupt();
 			}
-		} catch(Exception e) {
-			e.printStackTrace();
 		} finally {
 			lock.unlock();
 		}
@@ -290,8 +249,6 @@ public class ScriptCommands implements IScriptCommands, IStreamListener, IRoomLi
 		lock.lock();
 		try {
 			gotResume.signalAll();
-		} catch(Exception e) {
-			e.printStackTrace();
 		} finally {
 			lock.unlock();
 		}
@@ -305,13 +262,11 @@ public class ScriptCommands implements IScriptCommands, IStreamListener, IRoomLi
 		return suspended;
 	}
 	
-	public void waitForResume() {
+	public void waitForResume() throws InterruptedException {
 		while(suspended) {
 			lock.lock();
 			try {
 				gotResume.await();
-			} catch(Exception e) {
-				e.printStackTrace();
 			} finally {
 				lock.unlock();
 			}
@@ -319,14 +274,10 @@ public class ScriptCommands implements IScriptCommands, IStreamListener, IRoomLi
 	}
 	
 	public void addThread(Thread thread) {
-		synchronized(scriptThreads) {
-			scriptThreads.add(thread);
-		}
+		scriptThreads.add(thread);
 	}
 	
 	public void removeThread(Thread thread) {
-		synchronized(scriptThreads) {
-			scriptThreads.remove(thread);
-		}
+		scriptThreads.remove(thread);
 	}
 }

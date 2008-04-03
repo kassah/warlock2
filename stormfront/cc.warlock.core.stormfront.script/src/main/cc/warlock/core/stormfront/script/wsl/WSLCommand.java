@@ -32,7 +32,7 @@ public class WSLCommand extends WSLAbstractCommand {
 		this.value = value;
 	}
 	
-	public void execute() {
+	public void execute() throws InterruptedException {
 		 // we can have empty commands at labels
 		if(value == null)
 			return;

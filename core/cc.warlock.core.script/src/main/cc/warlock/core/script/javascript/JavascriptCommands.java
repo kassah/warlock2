@@ -46,35 +46,28 @@ public class JavascriptCommands {
 	private int nextTimerID = 1;
 	private Timer timer = new Timer();
 	
-	public class StopException extends Error { }
+	
 	
 	public JavascriptCommands(IScriptCommands commands, JavascriptScript script) {
 		this.commands = commands;
 		this.script = script;
 	}
-
-	protected void checkStop() {
-		if(!script.isRunning())
-			throw new StopException();
-		if(commands.isSuspended())
-			commands.waitForResume();
-	}
 	
 	public void echo(String text) {
-		checkStop();
+		script.checkStop();
 		
 		commands.echo(text);
 	}
 	
 	public void echo() {
-		checkStop();
+		script.checkStop();
 		
 		commands.echo("");
 	}
 
 	public void include (String otherScript)
 	{
-		checkStop();
+		script.checkStop();
 		
 		if (script.getScriptInfo() instanceof IScriptFileInfo)
 		{
@@ -106,54 +99,74 @@ public class JavascriptCommands {
 	}
 
 	public void move(String direction) {
-		checkStop();
+		script.checkStop();
 		
-		commands.move(direction);
+		try {
+			commands.move(direction);
+		} catch(InterruptedException e) {
+			script.checkStop();
+		}
 	}
 
 	public void pause(double seconds) {
-		checkStop();
+		script.checkStop();
 		
-		commands.pause(seconds);
+		try {
+			commands.pause(seconds);
+		} catch(InterruptedException e) {
+			script.checkStop();
+		}
 	}
 
 	public void put(String text) {
-		checkStop();
+		script.checkStop();
 		
-		commands.put(text);
+		try {
+			commands.put(text);
+		} catch(InterruptedException e) {
+			script.checkStop();
+		}
 	}
 	
 	public void waitFor(String string)
 	{
-		checkStop();
+		script.checkStop();
 		
 		waitFor(new TextMatch(string, true));
 	}
 	
 	// Default to case sensitivity
 	public void waitForRe(String string) {
-		checkStop();
+		script.checkStop();
 		
 		waitForRe(string, false);
 	}
 	
 	public void waitForRe(String string, Boolean ignoreCase)
 	{
-		checkStop();
+		script.checkStop();
 		
 		waitFor(new RegexMatch(string, ignoreCase));
 	}
 
 	public void waitFor(IMatch match) {
-		checkStop();
+		script.checkStop();
 		
-		commands.waitFor(match);
+		try {
+			commands.waitFor(match);
+		} catch(InterruptedException e) {
+			script.checkStop();
+		}
 	}
 
 	public void waitForPrompt() {
-		checkStop();
+		script.checkStop();
 		
-		commands.waitForPrompt();
+		try {
+			commands.waitForPrompt();
+		} catch(InterruptedException e) {
+			script.checkStop();
+		}
 	}
 
 	public void exit() throws Error {
@@ -164,7 +177,7 @@ public class JavascriptCommands {
 	
 	public IScriptCommands getScriptCommands ()
 	{
-		checkStop();
+		script.checkStop();
 		
 		return commands;
 	}
@@ -196,7 +209,7 @@ public class JavascriptCommands {
 	}
 	
 	public int setInterval(String command, long interval) {
-		checkStop();
+		script.checkStop();
 		
 		int id = nextTimerID++;
 		
@@ -208,7 +221,7 @@ public class JavascriptCommands {
 	}
 	
 	public int setTimeout(String command, long timeout) {
-		checkStop();
+		script.checkStop();
 		
 		int id = nextTimerID++;
 		

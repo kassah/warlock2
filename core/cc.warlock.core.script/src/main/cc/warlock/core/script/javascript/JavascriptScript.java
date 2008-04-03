@@ -50,6 +50,8 @@ public class JavascriptScript extends AbstractScript {
 	private Context context;
 	private IScriptCommands commands;
 	
+	public class StopException extends Error { }
+	
 	public JavascriptScript (JavascriptEngine engine, IScriptInfo info, IWarlockClient client, IScriptCommands commands)
 	{
 		super(info, client);
@@ -83,4 +85,16 @@ public class JavascriptScript extends AbstractScript {
 	}
 	
 	public void execute(String command) { }
+	
+	public void checkStop() {
+		if(commands.isSuspended()) {
+			try {
+				commands.waitForResume();
+			} catch(InterruptedException e) {
+				// Nothing to do
+			}
+		}
+		if(!isRunning())
+			throw new StopException();
+	}
 }

@@ -34,7 +34,7 @@ public class WSLCondition extends WSLAbstractCommand {
 		this.command = command;
 	}
 	
-	public void execute() {
+	public void execute() throws InterruptedException {
 		boolean cond = condition.toBoolean();
 		script.setLastCondition(cond);
 		if(cond)
