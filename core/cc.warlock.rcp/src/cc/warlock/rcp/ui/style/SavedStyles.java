@@ -29,7 +29,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.net.URL;
 import java.util.Collection;
-import java.util.Hashtable;
+import java.util.HashMap;
 import java.util.Properties;
 
 import org.eclipse.swt.graphics.Color;
@@ -39,7 +39,8 @@ import cc.warlock.core.configuration.ConfigurationUtil;
 
 public class SavedStyles {
 
-	private static Hashtable<String,Style> styles = new Hashtable<String,Style>();
+	// TODO - determine if styles should be synchronized
+	private static HashMap<String,Style> styles = new HashMap<String,Style>();
 	private static Properties props = new Properties();
 	
 	public static final String STYLE_MAIN_WINDOW = "mainWindow";
@@ -80,12 +81,14 @@ public class SavedStyles {
 					String styleName = elements[1];
 					String propertyName = elements[2];
 					
-					if (!styles.containsKey(styleName)) {
-						styles.put(styleName, new Style());
-						styles.get(styleName).setStyleName(styleName);
+					Style style = styles.get(styleName);
+					
+					if (style == null) {
+						style = new Style();
+						style.setStyleName(styleName);
+						styles.put(styleName, style);
 					}
 					
-					Style style = styles.get(styleName);
 					if (FOREGROUND.equals(propertyName) && style.getForeground() == null)
 						style.setForeground(getColorFromStyle(styleName, FOREGROUND));
 					else if (BACKGROUND.equals(propertyName) && style.getBackground() == null)

@@ -21,14 +21,14 @@
  */
 package cc.warlock.rcp.ui.style;
 
-import java.util.Hashtable;
+import java.util.HashMap;
 
 import cc.warlock.core.client.IWarlockClient;
 import cc.warlock.rcp.ui.IStyleProvider;
 
 public class StyleProviders {
 
-	public static Hashtable<IWarlockClient, IStyleProvider> styleProviders = new Hashtable<IWarlockClient, IStyleProvider>();
+	public static HashMap<IWarlockClient, IStyleProvider> styleProviders = new HashMap<IWarlockClient, IStyleProvider>();
 	
 	public static IStyleProvider getStyleProvider (IWarlockClient client)
 	{

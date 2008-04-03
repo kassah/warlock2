@@ -21,7 +21,7 @@
  */
 package cc.warlock.rcp.util;
 
-import java.util.Hashtable;
+import java.util.HashMap;
 
 import org.eclipse.swt.graphics.Color;
 import org.eclipse.swt.graphics.RGB;
@@ -32,9 +32,9 @@ import cc.warlock.core.client.WarlockColor;
 public class ColorUtil {
 
 	// cached associations for minimizing object overhead
-	protected static Hashtable<WarlockColor,Color> cachedColors = new Hashtable<WarlockColor, Color>();
-	protected static Hashtable<WarlockColor,RGB> cachedRGBs = new Hashtable<WarlockColor, RGB>();
-	protected static Hashtable<RGB,WarlockColor> cachedRGBWarlockColors = new Hashtable<RGB,WarlockColor>();
+	protected static HashMap<WarlockColor, Color> cachedColors = new HashMap<WarlockColor, Color>();
+	protected static HashMap<WarlockColor, RGB> cachedRGBs = new HashMap<WarlockColor, RGB>();
+	protected static HashMap<RGB, WarlockColor> cachedRGBWarlockColors = new HashMap<RGB,WarlockColor>();
 	
 	public static WarlockColor rgbToWarlockColor (RGB rgb)
 	{

@@ -21,7 +21,7 @@
  */
 package cc.warlock.core.client.internal;
 
-import java.util.Hashtable;
+import java.util.HashMap;
 import java.util.Map;
 
 import cc.warlock.core.client.ICharacterStatus;
@@ -30,7 +30,7 @@ import cc.warlock.core.client.IWarlockClient;
 
 public class CharacterStatus extends ClientProperty<String> implements ICharacterStatus {
 	
-	protected Map<StatusType, Boolean> status = new Hashtable<StatusType, Boolean>();
+	protected HashMap<StatusType, Boolean> status = new HashMap<StatusType, Boolean>();
 	
 	public CharacterStatus (IWarlockClient client)
 	{

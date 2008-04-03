@@ -26,7 +26,7 @@ import java.io.FileNotFoundException;
 import java.io.FileReader;
 import java.io.Reader;
 import java.util.Arrays;
-import java.util.Hashtable;
+import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Set;
@@ -43,7 +43,8 @@ import cc.warlock.core.script.configuration.ScriptConfiguration;
 
 public class FilesystemScriptProvider implements IFilesystemScriptProvider, Runnable {
 
-	protected Hashtable<ScriptFileInfo, Long> infos = new Hashtable<ScriptFileInfo, Long>();
+	// TODO - determine if infos needs to be synchronized
+	protected HashMap<ScriptFileInfo, Long> infos = new HashMap<ScriptFileInfo, Long>();
 	
 	protected boolean scanning = false, scanFinished = false;
 	protected static FilesystemScriptProvider _instance;

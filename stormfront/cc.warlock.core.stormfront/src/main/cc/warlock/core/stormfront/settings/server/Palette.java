@@ -24,7 +24,7 @@ package cc.warlock.core.stormfront.settings.server;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
-import java.util.Hashtable;
+import java.util.HashMap;
 import java.util.List;
 
 import cc.warlock.core.stormfront.client.StormFrontColor;
@@ -36,7 +36,7 @@ public class Palette extends ServerSetting {
 	public static final String STORMFRONT_MARKUP_PREFIX = "<palette><<m>";
 	public static final String STORMFRONT_MARKUP_SUFFIX = "</<m></palette>";
 	
-	protected Hashtable<String, PaletteEntry> palette = new Hashtable<String, PaletteEntry>();
+	protected HashMap<String, PaletteEntry> palette = new HashMap<String, PaletteEntry>();
 	
 	public Palette (ServerSettings serverSettings, StormFrontElement paletteElement)
 	{

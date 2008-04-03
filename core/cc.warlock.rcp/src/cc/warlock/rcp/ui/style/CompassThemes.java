@@ -25,7 +25,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.net.URL;
 import java.util.Enumeration;
-import java.util.Hashtable;
+import java.util.HashMap;
 import java.util.Properties;
 
 import org.osgi.framework.Bundle;
@@ -36,7 +36,7 @@ import cc.warlock.rcp.plugin.Warlock2Plugin;
 
 public class CompassThemes {
 
-	private static Hashtable<String, CompassTheme> themes = new Hashtable<String, CompassTheme>();
+	private static HashMap<String, CompassTheme> themes = new HashMap<String, CompassTheme>();
 	
 	private static final String THEME_DESCRIPTION = "theme.description";
 	private static final String THEME_TITLE = "theme.title";

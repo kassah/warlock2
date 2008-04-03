@@ -26,7 +26,7 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.UnsupportedEncodingException;
 import java.util.ArrayList;
-import java.util.Hashtable;
+import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
@@ -47,9 +47,9 @@ public class WarlockConfiguration {
 	
 	protected ArrayList<IConfigurationProvider> providers = new ArrayList<IConfigurationProvider>();
 	protected ArrayList<Element> unhandledElements = new ArrayList<Element>();
-	protected Hashtable<Element, IConfigurationProvider> elementProviders = new Hashtable<Element, IConfigurationProvider>();
+	protected HashMap<Element, IConfigurationProvider> elementProviders = new HashMap<Element, IConfigurationProvider>();
 	
-	protected static Hashtable<String, WarlockConfiguration> configurations  = new Hashtable<String, WarlockConfiguration>();
+	protected static HashMap<String, WarlockConfiguration> configurations  = new HashMap<String, WarlockConfiguration>();
 	
 	public static WarlockConfiguration getWarlockConfiguration(String configFilename)
 	{
@@ -127,7 +127,7 @@ public class WarlockConfiguration {
 		{
 			providers.remove(provider);
 			
-			if (elementProviders.contains(provider)) {
+			if (elementProviders.containsValue(provider)) {
 				for (Iterator<Map.Entry<Element,IConfigurationProvider>> iter = elementProviders.entrySet().iterator(); iter.hasNext(); )
 				{
 					Map.Entry<Element, IConfigurationProvider> entry = iter.next();

@@ -29,7 +29,7 @@ package cc.warlock.rcp.ui.macros;
 
 import java.util.ArrayList;
 import java.util.Collection;
-import java.util.Hashtable;
+import java.util.HashMap;
 import java.util.List;
 
 import org.eclipse.core.runtime.CoreException;
@@ -62,13 +62,15 @@ public class MacroRegistry implements IMacroProvider {
 	private static MacroRegistry instance;
 	
 	private ArrayList<IMacro> macros;
-	private Hashtable<String,IMacroVariable> variables;
-	private Hashtable<String,IMacroCommand> commands;
+	
+	// TODO - determine if variables and commands should be synchronized
+	private HashMap<String, IMacroVariable> variables;
+	private HashMap<String, IMacroCommand> commands;
 	
 	MacroRegistry () {
 		macros = new ArrayList<IMacro>();
-		variables = new Hashtable<String,IMacroVariable>();
-		commands = new Hashtable<String,IMacroCommand>();
+		variables = new HashMap<String, IMacroVariable>();
+		commands = new HashMap<String, IMacroCommand>();
 	}
 	
 	protected void init() {

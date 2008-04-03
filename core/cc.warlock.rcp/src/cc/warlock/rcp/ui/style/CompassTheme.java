@@ -21,7 +21,7 @@
  */
 package cc.warlock.rcp.ui.style;
 
-import java.util.Hashtable;
+import java.util.HashMap;
 
 import org.eclipse.swt.graphics.Image;
 import org.eclipse.swt.graphics.Point;
@@ -34,8 +34,8 @@ public class CompassTheme {
 
 	private String name, title, description;
 	private Image mainImage;
-	private Hashtable<DirectionType, Image> directionImages = new Hashtable<DirectionType, Image>();
-	private Hashtable<DirectionType, Point> directionPositions = new Hashtable<DirectionType, Point>();
+	private HashMap<DirectionType, Image> directionImages = new HashMap<DirectionType, Image>();
+	private HashMap<DirectionType, Point> directionPositions = new HashMap<DirectionType, Point>();
 	
 	public String getName() {
 		return name;

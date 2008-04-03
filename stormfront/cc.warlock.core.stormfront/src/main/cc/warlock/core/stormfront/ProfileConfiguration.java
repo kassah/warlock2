@@ -23,7 +23,7 @@ package cc.warlock.core.stormfront;
 
 import java.util.ArrayList;
 import java.util.Collection;
-import java.util.Hashtable;
+import java.util.HashMap;
 import java.util.List;
 
 import org.dom4j.DocumentHelper;
@@ -50,7 +50,8 @@ public class ProfileConfiguration implements IConfigurationProvider {
 		return WarlockConfiguration.getWarlockConfiguration(PROFILE_CONFIGURATION_FILE);
 	}
 	
-	protected Hashtable<String, Account> accounts = new Hashtable<String, Account>();
+	// TODO - determine if accounts should be synchronized
+	protected HashMap<String, Account> accounts = new HashMap<String, Account>();
 	
 	protected ProfileConfiguration () {
 		WarlockConfiguration.getWarlockConfiguration(PROFILE_CONFIGURATION_FILE).addConfigurationProvider(this);

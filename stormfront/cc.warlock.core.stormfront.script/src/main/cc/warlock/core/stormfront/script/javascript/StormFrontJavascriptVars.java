@@ -21,7 +21,7 @@
  */
 package cc.warlock.core.stormfront.script.javascript;
 
-import java.util.Hashtable;
+import java.util.HashMap;
 
 import org.mozilla.javascript.Scriptable;
 
@@ -34,8 +34,8 @@ import cc.warlock.core.stormfront.script.IStormFrontScriptCommands;
 
 public class StormFrontJavascriptVars implements IJavascriptVariableProvider {
 
-	protected Hashtable<JavascriptScript, StormFrontJavascriptCommands> scriptCommands =
-		new Hashtable<JavascriptScript, StormFrontJavascriptCommands>();
+	protected HashMap<JavascriptScript, StormFrontJavascriptCommands> scriptCommands =
+		new HashMap<JavascriptScript, StormFrontJavascriptCommands>();
 	
 	public StormFrontJavascriptVars ()
 	{

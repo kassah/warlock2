@@ -21,7 +21,7 @@
  */
 package cc.warlock.core.stormfront.settings.skin;
 
-import java.util.Hashtable;
+import java.util.HashMap;
 
 import cc.warlock.core.client.IWarlockStyle;
 import cc.warlock.core.client.WarlockColor;
@@ -40,8 +40,9 @@ public class DefaultSkin implements IStormFrontSkin {
 	public static final int DEFAULT_FONT_SIZE = 12;
 	public static final WarlockColor MAIN_COLOR = new WarlockColor(-1, -1, -1);
 	
-	protected Hashtable<String, WarlockColor> fgColors = new Hashtable<String, WarlockColor>();
-	protected Hashtable<String, WarlockColor> bgColors = new Hashtable<String, WarlockColor>();
+	// TODO give these proper size/load since we know their final sizes.
+	protected HashMap<String, WarlockColor> fgColors = new HashMap<String, WarlockColor>();
+	protected HashMap<String, WarlockColor> bgColors = new HashMap<String, WarlockColor>();
 	protected WarlockColor commandLineBarColor;
 	protected IStormFrontClientSettings settings;
 	

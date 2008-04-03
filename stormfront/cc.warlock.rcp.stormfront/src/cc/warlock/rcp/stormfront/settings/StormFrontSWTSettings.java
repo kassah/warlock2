@@ -21,7 +21,7 @@
  */
 package cc.warlock.rcp.stormfront.settings;
 
-import java.util.Hashtable;
+import java.util.HashMap;
 import java.util.List;
 
 import org.eclipse.swt.SWT;
@@ -39,8 +39,8 @@ import cc.warlock.core.stormfront.settings.internal.StormFrontClientSettings;
 @SuppressWarnings("deprecation")
 public class StormFrontSWTSettings implements IStormFrontMacroImporter {
 
-	public static Hashtable<String, Integer> keys = new Hashtable<String, Integer>();
-	public static Hashtable<String, Integer> mods = new Hashtable<String, Integer>();
+	public static HashMap<String, Integer> keys = new HashMap<String, Integer>();
+	public static HashMap<String, Integer> mods = new HashMap<String, Integer>();
 	static {
 		keys.put("Keypad 0", SWT.KEYPAD_0);
 		keys.put("Keypad 1", SWT.KEYPAD_1);

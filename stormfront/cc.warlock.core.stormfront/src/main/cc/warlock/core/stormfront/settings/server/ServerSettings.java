@@ -30,7 +30,6 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
-import java.util.Hashtable;
 import java.util.List;
 import java.util.ListIterator;
 import java.util.Map;
@@ -68,13 +67,13 @@ public class ServerSettings implements Comparable<ServerSettings>
 	private StormFrontDocument document;
 	protected Palette palette;
 	
-	protected Hashtable<String, WindowSettings> windowSettings = new Hashtable<String,WindowSettings>();
+	protected HashMap<String, WindowSettings> windowSettings = new HashMap<String,WindowSettings>();
 	protected CommandLineSettings commandLineSettings;
-	protected Hashtable<String, Preset> presets = new Hashtable<String,Preset>();
+	protected HashMap<String, Preset> presets = new HashMap<String,Preset>();
 	protected ArrayList<HighlightPreset> highlightStrings = new ArrayList<HighlightPreset>();
-	protected Hashtable<String, String> variables = new Hashtable<String, String>();
+	protected HashMap<String, String> variables = new HashMap<String, String>();
 	protected ArrayList<ArrayList<MacroKey>> macroSets = new ArrayList<ArrayList<MacroKey>>();
-	protected Hashtable<String, ServerScript> scripts = new Hashtable<String, ServerScript>();
+	protected HashMap<String, ServerScript> scripts = new HashMap<String, ServerScript>();
 	protected ArrayList<IgnoreSetting> ignores = new ArrayList<IgnoreSetting>();
 	
 	protected HashMap<HighlightPreset, HighlightPreset> deletedHighlightStrings = new HashMap<HighlightPreset, HighlightPreset>();
