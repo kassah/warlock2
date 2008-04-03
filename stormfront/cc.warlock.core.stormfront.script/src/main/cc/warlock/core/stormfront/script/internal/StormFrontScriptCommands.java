@@ -27,8 +27,6 @@ import java.util.Map;
 import java.util.concurrent.LinkedBlockingQueue;
 import java.util.concurrent.TimeUnit;
 
-import cc.warlock.core.client.IProperty;
-import cc.warlock.core.client.IPropertyListener;
 import cc.warlock.core.client.IStream;
 import cc.warlock.core.script.IMatch;
 import cc.warlock.core.script.IScript;
@@ -36,7 +34,7 @@ import cc.warlock.core.script.internal.ScriptCommands;
 import cc.warlock.core.stormfront.client.IStormFrontClient;
 import cc.warlock.core.stormfront.script.IStormFrontScriptCommands;
 
-public class StormFrontScriptCommands extends ScriptCommands implements IStormFrontScriptCommands, IPropertyListener<Integer> {
+public class StormFrontScriptCommands extends ScriptCommands implements IStormFrontScriptCommands {
 
 	protected IStormFrontClient sfClient;
 	protected IScript script;
@@ -46,9 +44,7 @@ public class StormFrontScriptCommands extends ScriptCommands implements IStormFr
 	{
 		super(client, name);
 		this.sfClient = client;
-		waitingForRoundtime = false;
 		
-		client.getRoundtime().addListener(this);
 		client.getDeathsStream().addStreamListener(this);
 		client.getFamiliarStream().addStreamListener(this);
 		client.addRoomListener(this);
@@ -80,71 +76,57 @@ public class StormFrontScriptCommands extends ScriptCommands implements IStormFr
 		super.streamPrompted(stream, prompt);
 	}
 	
-	protected boolean waitingForRoundtime;
 	public void waitForRoundtime ()
 	{
-		if(!interrupted) {
-			try {
-				while(sfClient.getRoundtime().get() > 0 && !interrupted) {
-					super.pause(sfClient.getRoundtime().get() + 1);
-				}
-			} catch(Exception e) {
-				e.printStackTrace();
-			}
+		try {
+			while(sfClient.getRoundtime().get() > 0 && script.isRunning())
+				Thread.sleep((sfClient.getRoundtime().get() + 1) * 1000L);
+		} catch(InterruptedException e) {
+			// we really don't care
 		}
 	}
-	
-	public void propertyActivated(IProperty<Integer> property) {}
-	public void propertyChanged(IProperty<Integer> property, Integer oldValue) {
-		if (property.getName().equals("roundtime"))
-		{
-			if (property.get() == 0) waitingForRoundtime = false;
-		}
-	}
-	
-	public void propertyCleared(IProperty<Integer> property, Integer oldValue) {}
 	
 	private Map<IMatch, Runnable> actions = Collections.synchronizedMap(new HashMap<IMatch, Runnable>());
 	
 	protected  class ScriptActionThread implements Runnable {
 		public void run() {
+			StormFrontScriptCommands.this.addThread(Thread.currentThread());
 			LinkedBlockingQueue<String> queue = new LinkedBlockingQueue<String>();
-			synchronized(textWaiters) {
-				textWaiters.add(queue);
-			}
-			actionLoop: while(true) {
-				String text = null;
+			textWaiters.add(queue);
+			try {
+				actionLoop: while(script.isRunning()) {
+					String text = null;
 
-				while(text == null) {
-					try {
+					while(text == null) {
 						text = queue.poll(100L, TimeUnit.MILLISECONDS);
-						if(actions.size() == 0 || interrupted) {
+						if(actions.size() == 0) {
 							break actionLoop;
 						}
-					} catch(Exception e) {
-						e.printStackTrace();
+					}
+					synchronized(actions) {
+						for(Map.Entry<IMatch, Runnable> action : actions.entrySet()) {
+							if(action.getKey().matches(text))
+								action.getValue().run();
+						}
 					}
 				}
-				synchronized(actions) {
-					for(Map.Entry<IMatch, Runnable> action : actions.entrySet()) {
-						if(action.getKey().matches(text))
-							action.getValue().run();
-					}
-				}
-			}
-			synchronized(textWaiters) {
+			} catch(InterruptedException e) {
+				// nothing to do
+			} finally {
 				textWaiters.remove(queue);
+				StormFrontScriptCommands.this.removeThread(Thread.currentThread());
 			}
 		}
 	}
 	
 	public void addAction(Runnable action, IMatch match) {
-		if(actions.size() == 0) {
-			new Thread(new ScriptActionThread()).start();
-		}
-		
 		synchronized(actions) {
-			actions.put(match, action);
+			if(actions.size() == 0) {
+				actions.put(match, action);
+				new Thread(new ScriptActionThread()).start();
+			} else {
+				actions.put(match, action);
+			}
 		}
 	}
 	
@@ -153,9 +135,7 @@ public class StormFrontScriptCommands extends ScriptCommands implements IStormFr
 	}
 	
 	public void removeAction(IMatch action) {
-		synchronized(actions) {
-			actions.remove(action);
-		}
+		actions.remove(action);
 	}
 	
 	public void removeAction(String text) {

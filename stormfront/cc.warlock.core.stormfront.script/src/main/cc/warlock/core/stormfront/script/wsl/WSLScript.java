@@ -244,6 +244,7 @@ public class WSLScript extends AbstractScript {
 	
 	private class ScriptRunner  implements Runnable {
 		public void run() {
+			scriptCommands.addThread(Thread.currentThread());
 			try {
 				Reader scriptReader = info.openReader();
 				
@@ -265,9 +266,13 @@ public class WSLScript extends AbstractScript {
 			
 			curCommand = commands.get(0);
 			
-			while(curCommand != null && isRunning()) {
+			// crazy dance to make sure we're not suspended and not in a roundtime
+			scriptCommands.waitForRoundtime();
+			while(scriptCommands.isSuspended()) {
 				scriptCommands.waitForResume();
 				scriptCommands.waitForRoundtime();
+			}
+			while(curCommand != null && isRunning()) {
 				int index = commands.indexOf(curCommand) + 1;
 				if(index < commands.size())
 					nextCommand = commands.get(index);
@@ -277,7 +282,13 @@ public class WSLScript extends AbstractScript {
 				curCommand.execute();
 				
 				curCommand = nextCommand;
-				scriptCommands.clearInterrupt();
+				
+				// crazy dance to make sure we're not suspended and not in a roundtime
+				scriptCommands.waitForRoundtime();
+				while(scriptCommands.isSuspended()) {
+					scriptCommands.waitForResume();
+					scriptCommands.waitForRoundtime();
+				}
 			}
 			
 			if(isRunning())

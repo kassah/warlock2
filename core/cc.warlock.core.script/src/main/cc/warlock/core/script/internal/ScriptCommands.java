@@ -61,9 +61,7 @@ public class ScriptCommands implements IScriptCommands, IStreamListener, IRoomLi
 	protected final Condition gotPromptCond = lock.newCondition();
 	protected boolean gotPrompt = false;
 	
-	protected boolean interrupted = false;
-	
-	private List<Thread> pausedThreads = Collections.synchronizedList(new ArrayList<Thread>());
+	private List<Thread> scriptThreads = Collections.synchronizedList(new ArrayList<Thread>());
 	
 	public ScriptCommands (IWarlockClient client, String scriptName)
 	{
@@ -97,19 +95,13 @@ public class ScriptCommands implements IScriptCommands, IStreamListener, IRoomLi
 				String text = null;
 				// wait for some text
 				while(text == null) {
-					try {
-						text = matchQueue.poll(100L, TimeUnit.MILLISECONDS);
-						// if we change the poll timeout, make sure the following line is updated
-						if(!ignoreTimeout) {
-							timeout -= 0.1;
-							if(timeout <= 0)
-								break matchWaitLoop;
-						}
-					} catch(Exception e) {
-						e.printStackTrace();
+					text = matchQueue.poll(100L, TimeUnit.MILLISECONDS);
+					// if we change the poll timeout, make sure the following line is updated
+					if(!ignoreTimeout) {
+						timeout -= 0.1;
+						if(timeout <= 0)
+							break matchWaitLoop;
 					}
-					if(interrupted)
-						break matchWaitLoop;
 				}
 				// try all of our matches
 				for(IMatch match : matches) {
@@ -118,6 +110,8 @@ public class ScriptCommands implements IScriptCommands, IStreamListener, IRoomLi
 					}
 				}
 			}
+		} catch(InterruptedException e) {
+			// Nothing to do
 		} finally {
 			synchronized(textWaiters) {
 				textWaiters.remove(matchQueue);
@@ -136,15 +130,15 @@ public class ScriptCommands implements IScriptCommands, IStreamListener, IRoomLi
 		lock.lock();
 		try {
 			roomWaiting = true;
-			while (!interrupted && roomWaiting) {
+			while (roomWaiting) {
 				nextRoom.await();
 			}
 			roomWaiting = false;
-			while(!interrupted && !gotPrompt) {
+			while(!gotPrompt) {
 				gotPromptCond.await();
 			}
-		} catch(Exception e) {
-			e.printStackTrace();
+		} catch(InterruptedException e) {
+			// don't care
 		} finally {
 			roomWaiting = false;
 			lock.unlock();
@@ -152,18 +146,10 @@ public class ScriptCommands implements IScriptCommands, IStreamListener, IRoomLi
 	}
 
 	public void pause (double seconds) {
-		Thread thread = Thread.currentThread();
 		try {
-			synchronized(pausedThreads) {
-				pausedThreads.add(thread);
-			}
 			Thread.sleep((long)(seconds * 1000.0));
 		} catch(InterruptedException e) {
 			// we really don't care
-		} finally {
-			synchronized(pausedThreads) {
-				pausedThreads.remove(thread);
-			}
 		}
 	}
 	
@@ -179,21 +165,17 @@ public class ScriptCommands implements IScriptCommands, IStreamListener, IRoomLi
 			textWaiters.add(queue);
 		}
 		try {
-			waitForLoop: while(true) {
+			while(true) {
 				while(text == null) {
-					try {
-						text = queue.poll(100L, TimeUnit.MILLISECONDS);
-					} catch(Exception e) {
-						e.printStackTrace();
-					}
-					if(interrupted)
-						break waitForLoop;
+					text = queue.poll(100L, TimeUnit.MILLISECONDS);
 				}
 				if(match.matches(text)) {
 					break;
 				}
 				text = null;
 			}
+		} catch(InterruptedException e) {
+			// Nothing to do
 		} finally {
 			synchronized(textWaiters) {
 				textWaiters.remove(queue);
@@ -291,23 +273,15 @@ public class ScriptCommands implements IScriptCommands, IStreamListener, IRoomLi
 	public void interrupt() {
 		lock.lock();
 		try {
-			interrupted = true;
-			gotPromptCond.signalAll();
-			nextRoom.signalAll();
-			gotResume.signalAll();
-			synchronized(pausedThreads) {
-				for(Thread pausedThread : pausedThreads)
-					pausedThread.interrupt();
+			synchronized(scriptThreads) {
+				for(Thread scriptThread : scriptThreads)
+					scriptThread.interrupt();
 			}
 		} catch(Exception e) {
 			e.printStackTrace();
 		} finally {
 			lock.unlock();
 		}
-	}
-	
-	public void clearInterrupt() {
-		interrupted = false;
 	}
 	
 	public void resume() {
@@ -341,6 +315,18 @@ public class ScriptCommands implements IScriptCommands, IStreamListener, IRoomLi
 			} finally {
 				lock.unlock();
 			}
+		}
+	}
+	
+	public void addThread(Thread thread) {
+		synchronized(scriptThreads) {
+			scriptThreads.add(thread);
+		}
+	}
+	
+	public void removeThread(Thread thread) {
+		synchronized(scriptThreads) {
+			scriptThreads.remove(thread);
 		}
 	}
 }

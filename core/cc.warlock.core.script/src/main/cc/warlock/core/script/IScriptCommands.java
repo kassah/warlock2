@@ -51,8 +51,9 @@ public interface IScriptCommands extends IRoomListener {
 	
 	public void stop();
 	
+	public void addThread(Thread thread);
+	public void removeThread(Thread thread);
 	public void interrupt();
-	public void clearInterrupt();
 	
 	public void suspend();
 	public void resume();
