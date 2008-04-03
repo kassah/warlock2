@@ -253,8 +253,13 @@ public class ScriptCommands implements IScriptCommands, IStreamListener, IRoomLi
 	}
 	
 	public void resume() {
-		this.suspended = false;
-		gotResume.signalAll();
+		lock.lock();
+		try {
+			suspended = false;
+			gotResume.signalAll();
+		} finally {
+			lock.unlock();
+		}
 	}
 
 	public void suspend() {
