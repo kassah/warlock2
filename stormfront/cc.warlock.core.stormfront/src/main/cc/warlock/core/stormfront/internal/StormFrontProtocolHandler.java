@@ -164,7 +164,7 @@ public class StormFrontProtocolHandler implements IStormFrontProtocolHandler {
 	{
 		try {
 			return streamStack.peek().stream;
-		} catch(Exception e) {
+		} catch(EmptyStackException e) {
 			return client.getDefaultStream();
 		}
 	}
@@ -235,10 +235,10 @@ public class StormFrontProtocolHandler implements IStormFrontProtocolHandler {
 			if(newLine && !tagHandler.ignoreNewlines()) {
 				characters("\n");
 			}
-		} else {
+		} /* else {
 			if (rawXML != null)
 				characters(rawXML);
-		}
+		} */
 	}
 	
 	/* (non-Javadoc)
@@ -257,10 +257,10 @@ public class StormFrontProtocolHandler implements IStormFrontProtocolHandler {
 			if(newLine && !tagHandler.ignoreNewlines()) {
 				characters("\n");
 			}
-		} else {
+		} /*else {
 			if(rawXML != null)
 				characters(rawXML);
-		}
+		}*/
 	}
 	
 	private IStormFrontTagHandler getTagHandlerForElement(String name,
