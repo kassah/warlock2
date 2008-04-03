@@ -46,8 +46,6 @@ public class JavascriptCommands {
 	private int nextTimerID = 1;
 	private Timer timer = new Timer();
 	
-	
-	
 	public JavascriptCommands(IScriptCommands commands, JavascriptScript script) {
 		this.commands = commands;
 		this.script = script;

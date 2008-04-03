@@ -34,7 +34,9 @@ import cc.warlock.core.script.internal.RegexMatch;
 import cc.warlock.core.script.internal.TextMatch;
 
 public class MatchList extends ScriptableObject {
-
+	
+	private static final long serialVersionUID = 2034366988104765649L;
+	
 	private HashMap<IMatch, Runnable> matches = new HashMap<IMatch, Runnable>();
 	private BlockingQueue<String> queue;
 	private JavascriptScript script;

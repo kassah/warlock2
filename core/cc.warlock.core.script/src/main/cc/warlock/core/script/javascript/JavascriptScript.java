@@ -50,7 +50,9 @@ public class JavascriptScript extends AbstractScript {
 	private Context context;
 	private IScriptCommands commands;
 	
-	public class StopException extends Error { }
+	public class StopException extends Error {
+		private static final long serialVersionUID = 5687999229834097094L;
+	}
 	
 	public JavascriptScript (JavascriptEngine engine, IScriptInfo info, IWarlockClient client, IScriptCommands commands)
 	{
