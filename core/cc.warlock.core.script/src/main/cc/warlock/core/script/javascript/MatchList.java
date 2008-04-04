@@ -79,8 +79,8 @@ public class MatchList extends ScriptableObject {
 		}
 		TextMatch match = new TextMatch(text, true);
 		Function function = null;
-		if (function != null && function instanceof Function)
-			function = (Function)function;
+		if (f != null && f instanceof Function)
+			function = (Function)f;
 		
 		matches.put(match, new JSMatchData(function, null));
 		
@@ -114,8 +114,8 @@ public class MatchList extends ScriptableObject {
 		
 		RegexMatch match = new RegexMatch(regex);
 		Function function = null;
-		if (function != null && function instanceof Function)
-			function = (Function)function;
+		if (f != null && f instanceof Function)
+			function = (Function)f;
 		
 		matches.put(match, new JSRegexMatchData(match, function, null));
 		
