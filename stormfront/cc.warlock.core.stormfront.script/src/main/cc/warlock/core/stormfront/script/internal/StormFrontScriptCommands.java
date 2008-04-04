@@ -95,14 +95,11 @@ public class StormFrontScriptCommands extends ScriptCommands implements IStormFr
 			addThread(this);
 			LinkedBlockingQueue<String> queue = new LinkedBlockingQueue<String>();
 			textWaiters.add(queue);
-			try {
-				while(script.isRunning() && actions.size() > 0) {
+
+			while(true) {
+				try {
 					String text = null;
-					try {
-						text = queue.take();
-					} catch(InterruptedException e) {
-						continue;
-					}
+					text = queue.take();
 
 					synchronized(actions) {
 						for(Map.Entry<IMatch, Runnable> action : actions.entrySet()) {
@@ -110,11 +107,18 @@ public class StormFrontScriptCommands extends ScriptCommands implements IStormFr
 								action.getValue().run();
 						}
 					}
+				}  catch(InterruptedException e) {
+					// nothing to do
+				} finally {
+					synchronized(actions) {
+						if(!script.isRunning() || actions.size() == 0) {
+							textWaiters.remove(queue);
+							removeThread(this);
+							actionThread = null;
+							break;
+						}
+					}
 				}
-			} finally {
-				textWaiters.remove(queue);
-				removeThread(this);
-				actionThread = null;
 			}
 		}
 	}
