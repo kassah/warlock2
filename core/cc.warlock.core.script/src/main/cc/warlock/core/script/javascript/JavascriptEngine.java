@@ -136,7 +136,6 @@ public class JavascriptEngine implements IScriptEngine {
 	protected static String includeFunctionName = "<warlock js:include>";
 	
 
-	
 	public IScript startScript(IScriptInfo info, final IWarlockClient client, final String[] arguments) {
 		// FIXME need to somehow get dependent IScriptCommands to pass into the following constructor
 		
@@ -149,6 +148,7 @@ public class JavascriptEngine implements IScriptEngine {
 		new Thread(new Runnable() {
 			
 			public void run () {
+				script.getCommands().addThread(Thread.currentThread());
 				Context context = Context.enter();
 				try {
 					script.setContext(context);
@@ -188,6 +188,7 @@ public class JavascriptEngine implements IScriptEngine {
 					client.getDefaultStream().echo("[unhandled exception in script: " + script.getName() + "]\n");
 				}
 				finally {
+					script.getCommands().removeThread(Thread.currentThread());
 					if(script.isRunning()) {
 						script.stop();
 					}
