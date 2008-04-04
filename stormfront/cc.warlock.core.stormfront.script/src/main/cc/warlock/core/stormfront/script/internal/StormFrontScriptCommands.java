@@ -38,9 +38,14 @@ public class StormFrontScriptCommands extends ScriptCommands implements IStormFr
 
 	protected IStormFrontClient sfClient;
 	protected IScript script;
+	
 	private int typeAhead = 0;
 	
-	public StormFrontScriptCommands (IStormFrontClient client, String name)
+	private Map<IMatch, Runnable> actions =
+		Collections.synchronizedMap(new HashMap<IMatch, Runnable>());
+	private Thread actionThread = null;
+	
+	public StormFrontScriptCommands(IStormFrontClient client, String name)
 	{
 		super(client, name);
 		this.sfClient = client;
@@ -50,7 +55,7 @@ public class StormFrontScriptCommands extends ScriptCommands implements IStormFr
 		client.addRoomListener(this);
 	}
 	
-	public StormFrontScriptCommands (IStormFrontClient client, IScript script)
+	public StormFrontScriptCommands(IStormFrontClient client, IScript script)
 	{
 		this(client, script.getName());
 		
@@ -65,40 +70,41 @@ public class StormFrontScriptCommands extends ScriptCommands implements IStormFr
 	public void put(String text) throws InterruptedException {
 		if(typeAhead >= 2)
 			this.waitForPrompt();
-		typeAhead++;
+		synchronized(this) {
+			typeAhead++;
+		}
 		super.put(text);
 	}
 	
 	@Override
 	public void streamPrompted(IStream stream, String prompt) {
-		if(typeAhead > 0)
-			typeAhead--;
+		synchronized(this) {
+			if(typeAhead > 0)
+				typeAhead--;
+		}
 		super.streamPrompted(stream, prompt);
 	}
 	
-	public void waitForRoundtime () throws InterruptedException
+	public void waitForRoundtime() throws InterruptedException
 	{
 		while(sfClient.getRoundtime().get() > 0)
 			Thread.sleep((sfClient.getRoundtime().get() + 1) * 1000L);
 	}
 	
-	private Map<IMatch, Runnable> actions = Collections.synchronizedMap(new HashMap<IMatch, Runnable>());
-	
-	protected  class ScriptActionThread implements Runnable {
+	private class ScriptActionThread extends Thread {
 		public void run() {
-			StormFrontScriptCommands.this.addThread(Thread.currentThread());
+			addThread(this);
 			LinkedBlockingQueue<String> queue = new LinkedBlockingQueue<String>();
 			textWaiters.add(queue);
 			try {
-				actionLoop: while(script.isRunning()) {
+				while(script.isRunning() && actions.size() > 0) {
 					String text = null;
-
-					while(text == null) {
-						text = queue.poll(100L, TimeUnit.MILLISECONDS);
-						if(actions.size() == 0) {
-							break actionLoop;
-						}
+					try {
+						text = queue.take();
+					} catch(InterruptedException e) {
+						continue;
 					}
+
 					synchronized(actions) {
 						for(Map.Entry<IMatch, Runnable> action : actions.entrySet()) {
 							if(action.getKey().matches(text))
@@ -106,32 +112,38 @@ public class StormFrontScriptCommands extends ScriptCommands implements IStormFr
 						}
 					}
 				}
-			} catch(InterruptedException e) {
-				// nothing to do
 			} finally {
 				textWaiters.remove(queue);
-				StormFrontScriptCommands.this.removeThread(Thread.currentThread());
+				removeThread(this);
 			}
 		}
 	}
 	
 	public void addAction(Runnable action, IMatch match) {
 		synchronized(actions) {
-			if(actions.size() == 0) {
-				actions.put(match, action);
-				new Thread(new ScriptActionThread()).start();
-			} else {
-				actions.put(match, action);
+			actions.put(match, action);
+			
+			if(actionThread == null) {	
+				actionThread = new ScriptActionThread();
+				actionThread.start();
 			}
 		}
 	}
 	
 	public void clearActions() {
-		actions.clear();
+		synchronized(actions) {
+			actions.clear();
+			if(actionThread != null)
+				actionThread.interrupt();
+		}
 	}
 	
 	public void removeAction(IMatch action) {
-		actions.remove(action);
+		synchronized(actions) {
+			actions.remove(action);
+			if(actionThread != null)
+				actionThread.interrupt();
+		}
 	}
 	
 	public void removeAction(String text) {
@@ -139,7 +151,7 @@ public class StormFrontScriptCommands extends ScriptCommands implements IStormFr
 			for(IMatch match : actions.keySet()) {
 				// remove the element with the same name as text
 				if(match.getText().equals(text)) {
-					actions.remove(match);
+					removeAction(match);
 				}
 			}
 		}
