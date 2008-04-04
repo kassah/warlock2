@@ -131,7 +131,10 @@ public class StormFrontJavascriptCommands extends JavascriptCommands
 	}
 	
 	public String getVariable(String name) {
-		return sfCommands.getStormFrontClient().getClientSettings().getVariable("name").toString();
+		IVariable var = sfCommands.getStormFrontClient().getClientSettings().getVariable("name");
+		if(var == null)
+			return null;
+		return var.toString();
 	}
 	
 	public void setVariable(String name, String value) {
