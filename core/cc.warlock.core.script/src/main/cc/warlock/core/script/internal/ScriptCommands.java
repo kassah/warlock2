@@ -136,10 +136,13 @@ public class ScriptCommands implements IScriptCommands, IStreamListener, IRoomLi
 	}
 
 	public void pause(double seconds) throws InterruptedException {
-		long pauseEnd = System.currentTimeMillis() + (long)(seconds * 1000.0);
 		long now = System.currentTimeMillis();
-		while(pauseEnd > now)
+		long pauseEnd = now + (long)(seconds * 1000.0);
+		
+		while(pauseEnd > now) {
 			Thread.sleep(pauseEnd - now);
+			now = System.currentTimeMillis();
+		}
 	}
 	
 	public void put(String text) throws InterruptedException {
@@ -163,7 +166,7 @@ public class ScriptCommands implements IScriptCommands, IStreamListener, IRoomLi
 		}
 	}
 
-	public void waitForPrompt () throws InterruptedException {
+	public void waitForPrompt() throws InterruptedException {
 		lock.lock();
 		try {
 			while(!atPrompt)
@@ -192,7 +195,7 @@ public class ScriptCommands implements IScriptCommands, IStreamListener, IRoomLi
 		receiveLine(prompt);
 	}
 	
-	public void streamReceivedCommand (IStream stream, String text) {
+	public void streamReceivedCommand(IStream stream, String text) {
 		atPrompt = false;
 		receiveText(text);
 	}
