@@ -25,7 +25,6 @@ import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.concurrent.LinkedBlockingQueue;
-import java.util.concurrent.TimeUnit;
 
 import cc.warlock.core.client.IStream;
 import cc.warlock.core.script.IMatch;
@@ -115,6 +114,7 @@ public class StormFrontScriptCommands extends ScriptCommands implements IStormFr
 			} finally {
 				textWaiters.remove(queue);
 				removeThread(this);
+				actionThread = null;
 			}
 		}
 	}
