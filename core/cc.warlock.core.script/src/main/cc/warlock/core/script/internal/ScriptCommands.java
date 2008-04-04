@@ -57,7 +57,6 @@ public class ScriptCommands implements IScriptCommands, IStreamListener, IRoomLi
 	private final Condition nextRoom = lock.newCondition();
 	private final Condition atPromptCond = lock.newCondition();
 	
-	
 	private List<Thread> scriptThreads = Collections.synchronizedList(new ArrayList<Thread>());
 	
 	public ScriptCommands(IWarlockClient client, String scriptName)
@@ -240,7 +239,6 @@ public class ScriptCommands implements IScriptCommands, IStreamListener, IRoomLi
 		}
 	}
 
-	
 	public void stop() {
 		interrupt();
 
