@@ -2,11 +2,11 @@
 <classpath>
 	<classpathentry kind="src" path="src/eclipse"/>
 	<classpathentry kind="src" path="src/main"/>
-	<classpathentry exported="true" kind="lib" path="lib/commons-codec-1.1.jar"/>
 	<classpathentry exported="true" kind="lib" path="lib/commons-lang-2.3.jar"/>
 	<classpathentry exported="true" kind="lib" path="lib/dom4j-1.6.1.jar"/>
 	<classpathentry exported="true" kind="lib" path="lib/jaxen-1.1-beta-6.jar"/>
 	<classpathentry exported="true" kind="lib" path="lib/JSAP-2.1.jar"/>
+	<classpathentry exported="true" kind="lib" path="lib/commons-codec-1.1.jar"/>
 	<classpathentry kind="con" path="org.eclipse.jdt.launching.JRE_CONTAINER/org.eclipse.jdt.internal.debug.ui.launcher.StandardVMType/J2SE-1.5"/>
 	<classpathentry kind="con" path="org.eclipse.pde.core.requiredPlugins"/>
 	<classpathentry kind="output" path="bin"/>

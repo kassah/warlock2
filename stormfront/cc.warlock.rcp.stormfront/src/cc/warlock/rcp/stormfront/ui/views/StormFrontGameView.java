@@ -278,6 +278,10 @@ public class StormFrontGameView extends GameView implements IStormFrontClientVie
 		{
 			addStream(client.getStream(IStormFrontClient.DEATH_STREAM_NAME));
 			sfClient = (IStormFrontClient) client;
+			/*addStream(client.getStream(IStormFrontClient.ROOM_STREAM_NAME));
+			addStream(client.getStream(IStormFrontClient.INVENTORY_STREAM_NAME));
+			addStream(client.getStream(IStormFrontClient.THOUGHTS_STREAM_NAME));
+			addStream(client.getStream(IStormFrontClient.FAMILIAR_STREAM_NAME));*/
 
 			StyleProviders.setStyleProvider(client, new StormFrontStyleProvider(sfClient.getStormFrontClientSettings()));
 			

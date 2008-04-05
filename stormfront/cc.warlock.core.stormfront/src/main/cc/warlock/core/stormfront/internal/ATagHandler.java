@@ -82,7 +82,6 @@ public class ATagHandler extends DefaultTagHandler {
 			}
 		}
 		handler.addStyle(style);
-
 	}
 	
 	@Override

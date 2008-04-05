@@ -113,6 +113,7 @@ public class Stream implements IStream {
 	
 	public void send(WarlockString text) {
 		readLock.lock();
+		
 		try {
 			if (isLogging && client.getLogger() != null) {
 				client.getLogger().logText(text);
