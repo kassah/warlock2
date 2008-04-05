@@ -32,11 +32,8 @@ import org.eclipse.ui.PlatformUI;
 import org.eclipse.ui.WorkbenchException;
 import org.eclipse.ui.application.IWorkbenchWindowConfigurer;
 
-import cc.warlock.core.client.IWarlockClient;
 import cc.warlock.rcp.application.ScriptsPerspectiveFactory;
 import cc.warlock.rcp.application.WarlockApplication;
-import cc.warlock.rcp.plugin.Warlock2Plugin;
-import cc.warlock.rcp.views.GameView;
 
 public class ScriptsWindowHandler extends SimpleCommandHandler implements
 		IHandler {

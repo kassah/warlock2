@@ -48,10 +48,8 @@ import cc.warlock.core.client.IProperty;
 import cc.warlock.core.client.IStream;
 import cc.warlock.core.client.IStreamListener;
 import cc.warlock.core.client.IWarlockClient;
-import cc.warlock.core.client.IWarlockClientListener;
 import cc.warlock.core.client.IWarlockStyle;
 import cc.warlock.core.client.PropertyListener;
-import cc.warlock.core.client.WarlockClientRegistry;
 import cc.warlock.core.client.WarlockFont;
 import cc.warlock.core.client.WarlockString;
 import cc.warlock.core.client.settings.IHighlightString;
@@ -65,7 +63,7 @@ import cc.warlock.rcp.ui.style.StyleProviders;
 import cc.warlock.rcp.util.ColorUtil;
 import cc.warlock.rcp.util.FontUtil;
 
-public class StreamView extends ViewPart implements IStreamListener, IGameViewFocusListener, IWarlockClientListener {
+public class StreamView extends ViewPart implements IStreamListener, IGameViewFocusListener {
 	
 	public static final String STREAM_VIEW_PREFIX = "cc.warlock.rcp.views.stream.";
 	
@@ -101,8 +99,6 @@ public class StreamView extends ViewPart implements IStreamListener, IGameViewFo
 		if (!(this instanceof GameView))
 		{
 			GameView.addGameViewFocusListener(this);
-			// WarlockClientRegistry.addWarlockClientListener(this);
-			
 			this.multiClient = true;
 		}
 	}
@@ -271,15 +267,6 @@ public class StreamView extends ViewPart implements IStreamListener, IGameViewFo
 		mainStream.setView(false);
 	}
 	
-	public void clientConnected (IWarlockClient client) {
-		addStream(client.getStream(this.getStreamName()));
-	}
-	
-	public void clientActivated (IWarlockClient client) { }
-	
-	public void clientDisconnected (IWarlockClient client) { }
-	public void clientRemoved (IWarlockClient client) { }
-	
 	public void addStream (IStream stream) {
 		streams.add(stream);
 		stream.addStreamListener(streamListenerWrapper);
@@ -359,7 +346,6 @@ public class StreamView extends ViewPart implements IStreamListener, IGameViewFo
 	}
 	
 	public void streamReceivedText(IStream stream, WarlockString text) {
-		System.out.println("stream " + stream.getName() + ": " + text);
 		if (this.mainStream.equals(stream) || this.streams.contains(stream))
 		{
 			WarlockString string = new WarlockString();
