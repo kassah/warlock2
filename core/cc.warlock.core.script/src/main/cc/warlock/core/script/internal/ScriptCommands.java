@@ -49,6 +49,14 @@ public class ScriptCommands implements IScriptCommands, IStreamListener, IRoomLi
 	private String scriptName;
 	
 	private boolean suspended = false;
+	/**
+	 * Used to count room changes. In order to enable waitForRoom to reliably
+	 * detect when we've entered a new room, we need a persistent state change
+	 * of some sort. Unless you miss 4 billion rooms, this number will be
+	 * different.
+	 * 
+	 * @see #waitNextRoom()
+	 */
 	private int room = 0;
 	private boolean atPrompt;
 	
@@ -89,20 +97,19 @@ public class ScriptCommands implements IScriptCommands, IStreamListener, IRoomLi
 			long timeoutEnd = 0L;
 			if(haveTimeout)
 				timeoutEnd = System.currentTimeMillis() + (long)(timeout * 1000.0);
+			
 			// run until we get a match or are told to stop
 			while(true) {
 				String text = null;
 				// wait for some text
-				while(text == null) {
-					if(haveTimeout) {
-						long now = System.currentTimeMillis();
-						if(timeoutEnd >= now)
-							text = matchQueue.poll(timeoutEnd - now, TimeUnit.MILLISECONDS);
-						if(text == null)
-							return null;
-					} else {
-						text = matchQueue.take();
-					}
+				if(haveTimeout) {
+					long now = System.currentTimeMillis();
+					if(timeoutEnd >= now)
+						text = matchQueue.poll(timeoutEnd - now, TimeUnit.MILLISECONDS);
+					if(text == null)
+						return null;
+				} else {
+					text = matchQueue.take();
 				}
 				// try all of our matches
 				for(IMatch match : matches) {
@@ -150,12 +157,11 @@ public class ScriptCommands implements IScriptCommands, IStreamListener, IRoomLi
 
 	public void waitFor(IMatch match) throws InterruptedException {
 		LinkedBlockingQueue<String> queue = new LinkedBlockingQueue<String>();
-		String text = null;
 
 		textWaiters.add(queue);
 		try {
 			while(true) {
-				text = queue.take();
+				String text = queue.take();
 				if(match.matches(text)) {
 					break;
 				}

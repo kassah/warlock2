@@ -76,11 +76,21 @@ public interface IStormFrontClient extends IWarlockClient, IRoomListener {
 	public IProperty<Integer> getRoundtime();
 	
 	/**
-	 * Start a new roundtime countdown based on the seconds argument.
-	 * @param seconds The number of seconds to count down in the Roundtime bar.
-	 * @param label The label to show in the roundtime bar.
+	 * Set up a roundtime to start with the next time sync.
+	 * @param roundtimeEnd The end of the roundtime as sent from the server.
 	 */
-	public void startRoundtime(int seconds);
+	public void setupRoundtime(Integer roundtimeEnd);
+	
+	/**
+	 * Sync the current time as perceived by the server.
+	 * @param now Time the server thinks it is.
+	 */
+	public void syncTime(Integer now);
+	
+	/**
+	 * Wait out any active roundtimes.
+	 */
+	public void waitForRoundtime() throws InterruptedException;
 	
 	/**
 	 * @return The health property
@@ -175,10 +185,6 @@ public interface IStormFrontClient extends IWarlockClient, IRoomListener {
 	 * @return The component with the passed in name
 	 */
 	public IProperty<String> getComponent(String componentName);
-	
-	public long getTime();
-	
-	public void setTime(long time);
 	
 	public void loadCmdlist();
 	

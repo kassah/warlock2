@@ -19,12 +19,7 @@
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
-/*
- * Created on Mar 26, 2005
- *
- * TODO To change the template for this generated file go to
- * Window - Preferences - Java - Code Style - Code Templates
- */
+
 package cc.warlock.core.stormfront.client.internal;
 
 import java.io.FileInputStream;
@@ -33,8 +28,6 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
-import java.util.Timer;
-import java.util.TimerTask;
 
 import cc.warlock.core.client.ICharacterStatus;
 import cc.warlock.core.client.IProperty;
@@ -84,10 +77,9 @@ public class StormFrontClient extends WarlockClient implements IStormFrontClient
 	protected ClientProperty<String> playerId, characterName, roomDescription;
 	protected StormFrontClientSettings clientSettings;
 	protected StormFrontServerSettings serverSettings;
-	private Timer timer;
-	protected SFTimerTask timerTask;
-	private double currentTime = 0.0;
-	private double rtRemaining = -1.0;
+	protected long timeDelta;
+	protected Integer roundtimeEnd;
+	protected Thread roundtimeThread = null;
 	protected ArrayList<IScript> runningScripts;
 	protected ArrayList<IScriptListener> scriptListeners;
 	protected DefaultSkin skin;
@@ -115,9 +107,7 @@ public class StormFrontClient extends WarlockClient implements IStormFrontClient
 		monsterCount = new ClientProperty<Integer>(this, "monsterCount", null);
 		mode = new ClientProperty<GameMode>(this, "gameMode", GameMode.Game);
 
-		timer = new Timer();
-		timerTask = new SFTimerTask();
-		timer.scheduleAtFixedRate(timerTask, 0, 100L);
+		roundtimeEnd = null;
 		runningScripts = new ArrayList<IScript>();
 		scriptListeners = new ArrayList<IScriptListener>();
 		
@@ -205,27 +195,80 @@ public class StormFrontClient extends WarlockClient implements IStormFrontClient
 		return monsterCount;
 	}
 
-	private class SFTimerTask extends TimerTask
-	{
-		
-		public void run () 
+	private class RoundtimeThread extends Thread
+	{		
+		public void run()
 		{
-			currentTime += 0.1;
-			
-			if(rtRemaining > 0.0) {
-				rtRemaining -= 0.1;
-				int newRT = (int)Math.ceil(rtRemaining);
-				if(roundtime.get() != newRT)
-					roundtime.set(newRT);
+			for (;;) {
+				long now = System.currentTimeMillis();
+				long roundTime = 0;
+				
+				// Synchronize with external roundtime updates
+				synchronized(StormFrontClient.this) {
+					if (roundtimeEnd != null)
+						roundTime = roundtimeEnd * 1000L + timeDelta - now;
+					
+					if (roundTime <= 0) {
+						roundtimeThread = null;
+						roundtimeEnd = null;
+						roundtime.set(0);
+						StormFrontClient.this.notifyAll();
+						return;
+					}
+				}
+				
+				// Update the world with the new roundtime
+				// Avoid flicker caused by redundant updates
+				int rt = (int)((roundTime + 999) / 1000);
+				if (roundtime.get() != rt)
+					roundtime.set(rt);
+				
+				// Compute how long until next roundtime update
+				long waitTime = roundTime % 1000;
+				if (waitTime == 0) waitTime = 1000;
+				
+				try {
+					Thread.sleep(waitTime);
+				} catch (InterruptedException e) {
+					// This is not supposed to happen.
+					e.printStackTrace();
+				}
 			}
 		}
 	}
 	
-	public void startRoundtime (int seconds)
+	public synchronized void setupRoundtime(Integer end)
 	{
-		roundtime.activate();
-		rtRemaining = seconds;
-		roundtime.set(seconds);
+		roundtimeEnd = end;
+	}
+	
+	public synchronized void syncTime(Integer now)
+	{
+		if (roundtimeEnd == null) return;
+		
+		long newTimeDelta = System.currentTimeMillis() - now * 1000L;
+		if (roundtimeThread != null) {
+			// Don't decrease timeDelta while roundtimes are active.
+			if (newTimeDelta > timeDelta) timeDelta = newTimeDelta;
+			return;
+		}
+		timeDelta = newTimeDelta;
+		
+		roundtime.activate(); // FIXME Do we need this?
+		if (roundtimeEnd > now) {
+			// We need to do this now due to scheduling delays in the thread
+			roundtime.set(roundtimeEnd - now);
+			roundtimeThread = new RoundtimeThread();
+			roundtimeThread.start();
+		} else {
+			roundtime.set(0);
+			roundtimeEnd = null;
+		}
+	}
+	
+	public synchronized void waitForRoundtime() throws InterruptedException {
+		while (roundtimeEnd != null)
+			wait();
 	}
 	
 	public IProperty<BarStatus> getHealth() {
@@ -373,17 +416,6 @@ public class StormFrontClient extends WarlockClient implements IStormFrontClient
 			return new WarlockStyle();
 		}
 		return style;
-	}
-	
-	public long getTime() {
-		return (long)currentTime;
-	}
-	
-	public void setTime(long time) {
-		if(time < (long)currentTime)
-			currentTime = time + 0.9;
-		else if(time > (long)currentTime)
-			currentTime = time;
 	}
 	
 	public void loadCmdlist()

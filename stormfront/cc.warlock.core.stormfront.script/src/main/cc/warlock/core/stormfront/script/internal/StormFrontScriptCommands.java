@@ -21,8 +21,8 @@
  */
 package cc.warlock.core.stormfront.script.internal;
 
-import java.util.Collections;
 import java.util.HashMap;
+import java.util.Iterator;
 import java.util.Map;
 import java.util.concurrent.LinkedBlockingQueue;
 
@@ -40,8 +40,10 @@ public class StormFrontScriptCommands extends ScriptCommands implements IStormFr
 	
 	private int typeAhead = 0;
 	
-	private Map<IMatch, Runnable> actions =
-		Collections.synchronizedMap(new HashMap<IMatch, Runnable>());
+	/**
+	 * Storage for active actions. Users must acquire the monitor first!
+	 */
+	private HashMap<IMatch, Runnable> actions = new HashMap<IMatch, Runnable>();
 	private Thread actionThread = null;
 	
 	public StormFrontScriptCommands(IStormFrontClient client, String name)
@@ -86,8 +88,7 @@ public class StormFrontScriptCommands extends ScriptCommands implements IStormFr
 	
 	public void waitForRoundtime() throws InterruptedException
 	{
-		while(sfClient.getRoundtime().get() > 0)
-			Thread.sleep((sfClient.getRoundtime().get() + 1) * 1000L);
+		sfClient.waitForRoundtime();
 	}
 	
 	private class ScriptActionThread extends Thread {
@@ -96,28 +97,38 @@ public class StormFrontScriptCommands extends ScriptCommands implements IStormFr
 			LinkedBlockingQueue<String> queue = new LinkedBlockingQueue<String>();
 			textWaiters.add(queue);
 
-			while(true) {
-				try {
+			try {
+				while(true) {
+					assert !script.isRunning();
 					String text = null;
-					text = queue.take();
-
+					try {
+						text = queue.take();
+					} catch(InterruptedException e) {
+						synchronized(actions) {
+							/* We must clear actionThread in the same critical
+							 * section as the decision to terminate the thread
+							 */
+							if(actions.size() == 0) {
+								actionThread = null;
+								return;
+							}
+						}
+					}
+	
 					synchronized(actions) {
 						for(Map.Entry<IMatch, Runnable> action : actions.entrySet()) {
 							if(action.getKey().matches(text))
 								action.getValue().run();
 						}
 					}
-				}  catch(InterruptedException e) {
-					// nothing to do
-				} finally {
-					synchronized(actions) {
-						if(!script.isRunning() || actions.size() == 0) {
-							textWaiters.remove(queue);
-							removeThread(this);
-							actionThread = null;
-							break;
-						}
-					}
+				}
+			} finally {
+				textWaiters.remove(queue);
+				removeThread(this);
+				synchronized(actions) {
+					// FIXME What to do for a runtime exception?
+					if (actionThread == this)
+						actionThread = null;
 				}
 			}
 		}
@@ -152,12 +163,17 @@ public class StormFrontScriptCommands extends ScriptCommands implements IStormFr
 	
 	public void removeAction(String text) {
 		synchronized(actions) {
-			for(IMatch match : actions.keySet()) {
+			boolean changed = false;
+			for(Iterator<IMatch> iter = actions.keySet().iterator(); iter.hasNext(); ) {
+				IMatch match = iter.next();
 				// remove the element with the same name as text
 				if(match.getText().equals(text)) {
-					removeAction(match);
+					iter.remove();
+					changed = true;
 				}
 			}
+			if(changed && actionThread != null)
+				actionThread.interrupt();
 		}
 	}
 	
