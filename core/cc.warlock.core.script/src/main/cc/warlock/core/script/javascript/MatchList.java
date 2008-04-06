@@ -50,6 +50,15 @@ public class MatchList extends ScriptableObject {
 		queue = script.getCommands().createLineQueue();
 	}
 	
+	public void jsFunction_restart() {
+		script.checkStop();
+		
+		if(queue != null)
+			script.getCommands().removeLineQueue(queue);
+			
+		queue = script.getCommands().createLineQueue();
+	}
+	
 	private class JSMatchData implements Runnable {
 		
 		private Function function;
@@ -74,9 +83,11 @@ public class MatchList extends ScriptableObject {
 	}
 	
 	public IMatch jsFunction_match(String text, Object f) {
-		if(!script.isRunning()) {
-			throw new Error();
-		}
+		script.checkStop();
+		
+		if(queue == null)
+			queue = script.getCommands().createLineQueue();
+		
 		TextMatch match = new TextMatch(text, true);
 		Function function = null;
 		if (f != null && f instanceof Function)
@@ -112,6 +123,9 @@ public class MatchList extends ScriptableObject {
 	public IMatch jsFunction_matchRe(String regex, Object f) {
 		script.checkStop();
 		
+		if(queue == null)
+			queue = script.getCommands().createLineQueue();
+		
 		RegexMatch match = new RegexMatch(regex);
 		Function function = null;
 		if (f != null && f instanceof Function)
@@ -126,6 +140,9 @@ public class MatchList extends ScriptableObject {
 		script.checkStop();
 		
 		try {
+			if(queue == null)
+				queue = script.getCommands().createLineQueue();
+			
 			IMatch match = script.getCommands().matchWait(matches.keySet(), queue, 0.0);
 		
 			if (match != null)
@@ -138,6 +155,8 @@ public class MatchList extends ScriptableObject {
 		} catch(InterruptedException e) {
 			script.checkStop();
 			return null;
+		} finally {
+			queue = null;
 		}
 	}
 	

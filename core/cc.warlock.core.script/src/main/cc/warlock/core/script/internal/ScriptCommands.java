@@ -91,6 +91,11 @@ public class ScriptCommands implements IScriptCommands, IStreamListener, IRoomLi
 		return queue;
 	}
 	
+
+	public void removeLineQueue(BlockingQueue<String> queue) {
+		textWaiters.remove(queue);
+	}
+	
 	public IMatch matchWait(Collection<IMatch> matches, BlockingQueue<String> matchQueue, double timeout) throws InterruptedException {
 		try {
 			boolean haveTimeout = timeout > 0.0;
