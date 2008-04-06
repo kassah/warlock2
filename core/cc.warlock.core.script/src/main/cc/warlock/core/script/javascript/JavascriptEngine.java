@@ -87,7 +87,7 @@ public class JavascriptEngine implements IScriptEngine {
 				return;
 			}
 			if (!script.isRunning()) {
-				throw new Error();
+				throw script.new StopException();
 			}
 		}
 	}
