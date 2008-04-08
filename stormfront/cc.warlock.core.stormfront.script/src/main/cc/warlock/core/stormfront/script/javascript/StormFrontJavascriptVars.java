@@ -66,6 +66,7 @@ public class StormFrontJavascriptVars implements IJavascriptVariableProvider {
 			scope.put("leftHand", scope, new JavascriptProperty<String>(scope, sfClient.getLeftHand()));
 			scope.put("rightHand", scope, new JavascriptProperty<String>(scope, sfClient.getRightHand()));
 			scope.put("spell", scope, new JavascriptProperty<String>(scope, sfClient.getCurrentSpell()));
+			scope.put("monstercount", scope, new JavascriptProperty<Integer>(scope, sfClient.getMonsterCount()));
 			
 			scope.put("roomExits", scope, new JavascriptComponent(scope, sfClient, IStormFrontClient.COMPONENT_ROOM_EXITS));
 			scope.put("roomObjects", scope, new JavascriptComponent(scope, sfClient, IStormFrontClient.COMPONENT_ROOM_OBJECTS));
