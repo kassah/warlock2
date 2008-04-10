@@ -267,8 +267,11 @@ public class StormFrontClient extends WarlockClient implements IStormFrontClient
 	}
 	
 	public synchronized void waitForRoundtime() throws InterruptedException {
+		if (roundtimeEnd == null)
+			return;
 		while (roundtimeEnd != null)
 			wait();
+		Thread.sleep(1000);
 	}
 	
 	public IProperty<BarStatus> getHealth() {
