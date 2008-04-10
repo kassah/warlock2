@@ -186,6 +186,8 @@ public interface IStormFrontClient extends IWarlockClient, IRoomListener {
 	 */
 	public IProperty<String> getComponent(String componentName);
 	
+	public void updateComponent(String name, String value);
+	
 	public void loadCmdlist();
 	
 	public String getCommand(String coord);
