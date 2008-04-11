@@ -53,6 +53,10 @@ public class ServerScript extends ServerSetting {
 			tokens = scriptElement.getText();
 			setScriptContents(convertTokensToScript(tokens));
 		}
+		else if (format == null) {
+			// just assume plain text (for importing)
+			setScriptContents(scriptElement.getText());
+		}
 	}
 	
 	protected static final HashMap<String,String> shortCommands = new HashMap<String,String>();
