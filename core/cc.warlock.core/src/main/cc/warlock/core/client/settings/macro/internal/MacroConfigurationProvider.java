@@ -57,7 +57,9 @@ public class MacroConfigurationProvider extends ClientConfigurationProvider impl
 	}
 	
 	public void addMacro(IMacro macro) {
-		macros.add(macro);
+		if (!macros.contains(macro)) {
+			macros.add(macro);
+		}
 	}
 
 	public IMacro getMacro(int keycode, int modifiers) {
