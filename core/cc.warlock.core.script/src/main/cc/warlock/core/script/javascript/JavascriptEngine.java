@@ -38,6 +38,7 @@ import org.mozilla.javascript.Function;
 import org.mozilla.javascript.RhinoException;
 import org.mozilla.javascript.Scriptable;
 import org.mozilla.javascript.ScriptableObject;
+import org.mozilla.javascript.WrapFactory;
 import org.mozilla.javascript.WrappedException;
 
 import cc.warlock.core.client.IWarlockClient;
@@ -69,26 +70,37 @@ public class JavascriptEngine implements IScriptEngine {
 		
 		protected Context makeContext() {
 			Context cx = new Context();
+			// Can't optimize if we want the instruction counter
 			cx.setOptimizationLevel(-1);
-			cx.setInstructionObserverThreshold(1000);
+			// Allow the user to break infinite loops or waits that don't use
+			// our APIs (if such things exist).
+			cx.setInstructionObserverThreshold(500);
+			
+			// Expose our API as JS variables rather than Java primitives
+			WrapFactory wf = new WrapFactory();
+			wf.setJavaPrimitiveWrap(false);
+			cx.setWrapFactory(wf);
+			
 			return cx;
 		}
 		
 		protected void observeInstructionCount(Context cx, int instructionCount) {
 			JavascriptScript script = null;
+			// find our script by context
 			for(JavascriptScript cur : runningScripts) {
 				if(cur.getContext().equals(cx)) {
 					script = cur;
 					break;
 				}
 			}
+			
 			if(script == null) {
 				System.out.println("Couldn't find context.");
-				return;
+				throw new Error();
 			}
-			if (!script.isRunning()) {
+			
+			if (!script.isRunning())
 				throw script.new StopException();
-			}
 		}
 	}
 	
