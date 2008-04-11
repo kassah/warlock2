@@ -153,7 +153,9 @@ public class ServerSettings implements Comparable<ServerSettings>
 			
 			loadPalette();
 			
-			majorVersion = Integer.parseInt(document.getRootElement().attributeValue("major"));
+			String majorVersion = document.getRootElement().attributeValue("major");
+			if (majorVersion != null)
+				this.majorVersion = Integer.parseInt(majorVersion);
 			clientVersion = document.getRootElement().attributeValue("client");
 			crc = document.getRootElement().attributeValue("crc");
 			
