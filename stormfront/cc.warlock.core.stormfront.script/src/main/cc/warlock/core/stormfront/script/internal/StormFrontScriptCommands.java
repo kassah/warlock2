@@ -112,6 +112,7 @@ public class StormFrontScriptCommands extends ScriptCommands implements IStormFr
 								actionThread = null;
 								return;
 							}
+							continue;
 						}
 					}
 	
