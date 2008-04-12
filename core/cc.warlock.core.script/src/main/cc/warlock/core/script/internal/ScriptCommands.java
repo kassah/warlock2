@@ -58,6 +58,7 @@ public class ScriptCommands implements IScriptCommands, IStreamListener, IRoomLi
 	 * @see #waitNextRoom()
 	 */
 	private int room = 0;
+	private int prompt = 0;
 	private boolean atPrompt;
 	
 	private final Lock lock = new ReentrantLock();
@@ -179,7 +180,8 @@ public class ScriptCommands implements IScriptCommands, IStreamListener, IRoomLi
 	public void waitForPrompt() throws InterruptedException {
 		lock.lock();
 		try {
-			while(!atPrompt)
+			int oldPrompt = prompt;
+			while(oldPrompt == prompt)
 				atPromptCond.await();
 		} finally {
 			lock.unlock();
@@ -198,6 +200,7 @@ public class ScriptCommands implements IScriptCommands, IStreamListener, IRoomLi
 		lock.lock();
 		try {
 			atPrompt = true;
+			this.prompt++;
 			atPromptCond.signalAll();
 		} finally {
 			lock.unlock();
