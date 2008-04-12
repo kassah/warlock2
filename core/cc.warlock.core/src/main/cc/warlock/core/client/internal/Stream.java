@@ -27,8 +27,6 @@ package cc.warlock.core.client.internal;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
-import java.util.concurrent.locks.Lock;
-import java.util.concurrent.locks.ReentrantReadWriteLock;
 
 import cc.warlock.core.client.IProperty;
 import cc.warlock.core.client.IStream;
@@ -49,9 +47,6 @@ public class Stream implements IStream {
 	
 	protected IProperty<String> streamName, streamTitle;
 	private ArrayList<IStreamListener> listeners = new ArrayList<IStreamListener>();
-	private ReentrantReadWriteLock lock = new ReentrantReadWriteLock();
-	private Lock readLock = lock.readLock();
-	private Lock writeLock = lock.writeLock();
 	protected boolean isPrompting = false;
 	private boolean hasView = false;
 	protected boolean isLogging = false;
@@ -65,45 +60,25 @@ public class Stream implements IStream {
 		streams.put(streamName, this);
 	}
 
-	public void addStreamListener(IStreamListener listener) {
-		writeLock.lock();
-		try {
-			if (!listeners.contains(listener))
-				listeners.add(listener);
-		} finally {
-			writeLock.unlock();
-		}
+	public synchronized void addStreamListener(IStreamListener listener) {
+		if (!listeners.contains(listener))
+			listeners.add(listener);
 	}
 	
-	public void removeStreamListener(IStreamListener listener) {
-		writeLock.lock();
-		try {
-			if (listeners.contains(listener))
-				listeners.remove(listener);
-		} finally {
-			writeLock.unlock();
-		}
+	public synchronized void removeStreamListener(IStreamListener listener) {
+		if (listeners.contains(listener))
+			listeners.remove(listener);
 	}
 
-	public void clear() {
-		readLock.lock();
-		try {
-			for(IStreamListener listener : listeners) {
-				listener.streamCleared(this);
-			}
-		} finally {
-			readLock.unlock();
+	public synchronized void clear() {
+		for(IStreamListener listener : listeners) {
+			listener.streamCleared(this);
 		}
 	}
 	
-	public void flush() {
-		readLock.lock();
-		try {
-			for(IStreamListener listener : listeners) {
-				listener.streamFlush(this);
-			}
-		} finally {
-			readLock.unlock();
+	public synchronized void flush() {
+		for(IStreamListener listener : listeners) {
+			listener.streamFlush(this);
 		}
 	}
 	
@@ -111,63 +86,47 @@ public class Stream implements IStream {
 		send(new WarlockString(text));
 	}
 	
-	public void send(WarlockString text) {
-		readLock.lock();
-		
-		try {
-			if (isLogging && client.getLogger() != null) {
-				client.getLogger().logText(text);
+	public synchronized void send(WarlockString text) {
+		if (isLogging && client.getLogger() != null) {
+			client.getLogger().logText(text);
+		}
+
+		for(IStreamListener listener : listeners) {
+			try {
+				listener.streamReceivedText(this, text);
+			} catch (Throwable t) {
+				// TODO Auto-generated catch block
+				t.printStackTrace();
 			}
-			
-			for(IStreamListener listener : listeners) {
-				try {
-					listener.streamReceivedText(this, text);
-				} catch (Throwable t) {
-					// TODO Auto-generated catch block
-					t.printStackTrace();
-				}
-			}
-		} finally {
-			readLock.unlock();
 		}
 		isPrompting = false;
 	}
 	
-	public void prompt(String prompt) {
+	public synchronized void prompt(String prompt) {
 		isPrompting = true;
 		
-		readLock.lock();
-		try {
-			if (isLogging && client.getLogger() != null) {
-				client.getLogger().logPrompt(prompt);
+		if (isLogging && client.getLogger() != null) {
+			client.getLogger().logPrompt(prompt);
+		}
+
+		for (IStreamListener listener : listeners)
+		{
+			try {
+				listener.streamPrompted(this, prompt);
+			} catch (Throwable t) {
+				t.printStackTrace();
 			}
-			
-			for (IStreamListener listener : listeners)
-			{
-				try {
-					listener.streamPrompted(this, prompt);
-				} catch (Throwable t) {
-					t.printStackTrace();
-				}
-			}
-		} finally {
-			readLock.unlock();
 		}
 	}
 	
-	public void sendCommand(String text) {
-		readLock.lock();
-		try {
-			if (isLogging && client.getLogger() != null) {
-				client.getLogger().logEcho(text);
-			}
-			
-			for (IStreamListener listener : listeners)
-			{
-				listener.streamReceivedCommand(this, text);
-			}
-		} finally {
-			readLock.unlock();
+	public synchronized void sendCommand(String text) {
+		if (isLogging && client.getLogger() != null) {
+			client.getLogger().logEcho(text);
+		}
+
+		for (IStreamListener listener : listeners)
+		{
+			listener.streamReceivedCommand(this, text);
 		}
 		
 		isPrompting = false;
@@ -177,23 +136,18 @@ public class Stream implements IStream {
 		return isPrompting;
 	}
 	
-	public void echo(String text) {
-		readLock.lock();
-		try {
-			if (isLogging && client.getLogger() != null) {
-				client.getLogger().logEcho(text);
+	public synchronized void echo(String text) {
+		if (isLogging && client.getLogger() != null) {
+			client.getLogger().logEcho(text);
+		}
+
+		for (IStreamListener listener : listeners)
+		{
+			try {
+				listener.streamEchoed(this, text);
+			} catch (Throwable t) {
+				t.printStackTrace();
 			}
-			
-			for (IStreamListener listener : listeners)
-			{
-				try {
-					listener.streamEchoed(this, text);
-				} catch (Throwable t) {
-					t.printStackTrace();
-				}
-			}
-		} finally {
-			readLock.unlock();
 		}
 	}
 	
@@ -237,19 +191,14 @@ public class Stream implements IStream {
 		hasView = view;
 	}
 	
-	public void updateComponent(String id, String text) {
-		readLock.lock();
-		try {
-			for (IStreamListener listener : listeners)
-			{
-				try {
-					listener.componentUpdated(this, id, text);
-				} catch (Throwable t) {
-					t.printStackTrace();
-				}
+	public synchronized void updateComponent(String id, String text) {
+		for (IStreamListener listener : listeners)
+		{
+			try {
+				listener.componentUpdated(this, id, text);
+			} catch (Throwable t) {
+				t.printStackTrace();
 			}
-		} finally {
-			readLock.unlock();
 		}
 	}
 	
