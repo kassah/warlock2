@@ -59,6 +59,11 @@
             id="cc.warlock.rcp.stormfront.sgeConnectCommand"
             name="Simutronics Games">
       </command>
+      <command
+            defaultHandler="cc.warlock.rcp.stormfront.ui.menu.ImportStormfrontSettingsHandler"
+            id="cc.warlock.rcp.stormfront.importStormfrontSettingsCommand"
+            name="Import Stormfront Settings">
+      </command>
    </extension>
    <extension
          point="org.eclipse.ui.commandImages">
@@ -86,6 +91,15 @@
                class="cc.warlock.rcp.stormfront.ui.menu.StreamWindowContributionItem"
                id="cc.warlock.rcp.dynamicViews">
          </dynamic>
+      </menuContribution>
+      <menuContribution
+            locationURI="menu:cc.warlock.rcp.menu.prefs?before=cc.warlock.rcp.menu.preferences">
+         <command
+               commandId="cc.warlock.rcp.stormfront.importStormfrontSettingsCommand"
+               icon="images/import_wiz.gif"
+               id="cc.warlock.rcp.stormfront.menu.import"
+               label="Import from Stromfront...">
+         </command>
       </menuContribution>
    </extension>
    <extension
