@@ -16,12 +16,18 @@ grammar WSL;
 	private WSLScript script;
 	private int lineNum = 1;
 	public void setScript(WSLScript s) { script = s; }
+	private boolean isNumber(String str) {
+		try {
+			Double.parseDouble(str);
+			return true;
+		} catch(NumberFormatException e) {
+			return false;
+		}
+	}
 }
 
 @lexer::members {
-	private enum State { base, variableReplace, condition, action, quoted }
-	private boolean atStart = true;
-	private State state = State.base;
+	private boolean atStart = true;	
 }
 
 script
@@ -43,31 +49,31 @@ line
 	;
 
 expr returns [WSLAbstractCommand command]
-	: IF cond=conditionalExpression THEN c=expr
+	: keyIF cond=conditionalExpression keyTHEN c=expr
 		{
 			command = new WSLCondition(lineNum, script, cond, c);
 		}
-	| ACTION c=expr WHEN args=value_list
+	| keyACTION c=expr keyWHEN args=string_list
 		{
 			command = new WSLAction(lineNum, script, c, args);
 		}
-	| ACTION REMOVE args=value_list
+	| keyACTION keyREMOVE args=string_list
 		{
 			command = new WSLActionRemove(lineNum, script, args);
 		}
-	| ACTION CLEAR
+	| keyACTION keyCLEAR
 		{
 			command = new WSLActionClear(lineNum, script);
 		}
-	| args=value_list
+	| args=string_list
 		{
 			command = new WSLCommand(lineNum, script, args);
 		}
 	| { command = new WSLCommand(lineNum, script, null); }
 	;
 
-value_list returns [IWSLValue value]
-	: l=value_list_helper
+string_list returns [IWSLValue value]
+	: l=string_list_helper
 			{
 				if(l.size() > 1)
 					value = new WSLList(l);
@@ -76,23 +82,38 @@ value_list returns [IWSLValue value]
 			}
 	;
 
-value_list_helper returns [ArrayList<IWSLValue> list]
-	: ( data=script_value						{ list = new ArrayList<IWSLValue>(); list.add(data); } )
-	| ( data=script_value l=value_list_helper	{ list = l; list.add(0, data); } )
+string_list_helper returns [ArrayList<IWSLValue> list]
+	: data=string_value
+		{
+			String whitespace = "";
+			for(int i = input.index() - 1; i >= 0 && input.get(i).getChannel() != state.channel; i--) {
+				whitespace = input.get(i).getText() + whitespace;
+			}
+		}
+	(l=string_list_helper)?
+		{
+			if(l == null) {
+				list = new ArrayList<IWSLValue>();
+				list.add(data);
+			} else {
+				list = l;
+				if(whitespace.length() > 0)
+					list.add(0, new WSLString(whitespace));
+				list.add(0, data);
+			}
+		}
 	;
 
-script_value returns [IWSLValue value]
+string_value returns [IWSLValue value]
 	: v=STRING			{ value = new WSLString($v.text); }
 	| v=VARIABLE		{ value = new WSLVariable($v.text, script); }
 	| v=LOCAL_VARIABLE	{ value = new WSLLocalVariable($v.text, script); }
-	| v=NUMBER			{ value = new WSLNumber($v.text); }
-	| TRUE				{ value = new WSLBoolean(true); }
-	| FALSE				{ value = new WSLBoolean(false); }
+	| v=ESCAPED_CHAR	{ value = new WSLString($v.text); }
 	;
 	
 conditionalExpression returns [IWSLValue cond]
 	: arg=conditionalAndExpression  { ArrayList<IWSLValue> args = null; }
-		(OR argNext=conditionalAndExpression
+		(keyOR argNext=conditionalAndExpression
 			{
 				if(args == null) {
 					args = new ArrayList<IWSLValue>();
@@ -111,7 +132,7 @@ conditionalExpression returns [IWSLValue cond]
 
 conditionalAndExpression returns [IWSLValue cond]
 	: arg=equalityExpression { ArrayList<IWSLValue> args = null; }
-		(AND argNext=equalityExpression
+		(keyAND argNext=equalityExpression
 			{
 				if(args == null) {
 					args = new ArrayList<IWSLValue>();
@@ -156,8 +177,8 @@ equalityExpression returns [IWSLValue cond]
 	;
 
 equalityOp returns [EqualityOperator op]
-	: '=' '='?		{ op = EqualityOperator.equals; }
-	| ('!=' | '<>')		{ op = EqualityOperator.notequals; }
+	: keyEQUAL			{ op = EqualityOperator.equals; }
+	| keyNOTEQUAL		{ op = EqualityOperator.notequals; }
 	;
 	
 relationalExpression returns [IWSLValue cond]
@@ -188,127 +209,162 @@ relationalExpression returns [IWSLValue cond]
 	;
 
 relationalOp returns [RelationalOperator op]
-	: '>'			{ op = RelationalOperator.GreaterThan; }
-	| '<'			{ op = RelationalOperator.LessThan; }
-	| '>='			{ op = RelationalOperator.GreaterThanEqualTo; }
-	| '<='			{ op = RelationalOperator.LessThanEqualTo; }
-	| CONTAINS		{ op = RelationalOperator.Contains; }
+	: keyGT			{ op = RelationalOperator.GreaterThan; }
+	| keyLT			{ op = RelationalOperator.LessThan; }
+	| keyGTE		{ op = RelationalOperator.GreaterThanEqualTo; }
+	| keyLTE		{ op = RelationalOperator.LessThanEqualTo; }
+	| keyCONTAINS	{ op = RelationalOperator.Contains; }
 	;
 
 unaryExpression returns [IWSLValue cond]
-	: NOT arg=unaryExpression	{ cond = new WSLNotCondition(arg); }
-	| EXISTS arg=unaryExpression	{ cond = new WSLExistsCondition(arg); }
-	| arg=primaryExpression		{ cond = arg; }
+	: keyNOT arg=unaryExpression	{ cond = new WSLNotCondition(arg); }
+	| keyEXISTS arg=unaryExpression	{ cond = new WSLExistsCondition(arg); }
+	| arg=primaryExpression			{ cond = arg; }
 	;
 
 parenExpression returns [IWSLValue cond]
-	: '(' arg=conditionalExpression ')'		{ cond = arg; }
+	: keyLPAREN arg=conditionalExpression keyRPAREN		{ cond = arg; }
 	;
 
 primaryExpression returns [IWSLValue cond]
 	: arg=parenExpression	{ cond = arg; }
-	| l=value_list			{ cond = l; }
+	| (v=cond_value)		{ cond = v; }
+	;
+	
+cond_value returns [IWSLValue value]
+	: val=quoted_string	{ value = val; }
+	| v=VARIABLE		{ value = new WSLVariable($v.text, script); }
+	| v=LOCAL_VARIABLE	{ value = new WSLLocalVariable($v.text, script); }
+	| val=number		{ value = val; }
+	| keyTRUE			{ value = new WSLBoolean(true); }
+	| keyFALSE			{ value = new WSLBoolean(false); }
 	;
 
+number returns [IWSLValue value]
+	: { isNumber(input.LT(1).getText()) }? v=STRING	{ value = new WSLNumber($v.text); }
+	;
+
+quoted_string returns [IWSLValue value]
+	: quote str=string_list quote
+		{
+			// FIXME: get preceding and following whitespace
+			value = str;
+		}
+	;
+
+quote
+	: { input.LT(1).getText().equals("if") }? STRING
+	;
+
+keyIF
+	: { input.LT(1).getText().equals("if") }? STRING
+	;
+keyTHEN
+	: { input.LT(1).getText().equals("then") }? STRING
+	;
+keyOR
+	: { input.LT(1).getText().equals("or") || input.LT(1).getText().equals("||") }? STRING
+	;
+keyAND
+	: { input.LT(1).getText().equals("and") || input.LT(1).getText().equals("&&") }? STRING
+	;
+keyNOT
+	: { input.LT(1).getText().equals("not") || input.LT(1).getText().equals("!") }? STRING
+	;
+keyEQUAL
+	: { input.LT(1).getText().equals("=") || input.LT(1).getText().equals("==") }? STRING
+	;
+keyNOTEQUAL
+	: { input.LT(1).getText().equals("!=") || input.LT(1).getText().equals("<>") }? STRING
+	;
+keyGTE
+	: { input.LT(1).getText().equals(">=") }? STRING
+	;
+keyLTE
+	: { input.LT(1).getText().equals("<=") }? STRING
+	;
+keyGT
+	: { input.LT(1).getText().equals(">") }? STRING
+	;
+keyLT
+	: { input.LT(1).getText().equals("<") }? STRING
+	;
+keyLPAREN
+	: { input.LT(1).getText().equals("(") }? STRING
+	;
+keyRPAREN
+	: { input.LT(1).getText().equals(")") }? STRING
+	;
+keyEXISTS
+	: { input.LT(1).getText().equals("exists") }? STRING
+	;
+keyCONTAINS
+	: { input.LT(1).getText().equals("contains") || input.LT(1).getText().equals("indexof") }? STRING
+	;
+keyACTION
+	: { input.LT(1).getText().equals("action") }? STRING
+	;
+keyWHEN
+	: { input.LT(1).getText().equals("when") }? STRING
+	;
+keyREMOVE
+	: { input.LT(1).getText().equals("remove") }? STRING
+	;
+keyCLEAR
+	: { input.LT(1).getText().equals("clear") }? STRING
+	;
+keyTRUE
+	: { input.LT(1).getText().equals("true") }? STRING
+	;
+keyFALSE
+	: { input.LT(1).getText().equals("false") }? STRING
+	;
 
 
 WHITESPACE
-	: { state == State.base || state == State.condition }?=>
-		WS+			{ channel = HIDDEN; }
+	: BLANK+			{ $channel = HIDDEN; }
 	;
 EOL
-	: '\r'? '\n' { state = State.base; atStart = true; }
+	: '\r'? '\n' { atStart = true; }
 	;
 COMMENT
 	: { atStart }?=>
-		('#'|';') (~('\n'|'\r'))* { channel = HIDDEN; }
+		('#'|';') (~('\n'|'\r'))* { $channel = HIDDEN; }
 	;
 VARIABLE
-	: '%' var=WORD '%'?
+	: '%' var=VARIABLE_STRING '%'?
 			{
 				setText($var.text);
-				if(state == State.base) { state = State.variableReplace; atStart = false; }
+				atStart = false;
 			}
 	;
 LOCAL_VARIABLE
-	:  '$' var=WORD '$'?
+	:  '$' var=LOCAL_VARIABLE_STRING '$'?
 			{
 				setText($var.text);
-				if(state == State.base) { state = State.variableReplace; atStart = false; }
+				atStart = false;
 			}
 	;
-IF
-	: { state == State.base }?=> 'if' { state = State.condition; atStart = false; }
-	;
-THEN
-	: { state == State.condition }?=> 'then' { state = State.base; }
-	;
-OR
-	: { state == State.condition }?=> ('||' | 'or')
-	;
-AND
-	: { state == State.condition }?=> ('&&' | 'and')
-	;
-NOT
-	: { state == State.condition }?=> ('!' | 'not')
-	;
-EXISTS
-	: { state == State.condition }?=> ('exists')
-	;
-CONTAINS
-	: { state == State.condition }?=> ('contains' | 'indexof')
-	;
-ACTION
-	: { state == State.base }?=> 'action' WS+ { state = State.action; atStart = false; }
-	;
-WHEN
-	: { state == State.action }?=> 'when' { state = State.variableReplace; }
-	;
-REMOVE
-	: { state == State.action }?=> 'remove' { state = State.variableReplace; }
-	;
-CLEAR
-	: { state == State.action }?=> 'clear' { state = State.variableReplace; }
-	;
-TRUE
-	: { state == State.condition }?=> 'true'
-	;
-FALSE
-	: { state == State.condition }?=> 'false'
-	;
-NUMBER
-	: { state == State.condition }?=> '-'? (DIGIT)+ ('.' (DIGIT)+)?
-	;
 STRING
-	: { state == State.variableReplace }?=> ((~('%'|'$'|'\n'|'\r'))+ | '%' | '$')
-	| { state == State.variableReplace || state == State.action || state == State.quoted }?=> ('%%'|'$$')
+	: ((~('%'|'$'|'\\'|'"'|WS))+ | '%' | '$') { atStart = false; }
+	| ('%%'|'$$')
 		{
 			setText(getText().substring(0,1));
-		}
-	| { state == State.base }?=> WORD
-		{
-			state = State.variableReplace;
 			atStart = false;
 		}
-	| { state == State.action }?=> ((~(WS|'%'|'$'|'\n'|'\r'))+ | WS+ | '%' | '$')
-	| { state == State.condition }?=> '"'
-		{
-			state = State.quoted;
-			setText("");
-		}
-	| { state == State.quoted }?=> '"'
-		{
-			state = State.condition;
-			channel = HIDDEN;
-		}
-	| { state == State.quoted }?=> ((~('"'|'%'|'$'|'\n'|'\r'|'\\'))+ | ('\\' str=ANY { setText($str.text); }) | '%' | '$' )
+	;
+ESCAPED_CHAR
+    : '\\' str=ANY { setText($str.text); atStart = false; }
 	;
 LABEL
-	: label=LABEL_STRING ':'			{ setText($label.text); atStart = false; }
+	: { atStart }?=> label=LABEL_STRING ':'			{ setText($label.text); atStart = false; }
 	;
-	
-fragment WS
+
+fragment BLANK
 	: ' ' | '\t'
+	;
+fragment WS
+	: BLANK | '\n' | '\r'
 	;
 fragment DIGIT
 	: '0'..'9'
@@ -316,12 +372,15 @@ fragment DIGIT
 fragment ANY
 	: .
 	;
-fragment WORD_CHAR
-	: ('a'..'z'|DIGIT|'_')
-	;
 fragment WORD
-	: WORD_CHAR+
+	: ('a'..'z'|DIGIT|'_')+
 	;
 fragment LABEL_STRING
-	: (WORD_CHAR|'.'|'-')+
+	: (~(WS|':'))+
 	;
+fragment VARIABLE_STRING
+	: (~(WS|'%'))+
+	;
+fragment LOCAL_VARIABLE_STRING
+	: (~(WS|'$'))+
+	; 
