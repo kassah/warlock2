@@ -105,8 +105,10 @@ public class SGEConnection extends Connection implements IConnectionListener {
 	public void connect ()
 	{
 		try {
-			resetState();
-			connect (SGE_SERVER, SGE_PORT);
+			if (!connected) {
+				resetState();
+				connect (SGE_SERVER, SGE_PORT);
+			}
 		} catch (IOException e) {
 			e.printStackTrace();
 		}	
@@ -281,6 +283,7 @@ public class SGEConnection extends Connection implements IConnectionListener {
 				
 				case 'M':
 				{
+					games.clear();
 					String tokens[] = line.split("\t");
 					for (int i = 1; i < tokens.length; i+=2)
 					{
@@ -411,7 +414,6 @@ public class SGEConnection extends Connection implements IConnectionListener {
 	}
 	
 	public void disconnected(IConnection connection) {
-
 	}
 	
 	private static class AutoLoginListener extends SGEConnectionListener
