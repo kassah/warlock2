@@ -23,9 +23,7 @@ package cc.warlock.rcp.views;
 
 import java.util.ArrayList;
 import java.util.Collection;
-import java.util.Collections;
 import java.util.HashMap;
-import java.util.Map;
 import java.util.regex.MatchResult;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -89,7 +87,8 @@ public class StreamView extends ViewPart implements IStreamListener, IGameViewFo
 	protected String prompt;
 	protected boolean multiClient = false;
 	
-	private Map<IWarlockClient, WarlockString> textBuffers = Collections.synchronizedMap(new HashMap<IWarlockClient, WarlockString>());
+	private HashMap<IWarlockClient, WarlockString> textBuffers =
+		new HashMap<IWarlockClient, WarlockString>();
 	
 	public StreamView() {
 		openViews.add(this);
@@ -230,7 +229,7 @@ public class StreamView extends ViewPart implements IStreamListener, IGameViewFo
 	}
 	
 	@Override
-	public void setFocus() {
+	public synchronized void setFocus() {
 		// Set View in Focus
 		viewInFocus = this;
 	}
@@ -243,7 +242,7 @@ public class StreamView extends ViewPart implements IStreamListener, IGameViewFo
 		return mainStream;
 	}
 	
-	public void setMainStream(IStream stream) {
+	public synchronized void setMainStream(IStream stream) {
 		this.mainStream = stream;
 		
 		stream.addStreamListener(streamListenerWrapper);
@@ -260,14 +259,14 @@ public class StreamView extends ViewPart implements IStreamListener, IGameViewFo
 		stream.setView(true);
 	}
 	
-	public void removeMainStream ()
+	public synchronized void removeMainStream ()
 	{
 		mainStream.removeStreamListener(streamListenerWrapper);
 		mainStream.getTitle().removeListener(propertyListenerWrapper);
 		mainStream.setView(false);
 	}
 	
-	public void addStream (IStream stream) {
+	public synchronized void addStream (IStream stream) {
 		streams.add(stream);
 		stream.addStreamListener(streamListenerWrapper);
 		if (propertyListenerWrapper == null) {
@@ -285,35 +284,32 @@ public class StreamView extends ViewPart implements IStreamListener, IGameViewFo
 		stream.setView(true);
 	}
 	
-	public void removeStream (IStream stream) {
+	public synchronized void removeStream (IStream stream) {
 		stream.removeStreamListener(streamListenerWrapper);
 		stream.getTitle().removeListener(propertyListenerWrapper);
 		streams.remove(stream);
 		stream.setView(false);
 	}
 	
-	public void streamCleared(IStream stream) {
+	public synchronized void streamCleared(IStream stream) {
 		if (this.mainStream.equals(stream) || streams.contains(stream))
 		{
 			clientStreams.get(stream.getClient()).setText("");
 		}
 	}
 	
-	protected void bufferText (IWarlockClient client, WarlockString string)
+	protected synchronized void bufferText (IWarlockClient client, WarlockString string)
 	{
-		WarlockString bufferedText;
-		synchronized(textBuffers) {
-			bufferedText = textBuffers.get(client);
-			if(bufferedText == null) {
-				bufferedText = new WarlockString();
-				textBuffers.put(client, bufferedText);
-			}
+		WarlockString bufferedText = textBuffers.get(client);
+		if(bufferedText == null) {
+			bufferedText = new WarlockString();
+			textBuffers.put(client, bufferedText);
 		}
 
 		bufferedText.append(string);
 	}
 	
-	protected void appendText(IWarlockClient client, WarlockString string) {
+	protected synchronized void appendText(IWarlockClient client, WarlockString string) {
 		WarlockText text = getTextForClient(client);
 		highlightText(client, string);
 		text.append(string);
@@ -345,7 +341,7 @@ public class StreamView extends ViewPart implements IStreamListener, IGameViewFo
 		}
 	}
 	
-	public void streamReceivedText(IStream stream, WarlockString text) {
+	public synchronized void streamReceivedText(IStream stream, WarlockString text) {
 		if (this.mainStream.equals(stream) || this.streams.contains(stream))
 		{
 			WarlockString string = new WarlockString();
@@ -364,7 +360,7 @@ public class StreamView extends ViewPart implements IStreamListener, IGameViewFo
 		}
 	}
 	
-	public void streamEchoed(IStream stream, String text) {
+	public synchronized void streamEchoed(IStream stream, String text) {
 		if (this.mainStream.equals(stream) || this.streams.contains(stream))
 		{
 			IWarlockClient client = stream.getClient();
@@ -382,7 +378,7 @@ public class StreamView extends ViewPart implements IStreamListener, IGameViewFo
 		}
 	}
 	
-	public void streamReceivedCommand(IStream stream, String text) {
+	public synchronized void streamReceivedCommand(IStream stream, String text) {
 		if (this.mainStream.equals(stream) || this.streams.contains(stream))
 		{
 			IWarlockClient client = stream.getClient();
@@ -398,7 +394,7 @@ public class StreamView extends ViewPart implements IStreamListener, IGameViewFo
 		}
 	}
 	
-	public void streamPrompted(IStream stream, String prompt) {
+	public synchronized void streamPrompted(IStream stream, String prompt) {
 		if (!(this.mainStream.equals(stream) || this.streams.contains(stream)))
 			return;
 		
@@ -410,14 +406,11 @@ public class StreamView extends ViewPart implements IStreamListener, IGameViewFo
 			
 			WarlockString text = new WarlockString();
 			
-			WarlockString bufferedText;
-			synchronized(textBuffers) {
-				bufferedText = textBuffers.get(client);
-				if (bufferedText != null)
-				{
-					text.append(bufferedText);
-					textBuffers.remove(client);
-				}
+			WarlockString bufferedText = textBuffers.get(client);
+			if (bufferedText != null)
+			{
+				text.append(bufferedText);
+				textBuffers.remove(client);
 			}
 			
 			if (!GameViewConfiguration.instance().getSuppressPrompt()) {
@@ -439,7 +432,7 @@ public class StreamView extends ViewPart implements IStreamListener, IGameViewFo
 		return openViews;
 	}
 	
-	public void setClient (IWarlockClient client)
+	public synchronized void setClient (IWarlockClient client)
 	{
 		currentText = getTextForClient(client);
 		book.showPage(currentText.getTextWidget());
@@ -501,13 +494,11 @@ public class StreamView extends ViewPart implements IStreamListener, IGameViewFo
 		setPartName(title);
 	}
 	
-	public void streamFlush(IStream stream) {
-		synchronized(textBuffers) {
-			WarlockString bufferedText = textBuffers.get(stream.getClient());
-			if(bufferedText != null) {
-				appendText(stream.getClient(), bufferedText);
-				textBuffers.remove(stream.getClient());
-			}
+	public synchronized void streamFlush(IStream stream) {
+		WarlockString bufferedText = textBuffers.get(stream.getClient());
+		if(bufferedText != null) {
+			appendText(stream.getClient(), bufferedText);
+			textBuffers.remove(stream.getClient());
 		}
 	}
 	
