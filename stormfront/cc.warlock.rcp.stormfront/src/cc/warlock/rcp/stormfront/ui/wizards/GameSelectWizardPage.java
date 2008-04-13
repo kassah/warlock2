@@ -43,7 +43,6 @@ import org.eclipse.jface.viewers.LabelProvider;
 import org.eclipse.jface.viewers.SelectionChangedEvent;
 import org.eclipse.jface.viewers.TableViewer;
 import org.eclipse.jface.wizard.IWizardPage;
-import org.eclipse.jface.wizard.WizardPage;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.graphics.Image;
 import org.eclipse.swt.layout.FillLayout;
@@ -56,6 +55,8 @@ import cc.warlock.core.stormfront.network.SGEConnectionListener;
 import cc.warlock.rcp.stormfront.adapters.SWTSGEConnectionListenerAdapter;
 import cc.warlock.rcp.stormfront.ui.StormFrontSharedImages;
 import cc.warlock.rcp.ui.WarlockSharedImages;
+import cc.warlock.rcp.wizards.WizardPageWithNotification;
+import cc.warlock.rcp.wizards.WizardWithNotification;
 
 /**
  * @author Marshall
@@ -63,7 +64,7 @@ import cc.warlock.rcp.ui.WarlockSharedImages;
  * TODO To change the template for this generated type comment go to
  * Window - Preferences - Java - Code Style - Code Templates
  */
-public class GameSelectWizardPage extends WizardPage {
+public class GameSelectWizardPage extends WizardPageWithNotification {
 
 	private Table games;
 	private List<? extends ISGEGame> gameList;
@@ -110,9 +111,7 @@ public class GameSelectWizardPage extends WizardPage {
 				gameSelected(gamesViewer.getSelection());
 				
 				IWizardPage nextPage = getWizard().getNextPage(GameSelectWizardPage.this);
-
-				nextPage.setVisible(true);
-				setVisible(false);
+				getContainer().showPage(nextPage);
 			}
 		});
 //		gamesViewer.addFilter(new ViewerFilter() {
@@ -157,28 +156,27 @@ public class GameSelectWizardPage extends WizardPage {
 		}
 	}
 	
-	public void setVisible (boolean visible) {
-		super.setVisible(visible);
-		
-		if (!visible && gameList != null && !gameList.isEmpty()) {
-			try {
-				getContainer().run(true, true, new IRunnableWithProgress() {
-					public void run(IProgressMonitor monitor)
-						throws InvocationTargetException, InterruptedException
-					{
-						listener.setProgressMonitor(monitor);
-						
-						monitor.beginTask("Finding characters in \"" + selectedGame.getGameName() + "\"...", 2);
-						connection.selectGame(selectedGame.getGameCode());
-						monitor.worked(1);
-					}
-				});
-			} catch (Exception e) {
-				e.printStackTrace();
+	@Override
+	public void pageExited(int button) {
+		if (button == WizardWithNotification.NEXT) {
+			if (gameList != null && !gameList.isEmpty()) {
+				try {
+					getContainer().run(true, true, new IRunnableWithProgress() {
+						public void run(IProgressMonitor monitor)
+							throws InvocationTargetException, InterruptedException
+						{
+							listener.setProgressMonitor(monitor);
+							
+							monitor.beginTask("Finding characters in \"" + selectedGame.getGameName() + "\"...", 2);
+							connection.selectGame(selectedGame.getGameCode());
+							monitor.worked(1);
+						}
+					});
+				} catch (Exception e) {
+					e.printStackTrace();
+				}
 			}
 		}
-		
-		setPageComplete(true);
 	}
 	
 	private class Listener extends SGEConnectionListener {

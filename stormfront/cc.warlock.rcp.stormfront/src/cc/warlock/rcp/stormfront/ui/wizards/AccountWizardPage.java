@@ -154,7 +154,11 @@ public class AccountWizardPage extends WizardPageWithNotification implements ICo
 						listener.setProgressMonitor(monitor);
 						
 						monitor.beginTask(WizardMessages.bind(WizardMessages.AccountWizardPage_progressMessage, account.getText()), 4);
-						connection.connect();
+						if (!connection.isConnected()) {
+							connection.connect();
+						} else {
+							connection.login(account.getText(), password.getText());
+						}
 						monitor.worked(1);
 					}
 				});
@@ -189,6 +193,7 @@ public class AccountWizardPage extends WizardPageWithNotification implements ICo
 		
 		public void sgeError(SGEConnection connection, int errorCode) {
 			LoginUtil.showAuthenticationError(errorCode);
+			getContainer().showPage(AccountWizardPage.this);
 		}
 		
 		public void gamesReady(SGEConnection connection, List<? extends ISGEGame> games) {
