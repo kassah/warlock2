@@ -1,5 +1,6 @@
 grammar WSL;
 
+options { backtrack=true; memoize=true; }
 
 @parser::header {
 	package cc.warlock.core.stormfront.script.wsl;
@@ -49,11 +50,11 @@ line
 	;
 
 expr returns [WSLAbstractCommand command]
-	: keyIF cond=conditionalExpression keyTHEN c=expr
+	: (keyIF)=> keyIF cond=conditionalExpression keyTHEN c=expr
 		{
 			command = new WSLCondition(lineNum, script, cond, c);
 		}
-	| keyACTION c=expr keyWHEN args=string_list
+	| (keyACTION)=> (keyACTION c=expr keyWHEN args=string_list
 		{
 			command = new WSLAction(lineNum, script, c, args);
 		}
@@ -64,7 +65,7 @@ expr returns [WSLAbstractCommand command]
 	| keyACTION keyCLEAR
 		{
 			command = new WSLActionClear(lineNum, script);
-		}
+		})
 	| args=string_list
 		{
 			command = new WSLCommand(lineNum, script, args);
@@ -82,10 +83,10 @@ string_list returns [IWSLValue value]
 			}
 	;
 
-string_list_helper returns [ArrayList<IWSLValue> list]
+string_list_helper returns [ArrayList<IWSLValue> list] @init { String whitespace = null; }
 	: data=string_value
 		{
-			String whitespace = "";
+			whitespace = "";
 			for(int i = input.index() - 1; i >= 0 && input.get(i).getChannel() != state.channel; i--) {
 				whitespace = input.get(i).getText() + whitespace;
 			}
@@ -97,7 +98,7 @@ string_list_helper returns [ArrayList<IWSLValue> list]
 				list.add(data);
 			} else {
 				list = l;
-				if(whitespace.length() > 0)
+				if(whitespace != null && whitespace.length() > 0)
 					list.add(0, new WSLString(whitespace));
 				list.add(0, data);
 			}
@@ -111,9 +112,9 @@ string_value returns [IWSLValue value]
 	| v=ESCAPED_CHAR	{ value = new WSLString($v.text); }
 	;
 	
-conditionalExpression returns [IWSLValue cond]
-	: arg=conditionalAndExpression  { ArrayList<IWSLValue> args = null; }
-		(keyOR argNext=conditionalAndExpression
+conditionalExpression returns [IWSLValue cond] @init { ArrayList<IWSLValue> args = null; }
+	: arg=conditionalAndExpression { args = null; }
+		(keyOR)=> (keyOR argNext=conditionalAndExpression
 			{
 				if(args == null) {
 					args = new ArrayList<IWSLValue>();
@@ -130,8 +131,8 @@ conditionalExpression returns [IWSLValue cond]
 			}
 	;
 
-conditionalAndExpression returns [IWSLValue cond]
-	: arg=equalityExpression { ArrayList<IWSLValue> args = null; }
+conditionalAndExpression returns [IWSLValue cond] @init { ArrayList<IWSLValue> args = null; }
+	: arg=equalityExpression { args = null; }
 		(keyAND argNext=equalityExpression
 			{
 				if(args == null) {
@@ -150,11 +151,11 @@ conditionalAndExpression returns [IWSLValue cond]
 	;
 
 equalityExpression returns [IWSLValue cond]
-	: arg=relationalExpression
-			{
-				ArrayList<IWSLValue> args = null;
-				ArrayList<EqualityOperator> ops = null;
-			}
+	@init {
+			ArrayList<IWSLValue> args = null;
+			ArrayList<EqualityOperator> ops = null;
+		}
+	: arg=relationalExpression { args = null; ops = null; }
 		(op=equalityOp argNext=relationalExpression
 			{
 				if(args == null) {
@@ -183,28 +184,18 @@ equalityOp returns [EqualityOperator op]
 	
 relationalExpression returns [IWSLValue cond]
 	: arg=unaryExpression
+		((relationalOp)=> op=relationalOp argNext=unaryExpression | )
 			{
-				ArrayList<IWSLValue> args = null;
-				ArrayList<RelationalOperator> ops = null;
-			}
-		(op=relationalOp argNext=unaryExpression
-			{
-				if(args == null) {
-					args = new ArrayList<IWSLValue>();
-					args.add(arg);
-				}
-				args.add(argNext);
-				if(ops == null) {
-					ops = new ArrayList<RelationalOperator>();
-				}
-				ops.add(op);
-			}
-		)*
-			{
-				if(args == null || ops == null)
+				if(argNext == null || op == null) {
 					cond = arg;
-				else
+				} else {
+					ArrayList<IWSLValue> args = new ArrayList<IWSLValue>();
+					args.add(arg);
+					args.add(argNext);
+					ArrayList<RelationalOperator> ops = new ArrayList<RelationalOperator>();
+					ops.add(op);
 					cond = new WSLRelationalCondition(args, ops);
+				}
 			}
 	;
 
@@ -232,10 +223,10 @@ primaryExpression returns [IWSLValue cond]
 	;
 	
 cond_value returns [IWSLValue value]
-	: val=quoted_string	{ value = val; }
-	| v=VARIABLE		{ value = new WSLVariable($v.text, script); }
+	: v=VARIABLE		{ value = new WSLVariable($v.text, script); }
 	| v=LOCAL_VARIABLE	{ value = new WSLLocalVariable($v.text, script); }
-	| val=number		{ value = val; }
+	| (number)=> val=number		{ value = val; }
+	| (quoted_string)=> val=quoted_string	{ value = val; }
 	| keyTRUE			{ value = new WSLBoolean(true); }
 	| keyFALSE			{ value = new WSLBoolean(false); }
 	;
@@ -245,7 +236,7 @@ number returns [IWSLValue value]
 	;
 
 quoted_string returns [IWSLValue value]
-	: quote str=string_list quote
+	: (quote string_list)? quote str=string_list quote
 		{
 			// FIXME: get preceding and following whitespace
 			value = str;
@@ -253,7 +244,7 @@ quoted_string returns [IWSLValue value]
 	;
 
 quote
-	: { input.LT(1).getText().equals("if") }? STRING
+	: { input.LT(1).getText().equals("\"") }? STRING
 	;
 
 keyIF
@@ -321,8 +312,8 @@ keyFALSE
 	;
 
 
-WHITESPACE
-	: BLANK+			{ $channel = HIDDEN; }
+BLANK
+	: (' ' | '\t')+			{ $channel = HIDDEN; }
 	;
 EOL
 	: '\r'? '\n' { atStart = true; }
@@ -346,7 +337,7 @@ LOCAL_VARIABLE
 			}
 	;
 STRING
-	: ((~('%'|'$'|'\\'|'"'|WS))+ | '%' | '$') { atStart = false; }
+	: ((~('%'|'$'|'\\'|'"'|WS))+ | '%' | '$' | '"') { atStart = false; }
 	| ('%%'|'$$')
 		{
 			setText(getText().substring(0,1));
@@ -357,14 +348,11 @@ ESCAPED_CHAR
     : '\\' str=ANY { setText($str.text); atStart = false; }
 	;
 LABEL
-	: { atStart }?=> label=LABEL_STRING ':'			{ setText($label.text); atStart = false; }
+	: { atStart }?=> ( LABEL_STRING ':' )? label=LABEL_STRING ':'			{ setText($label.text); atStart = false; }
 	;
 
-fragment BLANK
-	: ' ' | '\t'
-	;
 fragment WS
-	: BLANK | '\n' | '\r'
+	: ' ' | '\t' | '\n' | '\r'
 	;
 fragment DIGIT
 	: '0'..'9'
@@ -372,15 +360,15 @@ fragment DIGIT
 fragment ANY
 	: .
 	;
-fragment WORD
-	: ('a'..'z'|DIGIT|'_')+
+fragment WORD_CHAR
+	: ('a'..'z'|DIGIT|'_')
 	;
 fragment LABEL_STRING
-	: (~(WS|':'))+
+	: WORD_CHAR (~(WS|':'))*
 	;
 fragment VARIABLE_STRING
-	: (~(WS|'%'))+
+	: WORD_CHAR (~(WS|'%'))*
 	;
 fragment LOCAL_VARIABLE_STRING
-	: (~(WS|'$'))+
+	: WORD_CHAR (~(WS|'$'))*
 	; 
