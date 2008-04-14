@@ -268,7 +268,8 @@ public class StreamView extends ViewPart implements IStreamListener, IGameViewFo
 	public synchronized void removeMainStream ()
 	{
 		mainStream.removeStreamListener(streamListenerWrapper);
-		mainStream.getTitle().removeListener(propertyListenerWrapper);
+		if (streamTitled)
+			mainStream.getTitle().removeListener(propertyListenerWrapper);
 		mainStream.setView(false);
 	}
 	
