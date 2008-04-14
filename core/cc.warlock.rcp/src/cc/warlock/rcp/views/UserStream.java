@@ -62,7 +62,7 @@ public class UserStream extends StreamView implements IWarlockClientListener {
 	}
 	
 	@Override
-	protected void appendText (IWarlockClient client, WarlockString string)
+	protected synchronized void appendText (IWarlockClient client, WarlockString string)
 	{
 		// Process filters on the complete lines
 		WarlockString ret = new WarlockString();
