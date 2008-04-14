@@ -86,6 +86,7 @@ public class StreamView extends ViewPart implements IStreamListener, IGameViewFo
 	protected boolean isPrompting = false;
 	protected String prompt;
 	protected boolean multiClient = false;
+	protected boolean streamTitled = true;
 	
 	private HashMap<IWarlockClient, WarlockString> textBuffers =
 		new HashMap<IWarlockClient, WarlockString>();
@@ -100,6 +101,10 @@ public class StreamView extends ViewPart implements IStreamListener, IGameViewFo
 			GameView.addGameViewFocusListener(this);
 			this.multiClient = true;
 		}
+	}
+	
+	public void setStreamTitled (boolean enabled) {
+		streamTitled = enabled;
 	}
 	
 	public void setMultiClient (boolean multiClient)
@@ -244,18 +249,19 @@ public class StreamView extends ViewPart implements IStreamListener, IGameViewFo
 	
 	public synchronized void setMainStream(IStream stream) {
 		this.mainStream = stream;
-		
-		stream.addStreamListener(streamListenerWrapper);
-		propertyListenerWrapper = new SWTPropertyListener<String>(new PropertyListener<String>() {
-			@Override
-			public void propertyChanged(IProperty<String> property, String oldValue) {
-				if (property.getName().equals("streamTitle"))
-				{
-					setPartName(property.get());
+		if (streamTitled) {
+			stream.addStreamListener(streamListenerWrapper);
+			propertyListenerWrapper = new SWTPropertyListener<String>(new PropertyListener<String>() {
+				@Override
+				public void propertyChanged(IProperty<String> property, String oldValue) {
+					if (property.getName().equals("streamTitle"))
+					{
+						setPartName(property.get());
+					}
 				}
-			}
-		});
-		stream.getTitle().addListener(propertyListenerWrapper);
+			});
+			stream.getTitle().addListener(propertyListenerWrapper);
+		}
 		stream.setView(true);
 	}
 	
@@ -269,24 +275,27 @@ public class StreamView extends ViewPart implements IStreamListener, IGameViewFo
 	public synchronized void addStream (IStream stream) {
 		streams.add(stream);
 		stream.addStreamListener(streamListenerWrapper);
-		if (propertyListenerWrapper == null) {
-			propertyListenerWrapper = new SWTPropertyListener<String>(new PropertyListener<String>() {
-				@Override
-				public void propertyChanged(IProperty<String> property, String oldValue) {
-					if (property.getName().equals("streamTitle"))
-					{
-						setPartName(property.get());
+		if (streamTitled) {
+			if (propertyListenerWrapper == null) {
+				propertyListenerWrapper = new SWTPropertyListener<String>(new PropertyListener<String>() {
+					@Override
+					public void propertyChanged(IProperty<String> property, String oldValue) {
+						if (property.getName().equals("streamTitle"))
+						{
+							setPartName(property.get());
+						}
 					}
-				}
-			});
+				});
+			}
+			stream.getTitle().addListener(propertyListenerWrapper);
 		}
-		stream.getTitle().addListener(propertyListenerWrapper);
 		stream.setView(true);
 	}
 	
 	public synchronized void removeStream (IStream stream) {
 		stream.removeStreamListener(streamListenerWrapper);
-		stream.getTitle().removeListener(propertyListenerWrapper);
+		if (streamTitled)
+			stream.getTitle().removeListener(propertyListenerWrapper);
 		streams.remove(stream);
 		stream.setView(false);
 	}
@@ -492,6 +501,11 @@ public class StreamView extends ViewPart implements IStreamListener, IGameViewFo
 	public void setViewTitle (String title)
 	{
 		setPartName(title);
+	}
+	
+	@Override
+	public void setPartName(String partName) {
+		super.setPartName(partName);
 	}
 	
 	public synchronized void streamFlush(IStream stream) {

@@ -94,9 +94,6 @@ public class UserStream extends StreamView implements IWarlockClientListener {
 	public void clientConnected(IWarlockClient client) {	
 		setClient(client);
 		addStream(client.getDefaultStream());
-		for (IStream x: client.getStreams()) {
-			x.getTitle().removeListener(propertyListenerWrapper);
-		}
 	}
 
 	public void clientDisconnected(IWarlockClient client) {
@@ -111,6 +108,7 @@ public class UserStream extends StreamView implements IWarlockClientListener {
 	public void createPartControl(Composite parent) {
 		super.createPartControl(parent);
 		String streamName = getViewSite().getSecondaryId().substring(getViewSite().getSecondaryId().lastIndexOf('.')+1);
+		setStreamTitled(false);
 		setName(streamName);
 		setStreamName(IWarlockClient.DEFAULT_STREAM_NAME);
 		setMultiClient(true);
