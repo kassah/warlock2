@@ -110,6 +110,7 @@ string_value returns [IWSLValue value]
 	| v=VARIABLE		{ value = new WSLVariable($v.text, script); }
 	| v=LOCAL_VARIABLE	{ value = new WSLLocalVariable($v.text, script); }
 	| v=ESCAPED_CHAR	{ value = new WSLString($v.text); }
+	| v=QUOTE			{ value = new WSLString($v.text); }
 	;
 	
 conditionalExpression returns [IWSLValue cond] @init { ArrayList<IWSLValue> args = null; }
@@ -131,23 +132,19 @@ conditionalExpression returns [IWSLValue cond] @init { ArrayList<IWSLValue> args
 			}
 	;
 
-conditionalAndExpression returns [IWSLValue cond] @init { ArrayList<IWSLValue> args = null; }
-	: arg=equalityExpression { args = null; }
-		(keyAND argNext=equalityExpression
-			{
-				if(args == null) {
-					args = new ArrayList<IWSLValue>();
-					args.add(arg);
-				}
+conditionalAndExpression returns [IWSLValue cond]
+	: arg=equalityExpression
+		((keyAND)=> keyAND argNext=equalityExpression | )
+		{
+			if(argNext == null) {
+				cond = arg;
+			} else {
+				ArrayList<IWSLValue> args = new ArrayList<IWSLValue>();
+				args.add(arg);
 				args.add(argNext);
+				cond = new WSLAndCondition(args);
 			}
-		)*
-			{
-				if(args == null)
-					cond = arg;
-				else
-					cond = new WSLAndCondition(args);
-			}
+		}
 	;
 
 equalityExpression returns [IWSLValue cond]
@@ -226,9 +223,9 @@ cond_value returns [IWSLValue value]
 	: v=VARIABLE		{ value = new WSLVariable($v.text, script); }
 	| v=LOCAL_VARIABLE	{ value = new WSLLocalVariable($v.text, script); }
 	| (number)=> val=number		{ value = val; }
-	| (quoted_string)=> val=quoted_string	{ value = val; }
-	| keyTRUE			{ value = new WSLBoolean(true); }
-	| keyFALSE			{ value = new WSLBoolean(false); }
+	| (keyTRUE)=> keyTRUE			{ value = new WSLBoolean(true); }
+	| (keyFALSE)=> keyFALSE			{ value = new WSLBoolean(false); }
+	| val=quoted_string	{ value = val; }
 	;
 
 number returns [IWSLValue value]
@@ -236,15 +233,43 @@ number returns [IWSLValue value]
 	;
 
 quoted_string returns [IWSLValue value]
-	: (quote string_list)? quote str=string_list quote
+	: QUOTE l=quoted_string_helper QUOTE
 		{
 			// FIXME: get preceding and following whitespace
-			value = str;
+			if(l.size() > 1)
+				value = new WSLList(l);
+			else
+				value = l.get(0);
 		}
 	;
 
-quote
-	: { input.LT(1).getText().equals("\"") }? STRING
+quoted_string_helper returns [ArrayList<IWSLValue> list] @init { String whitespace = null; }
+	: data=quoted_string_value
+		{
+			whitespace = "";
+			for(int i = input.index() - 1; i >= 0 && input.get(i).getChannel() != state.channel; i--) {
+				whitespace = input.get(i).getText() + whitespace;
+			}
+		}
+	(l=quoted_string_helper)?
+		{
+			if(l == null) {
+				list = new ArrayList<IWSLValue>();
+				list.add(data);
+			} else {
+				list = l;
+				if(whitespace != null && whitespace.length() > 0)
+					list.add(0, new WSLString(whitespace));
+				list.add(0, data);
+			}
+		}
+	;
+
+quoted_string_value returns [IWSLValue value]
+	: { !input.LT(1).getText().equals("\"") }? v=STRING			{ value = new WSLString($v.text); }
+	| v=VARIABLE		{ value = new WSLVariable($v.text, script); }
+	| v=LOCAL_VARIABLE	{ value = new WSLLocalVariable($v.text, script); }
+	| v=ESCAPED_CHAR	{ value = new WSLString($v.text); }
 	;
 
 keyIF
@@ -337,7 +362,7 @@ LOCAL_VARIABLE
 			}
 	;
 STRING
-	: ((~('%'|'$'|'\\'|'"'|WS))+ | '%' | '$' | '"') { atStart = false; }
+	: ((~('%'|'$'|'\\'|'"'|WS))+ | '%' | '$') { atStart = false; }
 	| ('%%'|'$$')
 		{
 			setText(getText().substring(0,1));
@@ -346,6 +371,9 @@ STRING
 	;
 ESCAPED_CHAR
     : '\\' str=ANY { setText($str.text); atStart = false; }
+	;
+QUOTE
+	: '"'
 	;
 LABEL
 	: { atStart }?=> ( LABEL_STRING ':' )? label=LABEL_STRING ':'			{ setText($label.text); atStart = false; }
