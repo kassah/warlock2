@@ -87,7 +87,7 @@ string_list_helper returns [ArrayList<IWSLValue> list] @init { String whitespace
 	: data=string_value
 		{
 			whitespace = "";
-			for(int i = input.index() - 1; i >= 0 && input.get(i).getChannel() != state.channel; i--) {
+			for(int i = input.index() - 1; i >= 0 && input.get(i).getChannel() != Token.DEFAULT_CHANNEL; i--) {
 				whitespace = input.get(i).getText() + whitespace;
 			}
 		}
@@ -115,7 +115,7 @@ string_value returns [IWSLValue value]
 	
 conditionalExpression returns [IWSLValue cond] @init { ArrayList<IWSLValue> args = null; }
 	: arg=conditionalAndExpression { args = null; }
-		(keyOR)=> (keyOR argNext=conditionalAndExpression
+		((keyOR)=> keyOR argNext=conditionalAndExpression
 			{
 				if(args == null) {
 					args = new ArrayList<IWSLValue>();
@@ -132,18 +132,22 @@ conditionalExpression returns [IWSLValue cond] @init { ArrayList<IWSLValue> args
 			}
 	;
 
-conditionalAndExpression returns [IWSLValue cond]
+conditionalAndExpression returns [IWSLValue cond] @init { ArrayList<IWSLValue> args = null; }
 	: arg=equalityExpression
-		((keyAND)=> keyAND argNext=equalityExpression | )
-		{
-			if(argNext == null) {
-				cond = arg;
-			} else {
-				ArrayList<IWSLValue> args = new ArrayList<IWSLValue>();
-				args.add(arg);
+		((keyAND)=> keyAND argNext=equalityExpression
+			{
+				if(args == null) {
+					args = new ArrayList<IWSLValue>();
+					args.add(arg);
+				}
 				args.add(argNext);
-				cond = new WSLAndCondition(args);
 			}
+		)*
+		{
+			if(args == null)
+				cond = arg;
+			else
+				cond = new WSLOrCondition(args);
 		}
 	;
 
@@ -153,7 +157,7 @@ equalityExpression returns [IWSLValue cond]
 			ArrayList<EqualityOperator> ops = null;
 		}
 	: arg=relationalExpression { args = null; ops = null; }
-		(op=equalityOp argNext=relationalExpression
+		((equalityOp)=> op=equalityOp argNext=relationalExpression
 			{
 				if(args == null) {
 					args = new ArrayList<IWSLValue>();
@@ -180,19 +184,29 @@ equalityOp returns [EqualityOperator op]
 	;
 	
 relationalExpression returns [IWSLValue cond]
-	: arg=unaryExpression
-		((relationalOp)=> op=relationalOp argNext=unaryExpression | )
+	@init {
+			ArrayList<IWSLValue> args = null;
+			ArrayList<RelationalOperator> ops = null;
+		}
+	: arg=unaryExpression { args = null; ops = null; }
+		((relationalOp)=> op=relationalOp argNext=unaryExpression
 			{
-				if(argNext == null || op == null) {
-					cond = arg;
-				} else {
-					ArrayList<IWSLValue> args = new ArrayList<IWSLValue>();
+				if(args == null) {
+					args = new ArrayList<IWSLValue>();
 					args.add(arg);
-					args.add(argNext);
-					ArrayList<RelationalOperator> ops = new ArrayList<RelationalOperator>();
-					ops.add(op);
-					cond = new WSLRelationalCondition(args, ops);
 				}
+				args.add(argNext);
+				if(ops == null) {
+					ops = new ArrayList<RelationalOperator>();
+				}
+				ops.add(op);
+			}
+		)*
+			{
+				if(args == null)
+					cond = arg;
+				else
+					cond = new WSLRelationalCondition(args, ops);
 			}
 	;
 
@@ -247,7 +261,7 @@ quoted_string_helper returns [ArrayList<IWSLValue> list] @init { String whitespa
 	: data=quoted_string_value
 		{
 			whitespace = "";
-			for(int i = input.index() - 1; i >= 0 && input.get(i).getChannel() != state.channel; i--) {
+			for(int i = input.index() - 1; i >= 0 && input.get(i).getChannel() != Token.DEFAULT_CHANNEL; i--) {
 				whitespace = input.get(i).getText() + whitespace;
 			}
 		}
@@ -266,7 +280,7 @@ quoted_string_helper returns [ArrayList<IWSLValue> list] @init { String whitespa
 	;
 
 quoted_string_value returns [IWSLValue value]
-	: { !input.LT(1).getText().equals("\"") }? v=STRING			{ value = new WSLString($v.text); }
+	: v=STRING			{ value = new WSLString($v.text); }
 	| v=VARIABLE		{ value = new WSLVariable($v.text, script); }
 	| v=LOCAL_VARIABLE	{ value = new WSLLocalVariable($v.text, script); }
 	| v=ESCAPED_CHAR	{ value = new WSLString($v.text); }
@@ -373,10 +387,10 @@ ESCAPED_CHAR
     : '\\' str=ANY { setText($str.text); atStart = false; }
 	;
 QUOTE
-	: '"'
+	: '"' { atStart = false; }
 	;
 LABEL
-	: { atStart }?=> ( LABEL_STRING ':' )? label=LABEL_STRING ':'			{ setText($label.text); atStart = false; }
+	: { atStart }?=> ( LABEL_STRING ':' )? label=LABEL_STRING ':' { setText($label.text); atStart = false; }
 	;
 
 fragment WS

@@ -15,4 +15,4 @@ Export-Package: cc.warlock.core.stormfront.script,
  cc.warlock.core.stormfront.script.wsl
 Bundle-ClassPath: warlock2-core-stormfront-script.jar,
  warlock2-core-stormfront-script-eclipse.jar,
- lib/runtime-2008-04-09.18.jar
+ lib/antlr-runtime-3.0.1.jar
