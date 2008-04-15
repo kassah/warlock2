@@ -390,7 +390,7 @@ QUOTE
 	: '"' { atStart = false; }
 	;
 LABEL
-	: { atStart }?=> ( LABEL_STRING ':' )? label=LABEL_STRING ':' { setText($label.text); atStart = false; }
+	: { atStart }?=> ( LABEL_STRING ':' )=> label=LABEL_STRING ':' { setText($label.text); atStart = false; }
 	;
 
 fragment WS
