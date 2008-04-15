@@ -287,19 +287,19 @@ quoted_string_value returns [IWSLValue value]
 	;
 
 keyIF
-	: { input.LT(1).getText().equals("if") }? STRING
+	: { input.LT(1).getText().equalsIgnoreCase("if") }? STRING
 	;
 keyTHEN
-	: { input.LT(1).getText().equals("then") }? STRING
+	: { input.LT(1).getText().equalsIgnoreCase("then") }? STRING
 	;
 keyOR
-	: { input.LT(1).getText().equals("or") || input.LT(1).getText().equals("||") }? STRING
+	: { input.LT(1).getText().equalsIgnoreCase("or") || input.LT(1).getText().equals("||") }? STRING
 	;
 keyAND
-	: { input.LT(1).getText().equals("and") || input.LT(1).getText().equals("&&") }? STRING
+	: { input.LT(1).getText().equalsIgnoreCase("and") || input.LT(1).getText().equals("&&") }? STRING
 	;
 keyNOT
-	: { input.LT(1).getText().equals("not") || input.LT(1).getText().equals("!") }? STRING
+	: { input.LT(1).getText().equalsIgnoreCase("not") || input.LT(1).getText().equals("!") }? STRING
 	;
 keyEQUAL
 	: { input.LT(1).getText().equals("=") || input.LT(1).getText().equals("==") }? STRING
@@ -326,28 +326,28 @@ keyRPAREN
 	: { input.LT(1).getText().equals(")") }? STRING
 	;
 keyEXISTS
-	: { input.LT(1).getText().equals("exists") }? STRING
+	: { input.LT(1).getText().equalsIgnoreCase("exists") }? STRING
 	;
 keyCONTAINS
-	: { input.LT(1).getText().equals("contains") || input.LT(1).getText().equals("indexof") }? STRING
+	: { input.LT(1).getText().equalsIgnoreCase("contains") || input.LT(1).getText().equalsIgnoreCase("indexof") }? STRING
 	;
 keyACTION
-	: { input.LT(1).getText().equals("action") }? STRING
+	: { input.LT(1).getText().equalsIgnoreCase("action") }? STRING
 	;
 keyWHEN
-	: { input.LT(1).getText().equals("when") }? STRING
+	: { input.LT(1).getText().equalsIgnoreCase("when") }? STRING
 	;
 keyREMOVE
-	: { input.LT(1).getText().equals("remove") }? STRING
+	: { input.LT(1).getText().equalsIgnoreCase("remove") }? STRING
 	;
 keyCLEAR
-	: { input.LT(1).getText().equals("clear") }? STRING
+	: { input.LT(1).getText().equalsIgnoreCase("clear") }? STRING
 	;
 keyTRUE
-	: { input.LT(1).getText().equals("true") }? STRING
+	: { input.LT(1).getText().equalsIgnoreCase("true") }? STRING
 	;
 keyFALSE
-	: { input.LT(1).getText().equals("false") }? STRING
+	: { input.LT(1).getText().equalsIgnoreCase("false") }? STRING
 	;
 
 
