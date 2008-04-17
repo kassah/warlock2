@@ -376,12 +376,11 @@ LOCAL_VARIABLE
 			}
 	;
 STRING
-	: ((~('%'|'$'|'\\'|'"'|WS))+ | '%' | '$') { atStart = false; }
-	| ('%%'|'$$')
-		{
-			setText(getText().substring(0,1));
-			atStart = false;
-		}
+	: ((~('%'|'$'|'\\'|'"'|'!'|'='|'>'|'<'|'('|')'|WS))+
+		| '%%' { setText("\%"); }
+		| '$$' { setText("$"); }
+		| '%' | '$' | '!=' | '<>' | '==' | '!' | '<' | '>' | '=' | '(' | ')'
+	) { atStart = false; }
 	;
 ESCAPED_CHAR
     : '\\' str=ANY { setText($str.text); atStart = false; }
