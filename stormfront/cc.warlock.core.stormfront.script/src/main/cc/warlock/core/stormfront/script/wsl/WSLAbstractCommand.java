@@ -24,6 +24,7 @@ package cc.warlock.core.stormfront.script.wsl;
 
 abstract public class WSLAbstractCommand {
 	private int lineNumber;
+	private boolean instant = false;
 	
 	public WSLAbstractCommand(int lineNumber) {
 		this.lineNumber = lineNumber;
@@ -31,6 +32,14 @@ abstract public class WSLAbstractCommand {
 	
 	public int getLineNumber() {
 		return lineNumber;
+	}
+	
+	public void setInstant(boolean i) {
+		instant = i;
+	}
+	
+	public boolean isInstant() {
+		return instant;
 	}
 	
 	abstract public void execute() throws InterruptedException;
