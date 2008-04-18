@@ -44,6 +44,13 @@ public class WSLAction extends WSLAbstractCommand {
 		public void run() {
 			script.setVariablesFromMatch((RegexMatch)match);
 			try {
+				if(!command.isInstant())
+					script.scriptCommands.waitForRoundtime();
+				while(script.scriptCommands.isSuspended()) {
+					script.scriptCommands.waitForResume();
+					if(!command.isInstant())
+						script.scriptCommands.waitForRoundtime();
+				}
 				command.execute();
 			} catch(InterruptedException e) {
 				// TODO - what to do here?
