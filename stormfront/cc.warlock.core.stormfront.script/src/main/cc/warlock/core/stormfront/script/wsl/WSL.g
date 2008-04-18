@@ -16,7 +16,7 @@ options { backtrack=true; memoize=true; }
 @parser::members {
 	private WSLScript script;
 	private int lineNum = 1;
-	private boolean inAction = false;
+	private int actionDepth = 0;
 	public void setScript(WSLScript s) { script = s; }
 	private boolean isNumber(String str) {
 		try {
@@ -60,18 +60,19 @@ expr returns [WSLAbstractCommand command]
 		{
 			command = new WSLCondition(lineNum, script, cond, c);
 		}
-	| (ACTION)=> ACTION { inAction = true; } (c=expr WHEN { inAction = false; } args=string_list
+	| (ACTION)=> ACTION { actionDepth++; } (c=expr WHEN { actionDepth--; } args=string_list
 			{
 				command = new WSLAction(lineNum, script, c, args);
 			}
-		| (REMOVE)=> REMOVE args=string_list
+		| (REMOVE)=> REMOVE { actionDepth--; } args=string_list
 			{
 				command = new WSLActionRemove(lineNum, script, args);
 			}
 		| (CLEAR)=> CLEAR
 			{
 				command = new WSLActionClear(lineNum, script);
-			}) { inAction = false; }
+				actionDepth--;
+			})
 	| (INSTANT)=> INSTANT c=expr
 		{
 			command = c;
@@ -298,7 +299,7 @@ qstring
 	;
 	
 string
-	: STRING | IF | THEN | OR | AND | NOTEQUAL | NOT | EQUAL | GTE | LTE | GT | LT | RPAREN | LPAREN | EXISTS | CONTAINS | ACTION | { !inAction }? WHEN | REMOVE | CLEAR | TRUE | FALSE | INSTANT | QUOTE | ESCAPED_CHAR
+	: STRING | IF | THEN | OR | AND | NOTEQUAL | NOT | EQUAL | GTE | LTE | GT | LT | RPAREN | LPAREN | EXISTS | CONTAINS | ACTION | { actionDepth == 0 }? WHEN | REMOVE | CLEAR | TRUE | FALSE | INSTANT | QUOTE | ESCAPED_CHAR
 	;
 
 IF
