@@ -156,7 +156,7 @@ conditionalAndExpression returns [IWSLValue cond] @init { ArrayList<IWSLValue> a
 			if(args == null)
 				cond = arg;
 			else
-				cond = new WSLOrCondition(args);
+				cond = new WSLAndCondition(args);
 		}
 	;
 
