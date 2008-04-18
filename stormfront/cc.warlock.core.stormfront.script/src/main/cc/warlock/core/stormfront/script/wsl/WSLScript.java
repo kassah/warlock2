@@ -54,8 +54,8 @@ public class WSLScript extends AbstractScript {
 	
 	private boolean debugging = false;
 	private int debugLevel = 1;
-	private HashMap<String, WSLAbstractCommand> labels = new HashMap<String, WSLAbstractCommand>();
-	private WSLAbstractCommand nextCommand;
+	private HashMap<String, Integer> labels = new HashMap<String, Integer>();
+	private int nextLine = 0;
 	private WSLAbstractCommand curCommand;
 	private String curLine;
 	private HashMap<String, IWSLValue> globalVariables = new HashMap<String, IWSLValue>();
@@ -155,18 +155,24 @@ public class WSLScript extends AbstractScript {
 	}
 	
 	private class WSLFrame {
-		private WSLAbstractCommand line;
+		private int line;
 		private HashMap<String, IWSLValue> localVariables;
 		
-		public WSLFrame(WSLAbstractCommand line, HashMap<String, IWSLValue> variables) {
+		public WSLFrame(int line, HashMap<String, IWSLValue> variables) {
 			this.line = line;
 			this.localVariables = variables;
 		}
 
 		public void restore() {
 			WSLScript.this.localVariables = localVariables;
-			WSLScript.this.curCommand = line;
-			WSLScript.this.nextCommand = line;
+			curCommand = commands.get(line);
+			nextLine = line;
+			while(curCommand == null) {
+				nextLine++;
+				if(nextLine >= commands.size())
+					break;
+				curCommand = commands.get(nextLine);
+			}
 		}
 	}
 	
@@ -264,23 +270,35 @@ public class WSLScript extends AbstractScript {
 			}
 			
 			curCommand = commands.get(0);
-			
-			// crazy dance to make sure we're not suspended and not in a roundtime
-			try {
-				scriptCommands.waitForRoundtime();
-				while(scriptCommands.isSuspended()) {
-					scriptCommands.waitForResume();
-					scriptCommands.waitForRoundtime();
-				}
-			} catch(InterruptedException e) {
-				// Nothing to do
+			while(curCommand == null) {
+				nextLine++;
+				if(nextLine >= commands.size())
+					break;
+				curCommand = commands.get(nextLine);
 			}
-			while(curCommand != null && isRunning()) {
-				int index = commands.indexOf(curCommand) + 1;
-				if(index < commands.size())
-					nextCommand = commands.get(index);
-				else
-					nextCommand = null;
+			
+			while(isRunning()) {
+				if(curCommand == null)
+					break;
+				// find the next non-null command
+				do {
+					nextLine++;
+					if(nextLine >= commands.size())
+						break;
+				} while (commands.get(nextLine) == null);
+				
+				// crazy dance to make sure we're not suspended and not in a roundtime
+				try {
+					if(!curCommand.isInstant())
+						scriptCommands.waitForRoundtime();
+					while(scriptCommands.isSuspended()) {
+						scriptCommands.waitForResume();
+						if(!curCommand.isInstant())
+							scriptCommands.waitForRoundtime();
+					}
+				} catch(InterruptedException e) {
+					// Nothing to do
+				}
 				
 				try {
 					curCommand.execute();
@@ -289,18 +307,10 @@ public class WSLScript extends AbstractScript {
 						break;
 				}
 				
-				curCommand = nextCommand;
+				if(nextLine >= commands.size())
+					break;
 				
-				// crazy dance to make sure we're not suspended and not in a roundtime
-				try {
-					scriptCommands.waitForRoundtime();
-					while(scriptCommands.isSuspended()) {
-						scriptCommands.waitForResume();
-						scriptCommands.waitForRoundtime();
-					}
-				} catch(InterruptedException e) {
-					// Nothing to do
-				}
+				curCommand = commands.get(nextLine);
 			}
 			
 			if(isRunning())
@@ -338,14 +348,14 @@ public class WSLScript extends AbstractScript {
 		scriptThread.start();
 	}
 	
-	public void addLabel(String label, WSLAbstractCommand line) {
+	public void addLabel(String label, Integer line) {
 		labels.put(label.toLowerCase(), line);
 	}
 	
 	public int labelLineNumber(String label) {
-		WSLAbstractCommand line = labels.get(label);
+		Integer line = labels.get(label);
 		if(line != null)
-			return line.getLineNumber();
+			return line;
 		else
 			return -1;
 	}
@@ -584,8 +594,15 @@ public class WSLScript extends AbstractScript {
 		}
 	}
 	
-	protected void gotoCommand(WSLAbstractCommand command) {
-		curCommand = nextCommand = command;
+	protected void gotoCommand(int line) {
+		curCommand = commands.get(line);
+		nextLine = line;
+		while(curCommand == null) {
+			nextLine++;
+			if(nextLine >= commands.size())
+				break;
+			curCommand = commands.get(nextLine);
+		}
 		
 		// if we're in an action, interrupt execution on the main thread
 		if(Thread.currentThread() != scriptThread) {
@@ -595,7 +612,7 @@ public class WSLScript extends AbstractScript {
 	
 	protected void gotoLabel (String label)
 	{
-		WSLAbstractCommand command = labels.get(label.toLowerCase());
+		Integer command = labels.get(label.toLowerCase());
 		
 		if (command != null)
 		{
@@ -631,7 +648,7 @@ public class WSLScript extends AbstractScript {
 	{
 		String[] args = arguments.split(argSeparator);
 		
-		WSLFrame frame = new WSLFrame(nextCommand, localVariables);
+		WSLFrame frame = new WSLFrame(nextLine, localVariables);
 		callstack.push(frame);
 		
 		// TODO perhaps abstract this
@@ -641,7 +658,7 @@ public class WSLScript extends AbstractScript {
 			setLocalVariable(String.valueOf(i + 1), args[i]);
 		}
 		
-		WSLAbstractCommand command = labels.get(label.toLowerCase());
+		Integer command = labels.get(label.toLowerCase());
 		
 		if (command != null)
 		{

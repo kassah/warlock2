@@ -39,14 +39,12 @@ script
 line
 	: (label=LABEL)? (c=expr)?
 		{
-			if(c == null)
-				c = new WSLCommand(lineNum, script, null);
 			script.addCommand(c);
 			if(label != null) {
 				int existingLine = script.labelLineNumber($label.text);
 				if(existingLine != -1)
 					script.echo("Redefinition of label \"" + $label.text + "\" on line " + lineNum + ", originally defined on line " + existingLine);
-				script.addLabel($label.text, c);
+				script.addLabel($label.text, lineNum);
 			}
 			lineNum++;
 		}
@@ -69,6 +67,11 @@ expr returns [WSLAbstractCommand command]
 			{
 				command = new WSLActionClear(lineNum, script);
 			}) { inAction = false; }
+	| (INSTANT)=> INSTANT c=expr
+		{
+			command = c;
+			command.setInstant(true);
+		}
 	| args=string_list
 		{
 			command = new WSLCommand(lineNum, script, args);
@@ -286,11 +289,11 @@ quoted_string_value returns [IWSLValue value]
 	;
 
 qstring
-	: STRING | IF | THEN | OR | AND | NOTEQUAL | NOT | EQUAL | GTE | LTE | GT | LT | RPAREN | LPAREN | EXISTS | CONTAINS | ACTION | WHEN | REMOVE | CLEAR | TRUE | FALSE | ESCAPED_CHAR
+	: STRING | IF | THEN | OR | AND | NOTEQUAL | NOT | EQUAL | GTE | LTE | GT | LT | RPAREN | LPAREN | EXISTS | CONTAINS | ACTION | WHEN | REMOVE | CLEAR | TRUE | FALSE | INSTANT | ESCAPED_CHAR
 	;
 	
 string
-	: STRING | IF | THEN | OR | AND | NOTEQUAL | NOT | EQUAL | GTE | LTE | GT | LT | RPAREN | LPAREN | EXISTS | CONTAINS | ACTION | { !inAction }? WHEN | REMOVE | CLEAR | TRUE | FALSE | QUOTE | ESCAPED_CHAR
+	: STRING | IF | THEN | OR | AND | NOTEQUAL | NOT | EQUAL | GTE | LTE | GT | LT | RPAREN | LPAREN | EXISTS | CONTAINS | ACTION | { !inAction }? WHEN | REMOVE | CLEAR | TRUE | FALSE | INSTANT | QUOTE | ESCAPED_CHAR
 	;
 
 IF
@@ -355,6 +358,9 @@ TRUE
 	;
 FALSE
 	: 'false' { atStart = false; }
+	;
+INSTANT
+	: 'instant' {atStart = false; }
 	;
 QUOTE
 	: '"' { atStart = false; }
