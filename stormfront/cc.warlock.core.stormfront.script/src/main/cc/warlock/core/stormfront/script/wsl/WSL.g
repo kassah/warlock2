@@ -57,7 +57,7 @@ expr returns [WSLAbstractCommand command]
 		{
 			command = new WSLCondition(lineNum, script, cond, c);
 		}
-	| (ACTION)=> ACTION { inAction = true; }((expr WHEN)=> c=expr WHEN args=string_list
+	| (ACTION)=> ACTION { inAction = true; } (c=expr WHEN args=string_list
 			{
 				command = new WSLAction(lineNum, script, c, args);
 			}
@@ -68,7 +68,7 @@ expr returns [WSLAbstractCommand command]
 		| (CLEAR)=> CLEAR
 			{
 				command = new WSLActionClear(lineNum, script);
-			})
+			}) { inAction = false; }
 	| args=string_list
 		{
 			command = new WSLCommand(lineNum, script, args);
@@ -108,8 +108,8 @@ string_list_helper returns [ArrayList<IWSLValue> list] @init { String whitespace
 	;
 
 string_value returns [IWSLValue value]
-	: str=string			{ value = new WSLString($str.text); }
-	| v=VARIABLE		{ value = new WSLVariable($v.text, script); }
+	: str=string				{ value = new WSLString($str.text); }
+	| v=VARIABLE				{ value = new WSLVariable($v.text, script); }
 	| v=LOCAL_VARIABLE	{ value = new WSLLocalVariable($v.text, script); }
 	;
 	
@@ -219,9 +219,9 @@ relationalOp returns [RelationalOperator op]
 	;
 
 unaryExpression returns [IWSLValue cond]
-	: NOT arg=unaryExpression	{ cond = new WSLNotCondition(arg); }
+	: NOT arg=unaryExpression			{ cond = new WSLNotCondition(arg); }
 	| EXISTS arg=unaryExpression	{ cond = new WSLExistsCondition(arg); }
-	| arg=primaryExpression			{ cond = arg; }
+	| arg=primaryExpression				{ cond = arg; }
 	;
 
 parenExpression returns [IWSLValue cond]
@@ -230,15 +230,15 @@ parenExpression returns [IWSLValue cond]
 
 primaryExpression returns [IWSLValue cond]
 	: arg=parenExpression	{ cond = arg; }
-	| (v=cond_value)		{ cond = v; }
+	| (v=cond_value)			{ cond = v; }
 	;
 	
 cond_value returns [IWSLValue value]
-	: v=VARIABLE		{ value = new WSLVariable($v.text, script); }
+	: v=VARIABLE				{ value = new WSLVariable($v.text, script); }
 	| v=LOCAL_VARIABLE	{ value = new WSLLocalVariable($v.text, script); }
-	| (number)=> val=number		{ value = val; }
-	| (TRUE)=> TRUE			{ value = new WSLBoolean(true); }
-	| (FALSE)=> FALSE			{ value = new WSLBoolean(false); }
+	| val=number				{ value = val; }
+	| TRUE							{ value = new WSLBoolean(true); }
+	| FALSE							{ value = new WSLBoolean(false); }
 	| val=quoted_string	{ value = val; }
 	;
 
@@ -280,8 +280,8 @@ quoted_string_helper returns [ArrayList<IWSLValue> list] @init { String whitespa
 	;
 
 quoted_string_value returns [IWSLValue value]
-	: str=qstring			{ value = new WSLString($str.text); }
-	| v=VARIABLE		{ value = new WSLVariable($v.text, script); }
+	: str=qstring				{ value = new WSLString($str.text); }
+	| v=VARIABLE				{ value = new WSLVariable($v.text, script); }
 	| v=LOCAL_VARIABLE	{ value = new WSLLocalVariable($v.text, script); }
 	;
 
