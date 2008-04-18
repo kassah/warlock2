@@ -60,7 +60,7 @@ expr returns [WSLAbstractCommand command]
 		{
 			command = new WSLCondition(lineNum, script, cond, c);
 		}
-	| (ACTION)=> ACTION { inAction = true; } (c=expr WHEN args=string_list
+	| (ACTION)=> ACTION { inAction = true; } (c=expr WHEN { inAction = false; } args=string_list
 			{
 				command = new WSLAction(lineNum, script, c, args);
 			}
