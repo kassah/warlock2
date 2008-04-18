@@ -16,6 +16,7 @@ options { backtrack=true; memoize=true; }
 @parser::members {
 	private WSLScript script;
 	private int lineNum = 1;
+	private boolean inAction = false;
 	public void setScript(WSLScript s) { script = s; }
 	private boolean isNumber(String str) {
 		try {
@@ -36,8 +37,10 @@ script
 	;
 
 line
-	: (label=LABEL)? c=expr
+	: (label=LABEL)? (c=expr)?
 		{
+			if(c == null)
+				c = new WSLCommand(lineNum, script, null);
 			script.addCommand(c);
 			if(label != null) {
 				int existingLine = script.labelLineNumber($label.text);
@@ -50,27 +53,26 @@ line
 	;
 
 expr returns [WSLAbstractCommand command]
-	: (keyIF)=> keyIF cond=conditionalExpression keyTHEN c=expr
+	: (IF)=> IF cond=conditionalExpression THEN c=expr
 		{
 			command = new WSLCondition(lineNum, script, cond, c);
 		}
-	| (keyACTION)=> (keyACTION c=expr keyWHEN args=string_list
-		{
-			command = new WSLAction(lineNum, script, c, args);
-		}
-	| keyACTION keyREMOVE args=string_list
-		{
-			command = new WSLActionRemove(lineNum, script, args);
-		}
-	| keyACTION keyCLEAR
-		{
-			command = new WSLActionClear(lineNum, script);
-		})
+	| (ACTION)=> ACTION { inAction = true; }((expr WHEN)=> c=expr WHEN args=string_list
+			{
+				command = new WSLAction(lineNum, script, c, args);
+			}
+		| (REMOVE)=> REMOVE args=string_list
+			{
+				command = new WSLActionRemove(lineNum, script, args);
+			}
+		| (CLEAR)=> CLEAR
+			{
+				command = new WSLActionClear(lineNum, script);
+			})
 	| args=string_list
 		{
 			command = new WSLCommand(lineNum, script, args);
 		}
-	| { command = new WSLCommand(lineNum, script, null); }
 	;
 
 string_list returns [IWSLValue value]
@@ -106,16 +108,14 @@ string_list_helper returns [ArrayList<IWSLValue> list] @init { String whitespace
 	;
 
 string_value returns [IWSLValue value]
-	: v=STRING			{ value = new WSLString($v.text); }
+	: str=string			{ value = new WSLString($str.text); }
 	| v=VARIABLE		{ value = new WSLVariable($v.text, script); }
 	| v=LOCAL_VARIABLE	{ value = new WSLLocalVariable($v.text, script); }
-	| v=ESCAPED_CHAR	{ value = new WSLString($v.text); }
-	| v=QUOTE			{ value = new WSLString($v.text); }
 	;
 	
 conditionalExpression returns [IWSLValue cond] @init { ArrayList<IWSLValue> args = null; }
 	: arg=conditionalAndExpression { args = null; }
-		((keyOR)=> keyOR argNext=conditionalAndExpression
+		(OR argNext=conditionalAndExpression
 			{
 				if(args == null) {
 					args = new ArrayList<IWSLValue>();
@@ -134,7 +134,7 @@ conditionalExpression returns [IWSLValue cond] @init { ArrayList<IWSLValue> args
 
 conditionalAndExpression returns [IWSLValue cond] @init { ArrayList<IWSLValue> args = null; }
 	: arg=equalityExpression
-		((keyAND)=> keyAND argNext=equalityExpression
+		(AND argNext=equalityExpression
 			{
 				if(args == null) {
 					args = new ArrayList<IWSLValue>();
@@ -157,7 +157,7 @@ equalityExpression returns [IWSLValue cond]
 			ArrayList<EqualityOperator> ops = null;
 		}
 	: arg=relationalExpression { args = null; ops = null; }
-		((equalityOp)=> op=equalityOp argNext=relationalExpression
+		(op=equalityOp argNext=relationalExpression
 			{
 				if(args == null) {
 					args = new ArrayList<IWSLValue>();
@@ -179,8 +179,8 @@ equalityExpression returns [IWSLValue cond]
 	;
 
 equalityOp returns [EqualityOperator op]
-	: keyEQUAL			{ op = EqualityOperator.equals; }
-	| keyNOTEQUAL		{ op = EqualityOperator.notequals; }
+	: EQUAL				{ op = EqualityOperator.equals; }
+	| NOTEQUAL		{ op = EqualityOperator.notequals; }
 	;
 	
 relationalExpression returns [IWSLValue cond]
@@ -189,7 +189,7 @@ relationalExpression returns [IWSLValue cond]
 			ArrayList<RelationalOperator> ops = null;
 		}
 	: arg=unaryExpression { args = null; ops = null; }
-		((relationalOp)=> op=relationalOp argNext=unaryExpression
+		(op=relationalOp argNext=unaryExpression
 			{
 				if(args == null) {
 					args = new ArrayList<IWSLValue>();
@@ -211,21 +211,21 @@ relationalExpression returns [IWSLValue cond]
 	;
 
 relationalOp returns [RelationalOperator op]
-	: keyGT			{ op = RelationalOperator.GreaterThan; }
-	| keyLT			{ op = RelationalOperator.LessThan; }
-	| keyGTE		{ op = RelationalOperator.GreaterThanEqualTo; }
-	| keyLTE		{ op = RelationalOperator.LessThanEqualTo; }
-	| keyCONTAINS	{ op = RelationalOperator.Contains; }
+	: GT				{ op = RelationalOperator.GreaterThan; }
+	| LT				{ op = RelationalOperator.LessThan; }
+	| GTE				{ op = RelationalOperator.GreaterThanEqualTo; }
+	| LTE				{ op = RelationalOperator.LessThanEqualTo; }
+	| CONTAINS	{ op = RelationalOperator.Contains; }
 	;
 
 unaryExpression returns [IWSLValue cond]
-	: keyNOT arg=unaryExpression	{ cond = new WSLNotCondition(arg); }
-	| keyEXISTS arg=unaryExpression	{ cond = new WSLExistsCondition(arg); }
+	: NOT arg=unaryExpression	{ cond = new WSLNotCondition(arg); }
+	| EXISTS arg=unaryExpression	{ cond = new WSLExistsCondition(arg); }
 	| arg=primaryExpression			{ cond = arg; }
 	;
 
 parenExpression returns [IWSLValue cond]
-	: keyLPAREN arg=conditionalExpression keyRPAREN		{ cond = arg; }
+	: LPAREN arg=conditionalExpression RPAREN		{ cond = arg; }
 	;
 
 primaryExpression returns [IWSLValue cond]
@@ -237,8 +237,8 @@ cond_value returns [IWSLValue value]
 	: v=VARIABLE		{ value = new WSLVariable($v.text, script); }
 	| v=LOCAL_VARIABLE	{ value = new WSLLocalVariable($v.text, script); }
 	| (number)=> val=number		{ value = val; }
-	| (keyTRUE)=> keyTRUE			{ value = new WSLBoolean(true); }
-	| (keyFALSE)=> keyFALSE			{ value = new WSLBoolean(false); }
+	| (TRUE)=> TRUE			{ value = new WSLBoolean(true); }
+	| (FALSE)=> FALSE			{ value = new WSLBoolean(false); }
 	| val=quoted_string	{ value = val; }
 	;
 
@@ -280,77 +280,85 @@ quoted_string_helper returns [ArrayList<IWSLValue> list] @init { String whitespa
 	;
 
 quoted_string_value returns [IWSLValue value]
-	: v=STRING			{ value = new WSLString($v.text); }
+	: str=qstring			{ value = new WSLString($str.text); }
 	| v=VARIABLE		{ value = new WSLVariable($v.text, script); }
 	| v=LOCAL_VARIABLE	{ value = new WSLLocalVariable($v.text, script); }
-	| v=ESCAPED_CHAR	{ value = new WSLString($v.text); }
 	;
 
-keyIF
-	: { input.LT(1).getText().equalsIgnoreCase("if") }? STRING
+qstring
+	: STRING | IF | THEN | OR | AND | NOTEQUAL | NOT | EQUAL | GTE | LTE | GT | LT | RPAREN | LPAREN | EXISTS | CONTAINS | ACTION | WHEN | REMOVE | CLEAR | TRUE | FALSE | ESCAPED_CHAR
 	;
-keyTHEN
-	: { input.LT(1).getText().equalsIgnoreCase("then") }? STRING
-	;
-keyOR
-	: { input.LT(1).getText().equalsIgnoreCase("or") || input.LT(1).getText().equals("||") }? STRING
-	;
-keyAND
-	: { input.LT(1).getText().equalsIgnoreCase("and") || input.LT(1).getText().equals("&&") }? STRING
-	;
-keyNOT
-	: { input.LT(1).getText().equalsIgnoreCase("not") || input.LT(1).getText().equals("!") }? STRING
-	;
-keyEQUAL
-	: { input.LT(1).getText().equals("=") || input.LT(1).getText().equals("==") }? STRING
-	;
-keyNOTEQUAL
-	: { input.LT(1).getText().equals("!=") || input.LT(1).getText().equals("<>") }? STRING
-	;
-keyGTE
-	: { input.LT(1).getText().equals(">=") }? STRING
-	;
-keyLTE
-	: { input.LT(1).getText().equals("<=") }? STRING
-	;
-keyGT
-	: { input.LT(1).getText().equals(">") }? STRING
-	;
-keyLT
-	: { input.LT(1).getText().equals("<") }? STRING
-	;
-keyLPAREN
-	: { input.LT(1).getText().equals("(") }? STRING
-	;
-keyRPAREN
-	: { input.LT(1).getText().equals(")") }? STRING
-	;
-keyEXISTS
-	: { input.LT(1).getText().equalsIgnoreCase("exists") }? STRING
-	;
-keyCONTAINS
-	: { input.LT(1).getText().equalsIgnoreCase("contains") || input.LT(1).getText().equalsIgnoreCase("indexof") }? STRING
-	;
-keyACTION
-	: { input.LT(1).getText().equalsIgnoreCase("action") }? STRING
-	;
-keyWHEN
-	: { input.LT(1).getText().equalsIgnoreCase("when") }? STRING
-	;
-keyREMOVE
-	: { input.LT(1).getText().equalsIgnoreCase("remove") }? STRING
-	;
-keyCLEAR
-	: { input.LT(1).getText().equalsIgnoreCase("clear") }? STRING
-	;
-keyTRUE
-	: { input.LT(1).getText().equalsIgnoreCase("true") }? STRING
-	;
-keyFALSE
-	: { input.LT(1).getText().equalsIgnoreCase("false") }? STRING
+	
+string
+	: STRING | IF | THEN | OR | AND | NOTEQUAL | NOT | EQUAL | GTE | LTE | GT | LT | RPAREN | LPAREN | EXISTS | CONTAINS | ACTION | { !inAction }? WHEN | REMOVE | CLEAR | TRUE | FALSE | QUOTE | ESCAPED_CHAR
 	;
 
-
+IF
+	: 'if' { atStart = false; }
+	;
+THEN
+	: 'then' { atStart = false; }
+	;
+OR
+	: ('or' | '||') { atStart = false; }
+	;
+AND
+	: ('and' | '&&') { atStart = false; }
+	;
+NOTEQUAL
+	: ('!=' | '<>') { atStart = false; }
+	;
+NOT
+	: ('not' | '!') { atStart = false; }
+	;
+EQUAL
+	: ('==' | '=') { atStart = false; }
+	;
+GTE
+	: '>=' { atStart = false; }
+	;
+LTE
+	: '<=' { atStart = false; }
+	;
+GT
+	: '>' { atStart = false; }
+	;
+LT
+	: '<' { atStart = false; }
+	;
+LPAREN
+	: '(' { atStart = false; }
+	;
+RPAREN
+	: ')' { atStart = false; }
+	;
+EXISTS
+	: 'exists' { atStart = false; }
+	;
+CONTAINS
+	: ('contains' | 'indexof') { atStart = false; }
+	;
+ACTION
+	: 'action' { atStart = false; }
+	;
+WHEN
+	: 'when' { atStart = false; }
+	;
+REMOVE
+	: 'remove' { atStart = false; }
+	;
+CLEAR
+	: 'clear' { atStart = false; }
+	;
+TRUE
+	: 'true' { atStart = false; }
+	;
+FALSE
+	: 'false' { atStart = false; }
+	;
+QUOTE
+	: '"' { atStart = false; }
+	;
 BLANK
 	: (' ' | '\t')+			{ $channel = HIDDEN; }
 	;
@@ -379,14 +387,11 @@ STRING
 	: ((~('%'|'$'|'\\'|'"'|'!'|'='|'>'|'<'|'('|')'|WS))+
 		| '%%' { setText("\%"); }
 		| '$$' { setText("$"); }
-		| '%' | '$' | '!=' | '<>' | '==' | '!' | '<' | '>' | '=' | '(' | ')'
+		| '%' | '$'
 	) { atStart = false; }
 	;
 ESCAPED_CHAR
     : '\\' str=ANY { setText($str.text); atStart = false; }
-	;
-QUOTE
-	: '"' { atStart = false; }
 	;
 LABEL
 	: { atStart }?=> ( LABEL_STRING ':' )=> label=LABEL_STRING ':' { setText($label.text); atStart = false; }
