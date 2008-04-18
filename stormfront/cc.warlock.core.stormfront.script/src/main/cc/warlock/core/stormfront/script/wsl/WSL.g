@@ -26,6 +26,11 @@ options { backtrack=true; memoize=true; }
 			return false;
 		}
 	}
+	@Override
+	public void reportError(RecognitionException ex) {
+		script.getCommands().echo("Line: " + ex.line + ":" + ex.charPositionInLine + ": " + ex.toString());
+		script.stop();
+	}
 }
 
 @lexer::members {
