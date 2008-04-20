@@ -44,6 +44,7 @@ import cc.warlock.core.script.IMatch;
 import cc.warlock.core.script.IScriptCommands;
 import cc.warlock.core.script.IScriptEngine;
 import cc.warlock.core.script.IScriptInfo;
+import cc.warlock.core.script.configuration.ScriptConfiguration;
 import cc.warlock.core.script.internal.RegexMatch;
 import cc.warlock.core.script.internal.TextMatch;
 import cc.warlock.core.stormfront.client.IStormFrontClient;
@@ -966,13 +967,10 @@ public class WSLScript extends AbstractScript {
 	
 	protected class WSLPut extends WSLCommandDefinition {
 		
-		private Pattern format = Pattern.compile("^\\.");
-		
 		public void execute(String arguments) throws InterruptedException {
 			scriptCommands.put(arguments);
 			// Quit this script if we're starting another one
-			Matcher m = format.matcher(arguments);
-			if(m.matches()) {
+			if(arguments.startsWith(ScriptConfiguration.instance().getScriptPrefix())) {
 				stop();
 			}
 		}

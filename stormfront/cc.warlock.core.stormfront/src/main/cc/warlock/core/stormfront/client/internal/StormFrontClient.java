@@ -132,7 +132,7 @@ public class StormFrontClient extends WarlockClient implements IStormFrontClient
 		String scriptPrefix = ScriptConfiguration.instance().getScriptPrefix();
 		
 		if (command.startsWith(scriptPrefix)){
-			runScript(command.substring(1));
+			runScript(command.substring(scriptPrefix.length()));
 		} else {
 			super.send(prefix, command);
 		}
