@@ -186,11 +186,12 @@ public class JavascriptEngine implements IScriptEngine {
 					if (!(e.getCause() instanceof Error))
 					{
 						e.printStackTrace();
-						client.getDefaultStream().echo("[JS " + e.details() + " at line " + e.lineNumber() + "]\n");
+						client.getDefaultStream().echo("[JS " + e.details() + "  Script: " + script.getName() + "  Line: " + e.lineNumber() + "]\n");
 					}
 				}
 				catch (RhinoException e) {
-					client.getDefaultStream().echo("[JS " + e.details() + " at line " + e.lineNumber() + "]\n");
+					e.printStackTrace();
+					client.getDefaultStream().echo("[JS " + e.details() + "  Script: " + script.getName() + "  Line: " + e.lineNumber() + "]\n");
 				}
 				catch(StopException e) {
 					// normal exit, do nothing
