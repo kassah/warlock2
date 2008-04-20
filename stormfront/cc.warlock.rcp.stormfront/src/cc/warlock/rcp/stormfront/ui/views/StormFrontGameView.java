@@ -159,6 +159,7 @@ public class StormFrontGameView extends GameView implements IStormFrontClientVie
 	{
 		String characterName = profile.getName();
 		reconnectLabel.setText("The character \"" + characterName + "\" is currently disconnected.");
+		reconnectLabel.setBackground(reconnectPopup.getBackground());
 
 		reconnect.setText("Login as \"" + characterName + "\"");
 		reconnect.setImage(WarlockSharedImages.getImage(WarlockSharedImages.IMG_RECONNECT));
@@ -180,6 +181,7 @@ public class StormFrontGameView extends GameView implements IStormFrontClientVie
 	{
 		reconnectLabel.setText("The character \"" + characterName +
 			"\" is not a saved profile, you will need to re-login:");
+		reconnectLabel.setBackground(reconnectPopup.getBackground());
 		reconnect.setText("Login");
 		reconnect.setImage(StormFrontSharedImages.getImage(StormFrontSharedImages.IMG_GAME));
 		if (currentListener != null)
