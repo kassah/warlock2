@@ -45,6 +45,7 @@ public class ScriptCommands implements IScriptCommands, IStreamListener, IRoomLi
 	protected IWarlockClient client;
 	protected Collection<LinkedBlockingQueue<String>> textWaiters =
 		Collections.synchronizedCollection(new ArrayList<LinkedBlockingQueue<String>>());
+	private StringBuffer receiveBuffer = new StringBuffer();
 	
 	private String scriptName;
 	
@@ -222,12 +223,11 @@ public class ScriptCommands implements IScriptCommands, IStreamListener, IRoomLi
 	
 	protected void receiveText(String text) {
 		int end;
-		while ((end = text.indexOf('\n')) != -1) {
-			receiveLine(text.substring(0, end + 1));
-			text = text.substring(end + 1);
+		receiveBuffer.append(text);
+		while ((end = receiveBuffer.indexOf("\n")) != -1) {
+			receiveLine(receiveBuffer.substring(0, end + 1));
+			receiveBuffer.delete(0, end + 1);
 		}
-		if(text.length() != 0)
-			receiveLine(text);
 	}
 	
 	protected void receiveLine(String line) {
