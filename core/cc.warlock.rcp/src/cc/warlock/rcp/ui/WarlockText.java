@@ -435,8 +435,16 @@ public class WarlockText implements LineBackgroundListener {
 	private void addStyles(List<WarlockStringStyleRange> styles, int offset, int length) {
 		// add a marker for each style with a name
 		for(WarlockStringStyleRange style : styles) {
-			if(style.style.getName() != null) {
-				this.addMarker(style.style.getName(), offset + style.getStart(), style.getLength());
+			String name = style.style.getName();
+			if(name != null) {
+				if(markers != null) {
+					WarlockTextMarker marker = markers.get(name);
+					if(marker != null && marker.offset + marker.length == offset + style.getStart()) {
+						marker.length += style.getLength();
+						continue;
+					}
+				}
+				this.addMarker(name, offset + style.getStart(), style.getLength());
 			}
 		}
 		
