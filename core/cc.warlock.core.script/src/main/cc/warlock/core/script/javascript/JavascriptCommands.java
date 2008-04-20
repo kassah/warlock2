@@ -92,6 +92,9 @@ public class JavascriptCommands {
 					// TODO Auto-generated catch block
 					e.printStackTrace();
 				}
+			} else {
+				commands.echo("ERROR:  Cannot include specified file: " + otherScript);
+				script.stop();
 			}
 		}
 	}
