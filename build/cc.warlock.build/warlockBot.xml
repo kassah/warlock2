@@ -18,4 +18,21 @@
 		
 		<antcall target="send-message"/>
 	</target>
+	
+	<target name="finished-premium-build">
+		<property file="warlock-build.properties"/>
+		<property file="mainBuilder/build.properties"/>
+		<property file="${buildDirectory}/${buildLabel}/currentSnapshot.properties"/>
+		
+		<condition 
+			property="message"
+			value="Warlock snapshot build succesfully completed: http://build.warlock.cc/premium/${build.current.snapshot}"
+			else="There was an error building the current snapshot, please see: http://hudson.warlock.cc">
+		
+			<isset property="build.current.snapshot"/>
+		</condition>
+		
+		<antcall target="send-message"/>
+	</target>
 </project>
+
