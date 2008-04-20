@@ -61,7 +61,8 @@
 			<istrue value="${premium-build}"/>
 			<then>
 				<copy todir="${buildDirectory}/plugins">
-					<fileset dir="${premium-dir}/*" includes="**/*" />
+					<fileset dir="${premium-dir}/automapper" includes="**/*" />
+					<fileset dir="${premium-dir}/monitor" includes="**/*" />
 				</copy>
 			</then>
 		</if>
