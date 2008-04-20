@@ -18,6 +18,14 @@ options { backtrack=true; memoize=true; }
 	private int lineNum = 1;
 	private int actionDepth = 0;
 	public void setScript(WSLScript s) { script = s; }
+	private boolean isNumber(String str) {
+		try {
+			Double.parseDouble(str);
+			return true;
+		} catch(NumberFormatException e) {
+			return false;
+		}
+	}
 	@Override
 	public void reportError(RecognitionException ex) {
 		script.getCommands().echo("Line: " + ex.line + ":" + ex.charPositionInLine + ": " + ex.toString());
@@ -180,7 +188,7 @@ equalityExpression returns [IWSLValue cond]
 	;
 
 equalityOp returns [EqualityOperator op]
-	: EQUAL				{ op = EqualityOperator.equals; }
+	: EQUAL			{ op = EqualityOperator.equals; }
 	| NOTEQUAL		{ op = EqualityOperator.notequals; }
 	;
 	
@@ -212,17 +220,17 @@ relationalExpression returns [IWSLValue cond]
 	;
 
 relationalOp returns [RelationalOperator op]
-	: GT				{ op = RelationalOperator.GreaterThan; }
-	| LT				{ op = RelationalOperator.LessThan; }
-	| GTE				{ op = RelationalOperator.GreaterThanEqualTo; }
-	| LTE				{ op = RelationalOperator.LessThanEqualTo; }
+	: GT		{ op = RelationalOperator.GreaterThan; }
+	| LT		{ op = RelationalOperator.LessThan; }
+	| GTE		{ op = RelationalOperator.GreaterThanEqualTo; }
+	| LTE		{ op = RelationalOperator.LessThanEqualTo; }
 	| CONTAINS	{ op = RelationalOperator.Contains; }
 	;
 
 unaryExpression returns [IWSLValue cond]
-	: NOT arg=unaryExpression			{ cond = new WSLNotCondition(arg); }
+	: NOT arg=unaryExpression		{ cond = new WSLNotCondition(arg); }
 	| EXISTS arg=unaryExpression	{ cond = new WSLExistsCondition(arg); }
-	| arg=primaryExpression				{ cond = arg; }
+	| arg=primaryExpression			{ cond = arg; }
 	;
 
 parenExpression returns [IWSLValue cond]
@@ -237,10 +245,14 @@ primaryExpression returns [IWSLValue cond]
 cond_value returns [IWSLValue value]
 	: v=VARIABLE		{ value = new WSLVariable($v.text, script); }
 	| v=LOCAL_VARIABLE	{ value = new WSLLocalVariable($v.text, script); }
-	| v=NUMBER			{ value = new WSLNumber($v.text); }
+	| val=number		{ value = val; }
 	| TRUE				{ value = new WSLBoolean(true); }
 	| FALSE				{ value = new WSLBoolean(false); }
 	| val=quoted_string	{ value = val; }
+	;
+
+number returns [IWSLValue value]
+	: { isNumber(input.LT(1).getText()) }? v=STRING	{ value = new WSLNumber($v.text); }
 	;
 
 quoted_string returns [IWSLValue value]
@@ -287,7 +299,7 @@ qstring returns [IWSLValue value]
 		| str=NOT | str=EQUAL | str=GTE | str=LTE | str=GT | str=LT
 		| str=RPAREN | str=LPAREN | str=EXISTS | str=CONTAINS | str=ACTION
 		| str=WHEN | str=REMOVE | str=CLEAR | str=TRUE | str=FALSE | str=INSTANT
-		| (BACKSLASH QUOTE)=> BACKSLASH str=QUOTE | str=BACKSLASH | str=NUMBER
+		| (BACKSLASH QUOTE)=> BACKSLASH str=QUOTE | str=BACKSLASH
 	) { value = new WSLString($str.text); }
 	;
 	
@@ -295,7 +307,7 @@ string
 	: STRING | IF | THEN | OR | AND | NOTEQUAL | NOT | EQUAL | GTE | LTE | GT
 	| LT | RPAREN | LPAREN | EXISTS | CONTAINS | ACTION
 	| { actionDepth == 0 }? WHEN | REMOVE | CLEAR | TRUE | FALSE | INSTANT
-	| QUOTE | BACKSLASH | NUMBER
+	| QUOTE | BACKSLASH
 	;
 
 IF
@@ -392,7 +404,7 @@ LOCAL_VARIABLE
 			}
 	;
 STRING
-	: ((~('%'|'$'|'\\'|'"'|'!'|'='|'>'|'<'|'('|')'|DIGIT|WS))+
+	: ((~('%'|'$'|'\\'|'"'|'!'|'='|'>'|'<'|'('|')'|WS))+
 		| '%%' { setText("\%"); }
 		| '$$' { setText("$"); }
 		| '%' | '$'
@@ -403,9 +415,6 @@ BACKSLASH
 	;
 LABEL
 	: { atStart }?=> ( LABEL_STRING ':' )=> label=LABEL_STRING ':' { setText($label.text); atStart = false; }
-	;
-NUMBER
-	: ('-'|'+')? (DIGIT+ | DIGIT* '.' DIGIT+)
 	;
 
 fragment WS
