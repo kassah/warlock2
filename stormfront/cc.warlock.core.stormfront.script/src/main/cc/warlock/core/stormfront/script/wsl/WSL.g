@@ -18,14 +18,6 @@ options { backtrack=true; memoize=true; }
 	private int lineNum = 1;
 	private int actionDepth = 0;
 	public void setScript(WSLScript s) { script = s; }
-	private boolean isNumber(String str) {
-		try {
-			Double.parseDouble(str);
-			return true;
-		} catch(NumberFormatException e) {
-			return false;
-		}
-	}
 	@Override
 	public void reportError(RecognitionException ex) {
 		script.getCommands().echo("Line: " + ex.line + ":" + ex.charPositionInLine + ": " + ex.toString());
@@ -243,16 +235,12 @@ primaryExpression returns [IWSLValue cond]
 	;
 	
 cond_value returns [IWSLValue value]
-	: v=VARIABLE				{ value = new WSLVariable($v.text, script); }
+	: v=VARIABLE		{ value = new WSLVariable($v.text, script); }
 	| v=LOCAL_VARIABLE	{ value = new WSLLocalVariable($v.text, script); }
-	| val=number				{ value = val; }
-	| TRUE							{ value = new WSLBoolean(true); }
-	| FALSE							{ value = new WSLBoolean(false); }
+	| v=NUMBER			{ value = new WSLNumber($v.text); }
+	| TRUE				{ value = new WSLBoolean(true); }
+	| FALSE				{ value = new WSLBoolean(false); }
 	| val=quoted_string	{ value = val; }
-	;
-
-number returns [IWSLValue value]
-	: { isNumber(input.LT(1).getText()) }? v=STRING	{ value = new WSLNumber($v.text); }
 	;
 
 quoted_string returns [IWSLValue value]
@@ -299,12 +287,15 @@ qstring returns [IWSLValue value]
 		| str=NOT | str=EQUAL | str=GTE | str=LTE | str=GT | str=LT
 		| str=RPAREN | str=LPAREN | str=EXISTS | str=CONTAINS | str=ACTION
 		| str=WHEN | str=REMOVE | str=CLEAR | str=TRUE | str=FALSE | str=INSTANT
-		| (BACKSLASH QUOTE)=> BACKSLASH str=QUOTE | str=BACKSLASH
+		| (BACKSLASH QUOTE)=> BACKSLASH str=QUOTE | str=BACKSLASH | str=NUMBER
 	) { value = new WSLString($str.text); }
 	;
 	
 string
-	: STRING | IF | THEN | OR | AND | NOTEQUAL | NOT | EQUAL | GTE | LTE | GT | LT | RPAREN | LPAREN | EXISTS | CONTAINS | ACTION | { actionDepth == 0 }? WHEN | REMOVE | CLEAR | TRUE | FALSE | INSTANT | QUOTE | BACKSLASH
+	: STRING | IF | THEN | OR | AND | NOTEQUAL | NOT | EQUAL | GTE | LTE | GT
+	| LT | RPAREN | LPAREN | EXISTS | CONTAINS | ACTION
+	| { actionDepth == 0 }? WHEN | REMOVE | CLEAR | TRUE | FALSE | INSTANT
+	| QUOTE | BACKSLASH | NUMBER
 	;
 
 IF
@@ -401,7 +392,7 @@ LOCAL_VARIABLE
 			}
 	;
 STRING
-	: ((~('%'|'$'|'\\'|'"'|'!'|'='|'>'|'<'|'('|')'|WS))+
+	: ((~('%'|'$'|'\\'|'"'|'!'|'='|'>'|'<'|'('|')'|DIGIT|WS))+
 		| '%%' { setText("\%"); }
 		| '$$' { setText("$"); }
 		| '%' | '$'
@@ -412,6 +403,9 @@ BACKSLASH
 	;
 LABEL
 	: { atStart }?=> ( LABEL_STRING ':' )=> label=LABEL_STRING ':' { setText($label.text); atStart = false; }
+	;
+NUMBER
+	: ('-'|'+')? (DIGIT+ | DIGIT* '.' DIGIT+)
 	;
 
 fragment WS
