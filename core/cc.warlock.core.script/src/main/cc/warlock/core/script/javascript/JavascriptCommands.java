@@ -63,7 +63,7 @@ public class JavascriptCommands {
 		commands.echo("");
 	}
 
-	public void include (String otherScript)
+	public boolean include (String otherScript)
 	{
 		script.checkStop();
 		
@@ -85,6 +85,7 @@ public class JavascriptCommands {
 					
 					includedScript.exec(script.getContext(), script.getScope());
 					
+					return true;
 				} catch (FileNotFoundException e) {
 					// TODO Auto-generated catch block
 					e.printStackTrace();
@@ -94,9 +95,9 @@ public class JavascriptCommands {
 				}
 			} else {
 				commands.echo("ERROR:  Cannot include specified file: " + otherScript);
-				script.stop();
 			}
 		}
+		return false;
 	}
 
 	public void move(String direction) {
