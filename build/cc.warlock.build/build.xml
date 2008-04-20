@@ -42,12 +42,29 @@
 		<progressCopy bar="copy" todir="${buildDirectory}/features">
 			<fileset dir="../../features" includes="cc.*.feature/**/*"/>
 		</progressCopy>
+		<if>
+			<istrue value="${premium-build}"/>
+			<then>
+				<copy todir="${buildDirectory}/features">
+					<fileset dir="${premium-dir}/features" includes="cc.*.feature/**/*" />
+				</copy>
+			</then>
+		</if>
 		<progress add="1" message="Copying Plugins..."/>
 		
 		<progressCopy bar="copy" todir="${buildDirectory}/plugins">
 			<fileset dir="../../core" includes="**/*"/>
 			<fileset dir="../../stormfront" includes="**/*"/>
 		</progressCopy>
+		
+		<if>
+			<istrue value="${premium-build}"/>
+			<then>
+				<copy todir="${buildDirectory}/plugins">
+					<fileset dir="${premium-dir}/*" includes="**/*" />
+				</copy>
+			</then>
+		</if>
 		<progress add="1"/>
 	</target>
 
@@ -82,9 +99,19 @@
 		<antRunner antfile="replaceVersions.xml"/>
 		<progress add="1" message="Building Plugins..."/>
 		
-		<antRunner antfile="${productBuild-script}">
-			<sysproperty key="builder" value="${basedir}/mainBuilder"/>
-		</antRunner>
+		<if>
+			<istrue value="${premium-build}"/>
+			<then>
+				<antRunner antfile="${productBuild-script}">
+					<sysproperty key="builder" value="${basedir}/premiumBuilder"/>
+				</antRunner>
+			</then>
+			<else>
+				<antRunner antfile="${productBuild-script}">
+					<sysproperty key="builder" value="${basedir}/mainBuilder"/>
+				</antRunner>
+			</else>
+		</if>
 		
 		<progress add="1" message="Renaming binaries..."/>
 		<antcall target="rename-binaries"/>
@@ -104,13 +131,24 @@
 			</then>
 		</if>
 		
+		<var name="build-url" value="http://build.warlock.cc/${warlock-version}"/>
+		<if>
+			<istrue value="${premium-build}"/>
+			<then>
+				<var name="build-url" value="http://build.warlock.cc/premium/${warlock-version}"/>
+			</then>
+		</if>
+				
 		<progress done="true"/>
 		<echo file="${buildDirectory}/${buildLabel}/${warlock-version}/build.properties">
 			build.duration=${build-timer}
 			build.date=${DSTAMP}
 			build.time=${TSTAMP}
 			build.id=${warlock-version}
-			build.url=http://build.warlock.cc/${warlock-version}
+			build.url=${build-url}
+		</echo>
+			
+		<echo file="${buildDirectory}/${buildLabel}/${warlock-version}/build.properties" append="true">
 		</echo>
 		
 		<echo file="${buildDirectory}/${buildLabel}/currentSnapshot.properties">
