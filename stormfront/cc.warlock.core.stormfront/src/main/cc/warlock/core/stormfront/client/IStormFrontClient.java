@@ -34,6 +34,7 @@ import cc.warlock.core.client.IProperty;
 import cc.warlock.core.client.IRoomListener;
 import cc.warlock.core.client.IStream;
 import cc.warlock.core.client.IWarlockClient;
+import cc.warlock.core.client.WarlockString;
 import cc.warlock.core.script.IScript;
 import cc.warlock.core.script.IScriptListener;
 import cc.warlock.core.stormfront.settings.IStormFrontClientSettings;
@@ -186,7 +187,7 @@ public interface IStormFrontClient extends IWarlockClient, IRoomListener {
 	 */
 	public IProperty<String> getComponent(String componentName);
 	
-	public void updateComponent(String name, String value);
+	public void updateComponent(String name, WarlockString value);
 	
 	public void loadCmdlist();
 	

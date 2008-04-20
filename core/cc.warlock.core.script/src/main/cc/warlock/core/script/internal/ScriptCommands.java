@@ -218,7 +218,7 @@ public class ScriptCommands implements IScriptCommands, IStreamListener, IRoomLi
 		receiveText(text.toString());
 	}
 	
-	public void componentUpdated(IStream stream, String id, String text) { }
+	public void componentUpdated(IStream stream, String id, WarlockString text) { }
 	
 	protected void receiveText(String text) {
 		int end;

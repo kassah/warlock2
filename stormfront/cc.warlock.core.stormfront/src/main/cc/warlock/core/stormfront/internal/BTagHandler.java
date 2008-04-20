@@ -21,14 +21,17 @@
  */
 package cc.warlock.core.stormfront.internal;
 
+import cc.warlock.core.client.IWarlockStyle;
 import cc.warlock.core.stormfront.IStormFrontProtocolHandler;
+import cc.warlock.core.stormfront.xml.StormFrontAttributeList;
 
 
 public class BTagHandler extends DefaultTagHandler {
 
+	private IWarlockStyle style;
+	
 	public BTagHandler(IStormFrontProtocolHandler handler) {
 		super(handler);
-		// TODO Auto-generated constructor stub
 	}
 
 	@Override
@@ -37,7 +40,18 @@ public class BTagHandler extends DefaultTagHandler {
 	}
 	
 	@Override
+	public void handleStart(StormFrontAttributeList attributes, String rawXML) {
+		style = handler.getClient().getClientSettings().getNamedStyle("bold");
+		handler.addStyle(style);
+	}
+	
+	@Override
 	public void handleEnd(String rawXML) {
+		if(style != null) {
+			handler.removeStyle(style);
+			style = null;
+		}
+		
 		// this will be off if we get nested b's.
 		handler.incrementMonsterCount();
 	}

@@ -535,7 +535,7 @@ public class StreamView extends ViewPart implements IStreamListener, IGameViewFo
 		currentText.pageDown();
 	}
 	
-	public void componentUpdated(IStream stream, String id, String value) {
+	public void componentUpdated(IStream stream, String id, WarlockString value) {
 		WarlockText text = getTextForClient(stream.getClient());
 		text.replaceMarker(id, value);
 	}

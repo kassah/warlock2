@@ -36,6 +36,7 @@ import cc.warlock.core.client.IStream;
 import cc.warlock.core.client.IWarlockSkin;
 import cc.warlock.core.client.IWarlockStyle;
 import cc.warlock.core.client.WarlockClientRegistry;
+import cc.warlock.core.client.WarlockString;
 import cc.warlock.core.client.internal.CharacterStatus;
 import cc.warlock.core.client.internal.ClientProperty;
 import cc.warlock.core.client.internal.WarlockClient;
@@ -397,8 +398,8 @@ public class StormFrontClient extends WarlockClient implements IStormFrontClient
 		//stream.addComponent(name);
 	}
 	
-	public void updateComponent(String name, String value) {
-		components.get(name).set(value);
+	public void updateComponent(String name, WarlockString value) {
+		components.get(name).set(value.toString());
 		componentStreams.get(name).updateComponent(name, value);
 	}
 	

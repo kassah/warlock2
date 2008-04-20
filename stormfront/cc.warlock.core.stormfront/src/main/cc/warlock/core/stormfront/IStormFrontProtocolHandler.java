@@ -27,6 +27,8 @@
  */
 package cc.warlock.core.stormfront;
 
+import java.util.Map;
+
 import cc.warlock.core.client.IStream;
 import cc.warlock.core.client.IWarlockStyle;
 import cc.warlock.core.stormfront.client.IStormFrontClient;
@@ -50,6 +52,7 @@ public interface IStormFrontProtocolHandler extends IStormFrontXMLHandler {
 	public void addStyle(IWarlockStyle style);
 	public void removeStyle(IWarlockStyle style);
 	public void clearStyles();
+	public Map<IWarlockStyle, Boolean> getStyles();
 	
 	public void resetMonsterCount();
 	public void incrementMonsterCount();

@@ -432,18 +432,11 @@ public class WarlockText implements LineBackgroundListener {
 		postTextChange(atBottom);
 	}
 	
-	public void append(WarlockString string) {
-		boolean atBottom = isAtBottom();
-		
-		int charCount = textWidget.getCharCount();
-		textWidget.append(string.toString());
-		
-		List<WarlockStringStyleRange> styles = string.getStyles();
-		
+	private void addStyles(List<WarlockStringStyleRange> styles, int offset, int length) {
 		// add a marker for each style with a name
 		for(WarlockStringStyleRange style : styles) {
 			if(style.style.getName() != null) {
-				this.addMarker(style.style.getName(), charCount + style.getStart(), style.getLength());
+				this.addMarker(style.style.getName(), offset + style.getStart(), style.getLength());
 			}
 		}
 		
@@ -464,17 +457,17 @@ public class WarlockText implements LineBackgroundListener {
 			}
 			
 			// create style segment for pos to next pos
-			int foundPos = findNextEvent(string, pos + 1);
+			int foundPos = findNextEvent(styles, pos + 1);
 			int nextPos;
 			if(foundPos < 0)
-				nextPos = string.length() - 1;
+				nextPos = length - 1;
 			else
 				nextPos = foundPos;
 			if(currentStyles.size() > 0) {
 				// merge all of the styles
-				StyleRangeWithData style = warlockStringStyleRangeToStyleRange(currentStyles.get(0), charCount);
+				StyleRangeWithData style = warlockStringStyleRangeToStyleRange(currentStyles.get(0), offset);
 				for(int i = 1; i < currentStyles.size(); i++) {
-					StyleRangeWithData nextStyle = warlockStringStyleRangeToStyleRange(currentStyles.get(i), charCount);
+					StyleRangeWithData nextStyle = warlockStringStyleRangeToStyleRange(currentStyles.get(i), offset);
 					if(nextStyle.font != null)
 						style.font = nextStyle.font;
 					if(nextStyle.background != null)
@@ -491,7 +484,7 @@ public class WarlockText implements LineBackgroundListener {
 					if(nextStyle.tooltip != null)
 						style.tooltip = nextStyle.tooltip;
 				}
-				style.start = charCount + pos;
+				style.start = offset + pos;
 				style.length = nextPos - pos;
 				finishedStyles.add(style);
 			}
@@ -502,6 +495,14 @@ public class WarlockText implements LineBackgroundListener {
 		for(StyleRangeWithData style : finishedStyles) {
 			textWidget.setStyleRange(style);
 		}
+	}
+	
+	public void append(WarlockString string) {
+		boolean atBottom = isAtBottom();
+		
+		int charCount = textWidget.getCharCount();
+		textWidget.append(string.toString());
+		addStyles(string.getStyles(), charCount, string.length());
 		
 		constrainLineLimit(atBottom);
 
@@ -509,9 +510,9 @@ public class WarlockText implements LineBackgroundListener {
 	}
 	
 	/* find an element in styles that intersects with the first element of styles, starting at pos */
-	private int findNextEvent(WarlockString string, int pos) {
+	private int findNextEvent(List<WarlockStringStyleRange> styles, int pos) {
 		int nextPos = -1;
-		for(WarlockStringStyleRange style : string.getStyles()) {
+		for(WarlockStringStyleRange style : styles) {
 			int start = style.getStart();
 			int end = start + style.getLength();
 			if(start >= pos) {
@@ -529,18 +530,17 @@ public class WarlockText implements LineBackgroundListener {
 		StyleRangeWithData styleRange = (StyleRangeWithData)StyleProviders.getStyleProvider(client).getStyleRange(client, range.style);
 		if(styleRange == null)
 			return null;
-//		if(range.style.getForegroundColor() != null && styleRange.foreground == null)
-//			styleRange.foreground = ColorUtil.warlockColorToColor(range.style.getForegroundColor());
-//		if(range.style.getBackgroundColor() != null && styleRange.background == null)
-//			styleRange.background = ColorUtil.warlockColorToColor(range.style.getBackgroundColor());
+
 		styleRange.start = offset + range.getStart();
 		styleRange.length = range.getLength();
+		
 		if(range.style.isFullLine())
 			setLineBackground(textWidget.getLineAtOffset(styleRange.start), styleRange.background);
 		if(range.style.getAction() != null)
 			styleRange.action = range.style.getAction();
 		if(range.style.getName() != null)
 			styleRange.data.put("name", range.style.getName());
+		
 		return styleRange;
 	}
 	
@@ -596,15 +596,16 @@ public class WarlockText implements LineBackgroundListener {
 		markers.put(name, new WarlockTextMarker(offset, length));
 	}
 	
-	public void replaceMarker(String name, String text) {
+	public void replaceMarker(String name, WarlockString text) {
 		if(markers == null) return;
 		WarlockTextMarker marker = markers.get(name);
 		if(marker == null) return;
 		int start = marker.offset;
 		int length = marker.length;
 		boolean atBottom = isAtBottom();
-		textWidget.replaceTextRange(start, length, text);
+		textWidget.replaceTextRange(start, length, text.toString());
 		updateMarkers(start, text.length() - length);
+		addStyles(text.getStyles(), start, text.length());
 		postTextChange(atBottom);
 	}
 	

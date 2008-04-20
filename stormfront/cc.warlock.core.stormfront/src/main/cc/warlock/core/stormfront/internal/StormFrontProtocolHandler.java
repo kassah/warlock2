@@ -317,6 +317,10 @@ public class StormFrontProtocolHandler implements IStormFrontProtocolHandler {
 		styles.clear();
 	}
 	
+	public Map<IWarlockStyle, Boolean> getStyles() {
+		return styles;
+	}
+	
 	public IStormFrontTagHandler getTagHandler(Class<? extends IStormFrontTagHandler> handlerType) {
 		
 		for (IStormFrontTagHandler handler : defaultTagHandlers.values())

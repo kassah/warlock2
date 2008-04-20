@@ -126,9 +126,9 @@ public class SWTStreamListener implements IStreamListener {
 	{
 		private IStream stream;
 		private String id;
-		private String text;
+		private WarlockString text;
 		
-		public ComponentUpdatedWrapper(IStream stream, String id, String text) {
+		public ComponentUpdatedWrapper(IStream stream, String id, WarlockString text) {
 			this.stream = stream;
 			this.id = id;
 			this.text = text;
@@ -168,7 +168,7 @@ public class SWTStreamListener implements IStreamListener {
 		run(new FlushWrapper(stream));
 	}
 	
-	public void componentUpdated(IStream stream, String id, String text) {
+	public void componentUpdated(IStream stream, String id, WarlockString text) {
 		run(new ComponentUpdatedWrapper(stream, id, text));
 	}
 }

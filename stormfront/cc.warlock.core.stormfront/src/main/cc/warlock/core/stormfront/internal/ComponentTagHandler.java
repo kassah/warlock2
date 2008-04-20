@@ -21,6 +21,10 @@
  */
 package cc.warlock.core.stormfront.internal;
 
+import java.util.Map;
+
+import cc.warlock.core.client.IWarlockStyle;
+import cc.warlock.core.client.WarlockString;
 import cc.warlock.core.stormfront.IStormFrontProtocolHandler;
 import cc.warlock.core.stormfront.client.IStormFrontClient;
 import cc.warlock.core.stormfront.xml.StormFrontAttributeList;
@@ -28,8 +32,8 @@ import cc.warlock.core.stormfront.xml.StormFrontAttributeList;
 
 public class ComponentTagHandler extends DefaultTagHandler {
 
-	protected String id;
-	protected StringBuffer componentText = new StringBuffer();
+	private String id;
+	private WarlockString componentText;
 	
 	public ComponentTagHandler(IStormFrontProtocolHandler handler) {
 		super(handler);
@@ -43,7 +47,7 @@ public class ComponentTagHandler extends DefaultTagHandler {
 	@Override
 	public void handleStart(StormFrontAttributeList attributes, String rawXML) {
 		id = attributes.getValue("id");
-		componentText.setLength(0);
+		componentText = new WarlockString();
 		
 		if(id != null && id.equals("room objs"))
 			handler.resetMonsterCount();
@@ -51,7 +55,12 @@ public class ComponentTagHandler extends DefaultTagHandler {
 	
 	@Override
 	public boolean handleCharacters(String characters) {
-		componentText.append(characters);
+		WarlockString str = new WarlockString(characters);
+		for(Map.Entry<IWarlockStyle, Boolean> style : handler.getStyles().entrySet()) {
+			str.addStyle(style.getKey());
+			style.setValue(true);
+		}
+		componentText.append(str);
 		
 		return true;
 	}
@@ -62,7 +71,8 @@ public class ComponentTagHandler extends DefaultTagHandler {
 			return;
 		
 		IStormFrontClient client = handler.getClient();
-		client.updateComponent(id, componentText.toString());
+		client.updateComponent(id, componentText);
+		componentText = null;
 		
 		if(id.equals("room objs")) {
 			int count = handler.getMonsterCount();

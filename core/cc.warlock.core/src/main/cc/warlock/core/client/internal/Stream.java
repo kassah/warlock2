@@ -191,7 +191,7 @@ public class Stream implements IStream {
 		hasView = view;
 	}
 	
-	public synchronized void updateComponent(String id, String text) {
+	public synchronized void updateComponent(String id, WarlockString text) {
 		for (IStreamListener listener : listeners)
 		{
 			try {

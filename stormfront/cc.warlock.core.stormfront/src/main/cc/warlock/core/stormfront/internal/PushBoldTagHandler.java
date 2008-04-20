@@ -21,16 +21,13 @@
  */
 package cc.warlock.core.stormfront.internal;
 
-import java.util.regex.Pattern;
-
 import cc.warlock.core.client.IWarlockStyle;
 import cc.warlock.core.stormfront.IStormFrontProtocolHandler;
 
 
 public class PushBoldTagHandler extends DefaultTagHandler {
 
-	protected IWarlockStyle style;
-	protected static final Pattern linkPattern = Pattern.compile("(www\\.|http://).+");
+	private IWarlockStyle style;
 	
 	public PushBoldTagHandler (IStormFrontProtocolHandler handler)
 	{

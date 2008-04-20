@@ -55,5 +55,5 @@ public interface IStream {
 	
 	public IWarlockClient getClient();
 	
-	public void updateComponent(String id, String text);
+	public void updateComponent(String id, WarlockString text);
 }
