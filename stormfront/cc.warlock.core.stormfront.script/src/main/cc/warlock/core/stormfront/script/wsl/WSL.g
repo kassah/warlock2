@@ -289,17 +289,22 @@ quoted_string_helper returns [ArrayList<IWSLValue> list] @init { String whitespa
 	;
 
 quoted_string_value returns [IWSLValue value]
-	: str=qstring				{ value = new WSLString($str.text); }
+	: str=qstring				{ value = str; }
 	| v=VARIABLE				{ value = new WSLVariable($v.text, script); }
 	| v=LOCAL_VARIABLE	{ value = new WSLLocalVariable($v.text, script); }
 	;
 
-qstring
-	: STRING | IF | THEN | OR | AND | NOTEQUAL | NOT | EQUAL | GTE | LTE | GT | LT | RPAREN | LPAREN | EXISTS | CONTAINS | ACTION | WHEN | REMOVE | CLEAR | TRUE | FALSE | INSTANT | ESCAPED_CHAR
+qstring returns [IWSLValue value]
+	: (str=STRING | str=IF | str=THEN | str=OR | str=AND | str=NOTEQUAL
+		| str=NOT | str=EQUAL | str=GTE | str=LTE | str=GT | str=LT
+		| str=RPAREN | str=LPAREN | str=EXISTS | str=CONTAINS | str=ACTION
+		| str=WHEN | str=REMOVE | str=CLEAR | str=TRUE | str=FALSE | str=INSTANT
+		| (BACKSLASH QUOTE)=> BACKSLASH str=QUOTE | str=BACKSLASH
+	) { value = new WSLString($str.text); }
 	;
 	
 string
-	: STRING | IF | THEN | OR | AND | NOTEQUAL | NOT | EQUAL | GTE | LTE | GT | LT | RPAREN | LPAREN | EXISTS | CONTAINS | ACTION | { actionDepth == 0 }? WHEN | REMOVE | CLEAR | TRUE | FALSE | INSTANT | QUOTE | ESCAPED_CHAR
+	: STRING | IF | THEN | OR | AND | NOTEQUAL | NOT | EQUAL | GTE | LTE | GT | LT | RPAREN | LPAREN | EXISTS | CONTAINS | ACTION | { actionDepth == 0 }? WHEN | REMOVE | CLEAR | TRUE | FALSE | INSTANT | QUOTE | BACKSLASH
 	;
 
 IF
@@ -402,8 +407,8 @@ STRING
 		| '%' | '$'
 	) { atStart = false; }
 	;
-ESCAPED_CHAR
-    : '\\' str=ANY { setText($str.text); atStart = false; }
+BACKSLASH
+    : '\\' { atStart = false; }
 	;
 LABEL
 	: { atStart }?=> ( LABEL_STRING ':' )=> label=LABEL_STRING ':' { setText($label.text); atStart = false; }
@@ -414,9 +419,6 @@ fragment WS
 	;
 fragment DIGIT
 	: '0'..'9'
-	;
-fragment ANY
-	: .
 	;
 fragment WORD_CHAR
 	: ('a'..'z'|DIGIT|'_')
