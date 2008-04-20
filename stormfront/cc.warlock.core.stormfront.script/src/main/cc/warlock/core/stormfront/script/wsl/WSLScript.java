@@ -298,7 +298,10 @@ public class WSLScript extends AbstractScript {
 							scriptCommands.waitForRoundtime();
 					}
 				} catch(InterruptedException e) {
-					// Nothing to do
+					
+				} finally {
+					if(!isRunning())
+						break;
 				}
 				
 				try {
