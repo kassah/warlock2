@@ -109,6 +109,7 @@ public class WSLScript extends AbstractScript {
 		addCommandDefinition("put", new WSLPut());
 		addCommandDefinition("random", new WSLRandom());
 		addCommandDefinition("return", new WSLReturn());
+		addCommandDefinition("run", new WSLRun());
 		addCommandDefinition("save", new WSLSave());
 		addCommandDefinition("setlocalvariable", new WSLSetLocalVariable());
 		addCommandDefinition("setvariable", new WSLSetVariable());
@@ -962,8 +963,22 @@ public class WSLScript extends AbstractScript {
 	
 	protected class WSLPut extends WSLCommandDefinition {
 		
+		private Pattern format = Pattern.compile("^\\.");
+		
 		public void execute(String arguments) throws InterruptedException {
 			scriptCommands.put(arguments);
+			// Quit this script if we're starting another one
+			Matcher m = format.matcher(arguments);
+			if(m.matches()) {
+				stop();
+			}
+		}
+	}
+	
+	protected class WSLRun extends WSLCommandDefinition {
+		
+		public void execute(String arguments) throws InterruptedException {
+			sfClient.runScript(arguments);
 		}
 	}
 	

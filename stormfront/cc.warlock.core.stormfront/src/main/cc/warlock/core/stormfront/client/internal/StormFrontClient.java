@@ -132,14 +132,13 @@ public class StormFrontClient extends WarlockClient implements IStormFrontClient
 		String scriptPrefix = ScriptConfiguration.instance().getScriptPrefix();
 		
 		if (command.startsWith(scriptPrefix)){
-			runScriptCommand(command);
+			runScript(command.substring(1));
 		} else {
 			super.send(prefix, command);
 		}
 	}
 	
-	protected  void runScriptCommand(String command) {
-		command = command.substring(1);
+	public void runScript(String command) {
 		command = command.replaceAll("[\\r\\n]", "");
 		
 		int firstSpace = command.indexOf(" ");

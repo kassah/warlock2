@@ -191,5 +191,7 @@ public interface IStormFrontClient extends IWarlockClient, IRoomListener {
 	public void loadCmdlist();
 	
 	public String getCommand(String coord);
+	
+	public void runScript(String command);
 
 }
