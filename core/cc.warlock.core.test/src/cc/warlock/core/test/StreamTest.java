@@ -90,7 +90,7 @@ public class StreamTest {
 			flushed = true;
 		}
 		
-		public void componentUpdated(IStream stream, String id, String value) {
+		public void componentUpdated(IStream stream, String id, WarlockString value) {
 			handleEvent();
 			componentUpdated = true;
 		}
