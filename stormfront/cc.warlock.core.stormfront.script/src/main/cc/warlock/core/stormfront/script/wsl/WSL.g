@@ -427,7 +427,7 @@ fragment WORD_CHAR
 	: ('a'..'z'|DIGIT|'_')
 	;
 fragment LABEL_STRING
-	: (~(WS|':'))*
+	: (~(WS|':'))+
 	;
 fragment VARIABLE_STRING
 	: WORD_CHAR (~(WS|'%'))*
