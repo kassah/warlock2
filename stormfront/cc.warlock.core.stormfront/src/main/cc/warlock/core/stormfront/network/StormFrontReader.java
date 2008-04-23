@@ -26,8 +26,6 @@ import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.nio.CharBuffer;
 
-import cc.warlock.core.stormfront.client.IStormFrontClient;
-
 public class StormFrontReader extends InputStreamReader {
 
 	private StormFrontConnection connection;
@@ -95,9 +93,9 @@ public class StormFrontReader extends InputStreamReader {
 	
 	private void flush() {
 		if(recentText.length() > 0) {
-			((IStormFrontClient) connection.getClient()).flushStreams();
 			connection.dataReady(recentText.toString());
 			recentText.setLength(0);
+			connection.getClient().flushStreams();
 		}
 	}
 }
