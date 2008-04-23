@@ -420,6 +420,7 @@ public class StreamView extends ViewPart implements IStreamListener, IGameViewFo
 			if (bufferedText != null)
 			{
 				text.append(bufferedText);
+				bufferedText.clear();
 				textBuffers.remove(client);
 			}
 			
@@ -513,6 +514,7 @@ public class StreamView extends ViewPart implements IStreamListener, IGameViewFo
 		WarlockString bufferedText = textBuffers.get(stream.getClient());
 		if(bufferedText != null) {
 			appendText(stream.getClient(), bufferedText);
+			bufferedText.clear();
 			textBuffers.remove(stream.getClient());
 		}
 	}
