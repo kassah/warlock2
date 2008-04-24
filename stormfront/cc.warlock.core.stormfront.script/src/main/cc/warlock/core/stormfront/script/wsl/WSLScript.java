@@ -141,19 +141,19 @@ public class WSLScript extends AbstractScript {
 	}
 
 	public IWSLValue getVariable(String name) {
-		return globalVariables.get(name.toLowerCase());
+		return globalVariables.get(name);
 	}
 	
 	public boolean variableExists(String name) {
-		return globalVariables.containsKey(name.toLowerCase());
+		return globalVariables.containsKey(name);
 	}
 	
 	public boolean localVariableExists(String name) {
-		return localVariables.containsKey(name.toLowerCase());
+		return localVariables.containsKey(name);
 	}
 	
 	public IWSLValue getLocalVariable(String name) {
-		return localVariables.get(name.toLowerCase());
+		return localVariables.get(name);
 	}
 	
 	private class WSLFrame {
@@ -537,15 +537,15 @@ public class WSLScript extends AbstractScript {
 	}
 	
 	private void setVariable(String name, IWSLValue value) {
-		globalVariables.put(name.toLowerCase(), value);
+		globalVariables.put(name, value);
 	}
 	
 	private void deleteVariable(String name) {
-		globalVariables.remove(name.toLowerCase());
+		globalVariables.remove(name);
 	}
 	
 	private void deleteLocalVariable(String name) {
-		localVariables.remove(name.toLowerCase());
+		localVariables.remove(name);
 	}
 	
 	public void setLocalVariable(String name, String value) {
@@ -553,7 +553,7 @@ public class WSLScript extends AbstractScript {
 	}
 	
 	public void setLocalVariable(String name, IWSLValue value) {
-		localVariables.put(name.toLowerCase(), value);
+		localVariables.put(name, value);
 	}
 	
 	protected class WSLSetVariable extends WSLCommandDefinition {
