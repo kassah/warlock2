@@ -84,7 +84,7 @@ public class StormFrontGameView extends GameView implements IStormFrontClientVie
 	protected IStormFrontClient sfClient;
 	protected StormFrontStatus status;
 	protected WarlockPopupAction reconnectPopup;
-	protected StormFrontTextBorder textBorder;
+	//protected StormFrontTextBorder textBorder;
 	
 	public StormFrontGameView ()
 	{
@@ -98,7 +98,7 @@ public class StormFrontGameView extends GameView implements IStormFrontClientVie
 		super.createPartControl(parent);
 		
 		text.addCompass();
-		textBorder = new StormFrontTextBorder(text);
+		//textBorder = new StormFrontTextBorder(text);
 		
 		
 		((GridLayout)entryComposite.getLayout()).numColumns = 2;
@@ -289,7 +289,7 @@ public class StormFrontGameView extends GameView implements IStormFrontClientVie
 			
 			if (status != null) {
 				status.setActiveClient(sfClient);
-				textBorder.setActiveClient(sfClient);
+				// textBorder.setActiveClient(sfClient);
 			}
 			
 			loadClientSettings(sfClient.getStormFrontClientSettings());
