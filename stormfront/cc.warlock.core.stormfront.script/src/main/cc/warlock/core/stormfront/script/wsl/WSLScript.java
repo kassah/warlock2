@@ -55,6 +55,7 @@ public class WSLScript extends AbstractScript {
 	
 	private boolean debugging = false;
 	private int debugLevel = 1;
+	protected double delay = 0.0;
 	private HashMap<String, Integer> labels = new HashMap<String, Integer>();
 	private int nextLine = 0;
 	private WSLAbstractCommand curCommand;
@@ -92,6 +93,7 @@ public class WSLScript extends AbstractScript {
 		addCommandDefinition("deletelocalvariable", new WSLDeleteLocalVariable());
 		addCommandDefinition("debug", new WSLDebug());
 		addCommandDefinition("debuglevel", new WSLDebugLevel());
+		addCommandDefinition("delay", new WSLDelay());
 		addCommandDefinition("echo", new WSLEcho());
 		addCommandDefinition("else", new WSLElse());
 		addCommandDefinition("exit", new WSLExit());
@@ -292,11 +294,11 @@ public class WSLScript extends AbstractScript {
 				// crazy dance to make sure we're not suspended and not in a roundtime
 				try {
 					if(!curCommand.isInstant())
-						scriptCommands.waitForRoundtime();
+						scriptCommands.waitForRoundtime(delay);
 					while(scriptCommands.isSuspended()) {
 						scriptCommands.waitForResume();
 						if(!curCommand.isInstant())
-							scriptCommands.waitForRoundtime();
+							scriptCommands.waitForRoundtime(delay);
 					}
 				} catch(InterruptedException e) {
 					
@@ -404,7 +406,6 @@ public class WSLScript extends AbstractScript {
 		echo("Script warning on line " + curCommand.getLineNumber() + " (" + curLine + "): " + message);
 	}
 	
-	
 	protected void scriptDebug (int level, String message)
 	{
 		if (level <= debugLevel && debugging) {
@@ -473,6 +474,17 @@ public class WSLScript extends AbstractScript {
 			Matcher m = format.matcher(arguments);
 			if (m.find()) {
 				debugLevel = Integer.parseInt(m.group(1));
+			}
+		}
+	}
+	
+	protected class WSLDelay extends WSLCommandDefinition {
+		
+		public void execute(String arguments) {
+			try {
+				delay = Double.parseDouble(arguments);
+			} catch(NumberFormatException e) {
+				scriptWarning("Invalid arguments to delay");
 			}
 		}
 	}

@@ -85,9 +85,9 @@ public class StormFrontScriptCommands extends ScriptCommands implements IStormFr
 		super.streamPrompted(stream, prompt);
 	}
 	
-	public void waitForRoundtime() throws InterruptedException
+	public void waitForRoundtime(double delay) throws InterruptedException
 	{
-		sfClient.waitForRoundtime();
+		sfClient.waitForRoundtime(delay);
 	}
 	
 	private class ScriptActionThread extends Thread {

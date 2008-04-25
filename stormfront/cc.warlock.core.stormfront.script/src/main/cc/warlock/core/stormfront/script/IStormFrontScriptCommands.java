@@ -29,7 +29,7 @@ public interface IStormFrontScriptCommands extends IScriptCommands {
 
 	public IStormFrontClient getStormFrontClient();
 	
-	public void waitForRoundtime() throws InterruptedException;
+	public void waitForRoundtime(double delay) throws InterruptedException;
 	
 	public void addAction(Runnable action, IMatch match);
 	

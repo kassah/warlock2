@@ -91,7 +91,7 @@ public interface IStormFrontClient extends IWarlockClient, IRoomListener {
 	/**
 	 * Wait out any active roundtimes.
 	 */
-	public void waitForRoundtime() throws InterruptedException;
+	public void waitForRoundtime(double delay) throws InterruptedException;
 	
 	/**
 	 * @return The health property

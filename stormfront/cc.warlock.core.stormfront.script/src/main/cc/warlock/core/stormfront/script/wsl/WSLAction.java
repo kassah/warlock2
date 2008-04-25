@@ -45,11 +45,11 @@ public class WSLAction extends WSLAbstractCommand {
 			script.setVariablesFromMatch((RegexMatch)match);
 			try {
 				if(!command.isInstant())
-					script.scriptCommands.waitForRoundtime();
+					script.scriptCommands.waitForRoundtime(script.delay);
 				while(script.scriptCommands.isSuspended()) {
 					script.scriptCommands.waitForResume();
 					if(!command.isInstant())
-						script.scriptCommands.waitForRoundtime();
+						script.scriptCommands.waitForRoundtime(script.delay);
 				}
 				command.execute();
 			} catch(InterruptedException e) {

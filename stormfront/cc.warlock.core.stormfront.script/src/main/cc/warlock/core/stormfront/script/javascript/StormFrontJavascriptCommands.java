@@ -104,7 +104,7 @@ public class StormFrontJavascriptCommands extends JavascriptCommands
 		script.checkStop();
 		
 		try {
-			sfCommands.waitForRoundtime();
+			sfCommands.waitForRoundtime(0.0);
 		} catch(InterruptedException e) {
 			script.checkStop();
 		}
@@ -124,7 +124,7 @@ public class StormFrontJavascriptCommands extends JavascriptCommands
 	public void pause(double seconds) {
 		super.pause(seconds);
 		try {
-			sfCommands.waitForRoundtime();
+			sfCommands.waitForRoundtime(0.0);
 		} catch(InterruptedException e) {
 			script.checkStop();
 		}
