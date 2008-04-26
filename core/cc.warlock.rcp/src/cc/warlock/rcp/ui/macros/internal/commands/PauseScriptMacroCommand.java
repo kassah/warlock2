@@ -49,6 +49,6 @@ public class PauseScriptMacroCommand implements IMacroCommand {
 	}
 	
 	public String getDescription() {
-		return "Pause/remove running scripts";
+		return "Suspend/resume running scripts";
 	}
 }
