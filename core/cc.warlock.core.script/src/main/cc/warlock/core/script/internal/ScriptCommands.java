@@ -194,7 +194,11 @@ public class ScriptCommands implements IScriptCommands, IStreamListener, IRoomLi
 	}
 		
 	public void streamCleared(IStream stream) {}
-	public void streamEchoed(IStream stream, String text) {}
+	
+	public void streamEchoed(IStream stream, String text) {
+		receiveText(text);
+	}
+	
 	public void streamFlush(IStream stream) {}
 	
 	public void streamPrompted(IStream stream, String prompt) {
