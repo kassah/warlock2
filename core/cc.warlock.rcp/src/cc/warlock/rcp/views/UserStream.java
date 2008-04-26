@@ -31,7 +31,6 @@ import org.eclipse.ui.IWorkbenchPage;
 import org.eclipse.ui.PartInitException;
 import org.eclipse.ui.PlatformUI;
 
-import cc.warlock.core.client.IStream;
 import cc.warlock.core.client.IStreamFilter;
 import cc.warlock.core.client.IWarlockClient;
 import cc.warlock.core.client.IWarlockClientListener;
@@ -111,7 +110,6 @@ public class UserStream extends StreamView implements IWarlockClientListener {
 		setStreamTitled(false);
 		setName(streamName);
 		setStreamName(IWarlockClient.DEFAULT_STREAM_NAME);
-		setMultiClient(true);
 		scanClients();
 		if (streamName.equals("Events")) {
 			this.filters = getEventsFilters();

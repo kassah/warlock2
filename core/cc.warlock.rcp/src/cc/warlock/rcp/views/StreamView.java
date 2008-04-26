@@ -85,7 +85,6 @@ public class StreamView extends ViewPart implements IStreamListener, IGameViewFo
 	protected boolean appendNewlines = false;
 	protected boolean isPrompting = false;
 	protected String prompt;
-	protected boolean multiClient = false;
 	protected boolean streamTitled = true;
 	
 	private HashMap<IWarlockClient, WarlockString> textBuffers =
@@ -99,17 +98,11 @@ public class StreamView extends ViewPart implements IStreamListener, IGameViewFo
 		if (!(this instanceof GameView))
 		{
 			GameView.addGameViewFocusListener(this);
-			this.multiClient = true;
 		}
 	}
 	
 	public void setStreamTitled (boolean enabled) {
 		streamTitled = enabled;
-	}
-	
-	public void setMultiClient (boolean multiClient)
-	{
-		this.multiClient = multiClient;
 	}
 
 	public static StreamView getViewForStream (String prefix, String streamName) {
@@ -128,7 +121,6 @@ public class StreamView extends ViewPart implements IStreamListener, IGameViewFo
 		try {
 			StreamView nextInstance = (StreamView) page.showView(STREAM_VIEW_PREFIX + prefix + streamName);
 			nextInstance.setStreamName(streamName);
-			nextInstance.setMultiClient(true);
 			
 			return nextInstance;
 		} catch (PartInitException e) {
@@ -224,12 +216,9 @@ public class StreamView extends ViewPart implements IStreamListener, IGameViewFo
 	}
 
 	public void gameViewFocused(GameView gameView) {
-		if (multiClient)
+		if (gameView.getWarlockClient() != null)
 		{
-			if (gameView.getWarlockClient() != null)
-			{
-				setClient(gameView.getWarlockClient());
-			}
+			setClient(gameView.getWarlockClient());
 		}
 	}
 	
