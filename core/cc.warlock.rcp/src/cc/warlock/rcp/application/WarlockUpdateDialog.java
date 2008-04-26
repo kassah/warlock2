@@ -64,7 +64,7 @@ public class WarlockUpdateDialog extends Dialog {
 		super(parent);
 		
 		for (IFeatureReference ref : newVersions.keySet())
-			this.features.put(ref, false);
+			this.features.put(ref, true);
 		
 		this.oldVersions = newVersions;
 	}
@@ -75,7 +75,7 @@ public class WarlockUpdateDialog extends Dialog {
 		
 		newShell.setText("Warlock Updates");
 		newShell.setImage(WarlockSharedImages.getImage(WarlockSharedImages.IMG_UPDATES));
-		newShell.setSize(400, 300);
+		newShell.setSize(400, 450);
 		newShell.setActive();
 	}
 		
