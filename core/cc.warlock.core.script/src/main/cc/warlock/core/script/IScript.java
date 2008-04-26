@@ -45,7 +45,9 @@ public interface IScript {
 	
 	public void stop();
 	
-	public void suspendOrResume();
+	public void suspend();
+	
+	public void resume();
 	
 	public void addScriptListener (IScriptListener listener);
 	

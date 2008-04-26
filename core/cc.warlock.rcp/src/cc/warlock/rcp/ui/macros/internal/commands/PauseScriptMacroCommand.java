@@ -30,23 +30,25 @@ import cc.warlock.core.script.ScriptEngineRegistry;
 
 public class PauseScriptMacroCommand implements IMacroCommand {
 	
+	boolean paused = false;
+	
 	public String getIdentifier() {
 		return "PauseScript";
 	}
 	
 	public void execute(IWarlockClientViewer viewer) {
 		List<IScript> runningScripts = ScriptEngineRegistry.getRunningScripts(viewer.getWarlockClient());
-		if (runningScripts.size() > 0)
+		for(IScript currentScript : runningScripts)
 		{
-			IScript currentScript = runningScripts.get(runningScripts.size() - 1);
-			if (currentScript != null)
-			{
-				currentScript.suspendOrResume();
-			}
+			if(paused)
+				currentScript.resume();
+			else
+				currentScript.suspend();
 		}
+		paused = !paused;
 	}
 	
 	public String getDescription() {
-		return "Pause the the most recent running script";
+		return "Pause/remove running scripts";
 	}
 }
