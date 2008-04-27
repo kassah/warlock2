@@ -299,11 +299,13 @@ public class StormFrontGameView extends GameView implements IStormFrontClientVie
 				public void clientConnected(IWarlockClient client) {}
 				public void clientRemoved(IWarlockClient client) {}
 				public void clientDisconnected(IWarlockClient client) {
-					Display.getDefault().asyncExec(new Runnable() {
-						public void run () { 
-							StormFrontGameView.this.disconnected();
-						}
-					});
+					if (client == StormFrontGameView.this.client) {
+						Display.getDefault().asyncExec(new Runnable() {
+							public void run () {
+								StormFrontGameView.this.disconnected();
+							}
+						});
+					}
 				}
 			});
 		}
