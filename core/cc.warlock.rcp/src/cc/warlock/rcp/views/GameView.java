@@ -313,7 +313,7 @@ public abstract class GameView extends StreamView implements IWarlockClientViewe
 		this.currentText = getTextForClient(client);
 		book.showPage(currentText.getTextWidget());
 		
-		setMainStream(client.getDefaultStream());
+		addStream(client.getDefaultStream());
 		client.addViewer(wrapper);
 		
 		for (StreamView streamView : StreamView.openViews)
@@ -329,7 +329,7 @@ public abstract class GameView extends StreamView implements IWarlockClientViewe
 	
 	protected void disconnected ()
 	{
-		removeMainStream();
+		removeStream(client.getDefaultStream());
 		client.removeViewer(wrapper);
 	}
 	

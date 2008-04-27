@@ -71,7 +71,6 @@ public class StreamView extends ViewPart implements IStreamListener, IGameViewFo
 	protected static ArrayList<StreamView> openViews = new ArrayList<StreamView>();
 	protected static StreamView viewInFocus;
 	
-	protected IStream mainStream;
 	protected ArrayList<IStream> streams;
 	protected WarlockText currentText;
 	protected Composite mainComposite;
@@ -210,6 +209,9 @@ public class StreamView extends ViewPart implements IStreamListener, IGameViewFo
 			text.setScrollDirection(SWT.DOWN);
 			
 			clientStreams.put(client, text);
+			
+			addStream(client.getStream(mainStreamName));
+
 			return text;
 		}
 		else return clientStreams.get(client);
@@ -230,36 +232,6 @@ public class StreamView extends ViewPart implements IStreamListener, IGameViewFo
 	
 	public static StreamView getViewInFocus() {
 		return viewInFocus;
-	}
-
-	public IStream getMainStream() {
-		return mainStream;
-	}
-	
-	public synchronized void setMainStream(IStream stream) {
-		this.mainStream = stream;
-		if (streamTitled) {
-			stream.addStreamListener(streamListenerWrapper);
-			propertyListenerWrapper = new SWTPropertyListener<String>(new PropertyListener<String>() {
-				@Override
-				public void propertyChanged(IProperty<String> property, String oldValue) {
-					if (property.getName().equals("streamTitle"))
-					{
-						setPartName(property.get());
-					}
-				}
-			});
-			stream.getTitle().addListener(propertyListenerWrapper);
-		}
-		stream.setView(true);
-	}
-	
-	public synchronized void removeMainStream ()
-	{
-		mainStream.removeStreamListener(streamListenerWrapper);
-		if (streamTitled)
-			mainStream.getTitle().removeListener(propertyListenerWrapper);
-		mainStream.setView(false);
 	}
 	
 	public synchronized void addStream (IStream stream) {
@@ -291,7 +263,7 @@ public class StreamView extends ViewPart implements IStreamListener, IGameViewFo
 	}
 	
 	public synchronized void streamCleared(IStream stream) {
-		if (this.mainStream.equals(stream) || streams.contains(stream))
+		if (streams.contains(stream))
 		{
 			clientStreams.get(stream.getClient()).setText("");
 		}
@@ -341,7 +313,7 @@ public class StreamView extends ViewPart implements IStreamListener, IGameViewFo
 	}
 	
 	public synchronized void streamReceivedText(IStream stream, WarlockString text) {
-		if (this.mainStream.equals(stream) || this.streams.contains(stream))
+		if (this.streams.contains(stream))
 		{
 			WarlockString string = new WarlockString();
 			
@@ -360,7 +332,7 @@ public class StreamView extends ViewPart implements IStreamListener, IGameViewFo
 	}
 	
 	public synchronized void streamEchoed(IStream stream, String text) {
-		if (this.mainStream.equals(stream) || this.streams.contains(stream))
+		if (this.streams.contains(stream))
 		{
 			IWarlockClient client = stream.getClient();
 			WarlockString string = new WarlockString();
@@ -378,7 +350,7 @@ public class StreamView extends ViewPart implements IStreamListener, IGameViewFo
 	}
 	
 	public synchronized void streamReceivedCommand(IStream stream, String text) {
-		if (this.mainStream.equals(stream) || this.streams.contains(stream))
+		if (this.streams.contains(stream))
 		{
 			IWarlockClient client = stream.getClient();
 			WarlockString string = new WarlockString(text);
@@ -394,7 +366,7 @@ public class StreamView extends ViewPart implements IStreamListener, IGameViewFo
 	}
 	
 	public synchronized void streamPrompted(IStream stream, String prompt) {
-		if (!(this.mainStream.equals(stream) || this.streams.contains(stream)))
+		if (!this.streams.contains(stream))
 			return;
 		
 		if(!isPrompting)
@@ -436,25 +408,13 @@ public class StreamView extends ViewPart implements IStreamListener, IGameViewFo
 	{
 		currentText = getTextForClient(client);
 		book.showPage(currentText.getTextWidget());
-		//if (multiClient) {
-		//	if (!streams.contains(client.getStream(mainStreamName)))
-		//		addStream(client.getStream(mainStreamName));
-		//} else {
-			if (mainStream == null)
-				setMainStream(client.getStream(mainStreamName));
-		//}
-
+		
 		if (StyleProviders.getStyleProvider(client) == null)
 			StyleProviders.setStyleProvider(client, DefaultStyleProvider.instance());
 	}
 	
 	@Override
 	public void dispose() {
-		if (mainStream != null) {
-			mainStream.removeStreamListener(streamListenerWrapper);
-			mainStream.getTitle().removeListener(propertyListenerWrapper);
-			mainStream.setView(false);
-		}
 		
 		for (IStream stream : streams)
 		{
