@@ -313,7 +313,6 @@ public abstract class GameView extends StreamView implements IWarlockClientViewe
 		this.currentText = getTextForClient(client);
 		book.showPage(currentText.getTextWidget());
 		
-		addStream(client.getDefaultStream());
 		client.addViewer(wrapper);
 		
 		for (StreamView streamView : StreamView.openViews)
