@@ -270,7 +270,7 @@ public class WSLScript extends AbstractScript {
 				return;
 			} catch (RecognitionException e) {
 				e.printStackTrace();
-				// TODO handle the exception
+				return;
 			}
 			
 			curCommand = commands.get(0);
