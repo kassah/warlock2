@@ -210,26 +210,26 @@ public class JavascriptCommands {
 		}
 	}
 	
-	public int setInterval(String command, long interval) {
+	public int setInterval(String command, double interval) {
 		script.checkStop();
 		
 		int id = nextTimerID++;
 		
 		CommandCallback c = new CommandCallback(command);
 		timeTasks.put(id, c);
-		timer.scheduleAtFixedRate(c, interval, interval);
+		timer.scheduleAtFixedRate(c, (long)(interval * 1000.0), (long)(interval * 1000.0));
 		
 		return id;
 	}
 	
-	public int setTimeout(String command, long timeout) {
+	public int setTimeout(String command, double timeout) {
 		script.checkStop();
 		
 		int id = nextTimerID++;
 		
 		CommandCallback c = new CommandCallback(command);
 		timeTasks.put(id, c);
-		timer.schedule(c, timeout);
+		timer.schedule(c, (long)(timeout * 1000.0));
 		
 		return id;
 	}
