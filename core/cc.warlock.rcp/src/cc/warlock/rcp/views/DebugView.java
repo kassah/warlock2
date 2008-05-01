@@ -76,6 +76,8 @@ public class DebugView extends ViewPart implements IConnectionListener, IGameVie
 				});
 			}
 		});
+		
+		GameView.addGameViewFocusListener(this);
 	}
 	
 	public void setClient(IWarlockClient client) {
