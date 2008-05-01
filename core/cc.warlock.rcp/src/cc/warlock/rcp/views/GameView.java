@@ -328,7 +328,6 @@ public abstract class GameView extends StreamView implements IWarlockClientViewe
 	
 	protected void disconnected ()
 	{
-		removeStream(client.getDefaultStream());
 		client.removeViewer(wrapper);
 	}
 	
