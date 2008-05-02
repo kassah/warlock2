@@ -101,6 +101,13 @@
                label="Import from Stromfront...">
          </command>
       </menuContribution>
+      <menuContribution
+      		locationURI="menu:cc.warlock.rcp.menu.scriptControl?after=cc.warlock.rcp.menu.scriptControl.seperator">
+         <dynamic
+               class="cc.warlock.rcp.stormfront.ui.menu.ScriptMenuContributionItem"
+               id="cc.warlock.rcp.stormfront.scriptControl">
+         </dynamic>
+       </menuContribution>
    </extension>
    <extension
          point="org.eclipse.ui.propertyPages">

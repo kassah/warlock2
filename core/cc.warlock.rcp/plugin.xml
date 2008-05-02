@@ -175,6 +175,15 @@
                mnemonic="W">
          </menu>
          <menu
+         		id="cc.warlock.rcp.menu.scriptControl"
+         		label="Script Control"
+         		mnemonic="S">
+	         <separator
+	               name="cc.warlock.rcp.menu.scriptControl.seperator"
+	               visible="true">
+	         </separator>
+         </menu>
+         <menu
                id="cc.warlock.rcp.menu.help"
                label="Help"
                mnemonic="H">

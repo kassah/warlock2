@@ -42,6 +42,7 @@ public interface IScript {
 	public String getName ();
 	
 	public boolean isRunning ();
+	public boolean isSuspended ();
 	
 	public void stop();
 	

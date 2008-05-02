@@ -59,8 +59,14 @@ public abstract class AbstractScript implements IScript {
 		getCommands().stop();
 		
 		for (IScriptListener listener : listeners) listener.scriptStopped(this, true);
+		
+		listeners.clear();
 	}
 
+	public boolean isSuspended() {
+		return getCommands().isSuspended();
+	}
+	
 	public void suspend() {
 		if(!getCommands().isSuspended()) {
 			echo("[script paused: " + getName() + "]");
