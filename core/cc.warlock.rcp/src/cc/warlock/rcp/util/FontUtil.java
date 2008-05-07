@@ -21,6 +21,8 @@
  */
 package cc.warlock.rcp.util;
 
+import java.util.HashMap;
+
 import org.eclipse.swt.graphics.Font;
 import org.eclipse.swt.graphics.FontData;
 import org.eclipse.swt.widgets.Display;
@@ -33,6 +35,8 @@ import cc.warlock.core.client.WarlockFont;
  */
 public class FontUtil {
 
+	private static HashMap<WarlockFont, Font> fonts = new HashMap<WarlockFont, Font>();
+	
 	public static FontData warlockFontToFontData (WarlockFont font)
 	{
 		FontData data = new FontData();
@@ -44,7 +48,12 @@ public class FontUtil {
 	
 	public static Font warlockFontToFont (WarlockFont font)
 	{
-		return new Font(Display.getDefault(), warlockFontToFontData(font));
+		Font f = fonts.get(font);
+		if(f == null) {
+			f = new Font(Display.getDefault(), warlockFontToFontData(font));
+			fonts.put(font, f);
+		}
+		return f;
 	}
 	
 	public static WarlockFont fontDataToWarlockFont (FontData data)
