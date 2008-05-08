@@ -741,15 +741,18 @@ public class WSLScript extends AbstractScript {
 				time = 0;
 			}
 			
-			IMatch match = scriptCommands.matchWait(matches, matchQueue, time);
-			matchQueue = null;
-			
-			if (match != null)
-			{
-				matchData.get(match).run();
+			try {
+				IMatch match = scriptCommands.matchWait(matches, matchQueue, time);
+				matchQueue = null;
+
+				if (match != null)
+				{
+					matchData.get(match).run();
+				}
+			} finally {
+				matches.clear();
+				matchData.clear();
 			}
-			matches.clear();
-			matchData.clear();
 		}
 	}
 
