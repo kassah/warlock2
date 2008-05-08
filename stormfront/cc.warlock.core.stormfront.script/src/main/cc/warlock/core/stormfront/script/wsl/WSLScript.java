@@ -136,6 +136,7 @@ public class WSLScript extends AbstractScript {
 		setVariable("roomplayers", new WSLComponent(IStormFrontClient.COMPONENT_ROOM_PLAYERS));
 		setVariable("roomobjects", new WSLComponent(IStormFrontClient.COMPONENT_ROOM_OBJECTS));
 		setVariable("roomtitle", new WSLRoomTitle());
+		setVariable("lastcommand", new WSLLastCommand());
 		
 		for(IVariable var : client.getClientSettings().getAllVariables()) {
 			setVariable(var.getIdentifier(), new WSLString(var.getValue()));
@@ -248,6 +249,12 @@ public class WSLScript extends AbstractScript {
 		
 		public String toString () {
 			return sfClient.getComponent(componentName).get();
+		}
+	}
+	
+	private class WSLLastCommand extends WSLAbstractString {
+		public String toString() {
+			return scriptCommands.getLastCommand();
 		}
 	}
 	

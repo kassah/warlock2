@@ -31,6 +31,8 @@ public interface IScriptCommands extends IRoomListener {
 
 	public void put (String text) throws InterruptedException;
 	
+	public String getLastCommand();
+	
 	public void echo (String text);
 	
 	public void move (String direction) throws InterruptedException;
