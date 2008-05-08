@@ -17,6 +17,7 @@
 					<include name="stringtemplate*.jar"/>
 				</fileset>
 			</classpath>
+			<jvmarg line="-Xmx512m -XX:MaxPermSize=128m"/>
 			<arg line="-o ../../src/antlr"/>
 			<arg line="-lib ../../src/antlr/${lib-dir}"/>
 			<arg value="${grammar-file}"/>
