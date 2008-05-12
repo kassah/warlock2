@@ -367,7 +367,7 @@ public class WSLScript extends AbstractScript {
 	}
 	
 	public int labelLineNumber(String label) {
-		Integer line = labels.get(label);
+		Integer line = labels.get(label.toLowerCase());
 		if(line != null)
 			return line;
 		else
@@ -650,7 +650,7 @@ public class WSLScript extends AbstractScript {
 			}
 			else
 			{
-				scriptError("Invalid goto statement, label \"" + label + "\" does not exist");
+				scriptError("Label \"" + label + "\" does not exist");
 			}
 		}
 	}
