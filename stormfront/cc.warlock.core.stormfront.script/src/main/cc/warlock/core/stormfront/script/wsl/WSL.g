@@ -386,7 +386,7 @@ EOL
 	: '\r'? '\n' { atStart = true; }
 	;
 COMMENT
-	: { atStart }?=> ~(WORD_CHAR|WS) (~('\n'|'\r'))* { $channel = HIDDEN; }
+	: { atStart }?=> ~(WORD_CHAR|WS|'$'|'%') (~('\n'|'\r'))* { $channel = HIDDEN; }
 	;
 VARIABLE
 	: '%' var=VARIABLE_STRING '%'?
