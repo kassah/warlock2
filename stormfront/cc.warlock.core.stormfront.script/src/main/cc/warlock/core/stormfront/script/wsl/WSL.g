@@ -413,7 +413,7 @@ BACKSLASH
     : '\\' { atStart = false; }
 	;
 LABEL
-	: { atStart }?=> label=LABEL_STRING ':' { setText($label.text); atStart = false; }
+	: { atStart }? label=LABEL_STRING ':' { setText($label.text); atStart = false; }
 	;
 
 fragment WS
