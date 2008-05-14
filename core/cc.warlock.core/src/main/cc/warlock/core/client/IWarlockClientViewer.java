@@ -63,7 +63,7 @@ public interface IWarlockClientViewer extends IStreamListener {
 	
 	public void paste();
 	
-	public void sound(InputStream soundStream);
+	public void playSound(InputStream soundStream);
 
 	public void loadClientSettings(IClientSettings settings);
 }

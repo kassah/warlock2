@@ -114,15 +114,15 @@ public class SWTWarlockClientViewer extends SWTStreamListener implements IWarloc
 		}
 	}
 	
-	private class SoundWrapper implements Runnable {
+	private class PlaySoundWrapper implements Runnable {
 		public InputStream soundStream;
 		
-		public SoundWrapper(InputStream soundStream) {
+		public PlaySoundWrapper(InputStream soundStream) {
 			this.soundStream = soundStream;
 		}
 		
 		public void run () {
-			viewer.sound(soundStream);
+			viewer.playSound(soundStream);
 		}
 	}
 	
@@ -191,8 +191,8 @@ public class SWTWarlockClientViewer extends SWTStreamListener implements IWarloc
 		run(new PasteWrapper());
 	}
 	
-	public void sound(InputStream file) {
-		run(new SoundWrapper(file));
+	public void playSound(InputStream file) {
+		run(new PlaySoundWrapper(file));
 	}
 
 	public void loadClientSettings(IClientSettings settings) {

@@ -217,7 +217,7 @@ public abstract class GameView extends StreamView implements IWarlockClientViewe
 		text.redraw();
 	}
 	
-	public void sound(InputStream soundStream) {
+	public void playSound(InputStream soundStream) {
 		// TODO Auto-generated method stub
 		RCPUtil.playSound(soundStream);
 	}
