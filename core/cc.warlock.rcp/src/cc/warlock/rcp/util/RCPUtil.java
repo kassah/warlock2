@@ -21,6 +21,7 @@
  */
 package cc.warlock.rcp.util;
 
+import java.io.BufferedInputStream;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStream;
@@ -95,11 +96,12 @@ public class RCPUtil {
 		try {
 			Clip clip = AudioSystem.getClip();
 			
-			AudioFileFormat format = AudioSystem.getAudioFileFormat(soundStream);
+			BufferedInputStream bufferedStream = new BufferedInputStream(soundStream);
+			AudioFileFormat format = AudioSystem.getAudioFileFormat(bufferedStream);
 			
 			final Flag finished = new Flag();
 			finished.value = false;
-			final AudioInputStream stream = new AudioInputStream(soundStream, format.getFormat(), format.getFrameLength()); 
+			final AudioInputStream stream = new AudioInputStream(bufferedStream, format.getFormat(), format.getFrameLength()); 
 			clip.open(stream);
 			clip.addLineListener(new LineListener() {
 				public void update(LineEvent event) {
@@ -120,7 +122,7 @@ public class RCPUtil {
 				if (Display.getDefault() != null) {
 					Display.getDefault().readAndDispatch();
 				} else {
-					Thread.sleep((long)300);
+					Thread.sleep((long)500);
 				}
 			}
 		} catch (FileNotFoundException e) {
