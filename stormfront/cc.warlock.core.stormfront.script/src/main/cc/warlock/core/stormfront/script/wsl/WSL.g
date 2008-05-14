@@ -383,10 +383,7 @@ BLANK
 	: (' ' | '\t')+			{ $channel = HIDDEN; }
 	;
 EOL
-	: ('\r'? '\n'|'\r') { atStart = true; }
-	;
-COMMENT
-	: { atStart }?=> ~(WORD_CHAR|WS|'$'|'%') (~('\n'|'\r'))* { $channel = HIDDEN; }
+	: ('\r'? '\n' | '\r')	{ atStart = true; }
 	;
 VARIABLE
 	: '%' var=VARIABLE_STRING '%'?
@@ -413,7 +410,10 @@ BACKSLASH
     : '\\' { atStart = false; }
 	;
 LABEL
-	: { atStart }? label=LABEL_STRING ':' { setText($label.text); atStart = false; }
+	: { atStart }?=> (LABEL_STRING ':')=> label=LABEL_STRING ':' { setText($label.text); atStart = false; }
+	;
+COMMENT
+	: { atStart }?=> (~(WORD_CHAR|WS|'$'|'%'))=> ~(WORD_CHAR|WS|'$'|'%') (~('\n'|'\r'))* { $channel = HIDDEN; }
 	;
 
 fragment WS
