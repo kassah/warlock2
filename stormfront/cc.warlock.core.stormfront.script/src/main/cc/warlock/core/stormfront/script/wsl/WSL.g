@@ -383,7 +383,7 @@ BLANK
 	: (' ' | '\t')+			{ $channel = HIDDEN; }
 	;
 EOL
-	: '\r'? '\n' { atStart = true; }
+	: ('\r'? '\n'|'\r') { atStart = true; }
 	;
 COMMENT
 	: { atStart }?=> ~(WORD_CHAR|WS|'$'|'%') (~('\n'|'\r'))* { $channel = HIDDEN; }
