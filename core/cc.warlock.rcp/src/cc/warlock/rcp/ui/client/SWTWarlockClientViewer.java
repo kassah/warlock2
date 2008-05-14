@@ -27,6 +27,8 @@
  */
 package cc.warlock.rcp.ui.client;
 
+import java.io.InputStream;
+
 import cc.warlock.core.client.IWarlockClient;
 import cc.warlock.core.client.IWarlockClientViewer;
 import cc.warlock.core.client.settings.IClientSettings;
@@ -112,6 +114,18 @@ public class SWTWarlockClientViewer extends SWTStreamListener implements IWarloc
 		}
 	}
 	
+	private class SoundWrapper implements Runnable {
+		public InputStream soundStream;
+		
+		public SoundWrapper(InputStream soundStream) {
+			this.soundStream = soundStream;
+		}
+		
+		public void run () {
+			viewer.sound(soundStream);
+		}
+	}
+	
 	private class PasteWrapper implements Runnable {
 		public void run () {
 			viewer.paste();
@@ -177,6 +191,10 @@ public class SWTWarlockClientViewer extends SWTStreamListener implements IWarloc
 		run(new PasteWrapper());
 	}
 	
+	public void sound(InputStream file) {
+		run(new SoundWrapper(file));
+	}
+
 	public void loadClientSettings(IClientSettings settings) {
 		run(new LoadClientSettingsWrapper(settings));
 	}

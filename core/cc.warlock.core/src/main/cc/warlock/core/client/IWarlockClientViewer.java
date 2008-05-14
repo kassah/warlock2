@@ -24,6 +24,8 @@
  */
 package cc.warlock.core.client;
 
+import java.io.InputStream;
+
 import cc.warlock.core.client.settings.IClientSettings;
 
 
@@ -60,6 +62,8 @@ public interface IWarlockClientViewer extends IStreamListener {
 	public void copy();
 	
 	public void paste();
+	
+	public void sound(InputStream soundStream);
 
 	public void loadClientSettings(IClientSettings settings);
 }

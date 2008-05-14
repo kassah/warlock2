@@ -25,6 +25,7 @@
 package cc.warlock.rcp.views;
 
 import java.io.IOException;
+import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -56,12 +57,12 @@ import cc.warlock.rcp.ui.WarlockPopupAction;
 import cc.warlock.rcp.ui.WarlockText;
 import cc.warlock.rcp.ui.client.SWTWarlockClientViewer;
 import cc.warlock.rcp.util.ColorUtil;
+import cc.warlock.rcp.util.RCPUtil;
 
 /**
  * @author marshall
  */
 public abstract class GameView extends StreamView implements IWarlockClientViewer {
-
 	protected static GameView firstInstance;
 	protected static boolean firstInstanceIsUsed = false;
 	protected static ArrayList<GameView> openViews = new ArrayList<GameView>();
@@ -214,6 +215,11 @@ public abstract class GameView extends StreamView implements IWarlockClientViewe
 		}
 		
 		text.redraw();
+	}
+	
+	public void sound(InputStream soundStream) {
+		// TODO Auto-generated method stub
+		RCPUtil.playSound(soundStream);
 	}
 	
 	protected Image createCaretImage (int width, Color foreground)
