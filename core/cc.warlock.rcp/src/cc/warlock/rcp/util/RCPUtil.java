@@ -21,10 +21,10 @@
  */
 package cc.warlock.rcp.util;
 
-import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.IOException;
+import java.io.InputStream;
 import java.net.MalformedURLException;
 import java.net.URL;
 
@@ -91,16 +91,16 @@ public class RCPUtil {
 		public boolean value;
 	}
 	
-	public static void playSound (File soundFile)
+	public static void playSound (InputStream soundStream)
 	{
 		try {
 			Clip clip = AudioSystem.getClip();
 			
-			AudioFileFormat format = AudioSystem.getAudioFileFormat(soundFile);
+			AudioFileFormat format = AudioSystem.getAudioFileFormat(soundStream);
 			
 			final Flag finished = new Flag();
 			finished.value = false;
-			final AudioInputStream stream = new AudioInputStream(new FileInputStream(soundFile), format.getFormat(), format.getFrameLength()); 
+			final AudioInputStream stream = new AudioInputStream(soundStream, format.getFormat(), format.getFrameLength()); 
 			clip.open(stream);
 			clip.addLineListener(new LineListener() {
 				public void update(LineEvent event) {
