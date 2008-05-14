@@ -21,6 +21,7 @@
  */
 package cc.warlock.core.script.internal;
 
+import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
@@ -36,6 +37,7 @@ import cc.warlock.core.client.IRoomListener;
 import cc.warlock.core.client.IStream;
 import cc.warlock.core.client.IStreamListener;
 import cc.warlock.core.client.IWarlockClient;
+import cc.warlock.core.client.IWarlockClientViewer;
 import cc.warlock.core.client.WarlockString;
 import cc.warlock.core.script.IMatch;
 import cc.warlock.core.script.IScriptCommands;
@@ -321,5 +323,11 @@ public class ScriptCommands implements IScriptCommands, IStreamListener, IRoomLi
 	
 	public String getLastCommand() {
 		return lastCommand;
+	}
+	
+	public void playSound(InputStream stream) {
+		for (IWarlockClientViewer viewer : getClient().getViewers()) {
+			viewer.playSound(stream);
+		}
 	}
 }

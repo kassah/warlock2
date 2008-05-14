@@ -22,6 +22,7 @@
 package cc.warlock.core.script.javascript;
 
 import java.io.File;
+import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.FileReader;
 import java.io.IOException;
@@ -232,5 +233,17 @@ public class JavascriptCommands {
 		timer.schedule(c, (long)(timeout * 1000.0));
 		
 		return id;
+	}
+	
+	public void playSound (String filename) {
+		File file = new File(filename);
+		if (file.exists()) {
+			try {
+				commands.playSound(new FileInputStream(file));
+			} catch (FileNotFoundException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
+		}
 	}
 }

@@ -21,6 +21,7 @@
  */
 package cc.warlock.core.script;
 
+import java.io.InputStream;
 import java.util.Collection;
 import java.util.concurrent.BlockingQueue;
 
@@ -62,4 +63,6 @@ public interface IScriptCommands extends IRoomListener {
 	public void resume();
 	public boolean isSuspended();
 	public void waitForResume() throws InterruptedException;
+	
+	public void playSound (InputStream stream);
 }
