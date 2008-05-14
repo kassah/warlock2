@@ -21,6 +21,9 @@
  */
 package cc.warlock.core.stormfront.script.wsl;
 
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.Reader;
 import java.util.ArrayList;
@@ -110,6 +113,7 @@ public class WSLScript extends AbstractScript {
 		addCommandDefinition("nextroom", new WSLNextRoom());
 		addCommandDefinition("pause", new WSLPause());
 		addCommandDefinition("put", new WSLPut());
+		addCommandDefinition("playsound", new WSLPlaySound());
 		addCommandDefinition("random", new WSLRandom());
 		addCommandDefinition("return", new WSLReturn());
 		addCommandDefinition("run", new WSLRun());
@@ -994,6 +998,21 @@ public class WSLScript extends AbstractScript {
 			// Quit this script if we're starting another one
 			if(arguments.startsWith(ScriptConfiguration.instance().getScriptPrefix())) {
 				stop();
+			}
+		}
+	}
+	
+	protected class WSLPlaySound extends WSLCommandDefinition {
+		public void execute(String arguments) throws InterruptedException {
+			
+			File file = new File(arguments);
+			if (file.exists()) {
+				try {
+					scriptCommands.playSound(new FileInputStream(file));
+				} catch (FileNotFoundException e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+				}
 			}
 		}
 	}
