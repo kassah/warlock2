@@ -640,9 +640,10 @@ public class WSLScript extends AbstractScript {
 	
 	protected void gotoLabel (String label)
 	{
-		// remove :
-		String[] parts = label.split(":");
-		label = parts[0];
+		// remove ":" from labels
+		int pos = label.indexOf(':');
+		if(pos >= 0)
+			label = label.substring(0, pos);
 		
 		Integer command = labels.get(label.toLowerCase());
 		

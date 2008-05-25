@@ -52,12 +52,6 @@ public class Command implements ICommand, Serializable {
 		this.fromScript = fromScript;
 	}
 	
-	public Command(String command, Date timestamp)
-	{
-		this.command = command + "\n";
-		this.timestamp = timestamp;
-	}
-	
 	public void setCommand(String command) {
 		this.command = command;
 		// FIXME: why is the following line here?
