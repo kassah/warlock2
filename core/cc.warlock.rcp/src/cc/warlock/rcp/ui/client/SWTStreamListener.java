@@ -23,6 +23,7 @@ package cc.warlock.rcp.ui.client;
 
 import org.eclipse.swt.widgets.Display;
 
+import cc.warlock.core.client.ICommand;
 import cc.warlock.core.client.IStream;
 import cc.warlock.core.client.IStreamListener;
 import cc.warlock.core.client.WarlockString;
@@ -82,15 +83,15 @@ public class SWTStreamListener implements IStreamListener {
 	private class CommandWrapper implements Runnable
 	{
 		private IStream stream;
-		private String text;
+		private ICommand command;
 		
-		public CommandWrapper(IStream stream, String text) {
+		public CommandWrapper(IStream stream, ICommand command) {
 			this.stream = stream;
-			this.text = text;
+			this.command = command;
 		}
 		
 		public void run() {
-			listener.streamReceivedCommand(stream, text);
+			listener.streamReceivedCommand(stream, command);
 		}
 	}
 	
@@ -160,8 +161,8 @@ public class SWTStreamListener implements IStreamListener {
 		run(new PromptedWrapper(stream, prompt));
 	}
 
-	public void streamReceivedCommand (IStream stream, String text) {
-		run(new CommandWrapper(stream, text));
+	public void streamReceivedCommand (IStream stream, ICommand command) {
+		run(new CommandWrapper(stream, command));
 	}
 	
 	public void streamFlush(IStream stream) {

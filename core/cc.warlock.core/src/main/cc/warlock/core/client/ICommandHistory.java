@@ -80,14 +80,6 @@ public interface ICommandHistory {
 	public void resetPosition();
 	
 	/**
-	 * Add a command to the command history.
-	 * Equivalent to addCommand(new Command(command, new Date()))
-	 * 
-	 * @param command
-	 */
-	public void addCommand (String command);
-	
-	/**
 	 * Add a command to the command history
 	 * @param command
 	 */

@@ -21,6 +21,7 @@
  */
 package cc.warlock.core.stormfront.internal;
 
+import cc.warlock.core.client.internal.Command;
 import cc.warlock.core.stormfront.IStormFrontProtocolHandler;
 
 
@@ -38,6 +39,6 @@ public class SentSettingsTagHandler extends DefaultTagHandler {
 
 	@Override
 	public void handleEnd(String rawXML) {
-		handler.getClient().send("");
+		handler.getClient().send(new Command("", true));
 	}
 }

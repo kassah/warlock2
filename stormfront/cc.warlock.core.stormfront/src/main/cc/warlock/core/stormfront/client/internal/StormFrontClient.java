@@ -30,6 +30,7 @@ import java.util.Collection;
 import java.util.HashMap;
 
 import cc.warlock.core.client.ICharacterStatus;
+import cc.warlock.core.client.ICommand;
 import cc.warlock.core.client.IProperty;
 import cc.warlock.core.client.IRoomListener;
 import cc.warlock.core.client.IStream;
@@ -129,13 +130,13 @@ public class StormFrontClient extends WarlockClient implements IStormFrontClient
 	}
 	
 	@Override
-	public void send(String prefix, String command) {
+	public void send(ICommand command) {
 		String scriptPrefix = ScriptConfiguration.instance().getScriptPrefix();
 		
-		if (command.startsWith(scriptPrefix)){
-			runScript(command.substring(scriptPrefix.length()));
+		if (command.getCommand().startsWith(scriptPrefix)){
+			runScript(command.getCommand().substring(scriptPrefix.length()));
 		} else {
-			super.send(prefix, command);
+			super.send(command);
 		}
 	}
 	

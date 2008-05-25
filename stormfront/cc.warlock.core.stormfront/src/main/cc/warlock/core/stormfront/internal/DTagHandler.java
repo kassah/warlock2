@@ -23,6 +23,7 @@ package cc.warlock.core.stormfront.internal;
 
 import cc.warlock.core.client.IWarlockClient;
 import cc.warlock.core.client.IWarlockStyle.StyleType;
+import cc.warlock.core.client.internal.Command;
 import cc.warlock.core.client.internal.WarlockStyle;
 import cc.warlock.core.stormfront.IStormFrontProtocolHandler;
 import cc.warlock.core.stormfront.xml.StormFrontAttributeList;
@@ -43,7 +44,7 @@ public class DTagHandler extends DefaultTagHandler {
 		}
 		
 		public void run() {
-			client.send(command);
+			client.send(new Command(command, true));
 		}
 
 	}

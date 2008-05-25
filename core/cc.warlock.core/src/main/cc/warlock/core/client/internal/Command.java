@@ -25,8 +25,6 @@
 package cc.warlock.core.client.internal;
 
 import java.io.Serializable;
-import java.text.DateFormat;
-import java.text.ParseException;
 import java.util.Date;
 
 import cc.warlock.core.client.ICommand;
@@ -41,40 +39,55 @@ public class Command implements ICommand, Serializable {
 
 	protected String command;
 	protected Date timestamp;
+	protected boolean fromScript = false;
+	protected String prefix;
 	
-	public Command(String string) {
-		// TODO make the following line work for all locales.
-		DateFormat dateFormat = DateFormat.getTimeInstance();
-		
-		String[] strs = string.split(",", 2);
-		command = strs[0];
-		try {
-			timestamp = dateFormat.parse(strs[1]);
-		} catch(ParseException e) {
-			e.printStackTrace();
-		}
+	public Command(String command) {
+		this.command = command + "\n";
+		timestamp = new Date();
+	}
+	
+	public Command(String command, boolean fromScript) {
+		this(command);
+		this.fromScript = fromScript;
 	}
 	
 	public Command(String command, Date timestamp)
 	{
-		this.command = command;
-		this.timestamp = (Date)timestamp.clone();
+		this.command = command + "\n";
+		this.timestamp = timestamp;
 	}
 	
 	public void setCommand(String command) {
 		this.command = command;
+		// FIXME: why is the following line here?
 		this.timestamp = new Date();
 	}
 	
 	public String getCommand() {
 		return command;
 	}
+	
+	public void setPrefix(String prefix) {
+		this.prefix = prefix;
+	}
 
 	public Date getTimestamp() {
-		return (Date)timestamp.clone();
+		return timestamp;
 	}
 
 	public String toString() {
 		return "(" + command + "," + timestamp.toString() + ")";
+	}
+	
+	public String getText() {
+		if(prefix != null)
+			return prefix + command;
+		else
+			return command;
+	}
+	
+	public boolean fromScript() {
+		return fromScript;
 	}
 }

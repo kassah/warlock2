@@ -34,7 +34,7 @@ public interface IStreamListener {
 	public void streamReceivedText (IStream stream, WarlockString text);
 	
 	public void streamPrompted (IStream stream, String prompt);
-	public void streamReceivedCommand (IStream stream, String text);
+	public void streamReceivedCommand (IStream stream, ICommand command);
 	
 	public void streamEchoed (IStream stream, String text);
 	

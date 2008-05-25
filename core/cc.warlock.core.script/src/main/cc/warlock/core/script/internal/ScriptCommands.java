@@ -33,12 +33,14 @@ import java.util.concurrent.locks.Condition;
 import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReentrantLock;
 
+import cc.warlock.core.client.ICommand;
 import cc.warlock.core.client.IRoomListener;
 import cc.warlock.core.client.IStream;
 import cc.warlock.core.client.IStreamListener;
 import cc.warlock.core.client.IWarlockClient;
 import cc.warlock.core.client.IWarlockClientViewer;
 import cc.warlock.core.client.WarlockString;
+import cc.warlock.core.client.internal.Command;
 import cc.warlock.core.script.IMatch;
 import cc.warlock.core.script.IScriptCommands;
 
@@ -164,7 +166,9 @@ public class ScriptCommands implements IScriptCommands, IStreamListener, IRoomLi
 	public void put(String text) throws InterruptedException {
 		lastCommand = text;
 		
-		client.send("[" + scriptName + "]: ", text);
+		Command command = new Command(text, true);
+		command.setPrefix("[" + scriptName + "]: ");
+		client.send(command);
 	}
 
 	public void waitFor(IMatch match) throws InterruptedException {
@@ -218,9 +222,10 @@ public class ScriptCommands implements IScriptCommands, IStreamListener, IRoomLi
 		receiveLine(prompt);
 	}
 	
-	public void streamReceivedCommand(IStream stream, String text) {
+	public void streamReceivedCommand(IStream stream, ICommand command) {
 		atPrompt = false;
-		receiveText(text);
+		if(!command.fromScript())
+			receiveText(command.getCommand());
 	}
 	
 	public void streamReceivedText(IStream stream, WarlockString text) {

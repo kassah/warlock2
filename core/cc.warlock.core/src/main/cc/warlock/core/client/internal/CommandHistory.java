@@ -29,7 +29,6 @@ import java.io.ByteArrayOutputStream;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.util.ArrayList;
-import java.util.Date;
 import java.util.LinkedList;
 import java.util.NoSuchElementException;
 import java.util.prefs.Preferences;
@@ -139,11 +138,6 @@ public class CommandHistory implements ICommandHistory {
 		position = -1;
 		
 		for (ICommandHistoryListener listener : listeners) listener.historyReset(current());
-	}
-	
-	public void addCommand (String string)
-	{
-		addCommand(new Command(string, new Date()));
 	}
 	
 	public void addCommand(ICommand command) {

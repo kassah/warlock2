@@ -28,6 +28,7 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
 
+import cc.warlock.core.client.ICommand;
 import cc.warlock.core.client.IProperty;
 import cc.warlock.core.client.IStream;
 import cc.warlock.core.client.IStreamListener;
@@ -119,14 +120,14 @@ public class Stream implements IStream {
 		}
 	}
 	
-	public synchronized void sendCommand(String text) {
+	public synchronized void sendCommand(ICommand command) {
 		if (isLogging && client.getLogger() != null) {
-			client.getLogger().logEcho(text);
+			client.getLogger().logEcho(command.getText());
 		}
 
 		for (IStreamListener listener : listeners)
 		{
-			listener.streamReceivedCommand(this, text);
+			listener.streamReceivedCommand(this, command);
 		}
 		
 		isPrompting = false;

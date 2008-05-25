@@ -41,4 +41,14 @@ public interface ICommand {
 	 * @return The timestamp for this command
 	 */
 	public Date getTimestamp();
+	
+	/**
+	 * @return The full line of text for the command
+	 */
+	public String getText();
+	
+	/**
+	 * @return Whether or not the command emanated from a script.
+	 */
+	public boolean fromScript();
 }

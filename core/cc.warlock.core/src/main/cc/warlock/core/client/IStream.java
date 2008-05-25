@@ -42,7 +42,7 @@ public interface IStream {
 	public void send (WarlockString text);
 	
 	public void prompt(String prompt);
-	public void sendCommand(String text);
+	public void sendCommand(ICommand command);
 	public boolean isPrompting();
 	public void flush();
 	public boolean hasView();

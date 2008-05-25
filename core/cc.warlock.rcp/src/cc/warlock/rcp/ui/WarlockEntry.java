@@ -35,6 +35,7 @@ import org.eclipse.swt.widgets.Composite;
 
 import cc.warlock.core.client.ICommand;
 import cc.warlock.core.client.IWarlockClientViewer;
+import cc.warlock.core.client.internal.Command;
 import cc.warlock.core.client.settings.macro.IMacro;
 
 public class WarlockEntry implements VerifyKeyListener {
@@ -66,6 +67,7 @@ public class WarlockEntry implements VerifyKeyListener {
 	}
 	
 	public void setText(String text) {
+		text = text.trim();
 		widget.setText(text);
 		widget.setCaretOffset(text.length());
 	}
@@ -219,13 +221,14 @@ public class WarlockEntry implements VerifyKeyListener {
 	}
 	
 	public void submit() {
-		String command;
+		String text;
 		if(searchMode) {
-			command = searchCommand;
+			text = searchCommand;
 			leaveSearchMode();
 		} else {
-			command = widget.getText();
+			text = widget.getText();
 		}
+		ICommand command = new Command(text);
 		viewer.getWarlockClient().send(command);
 		viewer.getWarlockClient().getCommandHistory().addCommand(command);
 		viewer.getWarlockClient().getCommandHistory().resetPosition();
@@ -235,7 +238,7 @@ public class WarlockEntry implements VerifyKeyListener {
 	public void repeatLastCommand() {
 		if (viewer.getWarlockClient().getCommandHistory().size() >= 1) {
 			ICommand command = viewer.getWarlockClient().getCommandHistory().getLastCommand();
-			viewer.getWarlockClient().send(command.getCommand());
+			viewer.getWarlockClient().send(command);
 		}
 	}
 	
@@ -243,7 +246,7 @@ public class WarlockEntry implements VerifyKeyListener {
 		if (viewer.getWarlockClient().getCommandHistory().size() >= 2)
 		{
 			ICommand command = viewer.getWarlockClient().getCommandHistory().getCommandAt(1);
-			viewer.getWarlockClient().send(command.getCommand());
+			viewer.getWarlockClient().send(command);
 		}
 	}
 }

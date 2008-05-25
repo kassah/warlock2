@@ -42,6 +42,7 @@ import org.eclipse.ui.PlatformUI;
 import org.eclipse.ui.part.PageBook;
 import org.eclipse.ui.part.ViewPart;
 
+import cc.warlock.core.client.ICommand;
 import cc.warlock.core.client.IProperty;
 import cc.warlock.core.client.IStream;
 import cc.warlock.core.client.IStreamListener;
@@ -349,13 +350,13 @@ public class StreamView extends ViewPart implements IStreamListener, IGameViewFo
 		}
 	}
 	
-	public synchronized void streamReceivedCommand(IStream stream, String text) {
+	public synchronized void streamReceivedCommand(IStream stream, ICommand command) {
 		if (this.streams.contains(stream))
 		{
 			IWarlockClient client = stream.getClient();
-			WarlockString string = new WarlockString(text);
+			WarlockString string = new WarlockString(command.getText());
 			
-			string.addStyle(0, text.length(), client.getCommandStyle());
+			string.addStyle(0, string.length(), client.getCommandStyle());
 			
 			if(!isPrompting)
 				appendText(client, new WarlockString(prompt));

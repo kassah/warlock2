@@ -29,6 +29,7 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
 
+import cc.warlock.core.client.ICommand;
 import cc.warlock.core.client.ICommandHistory;
 import cc.warlock.core.client.ICompass;
 import cc.warlock.core.client.IProperty;
@@ -94,24 +95,16 @@ public abstract class WarlockClient implements IWarlockClient {
 	
 	public abstract void connect(String server, int port, String key) throws IOException;
 	
-	public void send(String command) {
-		send(null, command);
-	}
-	
-	public void send(String prefix, String command) {
+	public void send(ICommand command) {
 		if(connection == null) {
 			// Not yet connected to server
 			return;
 		}
 		
-		String text = command + "\n";
-		if(prefix != null)
-			getDefaultStream().sendCommand(prefix + text);
-		else
-			getDefaultStream().sendCommand(text);
+		getDefaultStream().sendCommand(command);
 		
 		try {
-			connection.send(text);
+			connection.send(command.getCommand());
 		} catch(IOException e) {
 			e.printStackTrace();
 		}

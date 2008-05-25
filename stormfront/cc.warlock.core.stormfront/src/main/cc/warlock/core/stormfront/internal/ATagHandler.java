@@ -22,6 +22,7 @@
 package cc.warlock.core.stormfront.internal;
 
 import cc.warlock.core.client.IWarlockStyle.StyleType;
+import cc.warlock.core.client.internal.Command;
 import cc.warlock.core.client.internal.WarlockStyle;
 import cc.warlock.core.stormfront.IStormFrontProtocolHandler;
 import cc.warlock.core.stormfront.client.IStormFrontClient;
@@ -49,7 +50,7 @@ public class ATagHandler extends DefaultTagHandler {
 				if(noun != null) {
 					command = command.replaceAll("@", noun);
 				}
-				client.send(command);
+				client.send(new Command(command, true));
 			}
 		}
 
@@ -77,7 +78,7 @@ public class ATagHandler extends DefaultTagHandler {
 			String noun = attributes.getValue("noun");
 			style.setAction(new CommandRunner(handler.getClient(), coord, noun));
 			if(!requestedList) {
-				handler.getClient().send("_menu update 1");
+				handler.getClient().send(new Command("_menu update 1", true));
 				requestedList = true;
 			}
 		}
