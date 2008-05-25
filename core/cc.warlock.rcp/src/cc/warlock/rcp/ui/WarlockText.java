@@ -227,11 +227,6 @@ public class WarlockText implements LineBackgroundListener {
 		compass = new WarlockCompass(this, CompassThemes.getCompassTheme("small"));
 	}
 	
-	public WarlockCompass getCompass ()
-	{
-		return compass;
-	}
-	
 	public void addLineBackgroundListener(LineBackgroundListener listener) {
 		textWidget.addLineBackgroundListener(listener);
 	}

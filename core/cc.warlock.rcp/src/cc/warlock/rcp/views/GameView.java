@@ -71,7 +71,6 @@ public abstract class GameView extends StreamView implements IWarlockClientViewe
 	
 	protected PageBook popupPageBook;
 	protected Label emptyPopup;
-	protected WarlockText text;
 	protected WarlockEntry entry;
 	protected SWTWarlockClientViewer wrapper;
 	protected Composite entryComposite;
@@ -187,11 +186,11 @@ public abstract class GameView extends StreamView implements IWarlockClientViewe
 		
 		this.client = Warlock2Plugin.getDefault().getCurrentClient();
 		this.entry = new WarlockEntry(entryComposite, wrapper); // Do this BEFORE getTextForClient!
-		this.text = getTextForClient(this.client);
-		book.showPage(this.text.getTextWidget());
+		this.currentText = getTextForClient(this.client);
+		book.showPage(this.currentText.getTextWidget());
 		
-		text.setLineLimit(GameViewConfiguration.instance().getBufferLines());
-		text.setScrollDirection(SWT.DOWN);
+		currentText.setLineLimit(GameViewConfiguration.instance().getBufferLines());
+		currentText.setScrollDirection(SWT.DOWN);
 	}
 	
 	protected void initColors()
@@ -202,7 +201,7 @@ public abstract class GameView extends StreamView implements IWarlockClientViewe
 		entry.getWidget().setBackground(background);
 		entry.getWidget().setForeground(foreground);
 		
-		text.setBackgroundMode(SWT.INHERIT_DEFAULT);
+		currentText.setBackgroundMode(SWT.INHERIT_DEFAULT);
 	}
 	
 	
@@ -214,7 +213,7 @@ public abstract class GameView extends StreamView implements IWarlockClientViewe
 			listener.gameViewFocused(this);
 		}
 		
-		text.redraw();
+		currentText.redraw();
 	}
 	
 	public void playSound(InputStream soundStream) {
@@ -303,7 +302,7 @@ public abstract class GameView extends StreamView implements IWarlockClientViewe
 	}
 	
 	public void copy() {
-		text.copy();
+		currentText.copy();
 	}
 	
 	public void paste() {
@@ -311,7 +310,7 @@ public abstract class GameView extends StreamView implements IWarlockClientViewe
 	}
 	
 	public void copyDown() {
-		text.copy();
+		currentText.copy();
 	}
 	
 	public void setClient(IWarlockClient client) {
@@ -342,7 +341,7 @@ public abstract class GameView extends StreamView implements IWarlockClientViewe
 	}
 	
 	public WarlockText getWarlockText () {
-		return text;
+		return currentText;
 	}
 	
 	public WarlockEntry getWarlockEntry() {
@@ -361,24 +360,24 @@ public abstract class GameView extends StreamView implements IWarlockClientViewe
 	
 	public void showPopup (WarlockPopupAction popup)
 	{
-		boolean atBottom = text.isAtBottom();
+		boolean atBottom = currentText.isAtBottom();
 		popupPageBook.showPage(popup);
 		popupPageBook.setVisible(true);
 		((GridData)popupPageBook.getLayoutData()).exclude = false;
 		
 		mainComposite.layout();
-		text.postTextChange(atBottom);
+		currentText.postTextChange(atBottom);
 	}
 	
 	public void hidePopup (WarlockPopupAction popup)
 	{
-		boolean atBottom = text.isAtBottom();
+		boolean atBottom = currentText.isAtBottom();
 		popupPageBook.showPage(emptyPopup);		
 		popupPageBook.setVisible(false);
 		((GridData)popupPageBook.getLayoutData()).exclude = true;
 		
 		mainComposite.layout();
-		text.postTextChange(atBottom);
+		currentText.postTextChange(atBottom);
 	}
 	
 	@Override

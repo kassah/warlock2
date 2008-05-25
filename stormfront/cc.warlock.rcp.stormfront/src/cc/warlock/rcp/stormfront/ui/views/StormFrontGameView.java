@@ -63,7 +63,6 @@ import cc.warlock.rcp.stormfront.StormFrontGameViewConfiguration;
 import cc.warlock.rcp.stormfront.adapters.SWTStormFrontClientViewer;
 import cc.warlock.rcp.stormfront.ui.StormFrontSharedImages;
 import cc.warlock.rcp.stormfront.ui.StormFrontStatus;
-import cc.warlock.rcp.stormfront.ui.StormFrontTextBorder;
 import cc.warlock.rcp.stormfront.ui.actions.ProfileConnectAction;
 import cc.warlock.rcp.stormfront.ui.style.StormFrontStyleProvider;
 import cc.warlock.rcp.stormfront.ui.wizards.SGEConnectWizard;
@@ -97,7 +96,7 @@ public class StormFrontGameView extends GameView implements IStormFrontClientVie
 	public void createPartControl(Composite parent) {
 		super.createPartControl(parent);
 		
-		text.addCompass();
+		currentText.addCompass();
 		//textBorder = new StormFrontTextBorder(text);
 		
 		
@@ -191,7 +190,7 @@ public class StormFrontGameView extends GameView implements IStormFrontClientVie
 				WarlockWizardDialog dialog = new WarlockWizardDialog(Display.getDefault().getActiveShell(),
 						new SGEConnectWizard());
 			
-				int response = dialog.open();
+				dialog.open();
 				hidePopup(reconnectPopup);
 			}
 		};
@@ -353,7 +352,7 @@ public class StormFrontGameView extends GameView implements IStormFrontClientVie
 //		}
 		
 		normalFont = mainFont.isDefaultFont() ? JFaceResources.getDefaultFont() : new Font(getSite().getShell().getDisplay(), fontFace, fontSize, SWT.NONE);
-		text.setFont(normalFont);
+		currentText.setFont(normalFont);
 		
 		WarlockColor entryBG = settings.getCommandLineSettings().getBackgroundColor();
 		WarlockColor entryFG = settings.getCommandLineSettings().getForegroundColor();
@@ -366,9 +365,9 @@ public class StormFrontGameView extends GameView implements IStormFrontClientVie
 		Caret newCaret = createCaret(1, ColorUtil.warlockColorToColor(entryBarColor.isDefault() ? fg : entryBarColor));
 		entry.getWidget().setCaret(newCaret);
 		
-		text.setBackground(ColorUtil.warlockColorToColor(bg));
-		text.setForeground(ColorUtil.warlockColorToColor(fg));
-		text.getTextWidget().redraw();
+		currentText.setBackground(ColorUtil.warlockColorToColor(bg));
+		currentText.setForeground(ColorUtil.warlockColorToColor(fg));
+		currentText.getTextWidget().redraw();
 		
 		if (HandsView.getDefault() != null)
 		{
