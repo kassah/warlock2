@@ -640,16 +640,19 @@ public class WSLScript extends AbstractScript {
 	
 	protected void gotoLabel (String label)
 	{
+		// remove :
+		String[] parts = label.split(":");
+		label = parts[0];
+		
 		Integer command = labels.get(label.toLowerCase());
 		
-		if (command != null)
-		{
+		if (command != null) {
 			gotoCommand(command);
-		}
-		else {
+		} else {
 			command = labels.get("labelerror");
 			if (command != null)
 			{
+				scriptDebug(1, "Label \"" + label + "\" does not exist, going to \"labelerror\"");
 				gotoCommand(command);
 			}
 			else
