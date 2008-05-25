@@ -63,16 +63,11 @@ public class DefaultStyleProvider implements IStyleProvider {
 			else if (styleType.equals(IWarlockStyle.StyleType.MONOSPACE))
 			{
 				WarlockFont font = client.getClientSettings().getMainWindowSettings().getColumnFont();
-				if (font.isDefaultFont())
+				if (font.isDefaultFont() && Display.getDefault().getFontList(font.getFamilyName(), true).length > 0)
 				{
-					range.font = JFaceResources.getTextFont();
+					range.font = FontUtil.warlockFontToFont(font);
 				} else {
-					if (Display.getDefault().getFontList(font.getFamilyName(), true).length > 0)
-					{
-						range.font = FontUtil.warlockFontToFont(font);
-					} else {
-						range.font = JFaceResources.getTextFont();
-					}
+					range.font = JFaceResources.getTextFont();
 				}
 			}
 		}
