@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?eclipse version="3.2"?>
+<plugin>
+   <extension
+         point="org.eclipse.ui.commands">
+      <command
+            defaultHandler="cc.warlock.rcp.telnet.ui.menu.TelnetConnectionHandler"
+            description="Connect to a Telnet Game"
+            id="cc.warlock.rcp.telnet.telnetConnectCommand"
+            name="Telnet Games">
+      </command>
+   </extension>
+   <extension
+         point="cc.warlock.rcp.connectionCommands">
+      <connectionCommand
+            commandId="cc.warlock.rcp.telnet.telnetConnectCommand"
+            groupName="Create a New Connection"
+            weight="10">
+      </connectionCommand>
+   </extension>
+   <extension
+         point="org.eclipse.ui.commandImages">
+      <image
+            commandId="cc.warlock.rcp.telnet.telnetConnectCommand"
+            icon="images/game.gif">
+      </image>
+   </extension>
+
+</plugin>
