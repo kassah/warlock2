@@ -41,6 +41,10 @@ public class TelnetConnectWizard extends WizardWithNotification {
 		return true;
 	}
 	
+	public boolean canFinish() {
+		return page1.isPageComplete();
+	}
+	
 	public void addPages() {
 		page1 = new ConnectWizardPage();
 		
