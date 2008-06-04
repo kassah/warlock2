@@ -19,32 +19,23 @@
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
-package cc.warlock.rcp.telnet.ui.menu;
+package cc.warlock.rcp.telnet.ui.wizards;
 
-import org.eclipse.core.commands.ExecutionEvent;
-import org.eclipse.core.commands.ExecutionException;
-import org.eclipse.swt.widgets.Display;
-
-import cc.warlock.rcp.menu.SimpleCommandHandler;
-import cc.warlock.rcp.telnet.ui.wizards.TelnetConnectWizard;
-import cc.warlock.rcp.ui.WarlockWizardDialog;
+import org.eclipse.osgi.util.NLS;
 
 /**
- * @author Will Robertson
+ * @author kassah
  *
  */
-public class TelnetConnectionHandler extends SimpleCommandHandler {
-
-	/* (non-Javadoc)
-	 * @see org.eclipse.core.commands.IHandler#execute(org.eclipse.core.commands.ExecutionEvent)
-	 */
-	public Object execute(ExecutionEvent event) throws ExecutionException {
-		WarlockWizardDialog dialog = new WarlockWizardDialog(Display.getDefault().getActiveShell(),
-				new TelnetConnectWizard());
-		
-		dialog.open();
-		
-		return null;
+public class WizardMessages extends NLS {
+	private static final String BUNDLE_NAME = "cc.warlock.rcp.telnet.ui.wizards.messages"; //$NON-NLS-1$
+	public static String ConnectWizardPage_title;
+	public static String ConnectWizardPage_description;
+	public static String ConnectWizardPage_label_host;
+	public static String ConnectWizardPage_label_port;
+	
+	static {
+		// initialize resource bundle
+		NLS.initializeMessages(BUNDLE_NAME, WizardMessages.class);
 	}
-
 }

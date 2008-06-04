@@ -19,32 +19,32 @@
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
-package cc.warlock.rcp.telnet.ui.menu;
+package cc.warlock.rcp.telnet.ui.wizards;
 
-import org.eclipse.core.commands.ExecutionEvent;
-import org.eclipse.core.commands.ExecutionException;
-import org.eclipse.swt.widgets.Display;
-
-import cc.warlock.rcp.menu.SimpleCommandHandler;
-import cc.warlock.rcp.telnet.ui.wizards.TelnetConnectWizard;
-import cc.warlock.rcp.ui.WarlockWizardDialog;
+import cc.warlock.rcp.wizards.WizardWithNotification;
 
 /**
- * @author Will Robertson
+ * @author kassah
  *
  */
-public class TelnetConnectionHandler extends SimpleCommandHandler {
-
+public class TelnetConnectWizard extends WizardWithNotification {
+	private ConnectWizardPage page1;
+	
 	/* (non-Javadoc)
-	 * @see org.eclipse.core.commands.IHandler#execute(org.eclipse.core.commands.ExecutionEvent)
+	 * @see org.eclipse.jface.wizard.Wizard#performFinish()
 	 */
-	public Object execute(ExecutionEvent event) throws ExecutionException {
-		WarlockWizardDialog dialog = new WarlockWizardDialog(Display.getDefault().getActiveShell(),
-				new TelnetConnectWizard());
+	@Override
+	public boolean performFinish() {
+		// TODO Auto-generated method stub
+		System.out.println("Hostname: " + page1.host() + " Port: " + page1.port());
 		
-		dialog.open();
+		return true;
+	}
+	
+	public void addPages() {
+		page1 = new ConnectWizardPage();
 		
-		return null;
+		addPage(page1);
 	}
 
 }
