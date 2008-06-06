@@ -19,43 +19,18 @@
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
-package cc.warlock.rcp.telnet.ui.wizards;
+package cc.warlock.rcp.telnet.core.client;
 
-import java.util.HashMap;
-import java.util.Map;
-
-import cc.warlock.rcp.telnet.util.LoginUtil;
-import cc.warlock.rcp.wizards.WizardWithNotification;
 
 /**
- * @author kassah
+ * @author Will Robertson
  *
  */
-public class TelnetConnectWizard extends WizardWithNotification {
-	private ConnectWizardPage page1;
-	
-	/* (non-Javadoc)
-	 * @see org.eclipse.jface.wizard.Wizard#performFinish()
-	 */
-	@Override
-	public boolean performFinish() {
-		// TODO Auto-generated method stub
-		System.out.println("Hostname: " + page1.host() + " Port: " + page1.port());
-		Map<String, String> loginProperties = new HashMap<String,String>();
-		loginProperties.put("server", page1.host());
-		loginProperties.put("port", page1.port());
-		LoginUtil.connectAndOpenGameView (loginProperties, page1.host());
-		return true;
-	}
-	
-	public boolean canFinish() {
-		return page1.isPageComplete();
-	}
-	
-	public void addPages() {
-		page1 = new ConnectWizardPage();
+public class TelnetClientFactory {
+	public static TelnetClient createTelnetClient ()
+	{
+		TelnetClient client = new TelnetClient ();
 		
-		addPage(page1);
+		return client;
 	}
-
 }

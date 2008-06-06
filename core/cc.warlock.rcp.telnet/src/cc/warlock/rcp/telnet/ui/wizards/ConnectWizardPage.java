@@ -126,8 +126,8 @@ public class ConnectWizardPage extends WizardPageWithNotification {
 		return host.getText();
 	}
 	
-	public int port() {
-		return Integer.parseInt(port.getText());
+	public String port() {
+		return port.getText();
 	}
 	
 	public void checkComplete() {
