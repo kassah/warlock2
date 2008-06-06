@@ -33,6 +33,12 @@
             id="cc.warlock.rcp.views.rightView.userStream"
             name="Stream">
       </view>
+      <view
+            allowMultiple="true"
+            class="cc.warlock.rcp.views.GameView"
+            id="cc.warlock.rcp.ui.views.GameView"
+            name="GameView">
+      </view>
    </extension>
    <extension
          id="warlock"

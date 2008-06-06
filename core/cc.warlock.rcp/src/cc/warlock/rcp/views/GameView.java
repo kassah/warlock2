@@ -63,6 +63,8 @@ import cc.warlock.rcp.util.RCPUtil;
  * @author marshall
  */
 public abstract class GameView extends StreamView implements IWarlockClientViewer {
+	public static final String VIEW_ID = "cc.warlock.rcp.ui.views.GameView";
+	
 	protected static GameView firstInstance;
 	protected static boolean firstInstanceIsUsed = false;
 	protected static ArrayList<GameView> openViews = new ArrayList<GameView>();
