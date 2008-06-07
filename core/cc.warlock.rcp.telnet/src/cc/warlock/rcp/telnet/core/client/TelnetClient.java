@@ -27,8 +27,11 @@ import cc.warlock.core.client.IProperty;
 import cc.warlock.core.client.IWarlockSkin;
 import cc.warlock.core.client.IWarlockStyle;
 import cc.warlock.core.client.WarlockClientRegistry;
+import cc.warlock.core.client.internal.Property;
 import cc.warlock.core.client.internal.WarlockClient;
+import cc.warlock.core.client.internal.WarlockStyle;
 import cc.warlock.core.network.Connection;
+import cc.warlock.rcp.telnet.ui.DefaultSkin;
 
 /**
  * @author Will Robertson
@@ -54,8 +57,7 @@ public class TelnetClient extends WarlockClient {
 	 * @see cc.warlock.core.client.IWarlockClient#getCharacterName()
 	 */
 	public IProperty<String> getCharacterName() {
-		// TODO Auto-generated method stub
-		return null;
+		return new Property<String>("charName","Telnet");
 	}
 
 	/* (non-Javadoc)
@@ -63,7 +65,7 @@ public class TelnetClient extends WarlockClient {
 	 */
 	public IProperty<String> getClientId() {
 		// TODO Auto-generated method stub
-		return null;
+		return new Property<String>("ClientId","telnet."+hostname);
 	}
 
 	/* (non-Javadoc)
@@ -71,7 +73,7 @@ public class TelnetClient extends WarlockClient {
 	 */
 	public IWarlockStyle getCommandStyle() {
 		// TODO Auto-generated method stub
-		return null;
+		return new WarlockStyle();
 	}
 
 	/* (non-Javadoc)
@@ -79,7 +81,7 @@ public class TelnetClient extends WarlockClient {
 	 */
 	public IWarlockSkin getSkin() {
 		// TODO Auto-generated method stub
-		return null;
+		return new DefaultSkin();
 	}
 
 }
