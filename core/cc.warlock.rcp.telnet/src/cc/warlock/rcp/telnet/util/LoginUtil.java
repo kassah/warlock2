@@ -46,10 +46,10 @@ import cc.warlock.rcp.views.GameView;
  */
 public class LoginUtil {
 
-	public static void connect (GameView gameView, Map<String,String> loginProperties)
+	public static void connect (GameView gameView, String gameHost, String gamePort)
 	{
-		String server = loginProperties.get("GAMEHOST");
-		int port = Integer.parseInt (loginProperties.get("GAMEPORT"));
+		String server = gameHost;
+		int port = Integer.parseInt (gamePort);
 
 		IWarlockClient client = Warlock2Plugin.getDefault().getCurrentClient();
 //		
@@ -73,7 +73,7 @@ public class LoginUtil {
 		}
 	}
 	
-	public static void connectAndOpenGameView (Map<String,String> loginProperties, String characterName)
+	public static void connectAndOpenGameView (String gameHost, String gamePort, String characterName)
 	{
 		IWorkbenchPage page = PlatformUI.getWorkbench().getActiveWorkbenchWindow().getActivePage();
 		if (!page.getPerspective().getId().equals(WarlockPerspectiveFactory.WARLOCK_PERSPECTIVE_ID))
@@ -93,12 +93,12 @@ public class LoginUtil {
 			// reuse the existing view if it's already created
 			
 			GameView.initializeGameView(firstEmptyView);
-			connect(firstEmptyView, loginProperties);
+			connect(firstEmptyView, gameHost, gamePort);
 		}
 		else 
 		{
 			Warlock2Plugin.getDefault().addNextClient(TelnetClientFactory.createTelnetClient());
-			connect(GameView.createNext(GameView.VIEW_ID, characterName), loginProperties);
+			connect(GameView.createNext(GameView.VIEW_ID, characterName), gameHost, gamePort);
 		}
 	}
 	

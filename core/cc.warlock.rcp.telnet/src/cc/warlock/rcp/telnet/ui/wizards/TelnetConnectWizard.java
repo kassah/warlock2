@@ -41,10 +41,7 @@ public class TelnetConnectWizard extends WizardWithNotification {
 	public boolean performFinish() {
 		// TODO Auto-generated method stub
 		System.out.println("Hostname: " + page1.host() + " Port: " + page1.port());
-		Map<String, String> loginProperties = new HashMap<String,String>();
-		loginProperties.put("server", page1.host());
-		loginProperties.put("port", page1.port());
-		LoginUtil.connectAndOpenGameView (loginProperties, page1.host());
+		LoginUtil.connectAndOpenGameView (page1.host(), page1.port(), page1.host());
 		return true;
 	}
 	
