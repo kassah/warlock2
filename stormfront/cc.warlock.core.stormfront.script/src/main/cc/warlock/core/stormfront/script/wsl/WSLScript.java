@@ -91,6 +91,8 @@ public class WSLScript extends AbstractScript {
 		scriptCommands = new StormFrontScriptCommands(client, this);
 		
 		// add command handlers
+		addCommandDefinition("copyvariable", new WSLCopyVariable());
+		addCommandDefinition("copylocalvariable", new WSLCopyLocalVariable());
 		addCommandDefinition("counter", new WSLCounter());
 		addCommandDefinition("deletevariable", new WSLDeleteVariable());
 		addCommandDefinition("deletelocalvariable", new WSLDeleteLocalVariable());
@@ -618,6 +620,40 @@ public class WSLScript extends AbstractScript {
 				setLocalVariable(name, value);
 			} else {
 				scriptError("Invalid arguments to setLocalVariable");
+			}
+		}
+	}
+	
+	protected class WSLCopyVariable extends WSLCommandDefinition {
+		public void execute (String arguments) {
+			String[] args = arguments.split(argSeparator);
+			if (args.length == 2) {
+				scriptDebug(1, "copyVariable: %" + args[0] + " to %" + args[1]);
+				if (variableExists(args[0])) {
+					setVariable(args[1], getVariable(args[0]).toString());
+					((ClientSettings)sfClient.getClientSettings()).getVariableConfigurationProvider().addVariable(args[1], getVariable(args[0]).toString());
+				} else if (variableExists(args[1])) {
+					deleteVariable(args[1]);
+					((ClientSettings)sfClient.getClientSettings()).getVariableConfigurationProvider().removeVariable(args[1]);
+				} // else neither exist, do nothing
+			} else {
+				scriptWarning("Invalid arguments to copyVariable");
+			}
+		}
+	}
+	
+	protected class WSLCopyLocalVariable extends WSLCommandDefinition {
+		public void execute (String arguments) {
+			String[] args = arguments.split(argSeparator);
+			if (args.length == 2) {
+				scriptDebug(1, "copyLocalVariable: $" + args[0] + " to $" + args[1]);
+				if (localVariableExists(args[0])) {
+					setLocalVariable(args[1], getVariable(args[0]).toString());
+				} else if (localVariableExists(args[1])) {
+					deleteLocalVariable(args[1]);
+				} // else neither exist, do nothing
+			} else {
+				scriptWarning("Invalid arguments to copyLocalVariable");
 			}
 		}
 	}
