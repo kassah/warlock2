@@ -42,6 +42,7 @@ import cc.warlock.rcp.plugin.Warlock2Plugin;
 import cc.warlock.rcp.stormfront.adapters.SWTSGEConnectionListenerAdapter;
 import cc.warlock.rcp.stormfront.ui.StormFrontSharedImages;
 import cc.warlock.rcp.stormfront.ui.util.LoginUtil;
+import cc.warlock.rcp.stormfront.ui.views.StormFrontGameView;
 import cc.warlock.rcp.ui.network.SWTConnectionListenerAdapter;
 import cc.warlock.rcp.views.GameView;
 
@@ -137,10 +138,10 @@ public class ProfileConnectAction extends Action implements ISGEConnectionListen
 		
 		if (!monitor.isCanceled())
 		{
-			if (gameView == null)
+			if (gameView == null || !(gameView instanceof StormFrontGameView))
 				LoginUtil.connectAndOpenGameView(loginProperties, profile.getName());
 			else
-				LoginUtil.connect(gameView, loginProperties);
+				LoginUtil.connect((StormFrontGameView) gameView, loginProperties);
 		} else {
 			status = Status.CANCEL_STATUS;
 		}
