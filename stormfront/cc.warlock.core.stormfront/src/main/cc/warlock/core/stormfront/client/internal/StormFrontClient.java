@@ -76,7 +76,7 @@ public class StormFrontClient extends WarlockClient implements IStormFrontClient
 	protected ClientProperty<String> leftHand, rightHand, currentSpell;
 	protected StringBuffer buffer = new StringBuffer();
 	protected IStormFrontProtocolHandler handler;
-	protected ClientProperty<String> playerId, characterName, roomDescription;
+	protected ClientProperty<String> playerId, characterName, gameCode, roomDescription;
 	protected StormFrontClientSettings clientSettings;
 	protected StormFrontServerSettings serverSettings;
 	protected long timeDelta;
@@ -314,6 +314,10 @@ public class StormFrontClient extends WarlockClient implements IStormFrontClient
 	
 	public IProperty<String> getCharacterName() {
 		return characterName;
+	}
+	
+	public IProperty<String> getGameCode() {
+		return gameCode;
 	}
 	
 	public IProperty<String> getClientId() {

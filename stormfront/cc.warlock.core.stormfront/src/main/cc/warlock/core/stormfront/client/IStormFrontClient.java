@@ -72,6 +72,11 @@ public interface IStormFrontClient extends IWarlockClient, IRoomListener {
 	public IProperty<String> getPlayerId();
 	
 	/**
+	 * @return The gameCode of the current player
+	 */
+	public IProperty<String> getGameCode();
+	
+	/**
 	 * @return The roundtime property
 	 */
 	public IProperty<Integer> getRoundtime();
