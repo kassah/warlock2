@@ -105,6 +105,7 @@ public class StormFrontClient extends WarlockClient implements IStormFrontClient
 		spirit = new ClientProperty<BarStatus>(this, "spirit", null);
 		playerId = new ClientProperty<String>(this, "playerId", null);
 		characterName = new ClientProperty<String>(this, "characterName", null);
+		gameCode = new ClientProperty<String>(this, "gameCode", null);
 		roomDescription = new ClientProperty<String>(this, "roomDescription", null);
 		monsterCount = new ClientProperty<Integer>(this, "monsterCount", null);
 		mode = new ClientProperty<GameMode>(this, "gameMode", GameMode.Game);
