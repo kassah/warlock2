@@ -252,6 +252,7 @@ public class SGEConnection extends Connection implements IConnectionListener {
 			
 			switch (line.charAt(0))
 			{
+				/* response from user/pass sending */
 				case 'A':
 				{
 					if (line.indexOf("REJECT") != -1)
@@ -281,6 +282,7 @@ public class SGEConnection extends Connection implements IConnectionListener {
 
 				} break;
 				
+				/* Server is giving us a list of games */
 				case 'M':
 				{
 					games.clear();
@@ -309,6 +311,7 @@ public class SGEConnection extends Connection implements IConnectionListener {
 					
 				} break;
 				
+				/* Server is responding with Game Details */
 				case 'G':
 				{
 					if (retrievingGames)
@@ -358,6 +361,7 @@ public class SGEConnection extends Connection implements IConnectionListener {
 					}
 				} break;
 				
+				/* Server is giving us a list of characters in that game */
 				case 'C':
 				{
 					characters.clear();
@@ -369,6 +373,7 @@ public class SGEConnection extends Connection implements IConnectionListener {
 					fireEvent (CHARACTERS_READY);
 				} break;
 				
+				/* Server is responding to a request to play a character */
 				case 'L':
 				{
 					String tokens[] = line.split("\t");
