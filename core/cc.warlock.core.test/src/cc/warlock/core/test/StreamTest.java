@@ -26,6 +26,7 @@ import org.junit.Assert;
 import org.junit.BeforeClass;
 import org.junit.Test;
 
+import cc.warlock.core.client.ICommand;
 import cc.warlock.core.client.IStream;
 import cc.warlock.core.client.IStreamListener;
 import cc.warlock.core.client.WarlockString;
@@ -93,6 +94,11 @@ public class StreamTest {
 		public void componentUpdated(IStream stream, String id, WarlockString value) {
 			handleEvent();
 			componentUpdated = true;
+		}
+
+		public void streamReceivedCommand(IStream stream, ICommand command) {
+			// TODO Auto-generated method stub
+			
 		}
 	}
 	
