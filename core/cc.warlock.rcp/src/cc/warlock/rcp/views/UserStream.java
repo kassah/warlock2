@@ -45,16 +45,12 @@ import cc.warlock.rcp.ui.client.SWTWarlockClientListener;
  * UserStreams
  * ViewPart/Stream View Class that shows user configurable content filtered from the main window.
  */
-public class UserStream extends StreamView implements IWarlockClientListener {
+public class UserStream extends StreamView {
 	public static final String VIEW_ID = "cc.warlock.rcp.views.rightView.userStream";
 	protected static ArrayList<UserStream> openStreams = new ArrayList<UserStream>();
 	private IStreamFilter[] filters = null;
 	private String name = "Stream";
 	private ArrayList<String> styles;
-	
-	public void clientActivated(IWarlockClient client) {
-		// TODO Auto-generated method stub
-	}
 	
 	public void setFilters(IStreamFilter[] filters) {
 		this.filters = filters;
@@ -91,26 +87,18 @@ public class UserStream extends StreamView implements IWarlockClientListener {
 	}
 	
 	public void clientConnected(IWarlockClient client) {	
-		setClient(client);
+		super.clientConnected(client);
 		addStream(client.getDefaultStream());
-	}
-
-	public void clientDisconnected(IWarlockClient client) {
-		// TODO Auto-generated method stub
-	}
-	
-	public void clientRemoved(IWarlockClient client) {
-		// TODO Auto-generated method stub
 	}
 	
 	@Override
 	public void createPartControl(Composite parent) {
-		super.createPartControl(parent);
 		String streamName = getViewSite().getSecondaryId().substring(getViewSite().getSecondaryId().lastIndexOf('.')+1);
 		setStreamTitled(false);
 		setName(streamName);
 		setStreamName(IWarlockClient.DEFAULT_STREAM_NAME);
-		scanClients();
+		super.createPartControl(parent);
+		//scanClients();
 		if (streamName.equals("Events")) {
 			this.filters = getEventsFilters();
 		} else if (streamName.equals("Conversations")) {
@@ -186,17 +174,8 @@ public class UserStream extends StreamView implements IWarlockClientListener {
 	public String getName() {
 		return this.name;
 	}
-	
-	public void scanClients() {
-		for (IWarlockClient client : WarlockClientRegistry.getActiveClients()) {
-			if (client.getConnection() == null) continue;
-			if (client.getConnection().isConnected())
-				clientConnected(client);
-		}
-	}
 
 	public UserStream() {
 		super();
-		WarlockClientRegistry.addWarlockClientListener(new SWTWarlockClientListener(this));
 	}
 }

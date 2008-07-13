@@ -47,8 +47,10 @@ import cc.warlock.core.client.IProperty;
 import cc.warlock.core.client.IStream;
 import cc.warlock.core.client.IStreamListener;
 import cc.warlock.core.client.IWarlockClient;
+import cc.warlock.core.client.IWarlockClientListener;
 import cc.warlock.core.client.IWarlockStyle;
 import cc.warlock.core.client.PropertyListener;
+import cc.warlock.core.client.WarlockClientRegistry;
 import cc.warlock.core.client.WarlockFont;
 import cc.warlock.core.client.WarlockString;
 import cc.warlock.core.client.settings.IHighlightString;
@@ -57,12 +59,13 @@ import cc.warlock.rcp.configuration.GameViewConfiguration;
 import cc.warlock.rcp.ui.WarlockText;
 import cc.warlock.rcp.ui.client.SWTPropertyListener;
 import cc.warlock.rcp.ui.client.SWTStreamListener;
+import cc.warlock.rcp.ui.client.SWTWarlockClientListener;
 import cc.warlock.rcp.ui.style.DefaultStyleProvider;
 import cc.warlock.rcp.ui.style.StyleProviders;
 import cc.warlock.rcp.util.ColorUtil;
 import cc.warlock.rcp.util.FontUtil;
 
-public class StreamView extends ViewPart implements IStreamListener, IGameViewFocusListener {
+public class StreamView extends ViewPart implements IStreamListener, IGameViewFocusListener, IWarlockClientListener {
 	
 	public static final String STREAM_VIEW_PREFIX = "cc.warlock.rcp.views.stream.";
 	
@@ -98,6 +101,7 @@ public class StreamView extends ViewPart implements IStreamListener, IGameViewFo
 		if (!(this instanceof GameView))
 		{
 			GameView.addGameViewFocusListener(this);
+			WarlockClientRegistry.addWarlockClientListener(new SWTWarlockClientListener(this));
 		}
 	}
 	
@@ -156,6 +160,9 @@ public class StreamView extends ViewPart implements IStreamListener, IGameViewFo
 	public void createPartControl(Composite parent) {
 		createMainComposite(parent);
 		createPageBook();
+		if (!(this instanceof GameView)) {
+			scanClients();
+		}
 	}
 	
 	protected WarlockText getTextForClient (IWarlockClient client)
@@ -490,5 +497,35 @@ public class StreamView extends ViewPart implements IStreamListener, IGameViewFo
 	public void componentUpdated(IStream stream, String id, WarlockString value) {
 		WarlockText text = getTextForClient(stream.getClient());
 		text.replaceMarker(id, value);
+	}
+	
+	public void scanClients() {
+		for (IWarlockClient client : WarlockClientRegistry.getActiveClients()) {
+			if (client.getConnection() == null) continue;
+			if (client.getConnection().isConnected())
+				clientConnected(client);
+		}
+	}
+
+	public void clientActivated(IWarlockClient client) {
+		// TODO Auto-generated method stub
+		
+	}
+
+	public void clientConnected(IWarlockClient client) {
+		// TODO Auto-generated method stub
+		if (!(this instanceof GameView)) {
+			setClient(client);
+		}
+	}
+
+	public void clientDisconnected(IWarlockClient client) {
+		// TODO Auto-generated method stub
+		
+	}
+
+	public void clientRemoved(IWarlockClient client) {
+		// TODO Auto-generated method stub
+		
 	}
 }
