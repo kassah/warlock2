@@ -35,6 +35,7 @@ import cc.warlock.core.client.IWarlockStyle;
 import cc.warlock.core.client.WarlockString;
 import cc.warlock.core.client.internal.WarlockStyle;
 import cc.warlock.core.network.IConnection.ErrorType;
+import cc.warlock.core.stormfront.client.IStormFrontClient;
 import cc.warlock.core.stormfront.network.SGEConnection;
 import cc.warlock.rcp.plugin.Warlock2Plugin;
 import cc.warlock.rcp.stormfront.ui.StormFrontPerspectiveFactory;
@@ -46,16 +47,20 @@ import cc.warlock.rcp.views.GameView;
 
 public class LoginUtil {
 
-	public static void connect (GameView gameView, Map<String,String> loginProperties)
+	public static void connect (StormFrontGameView gameView, Map<String,String> loginProperties)
 	{
 		String server = loginProperties.get("GAMEHOST");
 		int port = Integer.parseInt (loginProperties.get("GAMEPORT"));
 		String key = loginProperties.get("KEY");
-
+		
+		// TODO: Somehow make sure this is a StormFrontClient rather than getting a random client/GameView.
 		IWarlockClient client = Warlock2Plugin.getDefault().getCurrentClient();
+		if (client instanceof IStormFrontClient) {
+			IStormFrontClient sfclient = (IStormFrontClient) client;
+			sfclient.getGameCode().set(loginProperties.get("GAMECODE"));
+		}
 //		
 		gameView.setClient(client);
-		
 		IWorkbenchPage page = PlatformUI.getWorkbench().getActiveWorkbenchWindow().getActivePage();
 		
 		try {
@@ -98,11 +103,12 @@ public class LoginUtil {
 			RCPUtil.openPerspective(StormFrontPerspectiveFactory.PERSPECTIVE_ID);
 		}
 		
-		GameView firstEmptyView = null;
+		StormFrontGameView firstEmptyView = null;
 		for (GameView view : GameView.getOpenGameViews()) {
-			if (view.getWarlockClient().getConnection() == null || !view.getWarlockClient().getConnection().isConnected()) {
-				firstEmptyView = view; break;
-			}
+			if (view instanceof StormFrontGameView)
+				if (view.getWarlockClient().getConnection() == null || !view.getWarlockClient().getConnection().isConnected()) {
+					firstEmptyView = (StormFrontGameView) view; break;
+				}
 		}
 		
 		if (firstEmptyView != null)
@@ -115,7 +121,7 @@ public class LoginUtil {
 		else 
 		{
 			Warlock2Plugin.getDefault().addNextClient(StormFrontClientFactory.createStormFrontClient());
-			connect(GameView.createNext(StormFrontGameView.VIEW_ID, characterName), loginProperties);
+			connect((StormFrontGameView) StormFrontGameView.createNext(StormFrontGameView.VIEW_ID, characterName), loginProperties);
 		}
 	}
 	
