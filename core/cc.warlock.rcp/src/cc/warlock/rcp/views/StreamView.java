@@ -501,22 +501,23 @@ public class StreamView extends ViewPart implements IStreamListener, IGameViewFo
 	
 	public void scanClients() {
 		for (IWarlockClient client : WarlockClientRegistry.getActiveClients()) {
-			if (client.getConnection() == null) continue;
-			if (client.getConnection().isConnected())
-				clientConnected(client);
+			clientActivated(client);
+			//if (client.getConnection() == null) continue;
+			//if (client.getConnection().isConnected())
+			//	clientConnected(client);
 		}
 	}
 
 	public void clientActivated(IWarlockClient client) {
 		// TODO Auto-generated method stub
-		
+		if (!(this instanceof GameView)) {
+			setClient(client);
+		}
 	}
 
 	public void clientConnected(IWarlockClient client) {
 		// TODO Auto-generated method stub
-		if (!(this instanceof GameView)) {
-			setClient(client);
-		}
+
 	}
 
 	public void clientDisconnected(IWarlockClient client) {
