@@ -52,12 +52,6 @@ public class StreamTest {
 			echo = prompt = null;
 		}
 		
-		public void streamReceivedCommand(IStream stream, String text) {
-			handleEvent();
-			this.receivedCommand = true;
-			this.command = text;
-		}
-		
 		public void streamReceivedText(IStream stream, WarlockString text) {
 			handleEvent();
 			receivedText = true;
@@ -97,8 +91,9 @@ public class StreamTest {
 		}
 
 		public void streamReceivedCommand(IStream stream, ICommand command) {
-			// TODO Auto-generated method stub
-			
+			handleEvent();
+			this.receivedCommand = true;
+			this.command = command.getText();
 		}
 	}
 	
