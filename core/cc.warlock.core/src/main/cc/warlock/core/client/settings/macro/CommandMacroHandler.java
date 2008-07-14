@@ -100,9 +100,6 @@ public class CommandMacroHandler implements IMacroHandler {
 					if(savedCommand != null)
 						viewer.setCurrentCommand(savedCommand);
 					break;
-				case '@':
-					// change location of cursor at end of line
-					break;
 				default:
 					viewer.append(curChar);
 				}
@@ -119,6 +116,8 @@ public class CommandMacroHandler implements IMacroHandler {
 						}
 					}
 				}
+			} else if(curChar == '@') {
+				// Stub... Move cursor to this char position
 			} else {
 				viewer.append(curChar);
 			}
