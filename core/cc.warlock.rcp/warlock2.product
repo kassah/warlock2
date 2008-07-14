@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<?pde version="3.1"?>
+<?pde version="3.4"?>
 
 <product name="Warlock 2" id="cc.warlock.rcp.product" application="cc.warlock.rcp.warlock" useFeatures="false">
 
@@ -10,7 +10,12 @@
       </text>
    </aboutInfo>
 
-   <configIni use="custom" path="/cc.warlock.rcp/config.ini"/>
+   <configIni use="default">
+      <linux>/cc.warlock.rcp/config.ini</linux>
+      <macosx>/cc.warlock.rcp/config.ini</macosx>
+      <solaris>/cc.warlock.rcp/config.ini</solaris>
+      <win32>/cc.warlock.rcp/config.ini</win32>
+   </configIni>
 
    <launcherArgs>
       <vmArgsMac>-XstartOnFirstThread -Dorg.eclipse.swt.internal.carbon.smallFonts</vmArgsMac>
@@ -34,7 +39,6 @@
             winLargeHigh="/cc.warlock.rcp/images/warlock_48.bmp"/>
       </win>
    </launcher>
-
 
    <vm>
    </vm>
@@ -63,7 +67,6 @@
       <plugin id="org.eclipse.core.net"/>
       <plugin id="org.eclipse.core.resources"/>
       <plugin id="org.eclipse.core.resources.compatibility" fragment="true"/>
-      <plugin id="org.eclipse.core.resources.win32"/>
       <plugin id="org.eclipse.core.runtime"/>
       <plugin id="org.eclipse.core.runtime.compatibility.registry" fragment="true"/>
       <plugin id="org.eclipse.equinox.app"/>
