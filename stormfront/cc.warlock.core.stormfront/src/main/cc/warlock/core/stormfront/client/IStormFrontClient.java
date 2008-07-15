@@ -50,6 +50,7 @@ public interface IStormFrontClient extends IWarlockClient, IRoomListener {
 	public static final String THOUGHTS_STREAM_NAME = "thoughts";
 	public static final String ROOM_STREAM_NAME = "room";
 	public static final String FAMILIAR_STREAM_NAME = "familiar";
+	public static final String STOW_STREAM_NAME = "stowContainer";
 	
 	public static final String COMPONENT_ROOM_PLAYERS = "room players";
 	public static final String COMPONENT_ROOM_OBJECTS = "room objs";

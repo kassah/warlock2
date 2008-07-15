@@ -50,6 +50,11 @@
             id="cc.warlock.rcp.views.stream.rightStream.familiar"
             name="Familiar">
       </view>
+      <view
+            class="cc.warlock.rcp.views.StreamView"
+            id="cc.warlock.rcp.views.stream.rightStream.stowContainer"
+            name="My Bag">
+      </view>
    </extension>
    <extension
          point="org.eclipse.ui.commands">
