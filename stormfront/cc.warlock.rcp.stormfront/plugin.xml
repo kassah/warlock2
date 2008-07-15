@@ -98,7 +98,7 @@
                commandId="cc.warlock.rcp.stormfront.importStormfrontSettingsCommand"
                icon="images/import_wiz.gif"
                id="cc.warlock.rcp.stormfront.menu.import"
-               label="Import from Stromfront...">
+               label="Import from Stormfront...">
          </command>
       </menuContribution>
       <menuContribution
