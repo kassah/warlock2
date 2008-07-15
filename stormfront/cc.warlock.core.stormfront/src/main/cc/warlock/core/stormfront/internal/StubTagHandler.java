@@ -31,7 +31,7 @@ public class StubTagHandler extends DefaultTagHandler {
 	
 	@Override
 	public String[] getTagNames() {
-		return new String[] { "skin", "forcesave", "exposeContainer", "container", "clearContainer", "openDialog",
+		return new String[] { "skin", "forcesave", "exposeContainer", "container", "openDialog",
 				"menuLink", "menuImage", "image", "link", "sep", "switchQuickBar", "endSetup", };
 	}
 

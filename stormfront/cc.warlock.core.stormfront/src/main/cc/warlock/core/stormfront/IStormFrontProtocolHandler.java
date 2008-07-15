@@ -31,6 +31,7 @@ import java.util.Map;
 
 import cc.warlock.core.client.IStream;
 import cc.warlock.core.client.IWarlockStyle;
+import cc.warlock.core.client.WarlockString;
 import cc.warlock.core.stormfront.client.IStormFrontClient;
 import cc.warlock.core.stormfront.xml.IStormFrontXMLHandler;
 
@@ -47,6 +48,7 @@ public interface IStormFrontProtocolHandler extends IStormFrontXMLHandler {
 	public IStormFrontClient getClient();
 	public void pushStream(String name, boolean watch);
 	public void popStream();
+	public void appendStream(String streamId, WarlockString characters);
 	public IStream getCurrentStream();
 	
 	public void addStyle(IWarlockStyle style);

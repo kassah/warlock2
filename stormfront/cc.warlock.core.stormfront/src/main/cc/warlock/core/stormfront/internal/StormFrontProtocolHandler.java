@@ -86,7 +86,10 @@ public class StormFrontProtocolHandler implements IStormFrontProtocolHandler {
 		new StreamTagHandler(this);
 		new StreamWindowTagHandler(this);
 		
+		// Container handlers
+		new ClearContainerTagHandler(this);
 		new InvTagHandler(this);
+		
 		new SpellTagHandler(this);
 		new LeftTagHandler(this);
 		new RightTagHandler(this);
@@ -158,6 +161,11 @@ public class StormFrontProtocolHandler implements IStormFrontProtocolHandler {
 	throws EmptyStackException {
 		if (streamStack.size() > 0)
 			streamStack.pop();
+	}
+	
+	public void appendStream(String streamId, WarlockString str) {
+		IStream stream = client.getStream(streamId);
+		stream.send(str);
 	}
 	
 	public IStream getCurrentStream ()

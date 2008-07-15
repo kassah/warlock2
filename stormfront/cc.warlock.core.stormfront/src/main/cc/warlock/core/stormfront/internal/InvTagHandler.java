@@ -21,10 +21,13 @@
  */
 package cc.warlock.core.stormfront.internal;
 
+import cc.warlock.core.client.WarlockString;
 import cc.warlock.core.stormfront.IStormFrontProtocolHandler;
+import cc.warlock.core.stormfront.xml.StormFrontAttributeList;
 
 
 public class InvTagHandler extends DefaultTagHandler {
+	protected String streamId;
 
 	public InvTagHandler(IStormFrontProtocolHandler handler) {
 		super(handler);
@@ -34,9 +37,15 @@ public class InvTagHandler extends DefaultTagHandler {
 	public String[] getTagNames() {
 		return new String[] { "inv" };
 	}
+	
+	@Override
+	public void handleStart(StormFrontAttributeList attributes, String rawXML) {
+		streamId = attributes.getValue("id") + "Container";
+	}
 
 	@Override
 	public boolean handleCharacters(String characters) {
+		handler.appendStream(streamId, new WarlockString(characters + "\n"));
 		return true;
 	}
 }
