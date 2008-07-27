@@ -37,6 +37,7 @@ public class ProgressTask extends Task {
 	public void execute() throws BuildException {
 		if (getProject().getProperty("hideProgress") != null)
 		{
+			System.out.println(message);
 			return;
 		}
 		
