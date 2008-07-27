@@ -261,7 +261,8 @@
 		<attribute name="antfile"/>
 		<element name="arguments" implicit="true" optional="true"/>
 			
-		<sequential>	
+		<sequential>
+			<echo>Launching antRunner using ${launcher-jar} on ant script @{antfile}, eclipseDir=${eclipseDir}, warlock-version=${warlock-version}, buildDirectory=${buildDirectory}</echo>
 			<java fork="true" jar="${launcher-jar}">
 				<arg line="-application org.eclipse.ant.core.antRunner"/>
 				<arg line="-buildfile @{antfile}"/>
