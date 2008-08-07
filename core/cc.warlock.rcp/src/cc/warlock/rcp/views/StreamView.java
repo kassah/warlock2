@@ -89,7 +89,12 @@ public class StreamView extends ViewPart implements IStreamListener, IGameViewFo
 	protected boolean isPrompting = false;
 	protected String prompt;
 	protected boolean streamTitled = true;
+	protected boolean bufferOnPrompt = true;
 	
+	public void setBufferOnPrompt(boolean bufferOnPrompt) {
+		this.bufferOnPrompt = bufferOnPrompt;
+	}
+
 	private HashMap<IWarlockClient, WarlockString> textBuffers =
 		new HashMap<IWarlockClient, WarlockString>();
 	
@@ -325,17 +330,23 @@ public class StreamView extends ViewPart implements IStreamListener, IGameViewFo
 		{
 			WarlockString string = new WarlockString();
 			
-			if (isPrompting) {
-				string.append("\n");
-				isPrompting = false;
+			if (bufferOnPrompt) {
+			
+				if (isPrompting) {
+					string.append("\n");
+					isPrompting = false;
+				}
+				
+				string.append(text);
+				
+				if (appendNewlines)
+					string.append("\n");
+				
+				bufferText(stream.getClient(), string);
 			}
-			
-			string.append(text);
-			
-			if (appendNewlines)
-				string.append("\n");
-			
-			bufferText(stream.getClient(), string);
+			else {
+				getTextForClient(stream.getClient()).append(text);
+			}
 		}
 	}
 	

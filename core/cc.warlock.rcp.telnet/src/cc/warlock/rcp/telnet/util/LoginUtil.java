@@ -22,7 +22,6 @@
 package cc.warlock.rcp.telnet.util;
 
 import java.io.IOException;
-import java.util.Map;
 
 import org.eclipse.jface.dialogs.MessageDialog;
 import org.eclipse.swt.widgets.Display;
@@ -37,6 +36,7 @@ import cc.warlock.core.network.IConnection.ErrorType;
 import cc.warlock.rcp.application.WarlockPerspectiveFactory;
 import cc.warlock.rcp.plugin.Warlock2Plugin;
 import cc.warlock.rcp.telnet.core.client.TelnetClientFactory;
+import cc.warlock.rcp.telnet.ui.views.TelnetGameView;
 import cc.warlock.rcp.util.RCPUtil;
 import cc.warlock.rcp.views.GameView;
 
@@ -98,7 +98,7 @@ public class LoginUtil {
 		else 
 		{
 			Warlock2Plugin.getDefault().addNextClient(TelnetClientFactory.createTelnetClient());
-			connect(GameView.createNext(GameView.VIEW_ID, characterName), gameHost, gamePort);
+			connect(GameView.createNext(TelnetGameView.VIEW_ID, characterName), gameHost, gamePort);
 		}
 	}
 	

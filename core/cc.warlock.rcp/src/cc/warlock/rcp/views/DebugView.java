@@ -147,8 +147,8 @@ public class DebugView extends ViewPart implements IConnectionListener, IGameVie
 		debug (connection.getClient(), "connected");
 	}
 	
-	public void dataReady(IConnection connection, String line) {
-		debug (connection.getClient(), line);
+	public void dataReady(IConnection connection, char[] data, int start, int length) {
+		debug (connection.getClient(), new String(data, start, length));
 	}
 	
 	public void disconnected(IConnection connection) {

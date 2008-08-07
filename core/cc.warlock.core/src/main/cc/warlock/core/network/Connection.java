@@ -19,14 +19,11 @@
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
-/*
- * Created on Sep 17, 2004
- */
 package cc.warlock.core.network;
 
-import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
+import java.io.Reader;
 import java.net.ConnectException;
 import java.net.Socket;
 import java.net.UnknownHostException;
@@ -42,7 +39,7 @@ public class Connection implements IConnection {
 	protected Socket socket;
 	protected ArrayList<IConnectionListener> connectionListeners;
 	protected boolean connected;
-	protected BufferedReader reader;
+	protected Reader reader;
 	protected String host = null;
 	protected int port = -1;
 	
@@ -64,9 +61,9 @@ public class Connection implements IConnection {
 	{
 		try {
 			socket = new Socket(host, port);
-			reader = new BufferedReader(new InputStreamReader(socket.getInputStream()));
+			reader = createReader(socket);
 			
-			new Thread(new EventPollThread()).start();
+			new Thread(createPollingRunnable()).start();
 		} catch (IOException e) {
 			if (e instanceof ConnectException && e.getMessage().contains("refused")) {
 				connectionError(ErrorType.ConnectionRefused);
@@ -74,6 +71,16 @@ public class Connection implements IConnection {
 				connectionError(ErrorType.UnknownHost);
 			} else throw e;
 		}
+	}
+	
+	protected Reader createReader (Socket socket)
+		throws IOException
+	{
+		return new InputStreamReader(socket.getInputStream());
+	}
+	
+	protected Runnable createPollingRunnable () {
+		return new EventPollThread();
 	}
 	
 	protected void connectionError (ErrorType errorType)
@@ -148,13 +155,24 @@ public class Connection implements IConnection {
 						break;
 					} else {
 						try {
-							String line = reader.readLine();
-							listenersGotLine(line);
+							readData(reader);
 						} catch(Exception e) {
 							e.printStackTrace();
 						}
 					}
 				}
+			}
+		}
+		
+		protected void readData (Reader reader) {
+			try {
+				char cbuf[] = new char[1024];
+				
+				int charsRead = reader.read(cbuf);
+				listenersGotData(cbuf, 0, charsRead);
+			} catch (IOException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
 			}
 		}
 		
@@ -172,10 +190,10 @@ public class Connection implements IConnection {
 			}
 		}
 		
-		private void listenersGotLine (String line)
+		private void listenersGotData (char[] cbuf, int start, int length)
 		{
 			for (IConnectionListener listener : connectionListeners) {
-				listener.dataReady(Connection.this, line);
+				listener.dataReady(Connection.this, cbuf, start, length);
 			}
 		}
 		

@@ -25,5 +25,16 @@
             icon="images/game.gif">
       </image>
    </extension>
+   <extension
+         point="org.eclipse.ui.views">
+      <view
+            allowMultiple="true"
+            class="cc.warlock.rcp.telnet.ui.views.TelnetGameView"
+            icon="images/game.gif"
+            id="cc.warlock.rcp.telnet.ui.views.TelnetGameView"
+            name="Telnet Game View"
+            restorable="true">
+      </view>
+   </extension>
 
 </plugin>

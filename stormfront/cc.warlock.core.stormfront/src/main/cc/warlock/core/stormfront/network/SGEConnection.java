@@ -32,16 +32,16 @@ import java.util.ListIterator;
 import java.util.Map;
 
 import cc.warlock.core.configuration.Profile;
-import cc.warlock.core.network.Connection;
 import cc.warlock.core.network.IConnection;
-import cc.warlock.core.network.IConnectionListener;
+import cc.warlock.core.network.ILineConnectionListener;
+import cc.warlock.core.network.LineConnection;
 import cc.warlock.core.stormfront.network.ISGEGame.AccountStatus;
 import cc.warlock.core.stormfront.network.ISGEGame.GameURL;
 
 /**
  * @author Marshall
  */
-public class SGEConnection extends Connection implements IConnectionListener {
+public class SGEConnection extends LineConnection implements ILineConnectionListener {
 
 	public static final String SGE_SERVER = "eaccess.play.net";
 	public static final int SGE_PORT = 7900;
@@ -237,8 +237,14 @@ public class SGEConnection extends Connection implements IConnectionListener {
 	protected ListIterator<SGEGame> gameIterator;
 	protected SGEGame currentGame;
 	protected boolean retrievingGames = false;
+
+	public void dataReady(IConnection connection, char[] data, int start,
+			int length) {
+		// TODO Auto-generated method stub
+		
+	}
 	
-	public void dataReady(IConnection connection, String line) {
+	public void lineReady(IConnection connection, String line) {
 		try {
 			
 			System.out.println("SGE: " + line);

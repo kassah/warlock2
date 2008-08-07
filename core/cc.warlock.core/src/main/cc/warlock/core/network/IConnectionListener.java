@@ -31,7 +31,7 @@ package cc.warlock.core.network;
 public interface IConnectionListener {
 
 	public void connected (IConnection connection);
-	public void dataReady (IConnection connection, String line);
+	public void dataReady (IConnection connection, char[] data, int start, int length);
 	public void disconnected (IConnection connection);
 	
 	public void connectionError (IConnection connection, IConnection.ErrorType errorType);

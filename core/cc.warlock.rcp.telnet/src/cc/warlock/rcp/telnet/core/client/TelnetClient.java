@@ -27,10 +27,16 @@ import cc.warlock.core.client.IProperty;
 import cc.warlock.core.client.IWarlockSkin;
 import cc.warlock.core.client.IWarlockStyle;
 import cc.warlock.core.client.WarlockClientRegistry;
-import cc.warlock.core.client.internal.Property;
+import cc.warlock.core.client.WarlockColor;
+import cc.warlock.core.client.WarlockString;
+import cc.warlock.core.client.IWarlockStyle.StyleType;
+import cc.warlock.core.client.internal.ClientProperty;
 import cc.warlock.core.client.internal.WarlockClient;
 import cc.warlock.core.client.internal.WarlockStyle;
 import cc.warlock.core.network.Connection;
+import cc.warlock.core.network.IConnection;
+import cc.warlock.core.network.IConnectionListener;
+import cc.warlock.core.network.IConnection.ErrorType;
 import cc.warlock.rcp.telnet.ui.DefaultSkin;
 
 /**
@@ -39,7 +45,19 @@ import cc.warlock.rcp.telnet.ui.DefaultSkin;
  */
 public class TelnetClient extends WarlockClient {
 	protected String hostname;
-
+	protected IProperty<String> characterName, clientId;
+	protected IWarlockSkin skin;
+	protected IWarlockStyle commandStyle;
+	
+	public TelnetClient ()
+	{
+		characterName = new ClientProperty<String>(this, "characterName", "<telnet>");
+		clientId = new ClientProperty<String>(this, "clientId", null);
+		skin = new DefaultSkin();
+		commandStyle = new WarlockStyle();
+		commandStyle.setBackgroundColor(new WarlockColor("#000033"));
+	}
+	
 	/* (non-Javadoc)
 	 * @see cc.warlock.core.client.internal.WarlockClient#connect(java.lang.String, int, java.lang.String)
 	 */
@@ -48,40 +66,57 @@ public class TelnetClient extends WarlockClient {
 		// TODO Auto-generated method stub
 		hostname = server;
 		connection = new Connection(server, port);
-		connection.connect(server, port);
+		connection.addConnectionListener(new IConnectionListener () {
+			public void connected(IConnection connection) {
+				WarlockClientRegistry.clientConnected(TelnetClient.this);
+			}
+			public void connectionError(IConnection connection,
+					ErrorType errorType) {
+			}
+			public void dataReady(IConnection connection, char[] data, int start, int length) {
+				
+//				WarlockString string = new WarlockString();
+//				string.append(new String(data, start, length));
+//				string.addStyle(0, string.length(), new WarlockStyle(new StyleType[] { StyleType.MONOSPACE }));
+				
+				getDefaultStream().send(new String(data, start, length));
+			}
+			public void disconnected(IConnection connection) {
+				WarlockClientRegistry.clientDisconnected(TelnetClient.this);
+			}
+		});
 		
-		WarlockClientRegistry.clientConnected(this);
+		clientId.set("telnet:" + hostname + ":" + port + "@" + hashCode());
+		connection.connect(server, port);
 	}
 
+	
 	/* (non-Javadoc)
 	 * @see cc.warlock.core.client.IWarlockClient#getCharacterName()
 	 */
 	public IProperty<String> getCharacterName() {
-		return new Property<String>("charName","Telnet");
+		return characterName;
 	}
 
 	/* (non-Javadoc)
 	 * @see cc.warlock.core.client.IWarlockClient#getClientId()
 	 */
 	public IProperty<String> getClientId() {
-		// TODO Auto-generated method stub
-		return new Property<String>("ClientId","telnet."+hostname);
+		return clientId;
 	}
 
 	/* (non-Javadoc)
 	 * @see cc.warlock.core.client.IWarlockClient#getCommandStyle()
 	 */
 	public IWarlockStyle getCommandStyle() {
-		// TODO Auto-generated method stub
-		return new WarlockStyle();
+		return commandStyle;
 	}
 
 	/* (non-Javadoc)
 	 * @see cc.warlock.core.client.IWarlockClient#getSkin()
 	 */
 	public IWarlockSkin getSkin() {
-		// TODO Auto-generated method stub
-		return new DefaultSkin();
+		return skin;
 	}
 
 }

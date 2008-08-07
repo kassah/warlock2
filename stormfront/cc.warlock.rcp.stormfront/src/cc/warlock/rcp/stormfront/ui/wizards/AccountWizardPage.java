@@ -46,7 +46,7 @@ import org.eclipse.swt.widgets.Text;
 
 import cc.warlock.core.configuration.Account;
 import cc.warlock.core.network.IConnection;
-import cc.warlock.core.network.IConnectionListener;
+import cc.warlock.core.network.ILineConnectionListener;
 import cc.warlock.core.network.IConnection.ErrorType;
 import cc.warlock.core.stormfront.ProfileConfiguration;
 import cc.warlock.core.stormfront.network.ISGEGame;
@@ -66,7 +66,7 @@ import cc.warlock.rcp.wizards.WizardPageWithNotification;
  * TODO To change the template for this generated type comment go to
  * Window - Preferences - Java - Code Style - Code Templates
  */
-public class AccountWizardPage extends WizardPageWithNotification implements IConnectionListener {
+public class AccountWizardPage extends WizardPageWithNotification implements ILineConnectionListener {
 
 	private SGEConnection connection;
 	private ComboField account;
@@ -224,5 +224,6 @@ public class AccountWizardPage extends WizardPageWithNotification implements ICo
 	
 	public void connected(IConnection connection) {}
 	public void disconnected(IConnection connection) {}
-	public void dataReady(IConnection connection, String line) {}
+	public void dataReady(IConnection connection, char[] data, int start, int length) {}
+	public void lineReady(IConnection connection, String line) {}
 }

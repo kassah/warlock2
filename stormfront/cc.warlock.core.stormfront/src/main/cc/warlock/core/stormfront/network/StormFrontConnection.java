@@ -108,7 +108,7 @@ public class StormFrontConnection implements IConnection
 	{
 		for (IConnectionListener listener : listeners)
 		{
-			listener.dataReady(this, line);
+			listener.dataReady(this, line.toCharArray(), 0, line.length());
 		}
 	}
 	
