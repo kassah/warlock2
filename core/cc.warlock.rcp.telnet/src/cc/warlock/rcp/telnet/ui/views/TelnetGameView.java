@@ -37,4 +37,13 @@ public class TelnetGameView extends GameView {
 	public TelnetClient getTelnetClient() {
 		return telnetClient;
 	}
+	
+	@Override
+	public Object getAdapter(Class adapter) {
+		if (TelnetClient.class.equals(adapter))
+		{
+			return telnetClient;
+		}
+		return super.getAdapter(adapter);
+	}
 }

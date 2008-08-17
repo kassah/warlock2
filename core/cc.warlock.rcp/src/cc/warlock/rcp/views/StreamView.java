@@ -376,10 +376,13 @@ public class StreamView extends ViewPart implements IStreamListener, IGameViewFo
 			
 			string.addStyle(0, string.length(), client.getCommandStyle());
 			
-			if(!isPrompting)
-				appendText(client, new WarlockString(prompt));
-			else
-				isPrompting = false;
+			if (bufferOnPrompt) {
+				if(!isPrompting)
+					appendText(client, new WarlockString(prompt));
+				else
+					isPrompting = false;
+			}
+			
 			appendText(client, string);
 		}
 	}

@@ -28,8 +28,6 @@ import cc.warlock.core.client.IWarlockSkin;
 import cc.warlock.core.client.IWarlockStyle;
 import cc.warlock.core.client.WarlockClientRegistry;
 import cc.warlock.core.client.WarlockColor;
-import cc.warlock.core.client.WarlockString;
-import cc.warlock.core.client.IWarlockStyle.StyleType;
 import cc.warlock.core.client.internal.ClientProperty;
 import cc.warlock.core.client.internal.WarlockClient;
 import cc.warlock.core.client.internal.WarlockStyle;
@@ -38,6 +36,7 @@ import cc.warlock.core.network.IConnection;
 import cc.warlock.core.network.IConnectionListener;
 import cc.warlock.core.network.IConnection.ErrorType;
 import cc.warlock.rcp.telnet.ui.DefaultSkin;
+import cc.warlock.rcp.ui.macros.MacroRegistry;
 
 /**
  * @author Will Robertson
@@ -51,11 +50,15 @@ public class TelnetClient extends WarlockClient {
 	
 	public TelnetClient ()
 	{
+		super();
+		
 		characterName = new ClientProperty<String>(this, "characterName", "<telnet>");
 		clientId = new ClientProperty<String>(this, "clientId", null);
 		skin = new DefaultSkin();
 		commandStyle = new WarlockStyle();
 		commandStyle.setBackgroundColor(new WarlockColor("#000033"));
+		
+		getClientSettings().addClientSettingProvider(MacroRegistry.instance());
 	}
 	
 	/* (non-Javadoc)
