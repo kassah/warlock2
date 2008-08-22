@@ -43,8 +43,10 @@ public class SimpleLogger implements IClientLogger {
 	protected IWarlockClient client;
 	protected StringBuffer buffer = new StringBuffer();
 	protected int maxBufferSize = 2000;
+	protected boolean nextlineStamp = false;
 	
 	protected static final DateFormat dateFormat = new SimpleDateFormat("MM-dd-yyyy");
+	protected static final DateFormat timeFormat = new SimpleDateFormat("[H:m:s] ");
 	
 	public SimpleLogger (IWarlockClient client)
 	{
@@ -52,22 +54,35 @@ public class SimpleLogger implements IClientLogger {
 	}
 	
 	public void logEcho(String command) {
-		buffer.append(command);
-		buffer.append('\n');
+		appendBuffer(command);
+		appendBuffer("\n");
 		
 		checkAndDumpBuffer();
 	}
 
 	public void logPrompt(String prompt) {
-		buffer.append(prompt);
+		appendBuffer(prompt);
 		
 		checkAndDumpBuffer();
 	}
 
 	public void logText(WarlockString text) {
-		buffer.append(text.toString());
+		appendBuffer(text.toString());
 		
 		checkAndDumpBuffer();
+	}
+	
+	protected void appendBuffer(String str) {
+		if (nextlineStamp) {
+			nextlineStamp = false;
+			str = timeFormat.format(Calendar.getInstance().getTime()) + str;
+		}
+		str = str.replaceAll("\n(.)", "\n" + timeFormat.format(Calendar.getInstance().getTime()) + "$1");
+		if (str.endsWith("\n")) {
+			nextlineStamp = true;
+		}
+		buffer.append(str);
+		System.out.print(str);
 	}
 
 	protected String characterName = null;
