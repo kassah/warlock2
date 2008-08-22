@@ -82,7 +82,6 @@ public class SimpleLogger implements IClientLogger {
 			nextlineStamp = true;
 		}
 		buffer.append(str);
-		System.out.print(str);
 	}
 
 	protected String characterName = null;
