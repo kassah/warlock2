@@ -786,8 +786,10 @@ public class WSLScript extends AbstractScript {
 			}
 			
 			try {
-				IMatch match = scriptCommands.matchWait(matches, matchQueue, time);
+				// Remove matchQueue before going into the wait so we don't end up trashing another wait's queue.
+				BlockingQueue<String> myQueue = matchQueue;
 				matchQueue = null;
+				IMatch match = scriptCommands.matchWait(matches, myQueue, time);
 
 				if (match != null)
 				{
