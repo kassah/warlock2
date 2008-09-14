@@ -50,14 +50,9 @@ public class LineConnection extends Connection {
 	
 	protected class LineEventPollThread extends Connection.EventPollThread {
 		@Override
-		protected void readData(Reader reader) {
-			try {
-				String line = bufferedReader.readLine();
-				listenersGotLine(line);
-			} catch (IOException e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
-			}
+		protected void readData(Reader reader) throws IOException {
+			String line = bufferedReader.readLine();
+			listenersGotLine(line);
 		}
 		
 		private void listenersGotLine (String line)

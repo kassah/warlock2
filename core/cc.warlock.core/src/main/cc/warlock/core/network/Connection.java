@@ -158,22 +158,18 @@ public class Connection implements IConnection {
 							readData(reader);
 						} catch(Exception e) {
 							e.printStackTrace();
+							break;
 						}
 					}
 				}
 			}
 		}
 		
-		protected void readData (Reader reader) {
-			try {
-				char cbuf[] = new char[1024];
-				
-				int charsRead = reader.read(cbuf);
-				listenersGotData(cbuf, 0, charsRead);
-			} catch (IOException e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
-			}
+		protected void readData (Reader reader) throws IOException {
+			char cbuf[] = new char[1024];
+
+			int charsRead = reader.read(cbuf);
+			listenersGotData(cbuf, 0, charsRead);
 		}
 		
 		private void listenersDisconnected ()
