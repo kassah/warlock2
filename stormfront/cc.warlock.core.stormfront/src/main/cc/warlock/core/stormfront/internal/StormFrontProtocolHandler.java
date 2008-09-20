@@ -163,11 +163,15 @@ public class StormFrontProtocolHandler implements IStormFrontProtocolHandler {
 			streamStack.pop();
 	}
 	
+	public void clearStreams() {
+		streamStack.clear();
+	}
+	
 	public void appendStream(String streamId, WarlockString str) {
 		IStream stream = client.getStream(streamId);
 		stream.send(str);
 	}
-	
+
 	public IStream getCurrentStream ()
 	{
 		try {
