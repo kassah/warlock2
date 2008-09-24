@@ -28,6 +28,7 @@ import org.eclipse.swt.SWT;
 import org.eclipse.swt.custom.ST;
 import org.eclipse.swt.custom.StyledText;
 import org.eclipse.swt.custom.VerifyKeyListener;
+import org.eclipse.swt.events.KeyEvent;
 import org.eclipse.swt.events.KeyListener;
 import org.eclipse.swt.events.VerifyEvent;
 import org.eclipse.swt.layout.GridData;
@@ -37,8 +38,9 @@ import cc.warlock.core.client.ICommand;
 import cc.warlock.core.client.IWarlockClientViewer;
 import cc.warlock.core.client.internal.Command;
 import cc.warlock.core.client.settings.macro.IMacro;
+import cc.warlock.rcp.views.GameView;
 
-public class WarlockEntry implements VerifyKeyListener {
+public class WarlockEntry {
 
 	private StyledText widget;
 	private IWarlockClientViewer viewer;
@@ -56,7 +58,7 @@ public class WarlockEntry implements VerifyKeyListener {
 		if (!Platform.getOS().equals(Platform.OS_MACOSX))
 			widget.setLineSpacing(2);
 		
-		widget.addVerifyKeyListener(this);
+		widget.addVerifyKeyListener(new KeyVerifier());
 	}
 	
 	public String getText() {
@@ -84,9 +86,9 @@ public class WarlockEntry implements VerifyKeyListener {
 		return widget;
 	}
 	
-	protected boolean checkAndExecuteMacro (IMacro macro, VerifyEvent e)
+	protected boolean checkAndExecuteMacro (IMacro macro, int keyCode, int stateMask)
 	{
-		if (macro.getKeyCode() == e.keyCode && macro.getModifiers() == e.stateMask)
+		if (macro.getKeyCode() == keyCode && macro.getModifiers() == stateMask)
 		{
 			try {
 				leaveSearchMode();
@@ -97,39 +99,62 @@ public class WarlockEntry implements VerifyKeyListener {
 				ex.printStackTrace();
 			}
 
-			e.doit = false;
 			return true;
 		}
 		return false;
 	}
 	
-	public void verifyKey(VerifyEvent e) {
+	// returns whether we processed the key or not.
+	protected boolean processKey(int keyCode, int stateMask, char character) {
 		//System.out.println("got char \"" + e.character + "\"");
 		for (IMacro macro : viewer.getWarlockClient().getClientSettings().getAllMacros())
 		{
-			if (checkAndExecuteMacro(macro, e)) {
-				return;
+			if (checkAndExecuteMacro(macro, keyCode, stateMask)) {
+				return true;
 			}
 		}
-		
+
 		if (!widget.isFocusControl() || searchMode) {
-			if(entryCharacters.contains(e.character))
+			if(entryCharacters.contains(character))
 			{
-				append(e.character);
-				e.doit = false;
+				append(character);
 				if(!widget.isFocusControl())
 					widget.setFocus();
-			} else if(e.character == '\b') {
+				return true;
+			} else if(character == '\b') {
 				if(searchMode) {
 					searchText.setLength(searchText.length() - 1);
 					search();
 				} else {
 					widget.invokeAction(ST.DELETE_PREVIOUS);
 				}
-				e.doit = false;
 				if(!widget.isFocusControl())
 					widget.setFocus();
+				return true;
 			}
+		}
+		return false;
+	}
+	
+	public class KeyVerifier implements VerifyKeyListener {
+		public void verifyKey(VerifyEvent e) {
+			if(!e.doit)
+				return;
+			if(processKey(e.keyCode, e.stateMask, e.character))
+				e.doit = false;
+		}
+	}
+	
+	public class KeyEventListener implements KeyListener {
+		public void keyPressed(KeyEvent e) {
+			if(!e.doit || viewer.getWarlockClient() != GameView.getGameViewInFocus().getWarlockClient())
+				return;
+			if(processKey(e.keyCode, e.stateMask, e.character))
+				e.doit = false;
+		}
+		
+		public void keyReleased(KeyEvent e) {
+			// Do nothing
 		}
 	}
 	
@@ -161,16 +186,16 @@ public class WarlockEntry implements VerifyKeyListener {
 		setSearchText();
 	}
 	
-	private static final char[] entryChars = new char[] {
-		'a', 'b', 'c', 'd', 'e', 'f', 'g', 'h', 'i', 'j', 'k', 'l', 'm', 'n', 'o', 'p', 'q', 'r', 's', 't', 'u', 'v', 'w', 'x', 'y', 'z',
-		'A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 'K', 'L', 'M', 'N', 'O', 'P', 'Q', 'R', 'S', 'T', 'U', 'V', 'W', 'X', 'Y', 'Z',
-		'0', '1', '2', '3', '4', '5', '6', '7', '8', '9',
-		'.', '/', '{', '}', '<', '>', ',', '?', '\'', '"', ':', ';', '[', ']', '|', '\\', '-', '_', '+', '=',
-		'~', '`', '!', '@', '#', '$', '%', '^', '&', '*', '(', ')', ' '
-	};
-	
 	private static final ArrayList<Character> entryCharacters = new ArrayList<Character>();
 	static {
+		char[] entryChars = new char[] {
+			'a', 'b', 'c', 'd', 'e', 'f', 'g', 'h', 'i', 'j', 'k', 'l', 'm', 'n', 'o', 'p', 'q', 'r', 's', 't', 'u', 'v', 'w', 'x', 'y', 'z',
+			'A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 'K', 'L', 'M', 'N', 'O', 'P', 'Q', 'R', 'S', 'T', 'U', 'V', 'W', 'X', 'Y', 'Z',
+			'0', '1', '2', '3', '4', '5', '6', '7', '8', '9',
+			'.', '/', '{', '}', '<', '>', ',', '?', '\'', '"', ':', ';', '[', ']', '|', '\\', '-', '_', '+', '=',
+			'~', '`', '!', '@', '#', '$', '%', '^', '&', '*', '(', ')', ' '
+		};
+		
 		for (char c : entryChars) {
 			entryCharacters.add(c);
 		}

@@ -190,7 +190,8 @@ public class StreamView extends ViewPart implements IStreamListener, IGameViewFo
 			if (game == null) {
 				System.out.println("Couldn't find a gameview for this client! This view won't be setup to send keys over.");
 			} else {
-				text.getTextWidget().addVerifyKeyListener(game.getWarlockEntry());
+				text.getTextWidget().addVerifyKeyListener(game.getWarlockEntry().new KeyVerifier());
+				PlatformUI.getWorkbench().getActiveWorkbenchWindow().getShell().addKeyListener(game.getWarlockEntry().new KeyEventListener());
 			}
 			
 			Color background = ColorUtil.warlockColorToColor(client.getSkin().getMainBackground());
