@@ -79,15 +79,6 @@ public class WarlockEntry implements VerifyKeyListener {
 	public void addKeyListener(KeyListener listener) {
 		widget.addKeyListener(listener);
 	}
-	
-	protected boolean isKeypadKey (int code) {
-		return (code == SWT.KEYPAD_0 || code == SWT.KEYPAD_1 || code == SWT.KEYPAD_2
-				|| code == SWT.KEYPAD_3 || code == SWT.KEYPAD_4 || code == SWT.KEYPAD_5
-				|| code == SWT.KEYPAD_6 || code == SWT.KEYPAD_7 || code == SWT.KEYPAD_8
-				|| code == SWT.KEYPAD_9 || code == SWT.KEYPAD_ADD || code == SWT.KEYPAD_CR
-				|| code == SWT.KEYPAD_DECIMAL || code == SWT.KEYPAD_DIVIDE || code == SWT.KEYPAD_EQUAL
-				|| code == SWT.KEYPAD_EQUAL || code == SWT.KEYPAD_MULTIPLY || code == SWT.KEYPAD_SUBTRACT);
-	}
 
 	public StyledText getWidget() {
 		return widget;
