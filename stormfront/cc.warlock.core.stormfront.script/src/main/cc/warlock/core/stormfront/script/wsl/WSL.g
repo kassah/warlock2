@@ -299,7 +299,7 @@ qstring returns [IWSLValue value]
 		| str=NOT | str=EQUAL | str=GTE | str=LTE | str=GT | str=LT
 		| str=RPAREN | str=LPAREN | str=EXISTS | str=CONTAINS | str=ACTION
 		| str=WHEN | str=REMOVE | str=CLEAR | str=TRUE | str=FALSE | str=INSTANT
-		| (BACKSLASH QUOTE)=> BACKSLASH str=QUOTE | str=BACKSLASH
+		| ((BACKSLASH QUOTE)=> BACKSLASH str=QUOTE) | str=BACKSLASH
 	) { value = new WSLString($str.text); }
 	;
 	
@@ -426,8 +426,8 @@ fragment LABEL_STRING
 	: (~(WS|':'))+
 	;
 fragment VARIABLE_STRING
-	: WORD_CHAR (~(WS|'%'))*
+	: WORD_CHAR (~(WS|'%'|'"'))*
 	;
 fragment LOCAL_VARIABLE_STRING
-	: WORD_CHAR (~(WS|'$'))*
+	: WORD_CHAR (~(WS|'$'|'"'))*
 	; 
