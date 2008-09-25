@@ -308,7 +308,8 @@ common_string returns [String value]
 
 qstring returns [IWSLValue value]
 	: str=common_string { value = new WSLString(str); }
-	| (PERCENT t=PERCENT | DOLLAR t=DOLLAR) { value = new WSLString($t.text); }
+	| ((BACKSLASH QUOTE)=> BACKSLASH t=QUOTE | PERCENT t=PERCENT
+		| DOLLAR t=DOLLAR) { value = new WSLString($t.text); }
 	;
 	
 string returns [String value]
@@ -364,7 +365,7 @@ qlocal_variable returns [String value]
 
 qvariable_string returns [String value]
 	: str=common_string { value = str; }
-	| t=DOLLAR { value = $t.text; }
+	| ((BACKSLASH QUOTE)=> BACKSLASH t=QUOTE | t=DOLLAR) { value = $t.text; }
 	;
 
 qvariable_string_helper returns [String value]
@@ -385,7 +386,7 @@ qlocal_variable_string_helper returns [String value]
 
 qlocal_variable_string returns [String value]
 	: str=common_string { value = str; }
-	| t=PERCENT { value = $t.text; }
+	| ((BACKSLASH QUOTE)=> BACKSLASH t=QUOTE | t=PERCENT) { value = $t.text; }
 	;
 
 
@@ -481,7 +482,7 @@ STRING
 	: (~('%'|'$'|'\\'|'"'|'!'|'='|'>'|'<'|'('|')'|'&'|'|'|WS))+  { atStart = false; }
 	;
 BACKSLASH
-    : '\\' c=ANY { setText($c.text); atStart = false; }
+    : '\\' { atStart = false; }
 	;
 LABEL
 	: { atStart }?=> (LABEL_STRING ':')=> label=LABEL_STRING ':' { setText($label.text); atStart = false; }
@@ -498,7 +499,4 @@ fragment WORD_CHAR
 	;
 fragment LABEL_STRING
 	: (~(WS|':'))+
-	;
-fragment ANY
-	: .
 	;
