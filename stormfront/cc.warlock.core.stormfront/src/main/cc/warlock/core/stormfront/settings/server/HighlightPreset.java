@@ -43,6 +43,7 @@ public class HighlightPreset extends Preset implements IHighlightString {
 	protected HighlightPreset originalString;
 	protected Pattern pattern;
 	protected int index;
+	protected String sound;
 	
 	protected HighlightPreset (ServerSettings serverSettings, Palette palette, int index)
 	{
@@ -60,6 +61,8 @@ public class HighlightPreset extends Preset implements IHighlightString {
 		this.isNew = other.isNew;
 		this.originalString = other;
 		this.index = other.index;
+		this.sound = other.sound;
+		
 	}
 	
 	public HighlightPreset (ServerSettings serverSettings, StormFrontElement highlightElement, Palette palette)
@@ -257,5 +260,13 @@ public class HighlightPreset extends Preset implements IHighlightString {
 	
 	public IClientSettingProvider getProvider() {
 		return null;
+	}
+	
+	public String getSound(){
+		return sound;
+	}
+	
+	public void setSound(String sound){
+		this.sound = sound;
 	}
 }
