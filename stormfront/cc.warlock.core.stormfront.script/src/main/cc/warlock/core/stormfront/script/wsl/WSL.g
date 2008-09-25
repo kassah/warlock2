@@ -26,6 +26,9 @@ options { backtrack=true; memoize=true; }
 			return false;
 		}
 	}
+	private boolean followingWhitespace() {
+		return input.get(input.index() - 1).getChannel() != Token.DEFAULT_CHANNEL;
+	}
 	@Override
 	public void reportError(RecognitionException ex) {
 		script.getCommands().echo("Line: " + ex.line + ":" + ex.charPositionInLine + ": " + ex.toString());
@@ -117,9 +120,9 @@ string_list_helper returns [ArrayList<IWSLValue> list] @init { String whitespace
 	;
 
 string_value returns [IWSLValue value]
-	: str=string				{ value = new WSLString($str.text); }
-	| v=VARIABLE				{ value = new WSLVariable($v.text, script); }
-	| v=LOCAL_VARIABLE	{ value = new WSLLocalVariable($v.text, script); }
+	: str=string				{ value = new WSLString(str); }
+	| v=variable				{ value = new WSLVariable(v, script); }
+	| v=local_variable			{ value = new WSLLocalVariable(v, script); }
 	;
 	
 conditionalExpression returns [IWSLValue cond] @init { ArrayList<IWSLValue> args = null; }
@@ -243,8 +246,8 @@ primaryExpression returns [IWSLValue cond]
 	;
 	
 cond_value returns [IWSLValue value]
-	: v=VARIABLE		{ value = new WSLVariable($v.text, script); }
-	| v=LOCAL_VARIABLE	{ value = new WSLLocalVariable($v.text, script); }
+	: PERCENT v=STRING	{ value = new WSLVariable($v.text, script); }
+	| DOLLAR v=STRING	{ value = new WSLLocalVariable($v.text, script); }
 	| val=number		{ value = val; }
 	| TRUE				{ value = new WSLBoolean(true); }
 	| FALSE				{ value = new WSLBoolean(false); }
@@ -290,8 +293,8 @@ quoted_string_helper returns [ArrayList<IWSLValue> list] @init { String whitespa
 
 quoted_string_value returns [IWSLValue value]
 	: str=qstring				{ value = str; }
-	| v=VARIABLE				{ value = new WSLVariable($v.text, script); }
-	| v=LOCAL_VARIABLE	{ value = new WSLLocalVariable($v.text, script); }
+	| v=qvariable				{ value = new WSLVariable(v, script); }
+	| v=qlocal_variable			{ value = new WSLLocalVariable(v, script); }
 	;
 
 qstring returns [IWSLValue value]
@@ -299,16 +302,102 @@ qstring returns [IWSLValue value]
 		| str=NOT | str=EQUAL | str=GTE | str=LTE | str=GT | str=LT
 		| str=RPAREN | str=LPAREN | str=EXISTS | str=CONTAINS | str=ACTION
 		| str=WHEN | str=REMOVE | str=CLEAR | str=TRUE | str=FALSE | str=INSTANT
-		| ((BACKSLASH QUOTE)=> BACKSLASH str=QUOTE) | str=BACKSLASH
+		| str=BACKSLASH | PERCENT str=PERCENT | DOLLAR str=DOLLAR
 	) { value = new WSLString($str.text); }
 	;
 	
-string
+string returns [String value]
+	: (str=STRING | str=IF | str=THEN | str=OR | str=AND | str=NOTEQUAL
+		| str=NOT | str=EQUAL | str=GTE | str=LTE | str=GT | str=LT
+		| str=RPAREN | str=LPAREN | str=EXISTS | str=CONTAINS | str=ACTION
+		| { actionDepth == 0 }? str=WHEN | str=REMOVE | str=CLEAR | str=TRUE
+		| str=FALSE | str=INSTANT | str=QUOTE | str=BACKSLASH
+		| (PERCENT PERCENT)=> PERCENT str=PERCENT
+		| (DOLLAR DOLLAR)=> DOLLAR str=DOLLAR | str=PERCENT { followingWhitespace() }?
+		| str=DOLLAR { followingWhitespace() }?
+	) { value = $str.text; }
+	;
+
+variable returns [String value]
+	: PERCENT str=variable_string_helper ({ !followingWhitespace() }? PERCENT)? { value = str; }
+	;
+	
+local_variable returns [String value]
+	: DOLLAR str=local_variable_string_helper ({ !followingWhitespace() }? DOLLAR)? { value = str; }
+	;
+
+variable_string_helper returns [String value]
+	: str=variable_string ({ !followingWhitespace() }? rest=variable_string_helper)?
+		{
+			if(rest == null) value = $str.text;
+			else value = $str.text + rest;
+		}
+	;
+
+local_variable_string_helper returns [String value]
+	: str=local_variable_string ({ !followingWhitespace() }? rest=local_variable_string_helper)?
+		{
+			if(rest == null) value = $str.text;
+			else value = $str.text + rest;
+		}
+	;
+	
+variable_string
 	: STRING | IF | THEN | OR | AND | NOTEQUAL | NOT | EQUAL | GTE | LTE | GT
 	| LT | RPAREN | LPAREN | EXISTS | CONTAINS | ACTION
 	| { actionDepth == 0 }? WHEN | REMOVE | CLEAR | TRUE | FALSE | INSTANT
-	| QUOTE | BACKSLASH
+	| QUOTE | BACKSLASH | DOLLAR
 	;
+
+local_variable_string
+	: STRING | IF | THEN | OR | AND | NOTEQUAL | NOT | EQUAL | GTE | LTE | GT
+	| LT | RPAREN | LPAREN | EXISTS | CONTAINS | ACTION
+	| { actionDepth == 0 }? WHEN | REMOVE | CLEAR | TRUE | FALSE | INSTANT
+	| QUOTE | BACKSLASH | PERCENT
+	;
+
+qvariable returns [String value]
+	: PERCENT str=qvariable_string_helper ({ !followingWhitespace() }? PERCENT)? { value = str; }
+	;
+	
+qlocal_variable returns [String value]
+	: DOLLAR str=qlocal_variable_string_helper ({ !followingWhitespace() }? DOLLAR)? { value = str; }
+	;
+
+qvariable_string returns [String value]
+	: (str=STRING | str=IF | str=THEN | str=OR | str=AND | str=NOTEQUAL
+		| str=NOT | str=EQUAL | str=GTE | str=LTE | str=GT | str=LT
+		| str=RPAREN | str=LPAREN | str=EXISTS | str=CONTAINS | str=ACTION
+		| str=WHEN | str=REMOVE | str=CLEAR | str=TRUE | str=FALSE | str=INSTANT
+		| str=BACKSLASH | str=DOLLAR
+	) { value = $str.text; }
+	;
+
+qvariable_string_helper returns [String value]
+	: str=qvariable_string ({ !followingWhitespace() }? rest=qvariable_string_helper)?
+		{
+			if(rest == null) value = str;
+			else value = str + rest;
+		}
+	;
+
+qlocal_variable_string_helper returns [String value]
+	: str=qlocal_variable_string ({ !followingWhitespace() }? rest=qlocal_variable_string_helper)?
+		{
+			if(rest == null) value = str;
+			else value = str + rest;
+		}
+	;
+
+qlocal_variable_string returns [String value]
+	: (str=STRING | str=IF | str=THEN | str=OR | str=AND | str=NOTEQUAL
+		| str=NOT | str=EQUAL | str=GTE | str=LTE | str=GT | str=LT
+		| str=RPAREN | str=LPAREN | str=EXISTS | str=CONTAINS | str=ACTION
+		| str=WHEN | str=REMOVE | str=CLEAR | str=TRUE | str=FALSE | str=INSTANT
+		| str=BACKSLASH | str=PERCENT
+	) { value = $str.text; }
+	;
+
 
 IF
 	: 'if' { atStart = false; }
@@ -385,29 +474,18 @@ BLANK
 EOL
 	: ('\r'? '\n' | '\r')	{ atStart = true; }
 	;
-VARIABLE
-	: '%' var=VARIABLE_STRING '%'?
-			{
-				setText($var.text);
-				atStart = false;
-			}
+PERCENT
+	: '%'					{ atStart = false; }
 	;
-LOCAL_VARIABLE
-	:  '$' var=LOCAL_VARIABLE_STRING '$'?
-			{
-				setText($var.text);
-				atStart = false;
-			}
+DOLLAR
+	: '$'					{ atStart = false; }
 	;
+
 STRING
-	: ((~('%'|'$'|'\\'|'"'|'!'|'='|'>'|'<'|'('|')'|WS))+
-		| '%%' { setText("\%"); }
-		| '$$' { setText("$"); }
-		| '%' | '$'
-	) { atStart = false; }
+	: (~('%'|'$'|'\\'|'"'|'!'|'='|'>'|'<'|'('|')'|WS))+  { atStart = false; }
 	;
 BACKSLASH
-    : '\\' { atStart = false; }
+    : '\\' c=ANY { setText($c.text); atStart = false; }
 	;
 LABEL
 	: { atStart }?=> (LABEL_STRING ':')=> label=LABEL_STRING ':' { setText($label.text); atStart = false; }
@@ -425,9 +503,6 @@ fragment WORD_CHAR
 fragment LABEL_STRING
 	: (~(WS|':'))+
 	;
-fragment VARIABLE_STRING
-	: WORD_CHAR (~(WS|'%'|'"'))*
+fragment ANY
+	: .
 	;
-fragment LOCAL_VARIABLE_STRING
-	: WORD_CHAR (~(WS|'$'|'"'))*
-	; 
