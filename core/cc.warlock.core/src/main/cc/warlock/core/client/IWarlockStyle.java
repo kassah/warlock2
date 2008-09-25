@@ -49,4 +49,7 @@ public interface IWarlockStyle {
 	public void setBackgroundColor(WarlockColor color);
 	public void setFullLine(boolean fullLine);
 	public void setName(String name);
+	public String getSound();
+	public void setSound(String sound);
+
 }

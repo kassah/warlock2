@@ -39,6 +39,7 @@ public class WarlockStyle implements IWarlockStyle {
 	private Runnable action;
 	private IWarlockStyle originalStyle;
 	private boolean needsUpdate;
+	private String sound = new String();
 	
 	public WarlockStyle (StyleType[] styleTypes)
 	{
@@ -63,6 +64,7 @@ public class WarlockStyle implements IWarlockStyle {
 		
 		this.originalStyle = other;
 		this.fullLine = other.isFullLine();
+		this.setSound(other.getSound());
 	}
 	
 	public Runnable getAction() {
@@ -151,4 +153,17 @@ public class WarlockStyle implements IWarlockStyle {
 	{
 		return originalStyle;
 	}
+	
+	public String getSound(){
+		return sound;
+	}
+	
+	public void setSound(String sound){
+		if ((this.sound == null) || (sound != null && !this.sound.equals(sound))){
+
+			needsUpdate = true;
+		}
+		this.sound = sound;
+	}
+	
 }

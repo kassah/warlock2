@@ -96,6 +96,7 @@ public class HighlightConfigurationProvider extends PatternConfigurationProvider
 	
 	@Override
 	protected void saveTo(List<Element> elements) {
+		//System.out.println("Saving highlights");
 		Element highlightsElement = DocumentHelper.createElement("highlights");
 		
 		for (IHighlightString string : highlights)
@@ -130,6 +131,8 @@ public class HighlightConfigurationProvider extends PatternConfigurationProvider
 		}
 		
 		style.setFullLine(booleanValue(sElement, "full-line"));
+		//System.out.println("Setting style sound to " + sElement.attributeValue("sound"));
+		style.setSound(sElement.attributeValue("sound"));
 		
 		return style;
 	}
@@ -160,7 +163,8 @@ public class HighlightConfigurationProvider extends PatternConfigurationProvider
 		}
 		
 		element.addAttribute("full-line", ""+style.isFullLine());
-		
+		//System.out.println("saving sound " + style.getSound());
+		element.addAttribute("sound", style.getSound());
 		return element;
 	}
 	

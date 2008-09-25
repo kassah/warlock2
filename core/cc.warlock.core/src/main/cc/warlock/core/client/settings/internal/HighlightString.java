@@ -32,6 +32,7 @@ import cc.warlock.core.client.settings.IHighlightString;
 public class HighlightString extends PatternSetting implements IHighlightString {
 
 	protected IWarlockStyle style;
+
 	
 	public HighlightString (IClientSettingProvider provider, String pattern, IWarlockStyle style) throws PatternSyntaxException
 	{
@@ -64,5 +65,7 @@ public class HighlightString extends PatternSetting implements IHighlightString 
 	public HighlightString getOriginalHighlightString() {
 		return (HighlightString)originalSetting;
 	}
+	
+
 }
 
