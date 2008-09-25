@@ -64,6 +64,7 @@ import cc.warlock.rcp.ui.style.DefaultStyleProvider;
 import cc.warlock.rcp.ui.style.StyleProviders;
 import cc.warlock.rcp.util.ColorUtil;
 import cc.warlock.rcp.util.FontUtil;
+import cc.warlock.rcp.util.SoundPlayer;
 
 public class StreamView extends ViewPart implements IStreamListener, IGameViewFocusListener, IWarlockClientListener {
 	
@@ -322,6 +323,17 @@ public class StreamView extends ViewPart implements IStreamListener, IGameViewFo
 				
 				IWarlockStyle style = highlight.getStyle();
 				text.addStyle(start, length, style);
+				
+				try{
+					if (style.getSound() != null && !style.getSound().equals("")){
+						//System.out.println("Playing sound " + style.getSound());
+						SoundPlayer.getInstance().play(style.getSound(), false);
+						//InputStream soundStream = new FileInputStream(style.getSound());
+						//RCPUtil.playSound(soundStream);
+					}
+				}catch(Exception e){
+					e.printStackTrace();
+				}
 			}
 		}
 	}

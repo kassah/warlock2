@@ -42,6 +42,8 @@ import org.eclipse.jface.viewers.ViewerFilter;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.ModifyEvent;
 import org.eclipse.swt.events.ModifyListener;
+import org.eclipse.swt.events.SelectionEvent;
+import org.eclipse.swt.events.SelectionListener;
 import org.eclipse.swt.graphics.Color;
 import org.eclipse.swt.graphics.Image;
 import org.eclipse.swt.graphics.RGB;
@@ -51,8 +53,11 @@ import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.widgets.Button;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Control;
+import org.eclipse.swt.widgets.Event;
+import org.eclipse.swt.widgets.FileDialog;
 import org.eclipse.swt.widgets.Group;
 import org.eclipse.swt.widgets.Label;
+import org.eclipse.swt.widgets.Listener;
 import org.eclipse.swt.widgets.TableColumn;
 import org.eclipse.swt.widgets.TableItem;
 import org.eclipse.swt.widgets.Text;
@@ -78,8 +83,9 @@ public class HighlightStringsPreferencePage extends PreferencePageUtils implemen
 	protected Button fillLineButton, regexButton, fullWordMatchButton, caseSensitiveButton;
 	protected ColorSelector customBGSelector, customFGSelector;
 	protected Button defaultBG, customBG, defaultFG, customFG;
-	protected Button addString, removeString;
+	protected Button addString, removeString, soundButton;
 	protected Text filterText;
+	protected Text soundText; 
 	protected IWarlockClient client;
 	protected IWarlockSkin skin;
 	protected ClientSettings settings;
@@ -252,6 +258,38 @@ public class HighlightStringsPreferencePage extends PreferencePageUtils implemen
 		caseSensitiveButton.setEnabled(false);
 		fullWordMatchButton = createCheckbox(optionsGroup, "Match full word (word boundary)");
 		fullWordMatchButton.setEnabled(false);
+		
+		Group soundGroup = new Group(optionsGroup, SWT.NONE);
+		soundGroup.setLayout(new GridLayout(3, false));
+		new Label(soundGroup, SWT.NONE).setText("Sound:");
+		soundText = new Text(soundGroup, SWT.BORDER | SWT.SINGLE);
+		soundText.setEnabled(false);
+		GridData soundTextData = new GridData(GridData.FILL_HORIZONTAL);
+		soundText.setLayoutData(soundTextData);
+		soundText.addListener(SWT.Modify, new Listener() {
+			public void handleEvent(Event event) {
+				selectedString.getStyle().setSound(soundText.getText());
+			}
+		});
+		
+		
+		soundButton = createButton(soundGroup, "Browse", SWT.PUSH);
+		
+		soundButton.setEnabled(false);
+		addBtnSoundListener(main);
+		
+		
+		
+	}
+	
+	private void addBtnSoundListener(final Composite parent){
+		soundButton.addSelectionListener(new SelectionListener(){
+			public void widgetSelected(SelectionEvent e){
+				browseForSound();
+			}
+			
+			public void widgetDefaultSelected(SelectionEvent e){}
+		});
 	}
 	
 	protected String getDisplayName ()
@@ -269,6 +307,7 @@ public class HighlightStringsPreferencePage extends PreferencePageUtils implemen
 	{
 		selectedString = string;
 		if (string == null) return;
+		
 		
 		WarlockColor fgColor = string.getStyle().getForegroundColor();
 		WarlockColor bgColor = string.getStyle().getBackgroundColor();
@@ -311,6 +350,20 @@ public class HighlightStringsPreferencePage extends PreferencePageUtils implemen
 		
 		fullWordMatchButton.setSelection(string.isFullWordMatch());
 		fullWordMatchButton.setEnabled(true);
+		
+		try{
+			if (string.getStyle().getSound() != null){
+				soundText.setText(string.getStyle().getSound());
+			}else{
+				soundText.setText("");
+			}
+		}catch(Exception e){
+			e.printStackTrace();
+		}
+		
+		soundText.setEnabled(true);
+		soundButton.setEnabled(true);
+
 	}
 	
 	@Override
@@ -336,6 +389,25 @@ public class HighlightStringsPreferencePage extends PreferencePageUtils implemen
 		} else if (button == regexButton) {
 			regexSelected();
 		}
+	}
+	
+	protected void browseForSound(){
+		FileDialog fd = new FileDialog(HighlightStringsPreferencePage.this.getShell(), SWT.OPEN);
+		fd.setFilterNames(new String[]{"Wave File (*.wav)"});
+		fd.setFilterExtensions(new String[]{"*.wav"});
+		String filename = fd.open();
+		if (filename != null){
+			soundText.setText(filename);
+			try{
+				if (selectedString != null && selectedString.getStyle() != null){
+					selectedString.getStyle().setSound(filename);
+					selectedString.setNeedsUpdate(true);
+				}
+			}catch(Exception e){
+				e.printStackTrace();
+			}
+		}
+
 	}
 	
 	@Override
