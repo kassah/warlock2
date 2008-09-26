@@ -253,9 +253,10 @@ string_list_helper returns [ArrayList<IWSLValue> list] @init { String whitespace
 	;
 
 string_value returns [IWSLValue value]
-	: (PERCENT variable_string)=> v=variable				{ value = new WSLVariable(v, script); }
-	| (DOLLAR local_variable_string)=> v=local_variable			{ value = new WSLLocalVariable(v, script); }
-	| str=string				{ value = new WSLString(str); }
+	: (variable)=> v=variable { value = new WSLVariable(v, script); }
+	| (local_variable)=> v=local_variable
+		{ value = new WSLLocalVariable(v, script); }
+	| str=string { value = new WSLString(str); }
 	;
 
 quoted_string returns [IWSLValue value]
@@ -292,9 +293,9 @@ quoted_string_helper returns [ArrayList<IWSLValue> list] @init { String whitespa
 	;
 
 quoted_string_value returns [IWSLValue value]
-	: (PERCENT qvariable_string)=> v=qvariable
+	: (qvariable)=> v=qvariable
 		{ value = new WSLVariable(v, script); }
-	| (DOLLAR qlocal_variable_string)=> v=qlocal_variable
+	| (qlocal_variable)=> v=qlocal_variable
 		{ value = new WSLLocalVariable(v, script); }
 	| str=qstring { value = str; }
 	;
@@ -326,12 +327,12 @@ string returns [String value]
 	;
 
 variable returns [String value]
-	: PERCENT str=variable_string_helper
+	: PERCENT { !followingWhitespace() }? str=variable_string_helper
 		({ !followingWhitespace() }? PERCENT)? { value = str; }
 	;
 	
 local_variable returns [String value]
-	: DOLLAR str=local_variable_string_helper
+	: DOLLAR { !followingWhitespace() }? str=local_variable_string_helper
 		({ !followingWhitespace() }? DOLLAR)? { value = str; }
 	;
 
@@ -362,12 +363,12 @@ local_variable_string returns [String value]
 	;
 
 qvariable returns [String value]
-	: PERCENT str=qvariable_string_helper
+	: PERCENT { !followingWhitespace() }? str=qvariable_string_helper
 		({ !followingWhitespace() }? PERCENT)? { value = str; }
 	;
 	
 qlocal_variable returns [String value]
-	: DOLLAR str=qlocal_variable_string_helper
+	: DOLLAR { !followingWhitespace() }? str=qlocal_variable_string_helper
 		({ !followingWhitespace() }? DOLLAR)? { value = str; }
 	;
 
