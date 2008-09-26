@@ -1055,6 +1055,9 @@ public class WSLScript extends AbstractScript {
 					// TODO Auto-generated catch block
 					e.printStackTrace();
 				}
+			} else {
+				scriptError("Sound file \"" + file + "\" not found.");
+				return;
 			}
 		}
 	}
