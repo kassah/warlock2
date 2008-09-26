@@ -27,7 +27,7 @@ options { backtrack=true; memoize=true; }
 		}
 	}
 	private boolean followingWhitespace() {
-		return input.get(input.index() - 1).getChannel() != Token.DEFAULT_CHANNEL;
+		return input.get(input.index() - 1).getChannel() == HIDDEN;
 	}
 	@Override
 	public void reportError(RecognitionException ex) {
@@ -246,8 +246,8 @@ primaryExpression returns [IWSLValue cond]
 	;
 	
 cond_value returns [IWSLValue value]
-	: PERCENT v=STRING	{ value = new WSLVariable($v.text, script); }
-	| DOLLAR v=STRING	{ value = new WSLLocalVariable($v.text, script); }
+	: (PERCENT STRING)=> PERCENT v=STRING	{ value = new WSLVariable($v.text, script); }
+	| (DOLLAR STRING)=> DOLLAR v=STRING		{ value = new WSLLocalVariable($v.text, script); }
 	| val=number		{ value = val; }
 	| TRUE				{ value = new WSLBoolean(true); }
 	| FALSE				{ value = new WSLBoolean(false); }
@@ -297,7 +297,7 @@ quoted_string_value returns [IWSLValue value]
 	| v=qlocal_variable			{ value = new WSLLocalVariable(v, script); }
 	;
 
-common_string returns [String value]
+common_text returns [String value]
 	: (str=STRING | str=IF | str=THEN | str=OR | str=AND | str=NOTEQUAL
 		| str=NOT | str=EQUAL | str=GTE | str=LTE | str=GT | str=LT
 		| str=RPAREN | str=LPAREN | str=EXISTS | str=CONTAINS | str=ACTION
@@ -306,27 +306,31 @@ common_string returns [String value]
 		{ value = $str.text; }
 	;
 
+common_string returns [String value]
+	: str=common_text { value = str; }
+	| ((PERCENT PERCENT)=> PERCENT t=PERCENT
+		| (DOLLAR DOLLAR)=> DOLLAR t=DOLLAR
+		| t=PERCENT | t=DOLLAR ) { value = $t.text; }
+	;
+
 qstring returns [IWSLValue value]
 	: str=common_string { value = new WSLString(str); }
-	| ((BACKSLASH QUOTE)=> BACKSLASH t=QUOTE | PERCENT t=PERCENT
-		| DOLLAR t=DOLLAR) { value = new WSLString($t.text); }
+	| (BACKSLASH QUOTE)=> BACKSLASH t=QUOTE { value = new WSLString($t.text); }
 	;
 	
 string returns [String value]
 	: str=common_string { value = str; }
-	| (t=QUOTE | (PERCENT PERCENT)=> PERCENT t=PERCENT
-		| (DOLLAR DOLLAR)=> DOLLAR t=DOLLAR
-		| t=PERCENT { followingWhitespace() }?
-		| t=DOLLAR { followingWhitespace() }?
-	) { value = $t.text; }
+	| t=QUOTE			{ value = $t.text; }
 	;
 
 variable returns [String value]
-	: PERCENT str=variable_string_helper ({ !followingWhitespace() }? PERCENT)? { value = str; }
+	: (PERCENT variable_string)=> PERCENT str=variable_string_helper
+		({ !followingWhitespace() }? PERCENT)? { value = str; }
 	;
 	
 local_variable returns [String value]
-	: DOLLAR str=local_variable_string_helper ({ !followingWhitespace() }? DOLLAR)? { value = str; }
+	: (DOLLAR local_variable_string)=> DOLLAR str=local_variable_string_helper
+		({ !followingWhitespace() }? DOLLAR)? { value = str; }
 	;
 
 variable_string_helper returns [String value]
@@ -346,25 +350,27 @@ local_variable_string_helper returns [String value]
 	;
 	
 variable_string returns [String value]
-	: str=common_string { value = str; }
+	: str=common_text { value = str; }
 	| (t=QUOTE | t=DOLLAR) { value = $t.text; }
 	;
 
 local_variable_string returns [String value]
-	: str=common_string { value = str; }
+	: str=common_text { value = str; }
 	| (t=QUOTE | t=PERCENT) { value = $t.text; }
 	;
 
 qvariable returns [String value]
-	: PERCENT str=qvariable_string_helper ({ !followingWhitespace() }? PERCENT)? { value = str; }
+	: (PERCENT qvariable_string)=> PERCENT str=qvariable_string_helper
+		({ !followingWhitespace() }? PERCENT)? { value = str; }
 	;
 	
 qlocal_variable returns [String value]
-	: DOLLAR str=qlocal_variable_string_helper ({ !followingWhitespace() }? DOLLAR)? { value = str; }
+	: (DOLLAR qvariable_string)=> DOLLAR str=qlocal_variable_string_helper
+		({ !followingWhitespace() }? DOLLAR)? { value = str; }
 	;
 
 qvariable_string returns [String value]
-	: str=common_string { value = str; }
+	: str=common_text { value = str; }
 	| ((BACKSLASH QUOTE)=> BACKSLASH t=QUOTE | t=DOLLAR) { value = $t.text; }
 	;
 
@@ -385,7 +391,7 @@ qlocal_variable_string_helper returns [String value]
 	;
 
 qlocal_variable_string returns [String value]
-	: str=common_string { value = str; }
+	: str=common_text { value = str; }
 	| ((BACKSLASH QUOTE)=> BACKSLASH t=QUOTE | t=PERCENT) { value = $t.text; }
 	;
 
