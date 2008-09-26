@@ -87,44 +87,6 @@ expr returns [WSLAbstractCommand command]
 		}
 	;
 
-string_list returns [IWSLValue value]
-	: l=string_list_helper
-			{
-				if(l.size() > 1)
-					value = new WSLList(l);
-				else
-					value = l.get(0);
-			}
-	;
-
-string_list_helper returns [ArrayList<IWSLValue> list] @init { String whitespace = null; }
-	: data=string_value
-		{
-			whitespace = "";
-			for(int i = input.index() - 1; i >= 0 && input.get(i).getChannel() != Token.DEFAULT_CHANNEL; i--) {
-				whitespace = input.get(i).getText() + whitespace;
-			}
-		}
-	(l=string_list_helper)?
-		{
-			if(l == null) {
-				list = new ArrayList<IWSLValue>();
-				list.add(data);
-			} else {
-				list = l;
-				if(whitespace != null && whitespace.length() > 0)
-					list.add(0, new WSLString(whitespace));
-				list.add(0, data);
-			}
-		}
-	;
-
-string_value returns [IWSLValue value]
-	: str=string				{ value = new WSLString(str); }
-	| v=variable				{ value = new WSLVariable(v, script); }
-	| v=local_variable			{ value = new WSLLocalVariable(v, script); }
-	;
-	
 conditionalExpression returns [IWSLValue cond] @init { ArrayList<IWSLValue> args = null; }
 	: arg=conditionalAndExpression { args = null; }
 		(OR argNext=conditionalAndExpression
@@ -258,6 +220,44 @@ number returns [IWSLValue value]
 	: { isNumber(input.LT(1).getText()) }? v=STRING	{ value = new WSLNumber($v.text); }
 	;
 
+string_list returns [IWSLValue value]
+	: l=string_list_helper
+			{
+				if(l.size() > 1)
+					value = new WSLList(l);
+				else
+					value = l.get(0);
+			}
+	;
+
+string_list_helper returns [ArrayList<IWSLValue> list] @init { String whitespace = null; }
+	: data=string_value
+		{
+			whitespace = "";
+			for(int i = input.index() - 1; i >= 0 && input.get(i).getChannel() != Token.DEFAULT_CHANNEL; i--) {
+				whitespace = input.get(i).getText() + whitespace;
+			}
+		}
+	(l=string_list_helper)?
+		{
+			if(l == null) {
+				list = new ArrayList<IWSLValue>();
+				list.add(data);
+			} else {
+				list = l;
+				if(whitespace != null && whitespace.length() > 0)
+					list.add(0, new WSLString(whitespace));
+				list.add(0, data);
+			}
+		}
+	;
+
+string_value returns [IWSLValue value]
+	: (PERCENT variable_string)=> v=variable				{ value = new WSLVariable(v, script); }
+	| (DOLLAR local_variable_string)=> v=local_variable			{ value = new WSLLocalVariable(v, script); }
+	| str=string				{ value = new WSLString(str); }
+	;
+
 quoted_string returns [IWSLValue value]
 	: QUOTE l=quoted_string_helper QUOTE
 		{
@@ -292,9 +292,11 @@ quoted_string_helper returns [ArrayList<IWSLValue> list] @init { String whitespa
 	;
 
 quoted_string_value returns [IWSLValue value]
-	: str=qstring				{ value = str; }
-	| v=qvariable				{ value = new WSLVariable(v, script); }
-	| v=qlocal_variable			{ value = new WSLLocalVariable(v, script); }
+	: (PERCENT qvariable_string)=> v=qvariable
+		{ value = new WSLVariable(v, script); }
+	| (DOLLAR qlocal_variable_string)=> v=qlocal_variable
+		{ value = new WSLLocalVariable(v, script); }
+	| str=qstring { value = str; }
 	;
 
 common_text returns [String value]
@@ -307,15 +309,15 @@ common_text returns [String value]
 	;
 
 common_string returns [String value]
-	: str=common_text { value = str; }
-	| ((PERCENT PERCENT)=> PERCENT t=PERCENT
+	: ((PERCENT PERCENT)=> PERCENT t=PERCENT
 		| (DOLLAR DOLLAR)=> DOLLAR t=DOLLAR
 		| t=PERCENT | t=DOLLAR ) { value = $t.text; }
+	| str=common_text { value = str; }
 	;
 
 qstring returns [IWSLValue value]
-	: str=common_string { value = new WSLString(str); }
-	| (BACKSLASH QUOTE)=> BACKSLASH t=QUOTE { value = new WSLString($t.text); }
+	: (BACKSLASH QUOTE)=> BACKSLASH t=QUOTE { value = new WSLString($t.text); }
+	|  str=common_string { value = new WSLString(str); }
 	;
 	
 string returns [String value]
@@ -324,12 +326,12 @@ string returns [String value]
 	;
 
 variable returns [String value]
-	: (PERCENT variable_string)=> PERCENT str=variable_string_helper
+	: PERCENT str=variable_string_helper
 		({ !followingWhitespace() }? PERCENT)? { value = str; }
 	;
 	
 local_variable returns [String value]
-	: (DOLLAR local_variable_string)=> DOLLAR str=local_variable_string_helper
+	: DOLLAR str=local_variable_string_helper
 		({ !followingWhitespace() }? DOLLAR)? { value = str; }
 	;
 
@@ -360,18 +362,18 @@ local_variable_string returns [String value]
 	;
 
 qvariable returns [String value]
-	: (PERCENT qvariable_string)=> PERCENT str=qvariable_string_helper
+	: PERCENT str=qvariable_string_helper
 		({ !followingWhitespace() }? PERCENT)? { value = str; }
 	;
 	
 qlocal_variable returns [String value]
-	: (DOLLAR qvariable_string)=> DOLLAR str=qlocal_variable_string_helper
+	: DOLLAR str=qlocal_variable_string_helper
 		({ !followingWhitespace() }? DOLLAR)? { value = str; }
 	;
 
 qvariable_string returns [String value]
-	: str=common_text { value = str; }
-	| ((BACKSLASH QUOTE)=> BACKSLASH t=QUOTE | t=DOLLAR) { value = $t.text; }
+	: ((BACKSLASH QUOTE)=> BACKSLASH t=QUOTE | t=DOLLAR) { value = $t.text; }
+	|  str=common_text { value = str; }
 	;
 
 qvariable_string_helper returns [String value]
@@ -391,8 +393,8 @@ qlocal_variable_string_helper returns [String value]
 	;
 
 qlocal_variable_string returns [String value]
-	: str=common_text { value = str; }
-	| ((BACKSLASH QUOTE)=> BACKSLASH t=QUOTE | t=PERCENT) { value = $t.text; }
+	: ((BACKSLASH QUOTE)=> BACKSLASH t=QUOTE | t=PERCENT) { value = $t.text; }
+	| str=common_text { value = str; }
 	;
 
 
