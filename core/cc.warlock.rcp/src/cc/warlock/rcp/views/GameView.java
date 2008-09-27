@@ -57,7 +57,7 @@ import cc.warlock.rcp.ui.WarlockPopupAction;
 import cc.warlock.rcp.ui.WarlockText;
 import cc.warlock.rcp.ui.client.SWTWarlockClientViewer;
 import cc.warlock.rcp.util.ColorUtil;
-import cc.warlock.rcp.util.RCPUtil;
+import cc.warlock.rcp.util.SoundPlayer;
 
 /**
  * @author marshall
@@ -219,8 +219,8 @@ public abstract class GameView extends StreamView implements IWarlockClientViewe
 	}
 	
 	public void playSound(InputStream soundStream) {
-		// TODO Auto-generated method stub
-		RCPUtil.playSound(soundStream);
+		SoundPlayer sp = SoundPlayer.getInstance();
+		sp.play(soundStream);
 	}
 	
 	protected Image createCaretImage (int width, Color foreground)

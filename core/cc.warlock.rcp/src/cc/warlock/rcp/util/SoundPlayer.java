@@ -1,7 +1,29 @@
+/**
+ * Warlock, the open-source cross-platform game client
+ *  
+ * Copyright 2008, Warlock LLC, and individual contributors as indicated
+ * by the @authors tag. 
+ *
+ * This is free software; you can redistribute it and/or modify it
+ * under the terms of the GNU Lesser General Public License as
+ * published by the Free Software Foundation; either version 2.1 of
+ * the License, or (at your option) any later version.
+ *
+ * This software is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
+ * Lesser General Public License for more details.
+ *
+ * You should have received a copy of the GNU Lesser General Public
+ * License along with this software; if not, write to the Free
+ * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
+ * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
+ */
 package cc.warlock.rcp.util;
 
 import java.io.File;
 import java.io.IOException;
+import java.io.InputStream;
 
 import javax.sound.sampled.AudioFormat;
 import javax.sound.sampled.AudioInputStream;
@@ -11,9 +33,6 @@ import javax.sound.sampled.LineUnavailableException;
 import javax.sound.sampled.SourceDataLine;
 
 
-
-
-
 public class SoundPlayer implements Runnable
 {
 	private static final int	EXTERNAL_BUFFER_SIZE = 128000;
@@ -21,38 +40,67 @@ public class SoundPlayer implements Runnable
 	Thread thread = null;
 	boolean bPlaying = false;
 	private String strFilename;
+	private AudioInputStream audioStream;
 	private boolean bRepeat = false;
 	
-	public SoundPlayer(){
-		
-	}
-	
 	public static SoundPlayer getInstance(){
-		if (instance == null){
+		if (instance == null) {
 			instance = new SoundPlayer();
 		}
 		return instance;
-
 	}
 	
 	public void run(){
-		
-		play(strFilename);
-		while(bPlaying && bRepeat){
-		
-			play(strFilename);
-		}
+		do {
+			if (strFilename != null) {
+				playFile(strFilename);
+			} else {
+				playStream(audioStream);
+			}
+		} while(bPlaying && bRepeat);
 	}
 
 	public void play(String strFilename, boolean bRepeat){
 		bPlaying = true;
 		this.bRepeat = bRepeat;
 		this.strFilename = strFilename;
-		if (thread != null){
+		this.audioStream = null;
+		if (thread != null) {
 			thread.interrupt();
 		}
 		thread = new Thread(this);
 		thread.start();
+	}
+	
+	public void play(AudioInputStream audioStream) {
+		bPlaying = true;
+		this.bRepeat = false;
+		this.strFilename = null;
+		this.audioStream = audioStream;
+		if (thread != null) {
+			thread.interrupt();
+		}
+		thread = new Thread(this);
+		thread.start();
+	}
+	
+	public void play(InputStream stream) {
+		AudioInputStream audioInputStream = null;
+		try
+		{
+			audioInputStream = AudioSystem.getAudioInputStream(stream);
+			play(audioInputStream);
+		}
+		catch (Exception e)
+		{
+			/*
+			  In case of an exception, we dump the exception
+			  including the stack trace to the console output.
+			  Then, we exit the program.
+			*/
+			e.printStackTrace();
+			return;
+		}
 	}
 	
 	public void stop(){
@@ -61,7 +109,8 @@ public class SoundPlayer implements Runnable
 			thread.interrupt();
 		}
 	}
-	private static void play(String strFilename)
+	
+	private static void playFile(String strFilename)
 	{
 		
 
@@ -87,12 +136,15 @@ public class SoundPlayer implements Runnable
 			/*
 			  In case of an exception, we dump the exception
 			  including the stack trace to the console output.
-			  Then, we exit the program.
 			*/
 			e.printStackTrace();
-			System.exit(1);
+			return;
 		}
-
+		
+		playStream(audioInputStream); // Now that we have the stream from the file, play it.
+	}
+		
+	private static void playStream(AudioInputStream audioInputStream) {
 		/*
 		  From the AudioInputStream, i.e. from the sound file,
 		  we fetch information about the format of the
@@ -179,7 +231,8 @@ public class SoundPlayer implements Runnable
 			}
 			if (nBytesRead >= 0)
 			{
-				int	nBytesWritten = line.write(abData, 0, nBytesRead);
+				//int	nBytesWritten = 
+				line.write(abData, 0, nBytesRead);
 			}
 		}
 
