@@ -145,33 +145,26 @@ public class BarsView extends ViewPart {
 		barComposite.setLayout(layout);
 		barComposite.setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, true));
 		
-//		roundtime.setSize(150, 15);
-		
 		initBarColors();
 		
-//		new Label(barComposite, SWT.NONE).setText("roundtime: ");
 		roundtime = new WarlockProgressBar(barComposite, SWT.NONE);
 		roundtime.setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, true, 7, 1));
 		
-//		new Label(barComposite, SWT.NONE).setText("health: ");
 		health = new WarlockProgressBar(barComposite, SWT.NONE);
 		health.setMinimum(0); health.setMaximum(100); health.setSelection(100); health.setLabel("health 100%");
 		health.setLayoutData(new GridData(GridData.FILL, GridData.FILL, true, true));
 		health.setBackground(healthBG); health.setForeground(healthFG); health.setBorderColor(healthBorder);
 		
-//		new Label(barComposite, SWT.NONE).setText("mana: ");
 		mana = new WarlockProgressBar(barComposite, SWT.NONE);
 		mana.setMinimum(0); mana.setMaximum(100); mana.setSelection(100); mana.setLabel("mana 100%");
 		mana.setLayoutData(new GridData(GridData.FILL, GridData.FILL, true, true));
 		mana.setBackground(manaBG); mana.setForeground(manaFG); mana.setBorderColor(manaBorder);
 		
-//		new Label(barComposite, SWT.NONE).setText("fatigue: ");
 		fatigue = new WarlockProgressBar(barComposite, SWT.NONE);
 		fatigue.setMinimum(0); fatigue.setMaximum(100); fatigue.setSelection(100); fatigue.setLabel("fatigue 100%");
 		fatigue.setLayoutData(new GridData(GridData.FILL, GridData.FILL, true, true));
 		fatigue.setBackground(fatigueBG); fatigue.setForeground(fatigueFG); fatigue.setBorderColor(fatigueBorder);
 		
-//		new Label(barComposite, SWT.NONE).setText("spirit: ");
 		spirit = new WarlockProgressBar(barComposite, SWT.NONE);
 		spirit.setMinimum(0); spirit.setMaximum(100); spirit.setSelection(100); spirit.setLabel("spirit 100%");
 		spirit.setLayoutData(new GridData(GridData.FILL, GridData.FILL, true, true));
@@ -224,7 +217,14 @@ public class BarsView extends ViewPart {
 	private class RoundtimeListener implements IPropertyListener<Integer> {
 		public void propertyActivated(IProperty<Integer> property) {
 			if (property == null || property.getName() == null) return;
-			activateRoundtime = true;
+			if (property instanceof ClientProperty)
+			{
+				ClientProperty<Integer> clientProperty = (ClientProperty<Integer>) property;
+				if (clientProperty.getClient() == activeClient)
+				{
+					activateRoundtime = true;
+				}
+			}
 		}
 
 		public void propertyCleared(IProperty<Integer> property, Integer oldValue) {	}
@@ -293,7 +293,8 @@ public class BarsView extends ViewPart {
 	
 	
 	public void roundtimeChanged(IWarlockClient source, final int roundtime) {
-		BarsView.this.roundtime.setSelection(roundtime);
+		if(source == activeClient)
+			BarsView.this.roundtime.setSelection(roundtime);
 	}
 	
 	public static BarsView getDefault ()
