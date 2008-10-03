@@ -50,7 +50,7 @@ public class RoundtimeTagHandler extends DefaultTagHandler {
 	
 	@Override
 	public void handleStart(StormFrontAttributeList attributes, String rawXML) {
-		handler.getClient().setupRoundtime(new Integer(attributes.getValue("value")));
+		handler.getClient().setupRoundtime(new Long(attributes.getValue("value")));
 	}
 
 }

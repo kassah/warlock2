@@ -80,7 +80,8 @@ public class StormFrontClient extends WarlockClient implements IStormFrontClient
 	protected StormFrontClientSettings clientSettings;
 	protected StormFrontServerSettings serverSettings;
 	protected long timeDelta;
-	protected Integer roundtimeEnd;
+	protected Long roundtimeEnd;
+	protected int roundtimeLength;
 	protected Thread roundtimeThread = null;
 	protected ArrayList<IScript> runningScripts;
 	protected ArrayList<IScriptListener> scriptListeners;
@@ -111,6 +112,7 @@ public class StormFrontClient extends WarlockClient implements IStormFrontClient
 		mode = new ClientProperty<GameMode>(this, "gameMode", GameMode.Game);
 
 		roundtimeEnd = null;
+		roundtimeLength = 0;
 		runningScripts = new ArrayList<IScript>();
 		scriptListeners = new ArrayList<IScriptListener>();
 		
@@ -203,16 +205,17 @@ public class StormFrontClient extends WarlockClient implements IStormFrontClient
 		{
 			for (;;) {
 				long now = System.currentTimeMillis();
-				long roundTime = 0;
+				long rt = 0;
 				
 				// Synchronize with external roundtime updates
 				synchronized(StormFrontClient.this) {
 					if (roundtimeEnd != null)
-						roundTime = roundtimeEnd * 1000L + timeDelta - now;
+						rt = roundtimeEnd * 1000L + timeDelta - now;
 					
-					if (roundTime <= 0) {
+					if (rt <= 0) {
 						roundtimeThread = null;
 						roundtimeEnd = null;
+						roundtimeLength = 0;
 						roundtime.set(0);
 						StormFrontClient.this.notifyAll();
 						return;
@@ -221,12 +224,12 @@ public class StormFrontClient extends WarlockClient implements IStormFrontClient
 				
 				// Update the world with the new roundtime
 				// Avoid flicker caused by redundant updates
-				int rt = (int)((roundTime + 999) / 1000);
-				if (roundtime.get() != rt)
-					roundtime.set(rt);
+				int rtSeconds = (int)((rt + 999) / 1000);
+				if (roundtime.get() != rtSeconds)
+					roundtime.set(rtSeconds);
 				
 				// Compute how long until next roundtime update
-				long waitTime = roundTime % 1000;
+				long waitTime = rt % 1000;
 				if (waitTime == 0) waitTime = 1000;
 				
 				try {
@@ -239,12 +242,12 @@ public class StormFrontClient extends WarlockClient implements IStormFrontClient
 		}
 	}
 	
-	public synchronized void setupRoundtime(Integer end)
+	public synchronized void setupRoundtime(Long end)
 	{
 		roundtimeEnd = end;
 	}
 	
-	public synchronized void syncTime(Integer now)
+	public synchronized void syncTime(Long now)
 	{
 		if (roundtimeEnd == null) return;
 		
@@ -256,16 +259,21 @@ public class StormFrontClient extends WarlockClient implements IStormFrontClient
 		}
 		timeDelta = newTimeDelta;
 		
-		roundtime.activate(); // FIXME Do we need this?
 		if (roundtimeEnd > now) {
 			// We need to do this now due to scheduling delays in the thread
-			roundtime.set(roundtimeEnd - now);
+			roundtimeLength = (int)(roundtimeEnd - now);
+			roundtime.set(roundtimeLength);
 			roundtimeThread = new RoundtimeThread();
 			roundtimeThread.start();
 		} else {
 			roundtime.set(0);
 			roundtimeEnd = null;
+			roundtimeLength = 0;
 		}
+	}
+	
+	public int getRoundtimeLength() {
+		return roundtimeLength;
 	}
 	
 	public synchronized void waitForRoundtime(double delay) throws InterruptedException {

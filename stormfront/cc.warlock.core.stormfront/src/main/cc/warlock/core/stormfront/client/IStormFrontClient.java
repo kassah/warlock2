@@ -86,18 +86,20 @@ public interface IStormFrontClient extends IWarlockClient, IRoomListener {
 	 * Set up a roundtime to start with the next time sync.
 	 * @param roundtimeEnd The end of the roundtime as sent from the server.
 	 */
-	public void setupRoundtime(Integer roundtimeEnd);
+	public void setupRoundtime(Long roundtimeEnd);
 	
 	/**
 	 * Sync the current time as perceived by the server.
 	 * @param now Time the server thinks it is.
 	 */
-	public void syncTime(Integer now);
+	public void syncTime(Long now);
 	
 	/**
 	 * Wait out any active roundtimes.
 	 */
 	public void waitForRoundtime(double delay) throws InterruptedException;
+	
+	public int getRoundtimeLength();
 	
 	/**
 	 * @return The health property
