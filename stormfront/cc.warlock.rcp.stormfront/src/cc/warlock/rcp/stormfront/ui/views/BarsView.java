@@ -118,7 +118,6 @@ public class BarsView extends ViewPart {
 			clients.add(client);
 			
 		} else {
-			activateRoundtime = true;
 			barListener.propertyChanged(client.getHealth(), null);
 			barListener.propertyChanged(client.getMana(), null);
 			barListener.propertyChanged(client.getSpirit(), null);
@@ -212,37 +211,31 @@ public class BarsView extends ViewPart {
 
 	}
 	
-	private boolean activateRoundtime = false;
-	
 	private class RoundtimeListener implements IPropertyListener<Integer> {
-		public void propertyActivated(IProperty<Integer> property) {
-			if (property == null || property.getName() == null) return;
-			if (property instanceof ClientProperty)
-			{
-				ClientProperty<Integer> clientProperty = (ClientProperty<Integer>) property;
-				if (clientProperty.getClient() == activeClient)
-				{
-					activateRoundtime = true;
-				}
-			}
-		}
+		int roundtimeLength = -1;
+		
+		public void propertyActivated(IProperty<Integer> property) {	}
 
 		public void propertyCleared(IProperty<Integer> property, Integer oldValue) {	}
+		
 		public void propertyChanged(IProperty<Integer> property, Integer oldValue) {
-			if (property == null || property.getName() == null) return;
+			if (property == null || property.getName() == null || !property.getName().equals("roundtime")) return;
 
 			if (property instanceof ClientProperty)
 			{
 				ClientProperty<Integer> clientProperty = (ClientProperty<Integer>) property;
 				if (clientProperty.getClient() == activeClient)
 				{
-					if (property.getName().equals("roundtime"))
-					{
-						if (activateRoundtime)
+					if (property.get() == 0) {
+						roundtimeLength = -1;
+						roundtime.setSelection(0);
+						roundtime.setLabel("no roundtime");
+					} else {
+						if (roundtimeLength != activeClient.getRoundtimeLength())
 						{
-							roundtime.setMaximum(property.get() * 1000);
+							roundtimeLength = activeClient.getRoundtimeLength();
+							roundtime.setMaximum(roundtimeLength * 1000);
 							roundtime.setMinimum(0);
-							activateRoundtime = false;
 						}
 						roundtime.setSelection(property.get() * 1000);
 						roundtime.setLabel("roundtime: " + property.get() + " seconds");
