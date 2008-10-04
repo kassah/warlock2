@@ -32,11 +32,11 @@ public class WSLLocalVariable extends WSLAbstractVariable {
 	
 	@Override
 	public IWSLValue getVariable() {
-		return script.getLocalVariable(variableName);
+		return script.getLocalVariable(variableName.toString());
 	}
 	
 	@Override
 	public boolean variableExists() {
-		return script.localVariableExists(variableName);
+		return script.localVariableExists(variableName.toString());
 	}
 }

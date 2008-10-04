@@ -23,11 +23,11 @@ package cc.warlock.core.stormfront.script.wsl;
 
 abstract public class WSLAbstractVariable extends WSLAbstractString {
 	
-	protected String variableName;
+	protected IWSLValue variableName;
 	private String prefix;
 	
 	public WSLAbstractVariable(IWSLValue var, String prefix) {
-		variableName = var.toString();
+		variableName = var;
 		this.prefix = prefix;
 	}
 	
@@ -35,7 +35,7 @@ abstract public class WSLAbstractVariable extends WSLAbstractString {
 	public String toString() {
 		IWSLValue value = getVariable();
 		if(value == null) {
-			return prefix + variableName;
+			return prefix + variableName.toString();
 		}
 		return value.toString();
 	}

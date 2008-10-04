@@ -32,11 +32,11 @@ public class WSLVariable extends WSLAbstractVariable {
 	
 	@Override
 	public IWSLValue getVariable() {
-		return script.getVariable(variableName);
+		return script.getVariable(variableName.toString());
 	}
 	
 	@Override
 	public boolean variableExists() {
-		return script.variableExists(variableName);
+		return script.variableExists(variableName.toString());
 	}
 }
