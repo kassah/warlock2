@@ -26,8 +26,8 @@ abstract public class WSLAbstractVariable extends WSLAbstractString {
 	protected String variableName;
 	private String prefix;
 	
-	public WSLAbstractVariable(String var, String prefix) {
-		variableName = var;
+	public WSLAbstractVariable(IWSLValue var, String prefix) {
+		variableName = var.toString();
 		this.prefix = prefix;
 	}
 	

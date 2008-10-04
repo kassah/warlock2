@@ -25,7 +25,7 @@ public class WSLVariable extends WSLAbstractVariable {
 	
 	private WSLScript script;
 	
-	public WSLVariable(String var, WSLScript script) {
+	public WSLVariable(IWSLValue var, WSLScript script) {
 		super(var, "%");
 		this.script = script;
 	}

@@ -25,7 +25,7 @@ public class WSLLocalVariable extends WSLAbstractVariable {
 	
 	private WSLScript script;
 	
-	public WSLLocalVariable(String var, WSLScript script) {
+	public WSLLocalVariable(IWSLValue var, WSLScript script) {
 		super(var, "$");
 		this.script = script;
 	}

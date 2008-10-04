@@ -208,8 +208,8 @@ primaryExpression returns [IWSLValue cond]
 	;
 	
 cond_value returns [IWSLValue value]
-	: (PERCENT STRING)=> PERCENT v=STRING	{ value = new WSLVariable($v.text, script); }
-	| (DOLLAR STRING)=> DOLLAR v=STRING		{ value = new WSLLocalVariable($v.text, script); }
+	: (PERCENT STRING)=> PERCENT v=STRING	{ value = new WSLVariable(new WSLString($v.text), script); }
+	| (DOLLAR STRING)=> DOLLAR v=STRING		{ value = new WSLLocalVariable(new WSLString($v.text), script); }
 	| val=number		{ value = val; }
 	| TRUE				{ value = new WSLBoolean(true); }
 	| FALSE				{ value = new WSLBoolean(false); }
@@ -328,11 +328,15 @@ variable returns [IWSLValue value]
 		({ !followingWhitespace() }? DOLLAR)? { value = new WSLLocalVariable(str, script); }
 	;
 
-variable_string_helper returns [String value]
+variable_string_helper returns [WSLList value]
 	: str=variable_string ({ !followingWhitespace() }? rest=variable_string_helper)?
 		{
-			if(rest == null) value = str;
-			else value = str + rest;
+			if(rest == null) {
+				value = new WSLList(new WSLString(str));
+			} else {
+				rest.prepend(new WSLString(str));
+				value = rest;
+			}
 		}
 	;
 	
@@ -353,11 +357,15 @@ qvariable_string returns [String value]
 	|  str=common_text { value = str; }
 	;
 
-qvariable_string_helper returns [String value]
+qvariable_string_helper returns [WSLList value]
 	: str=qvariable_string ({ !followingWhitespace() }? rest=qvariable_string_helper)?
 		{
-			if(rest == null) value = str;
-			else value = str + rest;
+			if(rest == null) {
+				value = new WSLList(new WSLString(str));
+			} else {
+				rest.prepend(new WSLString(str));
+				value = rest;
+			}
 		}
 	;
 
