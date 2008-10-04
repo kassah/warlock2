@@ -253,9 +253,7 @@ string_list_helper returns [ArrayList<IWSLValue> list] @init { String whitespace
 	;
 
 string_value returns [IWSLValue value]
-	: (variable)=> v=variable { value = new WSLVariable(v, script); }
-	| (local_variable)=> v=local_variable
-		{ value = new WSLLocalVariable(v, script); }
+	: (variable)=> v=variable { value = v; }
 	| str=string { value = new WSLString(str); }
 	;
 
@@ -293,11 +291,8 @@ quoted_string_helper returns [ArrayList<IWSLValue> list] @init { String whitespa
 	;
 
 quoted_string_value returns [IWSLValue value]
-	: (qvariable)=> v=qvariable
-		{ value = new WSLVariable(v, script); }
-	| (qlocal_variable)=> v=qlocal_variable
-		{ value = new WSLLocalVariable(v, script); }
-	| str=qstring { value = str; }
+	: (qvariable)=> v=qvariable { value = v; }
+	| v=qstring { value = v; }
 	;
 
 common_text returns [String value]
@@ -326,14 +321,11 @@ string returns [String value]
 	| t=QUOTE			{ value = $t.text; }
 	;
 
-variable returns [String value]
+variable returns [IWSLValue value]
 	: PERCENT { !followingWhitespace() }? str=variable_string_helper
-		({ !followingWhitespace() }? PERCENT)? { value = str; }
-	;
-	
-local_variable returns [String value]
-	: DOLLAR { !followingWhitespace() }? str=local_variable_string_helper
-		({ !followingWhitespace() }? DOLLAR)? { value = str; }
+		({ !followingWhitespace() }? PERCENT)? { value = new WSLVariable(str, script); }
+	| DOLLAR { !followingWhitespace() }? str=variable_string_helper
+		({ !followingWhitespace() }? DOLLAR)? { value = new WSLLocalVariable(str, script); }
 	;
 
 variable_string_helper returns [String value]
@@ -343,37 +335,21 @@ variable_string_helper returns [String value]
 			else value = str + rest;
 		}
 	;
-
-local_variable_string_helper returns [String value]
-	: str=local_variable_string ({ !followingWhitespace() }? rest=local_variable_string_helper)?
-		{
-			if(rest == null) value = str;
-			else value = str + rest;
-		}
-	;
 	
 variable_string returns [String value]
 	: str=common_text { value = str; }
-	| (t=QUOTE | t=DOLLAR) { value = $t.text; }
+	| t=QUOTE { value = $t.text; }
 	;
 
-local_variable_string returns [String value]
-	: str=common_text { value = str; }
-	| (t=QUOTE | t=PERCENT) { value = $t.text; }
-	;
-
-qvariable returns [String value]
+qvariable returns [IWSLValue value]
 	: PERCENT { !followingWhitespace() }? str=qvariable_string_helper
-		({ !followingWhitespace() }? PERCENT)? { value = str; }
-	;
-	
-qlocal_variable returns [String value]
-	: DOLLAR { !followingWhitespace() }? str=qlocal_variable_string_helper
-		({ !followingWhitespace() }? DOLLAR)? { value = str; }
+		({ !followingWhitespace() }? PERCENT)? { value = new WSLVariable(str, script); }
+	| DOLLAR { !followingWhitespace() }? str=qvariable_string_helper
+		({ !followingWhitespace() }? DOLLAR)? { value = new WSLLocalVariable(str, script); }
 	;
 
 qvariable_string returns [String value]
-	: ((BACKSLASH QUOTE)=> BACKSLASH t=QUOTE | t=DOLLAR) { value = $t.text; }
+	: (BACKSLASH QUOTE)=> BACKSLASH t=QUOTE { value = $t.text; }
 	|  str=common_text { value = str; }
 	;
 
@@ -383,19 +359,6 @@ qvariable_string_helper returns [String value]
 			if(rest == null) value = str;
 			else value = str + rest;
 		}
-	;
-
-qlocal_variable_string_helper returns [String value]
-	: str=qlocal_variable_string ({ !followingWhitespace() }? rest=qlocal_variable_string_helper)?
-		{
-			if(rest == null) value = str;
-			else value = str + rest;
-		}
-	;
-
-qlocal_variable_string returns [String value]
-	: ((BACKSLASH QUOTE)=> BACKSLASH t=QUOTE | t=PERCENT) { value = $t.text; }
-	| str=common_text { value = str; }
 	;
 
 
