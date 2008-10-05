@@ -208,8 +208,13 @@ primaryExpression returns [IWSLValue cond]
 	;
 	
 cond_value returns [IWSLValue value]
-	: (PERCENT STRING)=> PERCENT v=STRING	{ value = new WSLVariable(new WSLString($v.text), script); }
-	| (DOLLAR STRING)=> DOLLAR v=STRING		{ value = new WSLLocalVariable(new WSLString($v.text), script); }
+	: ((PERCENT | DOLLAR) { !followingWhitespace() }? (STRING | LPAREN))=>
+		(PERCENT (str=STRING { value = new WSLVariable(new WSLString($str.text), script); }
+				({ !followingWhitespace() }? PERCENT)?
+			| LPAREN v=escaped_var RPAREN { value = new WSLVariable(v, script); })
+		| DOLLAR (str=STRING { value = new WSLLocalVariable(new WSLString($str.text), script); }
+				({ !followingWhitespace() }? DOLLAR)?
+			| LPAREN v=escaped_var RPAREN { value = new WSLLocalVariable(v, script); }))
 	| val=number		{ value = val; }
 	| TRUE				{ value = new WSLBoolean(true); }
 	| FALSE				{ value = new WSLBoolean(false); }
