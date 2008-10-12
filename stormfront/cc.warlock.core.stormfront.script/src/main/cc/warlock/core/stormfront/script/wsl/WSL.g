@@ -278,7 +278,7 @@ quoted_string_helper returns [ArrayList<IWSLValue> list]
 	;
 
 quoted_string_value returns [IWSLValue value]
-	: ((PERCENT | DOLLAR) ~(EOL|PERCENT|DOLLAR|BLANK|EOF))=> v=qvariable { value = v; }
+	: ((PERCENT | DOLLAR) ~(EOL|PERCENT|DOLLAR|BLANK|EOF))=> v=variable { value = v; }
 	| v=qstring { value = v; }
 	;
 
@@ -317,50 +317,20 @@ variable returns [IWSLValue value]
 	;
 
 variable_string returns [IWSLValue value]
-	: v=variable_string_helper { value = v; }
-	;
-
-variable_string_helper returns [WSLList value]
-	: str=variable_string_value rest=variable_string_helper?
+	: str=variable_string_helper
 		{
-			if(rest == null) {
-				value = new WSLList(new WSLString(str));
-			} else {
-				rest.prepend(new WSLString(str));
-				value = rest;
-			}
+			value = new WSLString(str.toString());
 		}
 	;
-	
-variable_string_value returns [String value]
-	: str=common_string { value = str; }
-	| t=QUOTE { value = $t.text; }
-	;
 
-qvariable returns [IWSLValue value]
-	: PERCENT (str=escaped_var | str=qvariable_string PERCENT?)
-		{ value = new WSLVariable(str, script); }
-	| DOLLAR (str=escaped_var | str=qvariable_string DOLLAR?)
-		{ value = new WSLLocalVariable(str, script); }
-	;
-
-qvariable_string returns [IWSLValue value]
-	: v=qvariable_string_helper { value = v; }
-	;
-
-qvariable_string_value returns [String value]
-	: (BACKSLASH QUOTE)=> BACKSLASH t=QUOTE { value = $t.text; }
-	|  str=common_string { value = str; }
-	;
-
-qvariable_string_helper returns [WSLList value]
-	: str=qvariable_string_value rest=qvariable_string_helper?
+variable_string_helper returns [StringBuffer value]
+	: str=common_string rest=variable_string_helper?
 		{
 			if(rest == null) {
-				value = new WSLList(new WSLString(str));
+				value = new StringBuffer(str);
 			} else {
-				rest.prepend(new WSLString(str));
 				value = rest;
+				value.insert(0, str);
 			}
 		}
 	;
@@ -372,12 +342,12 @@ escaped_var returns [IWSLValue value]
 
 vstring_list returns [IWSLValue value]
 	: l=vstring_list_helper
-			{
-				if(l.size() > 1)
-					value = new WSLList(l);
-				else
-					value = l.get(0);
-			}
+		{
+			if(l.size() > 1)
+				value = new WSLList(l);
+			else
+				value = l.get(0);
+		}
 	;
 
 vstring_list_helper returns [ArrayList<IWSLValue> list]

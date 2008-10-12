@@ -21,7 +21,6 @@
  */
 package cc.warlock.core.stormfront.script.wsl;
 
-import java.util.ArrayList;
 import java.util.List;
 
 public class WSLList extends WSLAbstractString {
@@ -30,11 +29,6 @@ public class WSLList extends WSLAbstractString {
 	
 	public WSLList(List<IWSLValue> list) {
 		this.list = list;
-	}
-	
-	public WSLList(IWSLValue e) {
-		list = new ArrayList<IWSLValue>();
-		list.add(e);
 	}
 	
 	@Override
@@ -46,13 +40,5 @@ public class WSLList extends WSLAbstractString {
 		}
 		
 		return buffer.toString();
-	}
-	
-	public void add(IWSLValue e) {
-		list.add(e);
-	}
-	
-	public void prepend(IWSLValue e) {
-		list.add(0, e);
 	}
 }
