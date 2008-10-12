@@ -56,37 +56,35 @@ line
 	;
 
 expr returns [WSLAbstractCommand command]
-	: (
-		(IF)=> IF BLANK* cond=conditionalExpression BLANK* THEN BLANK* c=expr
+	: (IF)=> IF BLANK* cond=conditionalExpression BLANK* THEN BLANK* c=expr
+		{
+			command = new WSLCondition(lineNum, script, cond, c);
+		}
+	| (ACTION)=> ACTION BLANK* { actionDepth++; }
+		( (REMOVE)=> REMOVE BLANK* { actionDepth--; } args=string_list
 			{
-				command = new WSLCondition(lineNum, script, cond, c);
+				command = new WSLActionRemove(lineNum, script, args);
 			}
-		| (ACTION)=> ACTION BLANK* { actionDepth++; }
-			( (REMOVE)=> REMOVE { actionDepth--; } args=string_list
-				{
-					command = new WSLActionRemove(lineNum, script, args);
-				}
-			| (CLEAR)=> CLEAR
-				{
-					command = new WSLActionClear(lineNum, script);
-					actionDepth--;
-				}
-			| c=expr WHEN BLANK* { actionDepth--; } args=string_list
-				{
-					// FIXME: Variables in actions can't be "when"
-					command = new WSLAction(lineNum, script, c, args);
-				}
-			)
-		| (INSTANT)=> INSTANT BLANK* c=expr
+		| (CLEAR)=> CLEAR BLANK*
 			{
-				command = c;
-				command.setInstant(true);
+				command = new WSLActionClear(lineNum, script);
+				actionDepth--;
 			}
-		| args=string_list
+		| c=expr WHEN BLANK* { actionDepth--; } args=string_list
 			{
-				command = new WSLCommand(lineNum, script, args);
+				// FIXME: Variables in actions can't be "when"
+				command = new WSLAction(lineNum, script, c, args);
 			}
-	) BLANK*
+		)
+	| (INSTANT)=> INSTANT BLANK* c=expr
+		{
+			command = c;
+			command.setInstant(true);
+		}
+	| args=string_list
+		{
+			command = new WSLCommand(lineNum, script, args);
+		}
 	;
 
 conditionalExpression returns [IWSLValue cond] @init { ArrayList<IWSLValue> args = null; }
@@ -251,7 +249,8 @@ string_list_helper returns [ArrayList<IWSLValue> list]
 
 string_value returns [IWSLValue value]
 	: ((PERCENT | DOLLAR) ~(EOL|PERCENT|DOLLAR|BLANK|EOF))=> v=variable { value = v; }
-	| str=string { value = new WSLString(str); }
+	| str=text_string	{ value = new WSLString(str); }
+	| t=QUOTE			{ value = new WSLString($t.text); }
 	;
 
 quoted_string returns [IWSLValue value]
@@ -279,7 +278,8 @@ quoted_string_helper returns [ArrayList<IWSLValue> list]
 
 quoted_string_value returns [IWSLValue value]
 	: ((PERCENT | DOLLAR) ~(EOL|PERCENT|DOLLAR|BLANK|EOF))=> v=variable { value = v; }
-	| v=qstring { value = v; }
+	| (BACKSLASH QUOTE)=> BACKSLASH t=QUOTE { value = new WSLString($t.text); }
+	| str=text_string { value = new WSLString(str); }
 	;
 
 common_string returns [String value]
@@ -297,16 +297,6 @@ text_string returns [String value]
 		| t=PERCENT | t=DOLLAR | t=RPAREN | t=LPAREN | t=BLANK)
 		{ value = $t.text; }
 	| str=common_string { value = str; }
-	;
-
-qstring returns [IWSLValue value]
-	: (BACKSLASH QUOTE)=> BACKSLASH t=QUOTE { value = new WSLString($t.text); }
-	|  str=text_string { value = new WSLString(str); }
-	;
-	
-string returns [String value]
-	: str=text_string	{ value = str; }
-	| t=QUOTE			{ value = $t.text; }
 	;
 
 variable returns [IWSLValue value]
@@ -365,17 +355,14 @@ vstring_list_helper returns [ArrayList<IWSLValue> list]
 
 vstring_value returns [IWSLValue value]
 	: ((PERCENT | DOLLAR) ~(EOL|PERCENT|DOLLAR|BLANK|EOF))=> v=variable { value = v; }
-	| str=vstring { value = new WSLString(str); }
-	;
-
-vstring returns [String value]
-	: ((PERCENT PERCENT)=> PERCENT t=PERCENT
+	| ((PERCENT PERCENT)=> PERCENT t=PERCENT
 		| (DOLLAR DOLLAR)=> DOLLAR t=DOLLAR
 		| t=QUOTE | (BACKSLASH LPAREN)=> BACKSLASH t=LPAREN
 		| (BACKSLASH RPAREN)=> BACKSLASH t=RPAREN | t=BLANK)
-		{ value = $t.text; }
-	| str=common_string { value = str; }
+		{ value = new WSLString($t.text); }
+	| str=common_string { value = new WSLString(str); }
 	;
+
 
 IF
 	: 'if' { atStart = false; }
