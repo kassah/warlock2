@@ -26,9 +26,6 @@ options { backtrack=true; memoize=true; }
 			return false;
 		}
 	}
-	private boolean followingWhitespace() {
-		return input.get(input.index() - 1).getChannel() == HIDDEN;
-	}
 	@Override
 	public void reportError(RecognitionException ex) {
 		script.getCommands().echo("Line: " + ex.line + ":" + ex.charPositionInLine + ": " + ex.toString());
@@ -59,37 +56,42 @@ line
 	;
 
 expr returns [WSLAbstractCommand command]
-	: (IF)=> IF cond=conditionalExpression THEN c=expr
-		{
-			command = new WSLCondition(lineNum, script, cond, c);
-		}
-	| (ACTION)=> ACTION { actionDepth++; } (c=expr WHEN { actionDepth--; } args=string_list
+	: (
+		(IF)=> IF BLANK* cond=conditionalExpression BLANK* THEN BLANK* c=expr
 			{
-				command = new WSLAction(lineNum, script, c, args);
+				command = new WSLCondition(lineNum, script, cond, c);
 			}
-		| (REMOVE)=> REMOVE { actionDepth--; } args=string_list
+		| (ACTION)=> ACTION BLANK* { actionDepth++; }
+			( (REMOVE)=> REMOVE { actionDepth--; } args=string_list
+				{
+					command = new WSLActionRemove(lineNum, script, args);
+				}
+			| (CLEAR)=> CLEAR
+				{
+					command = new WSLActionClear(lineNum, script);
+					actionDepth--;
+				}
+			| c=expr WHEN BLANK* { actionDepth--; } args=string_list
+				{
+					// FIXME: Variables in actions can't be "when"
+					command = new WSLAction(lineNum, script, c, args);
+				}
+			)
+		| (INSTANT)=> INSTANT BLANK* c=expr
 			{
-				command = new WSLActionRemove(lineNum, script, args);
+				command = c;
+				command.setInstant(true);
 			}
-		| (CLEAR)=> CLEAR
+		| args=string_list
 			{
-				command = new WSLActionClear(lineNum, script);
-				actionDepth--;
-			})
-	| (INSTANT)=> INSTANT c=expr
-		{
-			command = c;
-			command.setInstant(true);
-		}
-	| args=string_list
-		{
-			command = new WSLCommand(lineNum, script, args);
-		}
+				command = new WSLCommand(lineNum, script, args);
+			}
+	) BLANK*
 	;
 
 conditionalExpression returns [IWSLValue cond] @init { ArrayList<IWSLValue> args = null; }
 	: arg=conditionalAndExpression { args = null; }
-		(OR argNext=conditionalAndExpression
+		(BLANK* OR BLANK* argNext=conditionalAndExpression
 			{
 				if(args == null) {
 					args = new ArrayList<IWSLValue>();
@@ -108,7 +110,7 @@ conditionalExpression returns [IWSLValue cond] @init { ArrayList<IWSLValue> args
 
 conditionalAndExpression returns [IWSLValue cond] @init { ArrayList<IWSLValue> args = null; }
 	: arg=equalityExpression
-		(AND argNext=equalityExpression
+		(BLANK* AND BLANK* argNext=equalityExpression
 			{
 				if(args == null) {
 					args = new ArrayList<IWSLValue>();
@@ -131,7 +133,7 @@ equalityExpression returns [IWSLValue cond]
 			ArrayList<EqualityOperator> ops = null;
 		}
 	: arg=relationalExpression { args = null; ops = null; }
-		(op=equalityOp argNext=relationalExpression
+		(BLANK* op=equalityOp BLANK* argNext=relationalExpression
 			{
 				if(args == null) {
 					args = new ArrayList<IWSLValue>();
@@ -163,7 +165,7 @@ relationalExpression returns [IWSLValue cond]
 			ArrayList<RelationalOperator> ops = null;
 		}
 	: arg=unaryExpression { args = null; ops = null; }
-		(op=relationalOp argNext=unaryExpression
+		(BLANK* op=relationalOp BLANK* argNext=unaryExpression
 			{
 				if(args == null) {
 					args = new ArrayList<IWSLValue>();
@@ -193,13 +195,13 @@ relationalOp returns [RelationalOperator op]
 	;
 
 unaryExpression returns [IWSLValue cond]
-	: NOT arg=unaryExpression		{ cond = new WSLNotCondition(arg); }
-	| EXISTS arg=unaryExpression	{ cond = new WSLExistsCondition(arg); }
-	| arg=primaryExpression			{ cond = arg; }
+	: NOT BLANK* arg=unaryExpression		{ cond = new WSLNotCondition(arg); }
+	| EXISTS BLANK* arg=unaryExpression		{ cond = new WSLExistsCondition(arg); }
+	| arg=primaryExpression					{ cond = arg; }
 	;
 
 parenExpression returns [IWSLValue cond]
-	: LPAREN arg=conditionalExpression RPAREN		{ cond = arg; }
+	: LPAREN BLANK* arg=conditionalExpression BLANK* RPAREN		{ cond = arg; }
 	;
 
 primaryExpression returns [IWSLValue cond]
@@ -208,13 +210,12 @@ primaryExpression returns [IWSLValue cond]
 	;
 	
 cond_value returns [IWSLValue value]
-	: ((PERCENT | DOLLAR) { !followingWhitespace() }? (STRING | LPAREN))=>
-		(PERCENT (str=STRING { value = new WSLVariable(new WSLString($str.text), script); }
-				({ !followingWhitespace() }? PERCENT)?
-			| v=escaped_var { value = new WSLVariable(v, script); })
-		| DOLLAR (str=STRING { value = new WSLLocalVariable(new WSLString($str.text), script); }
-				({ !followingWhitespace() }? DOLLAR)?
-			| v=escaped_var { value = new WSLLocalVariable(v, script); }))
+	: PERCENT (str=common_string
+			{ value = new WSLVariable(new WSLString(str), script); } PERCENT?
+		| v=escaped_var { value = new WSLVariable(v, script); })
+	| DOLLAR (str=common_string
+			{ value = new WSLLocalVariable(new WSLString(str), script); } DOLLAR?
+		| v=escaped_var { value = new WSLLocalVariable(v, script); })
 	| val=number		{ value = val; }
 	| TRUE				{ value = new WSLBoolean(true); }
 	| FALSE				{ value = new WSLBoolean(false); }
@@ -235,37 +236,27 @@ string_list returns [IWSLValue value]
 			}
 	;
 
-string_list_helper returns [ArrayList<IWSLValue> list] @init { String whitespace = null; }
-	: data=string_value
-		{
-			whitespace = "";
-			for(int i = input.index() - 1; i >= 0 && input.get(i).getChannel() != Token.DEFAULT_CHANNEL; i--) {
-				whitespace = input.get(i).getText() + whitespace;
-			}
-		}
-	(l=string_list_helper)?
+string_list_helper returns [ArrayList<IWSLValue> list]
+	: data=string_value (l=string_list_helper)?
 		{
 			if(l == null) {
 				list = new ArrayList<IWSLValue>();
 				list.add(data);
 			} else {
 				list = l;
-				if(whitespace != null && whitespace.length() > 0)
-					list.add(0, new WSLString(whitespace));
 				list.add(0, data);
 			}
 		}
 	;
 
 string_value returns [IWSLValue value]
-	: ((PERCENT | DOLLAR) { !followingWhitespace() }? ~(EOL|PERCENT|DOLLAR))=> v=variable { value = v; }
+	: ((PERCENT | DOLLAR) ~(EOL|PERCENT|DOLLAR|BLANK|EOF))=> v=variable { value = v; }
 	| str=string { value = new WSLString(str); }
 	;
 
 quoted_string returns [IWSLValue value]
 	: QUOTE l=quoted_string_helper QUOTE
 		{
-			// FIXME: get preceding and following whitespace
 			if(l.size() > 1)
 				value = new WSLList(l);
 			else
@@ -273,34 +264,25 @@ quoted_string returns [IWSLValue value]
 		}
 	;
 
-quoted_string_helper returns [ArrayList<IWSLValue> list] @init { String whitespace = null; }
-	: data=quoted_string_value
-		{
-			whitespace = "";
-			for(int i = input.index() - 1; i >= 0 && input.get(i).getChannel() != Token.DEFAULT_CHANNEL; i--) {
-				whitespace = input.get(i).getText() + whitespace;
-			}
-		}
-	(l=quoted_string_helper)?
+quoted_string_helper returns [ArrayList<IWSLValue> list]
+	: data=quoted_string_value (l=quoted_string_helper)?
 		{
 			if(l == null) {
 				list = new ArrayList<IWSLValue>();
 				list.add(data);
 			} else {
 				list = l;
-				if(whitespace != null && whitespace.length() > 0)
-					list.add(0, new WSLString(whitespace));
 				list.add(0, data);
 			}
 		}
 	;
 
 quoted_string_value returns [IWSLValue value]
-	: ((PERCENT | DOLLAR) { !followingWhitespace() }? ~(EOL|PERCENT|DOLLAR))=> v=qvariable { value = v; }
+	: ((PERCENT | DOLLAR) ~(EOL|PERCENT|DOLLAR|BLANK|EOF))=> v=qvariable { value = v; }
 	| v=qstring { value = v; }
 	;
 
-common_text returns [String value]
+common_string returns [String value]
 	: (str=STRING | str=IF | str=THEN | str=OR | str=AND | str=NOTEQUAL
 		| str=NOT | str=EQUAL | str=GTE | str=LTE | str=GT | str=LT  | str=AMP
 		| str=VERT | str=EXISTS | str=CONTAINS | str=ACTION | str=TRUE
@@ -309,29 +291,28 @@ common_text returns [String value]
 		{ value = $str.text; }
 	;
 
-common_string returns [String value]
+text_string returns [String value]
 	: ((PERCENT PERCENT)=> PERCENT t=PERCENT
 		| (DOLLAR DOLLAR)=> DOLLAR t=DOLLAR
-		| t=PERCENT | t=DOLLAR | t=RPAREN | t=LPAREN) { value = $t.text; }
-	| str=common_text { value = str; }
+		| t=PERCENT | t=DOLLAR | t=RPAREN | t=LPAREN | t=BLANK)
+		{ value = $t.text; }
+	| str=common_string { value = str; }
 	;
 
 qstring returns [IWSLValue value]
 	: (BACKSLASH QUOTE)=> BACKSLASH t=QUOTE { value = new WSLString($t.text); }
-	|  str=common_string { value = new WSLString(str); }
+	|  str=text_string { value = new WSLString(str); }
 	;
 	
 string returns [String value]
-	: str=common_string { value = str; }
+	: str=text_string	{ value = str; }
 	| t=QUOTE			{ value = $t.text; }
 	;
 
 variable returns [IWSLValue value]
-	: PERCENT { !followingWhitespace() }? (str=escaped_var
-			| str=variable_string ({ !followingWhitespace() }? PERCENT)?)
+	: PERCENT (str=escaped_var | str=variable_string PERCENT?)
 		{ value = new WSLVariable(str, script); }
-	| DOLLAR { !followingWhitespace() }? (str=escaped_var
-			| str=variable_string ({ !followingWhitespace() }? DOLLAR)?)
+	| DOLLAR (str=escaped_var | str=variable_string DOLLAR?)
 		{ value = new WSLLocalVariable(str, script); }
 	;
 
@@ -340,7 +321,7 @@ variable_string returns [IWSLValue value]
 	;
 
 variable_string_helper returns [WSLList value]
-	: str=variable_string_value ({ !followingWhitespace() }? rest=variable_string_helper)?
+	: str=variable_string_value rest=variable_string_helper?
 		{
 			if(rest == null) {
 				value = new WSLList(new WSLString(str));
@@ -352,16 +333,14 @@ variable_string_helper returns [WSLList value]
 	;
 	
 variable_string_value returns [String value]
-	: str=common_text { value = str; }
+	: str=common_string { value = str; }
 	| t=QUOTE { value = $t.text; }
 	;
 
 qvariable returns [IWSLValue value]
-	: PERCENT { !followingWhitespace() }? (str=escaped_var
-			| str=qvariable_string ({ !followingWhitespace() }? PERCENT)?)
+	: PERCENT (str=escaped_var | str=qvariable_string PERCENT?)
 		{ value = new WSLVariable(str, script); }
-	| DOLLAR { !followingWhitespace() }? (str=escaped_var
-			| str=qvariable_string ({ !followingWhitespace() }? DOLLAR)?)
+	| DOLLAR (str=escaped_var | str=qvariable_string DOLLAR?)
 		{ value = new WSLLocalVariable(str, script); }
 	;
 
@@ -371,11 +350,11 @@ qvariable_string returns [IWSLValue value]
 
 qvariable_string_value returns [String value]
 	: (BACKSLASH QUOTE)=> BACKSLASH t=QUOTE { value = $t.text; }
-	|  str=common_text { value = str; }
+	|  str=common_string { value = str; }
 	;
 
 qvariable_string_helper returns [WSLList value]
-	: str=qvariable_string_value ({ !followingWhitespace() }? rest=qvariable_string_helper)?
+	: str=qvariable_string_value rest=qvariable_string_helper?
 		{
 			if(rest == null) {
 				value = new WSLList(new WSLString(str));
@@ -401,30 +380,21 @@ vstring_list returns [IWSLValue value]
 			}
 	;
 
-vstring_list_helper returns [ArrayList<IWSLValue> list] @init { String whitespace = null; }
-	: data=vstring_value
-		{
-			whitespace = "";
-			for(int i = input.index() - 1; i >= 0 && input.get(i).getChannel() != Token.DEFAULT_CHANNEL; i--) {
-				whitespace = input.get(i).getText() + whitespace;
-			}
-		}
-	(l=vstring_list_helper)?
+vstring_list_helper returns [ArrayList<IWSLValue> list]
+	: data=vstring_value (l=vstring_list_helper)?
 		{
 			if(l == null) {
 				list = new ArrayList<IWSLValue>();
 				list.add(data);
 			} else {
 				list = l;
-				if(whitespace != null && whitespace.length() > 0)
-					list.add(0, new WSLString(whitespace));
 				list.add(0, data);
 			}
 		}
 	;
 
 vstring_value returns [IWSLValue value]
-	: ((PERCENT | DOLLAR) { !followingWhitespace() }? ~(EOL|PERCENT|DOLLAR))=> v=variable { value = v; }
+	: ((PERCENT | DOLLAR) ~(EOL|PERCENT|DOLLAR|BLANK|EOF))=> v=variable { value = v; }
 	| str=vstring { value = new WSLString(str); }
 	;
 
@@ -432,8 +402,9 @@ vstring returns [String value]
 	: ((PERCENT PERCENT)=> PERCENT t=PERCENT
 		| (DOLLAR DOLLAR)=> DOLLAR t=DOLLAR
 		| t=QUOTE | (BACKSLASH LPAREN)=> BACKSLASH t=LPAREN
-		| (BACKSLASH RPAREN)=> BACKSLASH t=RPAREN) { value = $t.text; }
-	| str=common_text { value = str; }
+		| (BACKSLASH RPAREN)=> BACKSLASH t=RPAREN | t=BLANK)
+		{ value = $t.text; }
+	| str=common_string { value = str; }
 	;
 
 IF
@@ -506,7 +477,7 @@ QUOTE
 	: '"' { atStart = false; }
 	;
 BLANK
-	: (' ' | '\t')+			{ $channel = HIDDEN; }
+	: (' ' | '\t')+			{ if(atStart) $channel = HIDDEN; }
 	;
 EOL
 	: ('\r'? '\n' | '\r')	{ atStart = true; }
