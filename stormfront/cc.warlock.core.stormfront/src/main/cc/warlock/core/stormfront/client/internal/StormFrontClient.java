@@ -269,6 +269,7 @@ public class StormFrontClient extends WarlockClient implements IStormFrontClient
 			roundtime.set(0);
 			roundtimeEnd = null;
 			roundtimeLength = 0;
+			StormFrontClient.this.notifyAll();
 		}
 	}
 	
