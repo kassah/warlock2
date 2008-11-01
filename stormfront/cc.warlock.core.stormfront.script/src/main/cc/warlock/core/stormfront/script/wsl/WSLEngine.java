@@ -40,6 +40,7 @@ public class WSLEngine implements IScriptEngine, IScriptListener {
 
 	public static final String ENGINE_ID = "cc.warlock.script.wsl.WSLEngine";
 	protected ArrayList<IScript> runningScripts = new ArrayList<IScript>();
+	protected ArrayList<IWSLCommandProvider> commandProviders = new ArrayList<IWSLCommandProvider>();
 	
 	public WSLEngine ()
 	{
@@ -50,6 +51,16 @@ public class WSLEngine implements IScriptEngine, IScriptListener {
 			ScriptConfiguration.instance().addEngineExtension(ENGINE_ID, "cmd");
 			ScriptConfiguration.instance().addEngineExtension(ENGINE_ID, "wsl");
 		}
+	}
+	
+	public void addCommandProvider (IWSLCommandProvider provider)
+	{
+		if (!commandProviders.contains(provider))
+			commandProviders.add(provider);
+	}
+	
+	public Collection<IWSLCommandProvider> getCommandProviders() {
+		return commandProviders;
 	}
 	
 	public String getScriptEngineId() {

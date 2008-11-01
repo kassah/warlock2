@@ -29,6 +29,7 @@ import java.io.Reader;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
+import java.util.Map;
 import java.util.Random;
 import java.util.Stack;
 import java.util.concurrent.BlockingQueue;
@@ -66,7 +67,7 @@ public class WSLScript extends AbstractScript {
 	private HashMap<String, IWSLValue> globalVariables = new HashMap<String, IWSLValue>();
 	private HashMap<String, IWSLValue> localVariables = new HashMap<String, IWSLValue>();
 	private Stack<WSLFrame> callstack = new Stack<WSLFrame>();
-	private HashMap<String, WSLCommandDefinition> wslCommands = new HashMap<String, WSLCommandDefinition>();
+	private HashMap<String, IWSLCommand> wslCommands = new HashMap<String, IWSLCommand>();
 	private Thread scriptThread;
 	private Pattern commandPattern = Pattern.compile("^([\\w]+)(\\s+(.*))?");
 
@@ -125,6 +126,13 @@ public class WSLScript extends AbstractScript {
 		addCommandDefinition("wait", new WSLWait());
 		addCommandDefinition("waitfor", new WSLWaitFor());
 		addCommandDefinition("waitforre", new WSLWaitForRe());
+		
+		for (IWSLCommandProvider provider : engine.getCommandProviders())
+		{
+			for (Map.Entry<String, IWSLCommand> entry : provider.getCommands().entrySet()) {
+				addCommandDefinition(entry.getKey(), entry.getValue());
+			}
+		}
 		
 		setVariable("mana", new WSLMana());
 		setVariable("health", new WSLHealth());
@@ -394,7 +402,7 @@ public class WSLScript extends AbstractScript {
 		String arguments = m.group(3);
 		if(arguments == null) arguments = "";
 		
-		WSLCommandDefinition command = wslCommands.get(commandName);
+		IWSLCommand command = wslCommands.get(commandName);
 		if(command != null) {
 			scriptDebug(2, "Debug: " + line);
 			command.execute(arguments);
@@ -404,7 +412,7 @@ public class WSLScript extends AbstractScript {
 		}
 	}
 	
-	private void addCommandDefinition (String name, WSLCommandDefinition command) {
+	private void addCommandDefinition (String name, IWSLCommand command) {
 		wslCommands.put(name, command);
 	}
 	
@@ -451,20 +459,14 @@ public class WSLScript extends AbstractScript {
 		}
 	}
 	
-	abstract protected class WSLCommandDefinition {
-		
-		abstract public void execute(String arguments) throws InterruptedException;
-		
-	}
-	
-	protected class WSLSave extends WSLCommandDefinition {
+	protected class WSLSave implements IWSLCommand {
 		
 		public void execute(String arguments) {
 			setVariable("s", arguments);
 		}
 	}
 
-	protected class WSLDebug extends WSLCommandDefinition {
+	protected class WSLDebug implements IWSLCommand {
 		public void execute(String arguments) {
 			if (arguments == null || arguments.length() == 0)
 			{
@@ -478,7 +480,7 @@ public class WSLScript extends AbstractScript {
 		}
 	}
 	
-	protected class WSLDebugLevel extends WSLCommandDefinition {
+	protected class WSLDebugLevel implements IWSLCommand {
 		private Pattern format = Pattern.compile("^(\\d+)$");
 		
 		public void execute(String arguments) {
@@ -489,7 +491,7 @@ public class WSLScript extends AbstractScript {
 		}
 	}
 	
-	protected class WSLDelay extends WSLCommandDefinition {
+	protected class WSLDelay implements IWSLCommand {
 		
 		public void execute(String arguments) {
 			try {
@@ -500,7 +502,7 @@ public class WSLScript extends AbstractScript {
 		}
 	}
 	
-	protected class WSLShift extends WSLCommandDefinition {
+	protected class WSLShift implements IWSLCommand {
 		
 		public void execute (String arguments) {
 			boolean local = arguments.trim().equalsIgnoreCase("local");
@@ -538,7 +540,7 @@ public class WSLScript extends AbstractScript {
 		}
 	}
 
-	protected class WSLDeleteVariable extends WSLCommandDefinition {
+	protected class WSLDeleteVariable implements IWSLCommand {
 		
 		public void execute (String arguments) {
 			String name = arguments.split(argSeparator)[0];
@@ -547,7 +549,7 @@ public class WSLScript extends AbstractScript {
 		}
 	}
 	
-	protected class WSLDeleteLocalVariable extends WSLCommandDefinition {
+	protected class WSLDeleteLocalVariable implements IWSLCommand {
 		
 		public void execute (String arguments) {
 			String name = arguments.split(argSeparator)[0];
@@ -579,7 +581,7 @@ public class WSLScript extends AbstractScript {
 		localVariables.put(name, value);
 	}
 	
-	protected class WSLSetVariable extends WSLCommandDefinition {
+	protected class WSLSetVariable implements IWSLCommand {
 		
 		private Pattern format = Pattern.compile("^([^\\s]+)(\\s+(.+)?)?$");
 		
@@ -601,7 +603,7 @@ public class WSLScript extends AbstractScript {
 		}
 	}
 	
-	protected class WSLSetLocalVariable extends WSLCommandDefinition {
+	protected class WSLSetLocalVariable implements IWSLCommand {
 		
 		private Pattern format = Pattern.compile("^([^\\s]+)(\\s+(.+)?)?$");
 		
@@ -663,7 +665,7 @@ public class WSLScript extends AbstractScript {
 		}
 	}
 	
-	protected class WSLGoto extends WSLCommandDefinition {
+	protected class WSLGoto implements IWSLCommand {
 		
 		public void execute (String arguments) {
 			if(arguments.trim().length() > 0) {
@@ -700,7 +702,7 @@ public class WSLScript extends AbstractScript {
 		}
 	}
 	
-	protected class WSLGosub extends WSLCommandDefinition {
+	protected class WSLGosub implements IWSLCommand {
 		
 		private Pattern format = Pattern.compile("^([^\\s]+)\\s*(.*)?$");
 		
@@ -724,14 +726,14 @@ public class WSLScript extends AbstractScript {
 		}
 	}
 	
-	protected class WSLReturn extends WSLCommandDefinition {
+	protected class WSLReturn implements IWSLCommand {
 		
 		public void execute (String arguments) {
 			gosubReturn();
 		}
 	}
 	
-	protected class WSLMatchWait extends WSLCommandDefinition {
+	protected class WSLMatchWait implements IWSLCommand {
 		
 		public void execute (String arguments) throws InterruptedException {
 			double time;
@@ -795,7 +797,7 @@ public class WSLScript extends AbstractScript {
 		}
 	}
 	
-	protected class WSLMatchRe extends WSLCommandDefinition {
+	protected class WSLMatchRe implements IWSLCommand {
 		
 		private Pattern format = Pattern.compile("^([^\\s]+)\\s+/(.*)/(\\w*)");
 		
@@ -828,7 +830,7 @@ public class WSLScript extends AbstractScript {
 		}
 	}
 
-	protected class WSLMatch extends WSLCommandDefinition {
+	protected class WSLMatch implements IWSLCommand {
 		
 		private Pattern format = Pattern.compile("^([^\\s]+)\\s+(.*)$");
 		
@@ -849,7 +851,7 @@ public class WSLScript extends AbstractScript {
 		}
 	}
 	
-	protected class WSLCounter extends WSLCommandDefinition {
+	protected class WSLCounter implements IWSLCommand {
 		
 		public void execute (String arguments) {
 			if (arguments.length() == 0) {
@@ -862,7 +864,7 @@ public class WSLScript extends AbstractScript {
 		}
 	}
 	
-	protected class WSLMath extends WSLCommandDefinition {
+	protected class WSLMath implements IWSLCommand {
 
 		public void execute (String arguments) {
 			String[] args = arguments.split(argSeparator, 2);
@@ -949,7 +951,7 @@ public class WSLScript extends AbstractScript {
 		}
 	}
 
-	protected class WSLWaitForRe extends WSLCommandDefinition {
+	protected class WSLWaitForRe implements IWSLCommand {
 
 		private Pattern format = Pattern.compile("^/([^/]*)/(\\w*)");
 
@@ -976,7 +978,7 @@ public class WSLScript extends AbstractScript {
 		}
 	}
 	
-	protected class WSLWaitFor extends WSLCommandDefinition {
+	protected class WSLWaitFor implements IWSLCommand {
 		
 		public void execute (String arguments) throws InterruptedException {
 			if (arguments.length() >= 1)
@@ -990,14 +992,14 @@ public class WSLScript extends AbstractScript {
 		}
 	}
 
-	protected class WSLWait extends WSLCommandDefinition {
+	protected class WSLWait implements IWSLCommand {
 		
 		public void execute (String arguments) throws InterruptedException {
 			scriptCommands.waitForPrompt();
 		}
 	}
 	
-	protected class WSLPut extends WSLCommandDefinition {
+	protected class WSLPut implements IWSLCommand {
 		
 		public void execute(String arguments) throws InterruptedException {
 			scriptCommands.put(arguments);
@@ -1008,7 +1010,7 @@ public class WSLScript extends AbstractScript {
 		}
 	}
 	
-	protected class WSLPlaySound extends WSLCommandDefinition {
+	protected class WSLPlaySound implements IWSLCommand {
 		public void execute(String arguments) throws InterruptedException {
 			
 			File file = new File(arguments);
@@ -1026,14 +1028,14 @@ public class WSLScript extends AbstractScript {
 		}
 	}
 	
-	protected class WSLRun extends WSLCommandDefinition {
+	protected class WSLRun implements IWSLCommand {
 		
 		public void execute(String arguments) throws InterruptedException {
 			sfClient.runScript(arguments);
 		}
 	}
 	
-	protected class WSLEcho extends WSLCommandDefinition {
+	protected class WSLEcho implements IWSLCommand {
 		
 		public void execute (String arguments)
 		{
@@ -1041,7 +1043,7 @@ public class WSLScript extends AbstractScript {
 		}
 	}
 	
-	protected class WSLPause extends WSLCommandDefinition {
+	protected class WSLPause implements IWSLCommand {
 		
 		public void execute (String arguments) throws InterruptedException
 		{
@@ -1063,7 +1065,7 @@ public class WSLScript extends AbstractScript {
 		}
 	}
 	
-	protected class WSLMove extends WSLCommandDefinition {
+	protected class WSLMove implements IWSLCommand {
 		
 		public void execute (String arguments) throws InterruptedException
 		{
@@ -1071,7 +1073,7 @@ public class WSLScript extends AbstractScript {
 		}
 	}
 	
-	protected class WSLNextRoom extends WSLCommandDefinition {
+	protected class WSLNextRoom implements IWSLCommand {
 		
 		public void execute (String arguments) throws InterruptedException
 		{
@@ -1079,7 +1081,7 @@ public class WSLScript extends AbstractScript {
 		}
 	}
 	
-	protected class WSLExit extends WSLCommandDefinition {
+	protected class WSLExit implements IWSLCommand {
 		
 		public void execute (String arguments) {
 			// TODO figure out if we should make this call here or elsewhere
@@ -1087,7 +1089,7 @@ public class WSLScript extends AbstractScript {
 		}
 	}
 	
-	protected class WSLIf_ extends WSLCommandDefinition {
+	protected class WSLIf_ implements IWSLCommand {
 		private String variableName;
 		public WSLIf_ (String variableName)
 		{
@@ -1102,7 +1104,7 @@ public class WSLScript extends AbstractScript {
 		}
 	}
 	
-	private class WSLRandom extends WSLCommandDefinition {
+	private class WSLRandom implements IWSLCommand {
 		
 		private Pattern format = Pattern.compile("^(\\d+)\\s+(\\d+)");
 		
@@ -1121,7 +1123,7 @@ public class WSLScript extends AbstractScript {
 		}
 	}
 	
-	private class WSLTimer extends WSLCommandDefinition {
+	private class WSLTimer implements IWSLCommand {
 		
 		private Pattern format = Pattern.compile("^(\\w+)(\\s+([^\\s]+))?");
 		
@@ -1166,7 +1168,7 @@ public class WSLScript extends AbstractScript {
 		}
 	}
 	
-	protected class WSLAddHighlightString extends WSLCommandDefinition {
+	protected class WSLAddHighlightString implements IWSLCommand {
 		
 		private Pattern format = Pattern.compile("^\"([^\"])\"(\\s*(.*))?");
 		private Pattern optionFormat = Pattern.compile("(\\w+)=(.*)");
@@ -1199,7 +1201,7 @@ public class WSLScript extends AbstractScript {
 		this.lastCondition = condition;
 	}
 	
-	private class WSLElse extends WSLCommandDefinition {
+	private class WSLElse implements IWSLCommand {
 		
 		public void execute (String arguments) throws InterruptedException {
 			if (!lastCondition)
