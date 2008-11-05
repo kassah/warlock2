@@ -112,7 +112,7 @@ public class SoundPlayer implements Runnable
 	
 	private static void playFile(String strFilename)
 	{
-		
+		System.out.println("SoundPlayer.playFile: Attempting to play: "+ strFilename);
 
 
 		/*
