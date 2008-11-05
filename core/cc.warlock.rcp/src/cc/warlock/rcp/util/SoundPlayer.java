@@ -113,8 +113,21 @@ public class SoundPlayer implements Runnable
 	private static void playFile(String strFilename)
 	{
 		System.out.println("SoundPlayer.playFile: Attempting to play: "+ strFilename);
-
-
+		if (System.getProperty("os.name").equals("Linux")) {
+			Boolean extPlay = true;
+			try {
+				Runtime.getRuntime().exec("aplay "+strFilename);
+			} catch (Exception e) {
+				e.printStackTrace();
+				extPlay = false;
+			}
+			
+			// If External Play was successful, then we continue
+			if (extPlay) {
+				System.out.println("Played file successfully via aplay");
+				return;
+			}
+		}
 		/*
 		  Now, that we're shure there is an argument, we
 		  take it as the filename of the soundfile
