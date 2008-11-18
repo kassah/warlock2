@@ -127,8 +127,8 @@ public class UserStream extends StreamView {
 		ArrayList<IStreamFilter> filters = new ArrayList<IStreamFilter>();
 		filters.add(new StreamFilter("\\bthoughts in your head\\b", IStreamFilter.type.regex));
 		filters.add(new StreamFilter("^\\w+ (nod|lean|stretch|smile|yawn|chuckle|chortle|beam|hug|applaud|babble|blink|bow|cackle|cringe|cower|weep|mumble|wave|ponder|peers quizzically|snort|snuggle|cuddle|smirk|laugh|grumble|dance|grin)s?( (at|to|with) \\w+)?\\.$", IStreamFilter.type.regex));
-		filters.add(new StreamFilter("^\\((?!You ).+\\)$", IStreamFilter.type.regex));	//act
-		filters.add(new StreamFilter("^\\((?!You|Type|ASK|Roundtime ).+\\)$", IStreamFilter.type.regex));	// GM sends
+		filters.add(new StreamFilter("^\\((?!You |Type |ASK |Roundtime: |You're ).+\\)$", IStreamFilter.type.regex));	//act
+		filters.add(new StreamFilter("^SEND\\[\\w+\\].*$", IStreamFilter.type.regex));	// GM sends
 		filters.add(new StreamFilter("^(You belt out, .*|You hear \\w+ yell, .*|\\w+ yells, )$", IStreamFilter.type.regex));	// Yells
 		
 		
