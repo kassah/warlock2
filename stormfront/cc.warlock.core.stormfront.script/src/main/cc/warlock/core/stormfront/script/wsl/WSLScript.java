@@ -839,7 +839,7 @@ public class WSLScript extends AbstractScript {
 			
 			if (m.find())
 			{
-				IMatch match = new TextMatch(m.group(2));
+				IMatch match = new TextMatch(m.group(2).trim());
 				matches.add(match);
 				matchData.put(match, new WSLTextMatchData(m.group(1)));
 				if(matchQueue == null) {
