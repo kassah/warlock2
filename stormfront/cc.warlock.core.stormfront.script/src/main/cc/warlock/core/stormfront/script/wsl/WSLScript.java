@@ -392,7 +392,7 @@ public class WSLScript extends AbstractScript {
 	
 	protected void execute(String line) throws InterruptedException {
 		curLine = line;
-		Matcher m = commandPattern.matcher(line);
+		Matcher m = commandPattern.matcher(line.trim());
 		
 		if (!m.find()) {
 			return;
@@ -505,7 +505,7 @@ public class WSLScript extends AbstractScript {
 	protected class WSLShift implements IWSLCommandDefinition {
 		
 		public void execute (String arguments) {
-			boolean local = arguments.trim().equalsIgnoreCase("local");
+			boolean local = arguments.equalsIgnoreCase("local");
 			
 			StringBuffer allArgs = new StringBuffer();
 			for (int i = 1; ; i++) {
@@ -668,7 +668,7 @@ public class WSLScript extends AbstractScript {
 	protected class WSLGoto implements IWSLCommandDefinition {
 		
 		public void execute (String arguments) {
-			if(arguments.trim().length() > 0) {
+			if(arguments.length() > 0) {
 				String[] args = arguments.split(argSeparator);
 				String label = args[0];
 				gotoLabel(label);
@@ -738,7 +738,7 @@ public class WSLScript extends AbstractScript {
 		public void execute (String arguments) throws InterruptedException {
 			double time;
 			
-			if(arguments.trim().length() > 0) {
+			if(arguments.length() > 0) {
 				String[] args = arguments.split(argSeparator);
 			
 				try {
@@ -839,7 +839,7 @@ public class WSLScript extends AbstractScript {
 			
 			if (m.find())
 			{
-				IMatch match = new TextMatch(m.group(2).trim());
+				IMatch match = new TextMatch(m.group(2));
 				matches.add(match);
 				matchData.put(match, new WSLTextMatchData(m.group(1)));
 				if(matchQueue == null) {
@@ -1049,7 +1049,7 @@ public class WSLScript extends AbstractScript {
 		{
 			double time;
 			
-			if(arguments.trim().length() > 0) {
+			if(arguments.length() > 0) {
 				String[] args = arguments.split(argSeparator);
 			
 				try {
