@@ -88,7 +88,6 @@ public class StormFrontClient extends WarlockClient implements IStormFrontClient
 	protected DefaultSkin skin;
 	protected HashMap<String, ClientProperty<String>> components = new HashMap<String, ClientProperty<String>>();
 	protected HashMap<String, IStream> componentStreams = new HashMap<String, IStream>();
-	protected ClientProperty<GameMode> mode;
 	protected HashMap<String, String> commands;
 	
 	public StormFrontClient() {
@@ -109,7 +108,6 @@ public class StormFrontClient extends WarlockClient implements IStormFrontClient
 		gameCode = new ClientProperty<String>(this, "gameCode", null);
 		roomDescription = new ClientProperty<String>(this, "roomDescription", null);
 		monsterCount = new ClientProperty<Integer>(this, "monsterCount", null);
-		mode = new ClientProperty<GameMode>(this, "gameMode", GameMode.Game);
 
 		roundtimeEnd = null;
 		roundtimeLength = 0;
