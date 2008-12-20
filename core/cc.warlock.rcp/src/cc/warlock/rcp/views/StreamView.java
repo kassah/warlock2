@@ -88,7 +88,7 @@ public class StreamView extends ViewPart implements IStreamListener, IGameViewFo
 	protected SWTPropertyListener<String> propertyListenerWrapper;
 	protected boolean appendNewlines = false;
 	protected boolean isPrompting = false;
-	protected String prompt;
+	protected String prompt = null;
 	protected boolean streamTitled = true;
 	protected boolean bufferOnPrompt = true;
 	
@@ -390,7 +390,7 @@ public class StreamView extends ViewPart implements IStreamListener, IGameViewFo
 			string.addStyle(0, string.length(), client.getCommandStyle());
 			
 			if (bufferOnPrompt) {
-				if(!isPrompting)
+				if(!isPrompting && prompt != null)
 					appendText(client, new WarlockString(prompt));
 				else
 					isPrompting = false;
@@ -421,16 +421,25 @@ public class StreamView extends ViewPart implements IStreamListener, IGameViewFo
 			}
 			
 			if (!GameViewConfiguration.instance().getSuppressPrompt()) {
+				// FIXME: Shouldn't this be set unconditionally?
 				isPrompting = true;
 				
-				text.append(prompt);
+				if(prompt != null)
+					text.append(prompt);
 			}
 			appendText(client, text);
 		} else {
-			if(!this.prompt.equals(prompt)) {
+			// if the new prompt is the same as the old one, do nothing.
+			// if the new prompt is null, just print the newline.
+			if(prompt == null) {
+				if(this.prompt != null) {
+					appendText(stream.getClient(), new WarlockString("\n"));
+					this.prompt = prompt;
+				}
+			} else if(this.prompt == null || !this.prompt.equals(prompt)) {
 				appendText(stream.getClient(), new WarlockString("\n" + prompt));
-			}
-			this.prompt = prompt;
+				this.prompt = prompt;
+			}	
 		}
 	}
 

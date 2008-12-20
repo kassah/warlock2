@@ -57,10 +57,6 @@ public interface IStormFrontClient extends IWarlockClient, IRoomListener {
 	public static final String COMPONENT_ROOM_EXITS = "room exits";
 	public static final String COMPONENT_ROOM_DESCRIPTION = "room desc";
 	
-	public static enum GameMode {
-		Game, CharacterManager
-	};
-	
 	/**
 	 * The server settings for this client
 	 * @return

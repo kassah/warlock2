@@ -42,7 +42,6 @@ public class ModeTagHandler extends DefaultTagHandler {
 	@Override
 	public void handleStart(StormFrontAttributeList attributes, String rawXML) {
 		id = attributes.getValue("id");
-			
 	}
 	
 	@Override
@@ -50,15 +49,12 @@ public class ModeTagHandler extends DefaultTagHandler {
 		if(id != null) {
 			StormFrontClient client = (StormFrontClient) handler.getClient();
 
-			if (id.equals("GAME"))
+			if (id.equals("CMGR"))
 			{
-				//client.getGameMode().set(IStormFrontClient.GameMode.Game);
-			}
-			else if (id.equals("CMGR"))
-			{
-				//client.getGameMode().set(IStormFrontClient.GameMode.CharacterManager);
 				((StormFrontConnection)client.getConnection()).passThrough();
-				//client.getDefaultStream().send(((StormFrontConnection)client.getConnection()).getBufferContents());
+				client.getDefaultStream().prompt(null);
+			} else {
+				// Shouldn't get here
 			}
 		}
 	}
