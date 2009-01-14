@@ -82,7 +82,7 @@ public class PatternSetting extends ClientSetting implements IPatternSetting {
 				flags |= Pattern.CASE_INSENSITIVE;
 			}
 			if (fullWord) {
-				s = "\\b" + s + "\\b";
+				s = "\\b" + s + "[\\.\\:\\,]?\\b";
 			}
 			
 			pattern = Pattern.compile(s, flags);
