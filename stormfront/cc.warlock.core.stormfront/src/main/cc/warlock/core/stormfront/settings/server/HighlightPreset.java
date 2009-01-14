@@ -73,12 +73,11 @@ public class HighlightPreset extends Preset implements IHighlightString {
 		this.text = highlightElement.attributeValue("text");
 		this.sound = highlightElement.attributeValue("sound");
 		
-		// This is opposite of what one would expect, but it's how it works.
 		if (highlightElement.attributeValue("word") != null 
 				&& highlightElement.attributeValue("word").equals("y")) {
-			this.fullWordMatch = false;
-		} else {
 			this.fullWordMatch = true;
+		} else {
+			this.fullWordMatch = false;
 		}
 	}
 	
