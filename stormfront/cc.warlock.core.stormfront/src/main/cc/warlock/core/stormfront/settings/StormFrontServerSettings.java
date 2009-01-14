@@ -238,6 +238,7 @@ public class StormFrontServerSettings extends ClientConfigurationProvider {
 		style.setBackgroundColor(stormfrontColorToWarlockColor(string.getBackgroundColor()));
 		style.setForegroundColor(stormfrontColorToWarlockColor(string.getForegroundColor()));
 		style.setFullLine(string.isFillEntireLine());
+		style.setSound(string.getSound());
 		
 		try {
 			HighlightString newString = new HighlightString(

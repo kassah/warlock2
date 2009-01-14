@@ -70,6 +70,7 @@ public class HighlightPreset extends Preset implements IHighlightString {
 		super(serverSettings, highlightElement, palette);
 		
 		this.text = highlightElement.attributeValue("text");
+		this.sound = highlightElement.attributeValue("sound");
 	}
 	
 	public String getText() {
