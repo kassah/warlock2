@@ -243,6 +243,7 @@ public class StormFrontServerSettings extends ClientConfigurationProvider {
 		try {
 			HighlightString newString = new HighlightString(
 					settings.getHighlightConfigurationProvider(), pattern.pattern(), true, true, true, style);
+			newString.setFullWordMatch(string.isFullWordMatch());
 			settings.getHighlightConfigurationProvider().addHighlightString(newString);
 		} catch(PatternSyntaxException e) {
 			e.printStackTrace();

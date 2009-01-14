@@ -44,6 +44,7 @@ public class HighlightPreset extends Preset implements IHighlightString {
 	protected Pattern pattern;
 	protected int index;
 	protected String sound;
+	protected boolean fullWordMatch = true;
 	
 	protected HighlightPreset (ServerSettings serverSettings, Palette palette, int index)
 	{
@@ -62,7 +63,7 @@ public class HighlightPreset extends Preset implements IHighlightString {
 		this.originalString = other;
 		this.index = other.index;
 		this.sound = other.sound;
-		
+		this.fullWordMatch = other.fullWordMatch;
 	}
 	
 	public HighlightPreset (ServerSettings serverSettings, StormFrontElement highlightElement, Palette palette)
@@ -71,6 +72,14 @@ public class HighlightPreset extends Preset implements IHighlightString {
 		
 		this.text = highlightElement.attributeValue("text");
 		this.sound = highlightElement.attributeValue("sound");
+		
+		// This is opposite of what one would expect, but it's how it works.
+		if (highlightElement.attributeValue("word") != null 
+				&& highlightElement.attributeValue("word").equals("y")) {
+			this.fullWordMatch = false;
+		} else {
+			this.fullWordMatch = true;
+		}
 	}
 	
 	public String getText() {
@@ -242,12 +251,12 @@ public class HighlightPreset extends Preset implements IHighlightString {
 	}
 	
 	public boolean isFullWordMatch() {
-		return true;
+		return this.fullWordMatch;
 	}
 	
 	public void setFullWordMatch(boolean fullWordMatch) {
 		// TODO Auto-generated method stub
-		
+		this.fullWordMatch = fullWordMatch;
 	}
 	
 	public void setPattern(Pattern pattern) {
