@@ -251,7 +251,7 @@ public class HighlightStringsPreferencePage extends PreferencePageUtils implemen
 		customBGSelector.setEnabled(false);
 		
 		regexButton = createCheckbox(optionsGroup, "Regular expression");
-		regexButton.setEnabled(true);
+		regexButton.setEnabled(false);
 		fillLineButton = createCheckbox(optionsGroup, "Highlight Entire Line");
 		fillLineButton.setEnabled(false);
 		caseSensitiveButton = createCheckbox(optionsGroup, "Case Sensitive");
