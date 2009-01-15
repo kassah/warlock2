@@ -305,9 +305,31 @@ public class HighlightStringsPreferencePage extends PreferencePageUtils implemen
 	
 	private void highlightStringSelected (HighlightString string)
 	{
+		if (string == null) {
+			// No string selected, disable all fields
+			defaultFG.setEnabled(false);
+			defaultFG.setSelection(true);
+			customFG.setEnabled(false);
+			customFG.setSelection(true);
+			customFGSelector.setEnabled(false);
+			defaultBG.setEnabled(false);
+			customBG.setEnabled(false);
+			customBG.setSelection(true);
+			customBGSelector.setEnabled(false);
+			regexButton.setEnabled(false);
+			regexButton.setSelection(false);
+			fillLineButton.setEnabled(false);
+			fillLineButton.setSelection(false);
+			caseSensitiveButton.setEnabled(false);
+			caseSensitiveButton.setSelection(false);
+			fullWordMatchButton.setEnabled(false);
+			fullWordMatchButton.setSelection(false);
+			soundText.setEnabled(false);
+			soundText.setText("");
+			soundButton.setEnabled(false);
+			return;
+		}
 		selectedString = string;
-		if (string == null) return;
-		
 		
 		WarlockColor fgColor = string.getStyle().getForegroundColor();
 		WarlockColor bgColor = string.getStyle().getBackgroundColor();
