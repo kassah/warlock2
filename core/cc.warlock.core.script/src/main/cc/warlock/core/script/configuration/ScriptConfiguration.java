@@ -42,7 +42,7 @@ import cc.warlock.core.script.javascript.JavascriptEngine;
 public class ScriptConfiguration implements IConfigurationProvider {
 
 	protected TreeSet<File> scriptDirectories = new TreeSet<File>();
-	protected Property<Boolean> autoScan;
+	protected Property<Boolean> autoScan, suppressExceptions;
 	protected Property<Long> scanTimeout;
 	protected String scriptPrefix;
 	
@@ -60,6 +60,7 @@ public class ScriptConfiguration implements IConfigurationProvider {
 	protected ScriptConfiguration ()
 	{
 		autoScan = new Property<Boolean>("autoScan", true);
+		suppressExceptions = new Property<Boolean>("suppressExceptions", true);
 		scanTimeout = new Property<Long>("scanTimeout", (long)500);
 		scriptPrefix = ".";
 		
@@ -74,6 +75,7 @@ public class ScriptConfiguration implements IConfigurationProvider {
 	{
 		scriptDirectories.clear();
 		autoScan.set(true);
+		suppressExceptions.set(false);
 		scanTimeout.set((long)500);
 		engineExtensions.clear();
 		scriptPrefix = ".";
@@ -104,6 +106,10 @@ public class ScriptConfiguration implements IConfigurationProvider {
 		autoScanElement.addAttribute("timeout", ""+scanTimeout.get());
 		autoScanElement.setText(autoScan.get()+"");
 		scriptConfig.add(autoScanElement);
+		
+		Element suppressExceptionsElement = DocumentHelper.createElement("suppressExceptions");
+		suppressExceptionsElement.setText(suppressExceptions.get()+"");
+		scriptConfig.add(suppressExceptionsElement);
 		
 		Element scriptPrefixElement = DocumentHelper.createElement("script-prefix");
 		scriptPrefixElement.setText(scriptPrefix);
@@ -169,6 +175,10 @@ public class ScriptConfiguration implements IConfigurationProvider {
 				scanTimeout.set(Long.parseLong(element.attributeValue("timeout")));
 				autoScan.set(Boolean.parseBoolean(element.getTextTrim()));
 			}
+			else if ("suppressExceptions".equals(element.getName()))
+			{
+				suppressExceptions.set(Boolean.parseBoolean(element.getTextTrim()));
+			}
 			else if ("script-prefix".equals(element.getName()))
 			{
 				scriptPrefix = element.getTextTrim();
@@ -197,6 +207,10 @@ public class ScriptConfiguration implements IConfigurationProvider {
 
 	public IProperty<Long> getScanTimeout() {
 		return scanTimeout;
+	}
+	
+	public IProperty<Boolean> getSupressExceptions() {
+		return suppressExceptions;
 	}
 
 	public List<String> getEngineExtensions (String engineId)

@@ -89,6 +89,8 @@ public class WSLScript extends AbstractScript {
 		this.engine = engine;
 		this.sfClient = client;
 		
+		this.debugging = !ScriptConfiguration.instance().getSupressExceptions().get();
+		
 		scriptCommands = new StormFrontScriptCommands(client, this);
 		
 		// add command handlers

@@ -29,10 +29,11 @@ import org.eclipse.swt.widgets.Control;
 import org.eclipse.ui.IWorkbenchPropertyPage;
 import org.eclipse.ui.dialogs.PropertyPage;
 
+import cc.warlock.core.script.configuration.ScriptConfiguration;
 import cc.warlock.rcp.configuration.GameViewConfiguration;
 
 public class WarlockPreferencePage extends PropertyPage implements IWorkbenchPropertyPage {
-	protected Button promptButton;
+	protected Button promptButton, suppressScriptExceptionsButton;
 	
 	protected Control createContents(Composite parent) {
 		Composite main = new Composite (parent, SWT.NONE);
@@ -42,6 +43,11 @@ public class WarlockPreferencePage extends PropertyPage implements IWorkbenchPro
 		promptButton = new Button(main, SWT.CHECK);
 		promptButton.setText("Supress prompts");
 		promptButton.setSelection(suppressPrompt);
+		
+		boolean suppressScriptExceptions = ScriptConfiguration.instance().getSupressExceptions().get();
+		suppressScriptExceptionsButton = new Button(main, SWT.CHECK);
+		suppressScriptExceptionsButton.setText("Suppress Script Exceptions");
+		suppressScriptExceptionsButton.setSelection(suppressScriptExceptions);
 		
 		return main;
 	}
@@ -55,6 +61,7 @@ public class WarlockPreferencePage extends PropertyPage implements IWorkbenchPro
 	@Override
 	public boolean performOk() {
 		GameViewConfiguration.instance().setSuppressPrompt(promptButton.getSelection());
+		ScriptConfiguration.instance().getSupressExceptions().set(suppressScriptExceptionsButton.getSelection());
 		return true;
 	}
 }
