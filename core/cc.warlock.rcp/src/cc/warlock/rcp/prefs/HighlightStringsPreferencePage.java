@@ -221,6 +221,7 @@ public class HighlightStringsPreferencePage extends PreferencePageUtils implemen
 		
 		removeString = createButton(buttonsComposite, "Remove", SWT.LEFT | SWT.PUSH);
 		removeString.setImage(WarlockSharedImages.getImage(WarlockSharedImages.IMG_REMOVE));
+		removeString.setEnabled(false);
 	}
 
 	private void createOptions (Composite main)
@@ -239,6 +240,7 @@ public class HighlightStringsPreferencePage extends PreferencePageUtils implemen
 		customFG.setEnabled(false);
 		customFGSelector = createColorSelector(fgColorComposite);
 		customFGSelector.setEnabled(false);
+		customFGSelector.setColorValue(new RGB(0, 0, 0));
 		
 		new Label(optionsGroup, SWT.NONE).setText("Background Color: ");
 		Composite bgColorComposite = new Composite(optionsGroup, SWT.NONE);
@@ -249,6 +251,7 @@ public class HighlightStringsPreferencePage extends PreferencePageUtils implemen
 		customBG.setEnabled(false);
 		customBGSelector = createColorSelector(bgColorComposite);
 		customBGSelector.setEnabled(false);
+		customBGSelector.setColorValue(new RGB(0, 0, 0));
 		
 		regexButton = createCheckbox(optionsGroup, "Regular expression");
 		regexButton.setEnabled(false);
@@ -307,15 +310,18 @@ public class HighlightStringsPreferencePage extends PreferencePageUtils implemen
 	{
 		if (string == null) {
 			// No string selected, disable all fields
+			removeString.setEnabled(false);
 			defaultFG.setEnabled(false);
 			defaultFG.setSelection(true);
 			customFG.setEnabled(false);
 			customFG.setSelection(true);
 			customFGSelector.setEnabled(false);
+			customFGSelector.setColorValue(new RGB(0, 0, 0));
 			defaultBG.setEnabled(false);
 			customBG.setEnabled(false);
 			customBG.setSelection(true);
 			customBGSelector.setEnabled(false);
+			customBGSelector.setColorValue(new RGB(0, 0, 0));
 			regexButton.setEnabled(false);
 			regexButton.setSelection(false);
 			fillLineButton.setEnabled(false);
@@ -330,6 +336,8 @@ public class HighlightStringsPreferencePage extends PreferencePageUtils implemen
 			return;
 		}
 		selectedString = string;
+		
+		removeString.setEnabled(true);
 		
 		WarlockColor fgColor = string.getStyle().getForegroundColor();
 		WarlockColor bgColor = string.getStyle().getBackgroundColor();
