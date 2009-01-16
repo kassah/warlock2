@@ -48,7 +48,7 @@ line
 			if(label != null) {
 				int existingLine = script.labelLineNumber($label.text);
 				if(existingLine != -1)
-					script.echo("Redefinition of label \"" + $label.text + "\" on line " + lineNum + ", originally defined on line " + existingLine);
+					script.scriptDebug(1, "Redefinition of label \"" + $label.text + "\" on line " + lineNum + ", originally defined on line " + existingLine);
 				script.addLabel($label.text, lineNum);
 			}
 			lineNum++;
