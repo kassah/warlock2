@@ -45,10 +45,22 @@ public class ScriptManager extends ViewPart implements IGameViewFocusListener {
 		//parent.setLayout
 		//main = new Composite(parent, SWT.NONE);
 		main = parent;
-		parent.setLayout(new GridLayout(1, false));
-		parent.setLayoutData(new GridData(GridData.FILL, GridData.FILL, true, false));
+		GridLayout layout = new GridLayout();
+		layout.numColumns = 1;
+		layout.horizontalSpacing=0;
+		layout.marginBottom=0;
+		layout.marginHeight =0;
+		layout.marginLeft =0;
+		layout.marginRight=0;
+		layout.marginTop =0;
+		layout.marginWidth=0;
+		layout.verticalSpacing = 0;
+		
+		parent.setLayout(layout);
+
 		
 		scriptsTable = new TableViewer(parent, SWT.SINGLE | SWT.BORDER | SWT.V_SCROLL | SWT.FILL );
+		scriptsTable.getTable().setLayoutData(new GridData(GridData.FILL_BOTH));
 		nameColumn = new TableColumn(scriptsTable.getTable(), SWT.LEFT, 0);
 		nameColumn.setWidth(100);
 		playColumn = new TableColumn(scriptsTable.getTable(), SWT.NONE, 1);
