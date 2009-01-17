@@ -39,6 +39,13 @@
             id="cc.warlock.rcp.ui.views.GameView"
             name="GameView">
       </view>
+      <view
+            allowMultiple="false"
+            class="cc.warlock.rcp.views.ScriptManager"
+            icon="images/script.gif"
+            id="cc.warlock.rcp.views.ScriptManager"
+            name="Script Manager">
+      </view>
    </extension>
    <extension
          id="warlock"

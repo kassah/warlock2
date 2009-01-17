@@ -32,6 +32,7 @@ import cc.warlock.core.stormfront.client.IStormFrontClient;
 import cc.warlock.rcp.actions.OpenStreamWindowAction;
 import cc.warlock.rcp.views.DebugView;
 import cc.warlock.rcp.views.GameView;
+import cc.warlock.rcp.views.ScriptManager;
 import cc.warlock.rcp.views.StreamView;
 
 
@@ -65,9 +66,33 @@ public class StreamWindowContributionItem extends CompoundContributionItem {
 		}
 	}
 	
+	private class ScriptManagerAction extends Action {
+		
+		private static final String title = "Scripts Manager";
+		
+		public ScriptManagerAction() {
+			super(title, Action.AS_CHECK_BOX);
+		}
+		
+		public void run() {
+			try {
+				ScriptManager view = (ScriptManager)
+				PlatformUI.getWorkbench().getActiveWorkbenchWindow().getActivePage().showView(ScriptManager.VIEW_ID, null, IWorkbenchPage.VIEW_VISIBLE);
+				
+			} catch(Exception e) {
+				e.printStackTrace();
+			}
+		}
+		
+		@Override
+		public String getText() {
+	 		return title;
+		}
+	}
+	
 	@Override
 	protected IContributionItem[] getContributionItems() {	
-		IContributionItem[] items = new IContributionItem[7];
+		IContributionItem[] items = new IContributionItem[8];
 		items[0] = streamContribution("Thoughts", IStormFrontClient.THOUGHTS_STREAM_NAME, StreamView.TOP_STREAM_PREFIX);
 		items[1] = streamContribution("Inventory", IStormFrontClient.INVENTORY_STREAM_NAME, StreamView.RIGHT_STREAM_PREFIX);
 		items[2] = streamContribution("Deaths", IStormFrontClient.DEATH_STREAM_NAME, StreamView.TOP_STREAM_PREFIX);
@@ -75,6 +100,7 @@ public class StreamWindowContributionItem extends CompoundContributionItem {
 		items[4] = streamContribution("Familiar", IStormFrontClient.FAMILIAR_STREAM_NAME, StreamView.RIGHT_STREAM_PREFIX);
 		items[5] = streamContribution("My Bag", IStormFrontClient.STOW_STREAM_NAME, StreamView.RIGHT_STREAM_PREFIX);
 		items[6] = new ActionContributionItem(new DebugAction());
+		//items[7] = new ActionContributionItem(new ScriptManagerAction());
 		return items;
 	}
 	

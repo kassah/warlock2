@@ -37,12 +37,12 @@ public class PreferencesHandler extends SimpleCommandHandler
 {	
 	public Object execute(ExecutionEvent event) throws ExecutionException {
 		
-		IWarlockClient activeClient = Warlock2Plugin.getDefault().getCurrentClient();
+		//IWarlockClient activeClient;
 		GameView inFocus = GameView.getGameViewInFocus();
-		if (inFocus != null)
-		{
-			activeClient = inFocus.getWarlockClient();
-		}
+		//if (inFocus != null)
+		//{
+		IWarlockClient activeClient = inFocus.getWarlockClient();
+		//}
 		
 		PreferenceDialog dialog = PreferencesUtil.createPropertyDialogOn(Display.getDefault().getActiveShell(),
 				new WarlockClientAdaptable(activeClient), null, null, null);
