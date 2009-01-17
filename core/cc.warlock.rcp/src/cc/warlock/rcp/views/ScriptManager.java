@@ -3,18 +3,14 @@
  */
 package cc.warlock.rcp.views;
 
-import java.util.Vector;
-import java.util.regex.PatternSyntaxException;
-
 import org.eclipse.jface.viewers.ArrayContentProvider;
 import org.eclipse.jface.viewers.CellEditor;
+import org.eclipse.jface.viewers.CheckboxCellEditor;
 import org.eclipse.jface.viewers.ICellModifier;
-import org.eclipse.jface.viewers.IStructuredContentProvider;
 import org.eclipse.jface.viewers.ITableLabelProvider;
 import org.eclipse.jface.viewers.LabelProvider;
 import org.eclipse.jface.viewers.TableViewer;
 import org.eclipse.jface.viewers.TextCellEditor;
-import org.eclipse.jface.viewers.Viewer;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.ControlAdapter;
 import org.eclipse.swt.events.ControlEvent;
@@ -27,11 +23,10 @@ import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.ScrollBar;
 import org.eclipse.swt.widgets.Table;
 import org.eclipse.swt.widgets.TableColumn;
-import org.eclipse.swt.widgets.TableItem;
 import org.eclipse.swt.widgets.Text;
+import org.eclipse.ui.ISharedImages;
+import org.eclipse.ui.PlatformUI;
 import org.eclipse.ui.part.ViewPart;
-
-import cc.warlock.core.client.settings.internal.HighlightString;
 
 /**
  * @author kassah
@@ -76,13 +71,12 @@ public class ScriptManager extends ViewPart implements IGameViewFocusListener {
 		scriptsTable = new TableViewer(parent, SWT.SINGLE | SWT.BORDER | SWT.V_SCROLL | SWT.FILL );
 		scriptsTable.getTable().setLayoutData(new GridData(GridData.FILL_BOTH));
 		scriptsTable.setUseHashlookup(true);
-		scriptsTable.setColumnProperties(new String[] { "name", "play", "pause", "stop" });
+		scriptsTable.setColumnProperties(new String[] { "name", "pause", "stop" });
 		
 		CellEditor editors[] = new CellEditor[] { 
 				new TextCellEditor(scriptsTable.getTable()),
-				new TextCellEditor(scriptsTable.getTable()),
-				new TextCellEditor(scriptsTable.getTable()),
-				new TextCellEditor(scriptsTable.getTable())
+				new CheckboxCellEditor(scriptsTable.getTable()),
+				new CheckboxCellEditor(scriptsTable.getTable())
 		};
 		scriptsTable.setCellEditors(editors);
 		
@@ -102,22 +96,19 @@ public class ScriptManager extends ViewPart implements IGameViewFocusListener {
 		
 		nameColumn = new TableColumn(scriptsTable.getTable(), SWT.LEFT, 0);
 		nameColumn.setText("Name");
-		playColumn = new TableColumn(scriptsTable.getTable(), SWT.NONE, 1);
-		playColumn.setWidth(30);
-		playColumn.setText("Play");
-		pauseColumn = new TableColumn(scriptsTable.getTable(), SWT.NONE, 2);
-		pauseColumn.setWidth(30);
+		pauseColumn = new TableColumn(scriptsTable.getTable(), SWT.RIGHT, 1);
+		pauseColumn.setWidth(16);
 		pauseColumn.setText("Pause");
-		stopColumn = new TableColumn(scriptsTable.getTable(), SWT.NONE, 3);
-		stopColumn.setWidth(30);
+		stopColumn = new TableColumn(scriptsTable.getTable(), SWT.RIGHT, 2);
+		stopColumn.setWidth(16);
 		stopColumn.setText("Stop");
 		scriptsTable.setLabelProvider(new ScriptsLabelProvider());
 		scriptsTable.setContentProvider(new ArrayContentProvider());
 		scriptsTable.setInput(new ScriptRow[] { 
-				new ScriptRow("sfhunter.cmd",true,false), 
-				new ScriptRow("train.cmd", false,false), 
-				new ScriptRow("do.wiz", true, false), 
-				new ScriptRow("go.wsl", true, true) 
+				new ScriptRow("sfhunter.cmd",false), 
+				new ScriptRow("train.cmd", true), 
+				new ScriptRow("do.wiz", false), 
+				new ScriptRow("go.wsl", true) 
 			});
 		
 		
@@ -139,14 +130,18 @@ public class ScriptManager extends ViewPart implements IGameViewFocusListener {
 					// table is getting smaller so make the columns 
 					// smaller first and then resize the table to
 					// match the client area width
-					nameColumn.setWidth(width - 90);
+					nameColumn.setWidth(width - 32);
+					stopColumn.setWidth(16);
+					pauseColumn.setWidth(16);
 					table.setSize(area.width, area.height);
 				} else {
 					// table is getting bigger so make the table 
 					// bigger first and then make the columns wider
 					// to match the client area width
 					table.setSize(area.width, area.height);
-					nameColumn.setWidth(width - 90);
+					nameColumn.setWidth(width - 32);
+					stopColumn.setWidth(16);
+					pauseColumn.setWidth(16);
 				}
 			}
 		});
@@ -174,46 +169,28 @@ public class ScriptManager extends ViewPart implements IGameViewFocusListener {
 
 	}
 	
-	/**
-	 * InnerClass that acts as a proxy for the ExampleTaskList 
-	 * providing content for the Table. It implements the ITaskListViewer 
-	 * interface since it must register changeListeners with the 
-	 * ExampleTaskList 
-	 */
-	class ScriptContentProvider implements IStructuredContentProvider {
-		private final int COUNT = 10;
-		private Vector<ScriptRow> scripts = new Vector(COUNT);
-		// Combo box choices
-		final String[] script_stuff = { "sfhunter.cmd", "train.cmd", "do.wiz", "go.wsl" };
-		
-		public void inputChanged(Viewer v, Object oldInput, Object newInput) {
-			// TODO Auto-generated method stub
-		}
-
-		public void dispose() {
-			// TODO Auto-generated method stub	
-		}
-
-		// Return the tasks as an array of Objects
-		public Object[] getElements(Object parent) {
-			// TODO Auto-generated method stub
-			ScriptRow script;
-			for (int i = 0; i < 4; i++) {
-				//script = new ScriptRow(script_stuff[i]);
-				//script.setPaused(false);
-				//script.setRunning(true);
-				//scripts.add(script);
-			}
-			return scripts.toArray();
-		}
-	}
-	
 	class ScriptsLabelProvider 
 	extends LabelProvider
 	implements ITableLabelProvider {
 
 		public Image getColumnImage(Object element, int columnIndex) {
-			return null;
+			Image result = null;
+			ScriptRow script = (ScriptRow) element;
+			switch (columnIndex) {
+				case 0 :
+					break;
+				case 1 :
+					if (!script.getRunning())
+						result = PlatformUI.getWorkbench().getSharedImages().getImage(ISharedImages.IMG_TOOL_FORWARD);
+					else
+						result = PlatformUI.getWorkbench().getSharedImages().getImage(ISharedImages.IMG_TOOL_FORWARD_DISABLED);
+				case 2:
+					if (script.getRunning() && !script.getPaused())
+						result = PlatformUI.getWorkbench().getSharedImages().getImage(ISharedImages.IMG_ELCL_STOP);
+					else
+						result = PlatformUI.getWorkbench().getSharedImages().getImage(ISharedImages.IMG_ELCL_STOP_DISABLED);
+			}
+			return result;
 		}
 
 		public String getColumnText(Object element, int columnIndex) {
@@ -224,13 +201,10 @@ public class ScriptManager extends ViewPart implements IGameViewFocusListener {
 					result = script.getName();
 					break;
 				case 1 :
-					result = script.getRunning()?"":">";
+					result = script.getPaused()?"|>":"||";
 					break;
 				case 2 :
-					result = (script.getRunning() && !script.getPaused())?"||":"";
-					break;
-				case 3 :
-					result = script.getRunning()?"[]":"";
+					result = "[]";
 					break;
 				default :
 					break;
@@ -244,11 +218,10 @@ public class ScriptManager extends ViewPart implements IGameViewFocusListener {
 		private Boolean running = false;
 		private Boolean paused = false;
 		
-		public ScriptRow(String name, Boolean running, Boolean paused) {
+		public ScriptRow(String name, Boolean paused) {
 			
 			super();
 			setName(name);
-			setRunning(running);
 			setPaused(paused);
 		}
 		
@@ -266,10 +239,6 @@ public class ScriptManager extends ViewPart implements IGameViewFocusListener {
 		
 		public void setName(String name) {
 			this.name = name;
-		}
-		
-		public void setRunning(Boolean running) {
-			this.running = running;
 		}
 		
 		public void setPaused(Boolean paused) {
