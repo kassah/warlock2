@@ -1,5 +1,23 @@
 /**
- * 
+ * Warlock, the open-source cross-platform game client
+ *  
+ * Copyright 2008, Warlock LLC, and individual contributors as indicated
+ * by the @authors tag. 
+ *
+ * This is free software; you can redistribute it and/or modify it
+ * under the terms of the GNU Lesser General Public License as
+ * published by the Free Software Foundation; either version 2.1 of
+ * the License, or (at your option) any later version.
+ *
+ * This software is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
+ * Lesser General Public License for more details.
+ *
+ * You should have received a copy of the GNU Lesser General Public
+ * License along with this software; if not, write to the Free
+ * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
+ * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
 package cc.warlock.rcp.views;
 
@@ -27,6 +45,8 @@ import org.eclipse.swt.widgets.Text;
 import org.eclipse.ui.ISharedImages;
 import org.eclipse.ui.PlatformUI;
 import org.eclipse.ui.part.ViewPart;
+
+import cc.warlock.rcp.ui.WarlockSharedImages;
 
 /**
  * @author kassah
@@ -72,6 +92,8 @@ public class ScriptManager extends ViewPart implements IGameViewFocusListener {
 		scriptsTable.getTable().setLayoutData(new GridData(GridData.FILL_BOTH));
 		scriptsTable.setUseHashlookup(true);
 		scriptsTable.setColumnProperties(new String[] { "name", "pause", "stop" });
+		scriptsTable.getTable().setLinesVisible(true);
+		//scriptsTable.getTable().setHeaderVisible(true);
 		
 		CellEditor editors[] = new CellEditor[] { 
 				new TextCellEditor(scriptsTable.getTable()),
@@ -97,10 +119,10 @@ public class ScriptManager extends ViewPart implements IGameViewFocusListener {
 		nameColumn = new TableColumn(scriptsTable.getTable(), SWT.LEFT, 0);
 		nameColumn.setText("Name");
 		pauseColumn = new TableColumn(scriptsTable.getTable(), SWT.RIGHT, 1);
-		pauseColumn.setWidth(16);
+		pauseColumn.setWidth(30);
 		pauseColumn.setText("Pause");
 		stopColumn = new TableColumn(scriptsTable.getTable(), SWT.RIGHT, 2);
-		stopColumn.setWidth(16);
+		stopColumn.setWidth(30);
 		stopColumn.setText("Stop");
 		scriptsTable.setLabelProvider(new ScriptsLabelProvider());
 		scriptsTable.setContentProvider(new ArrayContentProvider());
@@ -130,18 +152,18 @@ public class ScriptManager extends ViewPart implements IGameViewFocusListener {
 					// table is getting smaller so make the columns 
 					// smaller first and then resize the table to
 					// match the client area width
-					nameColumn.setWidth(width - 32);
-					stopColumn.setWidth(16);
-					pauseColumn.setWidth(16);
+					nameColumn.setWidth(width - 60);
+					stopColumn.setWidth(30);
+					pauseColumn.setWidth(30);
 					table.setSize(area.width, area.height);
 				} else {
 					// table is getting bigger so make the table 
 					// bigger first and then make the columns wider
 					// to match the client area width
 					table.setSize(area.width, area.height);
-					nameColumn.setWidth(width - 32);
-					stopColumn.setWidth(16);
-					pauseColumn.setWidth(16);
+					nameColumn.setWidth(width - 60);
+					stopColumn.setWidth(30);
+					pauseColumn.setWidth(30);
 				}
 			}
 		});
@@ -180,15 +202,14 @@ public class ScriptManager extends ViewPart implements IGameViewFocusListener {
 				case 0 :
 					break;
 				case 1 :
-					if (!script.getRunning())
-						result = PlatformUI.getWorkbench().getSharedImages().getImage(ISharedImages.IMG_TOOL_FORWARD);
+					if (!script.getPaused())
+						result = WarlockSharedImages.getImage(WarlockSharedImages.IMG_SCRIPT_SUSPEND);
 					else
-						result = PlatformUI.getWorkbench().getSharedImages().getImage(ISharedImages.IMG_TOOL_FORWARD_DISABLED);
+						result = WarlockSharedImages.getImage(WarlockSharedImages.IMG_SCRIPT_RESUME);
+					break;
 				case 2:
-					if (script.getRunning() && !script.getPaused())
-						result = PlatformUI.getWorkbench().getSharedImages().getImage(ISharedImages.IMG_ELCL_STOP);
-					else
-						result = PlatformUI.getWorkbench().getSharedImages().getImage(ISharedImages.IMG_ELCL_STOP_DISABLED);
+					result = WarlockSharedImages.getImage(WarlockSharedImages.IMG_SCRIPT_STOP);
+					break;
 			}
 			return result;
 		}
@@ -201,10 +222,10 @@ public class ScriptManager extends ViewPart implements IGameViewFocusListener {
 					result = script.getName();
 					break;
 				case 1 :
-					result = script.getPaused()?"|>":"||";
+					// result = script.getPaused()?"|>":"||";
 					break;
 				case 2 :
-					result = "[]";
+					// result = "[]";
 					break;
 				default :
 					break;
@@ -215,7 +236,6 @@ public class ScriptManager extends ViewPart implements IGameViewFocusListener {
 	
 	class ScriptRow {
 		private String name = "";
-		private Boolean running = false;
 		private Boolean paused = false;
 		
 		public ScriptRow(String name, Boolean paused) {
@@ -227,10 +247,6 @@ public class ScriptManager extends ViewPart implements IGameViewFocusListener {
 		
 		public String getName() {
 			return name;
-		}
-		
-		public Boolean getRunning() {
-			return running;
 		}
 		
 		public Boolean getPaused() {
