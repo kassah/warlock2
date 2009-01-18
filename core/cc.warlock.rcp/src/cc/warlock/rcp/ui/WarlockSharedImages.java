@@ -58,6 +58,11 @@ public class WarlockSharedImages {
 	public static final String IMG_CHARACTER = "/images/character.gif";
 	public static final String IMG_NEW_CHARACTER = "/images/new_character.gif";
 	
+	// Script Manager Buttons
+	public static final String IMG_SCRIPT_STOP = "/images/terminate.gif";
+	public static final String IMG_SCRIPT_SUSPEND = "/images/suspend.gif";
+	public static final String IMG_SCRIPT_RESUME = "/images/resume.gif";
+	
 	// Compass Images
 	public static final String IMG_COMPASS_LARGE_MAIN = "/images/compass/large/compass_main.png";
 	public static final String IMG_COMPASS_LARGE_NORTH_ON = "/images/compass/large/north_on.png";
