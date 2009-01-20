@@ -69,6 +69,7 @@ import cc.warlock.core.client.WarlockColor;
 import cc.warlock.core.client.internal.WarlockStyle;
 import cc.warlock.core.client.settings.IHighlightString;
 import cc.warlock.core.client.settings.internal.ClientSettings;
+import cc.warlock.core.client.settings.internal.HighlightConfigurationProvider;
 import cc.warlock.core.client.settings.internal.HighlightString;
 import cc.warlock.rcp.ui.WarlockSharedImages;
 import cc.warlock.rcp.util.ColorUtil;
@@ -579,24 +580,28 @@ public class HighlightStringsPreferencePage extends PreferencePageUtils implemen
 	
 	@Override
 	public boolean performOk() {
+		HighlightConfigurationProvider highlightConfig = settings.getHighlightConfigurationProvider();
+		if(highlightConfig == null)
+			return false;
+		
 		for (HighlightString string : highlightStrings) {
 			WarlockStyle style = (WarlockStyle) string.getStyle();
 			
 			if (addedStrings.contains(string)) {
-				settings.getHighlightConfigurationProvider().addHighlightString(string);
+				highlightConfig.addHighlightString(string);
 				addedStrings.remove(string);
 			}
 			else if (string.needsUpdate() || style.needsUpdate()) {
-				settings.getHighlightConfigurationProvider().replaceHighlightString(string.getOriginalHighlightString(), string);
+				highlightConfig.replaceHighlightString(string.getOriginalHighlightString(), string);
 			}
 		}
 		
 		for (HighlightString string : removedStrings)
 		{
 			if (string.getOriginalHighlightString() != null) {
-				settings.getHighlightConfigurationProvider().removeHighlightString(string.getOriginalHighlightString());
+				highlightConfig.removeHighlightString(string.getOriginalHighlightString());
 			} else {
-				settings.getHighlightConfigurationProvider().removeHighlightString(string);
+				highlightConfig.removeHighlightString(string);
 			}
 		}
 		
