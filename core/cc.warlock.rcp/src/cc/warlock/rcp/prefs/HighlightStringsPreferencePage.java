@@ -591,7 +591,7 @@ public class HighlightStringsPreferencePage extends PreferencePageUtils implemen
 				highlightConfig.addHighlightString(string);
 				addedStrings.remove(string);
 			}
-			else if (string.needsUpdate() || style.needsUpdate()) {
+			else if (string.needsUpdate() || (style != null && style.needsUpdate())) {
 				highlightConfig.replaceHighlightString(string.getOriginalHighlightString(), string);
 			}
 		}
