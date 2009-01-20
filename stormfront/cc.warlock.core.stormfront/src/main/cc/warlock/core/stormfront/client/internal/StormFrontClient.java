@@ -163,14 +163,6 @@ public class StormFrontClient extends WarlockClient implements IStormFrontClient
 		}
 	}
 	
-	public void scriptAdded(IScript script) {
-		for (IScriptListener listener : scriptListeners) listener.scriptAdded(script);
-	}
-	
-	public void scriptRemoved(IScript script) {
-		for (IScriptListener listener : scriptListeners) listener.scriptRemoved(script);
-	}
-	
 	public void scriptPaused(IScript script) {
 		for (IScriptListener listener : scriptListeners) listener.scriptPaused(script);
 	}

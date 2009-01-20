@@ -35,32 +35,6 @@ public class SWTScriptListener implements IScriptListener {
 		this.listener = listener;
 	}
 	
-	private class AddedListener implements Runnable
-	{
-		private IScript script;
-		
-		public AddedListener(IScript script) {
-			this.script = script;
-		}
-		
-		public void run() {
-			listener.scriptAdded(script);
-		}
-	}
-	
-	private class RemovedListener implements Runnable
-	{
-		private IScript script;
-		
-		public RemovedListener(IScript script) {
-			this.script = script;
-		}
-		
-		public void run() {
-			listener.scriptRemoved(script);
-		}
-	}
-	
 	private class PausedListener implements Runnable
 	{
 		private IScript script;
@@ -118,14 +92,6 @@ public class SWTScriptListener implements IScriptListener {
 	protected void run(Runnable runnable)
 	{
 		Display.getDefault().asyncExec(runnable);
-	}
-	
-	public void scriptAdded(IScript script) {
-		run(new AddedListener(script));
-	}
-	
-	public void scriptRemoved(IScript script) {
-		run(new RemovedListener(script));
 	}
 	
 	public void scriptPaused(IScript script) {
