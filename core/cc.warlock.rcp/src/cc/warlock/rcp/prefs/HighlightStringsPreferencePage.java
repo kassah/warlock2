@@ -485,7 +485,20 @@ public class HighlightStringsPreferencePage extends PreferencePageUtils implemen
 	}
 	
 	private void removeStringSelected() {
+		// Grab selected string.
 		HighlightString string = selectedString;
+		
+		// Select Next (or Previous if last) Highlight in line
+		int index = stringTable.getTable().getSelectionIndex();
+		if (stringTable.getElementAt(index + 1) != null) {
+			stringTable.getTable().setSelection(index + 1);
+			highlightStringSelected((HighlightString) stringTable.getElementAt(index + 1));
+		} else if (stringTable.getElementAt(index - 1) != null) {
+			stringTable.getTable().setSelection(index - 1);
+			highlightStringSelected((HighlightString) stringTable.getElementAt(index - 1));
+		}
+		
+		// Mark string removed in our changelog to commit to prefs
 		if (addedStrings.contains(string)) {
 			addedStrings.remove(string);
 		}
@@ -493,6 +506,7 @@ public class HighlightStringsPreferencePage extends PreferencePageUtils implemen
 			removedStrings.add(string);
 		}
 		
+		// Actually remove string from our active table and list.
 		highlightStrings.remove(string);
 		stringTable.remove(string);
 	}
