@@ -21,6 +21,8 @@
  */
 package cc.warlock.rcp.stormfront.ui.menu;
 
+import java.util.ArrayList;
+
 import org.eclipse.jface.action.Action;
 import org.eclipse.jface.action.ActionContributionItem;
 import org.eclipse.jface.action.IContributionItem;
@@ -28,6 +30,7 @@ import org.eclipse.ui.IWorkbenchPage;
 import org.eclipse.ui.PlatformUI;
 import org.eclipse.ui.actions.CompoundContributionItem;
 
+import cc.warlock.core.client.IStreamFilter;
 import cc.warlock.core.stormfront.client.IStormFrontClient;
 import cc.warlock.rcp.actions.OpenStreamWindowAction;
 import cc.warlock.rcp.views.DebugView;
@@ -92,16 +95,16 @@ public class StreamWindowContributionItem extends CompoundContributionItem {
 	
 	@Override
 	protected IContributionItem[] getContributionItems() {	
-		IContributionItem[] items = new IContributionItem[7];
-		items[0] = streamContribution("Thoughts", IStormFrontClient.THOUGHTS_STREAM_NAME, StreamView.TOP_STREAM_PREFIX);
-		items[1] = streamContribution("Inventory", IStormFrontClient.INVENTORY_STREAM_NAME, StreamView.RIGHT_STREAM_PREFIX);
-		items[2] = streamContribution("Deaths", IStormFrontClient.DEATH_STREAM_NAME, StreamView.TOP_STREAM_PREFIX);
-		items[3] = streamContribution("Current Room", IStormFrontClient.ROOM_STREAM_NAME, StreamView.RIGHT_STREAM_PREFIX);
-		items[4] = streamContribution("Familiar", IStormFrontClient.FAMILIAR_STREAM_NAME, StreamView.RIGHT_STREAM_PREFIX);
-		items[5] = streamContribution("My Bag", IStormFrontClient.STOW_STREAM_NAME, StreamView.RIGHT_STREAM_PREFIX);
-		items[6] = new ActionContributionItem(new DebugAction());
-		//items[7] = new ActionContributionItem(new ScriptManagerAction());
-		return items;
+		ArrayList<IContributionItem> items = new ArrayList<IContributionItem>();
+		items.add(streamContribution("Thoughts", IStormFrontClient.THOUGHTS_STREAM_NAME, StreamView.TOP_STREAM_PREFIX));
+		items.add(streamContribution("Inventory", IStormFrontClient.INVENTORY_STREAM_NAME, StreamView.RIGHT_STREAM_PREFIX));
+		items.add(streamContribution("Deaths", IStormFrontClient.DEATH_STREAM_NAME, StreamView.TOP_STREAM_PREFIX));
+		items.add(streamContribution("Current Room", IStormFrontClient.ROOM_STREAM_NAME, StreamView.RIGHT_STREAM_PREFIX));
+		items.add(streamContribution("Familiar", IStormFrontClient.FAMILIAR_STREAM_NAME, StreamView.RIGHT_STREAM_PREFIX));
+		items.add(streamContribution("My Bag", IStormFrontClient.STOW_STREAM_NAME, StreamView.RIGHT_STREAM_PREFIX));
+		items.add(new ActionContributionItem(new DebugAction()));
+		//items.add(new ActionContributionItem(new ScriptManagerAction()));
+		return items.toArray(new IContributionItem[items.size()]);
 	}
 	
 	protected IContributionItem streamContribution(String label, String streamName, String prefix)
