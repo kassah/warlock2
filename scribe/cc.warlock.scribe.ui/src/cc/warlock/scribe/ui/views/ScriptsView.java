@@ -44,32 +44,16 @@ import org.eclipse.swt.widgets.Shell;
 import org.eclipse.swt.widgets.TableColumn;
 import org.eclipse.ui.part.ViewPart;
 
-import cc.warlock.core.client.IWarlockClient;
-import cc.warlock.core.client.WarlockClientAdapter;
-import cc.warlock.core.client.WarlockClientRegistry;
 import cc.warlock.core.script.IScriptInfo;
 import cc.warlock.core.script.IScriptProvider;
 import cc.warlock.core.script.ScriptEngineRegistry;
-import cc.warlock.core.stormfront.client.IStormFrontClient;
-import cc.warlock.core.stormfront.serversettings.server.IServerScriptInfo;
-import cc.warlock.core.stormfront.serversettings.server.IServerSettingsListener;
-import cc.warlock.core.stormfront.serversettings.server.ServerSettings;
-import cc.warlock.rcp.util.ColorUtil;
 import cc.warlock.scribe.ui.ScribeSharedImages;
 
-public class ScriptsView extends ViewPart implements IServerSettingsListener {
+public class ScriptsView extends ViewPart {
 
 	public static final String VIEW_ID = "cc.warlock.scribe.ui.views.ScriptsView";
 	
 	protected TableViewer scriptList;
-	
-	protected void addListener (IWarlockClient client)
-	{
-		if (client instanceof IStormFrontClient)
-		{
-			((IStormFrontClient)client).getServerSettings().addServerSettingsListener(ScriptsView.this);
-		}
-	}
 	
 	@Override
 	public void createPartControl(Composite parent) {
@@ -116,21 +100,21 @@ public class ScriptsView extends ViewPart implements IServerSettingsListener {
 		TableColumn name = new TableColumn(scriptList.getTable(), SWT.NONE, 1);
 		name.setWidth(200);
 		
-		for (IWarlockClient client : WarlockClientRegistry.getActiveClients())
-		{
-			if (client instanceof IStormFrontClient)
-			{
-				serverSettingsLoaded(((IStormFrontClient)client).getServerSettings());
-			}
-		}
-		WarlockClientRegistry.addWarlockClientListener(new WarlockClientAdapter() {
-			public void clientConnected(IWarlockClient client) {
-				addListener(client);
-			}
-		});
+//		for (IWarlockClient client : WarlockClientRegistry.getActiveClients())
+//		{
+//			if (client instanceof IStormFrontClient)
+//			{
+//				serverSettingsLoaded(((IStormFrontClient)client).getServerSettings());
+//			}
+//		}
+//		WarlockClientRegistry.addWarlockClientListener(new WarlockClientAdapter() {
+//			public void clientConnected(IWarlockClient client) {
+//				addListener(client);
+//			}
+//		});
 	}
 	
-	public void serverSettingsLoaded(final ServerSettings settings) {
+	public void serverSettingsLoaded() {
 		Display.getDefault().syncExec(new Runnable() {
 			public void run() {
 				ArrayList<IScriptInfo> scripts = new ArrayList<IScriptInfo>();
@@ -180,14 +164,14 @@ public class ScriptsView extends ViewPart implements IServerSettingsListener {
 		
 		StyledText text = new StyledText(main, SWT.READ_ONLY | SWT.MULTI | SWT.V_SCROLL | SWT.H_SCROLL);
 		
-		if (scriptInfo instanceof IServerScriptInfo)
-		{
-			IServerScriptInfo info = (IServerScriptInfo) scriptInfo;
-			IStormFrontClient client = info.getClient();
-
-			text.setBackground(ColorUtil.warlockColorToColor(client.getServerSettings().getMainWindowSettings().getBackgroundColor()));
-			text.setForeground(ColorUtil.warlockColorToColor(client.getServerSettings().getMainWindowSettings().getForegroundColor()));
-		}
+//		if (scriptInfo instanceof IServerScriptInfo)
+//		{
+//			IServerScriptInfo info = (IServerScriptInfo) scriptInfo;
+//			IStormFrontClient client = info.getClient();
+//
+//			text.setBackground(ColorUtil.warlockColorToColor(client.getServerSettings().getMainWindowSettings().getBackgroundColor()));
+//			text.setForeground(ColorUtil.warlockColorToColor(client.getServerSettings().getMainWindowSettings().getForegroundColor()));
+//		}
 		
 		Reader reader = scriptInfo.openReader();
 		text.setText(readerToString(reader));
