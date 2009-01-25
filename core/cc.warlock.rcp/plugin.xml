@@ -347,6 +347,17 @@
             </and>
          </enabledWhen>
       </page>
+      <page
+            category="cc.warlock.rcp.warlockPrefs"
+            class="cc.warlock.rcp.prefs.LoggingPreferencePage"
+            id="cc.warlock.rcp.prefs.logging"
+            name="Logging">
+         <enabledWhen>
+            <adapt
+                  type="cc.warlock.core.client.IWarlockClient">
+            </adapt>
+         </enabledWhen>
+      </page>
    </extension>
    <extension
          point="org.eclipse.ui.navigator.navigatorContent">
