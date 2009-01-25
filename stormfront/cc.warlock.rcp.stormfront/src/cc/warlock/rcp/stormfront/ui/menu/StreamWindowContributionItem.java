@@ -92,7 +92,7 @@ public class StreamWindowContributionItem extends CompoundContributionItem {
 	
 	@Override
 	protected IContributionItem[] getContributionItems() {	
-		IContributionItem[] items = new IContributionItem[8];
+		IContributionItem[] items = new IContributionItem[7];
 		items[0] = streamContribution("Thoughts", IStormFrontClient.THOUGHTS_STREAM_NAME, StreamView.TOP_STREAM_PREFIX);
 		items[1] = streamContribution("Inventory", IStormFrontClient.INVENTORY_STREAM_NAME, StreamView.RIGHT_STREAM_PREFIX);
 		items[2] = streamContribution("Deaths", IStormFrontClient.DEATH_STREAM_NAME, StreamView.TOP_STREAM_PREFIX);
