@@ -42,17 +42,20 @@ import org.eclipse.swt.widgets.ScrollBar;
 import org.eclipse.swt.widgets.Table;
 import org.eclipse.swt.widgets.TableColumn;
 import org.eclipse.swt.widgets.Text;
-import org.eclipse.ui.ISharedImages;
-import org.eclipse.ui.PlatformUI;
 import org.eclipse.ui.part.ViewPart;
 
+import cc.warlock.core.client.IWarlockClient;
+import cc.warlock.core.script.IScript;
+import cc.warlock.core.script.IScriptEngine;
+import cc.warlock.core.script.IScriptInfo;
+import cc.warlock.core.script.IScriptListener;
 import cc.warlock.rcp.ui.WarlockSharedImages;
 
 /**
  * @author kassah
  *
  */
-public class ScriptManager extends ViewPart implements IGameViewFocusListener {
+public class ScriptManager extends ViewPart implements IGameViewFocusListener, IScriptListener {
 	protected Text entry;
 	protected TableViewer scriptsTable;
 	protected Composite main;
@@ -71,8 +74,6 @@ public class ScriptManager extends ViewPart implements IGameViewFocusListener {
 	 */
 	@Override
 	public void createPartControl(Composite parent) {
-		//parent.setLayout
-		//main = new Composite(parent, SWT.NONE);
 		main = parent;
 		GridLayout layout = new GridLayout();
 		layout.numColumns = 1;
@@ -167,11 +168,6 @@ public class ScriptManager extends ViewPart implements IGameViewFocusListener {
 				}
 			}
 		});
-
-		//column.setWidth(400);
-		
-		//entry = new Text(main, SWT.BORDER);
-		//entry.setLayoutData(new GridData(GridData.FILL, GridData.FILL, true, false));
 	}
 
 	/* (non-Javadoc)
@@ -191,18 +187,38 @@ public class ScriptManager extends ViewPart implements IGameViewFocusListener {
 
 	}
 	
+	public void scriptPaused(IScript script) {
+		// TODO Auto-generated method stub
+		
+	}
+
+	public void scriptResumed(IScript script) {
+		// TODO Auto-generated method stub
+		
+	}
+
+	public void scriptStarted(IScript script) {
+		// TODO Auto-generated method stub
+		
+	}
+
+	public void scriptStopped(IScript script, boolean userStopped) {
+		// TODO Auto-generated method stub
+		
+	}
+	
 	class ScriptsLabelProvider 
 	extends LabelProvider
 	implements ITableLabelProvider {
 
 		public Image getColumnImage(Object element, int columnIndex) {
 			Image result = null;
-			ScriptRow script = (ScriptRow) element;
+			IScript script = (IScript) element;
 			switch (columnIndex) {
 				case 0 :
 					break;
 				case 1 :
-					if (!script.getPaused())
+					if (!script.isSuspended())
 						result = WarlockSharedImages.getImage(WarlockSharedImages.IMG_SCRIPT_SUSPEND);
 					else
 						result = WarlockSharedImages.getImage(WarlockSharedImages.IMG_SCRIPT_RESUME);
@@ -216,7 +232,7 @@ public class ScriptManager extends ViewPart implements IGameViewFocusListener {
 
 		public String getColumnText(Object element, int columnIndex) {
 			String result = "";
-			ScriptRow script = (ScriptRow) element;
+			IScript script = (IScript) element;
 			switch (columnIndex) {
 				case 0:
 					result = script.getName();
@@ -234,31 +250,68 @@ public class ScriptManager extends ViewPart implements IGameViewFocusListener {
 		}
 	}
 	
-	class ScriptRow {
-		private String name = "";
-		private Boolean paused = false;
+	
+	class ScriptRow implements IScript {
+		protected String name;
+		protected Boolean suspended;
 		
-		public ScriptRow(String name, Boolean paused) {
-			
-			super();
-			setName(name);
-			setPaused(paused);
+		public ScriptRow(String name, Boolean suspended) {
+			this.name = name;
+			this.suspended = suspended;
 		}
-		
+
+		public void addScriptListener(IScriptListener listener) {
+			// TODO Auto-generated method stub
+			
+		}
+
+		public IWarlockClient getClient() {
+			// TODO Auto-generated method stub
+			return null;
+		}
+
 		public String getName() {
+			// TODO Auto-generated method stub
 			return name;
 		}
-		
-		public Boolean getPaused() {
-			return paused;
+
+		public IScriptEngine getScriptEngine() {
+			// TODO Auto-generated method stub
+			return null;
 		}
-		
-		public void setName(String name) {
-			this.name = name;
+
+		public IScriptInfo getScriptInfo() {
+			// TODO Auto-generated method stub
+			return null;
 		}
-		
-		public void setPaused(Boolean paused) {
-			this.paused = paused;
+
+		public boolean isRunning() {
+			// TODO Auto-generated method stub
+			return true;
+		}
+
+		public boolean isSuspended() {
+			// TODO Auto-generated method stub
+			return suspended;
+		}
+
+		public void removeScriptListener(IScriptListener listener) {
+			// TODO Auto-generated method stub
+			
+		}
+
+		public void resume() {
+			suspended = false;
+		}
+
+		public void stop() {
+			// TODO Auto-generated method stub
+			suspended = true;
+		}
+
+		public void suspend() {
+			// TODO Auto-generated method stub
+			suspended = true;
 		}
 	}
 }
