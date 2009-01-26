@@ -228,13 +228,18 @@ public class HighlightStringsPreferencePage extends PreferencePageUtils implemen
 	private void createOptions (Composite main)
 	{
 		Group optionsGroup = new Group(main, SWT.NONE);
-		optionsGroup.setLayout(new GridLayout(2, false));
+		optionsGroup.setLayout(new GridLayout(1, false));
 		optionsGroup.setLayoutData(new GridData(GridData.FILL, GridData.FILL, true, false));
 		optionsGroup.setText("Options");
+		Composite mainGroup = new Composite(optionsGroup, SWT.NONE);
 		
-		new Label(optionsGroup, SWT.NONE).setText("Foreground Color: ");
-		Composite fgColorComposite = new Composite(optionsGroup, SWT.NONE);
+		mainGroup.setLayout(new GridLayout(2, false));
+		mainGroup.setLayoutData(new GridData(GridData.FILL, GridData.FILL, true, false));
+		
+		new Label(mainGroup, SWT.NONE).setText("Foreground Color: ");
+		Composite fgColorComposite = new Composite(mainGroup, SWT.NONE);
 		fgColorComposite.setLayout(new GridLayout(3, false));
+		fgColorComposite.setLayoutData(new GridData(GridData.FILL, GridData.FILL, true, false));
 		defaultFG = createRadio(fgColorComposite, "Default");
 		defaultFG.setEnabled(false);
 		customFG = createRadio(fgColorComposite);
@@ -243,9 +248,10 @@ public class HighlightStringsPreferencePage extends PreferencePageUtils implemen
 		customFGSelector.setEnabled(false);
 		customFGSelector.setColorValue(new RGB(0, 0, 0));
 		
-		new Label(optionsGroup, SWT.NONE).setText("Background Color: ");
-		Composite bgColorComposite = new Composite(optionsGroup, SWT.NONE);
+		new Label(mainGroup, SWT.NONE).setText("Background Color: ");
+		Composite bgColorComposite = new Composite(mainGroup, SWT.NONE);
 		bgColorComposite.setLayout(new GridLayout(3, false));
+		bgColorComposite.setLayoutData(new GridData(GridData.FILL, GridData.FILL, true, false));
 		defaultBG = createRadio(bgColorComposite, "Default");
 		defaultBG.setEnabled(false);
 		customBG = createRadio(bgColorComposite);
@@ -254,17 +260,18 @@ public class HighlightStringsPreferencePage extends PreferencePageUtils implemen
 		customBGSelector.setEnabled(false);
 		customBGSelector.setColorValue(new RGB(0, 0, 0));
 		
-		regexButton = createCheckbox(optionsGroup, "Regular expression");
+		regexButton = createCheckbox(mainGroup, "Regular expression");
 		regexButton.setEnabled(false);
-		fillLineButton = createCheckbox(optionsGroup, "Highlight Entire Line");
+		fillLineButton = createCheckbox(mainGroup, "Highlight Entire Line");
 		fillLineButton.setEnabled(false);
-		caseSensitiveButton = createCheckbox(optionsGroup, "Case Sensitive");
+		caseSensitiveButton = createCheckbox(mainGroup, "Case Sensitive");
 		caseSensitiveButton.setEnabled(false);
-		fullWordMatchButton = createCheckbox(optionsGroup, "Match full word (word boundary)");
+		fullWordMatchButton = createCheckbox(mainGroup, "Match full word (word boundary)");
 		fullWordMatchButton.setEnabled(false);
 		
 		Group soundGroup = new Group(optionsGroup, SWT.NONE);
 		soundGroup.setLayout(new GridLayout(3, false));
+		soundGroup.setLayoutData(new GridData(GridData.FILL, GridData.FILL, true, false));
 		new Label(soundGroup, SWT.NONE).setText("Sound:");
 		soundText = new Text(soundGroup, SWT.BORDER | SWT.SINGLE);
 		soundText.setEnabled(false);
