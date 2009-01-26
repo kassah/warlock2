@@ -98,9 +98,7 @@ public class WSLEngine implements IScriptEngine, IScriptListener {
 	}
 	
 	public void scriptResumed(IScript script) { }
-	public void scriptRemoved(IScript script) { }
 	public void scriptPaused(IScript script) { }
-	public void scriptAdded(IScript script) { }
 	public void scriptStarted(IScript script) { }
 	
 	public void scriptStopped(IScript script, boolean userStopped) {
