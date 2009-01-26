@@ -73,7 +73,7 @@ public class CmdlistTagHandler extends DefaultTagHandler {
 	@Override
 	public boolean handleCharacters(String characters) {
 		System.out.print(characters);
-		buffer.append(StringEscapeUtils.escapeXml(characters));
+		buffer.append(characters);
 		return true;
 	}
 }

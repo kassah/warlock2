@@ -140,7 +140,7 @@ public class SettingsTagHandler extends DefaultTagHandler {
 	
 	@Override
 	public boolean handleCharacters(String characters) {
-		buffer.append(StringEscapeUtils.escapeXml(characters));
+		buffer.append(characters);
 		return true;
 	}
 	

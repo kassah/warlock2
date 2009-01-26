@@ -56,7 +56,7 @@ public class SettingsElementsTagHandler extends DefaultTagHandler {
 	
 	@Override
 	public boolean handleCharacters(String characters) {
-		settings.append(StringEscapeUtils.escapeXml(characters));
+		settings.append(characters);
 		return true;
 	}
 	
