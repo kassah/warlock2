@@ -21,6 +21,8 @@
  */
 package cc.warlock.core.stormfront.xml;
 
+import org.apache.commons.lang.StringEscapeUtils;
+
 public class StormFrontAttribute {
 
 	protected String name;
@@ -42,7 +44,7 @@ public class StormFrontAttribute {
 	}
 
 	public String getValue() {
-		return value;
+		return StringEscapeUtils.unescapeXml(value);
 	}
 
 	public void setValue(String value) {

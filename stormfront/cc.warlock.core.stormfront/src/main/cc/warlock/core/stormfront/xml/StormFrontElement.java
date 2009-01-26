@@ -157,13 +157,13 @@ public class StormFrontElement {
 	
 	public String getText ()
 	{
-		return text.toString();
+		return StringEscapeUtils.unescapeXml(text.toString());
 	}
 	
 	public String getTextTrim ()
 	{
         StringBuffer textContent = new StringBuffer();
-        StringTokenizer tokenizer = new StringTokenizer(text.toString());
+        StringTokenizer tokenizer = new StringTokenizer(getText());
 
         while (tokenizer.hasMoreTokens()) {
             String str = tokenizer.nextToken();
