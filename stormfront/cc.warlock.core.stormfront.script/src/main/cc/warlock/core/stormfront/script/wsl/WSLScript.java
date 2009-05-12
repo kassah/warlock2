@@ -64,7 +64,7 @@ public class WSLScript extends AbstractScript {
 	private int nextLine = 0;
 	private WSLAbstractCommand curCommand;
 	private String curLine;
-	private HashMap<String, IWSLValue> globalVariables = new HashMap<String, IWSLValue>();
+	private HashMap<String, IWSLValue> specialVariables = new HashMap<String, IWSLValue>();
 	private HashMap<String, IWSLValue> localVariables = new HashMap<String, IWSLValue>();
 	private Stack<WSLFrame> callstack = new Stack<WSLFrame>();
 	private HashMap<String, IWSLCommandDefinition> wslCommands = new HashMap<String, IWSLCommandDefinition>();
@@ -136,33 +136,39 @@ public class WSLScript extends AbstractScript {
 			}
 		}
 		
-		setVariable("mana", new WSLMana());
-		setVariable("health", new WSLHealth());
-		setVariable("fatigue", new WSLFatigue());
-		setVariable("spirit", new WSLSpirit());
-		setVariable("rt", new WSLRoundTime());
-		setVariable("monstercount", new WSLMonsterCount());
-		setVariable("lhand", new WSLLeftHand());
-		setVariable("rhand", new WSLRightHand());
-		setVariable("spell", new WSLSpell());
-		setVariable("roomdesc", new WSLComponent(IStormFrontClient.COMPONENT_ROOM_DESCRIPTION));
-		setVariable("roomexits", new WSLComponent(IStormFrontClient.COMPONENT_ROOM_EXITS));
-		setVariable("roomplayers", new WSLComponent(IStormFrontClient.COMPONENT_ROOM_PLAYERS));
-		setVariable("roomobjects", new WSLComponent(IStormFrontClient.COMPONENT_ROOM_OBJECTS));
-		setVariable("roomtitle", new WSLRoomTitle());
-		setVariable("lastcommand", new WSLLastCommand());
-		
-		for(IVariable var : client.getClientSettings().getAllVariables()) {
-			setVariable(var.getIdentifier(), new WSLString(var.getValue()));
-		}
+		setSpecialVariable("mana", new WSLMana());
+		setSpecialVariable("health", new WSLHealth());
+		setSpecialVariable("fatigue", new WSLFatigue());
+		setSpecialVariable("spirit", new WSLSpirit());
+		setSpecialVariable("rt", new WSLRoundTime());
+		setSpecialVariable("monstercount", new WSLMonsterCount());
+		setSpecialVariable("lhand", new WSLLeftHand());
+		setSpecialVariable("rhand", new WSLRightHand());
+		setSpecialVariable("spell", new WSLSpell());
+		setSpecialVariable("roomdesc", new WSLComponent(IStormFrontClient.COMPONENT_ROOM_DESCRIPTION));
+		setSpecialVariable("roomexits", new WSLComponent(IStormFrontClient.COMPONENT_ROOM_EXITS));
+		setSpecialVariable("roomplayers", new WSLComponent(IStormFrontClient.COMPONENT_ROOM_PLAYERS));
+		setSpecialVariable("roomobjects", new WSLComponent(IStormFrontClient.COMPONENT_ROOM_OBJECTS));
+		setSpecialVariable("roomtitle", new WSLRoomTitle());
+		setSpecialVariable("lastcommand", new WSLLastCommand());
 	}
 
 	public IWSLValue getVariable(String name) {
-		return globalVariables.get(name);
+		// these values are maintained by the script
+		IWSLValue val = specialVariables.get(name);
+		if (val != null)
+			return val;
+		
+		// return value from settings. All user global variables are stored here
+		IVariable var = sfClient.getClientSettings().getVariable(name);
+		if (var != null)
+			return new WSLString(var.getValue());
+		
+		return null;
 	}
 	
 	public boolean variableExists(String name) {
-		return globalVariables.containsKey(name);
+		return specialVariables.containsKey(name) || sfClient.getClientSettings().getVariable(name) != null;
 	}
 	
 	public boolean localVariableExists(String name) {
@@ -353,7 +359,7 @@ public class WSLScript extends AbstractScript {
 		StringBuffer totalArgs = new StringBuffer();
 		int i = 1;
 		for (String argument : arguments) {
-			setVariable(Integer.toString(i), argument);
+			setSpecialVariable(Integer.toString(i), argument);
 			if (i > 1)
 				totalArgs.append(" ");
 			totalArgs.append(argument);
@@ -361,15 +367,10 @@ public class WSLScript extends AbstractScript {
 		}
 		// populate the rest of the argument variable
 		for(; i <= 9; i++) {
-			setVariable(Integer.toString(i), "");
+			setSpecialVariable(Integer.toString(i), "");
 		}
 		// set 0 to the entire list
-		setVariable("0", totalArgs.toString());
-		
-		for (IVariable var : scriptCommands.getClient().getClientSettings().getAllVariables())
-		{
-			setVariable(var.getIdentifier(), var.getValue());
-		}
+		setSpecialVariable("0", totalArgs.toString());
 		
 		scriptThread = new Thread(new ScriptRunner());
 		scriptThread.setName("Wizard Script: " + getName());
@@ -464,7 +465,7 @@ public class WSLScript extends AbstractScript {
 	protected class WSLSave implements IWSLCommandDefinition {
 		
 		public void execute(String arguments) {
-			setVariable("s", arguments);
+			setSpecialVariable("s", arguments);
 		}
 	}
 
@@ -519,8 +520,8 @@ public class WSLScript extends AbstractScript {
 						setLocalVariable("0", allArgs.toString());
 						deleteLocalVariable(Integer.toString(i));
 					} else {
-						setVariable("0", allArgs.toString());
-						setVariable(Integer.toString(i), "");
+						setSpecialVariable("0", allArgs.toString());
+						setSpecialVariable(Integer.toString(i), "");
 					}
 					break;
 				}
@@ -535,7 +536,7 @@ public class WSLScript extends AbstractScript {
 					if (local) {
 						setLocalVariable(Integer.toString(i), arg);
 					} else {
-						setVariable(Integer.toString(i), arg);
+						setSpecialVariable(Integer.toString(i), arg);
 					}
 				}
 			}
@@ -547,7 +548,6 @@ public class WSLScript extends AbstractScript {
 		public void execute (String arguments) {
 			String name = arguments.split(argSeparator)[0];
 			deleteVariable(name);
-			((ClientSettings)sfClient.getClientSettings()).getVariableConfigurationProvider().removeVariable(name);
 		}
 	}
 	
@@ -559,16 +559,27 @@ public class WSLScript extends AbstractScript {
 		}
 	}
 
-	private void setVariable(String name, String value) {
-		setVariable(name, new WSLString(value));
+	private void setGlobalVariable(String name, IWSLValue value) {
+		setGlobalVariable(name, value.toString());
 	}
 	
-	private void setVariable(String name, IWSLValue value) {
-		globalVariables.put(name, value);
+	private void setGlobalVariable(String name, String value) {
+		if(specialVariables.containsValue(name))
+			scriptError("Cannot overwrite special variable \"" + name + "\"");
+		((ClientSettings)sfClient.getClientSettings()).getVariableConfigurationProvider().addVariable(name, value);
+	}
+	
+	private void setSpecialVariable(String name, String value) {
+		setSpecialVariable(name, new WSLString(value));
+	}
+	
+	private void setSpecialVariable(String name, IWSLValue value) {
+		deleteVariable(name);
+		specialVariables.put(name, value);
 	}
 	
 	private void deleteVariable(String name) {
-		globalVariables.remove(name);
+		((ClientSettings)sfClient.getClientSettings()).getVariableConfigurationProvider().removeVariable(name);
 	}
 	
 	private void deleteLocalVariable(String name) {
@@ -597,8 +608,7 @@ public class WSLScript extends AbstractScript {
 					value = " ";
 				
 				scriptDebug(1, "setVariable: " + name + "=" + value);
-				setVariable(name, value);
-				((ClientSettings)sfClient.getClientSettings()).getVariableConfigurationProvider().addVariable(name, value);
+				setGlobalVariable(name, value);
 			} else {
 				scriptWarning("Invalid arguments to setvariable");
 			}
@@ -902,7 +912,7 @@ public class WSLScript extends AbstractScript {
 
 		if ("set".equalsIgnoreCase(operator))
 		{
-			setVariable(targetVar, new WSLNumber(operand));
+			setGlobalVariable(targetVar, new WSLNumber(operand));
 			return;
 		}
 		
@@ -921,17 +931,17 @@ public class WSLScript extends AbstractScript {
 		if ("add".equalsIgnoreCase(operator))
 		{	
 			double newValue = value + operand;
-			setVariable(targetVar, new WSLNumber(newValue));
+			setGlobalVariable(targetVar, new WSLNumber(newValue));
 		}
 		else if ("subtract".equalsIgnoreCase(operator))
 		{
 			double newValue = value - operand;
-			setVariable(targetVar, new WSLNumber(newValue));
+			setGlobalVariable(targetVar, new WSLNumber(newValue));
 		}
 		else if ("multiply".equalsIgnoreCase(operator))
 		{
 			double newValue = value * operand;
-			setVariable(targetVar, new WSLNumber(newValue));
+			setGlobalVariable(targetVar, new WSLNumber(newValue));
 		}
 		else if ("divide".equalsIgnoreCase(operator))
 		{
@@ -940,12 +950,12 @@ public class WSLScript extends AbstractScript {
 				return;
 			}
 			double newValue = value / operand;
-			setVariable(targetVar, new WSLNumber(newValue));
+			setGlobalVariable(targetVar, new WSLNumber(newValue));
 		}
 		else if ("modulus".equalsIgnoreCase(operator))
 		{
 			double newValue = value % operand;
-			setVariable(targetVar, new WSLNumber(newValue));
+			setGlobalVariable(targetVar, new WSLNumber(newValue));
 		}
 		else
 		{
@@ -1118,7 +1128,7 @@ public class WSLScript extends AbstractScript {
 				int max = Integer.parseInt(m.group(2));
 				int r = min + new Random().nextInt(max - min + 1);
 				
-				setVariable("r", Integer.toString(r));
+				setSpecialVariable("r", Integer.toString(r));
 			} else {
 				scriptError("Invalid arguments to random");
 			}
@@ -1143,7 +1153,7 @@ public class WSLScript extends AbstractScript {
 					if(command.equals("start")) {
 						if(timer == null) {
 							timer = new ScriptTimer();
-							setVariable(timerName, timer);
+							setSpecialVariable(timerName, timer);
 						}
 						timer.start();
 					} else if(command.equals("stop")) {
