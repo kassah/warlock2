@@ -284,8 +284,10 @@ public class ClientSettings extends TreeConfigurationProvider implements IClient
 	}
 	
 	public IVariable getVariable(String identifier) {
-		for (IVariable var : getAllVariables()) {
-			if (var.getIdentifier().equals(identifier)) return var;
+		for (IVariableProvider provider : getAllProviders(IVariableProvider.class)) {
+			IVariable var = provider.getVariable(identifier);
+			if (var != null)
+				return var;
 		}
 		return null;
 	}
