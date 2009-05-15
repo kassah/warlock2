@@ -24,21 +24,20 @@ package cc.warlock.core.stormfront.internal;
 import cc.warlock.core.stormfront.IStormFrontProtocolHandler;
 
 
-public class PushBoldTagHandler extends DefaultTagHandler {
-	
-	public PushBoldTagHandler (IStormFrontProtocolHandler handler)
+public class PopBoldTagHandler extends DefaultTagHandler {
+	public PopBoldTagHandler (IStormFrontProtocolHandler handler)
 	{
 		super(handler);
 	}
 	
 	@Override
 	public String[] getTagNames() {
-		return new String[] { "pushBold" };
+		return new String[] { "popBold" };
 	}
 	
 	@Override
 	public void handleEnd(String rawXML) {
-		handler.startBold();
+		handler.stopBold();
 	}
 	
 	@Override

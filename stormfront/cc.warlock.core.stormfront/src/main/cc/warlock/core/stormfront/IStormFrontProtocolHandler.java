@@ -56,6 +56,8 @@ public interface IStormFrontProtocolHandler extends IStormFrontXMLHandler {
 	public void clearStyles();
 	public void clearStreams();
 	public Map<IWarlockStyle, Boolean> getStyles();
+	public void startBold();
+	public void stopBold();
 	
 	public void resetMonsterCount();
 	public void incrementMonsterCount();

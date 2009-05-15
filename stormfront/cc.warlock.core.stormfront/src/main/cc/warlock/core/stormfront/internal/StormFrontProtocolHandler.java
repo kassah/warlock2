@@ -57,6 +57,7 @@ public class StormFrontProtocolHandler implements IStormFrontProtocolHandler {
 	protected HashMap<IWarlockStyle, Boolean> styles = new HashMap<IWarlockStyle, Boolean>();
 	protected int currentSpacing = 0;
 	protected int monsterCount = 0;
+	protected IWarlockStyle boldStyle = null;
 	
  	public StormFrontProtocolHandler(IStormFrontClient client) {
 		
@@ -98,6 +99,7 @@ public class StormFrontProtocolHandler implements IStormFrontProtocolHandler {
 		new OutputTagHandler(this);
 		
 		new PushBoldTagHandler(this);
+		new PopBoldTagHandler(this);
 		new PresetTagHandler(this);
 		new IndicatorTagHandler(this);
 		new LaunchURLTagHandler(this);
@@ -307,8 +309,10 @@ public class StormFrontProtocolHandler implements IStormFrontProtocolHandler {
 	}
 	
 	public void removeStyle(IWarlockStyle style) {
-		Boolean sent = styles.remove(style);
-		if(sent != null && !sent.booleanValue()) {
+		Boolean wasSent = styles.remove(style);
+		
+		// If the style was never output, put it in the string anyway
+		if(wasSent != null && !wasSent.booleanValue()) {
 			WarlockString str = new WarlockString();
 			str.addStyle(style);
 
@@ -325,11 +329,26 @@ public class StormFrontProtocolHandler implements IStormFrontProtocolHandler {
 	}
 	
 	public void clearStyles() {
+		boldStyle = null;
 		styles.clear();
 	}
 	
 	public Map<IWarlockStyle, Boolean> getStyles() {
 		return styles;
+	}
+	
+	public void startBold() {
+		if (boldStyle == null) {
+			boldStyle = this.getClient().getClientSettings().getNamedStyle("bold");
+			this.addStyle(boldStyle);
+		}
+	}
+	
+	public void stopBold() {
+		if (boldStyle != null) {
+			this.removeStyle(boldStyle);
+			boldStyle = null;
+		}
 	}
 	
 	public IStormFrontTagHandler getTagHandler(Class<? extends IStormFrontTagHandler> handlerType) {
