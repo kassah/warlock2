@@ -307,8 +307,7 @@ public class StormFrontProtocolHandler implements IStormFrontProtocolHandler {
 	}
 	
 	public void removeStyle(IWarlockStyle style) {
-		Boolean sent = styles.get(style);
-		styles.remove(style);
+		Boolean sent = styles.remove(style);
 		if(sent != null && !sent.booleanValue()) {
 			WarlockString str = new WarlockString();
 			str.addStyle(style);
