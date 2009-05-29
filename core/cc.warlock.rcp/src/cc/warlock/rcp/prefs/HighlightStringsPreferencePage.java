@@ -506,14 +506,11 @@ public class HighlightStringsPreferencePage extends PreferencePageUtils implemen
 		}
 		
 		// Mark string removed in our changelog to commit to prefs
-		if (addedStrings.contains(string)) {
-			addedStrings.remove(string);
-		}
-		else {
+		// If it was added since the last commit, just remove it from the changelog
+		if (!addedStrings.remove(string))
 			removedStrings.add(string);
-		}
 		
-		// Actually remove string from our active table and list.
+		// Remove string from our display list and notify the table
 		highlightStrings.remove(string);
 		stringTable.remove(string);
 	}
