@@ -66,17 +66,8 @@ public class VariableConfigurationProvider extends ClientConfigurationProvider i
 		return variables.values();
 	}
 
-	public void removeVariable(IVariable variable) {
-		if (variables.containsKey(variable.getIdentifier()))
-		{
-			variables.remove(variable.getIdentifier());
-		}
-	}
-	
 	public void removeVariable(String identifier) {
-		if (variables.containsKey(identifier)) {
-			variables.remove(identifier);
-		}
+		variables.remove(identifier);
 	}
 	
 	@Override

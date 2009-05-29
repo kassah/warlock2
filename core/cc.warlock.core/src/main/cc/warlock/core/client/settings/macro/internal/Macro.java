@@ -102,9 +102,8 @@ public class Macro extends ClientSetting implements IMacro
 	}
 	
 	public void removeHandler(IMacroHandler handler) {
-		if (this.handlers.contains(handler)) {
+		if (this.handlers.remove(handler)) {
 			needsUpdate = true;
-			this.handlers.remove(handler);
 		}
 	}
 	

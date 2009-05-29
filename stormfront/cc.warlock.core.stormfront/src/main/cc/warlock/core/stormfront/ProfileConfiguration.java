@@ -122,10 +122,7 @@ public class ProfileConfiguration implements IConfigurationProvider {
 	
 	public void removeAccount (Account account)
 	{
-		if (accounts.containsKey(account.getAccountName()))
-		{
-			accounts.remove(account.getAccountName());
-		}
+		accounts.remove(account.getAccountName());
 	}
 
 	public Account getAccount (String accountName)

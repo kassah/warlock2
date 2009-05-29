@@ -349,8 +349,7 @@ public class StormFrontClient extends WarlockClient implements IStormFrontClient
 	
 	public void removeScriptListener (IScriptListener listener)
 	{
-		if (scriptListeners.contains(listener))
-			scriptListeners.remove(listener);
+		scriptListeners.remove(listener);
 	}
 	
 	public IWarlockSkin getSkin() {

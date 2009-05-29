@@ -119,8 +119,7 @@ public abstract class WarlockClient implements IWarlockClient {
 	}
 	
 	public void removeViewer(IWarlockClientViewer viewer) {
-		if (viewers.contains(viewer))
-			viewers.remove(viewer);
+		viewers.remove(viewer);
 	}
 	
 	public IStream getDefaultStream() {

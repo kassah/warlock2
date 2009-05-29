@@ -608,11 +608,9 @@ public class HighlightStringsPreferencePage extends PreferencePageUtils implemen
 		for (HighlightString string : highlightStrings) {
 			WarlockStyle style = (WarlockStyle) string.getStyle();
 			
-			if (addedStrings.contains(string)) {
+			if (addedStrings.remove(string)) {
 				highlightConfig.addHighlightString(string);
-				addedStrings.remove(string);
-			}
-			else if (string.needsUpdate() || (style != null && style.needsUpdate())) {
+			} else if (string.needsUpdate() || (style != null && style.needsUpdate())) {
 				highlightConfig.replaceHighlightString(string.getOriginalHighlightString(), string);
 			}
 		}

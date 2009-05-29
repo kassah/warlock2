@@ -175,7 +175,6 @@ public class CommandHistory implements ICommandHistory {
 	}
 	
 	public void removeCommandHistoryListener(ICommandHistoryListener listener) {
-		if (listeners.contains(listener))
-			listeners.remove(listener);
+		listeners.remove(listener);
 	}
 }

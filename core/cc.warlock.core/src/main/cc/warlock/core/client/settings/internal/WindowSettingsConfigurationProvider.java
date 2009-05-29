@@ -58,9 +58,7 @@ public class WindowSettingsConfigurationProvider extends ClientConfigurationProv
 	}
 
 	public void removeWindowSettings(IWindowSettings settings) {
-		if (windowSettings.contains(settings)) {
-			windowSettings.remove(settings);
-		}
+		windowSettings.remove(settings);
 	}
 
 	@Override

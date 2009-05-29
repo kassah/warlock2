@@ -67,8 +67,7 @@ public class Stream implements IStream {
 	}
 	
 	public synchronized void removeStreamListener(IStreamListener listener) {
-		if (listeners.contains(listener))
-			listeners.remove(listener);
+		listeners.remove(listener);
 	}
 
 	public synchronized void clear() {

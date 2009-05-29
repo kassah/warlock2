@@ -98,8 +98,7 @@ public abstract class GameView extends StreamView implements IWarlockClientViewe
 	
 	public static void removeGameViewFocusListener (IGameViewFocusListener listener)
 	{
-		if (focusListeners.contains(listener))
-			focusListeners.remove(listener);
+		focusListeners.remove(listener);
 	}
 	
 	public static List<GameView> getOpenGameViews ()

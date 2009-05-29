@@ -123,8 +123,7 @@ public class FilesystemScriptProvider implements IFilesystemScriptProvider, Runn
 		Set<File> scriptDirs =
 			ScriptConfiguration.instance().getScriptDirectories();
 		
-		if (scriptDirs.contains(directory))
-			scriptDirs.remove(directory);
+		scriptDirs.remove(directory);
 	}
 	
 	public List<IScriptInfo> getScriptInfos() {
@@ -186,9 +185,7 @@ public class FilesystemScriptProvider implements IFilesystemScriptProvider, Runn
 			ScriptFileInfo info = iter.next();
 			
 			if (!info.scriptFile.exists())
-			{
 				iter.remove();
-			}
 		}
 	}
 	

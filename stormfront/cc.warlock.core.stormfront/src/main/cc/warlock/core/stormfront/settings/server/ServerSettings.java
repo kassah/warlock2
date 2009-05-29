@@ -140,8 +140,7 @@ public class ServerSettings implements Comparable<ServerSettings>
 	
 	public void removeServerSettingsListener (IServerSettingsListener listener)
 	{
-		if (listeners.contains(listener))
-			listeners.remove(listener);
+		listeners.remove(listener);
 	}
 	
 	public void load (String playerId, InputStream stream)

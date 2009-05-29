@@ -133,11 +133,8 @@ public class StormFrontElement {
 	
 	public void removeElement (StormFrontElement element)
 	{
-		if (elements.contains(element))
-		{
-			elements.remove(element);
+		if (elements.remove(element))
 			element.setParent(null);
-		}
 	}
 	
 	public void setParent (StormFrontElement parent)

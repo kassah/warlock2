@@ -160,7 +160,6 @@ public class ClientSettings extends TreeConfigurationProvider implements IClient
 		return settingProviders;
 	}
 	
-	@SuppressWarnings("unchecked")
 	public <T extends IClientSettingProvider> List<T> getAllProviders(Class<T> providerClass) {
 		ArrayList<T> list = new ArrayList<T>();
 		for (IClientSettingProvider provider : settingProviders) {
@@ -178,9 +177,7 @@ public class ClientSettings extends TreeConfigurationProvider implements IClient
 	}
 
 	public void removeClientSettingProvider(IClientSettingProvider provider) {
-		if (settingProviders.contains(provider)) {
-			settingProviders.remove(provider);
-		}
+		settingProviders.remove(provider);
 	}
 	
 	public List<? extends IHighlightString> getAllHighlightStrings() {

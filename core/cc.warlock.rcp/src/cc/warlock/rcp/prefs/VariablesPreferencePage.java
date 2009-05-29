@@ -223,15 +223,11 @@ public class VariablesPreferencePage extends PreferencePageUtils {
 	
 	protected void removeVariableSelected ()
 	{
-		if (addedVariables.contains(currentVariable))
-		{
-			addedVariables.remove(currentVariable);
-		}
-		else if (variables.contains(currentVariable))
-		{
+		addedVariables.remove(currentVariable);
+		
+		if (variables.remove(currentVariable))
 			removedVariables.add(currentVariable);
-		}
-		variables.remove(currentVariable);
+		
 		variableTable.remove(currentVariable);
 	}
 	
@@ -289,14 +285,14 @@ public class VariablesPreferencePage extends PreferencePageUtils {
 		for (Variable var : variables) {
 			if (var.needsUpdate() && !addedVariables.contains(var)) {
 				IVariableProvider provider = (IVariableProvider) var.getProvider();
-				provider.removeVariable(var.getOriginalVariable());
+				provider.removeVariable(var.getOriginalVariable().getIdentifier());
 				provider.setVariable(var.getIdentifier(), var);
 			}
 		}
 		
 		for (Variable var : removedVariables) {
 			IVariableProvider provider = (IVariableProvider) var.getProvider();
-			provider.removeVariable(var);
+			provider.removeVariable(var.getIdentifier());
 		}
 		
 		for (Variable var : addedVariables) {

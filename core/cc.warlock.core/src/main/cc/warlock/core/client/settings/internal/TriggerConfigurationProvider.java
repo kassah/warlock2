@@ -80,9 +80,7 @@ public class TriggerConfigurationProvider extends PatternConfigurationProvider
 	}
 
 	public void removeTrigger(ITrigger trigger) {
-		if (triggers.contains(trigger)) {
-			triggers.remove(trigger);
-		}
+		triggers.remove(trigger);
 	}
 
 }

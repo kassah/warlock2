@@ -123,19 +123,14 @@ public class WarlockConfiguration {
 	
 	public void removeConfigurationProvider (IConfigurationProvider provider)
 	{
-		if (providers.contains(provider))
-		{
-			providers.remove(provider);
-			
+		if (providers.remove(provider)) {
 			if (elementProviders.containsValue(provider)) {
-				for (Iterator<Map.Entry<Element,IConfigurationProvider>> iter = elementProviders.entrySet().iterator(); iter.hasNext(); )
-				{
+				for (Iterator<Map.Entry<Element,IConfigurationProvider>> iter = elementProviders.entrySet().iterator();
+							iter.hasNext(); ) {
 					Map.Entry<Element, IConfigurationProvider> entry = iter.next();
 					
 					if (entry.getValue().equals(provider))
-					{
 						iter.remove();
-					}
 				}
 			}
 		}

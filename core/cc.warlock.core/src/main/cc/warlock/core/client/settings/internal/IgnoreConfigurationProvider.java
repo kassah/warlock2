@@ -78,9 +78,7 @@ public class IgnoreConfigurationProvider extends PatternConfigurationProvider
 	}
 
 	public void removeIgnore(IIgnore ignore) {
-		if (ignores.contains(ignore)) {
-			ignores.remove(ignore);
-		}
+		ignores.remove(ignore);
 	}
 
 }

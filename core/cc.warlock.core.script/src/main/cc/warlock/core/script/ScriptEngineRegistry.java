@@ -45,8 +45,7 @@ public class ScriptEngineRegistry {
 	
 	public static void removeScriptProvider (IScriptProvider provider)
 	{
-		if (providers.contains(provider))
-			providers.remove(provider);
+		providers.remove(provider);
 	}
 	
 	public static void addScriptEngine (IScriptEngine engine)

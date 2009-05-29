@@ -90,8 +90,7 @@ public abstract class AbstractScript implements IScript {
 	}
 	
 	public void removeScriptListener(IScriptListener listener) {
-		if (listeners.contains(listener))
-			listeners.remove(listener);
+		listeners.remove(listener);
 	}
 	
 	public String getName() {

@@ -146,9 +146,7 @@ public class MacroRegistry implements IMacroProvider {
 	}
 	
 	public void removeMacro(IMacro macro) {
-		if (macros.contains(macro)) {
-			macros.remove(macro);
-		}
+		macros.remove(macro);
 	}
 	
 	public void replaceMacro(IMacro originalMacro, IMacro newMacro) {
@@ -184,9 +182,7 @@ public class MacroRegistry implements IMacroProvider {
 	}
 	
 	public void removeMacroVariable(IMacroVariable variable) {
-		if (variables.containsKey(variable.getIdentifier())) {
-			variables.remove(variable.getIdentifier());
-		}
+		variables.remove(variable.getIdentifier());
 	}
 	
 	public void addMacroCommand(IMacroCommand command) {
@@ -198,9 +194,7 @@ public class MacroRegistry implements IMacroProvider {
 	}
 	
 	public void removeMacroCommand(IMacroCommand command) {
-		if (commands.containsKey(command.getIdentifier())) {
-			commands.remove(command.getIdentifier());
-		}
+		commands.remove(command.getIdentifier());
 	}
 	
 	public List<? extends IClientSetting> getSettings() {

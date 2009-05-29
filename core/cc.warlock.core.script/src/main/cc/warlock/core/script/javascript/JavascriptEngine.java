@@ -124,8 +124,7 @@ public class JavascriptEngine implements IScriptEngine {
 	
 	public void removeVariableProvider (IJavascriptVariableProvider provider)
 	{
-		if (varProviders.contains(provider))
-			varProviders.remove(provider);
+		varProviders.remove(provider);
 	}
 	
 	public boolean supports(IScriptInfo scriptInfo) {

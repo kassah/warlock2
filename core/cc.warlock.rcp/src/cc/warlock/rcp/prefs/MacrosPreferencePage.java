@@ -297,13 +297,11 @@ public class MacrosPreferencePage extends PreferencePageUtils implements
 
 	protected void removeMacroSelected ()
 	{
-		if (addedMacros.contains(selectedMacro)) {
-			addedMacros.remove(selectedMacro);
-		}
-		else if (macros.contains(selectedMacro)) {
+		addedMacros.remove(selectedMacro);
+		
+		if (macros.remove(selectedMacro)) {
 			removedMacros.add(selectedMacro);
 		}
-		macros.remove(selectedMacro);
 		
 		macroTable.remove(selectedMacro);
 	}

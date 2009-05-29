@@ -175,9 +175,7 @@ public class HighlightConfigurationProvider extends PatternConfigurationProvider
 	
 	public void removeNamedStyle (String name)
 	{
-		if (namedStyles.containsKey(name)) {
-			namedStyles.remove(name);
-		}
+		namedStyles.remove(name);
 	}
 	
 	public void addHighlightString (IHighlightString string)
@@ -191,8 +189,7 @@ public class HighlightConfigurationProvider extends PatternConfigurationProvider
 	
 	public void removeHighlightString (IHighlightString string)
 	{
-		if (highlights.contains(string))
-			highlights.remove(string);
+		highlights.remove(string);
 	}
 	
 	public void replaceHighlightString(IHighlightString originalString,
