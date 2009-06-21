@@ -53,6 +53,7 @@ public class StormFrontScriptCommands extends ScriptCommands implements IStormFr
 		
 		client.getDeathsStream().addStreamListener(this);
 		client.getFamiliarStream().addStreamListener(this);
+		client.getAssessStream().addStreamListener(this);
 	}
 	
 	public StormFrontScriptCommands(IStormFrontClient client, IScript script)
@@ -183,5 +184,6 @@ public class StormFrontScriptCommands extends ScriptCommands implements IStormFr
 		clearActions();
 		sfClient.getDeathsStream().removeStreamListener(this);
 		sfClient.getFamiliarStream().removeStreamListener(this);
+		sfClient.getAssessStream().removeStreamListener(this);
 	}
 }

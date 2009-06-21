@@ -52,6 +52,7 @@ public class ServerSettings implements Comparable<ServerSettings>
 	public static final String WINDOW_SPELLS = "sSpells";
 	public static final String WINDOW_DEATHS = "sdeath";
 	public static final String WINDOW_THOUGHTS = "sthoughts";
+	public static final String WINDOW_ASSESS = "sassess";
 	public static final String WINDOW_ROOM = "sroom";
 	public static final String WINDOW_NEWS = "snews";
 	public static final String WINDOW_CHAR_SHEET = "scharsheet";
@@ -748,6 +749,11 @@ public class ServerSettings implements Comparable<ServerSettings>
 	public WindowSettings getThoughtsWindowSettings ()
 	{
 		return getWindowSettings(WINDOW_THOUGHTS);
+	}
+	
+	public WindowSettings getAssessWindowSettings ()
+	{
+		return getWindowSettings(WINDOW_ASSESS);
 	}
 	
 	public WindowSettings getDeathsWindowSettings ()

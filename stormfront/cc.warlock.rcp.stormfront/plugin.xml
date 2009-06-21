@@ -29,6 +29,12 @@
             name="Inventory">
       </view>
       <view
+            allowMultiple="false"
+            class="cc.warlock.rcp.views.StreamView"
+            id="cc.warlock.rcp.views.stream.rightStream.assess"
+            name="Assess">
+      </view>
+      <view
             class="cc.warlock.rcp.views.StreamView"
             id="cc.warlock.rcp.views.stream.topStream.thoughts"
             name="Thoughts">

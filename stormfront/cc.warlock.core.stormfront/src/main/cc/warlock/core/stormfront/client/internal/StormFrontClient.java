@@ -390,6 +390,10 @@ public class StormFrontClient extends WarlockClient implements IStormFrontClient
 		return getStream(FAMILIAR_STREAM_NAME);
 	}
 	
+	public IStream getAssessStream() {
+		return getStream(ASSESS_STREAM_NAME);
+	}
+	
 	public void setComponent (String name, String value, IStream stream)
 	{
 		if (!components.containsKey(name)) {
