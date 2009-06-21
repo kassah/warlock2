@@ -41,6 +41,7 @@ public class StormFrontClientSettings extends ClientSettings implements
 	public static final String WINDOW_DEATHS = "deaths";
 	public static final String WINDOW_THOUGHTS = "thoughts";
 	public static final String WINDOW_ASSESS = "assess";
+	public static final String WINDOW_LOGONS = "logons";
 	public static final String WINDOW_ROOM = "room";
 	public static final String WINDOW_NEWS = "news";
 	public static final String WINDOW_CHAR_SHEET = "character-sheet";

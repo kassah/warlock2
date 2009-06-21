@@ -292,6 +292,8 @@ public class StormFrontServerSettings extends ClientConfigurationProvider {
 			return StormFrontClientSettings.WINDOW_THOUGHTS;
 		} else if (original.equals(ServerSettings.WINDOW_ASSESS)) {
 			return StormFrontClientSettings.WINDOW_ASSESS;
+		} else if (original.equals(ServerSettings.WINDOW_LOGONS)) {
+			return StormFrontClientSettings.WINDOW_LOGONS;
 		} else if (original.equals(ServerSettings.WINDOW_ROOM)) {
 			return StormFrontClientSettings.WINDOW_ROOM;
 		} else if (original.equals(ServerSettings.WINDOW_CHAR_SHEET)) {

@@ -102,6 +102,7 @@ public class StreamWindowContributionItem extends CompoundContributionItem {
 		items.add(streamContribution("Current Room", IStormFrontClient.ROOM_STREAM_NAME, StreamView.RIGHT_STREAM_PREFIX));
 		items.add(streamContribution("Familiar", IStormFrontClient.FAMILIAR_STREAM_NAME, StreamView.RIGHT_STREAM_PREFIX));
 		items.add(streamContribution("Assess", IStormFrontClient.ASSESS_STREAM_NAME, StreamView.RIGHT_STREAM_PREFIX));
+		items.add(streamContribution("Arrivals & Departures", IStormFrontClient.LOGONS_STREAM_NAME, StreamView.RIGHT_STREAM_PREFIX));
 		items.add(streamContribution("My Bag", IStormFrontClient.STOW_STREAM_NAME, StreamView.RIGHT_STREAM_PREFIX));
 		items.add(new ActionContributionItem(new DebugAction()));
 		//items.add(new ActionContributionItem(new ScriptManagerAction()));
