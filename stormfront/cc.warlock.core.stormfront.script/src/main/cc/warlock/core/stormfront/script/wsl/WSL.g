@@ -190,6 +190,7 @@ relationalOp returns [RelationalOperator op]
 	| GTE		{ op = RelationalOperator.GreaterThanEqualTo; }
 	| LTE		{ op = RelationalOperator.LessThanEqualTo; }
 	| CONTAINS	{ op = RelationalOperator.Contains; }
+	| CONTAINSRE { op = RelationalOperator.ContainsRe; }
 	;
 
 unaryExpression returns [IWSLValue cond]
@@ -285,7 +286,7 @@ quoted_string_value returns [IWSLValue value]
 common_string returns [String value]
 	: (str=STRING | str=IF | str=THEN | str=OR | str=AND | str=NOTEQUAL
 		| str=NOT | str=EQUAL | str=GTE | str=LTE | str=GT | str=LT  | str=AMP
-		| str=VERT | str=EXISTS | str=CONTAINS | str=ACTION | str=TRUE
+		| str=VERT | str=EXISTS | str=CONTAINS | str=CONTAINSRE | str=ACTION | str=TRUE
 		| str=FALSE | { actionDepth == 0 }? str=WHEN | str=REMOVE | str=CLEAR
 		| str=INSTANT | str=BACKSLASH)
 		{ value = $str.text; }
@@ -408,6 +409,9 @@ EXISTS
 	;
 CONTAINS
 	: ('contains' | 'indexof') { atStart = false; }
+	;
+CONTAINSRE
+	: 'containsre' { atStart = false; }
 	;
 ACTION
 	: 'action' { atStart = false; }
