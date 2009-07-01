@@ -52,6 +52,7 @@ public interface IStormFrontClient extends IWarlockClient, IRoomListener {
 	public static final String FAMILIAR_STREAM_NAME = "familiar";
 	public static final String STOW_STREAM_NAME = "stowContainer";
 	public static final String ASSESS_STREAM_NAME = "assess";
+	public static final String EXPERIENCE_STREAM_NAME = "experience";
 	public static final String LOGONS_STREAM_NAME = "logons";
 	
 	public static final String COMPONENT_ROOM_PLAYERS = "room players";
@@ -191,6 +192,12 @@ public interface IStormFrontClient extends IWarlockClient, IRoomListener {
 	 * @return The stream for combat assess
 	 */
 	public IStream getAssessStream();
+	
+	/**
+	 * @return The stream for experience
+	 */
+	public IStream getExperienceStream();
+	
 	
 	/**
 	 * @return The stream for Arrivals and Departures
