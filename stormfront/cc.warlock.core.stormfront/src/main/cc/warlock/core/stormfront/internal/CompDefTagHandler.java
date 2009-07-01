@@ -99,10 +99,5 @@ public class CompDefTagHandler extends DefaultTagHandler {
 		if(client instanceof StormFrontClient)
 			((StormFrontClient)client).setComponent(id, buffer.toString(), handler.getCurrentStream());
 	}
-	
-	@Override
-	public boolean ignoreNewlines() {
-		return false;
-	}
 }
 
