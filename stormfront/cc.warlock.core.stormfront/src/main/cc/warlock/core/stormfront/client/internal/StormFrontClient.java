@@ -414,8 +414,18 @@ public class StormFrontClient extends WarlockClient implements IStormFrontClient
 	}
 	
 	public void updateComponent(String name, WarlockString value) {
-		components.get(name).set(value.toString());
-		componentStreams.get(name).updateComponent(name, value);
+		ClientProperty<String> component = components.get(name);
+		if(component != null) {
+			component.set(value.toString());
+		} else {
+			component = new ClientProperty<String>(this, name, value.toString());
+			components.put(name, component);
+		}
+		
+		IStream stream = componentStreams.get(name);
+		if(stream != null)
+			stream.updateComponent(name, value);
+		// FIXME: else should we create the stream? -Sean
 	}
 	
 	public IProperty<String> getComponent(String componentName) {
