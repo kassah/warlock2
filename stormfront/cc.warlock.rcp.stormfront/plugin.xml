@@ -88,12 +88,22 @@
             id="cc.warlock.rcp.stormfront.importStormfrontSettingsCommand"
             name="Import Stormfront Settings">
       </command>
+      <command
+            defaultHandler="cc.warlock.rcp.stormfront.ui.menu.TestConnectonHandler"
+            description="Opens Test Connection to Warlock&apos;s Test Server"
+            id="cc.warlock.rcp.stormfront.sfTestConnection"
+            name="Test Connection">
+      </command>
    </extension>
    <extension
          point="org.eclipse.ui.commandImages">
       <image
             commandId="cc.warlock.rcp.stormfront.sgeConnectCommand"
             icon="images/game.gif">
+      </image>
+      <image
+            commandId="cc.warlock.rcp.stormfront.sfTestConnection"
+            icon="images/character.gif">
       </image>
    </extension>
    <extension
@@ -174,6 +184,11 @@
             classname="cc.warlock.rcp.stormfront.ui.menu.ProfileConnectContributionItem"
             groupName="Simutronics Characters">
       </dynamic>
+      <connectionCommand
+            commandId="cc.warlock.rcp.stormfront.sfTestConnection"
+            groupName="Simutronics Characters"
+            weight="1000">
+      </connectionCommand>
    </extension>
    <extension
          point="org.eclipse.ui.perspectives">
