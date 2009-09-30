@@ -32,14 +32,13 @@ public class WarlockWorkbenchAdvisor extends WorkbenchAdvisor {
 		configurer.setSaveAndRestore(true);
 		if (WarlockUpdates.autoUpdate())
 		{
-			TimerTask updateTask = new TimerTask() {
+			Thread updateTask = new Thread() {
 				public void run ()
 				{
 					WarlockUpdates.checkForUpdates(new NullProgressMonitor());
 				}
 			};
-			// check semi-immediately, then once per hour
-			timer.schedule(updateTask, 5000, 1000 * 60 * 60);
+			updateTask.start();
 		}
 	}
 	
