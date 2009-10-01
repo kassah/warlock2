@@ -280,7 +280,7 @@ public class StreamView extends ViewPart implements IStreamListener, IGameViewFo
 	public synchronized void streamCleared(IStream stream) {
 		if (streams.contains(stream))
 		{
-			clientStreams.get(stream.getClient()).setText("");
+			clientStreams.get(stream.getClient()).clearText();
 		}
 	}
 	

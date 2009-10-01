@@ -350,8 +350,17 @@ public class WarlockText implements LineBackgroundListener {
 		textWidget.setForeground(color);
 	}
 	
-	public void setText(String text) {
+	/*
+	 * This is protected since setting the text directly actually
+	 * causes some major problems with the markers and stuff
+	 */
+	protected void setText(String text) {
 		textWidget.setText(text);
+	}
+	
+	public void clearText() {
+		setText("");
+		clearMarkers();
 	}
 	
 	public Font getFont() {
@@ -597,6 +606,13 @@ public class WarlockText implements LineBackgroundListener {
 		if(markers == null)
 			markers = new HashMap<String, WarlockTextMarker>();
 		markers.put(name, new WarlockTextMarker(offset, length));
+	}
+	
+	public void clearMarkers() {
+		if(markers == null)
+			markers = new HashMap<String, WarlockTextMarker>();
+		else
+			markers.clear();
 	}
 	
 	public void replaceMarker(String name, WarlockString text) {
