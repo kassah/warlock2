@@ -76,6 +76,7 @@ public class StormFrontProtocolHandler implements IStormFrontProtocolHandler {
 		new DialogDataTagHandler(this);
 		new PromptTagHandler(this);
 		new RoundtimeTagHandler(this);
+		new CasttimeTagHandler(this);
 		new CompDefTagHandler(this); // for the room stream
 		new NavTagHandler(this); // for nextRoom notification
 		new CompassTagHandler(this);

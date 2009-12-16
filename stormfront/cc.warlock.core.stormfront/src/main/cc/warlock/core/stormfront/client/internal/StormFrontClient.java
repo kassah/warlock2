@@ -71,7 +71,7 @@ import com.martiansoftware.jsap.CommandLineTokenizer;
 public class StormFrontClient extends WarlockClient implements IStormFrontClient, IScriptListener, IRoomListener {
 
 	protected ICharacterStatus status;
-	protected ClientProperty<Integer> roundtime, monsterCount;
+	protected ClientProperty<Integer> roundtime, casttime, monsterCount;
 	protected ClientProperty<BarStatus> health, mana, fatigue, spirit;
 	protected ClientProperty<String> leftHand, rightHand, currentSpell;
 	protected StringBuffer buffer = new StringBuffer();
@@ -80,9 +80,10 @@ public class StormFrontClient extends WarlockClient implements IStormFrontClient
 	protected StormFrontClientSettings clientSettings;
 	protected StormFrontServerSettings serverSettings;
 	protected long timeDelta;
-	protected Long roundtimeEnd;
-	protected int roundtimeLength;
+	protected Long roundtimeEnd, casttimeEnd;
+	protected int roundtimeLength, casttimeLength;
 	protected Thread roundtimeThread = null;
+	protected Thread casttimeThread = null;
 	protected ArrayList<IScript> runningScripts;
 	protected ArrayList<IScriptListener> scriptListeners;
 	protected DefaultSkin skin;
@@ -99,6 +100,7 @@ public class StormFrontClient extends WarlockClient implements IStormFrontClient
 		currentSpell = new ClientProperty<String>(this, "currentSpell", null);
 		
 		roundtime = new ClientProperty<Integer>(this, "roundtime", 0);
+		casttime = new ClientProperty<Integer>(this, "casttime", 0);
 		health = new ClientProperty<BarStatus>(this, "health", null);
 		mana = new ClientProperty<BarStatus>(this, "mana", null);
 		fatigue = new ClientProperty<BarStatus>(this, "fatigue", null);
@@ -110,7 +112,9 @@ public class StormFrontClient extends WarlockClient implements IStormFrontClient
 		monsterCount = new ClientProperty<Integer>(this, "monsterCount", null);
 
 		roundtimeEnd = null;
+		casttimeEnd = null;
 		roundtimeLength = 0;
+		casttimeLength = 0;
 		runningScripts = new ArrayList<IScript>();
 		scriptListeners = new ArrayList<IScriptListener>();
 		
@@ -185,6 +189,10 @@ public class StormFrontClient extends WarlockClient implements IStormFrontClient
 		return roundtime;
 	}
 	
+	public IProperty<Integer> getCasttime() {
+		return casttime;
+	}
+	
 	public IProperty<Integer> getMonsterCount() {
 		return monsterCount;
 	}
@@ -232,33 +240,105 @@ public class StormFrontClient extends WarlockClient implements IStormFrontClient
 		}
 	}
 	
+	private class CasttimeThread extends Thread
+	{		
+		public void run()
+		{
+			for (;;) {
+				long now = System.currentTimeMillis();
+				long ct = 0;
+				
+				// Synchronize with external casttime updates
+				synchronized(StormFrontClient.this) {
+					if (casttimeEnd != null)
+						ct = casttimeEnd * 1000L + timeDelta - now;
+					
+					if (ct <= 0) {
+						casttimeThread = null;
+						casttimeEnd = null;
+						casttimeLength = 0;
+						casttime.set(0);
+						StormFrontClient.this.notifyAll();
+						return;
+					}
+				}
+				
+				// Update the world with the new casttime
+				// Avoid flicker caused by redundant updates
+				int ctSeconds = (int)((ct + 999) / 1000);
+				if (casttime.get() != ctSeconds)
+					casttime.set(ctSeconds);
+				
+				// Compute how long until next casttime update
+				long waitTime = ct % 1000;
+				if (waitTime == 0) waitTime = 1000;
+				
+				try {
+					Thread.sleep(waitTime);
+				} catch (InterruptedException e) {
+					// This is not supposed to happen.
+					e.printStackTrace();
+				}
+			}
+		}
+	}
+	
 	public synchronized void setupRoundtime(Long end)
 	{
 		roundtimeEnd = end;
 	}
 	
+	public synchronized void setupCasttime(Long end)
+	{
+		casttimeEnd = end;
+	}
+	
 	public synchronized void syncTime(Long now)
 	{
-		if (roundtimeEnd == null) return;
+		if (roundtimeEnd == null && casttimeEnd == null) return;
 		
 		long newTimeDelta = System.currentTimeMillis() - now * 1000L;
-		if (roundtimeThread != null) {
+		if (roundtimeThread != null || casttimeThread != null) {
 			// Don't decrease timeDelta while roundtimes are active.
 			if (newTimeDelta > timeDelta) timeDelta = newTimeDelta;
 			return;
 		}
 		timeDelta = newTimeDelta;
 		
-		if (roundtimeEnd > now) {
-			// We need to do this now due to scheduling delays in the thread
-			roundtimeLength = (int)(roundtimeEnd - now);
-			roundtime.set(roundtimeLength);
-			roundtimeThread = new RoundtimeThread();
-			roundtimeThread.start();
-		} else {
-			roundtime.set(0);
-			roundtimeEnd = null;
-			roundtimeLength = 0;
+		/* let's us know if we need to notify clients */
+		boolean notify = false;
+		
+		if (roundtimeEnd != null) {
+			if (roundtimeEnd > now) {
+				// We need to do this now due to scheduling delays in the thread
+				roundtimeLength = (int)(roundtimeEnd - now);
+				roundtime.set(roundtimeLength);
+				roundtimeThread = new RoundtimeThread();
+				roundtimeThread.start();
+			} else {
+				roundtime.set(0);
+				roundtimeEnd = null;
+				roundtimeLength = 0;
+				notify = true;
+			}
+		}
+		
+		if (casttimeEnd != null) {
+			if (casttimeEnd > now) {
+				// We need to do this now due to scheduling delays in the thread
+				casttimeLength = (int)(casttimeEnd - now);
+				casttime.set(casttimeLength);
+				casttimeThread = new CasttimeThread();
+				casttimeThread.start();
+			} else {
+				casttime.set(0);
+				casttimeEnd = null;
+				casttimeLength = 0;
+				notify = true;
+			}
+		}
+		
+		if (notify) {
 			StormFrontClient.this.notifyAll();
 		}
 	}
@@ -267,8 +347,19 @@ public class StormFrontClient extends WarlockClient implements IStormFrontClient
 		return roundtimeLength;
 	}
 	
+	public int getCasttimeLength() {
+		return casttimeLength;
+	}
+	
 	public synchronized void waitForRoundtime(double delay) throws InterruptedException {
 		while (roundtimeEnd != null) {
+			wait();
+			Thread.sleep((long)(delay * 1000));
+		}
+	}
+	
+	public synchronized void waitForCasttime(double delay) throws InterruptedException {
+		while (casttimeEnd != null) {
 			wait();
 			Thread.sleep((long)(delay * 1000));
 		}

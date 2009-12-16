@@ -35,6 +35,7 @@ import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Display;
+import org.eclipse.ui.part.PageBook;
 import org.eclipse.ui.part.ViewPart;
 
 import cc.warlock.core.client.IProperty;
@@ -62,14 +63,19 @@ public class BarsView extends ViewPart {
 	
 	protected static BarsView instance;
 	protected Color roundtimeFG, roundtimeBG, roundtimeBorder,
+		casttimeFG, casttimeBG, casttimeBorder,
 		healthFG, healthBG, healthBorder,
 		manaFG, manaBG, manaBorder,
 		fatigueFG, fatigueBG, fatigueBorder,
 		spiritFG, spiritBG, spiritBorder;
 	
-	protected WarlockProgressBar health, fatigue, spirit, mana, roundtime;
+	protected Composite rtBarWOCT, rtBarWCT = null;
+	protected PageBook rtPageBook = null;
+	
+	protected WarlockProgressBar health, fatigue, spirit, mana, roundtime, casttime;
 	
 	protected SWTPropertyListener<Integer> rtListener;
+	protected SWTPropertyListener<Integer> ctListener;
 	protected SWTPropertyListener<BarStatus> barListener;
 	protected IStormFrontClient activeClient;
 	protected ArrayList<IStormFrontClient> clients = new ArrayList<IStormFrontClient>();
@@ -77,6 +83,7 @@ public class BarsView extends ViewPart {
 	public BarsView() {
 		instance = this;
 		rtListener = new SWTPropertyListener<Integer>(new RoundtimeListener());
+		ctListener = new SWTPropertyListener<Integer>(new CasttimeListener());
 		barListener = new SWTPropertyListener<BarStatus>(new BarListener());
 		
 		WarlockClientRegistry.addWarlockClientListener(new WarlockClientAdapter() {
@@ -115,6 +122,7 @@ public class BarsView extends ViewPart {
 			client.getSpirit().addListener(barListener);
 			client.getFatigue().addListener(barListener);
 			client.getRoundtime().addListener(rtListener);
+			client.getCasttime().addListener(ctListener);
 			clients.add(client);
 			
 		} else {
@@ -123,6 +131,7 @@ public class BarsView extends ViewPart {
 			barListener.propertyChanged(client.getSpirit(), null);
 			barListener.propertyChanged(client.getFatigue(), null);
 			rtListener.propertyChanged(client.getRoundtime(), null);
+			ctListener.propertyChanged(client.getCasttime(), null);
 		}
 	}
 	
@@ -138,6 +147,10 @@ public class BarsView extends ViewPart {
 		top.setLayout(layout);
 		top.setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, true));
 		
+		/* Initialize the rtPageBook so it comes first */
+		rtPageBook = new PageBook(top, SWT.NONE);
+		rtPageBook.setLayoutData(new GridData(GridData.FILL, GridData.FILL, true, true));
+		
 		Composite barComposite = new Composite(top, SWT.NONE);
 		layout = new GridLayout(4, false);
 		layout.marginWidth = layout.marginHeight = layout.horizontalSpacing = 0;
@@ -146,8 +159,34 @@ public class BarsView extends ViewPart {
 		
 		initBarColors();
 		
-		roundtime = new WarlockProgressBar(barComposite, SWT.NONE);
+		rtBarWOCT = new Composite(rtPageBook, SWT.NONE);
+		layout.marginWidth = layout.marginHeight = layout.horizontalSpacing = 0;
+		rtBarWOCT.setLayout(layout);
+		rtBarWOCT.setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, true));
+		
+		rtBarWCT = new Composite(rtPageBook, SWT.NONE);
+		layout.marginWidth = layout.marginHeight = layout.horizontalSpacing = 0;
+		rtBarWCT.setLayout(layout);
+		rtBarWCT.setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, true));
+		
+		roundtime = new WarlockProgressBar(rtBarWOCT, SWT.NONE);
 		roundtime.setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, true, 7, 1));
+		roundtime.setMinimum(0); roundtime.setMaximum(0); roundtime.setLabel("roundtime: 0");
+		roundtime.setBackground(roundtimeBG); roundtime.setForeground(roundtimeFG); roundtime.setBorderColor(roundtimeBorder);
+//		roundtime.setSize(300, 5); //roundtime.setShowText(false);
+		
+		roundtime = new WarlockProgressBar(rtBarWCT, SWT.NONE);
+		roundtime.setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, true, 7, 1));
+		roundtime.setMinimum(0); roundtime.setMaximum(0); roundtime.setLabel("roundtime: 0");
+		roundtime.setBackground(roundtimeBG); roundtime.setForeground(roundtimeFG); roundtime.setBorderColor(roundtimeBorder);
+//		roundtime.setSize(300, 5); //roundtime.setShowText(false);
+		
+		casttime = new WarlockProgressBar(rtBarWCT, SWT.NONE);
+		casttime.setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, true, 7, 1));
+		casttime.setMinimum(0); casttime.setMaximum(0); casttime.setLabel("casttime: 0");
+		casttime.setBackground(casttimeBG); casttime.setForeground(casttimeFG); casttime.setBorderColor(casttimeBorder);
+		
+		rtPageBook.showPage(rtBarWOCT);
 		
 		health = new WarlockProgressBar(barComposite, SWT.NONE);
 		health.setMinimum(0); health.setMaximum(100); health.setSelection(100); health.setLabel("health 100%");
@@ -168,10 +207,6 @@ public class BarsView extends ViewPart {
 		spirit.setMinimum(0); spirit.setMaximum(100); spirit.setSelection(100); spirit.setLabel("spirit 100%");
 		spirit.setLayoutData(new GridData(GridData.FILL, GridData.FILL, true, true));
 		spirit.setBackground(spiritBG); spirit.setForeground(fatigueFG); spirit.setBorderColor(spiritBorder);
-		
-		roundtime.setMinimum(0); roundtime.setMaximum(0); roundtime.setLabel("roundtime: 0");
-		roundtime.setBackground(roundtimeBG); roundtime.setForeground(roundtimeFG); roundtime.setBorderColor(roundtimeBorder);
-//		roundtime.setSize(300, 5); //roundtime.setShowText(false);
 	}
 
 	private void initBarColors() {
@@ -196,6 +231,10 @@ public class BarsView extends ViewPart {
 		roundtimeBG = new Color(display, 151, 0, 0);
 		roundtimeFG = new Color(display, 0, 0, 0);
 		roundtimeBorder = new Color(display, 151, 130, 130);
+		
+		casttimeBG = new Color(display, 0, 0, 151);
+		casttimeFG = new Color(display, 255, 255, 255);
+		casttimeBorder = new Color(display, 130, 130, 151);
 	}
 	
 	protected void gameViewFocused (StormFrontGameView gameView)
@@ -239,6 +278,42 @@ public class BarsView extends ViewPart {
 						}
 						roundtime.setSelection(property.get() * 1000);
 						roundtime.setLabel("roundtime: " + property.get() + " seconds");
+					}
+				}
+			}
+		}
+	}
+	
+	private class CasttimeListener implements IPropertyListener<Integer> {
+		int casttimeLength = -1;
+		
+		public void propertyActivated(IProperty<Integer> property) {	}
+
+		public void propertyCleared(IProperty<Integer> property, Integer oldValue) {	}
+		
+		public void propertyChanged(IProperty<Integer> property, Integer oldValue) {
+			if (property == null || property.getName() == null || !property.getName().equals("casttime")) return;
+
+			if (property instanceof ClientProperty)
+			{
+				ClientProperty<Integer> clientProperty = (ClientProperty<Integer>) property;
+				if (clientProperty.getClient() == activeClient)
+				{
+					if (property.get() == 0) {
+						casttimeLength = -1;
+						casttime.setSelection(0);
+						casttime.setLabel("no casttime");
+						rtPageBook.showPage(rtBarWOCT);
+					} else {
+						if (casttimeLength != activeClient.getCasttimeLength())
+						{
+							casttimeLength = activeClient.getCasttimeLength();
+							casttime.setMaximum(casttimeLength * 1000);
+							casttime.setMinimum(0);
+						}
+						casttime.setSelection(property.get() * 1000);
+						casttime.setLabel("casttime: " + property.get() + " seconds");
+						rtPageBook.showPage(rtBarWCT);
 					}
 				}
 			}

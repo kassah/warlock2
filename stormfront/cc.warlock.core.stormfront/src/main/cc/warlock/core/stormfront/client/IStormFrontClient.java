@@ -82,10 +82,21 @@ public interface IStormFrontClient extends IWarlockClient, IRoomListener {
 	public IProperty<Integer> getRoundtime();
 	
 	/**
+	 * @return The casttime property
+	 */
+	public IProperty<Integer> getCasttime();
+	
+	/**
 	 * Set up a roundtime to start with the next time sync.
 	 * @param roundtimeEnd The end of the roundtime as sent from the server.
 	 */
 	public void setupRoundtime(Long roundtimeEnd);
+	
+	/**
+	 * Set up a casttime to start with the next time sync.
+	 * @param casttimeEnd The end of the casttime as sent from the server.
+	 */
+	public void setupCasttime(Long casttimeEnd);
 	
 	/**
 	 * Sync the current time as perceived by the server.
@@ -98,7 +109,14 @@ public interface IStormFrontClient extends IWarlockClient, IRoomListener {
 	 */
 	public void waitForRoundtime(double delay) throws InterruptedException;
 	
+	/**
+	 * Wait out any active casttimes.
+	 */
+	public void waitForCasttime(double delay) throws InterruptedException;
+	
 	public int getRoundtimeLength();
+	
+	public int getCasttimeLength();
 	
 	/**
 	 * @return The health property

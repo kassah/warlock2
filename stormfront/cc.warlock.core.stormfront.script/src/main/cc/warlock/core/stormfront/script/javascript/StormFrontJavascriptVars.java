@@ -63,6 +63,7 @@ public class StormFrontJavascriptVars implements IJavascriptVariableProvider {
 			scope.put("fatigue", scope, new JavascriptBarStatus(scope, sfClient.getFatigue()));
 			scope.put("spirit", scope, new JavascriptBarStatus(scope, sfClient.getSpirit()));
 			scope.put("roundtime", scope, new JavascriptProperty<Integer>(scope, sfClient.getRoundtime()));
+			scope.put("casttime", scope, new JavascriptProperty<Integer>(scope, sfClient.getCasttime()));
 			scope.put("leftHand", scope, new JavascriptProperty<String>(scope, sfClient.getLeftHand()));
 			scope.put("rightHand", scope, new JavascriptProperty<String>(scope, sfClient.getRightHand()));
 			scope.put("spell", scope, new JavascriptProperty<String>(scope, sfClient.getCurrentSpell()));
