@@ -45,6 +45,7 @@ import cc.warlock.core.stormfront.settings.skin.IStormFrontSkin;
  */
 public interface IStormFrontClient extends IWarlockClient, IRoomListener {
 	
+	public static final String ATMOSPHERICS_STREAM_NAME = "atmospherics";
 	public static final String DEATH_STREAM_NAME = "death";
 	public static final String INVENTORY_STREAM_NAME = "inv";
 	public static final String THOUGHTS_STREAM_NAME = "thoughts";
