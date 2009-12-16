@@ -72,7 +72,7 @@ public class BarsView extends ViewPart {
 	protected Composite rtBarWOCT, rtBarWCT = null;
 	protected PageBook rtPageBook = null;
 	
-	protected WarlockProgressBar health, fatigue, spirit, mana, roundtime, casttime;
+	protected WarlockProgressBar health, fatigue, spirit, mana, roundtime, roundtime2, casttime;
 	
 	protected SWTPropertyListener<Integer> rtListener;
 	protected SWTPropertyListener<Integer> ctListener;
@@ -175,11 +175,11 @@ public class BarsView extends ViewPart {
 		roundtime.setBackground(roundtimeBG); roundtime.setForeground(roundtimeFG); roundtime.setBorderColor(roundtimeBorder);
 //		roundtime.setSize(300, 5); //roundtime.setShowText(false);
 		
-		roundtime = new WarlockProgressBar(rtBarWCT, SWT.NONE);
-		roundtime.setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, true, 7, 1));
-		roundtime.setMinimum(0); roundtime.setMaximum(0); roundtime.setLabel("roundtime: 0");
-		roundtime.setBackground(roundtimeBG); roundtime.setForeground(roundtimeFG); roundtime.setBorderColor(roundtimeBorder);
-//		roundtime.setSize(300, 5); //roundtime.setShowText(false);
+		roundtime2 = new WarlockProgressBar(rtBarWCT, SWT.NONE);
+		roundtime2.setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, true, 7, 1));
+		roundtime2.setMinimum(0); roundtime2.setMaximum(0); roundtime2.setLabel("roundtime: 0");
+		roundtime2.setBackground(roundtimeBG); roundtime2.setForeground(roundtimeFG); roundtime2.setBorderColor(roundtimeBorder);
+//		roundtime2.setSize(300, 5); //roundtime2.setShowText(false);
 		
 		casttime = new WarlockProgressBar(rtBarWCT, SWT.NONE);
 		casttime.setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, true, 7, 1));
@@ -268,16 +268,22 @@ public class BarsView extends ViewPart {
 					if (property.get() == 0) {
 						roundtimeLength = -1;
 						roundtime.setSelection(0);
+						roundtime2.setSelection(0);
 						roundtime.setLabel("no roundtime");
+						roundtime2.setLabel("no roundtime");
 					} else {
 						if (roundtimeLength != activeClient.getRoundtimeLength())
 						{
 							roundtimeLength = activeClient.getRoundtimeLength();
 							roundtime.setMaximum(roundtimeLength * 1000);
+							roundtime2.setMaximum(roundtimeLength * 1000);
 							roundtime.setMinimum(0);
+							roundtime2.setMinimum(0);
 						}
 						roundtime.setSelection(property.get() * 1000);
+						roundtime2.setSelection(property.get() * 1000);
 						roundtime.setLabel("roundtime: " + property.get() + " seconds");
+						roundtime2.setLabel("roundtime: " + property.get() + " seconds");
 					}
 				}
 			}
@@ -361,8 +367,10 @@ public class BarsView extends ViewPart {
 	
 	
 	public void roundtimeChanged(IWarlockClient source, final int roundtime) {
-		if(source == activeClient)
+		if(source == activeClient) {
 			BarsView.this.roundtime.setSelection(roundtime);
+			BarsView.this.roundtime2.setSelection(roundtime);
+		}
 	}
 	
 	public static BarsView getDefault ()
