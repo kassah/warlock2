@@ -278,6 +278,7 @@ public class StormFrontGameView extends GameView implements IStormFrontClientVie
 		if (client instanceof IStormFrontClient)
 		{
 			addStream(client.getStream(IStormFrontClient.DEATH_STREAM_NAME));
+			addStream(client.getStream(IStormFrontClient.ATMOSPHERICS_STREAM_NAME));
 			sfClient = (IStormFrontClient) client;
 
 			StyleProviders.setStyleProvider(client, new StormFrontStyleProvider(sfClient.getStormFrontClientSettings()));
@@ -313,6 +314,7 @@ public class StormFrontGameView extends GameView implements IStormFrontClientVie
 		showPopup(reconnectPopup);
 //		reconnectPopup.setVisible(true);
 		removeStream(client.getStream(IStormFrontClient.DEATH_STREAM_NAME));
+		removeStream(client.getStream(IStormFrontClient.ATMOSPHERICS_STREAM_NAME));
 	}
 	
 	protected Font normalFont;
