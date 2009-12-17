@@ -2,8 +2,8 @@
 <classpath>
 	<classpathentry kind="src" path="src"/>
 	<classpathentry kind="con" path="org.eclipse.jdt.launching.JRE_CONTAINER"/>
-	<classpathentry kind="var" path="ECLIPSE_HOME/plugins/org.eclipse.pde.build_3.3.0.v20070612/lib/pdebuild-ant.jar" sourcepath="/ECLIPSE_HOME/plugins/org.eclipse.pde.source_3.3.0.v20070607-7N7M-DUUEF6Ez0H46IcCC/src/org.eclipse.pde.build_3.3.0.v20070612/lib/pdebuild-antsrc.zip"/>
-	<classpathentry kind="var" path="ECLIPSE_HOME/plugins/org.eclipse.pde.build_3.3.0.v20070612/pdebuild.jar"/>
+	<classpathentry kind="var" path="ECLIPSE_HOME/plugins/org.eclipse.pde.build_3.5.1.R35x_20090820/lib/pdebuild-ant.jar" sourcepath="/ECLIPSE_HOME/plugins/org.eclipse.pde.source_3.3.0.v20070607-7N7M-DUUEF6Ez0H46IcCC/src/org.eclipse.pde.build_3.3.0.v20070612/lib/pdebuild-antsrc.zip"/>
+	<classpathentry kind="var" path="ECLIPSE_HOME/plugins/org.eclipse.pde.build_3.5.1.R35x_20090820/pdebuild.jar"/>
 	<classpathentry kind="lib" path="lib/standalone-compiler.jar"/>
 	<classpathentry kind="lib" path="lib/izevent.jar"/>
 	<classpathentry kind="lib" path="lib/dom4j-1.6.1.jar"/>
