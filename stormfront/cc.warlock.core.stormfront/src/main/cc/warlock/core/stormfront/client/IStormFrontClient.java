@@ -120,24 +120,11 @@ public interface IStormFrontClient extends IWarlockClient, IRoomListener {
 	public int getCasttimeLength();
 	
 	/**
-	 * @return The health property
+	 * @return The vital associated with id
 	 */
-	public IProperty<BarStatus> getHealth();	
+	public String getVital(String id);
 	
-	/**
-	 * @return The amount of mana in the mana bar.
-	 */
-	public IProperty<BarStatus> getMana();
-	
-	/**
-	 * @return The amount of fatigue in the fatigue bar.
-	 */
-	public IProperty<BarStatus> getFatigue();
-	
-	/**
-	 * @return The amount of spirit in the spirit bar.
-	 */
-	public IProperty<BarStatus> getSpirit();
+	public String setVital(String id, String value);
 
 	/**
 	 * @return The left hand property

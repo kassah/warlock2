@@ -22,34 +22,16 @@
 
 package cc.warlock.core.stormfront.client;
 
-import java.util.ArrayList;
-
-import cc.warlock.core.stormfront.IStormFrontDialogListener;
+import cc.warlock.core.client.internal.ClientProperty;
 
 /**
  * @author sproctor
  *
  */
-public class StormFrontDialog {
-	private String id;
-	private ArrayList<IStormFrontDialogListener> listeners = new ArrayList<IStormFrontDialogListener>();
+public class StormFrontDialog extends ClientProperty<IStormFrontDialogMessage> {
 	
-	public StormFrontDialog(String id) {
-		this.id = id;
+	public StormFrontDialog(IStormFrontClient client, String name) {
+		super(client, name, null);
 	}
 	
-	public void addListener(IStormFrontDialogListener listener) {
-		listeners.add(listener);
-	}
-	
-	public void progressBar(String id, String text, int value, String left,
-			String top, String width, String height) {
-		for(IStormFrontDialogListener listener : listeners) {
-			listener.progressBar(id, text, value, left, top, width, height);
-		}
-	}
-	
-	public String getId() {
-		return id;
-	}
 }

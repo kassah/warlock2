@@ -49,7 +49,6 @@ import cc.warlock.core.script.IScriptListener;
 import cc.warlock.core.script.ScriptEngineRegistry;
 import cc.warlock.core.script.configuration.ScriptConfiguration;
 import cc.warlock.core.stormfront.IStormFrontProtocolHandler;
-import cc.warlock.core.stormfront.client.BarStatus;
 import cc.warlock.core.stormfront.client.IStormFrontClient;
 import cc.warlock.core.stormfront.client.StormFrontDialog;
 import cc.warlock.core.stormfront.network.StormFrontConnection;
@@ -73,7 +72,6 @@ public class StormFrontClient extends WarlockClient implements IStormFrontClient
 
 	protected ICharacterStatus status;
 	protected ClientProperty<Integer> roundtime, casttime, monsterCount;
-	protected ClientProperty<BarStatus> health, mana, fatigue, spirit;
 	protected ClientProperty<String> leftHand, rightHand, currentSpell;
 	protected StringBuffer buffer = new StringBuffer();
 	protected IStormFrontProtocolHandler handler;
@@ -88,10 +86,13 @@ public class StormFrontClient extends WarlockClient implements IStormFrontClient
 	protected ArrayList<IScript> runningScripts;
 	protected ArrayList<IScriptListener> scriptListeners;
 	protected DefaultSkin skin;
-	protected HashMap<String, ClientProperty<String>> components = new HashMap<String, ClientProperty<String>>();
+	protected HashMap<String, ClientProperty<String>> components =
+		new HashMap<String, ClientProperty<String>>();
 	protected HashMap<String, IStream> componentStreams = new HashMap<String, IStream>();
 	protected HashMap<String, String> commands;
-	protected HashMap<String, StormFrontDialog> dialogs = new HashMap<String, StormFrontDialog>();
+	protected HashMap<String, StormFrontDialog> dialogs =
+		new HashMap<String, StormFrontDialog>();
+	protected HashMap<String, String> vitals = new HashMap<String, String>();
 	
 	public StormFrontClient() {
 		super();
@@ -103,10 +104,6 @@ public class StormFrontClient extends WarlockClient implements IStormFrontClient
 		
 		roundtime = new ClientProperty<Integer>(this, "roundtime", 0);
 		casttime = new ClientProperty<Integer>(this, "casttime", 0);
-		health = new ClientProperty<BarStatus>(this, "health", null);
-		mana = new ClientProperty<BarStatus>(this, "mana", null);
-		fatigue = new ClientProperty<BarStatus>(this, "fatigue", null);
-		spirit = new ClientProperty<BarStatus>(this, "spirit", null);
 		playerId = new ClientProperty<String>(this, "playerId", null);
 		characterName = new ClientProperty<String>(this, "characterName", null);
 		gameCode = new ClientProperty<String>(this, "gameCode", null);
@@ -199,11 +196,17 @@ public class StormFrontClient extends WarlockClient implements IStormFrontClient
 		return monsterCount;
 	}
 
+	public void openDialog(String id) {
+		StormFrontDialog dialog = getDialog(id);
+		
+		dialog.activate();
+	}
+	
 	public StormFrontDialog getDialog(String id) {
 		StormFrontDialog dialog = dialogs.get(id);
 		
 		if(dialog == null) {
-			dialog = new StormFrontDialog(id);
+			dialog = new StormFrontDialog(this, id);
 			dialogs.put(id, dialog);
 		}
 		
@@ -378,20 +381,12 @@ public class StormFrontClient extends WarlockClient implements IStormFrontClient
 		}
 	}
 	
-	public IProperty<BarStatus> getHealth() {
-		return health;
+	public String getVital(String id) {
+		return vitals.get(id);
 	}
-
-	public IProperty<BarStatus> getMana() {
-		return mana;
-	}
-
-	public IProperty<BarStatus> getFatigue() {
-		return fatigue;
-	}
-
-	public IProperty<BarStatus> getSpirit() {
-		return spirit;
+	
+	public String setVital(String id, String value) {
+		return vitals.put(id, value);
 	}
 
 	public void connect(String server, int port, String key) throws IOException {

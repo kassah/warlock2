@@ -44,8 +44,9 @@ import cc.warlock.core.client.IWarlockClient;
 import cc.warlock.core.client.WarlockClientAdapter;
 import cc.warlock.core.client.WarlockClientRegistry;
 import cc.warlock.core.client.internal.ClientProperty;
-import cc.warlock.core.stormfront.client.BarStatus;
 import cc.warlock.core.stormfront.client.IStormFrontClient;
+import cc.warlock.core.stormfront.client.IStormFrontDialogMessage;
+import cc.warlock.rcp.stormfront.ui.StormFrontDialogControl;
 import cc.warlock.rcp.ui.WarlockProgressBar;
 import cc.warlock.rcp.ui.client.SWTPropertyListener;
 import cc.warlock.rcp.views.GameView;
@@ -63,20 +64,16 @@ public class BarsView extends ViewPart {
 	
 	protected static BarsView instance;
 	protected Color roundtimeFG, roundtimeBG, roundtimeBorder,
-		casttimeFG, casttimeBG, casttimeBorder,
-		healthFG, healthBG, healthBorder,
-		manaFG, manaBG, manaBorder,
-		fatigueFG, fatigueBG, fatigueBorder,
-		spiritFG, spiritBG, spiritBorder;
+		casttimeFG, casttimeBG, casttimeBorder;
 	
 	protected Composite rtBarWOCT, rtBarWCT = null;
 	protected PageBook rtPageBook = null;
 	
-	protected WarlockProgressBar health, fatigue, spirit, mana, roundtime, roundtime2, casttime;
+	protected WarlockProgressBar roundtime, roundtime2, casttime;
+	protected StormFrontDialogControl minivitals;
 	
 	protected SWTPropertyListener<Integer> rtListener;
 	protected SWTPropertyListener<Integer> ctListener;
-	protected SWTPropertyListener<BarStatus> barListener;
 	protected IStormFrontClient activeClient;
 	protected ArrayList<IStormFrontClient> clients = new ArrayList<IStormFrontClient>();
 	
@@ -84,7 +81,6 @@ public class BarsView extends ViewPart {
 		instance = this;
 		rtListener = new SWTPropertyListener<Integer>(new RoundtimeListener());
 		ctListener = new SWTPropertyListener<Integer>(new CasttimeListener());
-		barListener = new SWTPropertyListener<BarStatus>(new BarListener());
 		
 		WarlockClientRegistry.addWarlockClientListener(new WarlockClientAdapter() {
 			public void clientConnected(final IWarlockClient client) {
@@ -117,19 +113,13 @@ public class BarsView extends ViewPart {
 		
 		if (!clients.contains(client))
 		{
-			client.getHealth().addListener(barListener);
-			client.getMana().addListener(barListener);
-			client.getSpirit().addListener(barListener);
-			client.getFatigue().addListener(barListener);
 			client.getRoundtime().addListener(rtListener);
 			client.getCasttime().addListener(ctListener);
+			client.getDialog("minivitals").addListener(
+					new SWTPropertyListener<IStormFrontDialogMessage>(minivitals));
 			clients.add(client);
 			
 		} else {
-			barListener.propertyChanged(client.getHealth(), null);
-			barListener.propertyChanged(client.getMana(), null);
-			barListener.propertyChanged(client.getSpirit(), null);
-			barListener.propertyChanged(client.getFatigue(), null);
 			rtListener.propertyChanged(client.getRoundtime(), null);
 			ctListener.propertyChanged(client.getCasttime(), null);
 		}
@@ -143,7 +133,9 @@ public class BarsView extends ViewPart {
 		
 		Composite top = new Composite (parent, SWT.NONE);
 		GridLayout layout = new GridLayout(1, false);
-		layout.marginWidth = layout.marginHeight = layout.horizontalSpacing = 0;
+		layout.marginWidth = 0;
+		layout.marginHeight = 0;
+		layout.horizontalSpacing = 0;
 		top.setLayout(layout);
 		top.setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, true));
 		
@@ -151,11 +143,9 @@ public class BarsView extends ViewPart {
 		rtPageBook = new PageBook(top, SWT.NONE);
 		rtPageBook.setLayoutData(new GridData(GridData.FILL, GridData.FILL, true, true));
 		
-		Composite barComposite = new Composite(top, SWT.NONE);
-		layout = new GridLayout(4, false);
-		layout.marginWidth = layout.marginHeight = layout.horizontalSpacing = 0;
-		barComposite.setLayout(layout);
-		barComposite.setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, true));
+		minivitals = new StormFrontDialogControl(top, SWT.NONE);
+		minivitals.setLayoutData(new GridData(GridData.FILL, GridData.FILL, true, true));
+		
 		
 		initBarColors();
 		
@@ -188,45 +178,10 @@ public class BarsView extends ViewPart {
 		
 		rtPageBook.showPage(rtBarWOCT);
 		
-		health = new WarlockProgressBar(barComposite, SWT.NONE);
-		health.setMinimum(0); health.setMaximum(100); health.setSelection(100); health.setLabel("health 100%");
-		health.setLayoutData(new GridData(GridData.FILL, GridData.FILL, true, true));
-		health.setBackground(healthBG); health.setForeground(healthFG); health.setBorderColor(healthBorder);
-		
-		mana = new WarlockProgressBar(barComposite, SWT.NONE);
-		mana.setMinimum(0); mana.setMaximum(100); mana.setSelection(100); mana.setLabel("mana 100%");
-		mana.setLayoutData(new GridData(GridData.FILL, GridData.FILL, true, true));
-		mana.setBackground(manaBG); mana.setForeground(manaFG); mana.setBorderColor(manaBorder);
-		
-		fatigue = new WarlockProgressBar(barComposite, SWT.NONE);
-		fatigue.setMinimum(0); fatigue.setMaximum(100); fatigue.setSelection(100); fatigue.setLabel("fatigue 100%");
-		fatigue.setLayoutData(new GridData(GridData.FILL, GridData.FILL, true, true));
-		fatigue.setBackground(fatigueBG); fatigue.setForeground(fatigueFG); fatigue.setBorderColor(fatigueBorder);
-		
-		spirit = new WarlockProgressBar(barComposite, SWT.NONE);
-		spirit.setMinimum(0); spirit.setMaximum(100); spirit.setSelection(100); spirit.setLabel("spirit 100%");
-		spirit.setLayoutData(new GridData(GridData.FILL, GridData.FILL, true, true));
-		spirit.setBackground(spiritBG); spirit.setForeground(fatigueFG); spirit.setBorderColor(spiritBorder);
 	}
 
 	private void initBarColors() {
 		Display display = getSite().getShell().getDisplay();
-		
-		healthBG = new Color(display, 0x80, 0, 0);
-		healthFG = new Color(display, 255, 255, 255);
-		healthBorder = new Color(display, 0x79, 0x6a, 0x6a);
-		
-		manaBG = new Color(display, 0, 0, 0xff);
-		manaFG = new Color(display, 255, 255, 255);
-		manaBorder = new Color(display, 0x72, 0x72, 0xff);
-		
-		fatigueBG = new Color(display, 0xd0, 0x98, 0x2f);
-		fatigueFG = new Color(display, 0, 0, 0);
-		fatigueBorder = new Color(display, 0xde, 0xcc, 0xaa);
-		
-		spiritBG = new Color(display, 150, 150, 150);
-		spiritFG = new Color(display, 0, 0, 0);
-		spiritBorder = new Color(display, 225, 225, 225);
 		
 		roundtimeBG = new Color(display, 151, 0, 0);
 		roundtimeFG = new Color(display, 0, 0, 0);
@@ -260,7 +215,7 @@ public class BarsView extends ViewPart {
 		public void propertyChanged(IProperty<Integer> property, Integer oldValue) {
 			if (property == null || property.getName() == null || !property.getName().equals("roundtime")) return;
 
-			if (property instanceof ClientProperty)
+			if (property instanceof ClientProperty<?>)
 			{
 				ClientProperty<Integer> clientProperty = (ClientProperty<Integer>) property;
 				if (clientProperty.getClient() == activeClient)
@@ -300,7 +255,7 @@ public class BarsView extends ViewPart {
 		public void propertyChanged(IProperty<Integer> property, Integer oldValue) {
 			if (property == null || property.getName() == null || !property.getName().equals("casttime")) return;
 
-			if (property instanceof ClientProperty)
+			if (property instanceof ClientProperty<?>)
 			{
 				ClientProperty<Integer> clientProperty = (ClientProperty<Integer>) property;
 				if (clientProperty.getClient() == activeClient)
@@ -325,46 +280,6 @@ public class BarsView extends ViewPart {
 			}
 		}
 	}
-	
-	private class BarListener implements IPropertyListener<BarStatus> {
-		
-		public void propertyActivated(IProperty<BarStatus> property) { }
-		public void propertyCleared(IProperty<BarStatus> property, BarStatus oldValue) { }
-		
-		public void propertyChanged(IProperty<BarStatus> property, BarStatus oldValue) {
-			if (property == null || property.get() == null || property.getName() == null) return;
-
-			if (property instanceof ClientProperty)
-			{
-				ClientProperty<BarStatus> clientProperty = (ClientProperty<BarStatus>) property;
-				if (clientProperty.getClient() == activeClient)
-				{
-
-					if (property.getName().equals("health"))
-					{
-						health.setSelection(property.get().getValue());
-						health.setLabel(property.get().getText());
-					}
-					else if (property.getName().equals("mana"))
-					{
-						mana.setSelection(property.get().getValue());
-						mana.setLabel(property.get().getText());
-					}
-					else if (property.getName().equals("spirit"))
-					{
-						spirit.setSelection(property.get().getValue());
-						spirit.setLabel(property.get().getText());
-					}
-					else if (property.getName().equals("fatigue"))
-					{
-						fatigue.setSelection(property.get().getValue());
-						fatigue.setLabel(property.get().getText());
-					}
-				}
-			}
-		}
-	}
-	
 	
 	public void roundtimeChanged(IWarlockClient source, final int roundtime) {
 		if(source == activeClient) {

@@ -23,7 +23,6 @@
 package cc.warlock.rcp.stormfront.ui;
 
 import java.util.HashMap;
-import java.util.Map.Entry;
 
 import org.eclipse.jface.resource.JFaceResources;
 import org.eclipse.swt.events.PaintEvent;
@@ -37,7 +36,10 @@ import org.eclipse.swt.widgets.Canvas;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Display;
 
-import cc.warlock.core.stormfront.IStormFrontDialogListener;
+import cc.warlock.core.client.IProperty;
+import cc.warlock.core.client.IPropertyListener;
+import cc.warlock.core.stormfront.client.IStormFrontDialogMessage;
+import cc.warlock.core.stormfront.client.StormFrontProgressBar;
 
 /**
  * @author Marshall
@@ -45,12 +47,13 @@ import cc.warlock.core.stormfront.IStormFrontDialogListener;
  * This is a custom progress bar that mimics the L&F of StormFront's status bars.
  * It's sort of a dirty hack, but it suffices for now. It needs to handle being in a LayoutManager better...
  */
-public class StormFrontDialogControl extends Canvas implements IStormFrontDialogListener
+public class StormFrontDialogControl extends Canvas implements IPropertyListener<IStormFrontDialogMessage>
 {
 	protected Font progressFont;
 	protected int width, height;
 	protected int borderWidth;
-	protected HashMap<String, ProgressBarData> progressBars = new HashMap<String, ProgressBarData>();
+	protected HashMap<String, StormFrontProgressBar> progressBars =
+		new HashMap<String, StormFrontProgressBar>();
 	
 	protected Color healthFG, healthBG, healthBorder,
 		manaFG, manaBG, manaBorder,
@@ -102,23 +105,25 @@ public class StormFrontDialogControl extends Canvas implements IStormFrontDialog
 				
 				e.gc.setFont (progressFont);
 				
-				for(Entry<String, ProgressBarData> entry : progressBars.entrySet()) {
-					ProgressBarData progressBar = entry.getValue();
+				for(StormFrontProgressBar progressBar : progressBars.values()) {
+					int pbWidth = progressBar.getWidth();
+					int pbLeft = progressBar.getLeft();
+					int pbValue = progressBar.getValue();
 					
 					// This should probably all be abstracted out
-					int fullBarWidth = progressBar.width * bounds.width / 100;
+					int fullBarWidth = pbWidth * bounds.width / 100;
 					int barWidth = fullBarWidth - 2 * borderWidth;
 					int barHeight = bounds.height - 2 * borderWidth;
-					int filledWidth = progressBar.value * barWidth / 100;
-					int left = progressBar.left * fullBarWidth / 100;
+					int filledWidth = pbValue * barWidth / 100;
+					int left = pbLeft * bounds.width / 100;
 					
 					// Draw the border
-					Color borderColor = getBorderColor(entry.getKey());
+					Color borderColor = getBorderColor(progressBar.id);
 					e.gc.setForeground(borderColor);
 					e.gc.setLineWidth(borderWidth);
 					e.gc.drawRectangle(left, 0, fullBarWidth, bounds.height);
 					
-					Color bgColor = getBgColor(entry.getKey());
+					Color bgColor = getBgColor(progressBar.id);
 					
 					// draw the filled part of the rectangle
 					Color gradientColor = getGradientColor(25, true, bgColor);
@@ -132,13 +137,13 @@ public class StormFrontDialogControl extends Canvas implements IStormFrontDialog
 					e.gc.fillRectangle(borderWidth + left + filledWidth,
 							borderWidth, barWidth - filledWidth, barHeight);
 					
-					Color textColor = getTextColor(entry.getKey());
+					Color textColor = getTextColor(progressBar.id);
 					e.gc.setForeground(textColor);
 					
 					String text = progressBar.text;
 					Point extent = e.gc.textExtent(text);
 					
-					int text_left = (bounds.width - 2 * borderWidth - extent.x) / 2;
+					int text_left = left + (barWidth - extent.x) / 2;
 					int text_top = (bounds.height - 2 * borderWidth - e.gc.getFontMetrics().getHeight()) / 2;
 					e.gc.drawText (text, text_left, text_top, true);
 				}
@@ -185,31 +190,20 @@ public class StormFrontDialogControl extends Canvas implements IStormFrontDialog
 		super.dispose();
 	}
 
-	public void progressBar(String id, String text, int value, String left, String top,
-			String width, String height) {
-		progressBars.put(id, new ProgressBarData(text, value, Integer.parseInt(left),
-				Integer.parseInt(top), Integer.parseInt(width), Integer.parseInt(height)));
+	public void propertyChanged(IProperty<IStormFrontDialogMessage> property,
+			IStormFrontDialogMessage oldMsg) {
+		IStormFrontDialogMessage msg = property.get();
+		if(msg instanceof StormFrontProgressBar) {
+			StormFrontProgressBar bar = (StormFrontProgressBar) msg;
+			progressBars.put(bar.id, bar);
+		}
 		redraw();
 	}
 	
-	protected class ProgressBarData {
-		public String text;
-		public int value;
-		public int left;
-		public int top;
-		public int width;
-		public int height;
-		
-		public ProgressBarData(String text, int value, int left, int top,
-				int width, int height) {
-			this.text = text;
-			this.value = value;
-			this.left = left;
-			this.top = top;
-			this.width = width;
-			this.height = height;
-		}
-	}
+	public void propertyActivated(IProperty<IStormFrontDialogMessage> property) { }
+	
+	public void propertyCleared(IProperty<IStormFrontDialogMessage> msg,
+			IStormFrontDialogMessage oldMsg) { }
 	
 	private Color getTextColor(String id) {
 		

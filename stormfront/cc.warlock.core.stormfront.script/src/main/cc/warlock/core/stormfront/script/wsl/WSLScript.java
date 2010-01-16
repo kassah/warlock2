@@ -136,10 +136,6 @@ public class WSLScript extends AbstractScript {
 			}
 		}
 		
-		setSpecialVariable("mana", new WSLMana());
-		setSpecialVariable("health", new WSLHealth());
-		setSpecialVariable("fatigue", new WSLFatigue());
-		setSpecialVariable("spirit", new WSLSpirit());
 		setSpecialVariable("rt", new WSLRoundTime());
 		setSpecialVariable("monstercount", new WSLMonsterCount());
 		setSpecialVariable("lhand", new WSLLeftHand());
@@ -198,30 +194,6 @@ public class WSLScript extends AbstractScript {
 					break;
 				curCommand = commands.get(nextLine);
 			}
-		}
-	}
-	
-	private class WSLMana extends WSLAbstractNumber {
-		public double toDouble() {
-			return sfClient.getMana().get().getValue();
-		}
-	}
-	
-	private class WSLHealth extends WSLAbstractNumber {
-		public double toDouble() {
-			return sfClient.getHealth().get().getValue();
-		}
-	}
-	
-	private class WSLFatigue extends WSLAbstractNumber {
-		public double toDouble() {
-			return sfClient.getFatigue().get().getValue();
-		}
-	}
-	
-	private class WSLSpirit extends WSLAbstractNumber {
-		public double toDouble() {
-			return sfClient.getSpirit().get().getValue();
 		}
 	}
 	

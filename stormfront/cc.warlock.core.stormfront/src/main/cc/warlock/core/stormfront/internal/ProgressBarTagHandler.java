@@ -25,9 +25,9 @@
 package cc.warlock.core.stormfront.internal;
 
 import cc.warlock.core.stormfront.IStormFrontProtocolHandler;
-import cc.warlock.core.stormfront.client.BarStatus;
 import cc.warlock.core.stormfront.client.IStormFrontClient;
 import cc.warlock.core.stormfront.client.StormFrontDialog;
+import cc.warlock.core.stormfront.client.StormFrontProgressBar;
 import cc.warlock.core.stormfront.xml.StormFrontAttributeList;
 
 
@@ -53,9 +53,8 @@ public class ProgressBarTagHandler extends BaseTagHandler {
 	@Override
 	public void handleStart(StormFrontAttributeList attributes, String rawXML) {
     	String id = attributes.getValue("id");
-    	int value = Integer.parseInt(attributes.getValue("value"));
+    	String value = attributes.getValue("value");
     	String text = attributes.getValue("text");
-    	BarStatus bar = new BarStatus(value, text);
     	String left = attributes.getValue("left");
     	String top = attributes.getValue("top");
     	String width = attributes.getValue("width");
@@ -63,23 +62,8 @@ public class ProgressBarTagHandler extends BaseTagHandler {
 
 		IStormFrontClient client = handler.getClient();
 		StormFrontDialog dialog = client.getDialog(parent.id);
-		dialog.progressBar(id, text, value, left, top, width, height);
+		dialog.set(new StormFrontProgressBar(id, text, value, left, top, width, height));
 		
-		if (id.equals("health"))
-		{
-			client.getHealth().set(bar);
-		}
-		else if (id.equals("mana"))
-		{
-			client.getMana().set(bar);
-		}
-		else if (id.equals("stamina"))
-		{
-			client.getFatigue().set(bar);
-		}
-		else if (id.equals("spirit"))
-		{
-			client.getSpirit().set(bar);
-		}
+		client.setVital(id, value);
 	}
 }
