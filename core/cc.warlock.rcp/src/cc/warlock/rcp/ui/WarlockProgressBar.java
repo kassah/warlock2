@@ -73,50 +73,43 @@ public class WarlockProgressBar extends Canvas
 		
 		addPaintListener(new PaintListener() {
 			public void paintControl(PaintEvent e) {
-				if (label != null) {
-					Rectangle bounds = getBounds();
-					
+				Rectangle bounds = getBounds();
+
+				int barWidth = 0;
+				int fullBarWidth = bounds.width - 2 * borderWidth;
+				int fullBarHeight = bounds.height - 2 * borderWidth;
+
+				if (max > min)
+				{
+					double decimal = (selection / ((double)(max - min)));
+					barWidth = (int) Math.floor(decimal * fullBarWidth - 1);
+				}
+
+				Color gradientColor = getGradientColor(25, true);
+				e.gc.setBackground(gradientColor);
+				e.gc.setForeground(background);
+				e.gc.fillGradientRectangle(borderWidth, borderWidth, barWidth, fullBarHeight, false);
+
+				e.gc.setBackground(borderColor);
+				e.gc.fillRectangle(borderWidth + barWidth, borderWidth, fullBarWidth, fullBarHeight);
+
+				e.gc.setForeground(borderColor);
+				e.gc.setLineWidth(borderWidth);
+				e.gc.drawRectangle(0, 0, bounds.width, bounds.height);
+
+				if (showText && label != null) {
+
+
 					e.gc.setFont (progressFont);
-					
+
 					Point extent = e.gc.textExtent(label);
-					
-					int totalPixels = 0;
-					for (int i = 0; i < label.length(); i++)
-					{
-						totalPixels += e.gc.getCharWidth(label.charAt(i));
-						totalPixels += e.gc.getAdvanceWidth(label.charAt(i));
-					}
-					
-					int left = (int) Math.floor(((bounds.width - (borderWidth * 2)) - extent.x) / 2.0);
-					int top = (int) Math.floor(((bounds.height - (borderWidth * 2)) - e.gc.getFontMetrics().getHeight()) / 2.0);
-					
-					int barWidth = 0;
-					int fullBarWidth = (bounds.width - (borderWidth*2));
-					int fullBarHeight = (bounds.height - (borderWidth*2));
-					
-					if (max > min)
-					{
-						double decimal = (selection / ((double)(max - min)));
-						barWidth = (int) Math.floor(decimal * fullBarWidth - 1);
-					}
-					
-					Color gradientColor = getGradientColor(25, true);
-					e.gc.setBackground(gradientColor);
-					e.gc.setForeground(background);
-					e.gc.fillGradientRectangle(borderWidth, borderWidth, barWidth, fullBarHeight, false);
-					
-					e.gc.setBackground(borderColor);
-					e.gc.fillRectangle(borderWidth + barWidth, borderWidth, fullBarWidth, fullBarHeight);
-					
-					e.gc.setForeground(borderColor);
-					e.gc.setLineWidth(borderWidth);
-					e.gc.drawRectangle(0, 0, bounds.width, bounds.height);
-					
-					if (showText)
-					{
-						e.gc.setForeground(foreground);
-						e.gc.drawText (label, left, top, true);
-					}
+
+					int left = (bounds.width - 2 * borderWidth - extent.x) / 2;
+					int top = (bounds.height - 2 * borderWidth - e.gc.getFontMetrics().getHeight()) / 2;
+
+					e.gc.setForeground(foreground);
+					e.gc.drawText (label, left, top, true);
+
 				}
 			}
 		});
