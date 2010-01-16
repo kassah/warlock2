@@ -156,6 +156,7 @@ public abstract class GameView extends StreamView implements IWarlockClientViewe
 		super.createPartControl(parent);
 		
 		createEntry();
+		createCurrentText();
 		initColors();
 	}
 	
@@ -187,6 +188,9 @@ public abstract class GameView extends StreamView implements IWarlockClientViewe
 		
 		this.client = Warlock2Plugin.getDefault().getCurrentClient();
 		this.entry = new WarlockEntry(entryComposite, wrapper); // Do this BEFORE getTextForClient!
+	}
+	
+	protected void createCurrentText() {
 		this.currentText = getTextForClient(this.client);
 		book.showPage(this.currentText.getTextWidget());
 		
