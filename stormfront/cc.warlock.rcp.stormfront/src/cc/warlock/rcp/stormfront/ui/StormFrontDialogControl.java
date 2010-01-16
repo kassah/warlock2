@@ -48,14 +48,20 @@ import cc.warlock.core.stormfront.IStormFrontDialogListener;
 public class StormFrontDialogControl extends Canvas implements IStormFrontDialogListener
 {
 	protected Font progressFont;
-	protected Color borderColor;
 	protected int width, height;
 	protected int borderWidth;
 	protected HashMap<String, ProgressBarData> progressBars = new HashMap<String, ProgressBarData>();
 	
+	protected Color healthFG, healthBG, healthBorder,
+		manaFG, manaBG, manaBorder,
+		fatigueFG, fatigueBG, fatigueBorder,
+		spiritFG, spiritBG, spiritBorder,
+		defaultFG, defaultBG, defaultBorder;
+	
 	public StormFrontDialogControl (Composite composite, int style)
 	{
 		super(composite, style);
+		Display display = this.getDisplay();
 		
 		// defaults
 		width = 100;
@@ -65,30 +71,52 @@ public class StormFrontDialogControl extends Canvas implements IStormFrontDialog
 		FontData textData = textFont.getFontData()[0];
 		int minHeight = 8;
 		
+		healthBG = new Color(display, 0x80, 0, 0);
+		healthFG = new Color(display, 255, 255, 255);
+		healthBorder = new Color(display, 0x79, 0x6a, 0x6a);
+		
+		manaBG = new Color(display, 0, 0, 0xff);
+		manaFG = new Color(display, 255, 255, 255);
+		manaBorder = new Color(display, 0x72, 0x72, 0xff);
+		
+		fatigueBG = new Color(display, 0xd0, 0x98, 0x2f);
+		fatigueFG = new Color(display, 0, 0, 0);
+		fatigueBorder = new Color(display, 0xde, 0xcc, 0xaa);
+		
+		spiritBG = new Color(display, 150, 150, 150);
+		spiritFG = new Color(display, 0, 0, 0);
+		spiritBorder = new Color(display, 225, 225, 225);
+		
+		defaultBG = new Color(display, 150, 150, 150);
+		defaultFG = new Color(display, 0, 0, 0);
+		defaultBorder = new Color(display, 225, 225, 225);
+		
 		progressFont = new Font(getShell().getDisplay(),
 			textData.getName(), (int)Math.max(minHeight,textData.getHeight()), textData.getStyle());
 		
-		borderColor = new Color(getShell().getDisplay(), 25, 25, 25);
 		borderWidth = 1;
 		
 		addPaintListener(new PaintListener() {
 			public void paintControl(PaintEvent e) {
 				Rectangle bounds = getBounds();
-				int fullBarWidth = bounds.width - 2 * borderWidth;
-				int fullBarHeight = bounds.height - 2 * borderWidth;
-				
-				e.gc.setForeground(borderColor);
-				e.gc.setLineWidth(borderWidth);
-				e.gc.drawRectangle(0, 0, bounds.width, bounds.height);
 				
 				e.gc.setFont (progressFont);
 				
 				for(Entry<String, ProgressBarData> entry : progressBars.entrySet()) {
 					ProgressBarData progressBar = entry.getValue();
 					
-					int barWidth = progressBar.width * fullBarWidth / 100;
+					// This should probably all be abstracted out
+					int fullBarWidth = progressBar.width * bounds.width / 100;
+					int barWidth = fullBarWidth - 2 * borderWidth;
+					int barHeight = bounds.height - 2 * borderWidth;
 					int filledWidth = progressBar.value * barWidth / 100;
 					int left = progressBar.left * fullBarWidth / 100;
+					
+					// Draw the border
+					Color borderColor = getBorderColor(entry.getKey());
+					e.gc.setForeground(borderColor);
+					e.gc.setLineWidth(borderWidth);
+					e.gc.drawRectangle(left, 0, fullBarWidth, bounds.height);
 					
 					Color bgColor = getBgColor(entry.getKey());
 					
@@ -97,12 +125,12 @@ public class StormFrontDialogControl extends Canvas implements IStormFrontDialog
 					e.gc.setBackground(gradientColor);
 					e.gc.setForeground(bgColor);
 					e.gc.fillGradientRectangle(borderWidth + left, borderWidth,
-							filledWidth, fullBarHeight, false);
+							filledWidth, barHeight, false);
 					
 					// draw the background
 					e.gc.setBackground(borderColor);
-					e.gc.fillRectangle(borderWidth + left + filledWidth, borderWidth,
-							fullBarWidth - left - filledWidth, fullBarHeight);
+					e.gc.fillRectangle(borderWidth + left + filledWidth,
+							borderWidth, barWidth - filledWidth, barHeight);
 					
 					Color textColor = getTextColor(entry.getKey());
 					e.gc.setForeground(textColor);
@@ -184,20 +212,53 @@ public class StormFrontDialogControl extends Canvas implements IStormFrontDialog
 	}
 	
 	private Color getTextColor(String id) {
-		Display display = Display.getDefault();
 		
 		if(id.equals("health"))
-			return new Color(display, 255, 255, 255);
+			return healthFG;
 		
-		return new Color(display, 255, 255, 255);
+		if(id.equals("mana"))
+			return manaFG;
+		
+		if(id.equals("spirit"))
+			return spiritFG;
+		
+		if(id.equals("fatigue"))
+			return fatigueFG;
+		
+		return defaultFG;
 	}
 	
 	private Color getBgColor(String id) {
-		Display display = Display.getDefault();
 		
 		if(id.equals("health"))
-			return new Color(display, 0x80, 0, 0);
+			return healthBG;
 		
-		return new Color(display, 225, 225, 225);
+		if(id.equals("mana"))
+			return manaBG;
+		
+		if(id.equals("spirit"))
+			return spiritBG;
+		
+		if(id.equals("fatigue"))
+			return fatigueBG;
+		
+		return defaultBG;
+	}
+	
+	private Color getBorderColor(String id) {
+		
+		if(id.equals("health"))
+			return healthBorder;
+		
+		if(id.equals("mana"))
+			return manaBorder;
+		
+		if(id.equals("spirit"))
+			return spiritBorder;
+		
+		if(id.equals("fatigue"))
+			return fatigueBorder;
+		
+		return defaultBorder;
 	}
 }
