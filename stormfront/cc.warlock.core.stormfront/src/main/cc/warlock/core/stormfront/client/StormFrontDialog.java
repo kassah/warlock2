@@ -44,7 +44,7 @@ public class StormFrontDialog {
 	
 	public void progressBar(String text, int value, String left, String top, String width, String height) {
 		for(IStormFrontDialogListener listener : listeners) {
-			listener.progresBar(text, value, left, top, width, height);
+			listener.progressBar(text, value, left, top, width, height);
 		}
 	}
 	
