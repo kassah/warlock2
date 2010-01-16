@@ -12,6 +12,7 @@ public class SWTStormFrontDialogListener implements IStormFrontDialogListener {
 	}
 	
 	private class ProgressBarWrapper implements Runnable {
+		String id;
 		String text;
 		int value;
 		String left;
@@ -19,8 +20,9 @@ public class SWTStormFrontDialogListener implements IStormFrontDialogListener {
 		String width;
 		String height;
 		
-		public ProgressBarWrapper(String text, int value, String left,
-				String top, String width, String height) {
+		public ProgressBarWrapper(String id, String text, int value,
+				String left, String top, String width, String height) {
+			this.id = id;
 			this.text = text;
 			this.value = value;
 			this.left = left;
@@ -30,13 +32,13 @@ public class SWTStormFrontDialogListener implements IStormFrontDialogListener {
 		}
 		
 		public void run() {
-			listener.progressBar(text, value, left, top, width, height);
+			listener.progressBar(id, text, value, left, top, width, height);
 		}
 	}
 	
-	public void progressBar(String text, int value, String left, String top,
+	public void progressBar(String id, String text, int value, String left, String top,
 			String width, String height) {
-		Display.getDefault().asyncExec(new ProgressBarWrapper(text, value, left,
+		Display.getDefault().asyncExec(new ProgressBarWrapper(id, text, value, left,
 				top, width, height));
 	}
 }

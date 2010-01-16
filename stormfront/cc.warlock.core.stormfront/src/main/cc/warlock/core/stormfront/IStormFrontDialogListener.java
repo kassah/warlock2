@@ -27,5 +27,6 @@ package cc.warlock.core.stormfront;
  *
  */
 public interface IStormFrontDialogListener {
-	public void progressBar(String text, int value, String left, String top, String width, String height);
+	public void progressBar(String id, String text, int value, String left,
+			String top, String width, String height);
 }

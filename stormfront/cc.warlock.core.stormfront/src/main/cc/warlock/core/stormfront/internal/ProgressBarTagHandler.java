@@ -63,7 +63,7 @@ public class ProgressBarTagHandler extends BaseTagHandler {
 
 		IStormFrontClient client = handler.getClient();
 		StormFrontDialog dialog = client.getDialog(parent.id);
-		dialog.progressBar(text, value, left, top, width, height);
+		dialog.progressBar(id, text, value, left, top, width, height);
 		
 		if (id.equals("health"))
 		{
