@@ -22,13 +22,16 @@
 package cc.warlock.core.stormfront.internal;
 
 import cc.warlock.core.stormfront.IStormFrontProtocolHandler;
+import cc.warlock.core.stormfront.xml.StormFrontAttributeList;
 
 public class DialogDataTagHandler extends DefaultTagHandler {
 
+	public String id;
+	
 	DialogDataTagHandler(IStormFrontProtocolHandler handler) {
 		super(handler);
 		
-		addTagHandler(new BarTagHandler(handler));
+		addTagHandler(new ProgressBarTagHandler(handler, this));
 	}
 	
 	@Override
@@ -36,4 +39,8 @@ public class DialogDataTagHandler extends DefaultTagHandler {
 		return new String[] { "dialogData" };
 	}
 
+	@Override
+	public void handleStart(StormFrontAttributeList attributes, String rawXML) {
+		id = attributes.getValue("id");
+	}
 }

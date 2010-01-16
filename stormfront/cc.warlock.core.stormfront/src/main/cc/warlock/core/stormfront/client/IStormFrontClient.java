@@ -160,6 +160,11 @@ public interface IStormFrontClient extends IWarlockClient, IRoomListener {
 	public IProperty<Integer> getMonsterCount();
 	
 	/**
+	 * @return The associated SFDialog
+	 */
+	public StormFrontDialog getDialog(String id);
+	
+	/**
 	 * @return The character status
 	 */
 	public ICharacterStatus getCharacterStatus();

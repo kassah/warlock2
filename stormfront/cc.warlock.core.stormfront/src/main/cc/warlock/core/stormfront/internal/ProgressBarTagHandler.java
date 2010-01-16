@@ -27,6 +27,7 @@ package cc.warlock.core.stormfront.internal;
 import cc.warlock.core.stormfront.IStormFrontProtocolHandler;
 import cc.warlock.core.stormfront.client.BarStatus;
 import cc.warlock.core.stormfront.client.IStormFrontClient;
+import cc.warlock.core.stormfront.client.StormFrontDialog;
 import cc.warlock.core.stormfront.xml.StormFrontAttributeList;
 
 
@@ -35,11 +36,13 @@ import cc.warlock.core.stormfront.xml.StormFrontAttributeList;
  *
  * An XPath Listener that handles the health, mana, fatigue, and spirit bars.
  */
-public class BarTagHandler extends BaseTagHandler {
+public class ProgressBarTagHandler extends BaseTagHandler {
 	private IStormFrontProtocolHandler handler;
+	private DialogDataTagHandler parent;
 	
-	public BarTagHandler (IStormFrontProtocolHandler handler) {
+	public ProgressBarTagHandler (IStormFrontProtocolHandler handler, DialogDataTagHandler parent) {
 		this.handler = handler;
+		this.parent = parent;
 	}
 	
 	@Override
@@ -53,8 +56,14 @@ public class BarTagHandler extends BaseTagHandler {
     	int value = Integer.parseInt(attributes.getValue("value"));
     	String text = attributes.getValue("text");
     	BarStatus bar = new BarStatus(value, text);
+    	String left = attributes.getValue("left");
+    	String top = attributes.getValue("top");
+    	String width = attributes.getValue("width");
+    	String height = attributes.getValue("height");
 
 		IStormFrontClient client = handler.getClient();
+		StormFrontDialog dialog = client.getDialog(parent.id);
+		dialog.progressBar(text, value, left, top, width, height);
 		
 		if (id.equals("health"))
 		{

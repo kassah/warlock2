@@ -51,6 +51,7 @@ import cc.warlock.core.script.configuration.ScriptConfiguration;
 import cc.warlock.core.stormfront.IStormFrontProtocolHandler;
 import cc.warlock.core.stormfront.client.BarStatus;
 import cc.warlock.core.stormfront.client.IStormFrontClient;
+import cc.warlock.core.stormfront.client.StormFrontDialog;
 import cc.warlock.core.stormfront.network.StormFrontConnection;
 import cc.warlock.core.stormfront.settings.IStormFrontClientSettings;
 import cc.warlock.core.stormfront.settings.StormFrontServerSettings;
@@ -90,6 +91,7 @@ public class StormFrontClient extends WarlockClient implements IStormFrontClient
 	protected HashMap<String, ClientProperty<String>> components = new HashMap<String, ClientProperty<String>>();
 	protected HashMap<String, IStream> componentStreams = new HashMap<String, IStream>();
 	protected HashMap<String, String> commands;
+	protected HashMap<String, StormFrontDialog> dialogs = new HashMap<String, StormFrontDialog>();
 	
 	public StormFrontClient() {
 		super();
@@ -197,6 +199,17 @@ public class StormFrontClient extends WarlockClient implements IStormFrontClient
 		return monsterCount;
 	}
 
+	public StormFrontDialog getDialog(String id) {
+		StormFrontDialog dialog = dialogs.get(id);
+		
+		if(dialog == null) {
+			dialog = new StormFrontDialog(id);
+			dialogs.put(id, dialog);
+		}
+		
+		return dialog;
+	}
+	
 	private class RoundtimeThread extends Thread
 	{		
 		public void run()
