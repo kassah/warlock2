@@ -137,6 +137,10 @@ public class StormFrontJavascriptCommands extends JavascriptCommands
 		return var.getValue();
 	}
 	
+	public String getVital(String name) {
+		return sfCommands.getStormFrontClient().getVital(name);
+	}
+	
 	public void setVariable(String name, String value) {
 		((ClientSettings)sfCommands.getClient().getClientSettings()).getVariableConfigurationProvider().addVariable(name, value);
 	}
