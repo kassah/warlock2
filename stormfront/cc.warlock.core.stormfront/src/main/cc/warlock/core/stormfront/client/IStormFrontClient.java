@@ -149,7 +149,7 @@ public interface IStormFrontClient extends IWarlockClient, IRoomListener {
 	/**
 	 * @return The associated SFDialog
 	 */
-	public StormFrontDialog getDialog(String id);
+	public IProperty<IStormFrontDialogMessage> getDialog(String id);
 	
 	/**
 	 * @return The character status

@@ -39,7 +39,7 @@ import cc.warlock.core.client.IWarlockStyle;
 import cc.warlock.core.client.WarlockClientRegistry;
 import cc.warlock.core.client.WarlockString;
 import cc.warlock.core.client.internal.CharacterStatus;
-import cc.warlock.core.client.internal.ClientProperty;
+import cc.warlock.core.client.internal.Property;
 import cc.warlock.core.client.internal.WarlockClient;
 import cc.warlock.core.client.internal.WarlockStyle;
 import cc.warlock.core.client.settings.IClientSettings;
@@ -50,7 +50,7 @@ import cc.warlock.core.script.ScriptEngineRegistry;
 import cc.warlock.core.script.configuration.ScriptConfiguration;
 import cc.warlock.core.stormfront.IStormFrontProtocolHandler;
 import cc.warlock.core.stormfront.client.IStormFrontClient;
-import cc.warlock.core.stormfront.client.StormFrontDialog;
+import cc.warlock.core.stormfront.client.IStormFrontDialogMessage;
 import cc.warlock.core.stormfront.network.StormFrontConnection;
 import cc.warlock.core.stormfront.settings.IStormFrontClientSettings;
 import cc.warlock.core.stormfront.settings.StormFrontServerSettings;
@@ -71,11 +71,11 @@ import com.martiansoftware.jsap.CommandLineTokenizer;
 public class StormFrontClient extends WarlockClient implements IStormFrontClient, IScriptListener, IRoomListener {
 
 	protected ICharacterStatus status;
-	protected ClientProperty<Integer> roundtime, casttime, monsterCount;
-	protected ClientProperty<String> leftHand, rightHand, currentSpell;
+	protected Property<Integer> roundtime, casttime, monsterCount;
+	protected Property<String> leftHand, rightHand, currentSpell;
 	protected StringBuffer buffer = new StringBuffer();
 	protected IStormFrontProtocolHandler handler;
-	protected ClientProperty<String> playerId, characterName, gameCode, roomDescription;
+	protected Property<String> playerId, characterName, gameCode, roomDescription;
 	protected StormFrontClientSettings clientSettings;
 	protected StormFrontServerSettings serverSettings;
 	protected long timeDelta;
@@ -86,29 +86,29 @@ public class StormFrontClient extends WarlockClient implements IStormFrontClient
 	protected ArrayList<IScript> runningScripts;
 	protected ArrayList<IScriptListener> scriptListeners;
 	protected DefaultSkin skin;
-	protected HashMap<String, ClientProperty<String>> components =
-		new HashMap<String, ClientProperty<String>>();
+	protected HashMap<String, Property<String>> components =
+		new HashMap<String, Property<String>>();
 	protected HashMap<String, IStream> componentStreams = new HashMap<String, IStream>();
 	protected HashMap<String, String> commands;
-	protected HashMap<String, StormFrontDialog> dialogs =
-		new HashMap<String, StormFrontDialog>();
+	protected HashMap<String, Property<IStormFrontDialogMessage>> dialogs =
+		new HashMap<String, Property<IStormFrontDialogMessage>>();
 	protected HashMap<String, String> vitals = new HashMap<String, String>();
 	
 	public StormFrontClient() {
 		super();
 		
 		status = new CharacterStatus(this);
-		leftHand = new ClientProperty<String>(this, "leftHand", null);
-		rightHand = new ClientProperty<String>(this, "rightHand", null);
-		currentSpell = new ClientProperty<String>(this, "currentSpell", null);
+		leftHand = new Property<String>("leftHand", null);
+		rightHand = new Property<String>("rightHand", null);
+		currentSpell = new Property<String>("currentSpell", null);
 		
-		roundtime = new ClientProperty<Integer>(this, "roundtime", 0);
-		casttime = new ClientProperty<Integer>(this, "casttime", 0);
-		playerId = new ClientProperty<String>(this, "playerId", null);
-		characterName = new ClientProperty<String>(this, "characterName", null);
-		gameCode = new ClientProperty<String>(this, "gameCode", null);
-		roomDescription = new ClientProperty<String>(this, "roomDescription", null);
-		monsterCount = new ClientProperty<Integer>(this, "monsterCount", null);
+		roundtime = new Property<Integer>("roundtime", 0);
+		casttime = new Property<Integer>("casttime", 0);
+		playerId = new Property<String>("playerId", null);
+		characterName = new Property<String>("characterName", null);
+		gameCode = new Property<String>("gameCode", null);
+		roomDescription = new Property<String>("roomDescription", null);
+		monsterCount = new Property<Integer>("monsterCount", null);
 
 		roundtimeEnd = null;
 		casttimeEnd = null;
@@ -196,11 +196,11 @@ public class StormFrontClient extends WarlockClient implements IStormFrontClient
 		return monsterCount;
 	}
 	
-	public StormFrontDialog getDialog(String id) {
-		StormFrontDialog dialog = dialogs.get(id);
+	public Property<IStormFrontDialogMessage> getDialog(String id) {
+		Property<IStormFrontDialogMessage> dialog = dialogs.get(id);
 		
 		if(dialog == null) {
-			dialog = new StormFrontDialog(this, id);
+			dialog = new Property<IStormFrontDialogMessage>(id, null);
 			dialogs.put(id, dialog);
 		}
 		
@@ -395,7 +395,7 @@ public class StormFrontClient extends WarlockClient implements IStormFrontClient
 		
 	}
 
-	public ClientProperty<String> getPlayerId() {
+	public Property<String> getPlayerId() {
 		return playerId;
 	}
 	
@@ -498,7 +498,7 @@ public class StormFrontClient extends WarlockClient implements IStormFrontClient
 	public void setComponent (String name, String value, IStream stream)
 	{
 		if (!components.containsKey(name)) {
-			components.put(name, new ClientProperty<String>(this, name, value));
+			components.put(name, new Property<String>(name, value));
 		} else {
 			components.get(name).set(value);
 		}
@@ -507,11 +507,11 @@ public class StormFrontClient extends WarlockClient implements IStormFrontClient
 	}
 	
 	public void updateComponent(String name, WarlockString value) {
-		ClientProperty<String> component = components.get(name);
+		Property<String> component = components.get(name);
 		if(component != null) {
 			component.set(value.toString());
 		} else {
-			component = new ClientProperty<String>(this, name, value.toString());
+			component = new Property<String>(name, value.toString());
 			components.put(name, component);
 		}
 		

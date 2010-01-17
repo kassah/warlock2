@@ -28,13 +28,13 @@ import cc.warlock.core.client.ICharacterStatus;
 import cc.warlock.core.client.IPropertyListener;
 import cc.warlock.core.client.IWarlockClient;
 
-public class CharacterStatus extends ClientProperty<String> implements ICharacterStatus {
+public class CharacterStatus extends Property<String> implements ICharacterStatus {
 	
 	protected HashMap<StatusType, Boolean> status = new HashMap<StatusType, Boolean>();
 	
 	public CharacterStatus (IWarlockClient client)
 	{
-		super(client, "characterStatus", null);
+		super("characterStatus", null);
 		
 		for (StatusType type : StatusType.values())
 		{
