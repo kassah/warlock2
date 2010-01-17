@@ -103,6 +103,7 @@ public class WSLScript extends AbstractScript {
 		addCommandDefinition("echo", new WSLEcho());
 		addCommandDefinition("else", new WSLElse());
 		addCommandDefinition("exit", new WSLExit());
+		addCommandDefinition("getvital", new WSLGetVital());
 		addCommandDefinition("gosub", new WSLGosub());
 		addCommandDefinition("goto", new WSLGoto());
 		for(int i = 0; i <= 9; i++) {
@@ -1084,6 +1085,24 @@ public class WSLScript extends AbstractScript {
 			if (variableExists(variableName) && getVariable(variableName).toString().length() > 0)
 			{
 				WSLScript.this.execute(arguments);
+			}
+		}
+	}
+	
+	private class WSLGetVital implements IWSLCommandDefinition {
+		
+		private Pattern format = Pattern.compile("^(\\w+)\\s+(\\w+)");
+		
+		public void execute(String arguments) {
+			Matcher m = format.matcher(arguments);
+			
+			if(m.find()) {
+				String vital = m.group(1);
+				String var = m.group(2);
+				
+				setGlobalVariable(var, sfClient.getVital(vital));
+			} else {
+				scriptError("Invalid arguments to random");
 			}
 		}
 	}
