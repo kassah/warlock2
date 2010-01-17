@@ -28,7 +28,7 @@ import cc.warlock.core.client.IWarlockSkin;
 import cc.warlock.core.client.IWarlockStyle;
 import cc.warlock.core.client.WarlockClientRegistry;
 import cc.warlock.core.client.WarlockColor;
-import cc.warlock.core.client.internal.ClientProperty;
+import cc.warlock.core.client.internal.Property;
 import cc.warlock.core.client.internal.WarlockClient;
 import cc.warlock.core.client.internal.WarlockStyle;
 import cc.warlock.core.network.Connection;
@@ -52,8 +52,8 @@ public class TelnetClient extends WarlockClient {
 	{
 		super();
 		
-		characterName = new ClientProperty<String>(this, "characterName", "<telnet>");
-		clientId = new ClientProperty<String>(this, "clientId", null);
+		characterName = new Property<String>("characterName", "<telnet>");
+		clientId = new Property<String>("clientId", null);
 		skin = new DefaultSkin();
 		commandStyle = new WarlockStyle();
 		commandStyle.setBackgroundColor(new WarlockColor("#000033"));
