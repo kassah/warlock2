@@ -39,12 +39,10 @@ import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Display;
 import org.eclipse.ui.part.ViewPart;
 
-import cc.warlock.core.client.IProperty;
 import cc.warlock.core.client.IPropertyListener;
 import cc.warlock.core.client.IWarlockClient;
 import cc.warlock.core.client.WarlockClientAdapter;
 import cc.warlock.core.client.WarlockClientRegistry;
-import cc.warlock.core.client.internal.ClientProperty;
 import cc.warlock.core.client.settings.IWindowSettings;
 import cc.warlock.core.stormfront.client.IStormFrontClient;
 import cc.warlock.core.stormfront.settings.IStormFrontClientSettings;
@@ -54,7 +52,7 @@ import cc.warlock.rcp.util.ColorUtil;
 import cc.warlock.rcp.views.GameView;
 import cc.warlock.rcp.views.IGameViewFocusListener;
 
-public class HandsView extends ViewPart implements IPropertyListener<String> 
+public class HandsView extends ViewPart
 {
 	public static final String VIEW_ID = "cc.warlock.rcp.stormfront.ui.views.HandsView";
 	protected static HandsView _instance;
@@ -224,15 +222,18 @@ public class HandsView extends ViewPart implements IPropertyListener<String>
 		if (!clients.contains(client))
 		{
 			clear();
-			client.getLeftHand().addListener(new SWTPropertyListener<String>(this));
-			client.getRightHand().addListener(new SWTPropertyListener<String>(this));
-			client.getCurrentSpell().addListener(new SWTPropertyListener<String>(this));
+			client.getLeftHand().addListener(new SWTPropertyListener<String>(
+					new HandListener(leftHandInfo, client, "empty")));
+			client.getRightHand().addListener(new SWTPropertyListener<String>(
+					new HandListener(rightHandInfo, client, "empty")));
+			client.getCurrentSpell().addListener(new SWTPropertyListener<String>(
+					new HandListener(spellInfo, client, "none")));
 			
 			clients.add(client);
 		} else {
-			propertyChanged(client.getLeftHand(), null);
-			propertyChanged(client.getRightHand(), null);
-			propertyChanged(client.getCurrentSpell(), null);
+			leftHandInfo.setText(client.getLeftHand().get());
+			rightHandInfo.setText(client.getRightHand().get());
+			spellInfo.setText(client.getCurrentSpell().get());
 			loadSettings(client.getStormFrontClientSettings());
 		}
 	}
@@ -262,41 +263,26 @@ public class HandsView extends ViewPart implements IPropertyListener<String>
 		
 		setColors(fg, bg);
 	}
-	
-	public void propertyActivated(IProperty<String> property) {}
 
-	public void propertyChanged(IProperty<String> property, String oldValue) {
-		if (property != null && property instanceof ClientProperty)
-		{
-			ClientProperty<String> clientProperty = (ClientProperty<String>) property;
-			if (clientProperty.getClient() == activeClient)
-			{
-				if (property.getName().equals("leftHand")) {
-					leftHandInfo.setText(property.get());
-				}
-				else if (property.getName().equals("rightHand")) {
-					rightHandInfo.setText(property.get());
-				}
-				else if (property.getName().equals("currentSpell")) {
-					spellInfo.setText(property.get());
-				}
-			}
+	private class HandListener implements IPropertyListener<String> {
+		private GradientInfo hand;
+		private IStormFrontClient client;
+		private String emptyText;
+		
+		public HandListener(GradientInfo hand, IStormFrontClient client, String emptyText) {
+			this.hand = hand;
+			this.client = client;
+			this.emptyText = emptyText;
 		}
-	}
+		
+		public void propertyChanged(String value) {
+			if (client == activeClient)
+				hand.setText(value);
+		}
 
-	public void propertyCleared(IProperty<String> property, String oldValue) {
-		if (property != null && property instanceof ClientProperty)
-		{
-			ClientProperty<String> clientProperty = (ClientProperty<String>) property;
-			if (clientProperty.getClient() == activeClient)
-			{
-				if (property.getName().equals("leftHand"))
-					leftHandInfo.setText("Empty");
-				else if (property.getName().equals("rightHand"))
-					rightHandInfo.setText("Empty");
-				else if (property.getName().equals("currentSpell"))
-					spellInfo.setText("None");
-			}
+		public void propertyCleared() {
+			if (client == activeClient)
+				hand.setText(emptyText);
 		}
 	}
 	

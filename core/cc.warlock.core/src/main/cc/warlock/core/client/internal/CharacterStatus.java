@@ -50,7 +50,7 @@ public class CharacterStatus extends ClientProperty<String> implements ICharacte
 		}
 		
 		for (IPropertyListener<String> listener : listeners) {
-			listener.propertyCleared(this, null);
+			listener.propertyCleared();
 		}
 	}
 	
@@ -62,7 +62,7 @@ public class CharacterStatus extends ClientProperty<String> implements ICharacte
 			status.put(statusType, true);
 			for (IPropertyListener<String> listener : listeners)
 			{
-				listener.propertyChanged(this, null);
+				listener.propertyChanged(this.get());
 			}
 		}
 	}
@@ -75,7 +75,7 @@ public class CharacterStatus extends ClientProperty<String> implements ICharacte
 			status.put(statusType, false);
 			for (IPropertyListener<String> listener : listeners)
 			{
-				listener.propertyChanged(this, null);
+				listener.propertyChanged(this.get());
 			}
 		}
 	}

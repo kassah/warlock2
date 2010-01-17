@@ -256,11 +256,8 @@ public class StreamView extends ViewPart implements IStreamListener, IGameViewFo
 			if (propertyListenerWrapper == null) {
 				propertyListenerWrapper = new SWTPropertyListener<String>(new PropertyListener<String>() {
 					@Override
-					public void propertyChanged(IProperty<String> property, String oldValue) {
-						if (property.getName().equals("streamTitle"))
-						{
-							setPartName(property.get());
-						}
+					public void propertyChanged(String value) {
+						setPartName(value);
 					}
 				});
 			}

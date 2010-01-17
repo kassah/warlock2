@@ -28,6 +28,7 @@
 package cc.warlock.rcp.stormfront.ui.views;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.graphics.Color;
@@ -38,12 +39,10 @@ import org.eclipse.swt.widgets.Display;
 import org.eclipse.ui.part.PageBook;
 import org.eclipse.ui.part.ViewPart;
 
-import cc.warlock.core.client.IProperty;
 import cc.warlock.core.client.IPropertyListener;
 import cc.warlock.core.client.IWarlockClient;
 import cc.warlock.core.client.WarlockClientAdapter;
 import cc.warlock.core.client.WarlockClientRegistry;
-import cc.warlock.core.client.internal.ClientProperty;
 import cc.warlock.core.stormfront.client.IStormFrontClient;
 import cc.warlock.core.stormfront.client.IStormFrontDialogMessage;
 import cc.warlock.rcp.stormfront.ui.StormFrontDialogControl;
@@ -72,15 +71,18 @@ public class BarsView extends ViewPart {
 	protected WarlockProgressBar roundtime, roundtime2, casttime;
 	protected StormFrontDialogControl minivitals;
 	
-	protected SWTPropertyListener<Integer> rtListener;
-	protected SWTPropertyListener<Integer> ctListener;
+	protected HashMap<IStormFrontClient, SWTPropertyListener<Integer>> rtListeners =
+		new HashMap<IStormFrontClient, SWTPropertyListener<Integer>>();
+	protected HashMap<IStormFrontClient, SWTPropertyListener<Integer>> ctListeners =
+		new HashMap<IStormFrontClient, SWTPropertyListener<Integer>>();
+	protected HashMap<IStormFrontClient, SWTPropertyListener<IStormFrontDialogMessage>> mvListeners =
+		new HashMap<IStormFrontClient, SWTPropertyListener<IStormFrontDialogMessage>>();
+
 	protected IStormFrontClient activeClient;
 	protected ArrayList<IStormFrontClient> clients = new ArrayList<IStormFrontClient>();
 	
 	public BarsView() {
 		instance = this;
-		rtListener = new SWTPropertyListener<Integer>(new RoundtimeListener());
-		ctListener = new SWTPropertyListener<Integer>(new CasttimeListener());
 		
 		WarlockClientRegistry.addWarlockClientListener(new WarlockClientAdapter() {
 			public void clientConnected(final IWarlockClient client) {
@@ -113,15 +115,27 @@ public class BarsView extends ViewPart {
 		
 		if (!clients.contains(client))
 		{
+			SWTPropertyListener<Integer> rtListener =
+				new SWTPropertyListener<Integer>(new RoundtimeListener(client));
 			client.getRoundtime().addListener(rtListener);
+			rtListeners.put(client, rtListener);
+			
+			SWTPropertyListener<Integer> ctListener =
+				new SWTPropertyListener<Integer>(new CasttimeListener(client));
 			client.getCasttime().addListener(ctListener);
-			client.getDialog("minivitals").addListener(
-					new SWTPropertyListener<IStormFrontDialogMessage>(minivitals));
+			ctListeners.put(client, ctListener);
+			
+			SWTPropertyListener<IStormFrontDialogMessage> mvListener =
+				new SWTPropertyListener<IStormFrontDialogMessage>(
+						new MinivitalsListener(minivitals, client));
+			client.getDialog("minivitals").addListener(mvListener);
+			mvListeners.put(client, mvListener);
+			
 			clients.add(client);
 			
 		} else {
-			rtListener.propertyChanged(client.getRoundtime(), null);
-			ctListener.propertyChanged(client.getCasttime(), null);
+			rtListeners.get(client).propertyChanged(client.getRoundtime().get());
+			ctListeners.get(client).propertyChanged(client.getCasttime().get());
 		}
 	}
 	
@@ -205,78 +219,89 @@ public class BarsView extends ViewPart {
 
 	}
 	
+	private class MinivitalsListener implements IPropertyListener<IStormFrontDialogMessage> {
+		private StormFrontDialogControl control;
+		private IStormFrontClient client;
+		
+		public MinivitalsListener(StormFrontDialogControl control, IStormFrontClient client) {
+			this.control = control;
+			this.client = client;
+		}
+		
+		public void propertyChanged(IStormFrontDialogMessage msg) {
+			if(activeClient == client)
+				control.sendMessage(msg);
+		}
+		
+		public void propertyCleared() { }	
+	}
+	
 	private class RoundtimeListener implements IPropertyListener<Integer> {
 		int roundtimeLength = -1;
-		
-		public void propertyActivated(IProperty<Integer> property) {	}
+		private IStormFrontClient client;
 
-		public void propertyCleared(IProperty<Integer> property, Integer oldValue) {	}
+		public RoundtimeListener(IStormFrontClient client) {
+			this.client = client;
+		}
 		
-		public void propertyChanged(IProperty<Integer> property, Integer oldValue) {
-			if (property == null || property.getName() == null || !property.getName().equals("roundtime")) return;
-
-			if (property instanceof ClientProperty<?>)
-			{
-				ClientProperty<Integer> clientProperty = (ClientProperty<Integer>) property;
-				if (clientProperty.getClient() == activeClient)
+		public void propertyCleared() {	}
+		
+		public void propertyChanged(Integer value) {
+			if (client != activeClient)
+				return;
+			
+			if (value == 0) {
+				roundtimeLength = -1;
+				roundtime.setSelection(0);
+				roundtime2.setSelection(0);
+				roundtime.setLabel("no roundtime");
+				roundtime2.setLabel("no roundtime");
+			} else {
+				if (roundtimeLength != activeClient.getRoundtimeLength())
 				{
-					if (property.get() == 0) {
-						roundtimeLength = -1;
-						roundtime.setSelection(0);
-						roundtime2.setSelection(0);
-						roundtime.setLabel("no roundtime");
-						roundtime2.setLabel("no roundtime");
-					} else {
-						if (roundtimeLength != activeClient.getRoundtimeLength())
-						{
-							roundtimeLength = activeClient.getRoundtimeLength();
-							roundtime.setMaximum(roundtimeLength * 1000);
-							roundtime2.setMaximum(roundtimeLength * 1000);
-							roundtime.setMinimum(0);
-							roundtime2.setMinimum(0);
-						}
-						roundtime.setSelection(property.get() * 1000);
-						roundtime2.setSelection(property.get() * 1000);
-						roundtime.setLabel("roundtime: " + property.get() + " seconds");
-						roundtime2.setLabel("roundtime: " + property.get() + " seconds");
-					}
+					roundtimeLength = activeClient.getRoundtimeLength();
+					roundtime.setMaximum(roundtimeLength * 1000);
+					roundtime2.setMaximum(roundtimeLength * 1000);
+					roundtime.setMinimum(0);
+					roundtime2.setMinimum(0);
 				}
+				roundtime.setSelection(value * 1000);
+				roundtime2.setSelection(value * 1000);
+				roundtime.setLabel("roundtime: " + value + " seconds");
+				roundtime2.setLabel("roundtime: " + value + " seconds");
 			}
 		}
 	}
 	
 	private class CasttimeListener implements IPropertyListener<Integer> {
 		int casttimeLength = -1;
+		private IStormFrontClient client;
 		
-		public void propertyActivated(IProperty<Integer> property) {	}
+		public CasttimeListener(IStormFrontClient client) {
+			this.client = client;
+		}
 
-		public void propertyCleared(IProperty<Integer> property, Integer oldValue) {	}
+		public void propertyCleared() {	}
 		
-		public void propertyChanged(IProperty<Integer> property, Integer oldValue) {
-			if (property == null || property.getName() == null || !property.getName().equals("casttime")) return;
-
-			if (property instanceof ClientProperty<?>)
-			{
-				ClientProperty<Integer> clientProperty = (ClientProperty<Integer>) property;
-				if (clientProperty.getClient() == activeClient)
+		public void propertyChanged(Integer value) {
+			if (client != activeClient)
+				return;
+				
+			if (value == 0) {
+				casttimeLength = -1;
+				casttime.setSelection(0);
+				casttime.setLabel("no casttime");
+				rtPageBook.showPage(rtBarWOCT);
+			} else {
+				if (casttimeLength != activeClient.getCasttimeLength())
 				{
-					if (property.get() == 0) {
-						casttimeLength = -1;
-						casttime.setSelection(0);
-						casttime.setLabel("no casttime");
-						rtPageBook.showPage(rtBarWOCT);
-					} else {
-						if (casttimeLength != activeClient.getCasttimeLength())
-						{
-							casttimeLength = activeClient.getCasttimeLength();
-							casttime.setMaximum(casttimeLength * 1000);
-							casttime.setMinimum(0);
-						}
-						casttime.setSelection(property.get() * 1000);
-						casttime.setLabel("casttime: " + property.get() + " seconds");
-						rtPageBook.showPage(rtBarWCT);
-					}
+					casttimeLength = activeClient.getCasttimeLength();
+					casttime.setMaximum(casttimeLength * 1000);
+					casttime.setMinimum(0);
 				}
+				casttime.setSelection(value * 1000);
+				casttime.setLabel("casttime: " + value + " seconds");
+				rtPageBook.showPage(rtBarWCT);
 			}
 		}
 	}

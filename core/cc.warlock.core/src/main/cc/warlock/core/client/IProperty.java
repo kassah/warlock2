@@ -46,11 +46,6 @@ public interface IProperty<T> {
 	public void clear();
 	
 	/**
-	 * FIXME I don't know if this function is needed either
-	 */
-	public void activate();
-	
-	/**
 	 * adds a listener to this property
 	 * @param listener
 	 */

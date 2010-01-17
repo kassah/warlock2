@@ -32,16 +32,11 @@ public interface IPropertyListener<T> {
 	/**
 	 * this method is called when the value of the property has changed
 	 */
-	public void propertyChanged(IProperty<T> property, T oldValue);
+	public void propertyChanged(T value);
 	
 	/**
 	 * this method is called when the property is cleared
 	 */
-	public void propertyCleared(IProperty<T> property, T oldValue);
-	
-	/**
-	 * this method is called when the property is activated
-	 */
-	public void propertyActivated(IProperty<T> property);
+	public void propertyCleared();
 	
 }

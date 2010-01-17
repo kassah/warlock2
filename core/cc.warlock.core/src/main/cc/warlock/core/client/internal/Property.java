@@ -38,11 +38,9 @@ public class Property<T> implements IProperty<T> {
 	}
 	
 	public void set(T data) {
-		T oldData = this.data;
-		
 		this.data = data;
 		for(IPropertyListener<T> listener : listeners) {
-			listener.propertyChanged(this, oldData);
+			listener.propertyChanged(data);
 		}
 	}
 	
@@ -55,17 +53,10 @@ public class Property<T> implements IProperty<T> {
 	}
 	
 	public void clear() {
-		T oldData = this.data;
 		data = null;
 		
 		for(IPropertyListener<T> listener : listeners) {
-			listener.propertyCleared(this, oldData);
-		}
-	}
-	
-	public void activate() {
-		for (IPropertyListener<T> listener : listeners) {
-			listener.propertyActivated(this);
+			listener.propertyCleared();
 		}
 	}
 	

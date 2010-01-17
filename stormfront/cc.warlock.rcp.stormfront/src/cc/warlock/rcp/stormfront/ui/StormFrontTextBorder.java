@@ -115,32 +115,25 @@ public class StormFrontTextBorder implements PaintListener, IPropertyListener<St
 				textWidget.redraw();
 	}
 
-	public void propertyActivated(IProperty<String> property) {}
+	public void propertyChanged(String value) {
+		if (activeClient == null) return;
 
-	public void propertyChanged(IProperty<String> property, String oldValue) {
-		if (property == null || property.getName() == null || activeClient == null) return;
-		
-		if ("characterStatus".equals(property.getName()))
-		{
-			ICharacterStatus status = activeClient.getCharacterStatus();
-			if (status.getStatus().get(ICharacterStatus.StatusType.Stunned)
-					&& status.getStatus().get(ICharacterStatus.StatusType.Bleeding)) {
-				// If both are active, report stunned. 
-				// There is generally nothing they can do about the bleeding when stunned anyway
-				setStunned();
-			} else if (status.getStatus().get(ICharacterStatus.StatusType.Stunned)) {
-				setStunned();
-			} else if (status.getStatus().get(ICharacterStatus.StatusType.Bleeding)) {
-				setBleeding();
-			} else {
-				setClear();
-			}
+		ICharacterStatus status = activeClient.getCharacterStatus();
+		if (status.getStatus().get(ICharacterStatus.StatusType.Stunned)
+				&& status.getStatus().get(ICharacterStatus.StatusType.Bleeding)) {
+			// If both are active, report stunned. 
+			// There is generally nothing they can do about the bleeding when stunned anyway
+			setStunned();
+		} else if (status.getStatus().get(ICharacterStatus.StatusType.Stunned)) {
+			setStunned();
+		} else if (status.getStatus().get(ICharacterStatus.StatusType.Bleeding)) {
+			setBleeding();
+		} else {
+			setClear();
 		}
-		// TODO Auto-generated method stub
-		
 	}
 
-	public void propertyCleared(IProperty<String> property, String oldValue) {}
+	public void propertyCleared() {}
 
 	/* (non-Javadoc)
 	 * @see org.eclipse.swt.events.PaintListener#paintControl(org.eclipse.swt.events.PaintEvent)
@@ -170,7 +163,7 @@ public class StormFrontTextBorder implements PaintListener, IPropertyListener<St
 			
 			clients.add(client);
 		} else {
-			propertyChanged(client.getCharacterStatus(), null);
+			propertyChanged(client.getCharacterStatus().get());
 		}
 	}
 }

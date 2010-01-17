@@ -80,8 +80,6 @@ public class StormFrontStatus implements IPropertyListener<String> {
 			statusLabels[i].setImage(StormFrontSharedImages.getImage(StormFrontSharedImages.IMG_STATUS_BLANK));
 		}
 	}
-
-	public void propertyActivated(IProperty<String> property) {}
 	
 	protected void setStatusImage(int place, String imageId)
 	{
@@ -121,75 +119,72 @@ public class StormFrontStatus implements IPropertyListener<String> {
 			oldImage.dispose();
 	}
 	
-	public void propertyChanged(IProperty<String> property, String oldValue) {
-		if (property == null || property.getName() == null || activeClient == null) return;
-		
-		if ("characterStatus".equals(property.getName()))
+	public void propertyChanged(String value) {
+		if (activeClient == null) return;
+
+		ICharacterStatus status = activeClient.getCharacterStatus();
+
+		if (status.getStatus().get(ICharacterStatus.StatusType.Invisible)) 
 		{
-			ICharacterStatus status = activeClient.getCharacterStatus();
-			
-			if (status.getStatus().get(ICharacterStatus.StatusType.Invisible)) 
+			if (status.getStatus().get(ICharacterStatus.StatusType.Standing))
 			{
-				if (status.getStatus().get(ICharacterStatus.StatusType.Standing))
-				{
-					setStatusImage(0, StormFrontSharedImages.IMG_STATUS_INVIS_STANDING);
-				}
-				else if (status.getStatus().get(ICharacterStatus.StatusType.Sitting))
-				{
-					setStatusImage(0, StormFrontSharedImages.IMG_STATUS_INVIS_SITTING);
-				}
-				else if (status.getStatus().get(ICharacterStatus.StatusType.Kneeling))
-				{
-					setStatusImage(0, StormFrontSharedImages.IMG_STATUS_INVIS_KNEELING);
-				}
-				else if (status.getStatus().get(ICharacterStatus.StatusType.Prone))
-				{
-					setStatusImage(0, StormFrontSharedImages.IMG_STATUS_INVIS_PRONE);
-				}
-			} else {
-				if (status.getStatus().get(ICharacterStatus.StatusType.Standing))
-				{
-					setStatusImage(0, StormFrontSharedImages.IMG_STATUS_STANDING);
-				}
-				else if (status.getStatus().get(ICharacterStatus.StatusType.Sitting))
-				{
-					setStatusImage(0, StormFrontSharedImages.IMG_STATUS_SITTING);
-				}
-				else if (status.getStatus().get(ICharacterStatus.StatusType.Kneeling))
-				{
-					setStatusImage(0, StormFrontSharedImages.IMG_STATUS_KNEELING);
-				}
-				else if (status.getStatus().get(ICharacterStatus.StatusType.Prone))
-				{
-					setStatusImage(0, StormFrontSharedImages.IMG_STATUS_PRONE);
-				}
+				setStatusImage(0, StormFrontSharedImages.IMG_STATUS_INVIS_STANDING);
 			}
-			
-			if (status.getStatus().get(ICharacterStatus.StatusType.Joined))
+			else if (status.getStatus().get(ICharacterStatus.StatusType.Sitting))
 			{
-				setStatusImage(1, StormFrontSharedImages.IMG_STATUS_JOINED);
+				setStatusImage(0, StormFrontSharedImages.IMG_STATUS_INVIS_SITTING);
 			}
-			else {
-				setStatusImage(1, StormFrontSharedImages.IMG_STATUS_BLANK);
-			}
-			
-			if (status.getStatus().get(ICharacterStatus.StatusType.Hidden))
+			else if (status.getStatus().get(ICharacterStatus.StatusType.Kneeling))
 			{
-				setStatusImage(2, StormFrontSharedImages.IMG_STATUS_HIDDEN);
+				setStatusImage(0, StormFrontSharedImages.IMG_STATUS_INVIS_KNEELING);
 			}
-			else if (status.getStatus().get(ICharacterStatus.StatusType.Dead))
+			else if (status.getStatus().get(ICharacterStatus.StatusType.Prone))
 			{
-				setStatusImage(2, StormFrontSharedImages.IMG_STATUS_DEAD);
+				setStatusImage(0, StormFrontSharedImages.IMG_STATUS_INVIS_PRONE);
 			}
-			else {
-				setStatusImage(2, StormFrontSharedImages.IMG_STATUS_BLANK);
+		} else {
+			if (status.getStatus().get(ICharacterStatus.StatusType.Standing))
+			{
+				setStatusImage(0, StormFrontSharedImages.IMG_STATUS_STANDING);
 			}
-			
-			handleMultipleStatus(status);
+			else if (status.getStatus().get(ICharacterStatus.StatusType.Sitting))
+			{
+				setStatusImage(0, StormFrontSharedImages.IMG_STATUS_SITTING);
+			}
+			else if (status.getStatus().get(ICharacterStatus.StatusType.Kneeling))
+			{
+				setStatusImage(0, StormFrontSharedImages.IMG_STATUS_KNEELING);
+			}
+			else if (status.getStatus().get(ICharacterStatus.StatusType.Prone))
+			{
+				setStatusImage(0, StormFrontSharedImages.IMG_STATUS_PRONE);
+			}
 		}
+
+		if (status.getStatus().get(ICharacterStatus.StatusType.Joined))
+		{
+			setStatusImage(1, StormFrontSharedImages.IMG_STATUS_JOINED);
+		}
+		else {
+			setStatusImage(1, StormFrontSharedImages.IMG_STATUS_BLANK);
+		}
+
+		if (status.getStatus().get(ICharacterStatus.StatusType.Hidden))
+		{
+			setStatusImage(2, StormFrontSharedImages.IMG_STATUS_HIDDEN);
+		}
+		else if (status.getStatus().get(ICharacterStatus.StatusType.Dead))
+		{
+			setStatusImage(2, StormFrontSharedImages.IMG_STATUS_DEAD);
+		}
+		else {
+			setStatusImage(2, StormFrontSharedImages.IMG_STATUS_BLANK);
+		}
+
+		handleMultipleStatus(status);
 	}
 	
-	public void propertyCleared(IProperty<String> property, String oldValue) {}
+	public void propertyCleared() {}
 		
 	protected void setColors (Color fg, Color bg)
 	{
@@ -223,7 +218,7 @@ public class StormFrontStatus implements IPropertyListener<String> {
 			
 			clients.add(client);
 		} else {
-			propertyChanged(client.getCharacterStatus(), null);
+			propertyChanged(client.getCharacterStatus().get());
 		}
 		
 		loadSettings(client.getStormFrontClientSettings());

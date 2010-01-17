@@ -36,8 +36,6 @@ import org.eclipse.swt.widgets.Canvas;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Display;
 
-import cc.warlock.core.client.IProperty;
-import cc.warlock.core.client.IPropertyListener;
 import cc.warlock.core.stormfront.client.IStormFrontDialogMessage;
 import cc.warlock.core.stormfront.client.StormFrontProgressBar;
 
@@ -47,7 +45,7 @@ import cc.warlock.core.stormfront.client.StormFrontProgressBar;
  * This is a custom progress bar that mimics the L&F of StormFront's status bars.
  * It's sort of a dirty hack, but it suffices for now. It needs to handle being in a LayoutManager better...
  */
-public class StormFrontDialogControl extends Canvas implements IPropertyListener<IStormFrontDialogMessage>
+public class StormFrontDialogControl extends Canvas
 {
 	protected Font progressFont;
 	protected int width, height;
@@ -190,20 +188,13 @@ public class StormFrontDialogControl extends Canvas implements IPropertyListener
 		super.dispose();
 	}
 
-	public void propertyChanged(IProperty<IStormFrontDialogMessage> property,
-			IStormFrontDialogMessage oldMsg) {
-		IStormFrontDialogMessage msg = property.get();
+	public void sendMessage(IStormFrontDialogMessage msg) {
 		if(msg instanceof StormFrontProgressBar) {
 			StormFrontProgressBar bar = (StormFrontProgressBar) msg;
 			progressBars.put(bar.id, bar);
 		}
 		redraw();
 	}
-	
-	public void propertyActivated(IProperty<IStormFrontDialogMessage> property) { }
-	
-	public void propertyCleared(IProperty<IStormFrontDialogMessage> msg,
-			IStormFrontDialogMessage oldMsg) { }
 	
 	private Color getTextColor(String id) {
 		

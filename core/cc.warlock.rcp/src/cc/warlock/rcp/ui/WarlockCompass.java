@@ -186,13 +186,11 @@ public class WarlockCompass implements PaintListener, MouseMoveListener, MouseLi
 		}
 	}
 	
-	public void propertyActivated(IProperty<ICompass> property) {}
-	public void propertyCleared(IProperty<ICompass> property, ICompass oldValue) {}
-	public void propertyChanged(IProperty<ICompass> property, ICompass oldValue) {
-		if(compass == null || !compass.equals(property.get())) {
-			compass = property.get();
-			redraw();
-		}
+	public void propertyCleared() {}
+	
+	public void propertyChanged(ICompass value) {
+		compass = value;
+		redraw();
 	}
 	
 	protected void textResized (ControlEvent e)

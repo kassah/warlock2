@@ -37,60 +37,32 @@ public class SWTPropertyListener<T> implements IPropertyListener<T> {
 	
 	private class ChangedWrapper implements Runnable
 	{
-		private IProperty<T> property;
-		private T oldValue;
+		private T value;
 		
-		public ChangedWrapper(IProperty<T> p, T o) {
-			property = p;
-			oldValue = o;
+		public ChangedWrapper(T value) {
+			this.value = value;
 		}
 		
 		public void run ()
 		{
-			listener.propertyChanged(property, oldValue);
+			listener.propertyChanged(value);
 		}
 	}
 	
 	private class ClearedWrapper implements Runnable
 	{
-		private IProperty<T> property;
-		private T oldValue;
-		
-		public ClearedWrapper(IProperty<T> p, T o) {
-			property = p;
-			oldValue = o;
-		}
-		
 		public void run ()
 		{
-			listener.propertyCleared(property, oldValue);
+			listener.propertyCleared();
 		}
-	}
-	
-	private class ActivatedWrapper implements Runnable
-	{
-		private IProperty<T> property;
-		
-		public ActivatedWrapper(IProperty<T> p) {
-			property = p;
-		}
-		
-		public void run ()
-		{
-			listener.propertyActivated(property);
-		}
-	}
-	
-	public void propertyActivated (IProperty<T> property) {
-		Display.getDefault().asyncExec(new ActivatedWrapper(property));
 	}
 
-	public void propertyChanged (IProperty<T> property, T oldValue) {
-		Display.getDefault().asyncExec(new ChangedWrapper(property, oldValue));
+	public void propertyChanged (T value) {
+		Display.getDefault().asyncExec(new ChangedWrapper(value));
 	}
 
-	public void propertyCleared (IProperty<T> property, T oldValue) {
-		Display.getDefault().asyncExec(new ClearedWrapper(property, oldValue));
+	public void propertyCleared () {
+		Display.getDefault().asyncExec(new ClearedWrapper());
 	}
 
 }

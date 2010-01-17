@@ -195,12 +195,6 @@ public class StormFrontClient extends WarlockClient implements IStormFrontClient
 	public IProperty<Integer> getMonsterCount() {
 		return monsterCount;
 	}
-
-	public void openDialog(String id) {
-		StormFrontDialog dialog = getDialog(id);
-		
-		dialog.activate();
-	}
 	
 	public StormFrontDialog getDialog(String id) {
 		StormFrontDialog dialog = dialogs.get(id);
