@@ -57,6 +57,7 @@ public class StormFrontDialogControl extends Canvas
 		manaFG, manaBG, manaBorder,
 		fatigueFG, fatigueBG, fatigueBorder,
 		spiritFG, spiritBG, spiritBorder,
+		concentrationFG, concentrationBG, concentrationBorder,
 		defaultFG, defaultBG, defaultBorder;
 	
 	public StormFrontDialogControl (Composite composite, int style)
@@ -87,6 +88,10 @@ public class StormFrontDialogControl extends Canvas
 		spiritBG = new Color(display, 150, 150, 150);
 		spiritFG = new Color(display, 0, 0, 0);
 		spiritBorder = new Color(display, 225, 225, 225);
+		
+		concentrationBG = new Color(display, 0, 255, 0);
+		concentrationFG = new Color(display, 0, 0, 0);
+		concentrationBorder = new Color(display, 225, 225, 225);
 		
 		defaultBG = new Color(display, 150, 150, 150);
 		defaultFG = new Color(display, 0, 0, 0);
@@ -207,8 +212,11 @@ public class StormFrontDialogControl extends Canvas
 		if(id.equals("spirit"))
 			return spiritFG;
 		
-		if(id.equals("fatigue"))
+		if(id.equals("stamina"))
 			return fatigueFG;
+		
+		if(id.equals("concentration"))
+			return concentrationFG;
 		
 		return defaultFG;
 	}
@@ -224,8 +232,11 @@ public class StormFrontDialogControl extends Canvas
 		if(id.equals("spirit"))
 			return spiritBG;
 		
-		if(id.equals("fatigue"))
+		if(id.equals("stamina"))
 			return fatigueBG;
+		
+		if(id.equals("concentration"))
+			return concentrationBG;
 		
 		return defaultBG;
 	}
@@ -241,8 +252,11 @@ public class StormFrontDialogControl extends Canvas
 		if(id.equals("spirit"))
 			return spiritBorder;
 		
-		if(id.equals("fatigue"))
+		if(id.equals("stamina"))
 			return fatigueBorder;
+		
+		if(id.equals("concentration"))
+			return concentrationBorder;
 		
 		return defaultBorder;
 	}
