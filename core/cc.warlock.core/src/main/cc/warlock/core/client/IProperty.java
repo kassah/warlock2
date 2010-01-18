@@ -41,11 +41,6 @@ public interface IProperty<T> {
 	public T get();
 	
 	/**
-	 * FIXME I don't know if this method is appropriately generic, maybe it should be moved
-	 */
-	public void clear();
-	
-	/**
 	 * adds a listener to this property
 	 * @param listener
 	 */

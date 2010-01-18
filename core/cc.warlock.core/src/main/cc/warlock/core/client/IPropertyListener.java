@@ -34,9 +34,4 @@ public interface IPropertyListener<T> {
 	 */
 	public void propertyChanged(T value);
 	
-	/**
-	 * this method is called when the property is cleared
-	 */
-	public void propertyCleared();
-	
 }

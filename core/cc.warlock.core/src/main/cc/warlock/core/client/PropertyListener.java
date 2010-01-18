@@ -21,16 +21,6 @@
  */
 package cc.warlock.core.client;
 
-public class PropertyListener<T> implements IPropertyListener<T> {
-
-	public void propertyChanged(T value) {
-		// TODO Auto-generated method stub
-
-	}
-
-	public void propertyCleared() {
-		// TODO Auto-generated method stub
-
-	}
+public abstract class PropertyListener<T> implements IPropertyListener<T> {
 
 }

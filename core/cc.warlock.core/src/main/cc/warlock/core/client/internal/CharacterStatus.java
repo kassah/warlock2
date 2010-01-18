@@ -42,18 +42,6 @@ public class CharacterStatus extends Property<String> implements ICharacterStatu
 		}
 	}
 	
-	@Override
-	public void clear() {
-		for (StatusType type : StatusType.values())
-		{
-			status.put(type, false);
-		}
-		
-		for (IPropertyListener<String> listener : listeners) {
-			listener.propertyCleared();
-		}
-	}
-	
 	public void set(String data) {
 		StatusType statusType = StatusType.getStatusType(data);
 		

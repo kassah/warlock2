@@ -43,7 +43,6 @@ import org.eclipse.ui.part.PageBook;
 import org.eclipse.ui.part.ViewPart;
 
 import cc.warlock.core.client.ICommand;
-import cc.warlock.core.client.IProperty;
 import cc.warlock.core.client.IStream;
 import cc.warlock.core.client.IStreamListener;
 import cc.warlock.core.client.IWarlockClient;
@@ -255,7 +254,6 @@ public class StreamView extends ViewPart implements IStreamListener, IGameViewFo
 		if (streamTitled) {
 			if (propertyListenerWrapper == null) {
 				propertyListenerWrapper = new SWTPropertyListener<String>(new PropertyListener<String>() {
-					@Override
 					public void propertyChanged(String value) {
 						setPartName(value);
 					}

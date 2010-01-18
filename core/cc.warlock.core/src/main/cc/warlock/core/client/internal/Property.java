@@ -52,14 +52,6 @@ public class Property<T> implements IProperty<T> {
 		return data;
 	}
 	
-	public void clear() {
-		data = null;
-		
-		for(IPropertyListener<T> listener : listeners) {
-			listener.propertyCleared();
-		}
-	}
-	
 	public void addListener(IPropertyListener<T> listener) {
 		listeners.add(listener);
 	}

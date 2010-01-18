@@ -23,7 +23,6 @@ package cc.warlock.rcp.ui.client;
 
 import org.eclipse.swt.widgets.Display;
 
-import cc.warlock.core.client.IProperty;
 import cc.warlock.core.client.IPropertyListener;
 
 public class SWTPropertyListener<T> implements IPropertyListener<T> {
@@ -48,21 +47,9 @@ public class SWTPropertyListener<T> implements IPropertyListener<T> {
 			listener.propertyChanged(value);
 		}
 	}
-	
-	private class ClearedWrapper implements Runnable
-	{
-		public void run ()
-		{
-			listener.propertyCleared();
-		}
-	}
 
 	public void propertyChanged (T value) {
 		Display.getDefault().asyncExec(new ChangedWrapper(value));
-	}
-
-	public void propertyCleared () {
-		Display.getDefault().asyncExec(new ClearedWrapper());
 	}
 
 }

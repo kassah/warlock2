@@ -46,9 +46,9 @@ import org.eclipse.swt.widgets.MenuItem;
 import org.eclipse.ui.PartInitException;
 import org.eclipse.ui.PlatformUI;
 
+import cc.warlock.core.client.IPropertyListener;
 import cc.warlock.core.client.IWarlockClient;
 import cc.warlock.core.client.IWarlockClientListener;
-import cc.warlock.core.client.PropertyListener;
 import cc.warlock.core.client.WarlockClientRegistry;
 import cc.warlock.core.client.WarlockColor;
 import cc.warlock.core.client.WarlockFont;
@@ -324,7 +324,7 @@ public class StormFrontGameView extends GameView implements IStormFrontClientVie
 	{
 		IStormFrontClientSettings settings = (IStormFrontClientSettings) clientSettings;
 		
-		sfClient.getCharacterName().addListener(new PropertyListener<String>() {
+		sfClient.getCharacterName().addListener(new IPropertyListener<String>() {
 			public void propertyChanged(String value) {
 				String viewId = getViewSite().getId() + ":" + getViewSite().getSecondaryId();
 				
