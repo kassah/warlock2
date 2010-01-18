@@ -27,7 +27,6 @@ import java.util.List;
 import org.dom4j.DocumentHelper;
 import org.dom4j.Element;
 
-import cc.warlock.core.client.IProperty;
 import cc.warlock.core.client.IWarlockClient;
 import cc.warlock.core.client.IWarlockStyle;
 import cc.warlock.core.client.PropertyListener;
@@ -108,7 +107,7 @@ public class ClientSettings extends TreeConfigurationProvider implements IClient
 			public void clientActivated(IWarlockClient client) {
 				if (client == ClientSettings.this.client) {
 					client.getClientId().addListener(new PropertyListener<String>() {
-						public void propertyChanged(IProperty<String> property, String oldValue) {
+						public void propertyChanged(String value) {
 							parseClientSettings();
 						}
 					});
