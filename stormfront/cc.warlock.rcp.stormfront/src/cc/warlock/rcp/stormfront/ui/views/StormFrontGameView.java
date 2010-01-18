@@ -46,7 +46,6 @@ import org.eclipse.swt.widgets.MenuItem;
 import org.eclipse.ui.PartInitException;
 import org.eclipse.ui.PlatformUI;
 
-import cc.warlock.core.client.IProperty;
 import cc.warlock.core.client.IWarlockClient;
 import cc.warlock.core.client.IWarlockClientListener;
 import cc.warlock.core.client.PropertyListener;
@@ -328,11 +327,18 @@ public class StormFrontGameView extends GameView implements IStormFrontClientVie
 		sfClient.getCharacterName().addListener(new PropertyListener<String>() {
 			public void propertyChanged(String value) {
 				String viewId = getViewSite().getId() + ":" + getViewSite().getSecondaryId();
-				StormFrontGameViewConfiguration.instance().addProfileMapping(viewId, sfClient.getCharacterName().get());
+				
+				/* FIXME: Marshall, can you look the following. I _think_
+				 * sfClient.getCharacterName().get() should just be replaced
+				 * by value (the parameter to this method).
+				 */
+				StormFrontGameViewConfiguration.instance().addProfileMapping(viewId,
+						sfClient.getCharacterName().get());
 				
 				Display.getDefault().asyncExec(new Runnable() {
 					public void run() {
-						Profile profile = ProfileConfiguration.instance().getProfileByCharacterName(sfClient.getCharacterName().get());
+						Profile profile = ProfileConfiguration.instance()
+								.getProfileByCharacterName(sfClient.getCharacterName().get());
 						if (profile != null) {
 							setReconnectProfile(profile);
 						} else {
