@@ -326,7 +326,7 @@ public class StormFrontGameView extends GameView implements IStormFrontClientVie
 		IStormFrontClientSettings settings = (IStormFrontClientSettings) clientSettings;
 		
 		sfClient.getCharacterName().addListener(new PropertyListener<String>() {
-			public void propertyChanged(IProperty<String> property, String oldValue) {
+			public void propertyChanged(String value) {
 				String viewId = getViewSite().getId() + ":" + getViewSite().getSecondaryId();
 				StormFrontGameViewConfiguration.instance().addProfileMapping(viewId, sfClient.getCharacterName().get());
 				
