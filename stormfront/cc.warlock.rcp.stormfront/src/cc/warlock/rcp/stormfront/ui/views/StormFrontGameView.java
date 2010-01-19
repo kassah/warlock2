@@ -241,23 +241,23 @@ public class StormFrontGameView extends GameView implements IStormFrontClientVie
 	}
 	
 	private ProgressMonitorDialog settingsProgressDialog;
-	public void startDownloadingServerSettings() {
+	public void startedDownloadingServerSettings() {
 		settingsProgressDialog = new ProgressMonitorDialog(getSite().getShell());
 		settingsProgressDialog.setBlockOnOpen(false);
 		settingsProgressDialog.open();
 		
 		IProgressMonitor monitor = settingsProgressDialog.getProgressMonitor();
-		monitor.beginTask("Downloading server settings...", SettingType.values().length);
+		monitor.beginTask("Downloading server settings...", IProgressMonitor.UNKNOWN);
 	}
 	
-	public void receivedServerSetting(SettingType settingType)
+	public void receivedServerSetting(String setting)
 	{
 		if (settingsProgressDialog == null) {
 			Display.getDefault().readAndDispatch();
 		}
 		
 		IProgressMonitor monitor = settingsProgressDialog.getProgressMonitor();
-		monitor.subTask("Downloading " + settingType.toString() + "...");
+		monitor.subTask("Downloading " + setting + "...");
 		
 		monitor.worked(1);
 	}

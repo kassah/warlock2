@@ -21,12 +21,7 @@
  */
 package cc.warlock.core.stormfront.internal;
 
-import java.net.MalformedURLException;
-import java.net.URL;
-
-import cc.warlock.core.client.IWarlockClientViewer;
 import cc.warlock.core.stormfront.IStormFrontProtocolHandler;
-import cc.warlock.core.stormfront.client.IStormFrontClientViewer;
 import cc.warlock.core.stormfront.xml.StormFrontAttributeList;
 
 public class LaunchURLTagHandler extends DefaultTagHandler {
@@ -50,17 +45,7 @@ public class LaunchURLTagHandler extends DefaultTagHandler {
 	
 	@Override
 	public void handleEnd(String rawXML) {
-		for (IWarlockClientViewer viewer : handler.getClient().getViewers())
-		{
-			if (viewer instanceof IStormFrontClientViewer)
-			{
-				try {
-					((IStormFrontClientViewer)viewer).launchURL(new URL(url));
-				} catch (MalformedURLException e) {
-					e.printStackTrace();
-				}
-			}
-		}
+		handler.getClient().launchURL(url);
 	}
 
 }

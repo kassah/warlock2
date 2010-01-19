@@ -23,7 +23,6 @@ package cc.warlock.core.stormfront.settings.internal;
 
 import org.dom4j.Element;
 
-import cc.warlock.core.client.IWarlockClientViewer;
 import cc.warlock.core.client.settings.internal.ClientSettings;
 import cc.warlock.core.stormfront.client.IStormFrontClient;
 import cc.warlock.core.stormfront.settings.ICommandLineSettings;
@@ -76,10 +75,7 @@ public class StormFrontClientSettings extends ClientSettings implements
 	protected void parseClientSettings() {
 		super.parseClientSettings();
 		
-		for (IWarlockClientViewer viewer : client.getViewers())
-		{
-			viewer.loadClientSettings(this);
-		}
+		sfClient.loadClientSettings(this);
 	}
 	
 	public IStormFrontClient getStormFrontClient() {
@@ -99,10 +95,7 @@ public class StormFrontClientSettings extends ClientSettings implements
 	public void parseElement(Element element) {
 		super.parseElement(element);
 		
-		for (IWarlockClientViewer viewer : client.getViewers())
-		{
-			viewer.loadClientSettings(this);
-		}
+		sfClient.loadClientSettings(this);
 	}
 
 }

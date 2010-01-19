@@ -30,69 +30,88 @@ import cc.warlock.rcp.ui.client.SWTWarlockClientViewer;
 
 public class SWTStormFrontClientViewer extends SWTWarlockClientViewer implements IStormFrontClientViewer
 {
-	private IStormFrontClientViewer viewer;
-	private ListenerWrapper wrapper = new ListenerWrapper();
+	private IStormFrontClientViewer sfViewer;
 	
 	public SWTStormFrontClientViewer (IStormFrontClientViewer viewer)
 	{
 		super (viewer);
-		this.viewer = viewer;
+		this.sfViewer = viewer;
 	}
 	
-	private static enum EventType {
-		StartDownloadingServerSettings, ReceivedServerSetting,
-		FinishedDownloadingServerSettings, LaunchURL, AppendImage
-	};
-	
-	private class ListenerWrapper implements Runnable
+	private class StartedDownloadWrapper implements Runnable
 	{
-		private EventType eventType;
-		private SettingType settingType;
-		private URL url;
-		
 		public void run() {
-			switch (eventType)
-			{
-				case StartDownloadingServerSettings: viewer.startDownloadingServerSettings(); break;
-				case ReceivedServerSetting: viewer.receivedServerSetting(settingType);
-				case FinishedDownloadingServerSettings: viewer.finishedDownloadingServerSettings(); break;
-				case LaunchURL: viewer.launchURL(url); break;
-				case AppendImage: viewer.appendImage(url); break;
-			}
-			
-			url = null;
+			sfViewer.startedDownloadingServerSettings();
 		}
 	}
 
-	public IStormFrontClient getStormFrontClient() {
-		return viewer.getStormFrontClient();
+	private class ReceivedSettingWrapper implements Runnable
+	{
+		private String setting;
+		
+		public ReceivedSettingWrapper(String setting) {
+			this.setting = setting;
+		}
+
+		public void run() {
+			sfViewer.receivedServerSetting(setting);
+		}
 	}
 
-	public void startDownloadingServerSettings() {
-		wrapper.eventType = EventType.StartDownloadingServerSettings;
-		run(wrapper);
+	private class FinishedDownloadWrapper implements Runnable
+	{
+		public void run() {
+			sfViewer.finishedDownloadingServerSettings();
+		}
 	}
 	
-	public void receivedServerSetting(SettingType settingType) {
-		wrapper.eventType = EventType.ReceivedServerSetting;
-		wrapper.settingType = settingType;
-		run(wrapper);
+	private class LaunchUrlWrapper implements Runnable
+	{
+		private URL url;
+
+		LaunchUrlWrapper(URL url) {
+			this.url = url;
+		}
+		
+		public void run() {
+			sfViewer.launchURL(url);
+		}
+	}
+	
+	private class AppendImageWrapper implements Runnable
+	{
+		private URL url;
+
+		public AppendImageWrapper(URL url) {
+			this.url = url;
+		}
+		
+		public void run() {
+			sfViewer.appendImage(url);
+		}
+	}
+	
+	public IStormFrontClient getStormFrontClient() {
+		return sfViewer.getStormFrontClient();
+	}
+
+	public void startedDownloadingServerSettings() {
+		run(new StartedDownloadWrapper());
+	}
+	
+	public void receivedServerSetting(String setting) {
+		run(new ReceivedSettingWrapper(setting));
 	}
 	
 	public void finishedDownloadingServerSettings() {
-		wrapper.eventType = EventType.FinishedDownloadingServerSettings;
-		run(wrapper);
+		run(new FinishedDownloadWrapper());
 	}
 	
 	public void launchURL(URL url) {
-		wrapper.eventType = EventType.LaunchURL;
-		wrapper.url = url;
-		run(wrapper);
+		run(new LaunchUrlWrapper(url));
 	}
 	
 	public void appendImage(URL imageURL) {
-		wrapper.eventType = EventType.AppendImage;
-		wrapper.url = imageURL;
-		run(wrapper);
+		run(new AppendImageWrapper(imageURL));
 	}
 }

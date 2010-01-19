@@ -22,9 +22,15 @@
 
 package cc.warlock.core.stormfront.client.internal;
 
+import java.io.ByteArrayInputStream;
+import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
+import java.io.FileWriter;
 import java.io.IOException;
+import java.io.InputStream;
+import java.net.MalformedURLException;
+import java.net.URL;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
@@ -34,6 +40,7 @@ import cc.warlock.core.client.ICommand;
 import cc.warlock.core.client.IProperty;
 import cc.warlock.core.client.IRoomListener;
 import cc.warlock.core.client.IStream;
+import cc.warlock.core.client.IWarlockClientViewer;
 import cc.warlock.core.client.IWarlockSkin;
 import cc.warlock.core.client.IWarlockStyle;
 import cc.warlock.core.client.WarlockClientRegistry;
@@ -48,8 +55,8 @@ import cc.warlock.core.script.IScript;
 import cc.warlock.core.script.IScriptListener;
 import cc.warlock.core.script.ScriptEngineRegistry;
 import cc.warlock.core.script.configuration.ScriptConfiguration;
-import cc.warlock.core.stormfront.IStormFrontProtocolHandler;
 import cc.warlock.core.stormfront.client.IStormFrontClient;
+import cc.warlock.core.stormfront.client.IStormFrontClientViewer;
 import cc.warlock.core.stormfront.client.IStormFrontDialogMessage;
 import cc.warlock.core.stormfront.network.StormFrontConnection;
 import cc.warlock.core.stormfront.settings.IStormFrontClientSettings;
@@ -74,7 +81,6 @@ public class StormFrontClient extends WarlockClient implements IStormFrontClient
 	protected Property<Integer> roundtime, casttime, monsterCount;
 	protected Property<String> leftHand, rightHand, currentSpell;
 	protected StringBuffer buffer = new StringBuffer();
-	protected IStormFrontProtocolHandler handler;
 	protected Property<String> playerId, characterName, gameCode, roomDescription;
 	protected StormFrontClientSettings clientSettings;
 	protected StormFrontServerSettings serverSettings;
@@ -572,5 +578,91 @@ public class StormFrontClient extends WarlockClient implements IStormFrontClient
 	/* Internal only.. meant for importing/exporting stormfront's savings */
 	public StormFrontServerSettings getServerSettings() {
 		return serverSettings;
+	}
+	
+	public void launchURL(String url) {
+		for (IWarlockClientViewer viewer : viewers)
+		{
+			if (viewer instanceof IStormFrontClientViewer)
+			{
+				try {
+					((IStormFrontClientViewer)viewer).launchURL(new URL(url));
+				} catch (MalformedURLException e) {
+					e.printStackTrace();
+				}
+			}
+		}
+	}
+	
+	public void appendImage(String pictureId) {
+		try {
+			URL url = new URL("http://www.play.net/bfe/DR-art/" + pictureId + "_t.jpg");
+			
+			for (IWarlockClientViewer viewer : viewers) {
+				if (viewer instanceof IStormFrontClientViewer)
+					((IStormFrontClientViewer) viewer).appendImage(url);
+			}
+		} catch (MalformedURLException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+	}
+	
+	public void loadClientSettings(IClientSettings settings) {
+		for (IWarlockClientViewer viewer : viewers)
+		{
+			viewer.loadClientSettings(settings);
+		}
+	}
+	
+	public void startedDownloadingServerSettings() {
+		for (IWarlockClientViewer viewer : viewers) {
+			if (viewer instanceof IStormFrontClientViewer)
+				((IStormFrontClientViewer)viewer).startedDownloadingServerSettings();
+		}
+	}
+	
+	public void finishedDownloadingServerSettings(String str) {
+		String playerId = getPlayerId().get();
+		File settingsFile = ConfigurationUtil.getConfigurationFile("serverSettings_" + playerId + ".xml");
+		InputStream inStream = new ByteArrayInputStream(str.getBytes());
+		
+		try {
+			FileWriter writer = new FileWriter(settingsFile);
+
+			StormFrontDocument document = new StormFrontDocument(inStream);
+			document.saveTo(writer, true);
+			
+			writer.close();
+			inStream.close();
+			buffer.setLength(0);
+		} catch (IOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		
+		try {
+			InputStream stream = new FileInputStream(settingsFile);
+			
+			serverSettings.importServerSettings(stream, clientSettings);
+			stream.close();
+		} catch (FileNotFoundException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+		
+		for(IWarlockClientViewer viewer : viewers) {
+			if (viewer instanceof IStormFrontClientViewer)
+				((IStormFrontClientViewer)viewer).finishedDownloadingServerSettings();
+		}
+	}
+	
+	public void receivedServerSetting(String setting) {
+		for (IWarlockClientViewer viewer : viewers) {
+			if (viewer instanceof IStormFrontClientViewer)
+				((IStormFrontClientViewer)viewer).receivedServerSetting(setting);
+		}
 	}
 }

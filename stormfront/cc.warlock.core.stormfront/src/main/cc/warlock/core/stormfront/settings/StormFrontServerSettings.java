@@ -35,7 +35,6 @@ import java.util.regex.PatternSyntaxException;
 import org.dom4j.DocumentHelper;
 import org.dom4j.Element;
 
-import cc.warlock.core.client.IWarlockClientViewer;
 import cc.warlock.core.client.IWarlockStyle;
 import cc.warlock.core.client.WarlockColor;
 import cc.warlock.core.client.WarlockFont;
@@ -51,7 +50,6 @@ import cc.warlock.core.configuration.ConfigurationUtil;
 import cc.warlock.core.configuration.WarlockConfiguration;
 import cc.warlock.core.script.configuration.ScriptConfiguration;
 import cc.warlock.core.stormfront.client.IStormFrontClient;
-import cc.warlock.core.stormfront.client.IStormFrontClientViewer;
 import cc.warlock.core.stormfront.client.StormFrontColor;
 import cc.warlock.core.stormfront.settings.internal.StormFrontClientSettings;
 import cc.warlock.core.stormfront.settings.server.HighlightPreset;
@@ -215,14 +213,7 @@ public class StormFrontServerSettings extends ClientConfigurationProvider {
 		
 		WarlockConfiguration.getWarlockConfiguration(ClientSettings.CLIENT_SETTINGS).save();
 		
-		for (IWarlockClientViewer viewer : settings.getStormFrontClient().getViewers())
-		{
-			if (viewer instanceof IStormFrontClientViewer)
-			{
-				IStormFrontClientViewer sfViewer = (IStormFrontClientViewer) viewer;
-				sfViewer.loadClientSettings(settings);
-			}
-		}
+		settings.getStormFrontClient().loadClientSettings(settings);
 	}
 	
 	protected WarlockColor stormfrontColorToWarlockColor (StormFrontColor color)

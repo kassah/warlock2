@@ -35,6 +35,7 @@ import cc.warlock.core.client.IRoomListener;
 import cc.warlock.core.client.IStream;
 import cc.warlock.core.client.IWarlockClient;
 import cc.warlock.core.client.WarlockString;
+import cc.warlock.core.client.settings.IClientSettings;
 import cc.warlock.core.script.IScript;
 import cc.warlock.core.script.IScriptListener;
 import cc.warlock.core.stormfront.settings.IStormFrontClientSettings;
@@ -228,5 +229,17 @@ public interface IStormFrontClient extends IWarlockClient, IRoomListener {
 	public String getCommand(String coord);
 	
 	public void runScript(String command);
+	
+	public void launchURL(String url);
+	
+	public void appendImage(String pictureId);
+	
+	public void loadClientSettings(IClientSettings settings);
+	
+	public void startedDownloadingServerSettings();
+	
+	public void finishedDownloadingServerSettings(String str);
+	
+	public void receivedServerSetting(String setting);
 
 }

@@ -21,25 +21,9 @@
  */
 package cc.warlock.core.stormfront.internal;
 
-import java.io.ByteArrayInputStream;
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileNotFoundException;
-import java.io.FileWriter;
-import java.io.IOException;
-import java.io.InputStream;
-
-import org.apache.commons.lang.StringEscapeUtils;
-
-import cc.warlock.core.client.IWarlockClientViewer;
-import cc.warlock.core.configuration.ConfigurationUtil;
 import cc.warlock.core.stormfront.IStormFrontProtocolHandler;
 import cc.warlock.core.stormfront.IStormFrontTagHandler;
-import cc.warlock.core.stormfront.client.IStormFrontClientViewer;
-import cc.warlock.core.stormfront.client.internal.StormFrontClient;
-import cc.warlock.core.stormfront.settings.internal.StormFrontClientSettings;
 import cc.warlock.core.stormfront.xml.StormFrontAttributeList;
-import cc.warlock.core.stormfront.xml.StormFrontDocument;
 
 
 public class SettingsTagHandler extends DefaultTagHandler {
@@ -51,22 +35,6 @@ public class SettingsTagHandler extends DefaultTagHandler {
 		super(handler);
 		
 		subElements = new SettingsElementsTagHandler(handler, this);
-	}
-
-	protected static interface ViewerVisitor {
-		public void visit (IStormFrontClientViewer viewer);
-	}
-	
-	protected void visitViewers (ViewerVisitor visitor)
-	{
-		for (IWarlockClientViewer viewer : handler.getClient().getViewers())
-		{
-			if (viewer instanceof IStormFrontClientViewer)
-			{
-				IStormFrontClientViewer sfViewer = (IStormFrontClientViewer) viewer;
-				visitor.visit(sfViewer);
-			}
-		}
 	}
 	
 	@Override
@@ -86,56 +54,14 @@ public class SettingsTagHandler extends DefaultTagHandler {
 		if(major != null) buffer.append(" major=\"" + (Integer.parseInt(major) + 1) + "\"");
 		buffer.append(">\n");*/
 		
-		visitViewers(new ViewerVisitor() {
-			public void visit(IStormFrontClientViewer viewer) {
-				viewer.startDownloadingServerSettings();
-			}
-		});
+		handler.getClient().startedDownloadingServerSettings();
 	}
 	
 	@Override
 	public void handleEnd(String rawXML) {
 		buffer.append(rawXML);
 		
-		String playerId = handler.getClient().getPlayerId().get();
-		File serverSettings = ConfigurationUtil.getConfigurationFile("serverSettings_" + playerId + ".xml");
-		InputStream inStream = new ByteArrayInputStream(buffer.toString().getBytes());
-		
-		try {
-			FileWriter writer = new FileWriter(serverSettings);
-
-			StormFrontDocument document = new StormFrontDocument(inStream);
-			document.saveTo(writer, true);
-			
-			writer.close();
-			inStream.close();
-			buffer.setLength(0);
-		} catch (IOException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
-		
-		try {
-			InputStream stream = new FileInputStream(serverSettings);
-			StormFrontClient client = (StormFrontClient)handler.getClient();
-			StormFrontClientSettings settings = (StormFrontClientSettings)client.getStormFrontClientSettings();
-			
-			client.getServerSettings().importServerSettings(stream, settings);
-			stream.close();
-		} catch (FileNotFoundException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		} catch (IOException e) {
-			e.printStackTrace();
-		}
-		
-//		handler.getClient().getServerSettings().load(handler.getClient().getPlayerId().get());
-		visitViewers(new ViewerVisitor() {
-			public void visit(IStormFrontClientViewer viewer) {
-				viewer.finishedDownloadingServerSettings();
-			}
-		});
-
+		handler.getClient().finishedDownloadingServerSettings(buffer.toString());
 	}
 	
 	@Override

@@ -21,11 +21,7 @@
  */
 package cc.warlock.core.stormfront.internal;
 
-import org.apache.commons.lang.StringEscapeUtils;
-
 import cc.warlock.core.stormfront.IStormFrontProtocolHandler;
-import cc.warlock.core.stormfront.client.IStormFrontClientViewer;
-import cc.warlock.core.stormfront.internal.SettingsTagHandler.ViewerVisitor;
 import cc.warlock.core.stormfront.xml.StormFrontAttributeList;
 
 public class SettingsElementsTagHandler extends DefaultTagHandler {
@@ -62,30 +58,7 @@ public class SettingsElementsTagHandler extends DefaultTagHandler {
 	
 	@Override
 	public void handleEnd(String rawXML) {
-		IStormFrontClientViewer.SettingType setting = null;
-		if ("presets".equals(getCurrentTag())) setting = IStormFrontClientViewer.SettingType.Presets;
-		else if ("strings".equals(getCurrentTag())) setting = IStormFrontClientViewer.SettingType.Strings;
-		else if ("stream".equals(getCurrentTag())) setting = IStormFrontClientViewer.SettingType.Streams;
-		else if ("scripts".equals(getCurrentTag())) setting = IStormFrontClientViewer.SettingType.Scripts;
-		else if ("names".equals(getCurrentTag())) setting = IStormFrontClientViewer.SettingType.Names;
-		else if ("macros".equals(getCurrentTag())) setting = IStormFrontClientViewer.SettingType.Macros;
-		else if ("palette".equals(getCurrentTag())) setting = IStormFrontClientViewer.SettingType.Palette;
-		else if ("vars".equals(getCurrentTag())) setting = IStormFrontClientViewer.SettingType.Vars;
-		else if ("dialog".equals(getCurrentTag())) setting = IStormFrontClientViewer.SettingType.Dialogs;
-		else if ("panels".equals(getCurrentTag())) setting = IStormFrontClientViewer.SettingType.Panels;
-		else if ("toggles".equals(getCurrentTag())) setting = IStormFrontClientViewer.SettingType.Toggles;
-		else if ("misc".equals(getCurrentTag())) setting = IStormFrontClientViewer.SettingType.Misc;
-		else if ("options".equals(getCurrentTag())) setting = IStormFrontClientViewer.SettingType.Options;
-		
-		if (setting != null)
-		{
-			final IStormFrontClientViewer.SettingType finalSetting = setting;
-			settings.visitViewers(new ViewerVisitor() {
-				public void visit(IStormFrontClientViewer viewer) {
-					viewer.receivedServerSetting(finalSetting);
-				}
-			});
-		}
+		handler.getClient().receivedServerSetting(getCurrentTag());
 		
 		if (rawXML != null)
 		{

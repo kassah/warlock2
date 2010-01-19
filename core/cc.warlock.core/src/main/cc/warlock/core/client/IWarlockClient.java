@@ -25,6 +25,7 @@
 package cc.warlock.core.client;
 
 import java.io.IOException;
+import java.io.InputStream;
 import java.util.Collection;
 
 import cc.warlock.core.client.logging.IClientLogger;
@@ -59,11 +60,6 @@ public interface IWarlockClient extends IRoomListener {
 	 * @return This client's command history
 	 */
 	public ICommandHistory getCommandHistory();
-	
-	/**
-	 * @return the list of viewers for this client.
-	 */
-	public Collection<IWarlockClientViewer> getViewers();
 	
 	/**
 	 * Add a viewer to this client
@@ -151,4 +147,6 @@ public interface IWarlockClient extends IRoomListener {
 	 * @return This client's logger (for use by streams etc)
 	 */
 	public IClientLogger getLogger();
+	
+	public void playSound(InputStream stream);
 }

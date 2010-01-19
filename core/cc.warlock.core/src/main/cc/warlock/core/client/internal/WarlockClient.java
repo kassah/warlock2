@@ -25,6 +25,7 @@
 package cc.warlock.core.client.internal;
 
 import java.io.IOException;
+import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
@@ -109,10 +110,6 @@ public abstract class WarlockClient implements IWarlockClient {
 			e.printStackTrace();
 		}
 	}
-
-	public Collection<IWarlockClientViewer> getViewers() {
-		return viewers;
-	}
 	
 	public void addViewer(IWarlockClientViewer viewer) {
 		viewers.add(viewer);
@@ -181,4 +178,9 @@ public abstract class WarlockClient implements IWarlockClient {
 		return logger;
 	}
 	
+	public void playSound(InputStream stream) {
+		for (IWarlockClientViewer viewer : viewers) {
+			viewer.playSound(stream);
+		}
+	}
 }
