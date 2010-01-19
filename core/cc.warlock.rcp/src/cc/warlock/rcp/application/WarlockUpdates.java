@@ -167,16 +167,8 @@ public class WarlockUpdates {
 											
 											IFeatureReference featureRef = featuresToUpgrade.get(0);
 											IFeature feature = featureRef.getFeature(monitor);
-											
-											boolean restart = MessageDialog.openQuestion(PlatformUI.getWorkbench().getActiveWorkbenchWindow().getShell(),
-												"Restart Warlock?", 
-												"Warlock has finished downloading and updating to version " + feature.getVersionedIdentifier().getVersion() + "." +
-												" Would you like to restart Warlock for the changes to take effect?");
-											
-											if (restart)
-											{
-												PlatformUI.getWorkbench().restart();
-											}
+											/* Force a restart. Because everyone reports bugs before restarting. */
+											PlatformUI.getWorkbench().restart();
 										}
 									} catch (CoreException e) {
 										// TODO Auto-generated catch block
