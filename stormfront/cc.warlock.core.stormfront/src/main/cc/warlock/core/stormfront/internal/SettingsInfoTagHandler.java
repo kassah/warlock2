@@ -99,24 +99,29 @@ public class SettingsInfoTagHandler extends DefaultTagHandler {
 			} catch(IOException e) {
 				e.printStackTrace();
 			}
-		} else {
-			try {
-				handler.getClient().getConnection().sendLine("");
-				
-				StormFrontClient client = (StormFrontClient)handler.getClient();
-				if (client.getServerSettings().getClientVersion() == null)
-				{
-					FileInputStream stream = new FileInputStream(serverSettings);
-					StormFrontClientSettings settings =
-						(StormFrontClientSettings)handler.getClient().getStormFrontClientSettings();
-					
-					client.getServerSettings().importServerSettings(stream, settings);					
-					stream.close();
-				}
-			} catch(IOException e) {
-				e.printStackTrace();
-			}
-			
+		}
+		// TODO make this smart maybe?
+		// Taking this out, prevents settings merging, they already have
+		//  settings so they should just deal with them, rather than get
+		//  new ones
+//		} else {
+//			try {
+//				handler.getClient().getConnection().sendLine("");
+//				
+//				StormFrontClient client = (StormFrontClient)handler.getClient();
+//				if (client.getServerSettings().getClientVersion() == null)
+//				{
+//					FileInputStream stream = new FileInputStream(serverSettings);
+//					StormFrontClientSettings settings =
+//						(StormFrontClientSettings)handler.getClient().getStormFrontClientSettings();
+//					
+//					client.getServerSettings().importServerSettings(stream, settings);					
+//					stream.close();
+//				}
+//			} catch(IOException e) {
+//				e.printStackTrace();
+//			}
+
 			// TODO we will need to un-comment this later when we add code to support merging of stormfront's settings
 			// check against crc to see if we're up to date
 //			StormFrontDocument document = ServerSettings.getDocument(playerId);
@@ -152,7 +157,7 @@ public class SettingsInfoTagHandler extends DefaultTagHandler {
 //					e.printStackTrace();
 //				}
 //			}
-		}
+//		}
 	}
 	
 	public String getCRC () {
