@@ -99,6 +99,13 @@ public class SettingsInfoTagHandler extends DefaultTagHandler {
 			} catch(IOException e) {
 				e.printStackTrace();
 			}
+		} else {
+			try {
+				handler.getClient().getConnection().sendLine("");
+			} catch (IOException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
 		}
 		// TODO make this smart maybe?
 		// Taking this out, prevents settings merging, they already have
