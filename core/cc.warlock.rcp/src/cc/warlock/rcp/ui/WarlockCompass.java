@@ -40,10 +40,8 @@ import org.eclipse.swt.graphics.Point;
 import org.eclipse.swt.graphics.Rectangle;
 
 import cc.warlock.core.client.ICompass;
-import cc.warlock.core.client.IProperty;
 import cc.warlock.core.client.IPropertyListener;
 import cc.warlock.core.client.ICompass.DirectionType;
-import cc.warlock.rcp.ui.client.SWTPropertyListener;
 import cc.warlock.rcp.ui.style.CompassTheme;
 
 /**
@@ -65,7 +63,6 @@ public class WarlockCompass implements PaintListener, MouseMoveListener, MouseLi
 	
 	public WarlockCompass (WarlockText text, CompassTheme theme)
 	{
-		text.getClient().getCompass().addListener(new SWTPropertyListener<ICompass>(this));
 		this.text = text;
 		this.theme = theme;
 		

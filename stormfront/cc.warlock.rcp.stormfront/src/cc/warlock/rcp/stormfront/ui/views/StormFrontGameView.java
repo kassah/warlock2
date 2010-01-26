@@ -46,6 +46,7 @@ import org.eclipse.swt.widgets.MenuItem;
 import org.eclipse.ui.PartInitException;
 import org.eclipse.ui.PlatformUI;
 
+import cc.warlock.core.client.ICompass;
 import cc.warlock.core.client.IPropertyListener;
 import cc.warlock.core.client.IWarlockClient;
 import cc.warlock.core.client.IWarlockClientListener;
@@ -65,9 +66,12 @@ import cc.warlock.rcp.stormfront.ui.StormFrontStatus;
 import cc.warlock.rcp.stormfront.ui.actions.ProfileConnectAction;
 import cc.warlock.rcp.stormfront.ui.style.StormFrontStyleProvider;
 import cc.warlock.rcp.stormfront.ui.wizards.SGEConnectWizard;
+import cc.warlock.rcp.ui.WarlockCompass;
 import cc.warlock.rcp.ui.WarlockPopupAction;
 import cc.warlock.rcp.ui.WarlockSharedImages;
 import cc.warlock.rcp.ui.WarlockWizardDialog;
+import cc.warlock.rcp.ui.client.SWTPropertyListener;
+import cc.warlock.rcp.ui.style.CompassThemes;
 import cc.warlock.rcp.ui.style.StyleProviders;
 import cc.warlock.rcp.util.ColorUtil;
 import cc.warlock.rcp.util.RCPUtil;
@@ -82,6 +86,7 @@ public class StormFrontGameView extends GameView implements IStormFrontClientVie
 	protected IStormFrontClient sfClient;
 	protected StormFrontStatus status;
 	protected WarlockPopupAction reconnectPopup;
+	private WarlockCompass compass;
 	//protected StormFrontTextBorder textBorder;
 	
 	public StormFrontGameView ()
@@ -95,9 +100,8 @@ public class StormFrontGameView extends GameView implements IStormFrontClientVie
 	public void createPartControl(Composite parent) {
 		super.createPartControl(parent);
 		
-		currentText.addCompass();
+		compass = new WarlockCompass(streamText, CompassThemes.getCompassTheme("small"));
 		//textBorder = new StormFrontTextBorder(text);
-		
 		
 		((GridLayout)entryComposite.getLayout()).numColumns = 2;
 		status = new StormFrontStatus(entryComposite);
@@ -272,12 +276,14 @@ public class StormFrontGameView extends GameView implements IStormFrontClientVie
 	public void setClient(IWarlockClient client) {
 		super.setClient(client);
 		
+		client.getCompass().addListener(new SWTPropertyListener<ICompass>(compass));
+		
 		hidePopup(reconnectPopup);
 //		reconnectPopup.setVisible(false);
 		if (client instanceof IStormFrontClient)
 		{
-			addStream(client.getStream(IStormFrontClient.DEATH_STREAM_NAME));
-			addStream(client.getStream(IStormFrontClient.ATMOSPHERICS_STREAM_NAME));
+			client.getStream(IStormFrontClient.DEATH_STREAM_NAME).addStreamListener(streamText);
+			client.getStream(IStormFrontClient.ATMOSPHERICS_STREAM_NAME).addStreamListener(streamText);
 			sfClient = (IStormFrontClient) client;
 
 			StyleProviders.setStyleProvider(client, new StormFrontStyleProvider(sfClient.getStormFrontClientSettings()));
@@ -312,8 +318,6 @@ public class StormFrontGameView extends GameView implements IStormFrontClientVie
 		
 		showPopup(reconnectPopup);
 //		reconnectPopup.setVisible(true);
-		removeStream(client.getStream(IStormFrontClient.DEATH_STREAM_NAME));
-		removeStream(client.getStream(IStormFrontClient.ATMOSPHERICS_STREAM_NAME));
 	}
 	
 	protected Font normalFont;
@@ -360,7 +364,7 @@ public class StormFrontGameView extends GameView implements IStormFrontClientVie
 //		}
 		
 		normalFont = mainFont.isDefaultFont() ? JFaceResources.getDefaultFont() : new Font(getSite().getShell().getDisplay(), fontFace, fontSize, SWT.NONE);
-		currentText.setFont(normalFont);
+		streamText.setFont(normalFont);
 		
 		WarlockColor entryBG = settings.getCommandLineSettings().getBackgroundColor();
 		WarlockColor entryFG = settings.getCommandLineSettings().getForegroundColor();
@@ -373,9 +377,9 @@ public class StormFrontGameView extends GameView implements IStormFrontClientVie
 		Caret newCaret = createCaret(1, ColorUtil.warlockColorToColor(entryBarColor.isDefault() ? fg : entryBarColor));
 		entry.getWidget().setCaret(newCaret);
 		
-		currentText.setBackground(ColorUtil.warlockColorToColor(bg));
-		currentText.setForeground(ColorUtil.warlockColorToColor(fg));
-		currentText.getTextWidget().redraw();
+		streamText.setBackground(ColorUtil.warlockColorToColor(bg));
+		streamText.setForeground(ColorUtil.warlockColorToColor(fg));
+		streamText.getTextWidget().redraw();
 		
 		if (HandsView.getDefault() != null)
 		{
@@ -384,11 +388,8 @@ public class StormFrontGameView extends GameView implements IStormFrontClientVie
 		
 		for (StreamView streamView : StreamView.getOpenViews())
 		{
-			if (!(streamView instanceof GameView))
-			{
-				streamView.setBackground(client, ColorUtil.warlockColorToColor(bg));
-				streamView.setForeground(client, ColorUtil.warlockColorToColor(fg));
-			}
+			streamView.setBackground(client, ColorUtil.warlockColorToColor(bg));
+			streamView.setForeground(client, ColorUtil.warlockColorToColor(fg));
 		}
 		
 		if (status != null) {

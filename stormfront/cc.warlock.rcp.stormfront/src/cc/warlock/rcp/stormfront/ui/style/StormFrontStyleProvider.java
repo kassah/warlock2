@@ -26,7 +26,6 @@ import org.eclipse.swt.SWT;
 import org.eclipse.swt.graphics.Font;
 import org.eclipse.swt.widgets.Display;
 
-import cc.warlock.core.client.IWarlockClient;
 import cc.warlock.core.client.IWarlockStyle;
 import cc.warlock.core.client.WarlockColor;
 import cc.warlock.core.client.WarlockFont;
@@ -42,13 +41,14 @@ public class StormFrontStyleProvider extends DefaultStyleProvider {
 	
 	public StormFrontStyleProvider (IStormFrontClientSettings settings)
 	{
+		super(settings.getClient());
 		this.settings = settings;
 	}
 	
-	public StyleRangeWithData getStyleRange (IWarlockClient client, IWarlockStyle style)
+	public StyleRangeWithData getStyleRange (IWarlockStyle style)
 	{
 		Display display = Display.getDefault();
-		StyleRangeWithData range = super.getStyleRange(client, style);
+		StyleRangeWithData range = super.getStyleRange(style);
 		
 		IStormFrontClient sfClient = (IStormFrontClient)client;
 		

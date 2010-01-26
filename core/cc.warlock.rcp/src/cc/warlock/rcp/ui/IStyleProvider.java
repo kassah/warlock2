@@ -21,11 +21,8 @@
  */
 package cc.warlock.rcp.ui;
 
-import org.eclipse.swt.custom.StyleRange;
-
-import cc.warlock.core.client.IWarlockClient;
 import cc.warlock.core.client.IWarlockStyle;
 
 public interface IStyleProvider {
-	public StyleRange getStyleRange (IWarlockClient client, IWarlockStyle style);
+	public StyleRangeWithData getStyleRange (IWarlockStyle style);
 }

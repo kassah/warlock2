@@ -36,18 +36,13 @@ import cc.warlock.rcp.util.FontUtil;
 
 public class DefaultStyleProvider implements IStyleProvider {
 	
-	protected static DefaultStyleProvider _instance;
-	protected DefaultStyleProvider () { }
+	protected IWarlockClient client;
 	
-	public static DefaultStyleProvider instance()
-	{
-		if (_instance == null) {
-			_instance = new DefaultStyleProvider();
-		}
-		return _instance;
+	public DefaultStyleProvider (IWarlockClient client) {
+		this.client = client;
 	}
 	
-	public StyleRangeWithData getStyleRange (IWarlockClient client, IWarlockStyle style)
+	public StyleRangeWithData getStyleRange (IWarlockStyle style)
 	{	
 		StyleRangeWithData range = new StyleRangeWithData();
 		range.fontStyle = 0;

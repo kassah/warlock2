@@ -29,6 +29,8 @@ package cc.warlock.rcp.ui.client;
 
 import java.io.InputStream;
 
+import org.eclipse.swt.widgets.Display;
+
 import cc.warlock.core.client.IWarlockClient;
 import cc.warlock.core.client.IWarlockClientViewer;
 import cc.warlock.core.client.settings.IClientSettings;
@@ -38,13 +40,12 @@ import cc.warlock.core.client.settings.IClientSettings;
  *
  * A convenience super class for viewers who need SWT thread access
  */
-public class SWTWarlockClientViewer extends SWTStreamListener implements IWarlockClientViewer  {
+public class SWTWarlockClientViewer implements IWarlockClientViewer  {
 
 	private IWarlockClientViewer viewer;
 	
 	public SWTWarlockClientViewer (IWarlockClientViewer viewer)
 	{
-		super(viewer);
 		this.viewer = viewer;
 	}
 	
@@ -141,6 +142,11 @@ public class SWTWarlockClientViewer extends SWTStreamListener implements IWarloc
 		public void run () {
 			viewer.loadClientSettings(settings);
 		}
+	}
+	
+	protected void run(Runnable runnable)
+	{
+		Display.getDefault().asyncExec(runnable);
 	}
 	
 	public String getCurrentCommand() {

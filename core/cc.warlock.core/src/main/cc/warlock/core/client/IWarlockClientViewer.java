@@ -37,7 +37,7 @@ import cc.warlock.core.client.settings.IClientSettings;
  * The implementor of this class will be responsible for echoing
  * and appending text to the view of this client.  
  */
-public interface IWarlockClientViewer extends IStreamListener {
+public interface IWarlockClientViewer {
 
 	public IWarlockClient getWarlockClient ();
 	

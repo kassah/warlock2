@@ -23,7 +23,7 @@ package cc.warlock.rcp.ui.macros.internal.commands;
 
 import cc.warlock.core.client.IWarlockClientViewer;
 import cc.warlock.core.client.settings.macro.IMacroCommand;
-import cc.warlock.rcp.views.GameView;
+import cc.warlock.rcp.views.WarlockView;
 
 /**
  * @author Will Robertson
@@ -36,8 +36,8 @@ public class PageUpCommand implements IMacroCommand {
 	 * @see cc.warlock.rcp.ui.macros.IMacroCommand#execute(cc.warlock.core.client.IWarlockClientViewer)
 	 */
 	public void execute(IWarlockClientViewer context) {
-		if (GameView.getViewInFocus() != null)
-			GameView.getViewInFocus().pageUp();
+		if (WarlockView.getViewInFocus() != null)
+			WarlockView.getViewInFocus().pageUp();
 	}
 
 	/* (non-Javadoc)

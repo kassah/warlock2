@@ -61,17 +61,15 @@ import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Control;
 import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.Label;
+import org.eclipse.swt.widgets.Layout;
 import org.eclipse.swt.widgets.Menu;
 import org.eclipse.swt.widgets.MenuItem;
 import org.eclipse.swt.widgets.ScrollBar;
 import org.eclipse.ui.ISharedImages;
 import org.eclipse.ui.PlatformUI;
 
-import cc.warlock.core.client.IWarlockClient;
 import cc.warlock.core.client.WarlockString;
 import cc.warlock.core.client.WarlockString.WarlockStringStyleRange;
-import cc.warlock.rcp.ui.style.CompassThemes;
-import cc.warlock.rcp.ui.style.StyleProviders;
 
 /**
  * This is an extension of the StyledText widget which has special support for embedding of arbitrary Controls/Links
@@ -91,8 +89,7 @@ public class WarlockText implements LineBackgroundListener {
 	private Cursor handCursor, defaultCursor;
 	private int lineLimit = 5000;
 	private int doScrollDirection = SWT.UP;
-	private IWarlockClient client;
-	private WarlockCompass compass;
+	private IStyleProvider styleProvider;
 	private Menu contextMenu;
 	private HashMap<String, WarlockTextMarker> markers;
 	
@@ -108,9 +105,8 @@ public class WarlockText implements LineBackgroundListener {
 		}
 	}
 	
-	public WarlockText(Composite parent, int style, IWarlockClient client) {
+	public WarlockText(Composite parent, int style) {
 		textWidget = new StyledText(parent, style);
-		this.client = client;
 		ISharedImages images = PlatformUI.getWorkbench().getSharedImages();
 		
 		Display display = parent.getDisplay();
@@ -185,7 +181,9 @@ public class WarlockText implements LineBackgroundListener {
 						setCursor(defaultCursor);
 					}
 				} catch (IllegalArgumentException ex) {
-					// swallow -- this happens if the mouse cursor moves to an area not covered by the imaginary rectangle surround the current text
+					// swallow -- this happens if the mouse cursor moves to an
+					// area not covered by the imaginary rectangle surround the
+					// current text
 					setCursor(defaultCursor);
 				}
 			}
@@ -213,22 +211,13 @@ public class WarlockText implements LineBackgroundListener {
 			}
 		});
 		
-		addLineBackgroundListener(this);
+		textWidget.addLineBackgroundListener(this);
 		addControlListener(new ControlListener () {
 			public void controlMoved(ControlEvent e) { }
 			public void controlResized(ControlEvent e) {
 				redraw();
 			}
 		});
-	}
-	
-	public void addCompass ()
-	{
-		compass = new WarlockCompass(this, CompassThemes.getCompassTheme("small"));
-	}
-	
-	public void addLineBackgroundListener(LineBackgroundListener listener) {
-		textWidget.addLineBackgroundListener(listener);
 	}
 	
 	public void addControlListener(ControlListener listener) {
@@ -477,9 +466,11 @@ public class WarlockText implements LineBackgroundListener {
 				nextPos = foundPos;
 			if(currentStyles.size() > 0) {
 				// merge all of the styles
-				StyleRangeWithData style = warlockStringStyleRangeToStyleRange(currentStyles.get(0), offset);
+				StyleRangeWithData style = warlockStringStyleRangeToStyleRange(
+						currentStyles.get(0), offset);
 				for(int i = 1; i < currentStyles.size(); i++) {
-					StyleRangeWithData nextStyle = warlockStringStyleRangeToStyleRange(currentStyles.get(i), offset);
+					StyleRangeWithData nextStyle = warlockStringStyleRangeToStyleRange(
+							currentStyles.get(i), offset);
 					if(nextStyle.font != null)
 						style.font = nextStyle.font;
 					if(nextStyle.background != null)
@@ -539,7 +530,7 @@ public class WarlockText implements LineBackgroundListener {
 	}
 	
 	private StyleRangeWithData warlockStringStyleRangeToStyleRange(WarlockStringStyleRange range, int offset) {
-		StyleRangeWithData styleRange = (StyleRangeWithData)StyleProviders.getStyleProvider(client).getStyleRange(client, range.style);
+		StyleRangeWithData styleRange = styleProvider.getStyleRange(range.style);
 		if(styleRange == null)
 			return null;
 
@@ -566,9 +557,8 @@ public class WarlockText implements LineBackgroundListener {
 		//     after an action that will cause a resize.
 		if (atBottom && !isAtBottom()) {
 			if (doScrollDirection == SWT.DOWN) {
-				textWidget.setTopPixel(textWidget.getTopPixel() + textWidget.getLinePixel(textWidget.getLineCount()));
-				if (compass != null)
-					compass.redraw();
+				textWidget.setTopPixel(textWidget.getTopPixel()
+						+ textWidget.getLinePixel(textWidget.getLineCount()));
 			}
 			
 			// FIXME: is this still needed?
@@ -711,7 +701,11 @@ public class WarlockText implements LineBackgroundListener {
 		return textWidget;
 	}
 	
-	public IWarlockClient getClient() {
-		return client;
+	public void setStyleProvider(IStyleProvider styleProvider) {
+		this.styleProvider = styleProvider;
+	}
+	
+	public void setLayout(Layout layout) {
+		textWidget.setLayout(layout);
 	}
 }

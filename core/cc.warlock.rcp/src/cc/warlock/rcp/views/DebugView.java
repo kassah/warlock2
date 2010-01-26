@@ -36,7 +36,6 @@ import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.Text;
 import org.eclipse.ui.part.PageBook;
-import org.eclipse.ui.part.ViewPart;
 
 import cc.warlock.core.client.IWarlockClient;
 import cc.warlock.core.client.WarlockClientAdapter;
@@ -46,14 +45,16 @@ import cc.warlock.core.network.IConnectionListener;
 import cc.warlock.core.network.IConnection.ErrorType;
 import cc.warlock.rcp.ui.WarlockText;
 import cc.warlock.rcp.ui.network.SWTConnectionListenerAdapter;
+import cc.warlock.rcp.ui.style.DefaultStyleProvider;
 
-public class DebugView extends ViewPart implements IConnectionListener, IGameViewFocusListener {
+public class DebugView extends WarlockView implements IConnectionListener, IGameViewFocusListener {
 
 	protected PageBook book;
 	protected Text entry;
 	protected Button copyAll;
 	private HashMap<IWarlockClient, WarlockText> clientStreams = new HashMap<IWarlockClient, WarlockText>();
-	private IWarlockClient client;
+	private IWarlockClient activeClient;
+	private WarlockText activeText;
 	
 	public static final String VIEW_ID = "cc.warlock.rcp.views.DebugView";
 	
@@ -81,8 +82,9 @@ public class DebugView extends ViewPart implements IConnectionListener, IGameVie
 	}
 	
 	public void setClient(IWarlockClient client) {
-		this.client = client;
-		book.showPage(getTextForClient(client).getTextWidget());
+		activeClient = client;
+		activeText = getTextForClient(client);
+		book.showPage(activeText.getTextWidget());
 	}
 	
 	private void debug (IWarlockClient client, String message)
@@ -104,8 +106,8 @@ public class DebugView extends ViewPart implements IConnectionListener, IGameVie
 		
 		copyAll.addSelectionListener(new SelectionAdapter() {
 			public void widgetSelected(SelectionEvent e) {
-				getTextForClient(client).selectAll();
-				getTextForClient(client).copy();
+				activeText.selectAll();
+				activeText.copy();
 			}
 		});
 		
@@ -130,7 +132,7 @@ public class DebugView extends ViewPart implements IConnectionListener, IGameVie
 	{
 		String toSend = entry.getText() + "\n";
 		try {
-			client.getConnection().send(toSend.getBytes());
+			activeClient.getConnection().send(toSend.getBytes());
 			entry.setText("");
 		} catch (IOException e1) {
 			// TODO Auto-generated catch block
@@ -140,7 +142,7 @@ public class DebugView extends ViewPart implements IConnectionListener, IGameVie
 
 	@Override
 	public void setFocus() {
-		getTextForClient(client).setFocus();
+		activeText.setFocus();
 	}
 	
 	public void connected(IConnection connection) {
@@ -164,10 +166,11 @@ public class DebugView extends ViewPart implements IConnectionListener, IGameVie
 	}
 	
 	public WarlockText getTextForClient(IWarlockClient client) {
-		if (!clientStreams.containsKey(client))
-		{
-			// TODO move this section into WarlockText
-			WarlockText text = new WarlockText(book, SWT.V_SCROLL, client);
+		WarlockText text = clientStreams.get(client);
+		
+		if (text == null) {
+			text = new WarlockText(book, SWT.V_SCROLL);
+			text.setStyleProvider(new DefaultStyleProvider(client));
 			GridData data = new GridData(GridData.FILL, GridData.FILL, true, true);
 			text.setLayoutData(data);
 			text.setEditable(false);
@@ -179,6 +182,15 @@ public class DebugView extends ViewPart implements IConnectionListener, IGameVie
 			clientStreams.put(client, text);
 			return text;
 		}
-		else return clientStreams.get(client);
+		
+		return text;
+	}
+	
+	public void pageUp() {
+		activeText.pageUp();
+	}
+	
+	public void pageDown() {
+		activeText.pageDown();
 	}
 }

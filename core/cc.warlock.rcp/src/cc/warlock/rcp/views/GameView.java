@@ -51,10 +51,9 @@ import org.eclipse.ui.part.PageBook;
 import cc.warlock.core.client.IWarlockClient;
 import cc.warlock.core.client.IWarlockClientViewer;
 import cc.warlock.rcp.configuration.GameViewConfiguration;
-import cc.warlock.rcp.plugin.Warlock2Plugin;
+import cc.warlock.rcp.ui.StreamText;
 import cc.warlock.rcp.ui.WarlockEntry;
 import cc.warlock.rcp.ui.WarlockPopupAction;
-import cc.warlock.rcp.ui.WarlockText;
 import cc.warlock.rcp.ui.client.SWTWarlockClientViewer;
 import cc.warlock.rcp.util.ColorUtil;
 import cc.warlock.rcp.util.SoundPlayer;
@@ -62,7 +61,7 @@ import cc.warlock.rcp.util.SoundPlayer;
 /**
  * @author marshall
  */
-public abstract class GameView extends StreamView implements IWarlockClientViewer {
+public abstract class GameView extends WarlockView implements IWarlockClientViewer {
 	public static final String VIEW_ID = "cc.warlock.rcp.ui.views.GameView";
 	
 	protected static GameView firstInstance;
@@ -73,10 +72,13 @@ public abstract class GameView extends StreamView implements IWarlockClientViewe
 	
 	protected PageBook popupPageBook;
 	protected Label emptyPopup;
+	protected StreamText streamText;
 	protected WarlockEntry entry;
 	protected SWTWarlockClientViewer wrapper;
 	protected Composite entryComposite;
 	protected IWarlockClient client;
+	protected String streamName;
+	protected Composite mainComposite;
 	
 	public GameView () {
 		if (firstInstance == null) {
@@ -88,7 +90,7 @@ public abstract class GameView extends StreamView implements IWarlockClientViewe
 		openViews.add(this);
 		wrapper = new SWTWarlockClientViewer(this);
 		
-		setStreamName(IWarlockClient.DEFAULT_STREAM_NAME);
+		streamName = IWarlockClient.DEFAULT_STREAM_NAME;
 	}
 	
 	public static void addGameViewFocusListener (IGameViewFocusListener listener)
@@ -153,15 +155,16 @@ public abstract class GameView extends StreamView implements IWarlockClientViewe
 	}
 	
 	public void createPartControl(Composite parent) {
-		super.createPartControl(parent);
+		// Create main composite
+		mainComposite = new Composite (parent, SWT.NONE);
+		GridLayout layout = new GridLayout(1, false);
+		layout.marginHeight = 0;
+		layout.marginWidth = 0;
+		layout.horizontalSpacing = 0;
+		layout.verticalSpacing = 0;
+		mainComposite.setLayout(layout);
 		
-		createEntry();
-		createCurrentText();
-		initColors();
-	}
-	
-	@Override
-	protected void createPageBook() {
+		// create a pagebook for the popups
 		popupPageBook = new PageBook(mainComposite, SWT.NONE);
 		GridData data = new GridData(SWT.FILL, SWT.FILL, true, false);
 		data.exclude = true;
@@ -172,31 +175,20 @@ public abstract class GameView extends StreamView implements IWarlockClientViewe
 		popupPageBook.showPage(emptyPopup);
 		popupPageBook.setVisible(false);
 		
-		super.createPageBook();
-	}
-	
-	protected void createEntry ()
-	{
+		streamText = new StreamText(mainComposite, streamName);
+		streamText.setLineLimit(GameViewConfiguration.instance().getBufferLines());
+		streamText.setLayout(layout);
+		
+		// create the entry
 		entryComposite = new Composite(mainComposite, SWT.NONE);
-		GridLayout layout = new GridLayout(1, false);
-		layout.horizontalSpacing = 0;
-		layout.verticalSpacing = 0;
-		layout.marginHeight = 1;
-		layout.marginWidth = 0;
 		entryComposite.setLayout(layout);
 		entryComposite.setLayoutData(new GridData(GridData.FILL, GridData.VERTICAL_ALIGN_END, true, false));
 		
-		this.client = Warlock2Plugin.getDefault().getCurrentClient();
 		this.entry = new WarlockEntry(entryComposite, wrapper); // Do this BEFORE getTextForClient!
+		
+		initColors();
 	}
 	
-	protected void createCurrentText() {
-		this.currentText = getTextForClient(this.client);
-		book.showPage(this.currentText.getTextWidget());
-		
-		currentText.setLineLimit(GameViewConfiguration.instance().getBufferLines());
-		currentText.setScrollDirection(SWT.DOWN);
-	}
 	
 	protected void initColors()
 	{
@@ -206,19 +198,18 @@ public abstract class GameView extends StreamView implements IWarlockClientViewe
 		entry.getWidget().setBackground(background);
 		entry.getWidget().setForeground(foreground);
 		
-		currentText.setBackgroundMode(SWT.INHERIT_DEFAULT);
+		streamText.setBackgroundMode(SWT.INHERIT_DEFAULT);
 	}
 	
 	
 	public void setFocus() {
-		super.setFocus();
 		gameInFocus = this;
 		for (IGameViewFocusListener listener : focusListeners)
 		{
 			listener.gameViewFocused(this);
 		}
 		
-		currentText.redraw();
+		streamText.redraw();
 	}
 	
 	public void playSound(InputStream soundStream) {
@@ -307,33 +298,11 @@ public abstract class GameView extends StreamView implements IWarlockClientViewe
 	}
 	
 	public void copy() {
-		currentText.copy();
+		streamText.copy();
 	}
 	
 	public void paste() {
 		entry.getWidget().paste();
-	}
-	
-	public void copyDown() {
-		currentText.copy();
-	}
-	
-	public void setClient(IWarlockClient client) {
-		this.client = client;
-		this.currentText = getTextForClient(client);
-		book.showPage(currentText.getTextWidget());
-		
-		client.addViewer(wrapper);
-		
-		for (StreamView streamView : StreamView.openViews)
-		{
-			if (!(streamView instanceof GameView))
-			{
-				// initialize pre-opened stream views
-				streamView.setAppendNewlines(false);
-				streamView.setClient(client);
-			}
-		}
 	}
 	
 	protected void disconnected ()
@@ -343,10 +312,6 @@ public abstract class GameView extends StreamView implements IWarlockClientViewe
 	
 	public IWarlockClient getWarlockClient() {
 		return client;
-	}
-	
-	public WarlockText getWarlockText () {
-		return currentText;
 	}
 	
 	public WarlockEntry getWarlockEntry() {
@@ -365,24 +330,24 @@ public abstract class GameView extends StreamView implements IWarlockClientViewe
 	
 	public void showPopup (WarlockPopupAction popup)
 	{
-		boolean atBottom = currentText.isAtBottom();
+		boolean atBottom = streamText.isAtBottom();
 		popupPageBook.showPage(popup);
 		popupPageBook.setVisible(true);
 		((GridData)popupPageBook.getLayoutData()).exclude = false;
 		
 		mainComposite.layout();
-		currentText.postTextChange(atBottom);
+		streamText.postTextChange(atBottom);
 	}
 	
 	public void hidePopup (WarlockPopupAction popup)
 	{
-		boolean atBottom = currentText.isAtBottom();
+		boolean atBottom = streamText.isAtBottom();
 		popupPageBook.showPage(emptyPopup);		
 		popupPageBook.setVisible(false);
 		((GridData)popupPageBook.getLayoutData()).exclude = true;
 		
 		mainComposite.layout();
-		currentText.postTextChange(atBottom);
+		streamText.postTextChange(atBottom);
 	}
 	
 	@Override
@@ -416,5 +381,18 @@ public abstract class GameView extends StreamView implements IWarlockClientViewe
 				firstInstance = openViews.get(0);
 		}
 		super.dispose();
+	}
+	
+	public void pageDown() {
+		streamText.pageDown();
+	}
+	
+	public void pageUp() {
+		streamText.pageUp();
+	}
+	
+	public void setClient(IWarlockClient client) {
+		this.client = client;
+		streamText.setClient(client);
 	}
 }

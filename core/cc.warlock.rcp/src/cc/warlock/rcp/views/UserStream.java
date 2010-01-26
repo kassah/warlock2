@@ -36,6 +36,7 @@ import cc.warlock.core.client.IWarlockClient;
 import cc.warlock.core.client.WarlockString;
 import cc.warlock.core.client.WarlockString.WarlockStringStyleRange;
 import cc.warlock.core.client.internal.StreamFilter;
+import cc.warlock.rcp.ui.StreamText;
 
 /**
  * @author Will Robertson
@@ -53,39 +54,41 @@ public class UserStream extends StreamView {
 		this.filters = filters;
 	}
 	
-	@Override
-	protected synchronized void appendText (IWarlockClient client, WarlockString string)
-	{
-		// Process filters on the complete lines
-		WarlockString ret = new WarlockString();
-		bufferLoop: for (WarlockString buffer : string.split("\\r?\\n")) {
-			if(styles != null)
-				for(WarlockStringStyleRange style : buffer.getStyles()) {
-					String name = style.style.getName();
-					if(name != null && styles.contains(name)) {
+	protected class UserStreamText extends StreamText {
+		
+		public UserStreamText(Composite parent, String streamName) {
+			super(parent, streamName);
+		}
+		
+		@Override
+		protected synchronized void appendText (WarlockString string)
+		{
+			// Process filters on the complete lines
+			WarlockString ret = new WarlockString();
+			bufferLoop: for (WarlockString buffer : string.split("\\r?\\n")) {
+				if(styles != null)
+					for(WarlockStringStyleRange style : buffer.getStyles()) {
+						String name = style.style.getName();
+						if(name != null && styles.contains(name)) {
+							ret.append(buffer);
+							ret.append("\n");
+							continue bufferLoop;
+						}
+					}
+				for (IStreamFilter filter : filters) {
+					if (filter == null) continue;
+					if (filter.match(buffer)) {
+						// If a filter matches, we go ahead and display the chunk
 						ret.append(buffer);
 						ret.append("\n");
 						continue bufferLoop;
 					}
 				}
-			for (IStreamFilter filter : this.filters) {
-				if (filter == null) continue;
-				if (filter.match(buffer)) {
-					// If a filter matches, we go ahead and display the chunk
-					ret.append(buffer);
-					ret.append("\n");
-					continue bufferLoop;
-				}
+			}
+			if (ret.length() > 0) {
+				super.appendText(ret);
 			}
 		}
-		if (ret.length() > 0) {
-			super.appendText(client, ret);
-		}
-	}
-	
-	public void clientConnected(IWarlockClient client) {	
-		super.clientConnected(client);
-		addStream(client.getDefaultStream());
 	}
 	
 	@Override
@@ -108,6 +111,13 @@ public class UserStream extends StreamView {
 		} else {
 			System.err.println("Not a stream name we recognize! ("+streamName+")");
 		}
+	}
+	
+	@Override
+	protected void addClient(IWarlockClient client) {
+		UserStreamText streamText = new UserStreamText(book, streamName);
+		streamText.setClient(client);
+		client.getDefaultStream().addStreamListener(streamText);
 	}
 	
 	protected IStreamFilter[] getEventsFilters ()
@@ -174,9 +184,5 @@ public class UserStream extends StreamView {
 	
 	public String getName() {
 		return this.name;
-	}
-
-	public UserStream() {
-		super();
 	}
 }
