@@ -26,6 +26,7 @@ import java.util.Collection;
 import java.util.HashMap;
 
 import org.eclipse.swt.SWT;
+import org.eclipse.swt.custom.StyledText;
 import org.eclipse.swt.graphics.Color;
 import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.layout.GridLayout;
@@ -115,6 +116,7 @@ public class StreamView extends WarlockView implements IGameViewFocusListener, I
 		book = new PageBook(mainComposite, SWT.NONE);
 		book.setLayoutData(new GridData(GridData.FILL, GridData.FILL, true, true));
 		
+		new StyledText(book, SWT.V_SCROLL);
 		streamName = getViewSite().getId().substring(getViewSite().getId().lastIndexOf('.')+1);
 		for (IWarlockClient client : WarlockClientRegistry.getActiveClients()) {
 			addClient(client);

@@ -40,7 +40,7 @@ public class StreamText extends WarlockText implements IStreamListener {
 	private WarlockString textBuffer;
 	
 	public StreamText(Composite parent, String streamName) {
-		super(parent, SWT.V_SCROLL);
+		super(parent);
 		this.streamName = streamName;
 
 		// TODO move this section into WarlockText

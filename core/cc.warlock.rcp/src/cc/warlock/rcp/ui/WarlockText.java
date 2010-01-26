@@ -105,8 +105,8 @@ public class WarlockText implements LineBackgroundListener {
 		}
 	}
 	
-	public WarlockText(Composite parent, int style) {
-		textWidget = new StyledText(parent, style);
+	public WarlockText(Composite parent) {
+		textWidget = new StyledText(parent, SWT.V_SCROLL);
 		ISharedImages images = PlatformUI.getWorkbench().getSharedImages();
 		
 		Display display = parent.getDisplay();

@@ -169,7 +169,7 @@ public class DebugView extends WarlockView implements IConnectionListener, IGame
 		WarlockText text = clientStreams.get(client);
 		
 		if (text == null) {
-			text = new WarlockText(book, SWT.V_SCROLL);
+			text = new WarlockText(book);
 			text.setStyleProvider(new DefaultStyleProvider(client));
 			GridData data = new GridData(GridData.FILL, GridData.FILL, true, true);
 			text.setLayoutData(data);
