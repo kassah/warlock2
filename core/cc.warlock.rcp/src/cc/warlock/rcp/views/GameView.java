@@ -177,11 +177,11 @@ public abstract class GameView extends WarlockView implements IWarlockClientView
 		
 		streamText = new StreamText(mainComposite, streamName);
 		streamText.setLineLimit(GameViewConfiguration.instance().getBufferLines());
-		streamText.setLayout(layout);
+		streamText.setLayout(new GridLayout(1, false));
 		
 		// create the entry
 		entryComposite = new Composite(mainComposite, SWT.NONE);
-		entryComposite.setLayout(layout);
+		entryComposite.setLayout(new GridLayout(1, false));
 		entryComposite.setLayoutData(new GridData(GridData.FILL, GridData.VERTICAL_ALIGN_END, true, false));
 		
 		this.entry = new WarlockEntry(entryComposite, wrapper); // Do this BEFORE getTextForClient!
