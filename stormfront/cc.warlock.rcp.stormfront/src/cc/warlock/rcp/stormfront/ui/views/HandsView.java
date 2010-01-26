@@ -276,13 +276,12 @@ public class HandsView extends ViewPart
 		}
 		
 		public void propertyChanged(String value) {
-			if (client == activeClient)
-				hand.setText(value);
-		}
-
-		public void propertyCleared() {
-			if (client == activeClient)
-				hand.setText(emptyText);
+			if (client == activeClient) {
+				if(value == null)
+					hand.setText(emptyText);
+				else
+					hand.setText(value);
+			}
 		}
 	}
 	

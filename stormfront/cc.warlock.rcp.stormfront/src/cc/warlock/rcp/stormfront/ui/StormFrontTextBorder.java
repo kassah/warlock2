@@ -33,8 +33,8 @@ import org.eclipse.swt.events.SelectionEvent;
 import org.eclipse.swt.events.SelectionListener;
 import org.eclipse.swt.graphics.Color;
 import org.eclipse.swt.graphics.GC;
+
 import cc.warlock.core.client.ICharacterStatus;
-import cc.warlock.core.client.IProperty;
 import cc.warlock.core.client.IPropertyListener;
 import cc.warlock.core.stormfront.client.IStormFrontClient;
 import cc.warlock.rcp.ui.WarlockText;
@@ -132,8 +132,6 @@ public class StormFrontTextBorder implements PaintListener, IPropertyListener<St
 			setClear();
 		}
 	}
-
-	public void propertyCleared() {}
 
 	/* (non-Javadoc)
 	 * @see org.eclipse.swt.events.PaintListener#paintControl(org.eclipse.swt.events.PaintEvent)

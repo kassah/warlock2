@@ -233,7 +233,6 @@ public class BarsView extends ViewPart {
 				control.sendMessage(msg);
 		}
 		
-		public void propertyCleared() { }	
 	}
 	
 	private class RoundtimeListener implements IPropertyListener<Integer> {
@@ -243,8 +242,6 @@ public class BarsView extends ViewPart {
 		public RoundtimeListener(IStormFrontClient client) {
 			this.client = client;
 		}
-		
-		public void propertyCleared() {	}
 		
 		public void propertyChanged(Integer value) {
 			if (client != activeClient)
@@ -281,8 +278,6 @@ public class BarsView extends ViewPart {
 			this.client = client;
 		}
 
-		public void propertyCleared() {	}
-		
 		public void propertyChanged(Integer value) {
 			if (client != activeClient)
 				return;

@@ -183,8 +183,6 @@ public class WarlockCompass implements PaintListener, MouseMoveListener, MouseLi
 		}
 	}
 	
-	public void propertyCleared() {}
-	
 	public void propertyChanged(ICompass value) {
 		compass = value;
 		redraw();

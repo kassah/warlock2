@@ -34,7 +34,6 @@ import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Label;
 
 import cc.warlock.core.client.ICharacterStatus;
-import cc.warlock.core.client.IProperty;
 import cc.warlock.core.client.IPropertyListener;
 import cc.warlock.core.stormfront.client.IStormFrontClient;
 import cc.warlock.core.stormfront.settings.IStormFrontClientSettings;
@@ -184,8 +183,6 @@ public class StormFrontStatus implements IPropertyListener<String> {
 		handleMultipleStatus(status);
 	}
 	
-	public void propertyCleared() {}
-		
 	protected void setColors (Color fg, Color bg)
 	{
 		for (int i = 0; i < statusLabels.length; i++)
