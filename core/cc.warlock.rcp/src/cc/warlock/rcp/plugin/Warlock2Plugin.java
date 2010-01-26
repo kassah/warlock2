@@ -21,7 +21,6 @@
  */
 package cc.warlock.rcp.plugin;
 
-import java.util.ArrayList;
 import java.util.MissingResourceException;
 import java.util.ResourceBundle;
 
@@ -32,7 +31,6 @@ import org.eclipse.core.runtime.Platform;
 import org.eclipse.ui.plugin.AbstractUIPlugin;
 import org.osgi.framework.BundleContext;
 
-import cc.warlock.core.client.IWarlockClient;
 import cc.warlock.rcp.ui.client.WarlockClientAdaptable;
 import cc.warlock.rcp.ui.client.WarlockClientAdapterFactory;
 import cc.warlock.rcp.ui.macros.MacroRegistry;
@@ -45,8 +43,6 @@ public class Warlock2Plugin extends AbstractUIPlugin {
 	private static Warlock2Plugin plugin;
 	//Resource bundle.
 	private ResourceBundle resourceBundle;
-	
-	private ArrayList<IWarlockClient> clients = new ArrayList<IWarlockClient>();
 	
 	public static final String PLUGIN_ID = "cc.warlock.rcp";
 	
@@ -74,24 +70,6 @@ public class Warlock2Plugin extends AbstractUIPlugin {
 		MacroRegistry.instance();
 		
 		Platform.getAdapterManager().registerAdapters(new WarlockClientAdapterFactory(), WarlockClientAdaptable.class);
-	}
-	
-	public IWarlockClient getCurrentClient ()
-	{
-		return clients.get(clients.size()-1);
-	}
-	
-	public void addClient (IWarlockClient client)
-	{
-		clients.add(client);
-	}
-	
-	public IWarlockClient addNextClient (IWarlockClient client)
-	{
-		IWarlockClient oldClient = getCurrentClient();
-		
-		clients.add(client);
-		return oldClient;
 	}
 	
 	public IExtension[] getExtensions (String extensionPoint)

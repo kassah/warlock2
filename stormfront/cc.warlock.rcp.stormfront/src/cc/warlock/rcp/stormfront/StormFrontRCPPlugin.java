@@ -29,10 +29,8 @@ import cc.warlock.core.configuration.Profile;
 import cc.warlock.core.stormfront.ProfileConfiguration;
 import cc.warlock.core.stormfront.script.javascript.StormFrontJavascriptVars;
 import cc.warlock.rcp.application.WarlockApplication;
-import cc.warlock.rcp.plugin.Warlock2Plugin;
 import cc.warlock.rcp.stormfront.adapters.StormFrontClientAdapterFactory;
 import cc.warlock.rcp.stormfront.ui.actions.ProfileConnectAction;
-import cc.warlock.rcp.stormfront.ui.util.StormFrontClientFactory;
 import cc.warlock.rcp.ui.client.WarlockClientAdaptable;
 
 /**
@@ -62,9 +60,6 @@ public class StormFrontRCPPlugin extends AbstractUIPlugin {
 		
 		// i think this is the best place for this to go?
 		new StormFrontJavascriptVars();
-		
-		// force-load our initial client so we can do offline scripting
-		Warlock2Plugin.getDefault().addClient(StormFrontClientFactory.createStormFrontClient());
 		
 		Platform.getAdapterManager().registerAdapters(new StormFrontClientAdapterFactory(), WarlockClientAdaptable.class);
 		

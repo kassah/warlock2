@@ -30,14 +30,12 @@ import org.eclipse.ui.IWorkbenchPage;
 import org.eclipse.ui.PartInitException;
 import org.eclipse.ui.PlatformUI;
 
-import cc.warlock.core.client.IWarlockClient;
 import cc.warlock.core.client.IWarlockStyle;
 import cc.warlock.core.client.WarlockString;
 import cc.warlock.core.client.internal.WarlockStyle;
 import cc.warlock.core.network.IConnection.ErrorType;
 import cc.warlock.core.stormfront.client.IStormFrontClient;
 import cc.warlock.core.stormfront.network.SGEConnection;
-import cc.warlock.rcp.plugin.Warlock2Plugin;
 import cc.warlock.rcp.stormfront.ui.StormFrontPerspectiveFactory;
 import cc.warlock.rcp.stormfront.ui.views.BarsView;
 import cc.warlock.rcp.stormfront.ui.views.HandsView;
@@ -54,13 +52,11 @@ public class LoginUtil {
 		String key = loginProperties.get("KEY");
 		
 		// TODO: Somehow make sure this is a StormFrontClient rather than getting a random client/GameView.
-		IWarlockClient client = Warlock2Plugin.getDefault().getCurrentClient();
-		if (client instanceof IStormFrontClient) {
-			IStormFrontClient sfclient = (IStormFrontClient) client;
-			sfclient.getGameCode().set(loginProperties.get("GAMECODE"));
-		}
-//		
+		IStormFrontClient client = StormFrontClientFactory.createStormFrontClient();
+		IStormFrontClient sfclient = (IStormFrontClient) client;
+		sfclient.getGameCode().set(loginProperties.get("GAMECODE"));
 		gameView.setClient(client);
+		
 		IWorkbenchPage page = PlatformUI.getWorkbench().getActiveWorkbenchWindow().getActivePage();
 		
 		try {
@@ -120,7 +116,6 @@ public class LoginUtil {
 		}
 		else 
 		{
-			Warlock2Plugin.getDefault().addNextClient(StormFrontClientFactory.createStormFrontClient());
 			connect((StormFrontGameView) StormFrontGameView.createNext(StormFrontGameView.VIEW_ID, characterName), loginProperties);
 		}
 	}

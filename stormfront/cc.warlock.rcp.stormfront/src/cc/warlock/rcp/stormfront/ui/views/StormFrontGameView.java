@@ -275,21 +275,24 @@ public class StormFrontGameView extends GameView implements IStormFrontClientVie
 	
 	@Override
 	public void setClient(IWarlockClient client) {
-		super.setClient(client);
-		
 		client.getCompass().addListener(new SWTPropertyListener<ICompass>(compass));
 		
 		hidePopup(reconnectPopup);
 //		reconnectPopup.setVisible(false);
 		if (client instanceof IStormFrontClient)
 		{
+			sfClient = (IStormFrontClient) client;
+
+			// The style provider needs to be set before the client is set on
+			//   the text widget, or the text widget won't get the style provider.
+			StyleProviders.setStyleProvider(client,
+					new StormFrontStyleProvider(sfClient.getStormFrontClientSettings()));
+			
 			SWTStreamListener streamListener = new SWTStreamListener(streamText);
 			client.getDefaultStream().addStreamListener(streamListener);
 			client.getStream(IStormFrontClient.DEATH_STREAM_NAME).addStreamListener(streamListener);
 			client.getStream(IStormFrontClient.ATMOSPHERICS_STREAM_NAME).addStreamListener(streamListener);
-			sfClient = (IStormFrontClient) client;
-
-			StyleProviders.setStyleProvider(client, new StormFrontStyleProvider(sfClient.getStormFrontClientSettings()));
+			
 			
 			if (status != null) {
 				status.setActiveClient(sfClient);
@@ -313,6 +316,8 @@ public class StormFrontGameView extends GameView implements IStormFrontClientVie
 				}
 			});
 		}
+		
+		super.setClient(client);
 	}
 	
 	protected void disconnected ()

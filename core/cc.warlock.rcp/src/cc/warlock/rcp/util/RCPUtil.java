@@ -144,18 +144,19 @@ public class RCPUtil {
 	
 	public static void openPreferences (String pageId)
 	{
-		IWarlockClient activeClient = Warlock2Plugin.getDefault().getCurrentClient();
 		GameView inFocus = GameView.getGameViewInFocus();
+		// FIXME: handle the case where we don't have a GameView
 		if (inFocus != null)
 		{
-			activeClient = inFocus.getWarlockClient();
+			// FIXME: the GameView may not be connected, so... no preferences?
+			IWarlockClient activeClient = inFocus.getWarlockClient();
+
+			PreferenceDialog dialog = PreferencesUtil.createPropertyDialogOn(Display.getDefault().getActiveShell(),
+					new WarlockClientAdaptable(activeClient), pageId, null, null);
+
+			dialog.getTreeViewer().expandToLevel(2);
+
+			int response = dialog.open();
 		}
-		
-		PreferenceDialog dialog = PreferencesUtil.createPropertyDialogOn(Display.getDefault().getActiveShell(),
-				new WarlockClientAdaptable(activeClient), pageId, null, null);
-		
-		dialog.getTreeViewer().expandToLevel(2);
-		
-		int response = dialog.open();
 	}
 }
