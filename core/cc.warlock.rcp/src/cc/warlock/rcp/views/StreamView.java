@@ -42,9 +42,8 @@ import cc.warlock.core.client.PropertyListener;
 import cc.warlock.core.client.WarlockClientRegistry;
 import cc.warlock.rcp.ui.StreamText;
 import cc.warlock.rcp.ui.client.SWTPropertyListener;
+import cc.warlock.rcp.ui.client.SWTStreamListener;
 import cc.warlock.rcp.ui.client.SWTWarlockClientListener;
-import cc.warlock.rcp.ui.style.DefaultStyleProvider;
-import cc.warlock.rcp.ui.style.StyleProviders;
 
 public class StreamView extends WarlockView implements IGameViewFocusListener, IWarlockClientListener {
 	
@@ -126,7 +125,7 @@ public class StreamView extends WarlockView implements IGameViewFocusListener, I
 		StreamText streamText = new StreamText(book, streamName);
 		streamText.setClient(client);
 		IStream stream = client.getStream(streamName);
-		stream.addStreamListener(streamText);
+		stream.addStreamListener(new SWTStreamListener(streamText));
 		if (streamTitled) {
 			// TODO: Make sure this listener gets destroyed on dispose.
 			stream.getTitle().addListener(new SWTPropertyListener<String>(
@@ -169,9 +168,6 @@ public class StreamView extends WarlockView implements IGameViewFocusListener, I
 		activeStream = streams.get(client);
 		
 		book.showPage(activeStream.getTextWidget());
-		
-		if (StyleProviders.getStyleProvider(client) == null)
-			StyleProviders.setStyleProvider(client, new DefaultStyleProvider(client));
 	}
 	
 	@Override
