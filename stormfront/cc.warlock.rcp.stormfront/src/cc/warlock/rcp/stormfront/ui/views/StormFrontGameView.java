@@ -71,6 +71,7 @@ import cc.warlock.rcp.ui.WarlockPopupAction;
 import cc.warlock.rcp.ui.WarlockSharedImages;
 import cc.warlock.rcp.ui.WarlockWizardDialog;
 import cc.warlock.rcp.ui.client.SWTPropertyListener;
+import cc.warlock.rcp.ui.client.SWTStreamListener;
 import cc.warlock.rcp.ui.style.CompassThemes;
 import cc.warlock.rcp.ui.style.StyleProviders;
 import cc.warlock.rcp.util.ColorUtil;
@@ -282,8 +283,10 @@ public class StormFrontGameView extends GameView implements IStormFrontClientVie
 //		reconnectPopup.setVisible(false);
 		if (client instanceof IStormFrontClient)
 		{
-			client.getStream(IStormFrontClient.DEATH_STREAM_NAME).addStreamListener(streamText);
-			client.getStream(IStormFrontClient.ATMOSPHERICS_STREAM_NAME).addStreamListener(streamText);
+			SWTStreamListener streamListener = new SWTStreamListener(streamText);
+			client.getDefaultStream().addStreamListener(streamListener);
+			client.getStream(IStormFrontClient.DEATH_STREAM_NAME).addStreamListener(streamListener);
+			client.getStream(IStormFrontClient.ATMOSPHERICS_STREAM_NAME).addStreamListener(streamListener);
 			sfClient = (IStormFrontClient) client;
 
 			StyleProviders.setStyleProvider(client, new StormFrontStyleProvider(sfClient.getStormFrontClientSettings()));
