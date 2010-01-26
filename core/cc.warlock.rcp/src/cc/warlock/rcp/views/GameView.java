@@ -181,7 +181,12 @@ public abstract class GameView extends WarlockView implements IWarlockClientView
 		
 		// create the entry
 		entryComposite = new Composite(mainComposite, SWT.NONE);
-		entryComposite.setLayout(new GridLayout(1, false));
+		layout = new GridLayout(1, false);
+		layout.horizontalSpacing = 0;
+		layout.verticalSpacing = 0;
+		layout.marginHeight = 1;
+		layout.marginWidth = 0;
+		entryComposite.setLayout(layout);
 		entryComposite.setLayoutData(new GridData(GridData.FILL, GridData.VERTICAL_ALIGN_END, true, false));
 		
 		this.entry = new WarlockEntry(entryComposite, wrapper); // Do this BEFORE getTextForClient!
