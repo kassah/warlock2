@@ -226,7 +226,7 @@ public class StreamView extends WarlockView implements IGameViewFocusListener, I
 
 	public void clientActivated(IWarlockClient client) {
 		addClient(client);
-		if(activeClient == null || activeStream == null)
+		if(activeClient == null || activeClient == client || activeStream == null)
 			setClient(client);
 	}
 
