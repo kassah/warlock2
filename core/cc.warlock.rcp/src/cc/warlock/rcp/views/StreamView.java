@@ -116,7 +116,9 @@ public class StreamView extends WarlockView implements IGameViewFocusListener, I
 		book = new PageBook(mainComposite, SWT.NONE);
 		book.setLayoutData(new GridData(GridData.FILL, GridData.FILL, true, true));
 		
-		new StyledText(book, SWT.V_SCROLL);
+		StyledText text = new StyledText(book, SWT.V_SCROLL);
+		text.setLayout(new GridLayout(1, false));
+		
 		streamName = getViewSite().getId().substring(getViewSite().getId().lastIndexOf('.')+1);
 		for (IWarlockClient client : WarlockClientRegistry.getActiveClients()) {
 			addClient(client);
@@ -125,6 +127,8 @@ public class StreamView extends WarlockView implements IGameViewFocusListener, I
 	
 	protected void addClient(IWarlockClient client) {
 		StreamText streamText = new StreamText(book, streamName);
+		streamText.setLayout(new GridLayout(1, false));
+		streams.put(client, streamText);
 		streamText.setClient(client);
 		IStream stream = client.getStream(streamName);
 		stream.addStreamListener(new SWTStreamListener(streamText));
