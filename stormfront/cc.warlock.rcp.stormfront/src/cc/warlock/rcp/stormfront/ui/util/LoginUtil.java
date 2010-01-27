@@ -101,10 +101,15 @@ public class LoginUtil {
 		
 		StormFrontGameView firstEmptyView = null;
 		for (GameView view : GameView.getOpenGameViews()) {
-			if (view instanceof StormFrontGameView)
-				if (view.getWarlockClient().getConnection() == null || !view.getWarlockClient().getConnection().isConnected()) {
-					firstEmptyView = (StormFrontGameView) view; break;
-				}
+			if (!(view instanceof StormFrontGameView))
+				continue;
+
+			if (view.getWarlockClient() == null
+					|| view.getWarlockClient().getConnection() == null
+					|| !view.getWarlockClient().getConnection().isConnected()) {
+				firstEmptyView = (StormFrontGameView) view;
+				break;
+			}
 		}
 		
 		if (firstEmptyView != null)
