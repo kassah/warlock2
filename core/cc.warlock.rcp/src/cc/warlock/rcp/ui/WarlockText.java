@@ -459,11 +459,8 @@ public class WarlockText implements LineBackgroundListener {
 			
 			// create style segment for pos to next pos
 			int foundPos = findNextEvent(styles, pos + 1);
-			int nextPos;
-			if(foundPos < 0)
-				nextPos = length - 1;
-			else
-				nextPos = foundPos;
+			int nextPos = foundPos < 0 ? length : foundPos;
+
 			if(currentStyles.size() > 0) {
 				// merge all of the styles
 				StyleRangeWithData style = warlockStringStyleRangeToStyleRange(
