@@ -173,7 +173,8 @@ public class StreamView extends WarlockView implements IGameViewFocusListener, I
 		activeClient = client;
 		activeStream = streams.get(client);
 		
-		book.showPage(activeStream.getTextWidget());
+		if(activeStream != null)
+			book.showPage(activeStream.getTextWidget());
 	}
 	
 	@Override
@@ -225,6 +226,8 @@ public class StreamView extends WarlockView implements IGameViewFocusListener, I
 
 	public void clientActivated(IWarlockClient client) {
 		addClient(client);
+		if(activeClient == null || activeStream == null)
+			setClient(client);
 	}
 
 	public void clientConnected(IWarlockClient client) {
