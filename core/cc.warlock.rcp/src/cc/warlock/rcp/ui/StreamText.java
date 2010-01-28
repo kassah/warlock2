@@ -8,7 +8,6 @@ import java.util.regex.PatternSyntaxException;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.graphics.Color;
 import org.eclipse.swt.graphics.Font;
-import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Display;
 import org.eclipse.ui.PlatformUI;
@@ -42,15 +41,6 @@ public class StreamText extends WarlockText implements IStreamListener {
 	public StreamText(Composite parent, String streamName) {
 		super(parent);
 		this.streamName = streamName;
-
-		// TODO move this section into WarlockText
-		GridData data = new GridData(GridData.FILL, GridData.FILL, true, true);
-		this.setLayoutData(data);
-		this.setEditable(false);
-		this.setWordWrap(true);
-		this.getTextWidget().setIndent(1);
-
-		this.setScrollDirection(SWT.DOWN);
 	}
 	
 	public void setFocus() {

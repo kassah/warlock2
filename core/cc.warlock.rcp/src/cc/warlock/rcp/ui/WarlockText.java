@@ -56,6 +56,7 @@ import org.eclipse.swt.graphics.GlyphMetrics;
 import org.eclipse.swt.graphics.Image;
 import org.eclipse.swt.graphics.Point;
 import org.eclipse.swt.graphics.Rectangle;
+import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.widgets.Caret;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Control;
@@ -88,7 +89,7 @@ public class WarlockText implements LineBackgroundListener {
 	private HashMap<Control, Rectangle> anchoredControls = new HashMap<Control, Rectangle>();
 	private Cursor handCursor, defaultCursor;
 	private int lineLimit = 5000;
-	private int doScrollDirection = SWT.UP;
+	private int doScrollDirection = SWT.DOWN;
 	private IStyleProvider styleProvider;
 	private Menu contextMenu;
 	private HashMap<String, WarlockTextMarker> markers;
@@ -107,6 +108,12 @@ public class WarlockText implements LineBackgroundListener {
 	
 	public WarlockText(Composite parent) {
 		textWidget = new StyledText(parent, SWT.V_SCROLL);
+		
+		textWidget.setLayoutData(new GridData(GridData.FILL, GridData.FILL, true, true));
+		textWidget.setEditable(false);
+		textWidget.setWordWrap(true);
+		textWidget.setIndent(1);
+		
 		ISharedImages images = PlatformUI.getWorkbench().getSharedImages();
 		
 		Display display = parent.getDisplay();
@@ -317,18 +324,6 @@ public class WarlockText implements LineBackgroundListener {
 	
 	public Rectangle getClientArea() {
 		return textWidget.getClientArea();
-	}
-	
-	public void setLayoutData(Object layoutData) {
-		textWidget.setLayoutData(layoutData);
-	}
-	
-	public void setEditable(boolean editable) {
-		textWidget.setEditable(editable);
-	}
-	
-	public void setWordWrap(boolean wrap) {
-		textWidget.setWordWrap(wrap);
 	}
 	
 	public void setBackground(Color color) {

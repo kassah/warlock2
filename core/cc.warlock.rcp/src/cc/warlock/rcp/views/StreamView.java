@@ -65,6 +65,8 @@ public class StreamView extends WarlockView implements IGameViewFocusListener, I
 		new HashMap<IWarlockClient, StreamText>();
 
 	protected boolean streamTitled = true;
+	
+	private StyledText nullTextWidget;
 
 	public StreamView() {
 		super();
@@ -118,8 +120,14 @@ public class StreamView extends WarlockView implements IGameViewFocusListener, I
 		book = new PageBook(mainComposite, SWT.NONE);
 		book.setLayoutData(new GridData(GridData.FILL, GridData.FILL, true, true));
 		
-		StyledText text = new StyledText(book, SWT.V_SCROLL);
-		text.setLayout(new GridLayout(1, false));
+		nullTextWidget = new StyledText(book, SWT.V_SCROLL);
+		nullTextWidget.setLayout(new GridLayout(1, false));
+		nullTextWidget.setLayoutData(new GridData(GridData.FILL,
+				GridData.FILL, true, true));
+		nullTextWidget.setEditable(false);
+		nullTextWidget.setWordWrap(true);
+		nullTextWidget.setIndent(1);
+		book.showPage(nullTextWidget);
 		
 		streamName = getViewSite().getId().substring(getViewSite().getId().lastIndexOf('.')+1);
 		for (IWarlockClient client : WarlockClientRegistry.getActiveClients()) {
@@ -164,13 +172,6 @@ public class StreamView extends WarlockView implements IGameViewFocusListener, I
 		setClient(gameView.getWarlockClient());
 	}
 	
-	@Override
-	public void setFocus() {
-		super.setFocus();
-		//activeStream.getTextWidget().redraw();
-		//book.redraw();
-	}
-	
 	public static Collection<StreamView> getOpenViews ()
 	{
 		return openViews;
@@ -184,11 +185,10 @@ public class StreamView extends WarlockView implements IGameViewFocusListener, I
 		activeClient = client;
 		activeStream = streams.get(client);
 		
-		if(activeStream != null) {
+		if(activeStream != null)
 			book.showPage(activeStream.getTextWidget());
-			//activeStream.getTextWidget().redraw();
-			//book.redraw();
-		}
+		else
+			book.showPage(nullTextWidget);
 	}
 	
 	@Override

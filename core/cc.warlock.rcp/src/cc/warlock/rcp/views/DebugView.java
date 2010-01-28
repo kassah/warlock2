@@ -167,13 +167,6 @@ public class DebugView extends WarlockView implements IConnectionListener, IGame
 		if (text == null) {
 			text = new WarlockText(book);
 			text.setStyleProvider(new DefaultStyleProvider(client));
-			GridData data = new GridData(GridData.FILL, GridData.FILL, true, true);
-			text.setLayoutData(data);
-			text.setEditable(false);
-			text.setWordWrap(true);
-			text.getTextWidget().setIndent(1);
-			
-			text.setScrollDirection(SWT.DOWN);
 			
 			clientStreams.put(client, text);
 			return text;
