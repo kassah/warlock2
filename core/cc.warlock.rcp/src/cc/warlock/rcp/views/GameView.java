@@ -159,12 +159,12 @@ public abstract class GameView extends WarlockView implements IWarlockClientView
 	public void createPartControl(Composite parent) {
 		// Create main composite
 		mainComposite = new Composite (parent, SWT.NONE);
-		GridLayout layout = new GridLayout(1, false);
-		layout.marginHeight = 0;
-		layout.marginWidth = 0;
-		layout.horizontalSpacing = 0;
-		layout.verticalSpacing = 0;
-		mainComposite.setLayout(layout);
+		GridLayout mainLayout = new GridLayout(1, false);
+		mainLayout.marginHeight = 0;
+		mainLayout.marginWidth = 0;
+		mainLayout.horizontalSpacing = 0;
+		mainLayout.verticalSpacing = 0;
+		mainComposite.setLayout(mainLayout);
 		
 		// create a pagebook for the popups
 		popupPageBook = new PageBook(mainComposite, SWT.NONE);
@@ -183,12 +183,12 @@ public abstract class GameView extends WarlockView implements IWarlockClientView
 		
 		// create the entry
 		entryComposite = new Composite(mainComposite, SWT.NONE);
-		layout = new GridLayout(1, false);
-		layout.horizontalSpacing = 0;
-		layout.verticalSpacing = 0;
-		layout.marginHeight = 1;
-		layout.marginWidth = 0;
-		entryComposite.setLayout(layout);
+		GridLayout entryLayout = new GridLayout(1, false);
+		entryLayout.horizontalSpacing = 0;
+		entryLayout.verticalSpacing = 0;
+		entryLayout.marginHeight = 1;
+		entryLayout.marginWidth = 0;
+		entryComposite.setLayout(entryLayout);
 		entryComposite.setLayoutData(new GridData(GridData.FILL, GridData.VERTICAL_ALIGN_END, true, false));
 		
 		this.entry = new WarlockEntry(entryComposite, wrapper); // Do this BEFORE getTextForClient!
