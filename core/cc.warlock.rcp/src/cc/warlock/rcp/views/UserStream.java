@@ -26,6 +26,7 @@ package cc.warlock.rcp.views;
 
 import java.util.ArrayList;
 
+import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.ui.IWorkbenchPage;
 import org.eclipse.ui.PartInitException;
@@ -37,6 +38,7 @@ import cc.warlock.core.client.WarlockString;
 import cc.warlock.core.client.WarlockString.WarlockStringStyleRange;
 import cc.warlock.core.client.internal.StreamFilter;
 import cc.warlock.rcp.ui.StreamText;
+import cc.warlock.rcp.ui.client.SWTStreamListener;
 
 /**
  * @author Will Robertson
@@ -116,8 +118,11 @@ public class UserStream extends StreamView {
 	@Override
 	protected void addClient(IWarlockClient client) {
 		UserStreamText streamText = new UserStreamText(book, streamName);
+		streamText.setLayout(new GridLayout(1, false));
 		streamText.setClient(client);
-		client.getDefaultStream().addStreamListener(streamText);
+		streams.put(client, streamText);
+		
+		client.getDefaultStream().addStreamListener(new SWTStreamListener(streamText));
 	}
 	
 	protected IStreamFilter[] getEventsFilters ()
