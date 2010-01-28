@@ -81,7 +81,6 @@ public class ServerSettings implements Comparable<ServerSettings>
 	
 	protected HashMap<HighlightPreset, HighlightPreset> deletedHighlightStrings = new HashMap<HighlightPreset, HighlightPreset>();
 	protected ArrayList<String> deletedVariables = new ArrayList<String>();
-	protected ArrayList<IServerSettingsListener> listeners = new ArrayList<IServerSettingsListener>();
 	
 	protected ServerScriptProvider scriptProvider;
 	
@@ -136,16 +135,6 @@ public class ServerSettings implements Comparable<ServerSettings>
 		return null;
 	}
 	
-	public void addServerSettingsListener (IServerSettingsListener listener)
-	{
-		listeners.add(listener);
-	}
-	
-	public void removeServerSettingsListener (IServerSettingsListener listener)
-	{
-		listeners.remove(listener);
-	}
-	
 	public void load (String playerId, InputStream stream)
 	{
 		this.playerId = playerId;
@@ -181,12 +170,6 @@ public class ServerSettings implements Comparable<ServerSettings>
 			
 			stream.close();
 			incrementMajorVersion();
-			
-			for (IServerSettingsListener listener : listeners) {
-				try {
-					listener.serverSettingsLoaded(this);
-				} catch (Throwable t) { }
-			}
 		} catch (FileNotFoundException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
