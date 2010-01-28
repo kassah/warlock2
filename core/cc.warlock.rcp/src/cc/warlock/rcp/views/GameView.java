@@ -81,6 +81,8 @@ public abstract class GameView extends WarlockView implements IWarlockClientView
 	protected Composite mainComposite;
 	
 	public GameView () {
+		super();
+		
 		if (firstInstance == null) {
 			firstInstance = this;
 			gameInFocus = this;
@@ -206,8 +208,9 @@ public abstract class GameView extends WarlockView implements IWarlockClientView
 		streamText.setBackgroundMode(SWT.INHERIT_DEFAULT);
 	}
 	
-	
+	@Override
 	public void setFocus() {
+		super.setFocus();
 		gameInFocus = this;
 		for (IGameViewFocusListener listener : focusListeners)
 		{

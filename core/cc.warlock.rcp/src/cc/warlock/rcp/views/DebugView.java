@@ -71,8 +71,9 @@ public class DebugView extends WarlockView implements IConnectionListener, IGame
 			public void clientConnected(final IWarlockClient client) {
 				Display.getDefault().asyncExec(new Runnable() {
 					public void run () {
-						setClient(client);
-						client.getConnection().addConnectionListener(new SWTConnectionListenerAdapter(DebugView.this));
+						IConnection conn = client.getConnection();
+						if(conn != null)
+							conn.addConnectionListener(new SWTConnectionListenerAdapter(DebugView.this));
 					}
 				});
 			}
@@ -138,11 +139,6 @@ public class DebugView extends WarlockView implements IConnectionListener, IGame
 			// TODO Auto-generated catch block
 			e1.printStackTrace();
 		}
-	}
-
-	@Override
-	public void setFocus() {
-		activeText.setFocus();
 	}
 	
 	public void connected(IConnection connection) {

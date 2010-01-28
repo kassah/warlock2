@@ -48,6 +48,7 @@ public class StreamWindowContributionItem extends CompoundContributionItem {
 			super(title, Action.AS_CHECK_BOX);
 		}
 		
+		@Override
 		public void run() {
 			try {
 				DebugView view = (DebugView)
