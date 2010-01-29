@@ -26,7 +26,6 @@ package cc.warlock.core.client;
 
 import java.io.IOException;
 import java.io.InputStream;
-import java.util.Collection;
 
 import cc.warlock.core.client.logging.IClientLogger;
 import cc.warlock.core.client.settings.IClientSettings;
@@ -104,11 +103,6 @@ public interface IWarlockClient extends IRoomListener {
 	public IWarlockStyle getCommandStyle();
 	
 	public void flushStreams();
-	
-	/**
-	 * @return a list of streams for this client
-	 */
-	public Collection<IStream> getStreams();
 	
 	/**
 	 * Listen when the client has received a "nextRoom" event

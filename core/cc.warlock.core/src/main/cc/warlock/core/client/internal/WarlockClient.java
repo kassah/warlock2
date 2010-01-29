@@ -29,6 +29,7 @@ import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
+import java.util.HashMap;
 
 import cc.warlock.core.client.ICommand;
 import cc.warlock.core.client.ICommandHistory;
@@ -61,6 +62,7 @@ public abstract class WarlockClient implements IWarlockClient {
 	protected Property<ICompass> compass = new Property<ICompass>("compass", null);
 	protected IClientSettings clientSettings;
 	protected IClientLogger logger;
+	protected HashMap<String, IStream> streams = new HashMap<String, IStream>();
 	
 	public WarlockClient () {
 		viewers = new ArrayList<IWarlockClientViewer>();
@@ -124,26 +126,20 @@ public abstract class WarlockClient implements IWarlockClient {
 	}
 	
 	public IStream getStream(String streamName) {
-		return Stream.fromName(this, streamPrefix + streamName);
+		synchronized(streams) {
+			return streams.get(streamName);
+		}
 	}
 	
 	public IConnection getConnection() {
 		return connection;
 	}
 	
-	public Collection<IStream> getStreams() {
-		Collection<IStream> streams = new ArrayList<IStream>();
-		for(IStream stream : Stream.getStreams()) {
-			IWarlockClient client = stream.getClient();
-			if (client != null && client.equals(this))
-				streams.add(stream);
-		}
-		return streams;
-	}
-	
 	public void flushStreams() {
-		for(IStream stream : getStreams()) {
-			stream.flush();
+		synchronized(streams) {
+			for(IStream stream : streams.values()) {
+				stream.flush();
+			}
 		}
 	}
 	

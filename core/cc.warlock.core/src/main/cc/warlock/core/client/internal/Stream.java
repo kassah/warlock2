@@ -25,8 +25,6 @@
 package cc.warlock.core.client.internal;
 
 import java.util.ArrayList;
-import java.util.Collection;
-import java.util.HashMap;
 
 import cc.warlock.core.client.ICommand;
 import cc.warlock.core.client.IProperty;
@@ -43,7 +41,6 @@ import cc.warlock.core.client.WarlockString;
  */
 public class Stream implements IStream {
 	
-	protected static final HashMap<String, Stream> streams = new HashMap<String, Stream>();
 	protected IWarlockClient client;
 	
 	protected IProperty<String> streamName, streamTitle;
@@ -57,8 +54,6 @@ public class Stream implements IStream {
 		this.streamName = new Property<String>("streamName", null);
 		this.streamName.set(streamName);
 		this.streamTitle = new Property<String>("streamTitle", null);
-		
-		streams.put(streamName, this);
 	}
 
 	public synchronized void addStreamListener(IStreamListener listener) {
@@ -153,25 +148,6 @@ public class Stream implements IStream {
 	
 	public IProperty<String> getName() {
 		return streamName;
-	}
-	
-	protected static Stream fromName (IWarlockClient client, String name)
-	{
-		if (streams.containsKey(name))
-			return streams.get(name);
-		
-		else {
-			Stream stream = new Stream(client, name);
-			if (name.contains(IWarlockClient.DEFAULT_STREAM_NAME)) {
-				stream.setLogging(true);
-			}
-			return stream;
-		}
-	}
-	
-	public static Collection<Stream> getStreams ()
-	{
-		return streams.values();
 	}
 	
 	public IWarlockClient getClient ()

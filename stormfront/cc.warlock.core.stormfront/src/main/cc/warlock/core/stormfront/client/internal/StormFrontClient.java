@@ -40,6 +40,7 @@ import cc.warlock.core.client.ICommand;
 import cc.warlock.core.client.IProperty;
 import cc.warlock.core.client.IRoomListener;
 import cc.warlock.core.client.IStream;
+import cc.warlock.core.client.IWarlockClient;
 import cc.warlock.core.client.IWarlockClientViewer;
 import cc.warlock.core.client.IWarlockSkin;
 import cc.warlock.core.client.IWarlockStyle;
@@ -461,7 +462,18 @@ public class StormFrontClient extends WarlockClient implements IStormFrontClient
 	
 	@Override
 	public IStream getStream(String streamName) {
-		return StormFrontStream.fromNameAndClient(this, streamPrefix + streamName);
+		synchronized(streams) {
+			IStream stream = super.getStream(streamName);
+			if(stream == null) {
+				StormFrontStream sfStream = new StormFrontStream(this, streamName);
+				if (streamName.contains(IWarlockClient.DEFAULT_STREAM_NAME)) {
+					sfStream.setLogging(true);
+				}
+				stream = sfStream;
+				streams.put(streamName, stream);
+			}
+			return stream;
+		}
 	}
 	
 	public IStream getThoughtsStream() {

@@ -25,7 +25,6 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import java.util.regex.PatternSyntaxException;
 
-import cc.warlock.core.client.IWarlockClient;
 import cc.warlock.core.client.WarlockString;
 import cc.warlock.core.client.internal.Stream;
 import cc.warlock.core.client.settings.IIgnore;
@@ -36,20 +35,6 @@ public class StormFrontStream extends Stream {
 	protected StormFrontStream (IStormFrontClient client, String streamName)
 	{
 		super(client, streamName);
-	}
-	
-	protected static Stream fromNameAndClient (IStormFrontClient client, String name)
-	{
-		if (streams.containsKey(name))
-			return streams.get(name);
-		
-		else {
-			StormFrontStream stream = new StormFrontStream(client, name);
-			if (name.contains(IWarlockClient.DEFAULT_STREAM_NAME)) {
-				stream.setLogging(true);
-			}
-			return stream;
-		}
 	}
 	
 	@Override
