@@ -24,6 +24,7 @@ package cc.warlock.rcp.ui;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.custom.ExtendedModifyEvent;
 import org.eclipse.swt.custom.ExtendedModifyListener;
+import org.eclipse.swt.custom.StyledText;
 import org.eclipse.swt.events.ControlEvent;
 import org.eclipse.swt.events.ControlListener;
 import org.eclipse.swt.events.MouseEvent;
@@ -50,7 +51,7 @@ import cc.warlock.rcp.ui.style.CompassTheme;
  */
 public class WarlockCompass implements PaintListener, MouseMoveListener, MouseListener, IPropertyListener<ICompass> {
 
-	private WarlockText text;
+	private StyledText text;
 	private boolean dragging = false;
 	private Point originalPosition = new Point(-1,-1), startedDraggingFrom = new Point(-1,-1);
 	private int x = -1, y = -1, rightDiff, bottomDiff;
@@ -61,7 +62,7 @@ public class WarlockCompass implements PaintListener, MouseMoveListener, MouseLi
 	private Image compassImage = WarlockSharedImages.getImage(WarlockSharedImages.IMG_COMPASS_SMALL_MAIN);
 	private Rectangle compassBounds = compassImage.getBounds();
 	
-	public WarlockCompass (WarlockText text, CompassTheme theme)
+	public WarlockCompass (StyledText text, CompassTheme theme)
 	{
 		this.text = text;
 		this.theme = theme;

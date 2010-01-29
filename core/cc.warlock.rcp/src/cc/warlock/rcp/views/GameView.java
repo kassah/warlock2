@@ -179,7 +179,7 @@ public abstract class GameView extends WarlockView implements IWarlockClientView
 		
 		streamText = new StreamText(mainComposite, streamName);
 		streamText.setLineLimit(GameViewConfiguration.instance().getBufferLines());
-		streamText.setLayout(new GridLayout(1, false));
+		streamText.getTextWidget().setLayout(new GridLayout(1, false));
 		
 		// create the entry
 		entryComposite = new Composite(mainComposite, SWT.NONE);
@@ -205,7 +205,7 @@ public abstract class GameView extends WarlockView implements IWarlockClientView
 		entry.getWidget().setBackground(background);
 		entry.getWidget().setForeground(foreground);
 		
-		streamText.setBackgroundMode(SWT.INHERIT_DEFAULT);
+		//streamText.setBackgroundMode(SWT.INHERIT_DEFAULT);
 	}
 	
 	@Override
@@ -216,8 +216,6 @@ public abstract class GameView extends WarlockView implements IWarlockClientView
 		{
 			listener.gameViewFocused(this);
 		}
-		
-		streamText.redraw();
 	}
 	
 	public void playSound(InputStream soundStream) {

@@ -142,7 +142,7 @@ public class StreamView extends WarlockView implements IGameViewFocusListener, I
 	
 	protected void addClient(IWarlockClient client) {
 		StreamText streamText = new StreamText(book, streamName);
-		streamText.setLayout(new GridLayout(1, false));
+		streamText.getTextWidget().setLayout(new GridLayout(1, false));
 		streams.put(client, streamText);
 		streamText.setClient(client);
 		IStream stream = client.getStream(streamName);

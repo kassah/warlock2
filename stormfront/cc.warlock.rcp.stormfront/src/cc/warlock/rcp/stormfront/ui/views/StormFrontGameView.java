@@ -101,7 +101,7 @@ public class StormFrontGameView extends GameView implements IStormFrontClientVie
 	public void createPartControl(Composite parent) {
 		super.createPartControl(parent);
 		
-		compass = new WarlockCompass(streamText, CompassThemes.getCompassTheme("small"));
+		compass = new WarlockCompass(streamText.getTextWidget(), CompassThemes.getCompassTheme("small"));
 		//textBorder = new StormFrontTextBorder(text);
 		
 		((GridLayout)entryComposite.getLayout()).numColumns = 2;

@@ -25,6 +25,7 @@ import java.util.ArrayList;
 
 import org.eclipse.swt.custom.ExtendedModifyEvent;
 import org.eclipse.swt.custom.ExtendedModifyListener;
+import org.eclipse.swt.custom.StyledText;
 import org.eclipse.swt.events.ControlEvent;
 import org.eclipse.swt.events.ControlListener;
 import org.eclipse.swt.events.PaintEvent;
@@ -45,7 +46,7 @@ import cc.warlock.rcp.ui.client.SWTPropertyListener;
  *
  */
 public class StormFrontTextBorder implements PaintListener, IPropertyListener<String> {
-	protected WarlockText textWidget;
+	protected StyledText textWidget;
 	protected Boolean highlighted;
 	protected Boolean stunned;
 	protected Boolean bleeding;
@@ -55,16 +56,16 @@ public class StormFrontTextBorder implements PaintListener, IPropertyListener<St
 	protected SWTPropertyListener<String> wrapper = new SWTPropertyListener<String>(this);
 	
 	public StormFrontTextBorder(WarlockText text) {
-		textWidget = text; // Set Text Widget we'll be drawing on
+		textWidget = text.getTextWidget(); // Set Text Widget we'll be drawing on
 		highlighted = false;
-		text.addPaintListener(this);
-		text.addControlListener(new ControlListener () {
+		textWidget.addPaintListener(this);
+		textWidget.addControlListener(new ControlListener () {
 			public void controlMoved(ControlEvent e) {}
 			public void controlResized(ControlEvent e) {
 				redraw();
 			}
 		});
-		text.getVerticalBar().addSelectionListener(new SelectionListener () {
+		textWidget.getVerticalBar().addSelectionListener(new SelectionListener () {
 			public void widgetDefaultSelected(SelectionEvent e) {
 				widgetSelected(e);
 			}
@@ -72,7 +73,7 @@ public class StormFrontTextBorder implements PaintListener, IPropertyListener<St
 				redraw();
 			}
 		});
-		text.addExtendedModifyListener(new ExtendedModifyListener() {
+		textWidget.addExtendedModifyListener(new ExtendedModifyListener() {
 			public void modifyText(ExtendedModifyEvent e) {
 				redraw();
 			}

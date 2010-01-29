@@ -27,45 +27,24 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 
-import org.eclipse.core.runtime.Platform;
 import org.eclipse.swt.SWT;
-import org.eclipse.swt.custom.ExtendedModifyListener;
-import org.eclipse.swt.custom.LineBackgroundEvent;
-import org.eclipse.swt.custom.LineBackgroundListener;
-import org.eclipse.swt.custom.PaintObjectListener;
 import org.eclipse.swt.custom.ST;
 import org.eclipse.swt.custom.StyleRange;
 import org.eclipse.swt.custom.StyledText;
-import org.eclipse.swt.custom.StyledTextContent;
-import org.eclipse.swt.events.ControlEvent;
-import org.eclipse.swt.events.ControlListener;
-import org.eclipse.swt.events.FocusListener;
-import org.eclipse.swt.events.KeyListener;
 import org.eclipse.swt.events.MouseEvent;
 import org.eclipse.swt.events.MouseListener;
 import org.eclipse.swt.events.MouseMoveListener;
-import org.eclipse.swt.events.PaintListener;
 import org.eclipse.swt.events.SelectionAdapter;
 import org.eclipse.swt.events.SelectionEvent;
-import org.eclipse.swt.events.VerifyEvent;
-import org.eclipse.swt.events.VerifyListener;
 import org.eclipse.swt.graphics.Color;
 import org.eclipse.swt.graphics.Cursor;
 import org.eclipse.swt.graphics.Font;
-import org.eclipse.swt.graphics.GlyphMetrics;
-import org.eclipse.swt.graphics.Image;
 import org.eclipse.swt.graphics.Point;
-import org.eclipse.swt.graphics.Rectangle;
 import org.eclipse.swt.layout.GridData;
-import org.eclipse.swt.widgets.Caret;
 import org.eclipse.swt.widgets.Composite;
-import org.eclipse.swt.widgets.Control;
 import org.eclipse.swt.widgets.Display;
-import org.eclipse.swt.widgets.Label;
-import org.eclipse.swt.widgets.Layout;
 import org.eclipse.swt.widgets.Menu;
 import org.eclipse.swt.widgets.MenuItem;
-import org.eclipse.swt.widgets.ScrollBar;
 import org.eclipse.ui.ISharedImages;
 import org.eclipse.ui.PlatformUI;
 
@@ -80,21 +59,17 @@ import cc.warlock.core.client.WarlockString.WarlockStringStyleRange;
  * 
  * @author Marshall
  */
-public class WarlockText implements LineBackgroundListener {
+public class WarlockText {
 
 	public static final char OBJECT_HOLDER = '\uFFFc';
 	
 	private StyledText textWidget;
-	private HashMap<Object, StyleRangeWithData> objects = new HashMap<Object, StyleRangeWithData>();
-	private HashMap<Control, Rectangle> anchoredControls = new HashMap<Control, Rectangle>();
 	private Cursor handCursor, defaultCursor;
 	private int lineLimit = 5000;
 	private int doScrollDirection = SWT.DOWN;
 	private IStyleProvider styleProvider;
 	private Menu contextMenu;
-	private HashMap<String, WarlockTextMarker> markers;
-	
-	protected HashMap<Integer, Color> lineBackgrounds = new HashMap<Integer,Color>();
+	private HashMap<String, WarlockTextMarker> markers = new HashMap<String, WarlockTextMarker>();
 	
 	private class WarlockTextMarker {
 		public int offset;
@@ -108,69 +83,41 @@ public class WarlockText implements LineBackgroundListener {
 	
 	public WarlockText(Composite parent) {
 		textWidget = new StyledText(parent, SWT.V_SCROLL);
-		
+
 		textWidget.setLayoutData(new GridData(GridData.FILL, GridData.FILL, true, true));
 		textWidget.setEditable(false);
 		textWidget.setWordWrap(true);
 		textWidget.setIndent(1);
-		
+
 		ISharedImages images = PlatformUI.getWorkbench().getSharedImages();
-		
+
 		Display display = parent.getDisplay();
 		handCursor = new Cursor(display, SWT.CURSOR_HAND);
 		defaultCursor = parent.getCursor();
-		
+
 		contextMenu = new Menu(textWidget);
 		MenuItem itemCopy = new MenuItem(contextMenu, SWT.PUSH);
 		itemCopy.addSelectionListener(new SelectionAdapter() {
-		            public void widgetSelected(SelectionEvent arg0) {
-		                textWidget.copy();
-		            }
-		        });
+			public void widgetSelected(SelectionEvent arg0) {
+				textWidget.copy();
+			}
+		});
 		itemCopy.setText("Copy");
 		itemCopy.setImage(images.getImage(ISharedImages.IMG_TOOL_COPY));
 		MenuItem itemClear = new MenuItem(contextMenu, SWT.PUSH);
 		itemClear.addSelectionListener(new SelectionAdapter() {
-            public void widgetSelected(SelectionEvent arg0) {
-                textWidget.setText("");
-                lineBackgrounds.clear();
-            }
-        });
+			public void widgetSelected(SelectionEvent arg0) {
+				textWidget.setText("");
+			}
+		});
 		itemClear.setText("Clear");
 		itemClear.setImage(images.getImage(ISharedImages.IMG_TOOL_DELETE));
 		textWidget.setMenu(contextMenu);
-		
-		addVerifyListener(new VerifyListener()  {
-			public void verifyText(VerifyEvent e) {
-				int start = e.start;
-				int replaceCharCount = e.end - e.start;
-				int nHolder = 0;
-				for (Iterator<Object> iter = objects.keySet().iterator(); iter.hasNext(); )
-				{
-					Object object = iter.next();
-					
-					int offset = getHolderOffset(nHolder);
-					if (start <= offset && offset < start + replaceCharCount) {
-						// this control is being deleted from the text
-						if (object instanceof Control)
-						{
-							Control control = (Control) object;
-							if (control != null && !control.isDisposed()) {
-								control.dispose();
-								iter.remove();
-							}
-							offset = -1;
-						}
-					}
-					nHolder++;
-				}
-			}
-		});
-		
-		addMouseMoveListener(new MouseMoveListener() {
+
+		textWidget.addMouseMoveListener(new MouseMoveListener() {
 			public void mouseMove(MouseEvent e) {
 				try {
-					if (!isDisposed() && isVisible())
+					if (!textWidget.isDisposed() && textWidget.isVisible())
 					{
 						Point point = new Point(e.x, e.y);
 						int offset = textWidget.getOffsetAtLocation(point);
@@ -180,23 +127,23 @@ public class WarlockText implements LineBackgroundListener {
 							StyleRangeWithData range2 = (StyleRangeWithData) range;
 							if (range2.action != null)
 							{
-								setCursor(handCursor);
+								textWidget.setCursor(handCursor);
 								return;
 							}
-						
+
 						}
-						setCursor(defaultCursor);
+						textWidget.setCursor(defaultCursor);
 					}
 				} catch (IllegalArgumentException ex) {
 					// swallow -- this happens if the mouse cursor moves to an
 					// area not covered by the imaginary rectangle surround the
 					// current text
-					setCursor(defaultCursor);
+					textWidget.setCursor(defaultCursor);
 				}
 			}
 		});
-		
-		addMouseListener(new MouseListener () {
+
+		textWidget.addMouseListener(new MouseListener () {
 			public void mouseDoubleClick(MouseEvent e) {}
 			public void mouseDown(MouseEvent e) {}
 			public void mouseUp(MouseEvent e) {
@@ -217,86 +164,6 @@ public class WarlockText implements LineBackgroundListener {
 				}
 			}
 		});
-		
-		textWidget.addLineBackgroundListener(this);
-		addControlListener(new ControlListener () {
-			public void controlMoved(ControlEvent e) { }
-			public void controlResized(ControlEvent e) {
-				redraw();
-			}
-		});
-	}
-	
-	public void addControlListener(ControlListener listener) {
-		textWidget.addControlListener(listener);
-	}
-	
-	public void addPaintListener(PaintListener listener) {
-		textWidget.addPaintListener(listener);
-	}
-	
-	public void addMouseListener(MouseListener listener) {
-		textWidget.addMouseListener(listener);
-	}
-	
-	public void addMouseMoveListener(MouseMoveListener listener) {
-		textWidget.addMouseMoveListener(listener);
-	}
-	
-	public void addPaintObjectListener(PaintObjectListener listener) {
-		textWidget.addPaintObjectListener(listener);
-	}
-	
-	public void addVerifyListener(VerifyListener verifyListener) {
-		textWidget.addVerifyListener(verifyListener);
-	}
-	
-	public void addExtendedModifyListener(ExtendedModifyListener extendedModifyListener) {
-		textWidget.addExtendedModifyListener(extendedModifyListener);
-	}
-	
-	public void addFocusListener(FocusListener listener) {
-		textWidget.addFocusListener(listener);
-	}
-	
-	public void addKeyListener(KeyListener listener) {
-		textWidget.addKeyListener(listener);
-	}
-	
-	public Rectangle getBounds() {
-		return textWidget.getBounds();
-	}
-	
-	public Display getDisplay() {
-		return textWidget.getDisplay();
-	}
-	
-	public ScrollBar getVerticalBar() {
-		return textWidget.getVerticalBar();
-	}
-	
-	public boolean isDisposed() {
-		return textWidget.isDisposed();
-	}
-	
-	public boolean isVisible() {
-		return textWidget.isVisible();
-	}
-	
-	public void setBackgroundMode(int mode) {
-		textWidget.setBackgroundMode(mode);
-	}
-	
-	public void setCursor(Cursor cursor) {
-		textWidget.setCursor(cursor);
-	}
-	
-	public void redraw() {
-		textWidget.redraw();
-	}
-	
-	public void redraw(int x, int y, int width, int height, boolean all) {
-		textWidget.redraw(x, y, width, height, all);
 	}
 	
 	public void selectAll() {
@@ -309,21 +176,13 @@ public class WarlockText implements LineBackgroundListener {
 	
 	public void pageUp() {
 		if (isAtBottom()) {
-			textWidget.setCaretOffset(this.getCharCount());
+			textWidget.setCaretOffset(textWidget.getCharCount());
 		}
 		textWidget.invokeAction(ST.PAGE_UP);
 	}
 	
 	public void pageDown() {
 		textWidget.invokeAction(ST.PAGE_DOWN);
-	}
-	
-	public void setFocus() {
-		textWidget.setFocus();
-	}
-	
-	public Rectangle getClientArea() {
-		return textWidget.getClientArea();
 	}
 	
 	public void setBackground(Color color) {
@@ -334,77 +193,13 @@ public class WarlockText implements LineBackgroundListener {
 		textWidget.setForeground(color);
 	}
 	
-	/*
-	 * This is protected since setting the text directly actually
-	 * causes some major problems with the markers and stuff
-	 */
-	protected void setText(String text) {
-		textWidget.setText(text);
-	}
-	
-	public void clearText() {
-		setText("");
-		clearMarkers();
-	}
-	
-	public Font getFont() {
-		return textWidget.getFont();
-	}
-	
 	public void setFont(Font font) {
 		textWidget.setFont(font);
 	}
 	
-	public int getCharCount() {
-		return textWidget.getCharCount();
-	}
-	
-	public String getText() {
-		return textWidget.getText();
-	}
-	
-	private int getHolderOffset (int nHolder)
-	{
-		String text = getText();
-		return text.indexOf(OBJECT_HOLDER);
-	}
-	
-	public void update() {
-		textWidget.update();
-	}
-	
-	public void addAnchoredControl (Control control, Rectangle dimensions)
-	{
-		anchoredControls.put(control, dimensions);
-		
-		update();
-	}
-	
-	public void addControls (Control[] controls)
-	{
-		int i = 0;
-		for (Control ctrl : controls)
-		{
-			StyleRangeWithData style = new StyleRangeWithData();
-			style.start = getHolderOffset(this.objects.keySet().size() + i);
-			style.length = 1;
-			Rectangle rect = ctrl.getBounds();
-			style.metrics = new GlyphMetrics(rect.height, 0, rect.width);
-			
-			this.objects.put(ctrl, style);
-			textWidget.setStyleRange(style);
-			
-			i++;
-		}
-		update();
-	}
-	
-	public void addImage (Image image) {
-		Label label = new Label(textWidget, SWT.NONE);
-		label.setImage(image);
-		label.setSize(image.getBounds().width, image.getBounds().width);
-		
-		addControls (new Control[] { label });		
+	public void clearText() {
+		textWidget.setText("");
+		clearMarkers();
 	}
 	
 	public void setLineLimit(int limit) {
@@ -425,12 +220,10 @@ public class WarlockText implements LineBackgroundListener {
 		for(WarlockStringStyleRange style : styles) {
 			String name = style.style.getName();
 			if(name != null) {
-				if(markers != null) {
-					WarlockTextMarker marker = markers.get(name);
-					if(marker != null && marker.offset + marker.length == offset + style.getStart()) {
-						marker.length += style.getLength();
-						continue;
-					}
+				WarlockTextMarker marker = markers.get(name);
+				if(marker != null && marker.offset + marker.length == offset + style.getStart()) {
+					marker.length += style.getLength();
+					continue;
 				}
 				this.addMarker(name, offset + style.getStart(), style.getLength());
 			}
@@ -492,12 +285,13 @@ public class WarlockText implements LineBackgroundListener {
 		}
 	}
 	
-	public void append(WarlockString string) {
+	public void append(WarlockString wstring) {
 		boolean atBottom = isAtBottom();
 		
 		int charCount = textWidget.getCharCount();
-		textWidget.append(string.toString());
-		addStyles(string.getStyles(), charCount, string.length());
+		String string = wstring.toString();
+		textWidget.append(string);
+		addStyles(wstring.getStyles(), charCount, string.length());
 		
 		constrainLineLimit(atBottom);
 
@@ -530,7 +324,7 @@ public class WarlockText implements LineBackgroundListener {
 		styleRange.length = range.getLength();
 		
 		if(range.style.isFullLine())
-			setLineBackground(textWidget.getLineAtOffset(styleRange.start), styleRange.background);
+			textWidget.setLineBackground(textWidget.getLineAtOffset(styleRange.start), 1, styleRange.background);
 		if(range.style.getAction() != null)
 			styleRange.action = range.style.getAction();
 		if(range.style.getName() != null)
@@ -547,23 +341,19 @@ public class WarlockText implements LineBackgroundListener {
 		// TODO: Make preTextChange private
 		// Explination: right now we can't listen for the before and after of our resize, so this must be called
 		//     after an action that will cause a resize.
-		if (atBottom && !isAtBottom()) {
-			if (doScrollDirection == SWT.DOWN) {
-				textWidget.setTopPixel(textWidget.getTopPixel()
-						+ textWidget.getLinePixel(textWidget.getLineCount()));
-			}
+		if (atBottom && doScrollDirection == SWT.DOWN) {
+			textWidget.setTopPixel(textWidget.getTopPixel()
+					+ textWidget.getLinePixel(textWidget.getLineCount()));
 			
 			// FIXME: is this still needed?
-			if (Platform.getOS().equals(Platform.OS_MACOSX)) {
-				redraw();
-			}
+			//if (Platform.getOS().equals(Platform.OS_MACOSX)) {
+			//	textWidget.redraw();
+			//}
 		}
 	}
 	
 	// Don't not call this function on append, only replace/remove/insert
 	private void updateMarkers(int offset, int delta) {
-		if(markers == null)
-			return;
 		for(Iterator<Map.Entry<String, WarlockTextMarker>> iter = markers.entrySet().iterator();
 		iter.hasNext(); )
 		{
@@ -585,22 +375,18 @@ public class WarlockText implements LineBackgroundListener {
 	}
 	
 	public void addMarker(String name, int offset, int length) {
-		if(markers == null)
-			markers = new HashMap<String, WarlockTextMarker>();
 		markers.put(name, new WarlockTextMarker(offset, length));
 	}
 	
 	public void clearMarkers() {
-		if(markers == null)
-			markers = new HashMap<String, WarlockTextMarker>();
-		else
-			markers.clear();
+		markers.clear();
 	}
 	
 	public void replaceMarker(String name, WarlockString text) {
-		if(markers == null) return;
 		WarlockTextMarker marker = markers.get(name);
-		if(marker == null) return;
+		if(marker == null)
+			return;
+		
 		int start = marker.offset;
 		int length = marker.length;
 		boolean atBottom = isAtBottom();
@@ -618,49 +404,18 @@ public class WarlockText implements LineBackgroundListener {
 			if (lines > lineLimit) {
 				int linesToRemove = lines - lineLimit;
 				int charsToRemove = textWidget.getOffsetAtLine(linesToRemove);
-				int pixelsToRemove = textWidget.getLinePixel(linesToRemove);
-				
-				textWidget.replaceTextRange(0, charsToRemove, "");
-				updateMarkers(0, -charsToRemove);
-				updateLineBackgrounds(linesToRemove);
-				if(!atBottom && pixelsToRemove < 0)
-					textWidget.setTopPixel(-pixelsToRemove);
+				if(atBottom) {
+					textWidget.replaceTextRange(0, charsToRemove, "");
+					updateMarkers(0, -charsToRemove);
+				} else {
+					int pixelsToRemove = textWidget.getLinePixel(linesToRemove);
+					textWidget.replaceTextRange(0, charsToRemove, "");
+					updateMarkers(0, -charsToRemove);
+					if(pixelsToRemove < 0)
+						textWidget.setTopPixel(-pixelsToRemove);
+				}
 			}
 		}
-	}
-	
-	@SuppressWarnings("unchecked")
-	private void updateLineBackgrounds (int lines)
-	{
-		HashMap<Integer, Color> copy = (HashMap<Integer, Color>) lineBackgrounds.clone(); 
-		lineBackgrounds.clear();
-		
-		for (Map.Entry<Integer, Color> line : copy.entrySet())
-		{
-			if (line.getKey() >= lines)
-			{
-				lineBackgrounds.put(line.getKey() - lines, line.getValue());
-			}
-		}
-	}
-	
-	public void lineGetBackground(LineBackgroundEvent event) {
-		int lineIndex = getLineAtOffset(event.lineOffset);
-		boolean hasBackground = lineBackgrounds.containsKey(lineIndex);
-		
-		if (hasBackground)
-		{
-			event.lineBackground = lineBackgrounds.get(lineIndex);
-		}
-	}
-	
-	public void setLineBackground (int line, Color background)
-	{
-		lineBackgrounds.put(line, background);
-	}
-	
-	public int getLineAtOffset(int offset) {
-		return textWidget.getLineAtOffset(offset);
 	}
 	
 	public void setScrollDirection(int dir) {
@@ -669,35 +424,11 @@ public class WarlockText implements LineBackgroundListener {
 		// TODO: Else throw an error
 	}
 	
-	public int getCaretOffset() {
-		return textWidget.getCaretOffset();
-	}
-	
-	public void setCaretOffset(Caret caret) {
-		textWidget.setCaret(caret);
-	}
-	
-	public void setCaretOffset(int offset) {
-		textWidget.setCaretOffset(offset);
-	}
-	
-	public void showSelection() {
-		textWidget.showSelection();
-	}
-	
-	public StyledTextContent getContent() {
-		return textWidget.getContent();
-	}
-
 	public StyledText getTextWidget() {
 		return textWidget;
 	}
 	
 	public void setStyleProvider(IStyleProvider styleProvider) {
 		this.styleProvider = styleProvider;
-	}
-	
-	public void setLayout(Layout layout) {
-		textWidget.setLayout(layout);
 	}
 }

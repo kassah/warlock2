@@ -118,7 +118,7 @@ public class UserStream extends StreamView {
 	@Override
 	protected void addClient(IWarlockClient client) {
 		UserStreamText streamText = new UserStreamText(book, streamName);
-		streamText.setLayout(new GridLayout(1, false));
+		streamText.getTextWidget().setLayout(new GridLayout(1, false));
 		streamText.setClient(client);
 		streams.put(client, streamText);
 		
