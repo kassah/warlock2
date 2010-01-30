@@ -64,6 +64,4 @@ public interface IWarlockClientViewer {
 	public void paste();
 	
 	public void playSound(InputStream soundStream);
-
-	public void loadClientSettings(IClientSettings settings);
 }

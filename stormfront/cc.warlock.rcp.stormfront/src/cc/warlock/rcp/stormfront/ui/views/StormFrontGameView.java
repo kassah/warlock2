@@ -49,11 +49,10 @@ import org.eclipse.ui.PlatformUI;
 import cc.warlock.core.client.ICompass;
 import cc.warlock.core.client.IPropertyListener;
 import cc.warlock.core.client.IWarlockClient;
-import cc.warlock.core.client.IWarlockClientListener;
 import cc.warlock.core.client.WarlockClientRegistry;
 import cc.warlock.core.client.WarlockColor;
 import cc.warlock.core.client.WarlockFont;
-import cc.warlock.core.client.settings.IClientSettings;
+import cc.warlock.core.client.internal.WarlockClientListener;
 import cc.warlock.core.configuration.Profile;
 import cc.warlock.core.stormfront.ProfileConfiguration;
 import cc.warlock.core.stormfront.client.IStormFrontClient;
@@ -66,19 +65,20 @@ import cc.warlock.rcp.stormfront.ui.StormFrontStatus;
 import cc.warlock.rcp.stormfront.ui.actions.ProfileConnectAction;
 import cc.warlock.rcp.stormfront.ui.style.StormFrontStyleProvider;
 import cc.warlock.rcp.stormfront.ui.wizards.SGEConnectWizard;
+import cc.warlock.rcp.ui.IStyleProvider;
 import cc.warlock.rcp.ui.WarlockCompass;
 import cc.warlock.rcp.ui.WarlockPopupAction;
 import cc.warlock.rcp.ui.WarlockSharedImages;
 import cc.warlock.rcp.ui.WarlockWizardDialog;
 import cc.warlock.rcp.ui.client.SWTPropertyListener;
 import cc.warlock.rcp.ui.client.SWTStreamListener;
+import cc.warlock.rcp.ui.client.SWTWarlockClientListener;
 import cc.warlock.rcp.ui.style.CompassThemes;
 import cc.warlock.rcp.ui.style.StyleProviders;
 import cc.warlock.rcp.util.ColorUtil;
 import cc.warlock.rcp.util.RCPUtil;
 import cc.warlock.rcp.views.ConnectionView;
 import cc.warlock.rcp.views.GameView;
-import cc.warlock.rcp.views.StreamView;
 
 public class StormFrontGameView extends GameView implements IStormFrontClientViewer {
 	
@@ -285,8 +285,7 @@ public class StormFrontGameView extends GameView implements IStormFrontClientVie
 
 			// The style provider needs to be set before the client is set on
 			//   the text widget, or the text widget won't get the style provider.
-			StyleProviders.setStyleProvider(client,
-					new StormFrontStyleProvider(sfClient.getStormFrontClientSettings()));
+			
 			
 			SWTStreamListener streamListener = new SWTStreamListener(streamText);
 			client.getDefaultStream().addStreamListener(streamListener);
@@ -299,12 +298,18 @@ public class StormFrontGameView extends GameView implements IStormFrontClientVie
 				// textBorder.setActiveClient(sfClient);
 			}
 			
-			loadClientSettings(sfClient.getStormFrontClientSettings());
+			IStormFrontClientSettings settings = sfClient.getStormFrontClientSettings();
+			if(settings != null)
+				loadClientSettings(settings);
 			
-			WarlockClientRegistry.addWarlockClientListener(new IWarlockClientListener () {
+			WarlockClientRegistry.addWarlockClientListener(new SWTWarlockClientListener(new WarlockClientListener() {
+				@Override
 				public void clientActivated(IWarlockClient client) {}
+				@Override
 				public void clientConnected(IWarlockClient client) {}
+				@Override
 				public void clientRemoved(IWarlockClient client) {}
+				@Override
 				public void clientDisconnected(IWarlockClient client) {
 					if (client == StormFrontGameView.this.client) {
 						Display.getDefault().asyncExec(new Runnable() {
@@ -314,7 +319,12 @@ public class StormFrontGameView extends GameView implements IStormFrontClientVie
 						});
 					}
 				}
-			});
+				@Override
+				public void clientSettingsLoaded(IWarlockClient client) {
+					// TODO Auto-generated method stub
+					
+				}
+			}));
 		}
 		
 		super.setClient(client);
@@ -332,9 +342,17 @@ public class StormFrontGameView extends GameView implements IStormFrontClientVie
 
 	private Button reconnect;
 	
-	public void loadClientSettings(IClientSettings clientSettings)
-	{
-		IStormFrontClientSettings settings = (IStormFrontClientSettings) clientSettings;
+	public void clientSettingsLoaded(IWarlockClient client) {
+		if(client == sfClient) {
+			loadClientSettings(sfClient.getStormFrontClientSettings());
+		}
+	}
+	
+	public void loadClientSettings(IStormFrontClientSettings settings)
+	{	
+		IStyleProvider styleProvider = new StormFrontStyleProvider(settings);
+		
+		StyleProviders.setStyleProvider(client, styleProvider);
 		
 		sfClient.getCharacterName().addListener(new IPropertyListener<String>() {
 			public void propertyChanged(String value) {
@@ -361,6 +379,8 @@ public class StormFrontGameView extends GameView implements IStormFrontClientVie
 			}
 		});
 		
+		streamText.setStyleProvider(styleProvider);
+		
 		WarlockColor bg = sfClient.getStormFrontSkin().getMainBackground();
 		WarlockColor fg = sfClient.getStormFrontSkin().getMainForeground();
 		
@@ -385,6 +405,7 @@ public class StormFrontGameView extends GameView implements IStormFrontClientVie
 		Caret newCaret = createCaret(1, ColorUtil.warlockColorToColor(entryBarColor.isDefault() ? fg : entryBarColor));
 		entry.getWidget().setCaret(newCaret);
 		
+		streamText.setClient(sfClient);
 		streamText.setBackground(ColorUtil.warlockColorToColor(bg));
 		streamText.setForeground(ColorUtil.warlockColorToColor(fg));
 		streamText.getTextWidget().redraw();
@@ -392,12 +413,6 @@ public class StormFrontGameView extends GameView implements IStormFrontClientVie
 		if (HandsView.getDefault() != null)
 		{
 			HandsView.getDefault().loadSettings(settings);
-		}
-		
-		for (StreamView streamView : StreamView.getOpenViews())
-		{
-			streamView.setBackground(client, ColorUtil.warlockColorToColor(bg));
-			streamView.setForeground(client, ColorUtil.warlockColorToColor(fg));
 		}
 		
 		if (status != null) {
@@ -445,5 +460,29 @@ public class StormFrontGameView extends GameView implements IStormFrontClientVie
 	
 	public IStormFrontClient getStormFrontClient() {
 		return sfClient;
+	}
+
+	@Override
+	public void clientActivated(IWarlockClient client) {
+		// TODO Auto-generated method stub
+		
+	}
+
+	@Override
+	public void clientConnected(IWarlockClient client) {
+		// TODO Auto-generated method stub
+		
+	}
+
+	@Override
+	public void clientDisconnected(IWarlockClient client) {
+		// TODO Auto-generated method stub
+		
+	}
+
+	@Override
+	public void clientRemoved(IWarlockClient client) {
+		// TODO Auto-generated method stub
+		
 	}
 }

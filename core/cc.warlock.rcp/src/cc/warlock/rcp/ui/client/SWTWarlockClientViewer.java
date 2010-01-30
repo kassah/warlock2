@@ -33,7 +33,6 @@ import org.eclipse.swt.widgets.Display;
 
 import cc.warlock.core.client.IWarlockClient;
 import cc.warlock.core.client.IWarlockClientViewer;
-import cc.warlock.core.client.settings.IClientSettings;
 
 /**
  * @author Marshall
@@ -133,17 +132,6 @@ public class SWTWarlockClientViewer implements IWarlockClientViewer  {
 		}
 	}
 	
-	private class LoadClientSettingsWrapper implements Runnable {
-		public IClientSettings settings;
-		public LoadClientSettingsWrapper(IClientSettings settings) {
-			this.settings = settings;
-		}
-		
-		public void run () {
-			viewer.loadClientSettings(settings);
-		}
-	}
-	
 	protected void run(Runnable runnable)
 	{
 		Display.getDefault().asyncExec(runnable);
@@ -199,9 +187,5 @@ public class SWTWarlockClientViewer implements IWarlockClientViewer  {
 	
 	public void playSound(InputStream file) {
 		run(new PlaySoundWrapper(file));
-	}
-
-	public void loadClientSettings(IClientSettings settings) {
-		run(new LoadClientSettingsWrapper(settings));
 	}
 }

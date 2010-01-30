@@ -38,8 +38,8 @@ import org.eclipse.core.runtime.IExtension;
 import org.eclipse.core.runtime.InvalidRegistryObjectException;
 
 import cc.warlock.core.client.IWarlockClient;
-import cc.warlock.core.client.IWarlockClientListener;
 import cc.warlock.core.client.WarlockClientRegistry;
+import cc.warlock.core.client.internal.WarlockClientListener;
 import cc.warlock.core.client.settings.IClientSetting;
 import cc.warlock.core.client.settings.macro.CommandMacroHandler;
 import cc.warlock.core.client.settings.macro.IMacro;
@@ -49,6 +49,7 @@ import cc.warlock.core.client.settings.macro.IMacroProvider;
 import cc.warlock.core.client.settings.macro.IMacroVariable;
 import cc.warlock.core.client.settings.macro.internal.Macro;
 import cc.warlock.rcp.plugin.Warlock2Plugin;
+import cc.warlock.rcp.ui.client.SWTWarlockClientListener;
 import cc.warlock.rcp.ui.macros.internal.SystemMacros;
 
 
@@ -85,14 +86,15 @@ public class MacroRegistry implements IMacroProvider {
 			instance = new MacroRegistry();
 			instance.init();
 			
-			WarlockClientRegistry.addWarlockClientListener(new IWarlockClientListener() {
+			WarlockClientRegistry.addWarlockClientListener(new SWTWarlockClientListener(new WarlockClientListener() {
 				public void clientActivated(IWarlockClient client) {}
-				public void clientConnected(IWarlockClient client) {
-					client.getClientSettings().addClientSettingProvider(instance);
-				}
+				public void clientConnected(IWarlockClient client) {}
 				public void clientDisconnected(IWarlockClient client) {}
 				public void clientRemoved(IWarlockClient client) {}
-			});
+				public void clientSettingsLoaded(IWarlockClient client) {
+					client.getClientSettings().addClientSettingProvider(instance);
+				}
+			}));
 		}
 		
 		return instance;

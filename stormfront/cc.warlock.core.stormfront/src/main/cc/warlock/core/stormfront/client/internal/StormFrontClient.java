@@ -82,7 +82,8 @@ public class StormFrontClient extends WarlockClient implements IStormFrontClient
 	protected Property<Integer> roundtime, casttime, monsterCount;
 	protected Property<String> leftHand, rightHand, currentSpell;
 	protected StringBuffer buffer = new StringBuffer();
-	protected Property<String> playerId, characterName, gameCode, roomDescription;
+	protected Property<String> characterName, roomDescription;
+	protected String gameCode, playerId;
 	protected StormFrontClientSettings clientSettings;
 	protected StormFrontServerSettings serverSettings;
 	protected long timeDelta;
@@ -101,8 +102,10 @@ public class StormFrontClient extends WarlockClient implements IStormFrontClient
 		new HashMap<String, Property<IStormFrontDialogMessage>>();
 	protected HashMap<String, String> vitals = new HashMap<String, String>();
 	
-	public StormFrontClient() {
+	public StormFrontClient(String gameCode) {
 		super();
+		
+		this.gameCode = gameCode;
 		
 		status = new CharacterStatus(this);
 		leftHand = new Property<String>("leftHand", null);
@@ -111,9 +114,7 @@ public class StormFrontClient extends WarlockClient implements IStormFrontClient
 		
 		roundtime = new Property<Integer>("roundtime", 0);
 		casttime = new Property<Integer>("casttime", 0);
-		playerId = new Property<String>("playerId", null);
 		characterName = new Property<String>("characterName", null);
-		gameCode = new Property<String>("gameCode", null);
 		roomDescription = new Property<String>("roomDescription", null);
 		monsterCount = new Property<Integer>("monsterCount", null);
 
@@ -125,19 +126,6 @@ public class StormFrontClient extends WarlockClient implements IStormFrontClient
 		scriptListeners = new ArrayList<IScriptListener>();
 		
 		WarlockClientRegistry.activateClient(this);
-	}
-	
-	@Override
-	protected IClientSettings createClientSettings() {
-		clientSettings = new StormFrontClientSettings(this);
-
-		skin = new DefaultSkin(clientSettings);
-		skin.loadDefaultStyles(clientSettings.getHighlightConfigurationProvider());
-		
-		serverSettings = new StormFrontServerSettings();
-		clientSettings.addChildProvider(serverSettings);
-		
-		return clientSettings;
 	}
 	
 	@Override
@@ -402,8 +390,25 @@ public class StormFrontClient extends WarlockClient implements IStormFrontClient
 		
 	}
 
-	public Property<String> getPlayerId() {
+	public String getPlayerId() {
 		return playerId;
+	}
+	
+	public void setPlayerId(String playerId) {
+		this.playerId = playerId;
+		
+		clientSettings = new StormFrontClientSettings(this, getClientId());
+		skin = new DefaultSkin(clientSettings);
+		skin.loadDefaultStyles(clientSettings.getHighlightConfigurationProvider());
+		
+		serverSettings = new StormFrontServerSettings();
+		clientSettings.addChildProvider(serverSettings);
+		
+		WarlockClientRegistry.clientSettingsLoaded(this);
+	}
+	
+	public IClientSettings getClientSettings() {
+		return clientSettings;
 	}
 	
 	public IStormFrontClientSettings getStormFrontClientSettings() {
@@ -414,11 +419,12 @@ public class StormFrontClient extends WarlockClient implements IStormFrontClient
 		return characterName;
 	}
 	
-	public IProperty<String> getGameCode() {
+	public String getGameCode() {
 		return gameCode;
 	}
 	
-	public IProperty<String> getClientId() {
+	public String getClientId() {
+		//return gameCode + "_" + playerId;
 		return playerId;
 	}
 	
@@ -620,13 +626,6 @@ public class StormFrontClient extends WarlockClient implements IStormFrontClient
 		}
 	}
 	
-	public void loadClientSettings(IClientSettings settings) {
-		for (IWarlockClientViewer viewer : viewers)
-		{
-			viewer.loadClientSettings(settings);
-		}
-	}
-	
 	public void startedDownloadingServerSettings() {
 		for (IWarlockClientViewer viewer : viewers) {
 			if (viewer instanceof IStormFrontClientViewer)
@@ -635,8 +634,7 @@ public class StormFrontClient extends WarlockClient implements IStormFrontClient
 	}
 	
 	public void finishedDownloadingServerSettings(String str) {
-		String playerId = getPlayerId().get();
-		File settingsFile = ConfigurationUtil.getConfigurationFile("serverSettings_" + playerId + ".xml");
+		File settingsFile = ConfigurationUtil.getConfigurationFile("serverSettings_" + getClientId() + ".xml");
 		InputStream inStream = new ByteArrayInputStream(str.getBytes());
 		
 		try {

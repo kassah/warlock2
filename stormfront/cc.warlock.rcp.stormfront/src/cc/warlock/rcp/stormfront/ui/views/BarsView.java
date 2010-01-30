@@ -41,8 +41,6 @@ import org.eclipse.ui.part.ViewPart;
 
 import cc.warlock.core.client.IPropertyListener;
 import cc.warlock.core.client.IWarlockClient;
-import cc.warlock.core.client.WarlockClientAdapter;
-import cc.warlock.core.client.WarlockClientRegistry;
 import cc.warlock.core.stormfront.client.IStormFrontClient;
 import cc.warlock.core.stormfront.client.IStormFrontDialogMessage;
 import cc.warlock.rcp.stormfront.ui.StormFrontDialogControl;
@@ -83,19 +81,6 @@ public class BarsView extends ViewPart {
 	
 	public BarsView() {
 		instance = this;
-		
-		WarlockClientRegistry.addWarlockClientListener(new WarlockClientAdapter() {
-			public void clientConnected(final IWarlockClient client) {
-				if (client instanceof IStormFrontClient)
-				{
-					Display.getDefault().asyncExec(new Runnable() {
-						public void run () {
-							setActiveClient((IStormFrontClient)client);
-						}
-					});
-				}
-			}
-		});
 		
 		GameView.addGameViewFocusListener(new IGameViewFocusListener () {
 			public void gameViewFocused(GameView gameView) {

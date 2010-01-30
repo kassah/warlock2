@@ -316,6 +316,9 @@ public class WarlockText {
 	}
 	
 	private StyleRangeWithData warlockStringStyleRangeToStyleRange(WarlockStringStyleRange range, int offset) {
+		if(styleProvider == null)
+			return null;
+		
 		StyleRangeWithData styleRange = styleProvider.getStyleRange(range.style);
 		if(styleRange == null)
 			return null;

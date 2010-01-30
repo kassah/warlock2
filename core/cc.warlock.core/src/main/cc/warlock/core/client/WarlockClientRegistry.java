@@ -79,6 +79,12 @@ public class WarlockClientRegistry {
 			listener.clientRemoved(client);
 	}
 	
+	public static void clientSettingsLoaded (IWarlockClient client)
+	{
+		for (IWarlockClientListener listener : listeners)
+			listener.clientSettingsLoaded(client);
+	}
+	
 	public static List<IWarlockClient> getActiveClients ()
 	{
 		return Collections.unmodifiableList(clients);

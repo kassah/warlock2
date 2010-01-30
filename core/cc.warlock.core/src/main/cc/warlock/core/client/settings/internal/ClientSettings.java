@@ -29,9 +29,6 @@ import org.dom4j.Element;
 
 import cc.warlock.core.client.IWarlockClient;
 import cc.warlock.core.client.IWarlockStyle;
-import cc.warlock.core.client.PropertyListener;
-import cc.warlock.core.client.WarlockClientAdapter;
-import cc.warlock.core.client.WarlockClientRegistry;
 import cc.warlock.core.client.settings.IClientSettingProvider;
 import cc.warlock.core.client.settings.IClientSettings;
 import cc.warlock.core.client.settings.IHighlightProvider;
@@ -59,8 +56,6 @@ import cc.warlock.core.configuration.WarlockConfiguration;
  */
 @SuppressWarnings("unchecked")
 public class ClientSettings extends TreeConfigurationProvider implements IClientSettings {
-
-	public static final String CLIENT_SETTINGS = "clientSettings.xml";
 	
 	public static final String WINDOW_MAIN = "main";
 	
@@ -76,7 +71,7 @@ public class ClientSettings extends TreeConfigurationProvider implements IClient
 	protected MacroConfigurationProvider macroConfigurationProvider;
 	protected WindowSettingsConfigurationProvider windowSettingsProvider;
 	
-	public ClientSettings (IWarlockClient client) {
+	public ClientSettings (IWarlockClient client, String clientId) {
 		super("client-settings");
 		this.client = client;
 		
@@ -103,31 +98,16 @@ public class ClientSettings extends TreeConfigurationProvider implements IClient
 		
 		setHandleChildren(true);
 		
-		WarlockClientRegistry.addWarlockClientListener(new WarlockClientAdapter() {
-			public void clientActivated(IWarlockClient client) {
-				if (client == ClientSettings.this.client) {
-					client.getClientId().addListener(new PropertyListener<String>() {
-						public void propertyChanged(String value) {
-							parseClientSettings();
-						}
-					});
-				}
-			}
-		});
-	}
-	
-	protected void parseClientSettings()
-	{
-		WarlockConfiguration.getWarlockConfiguration(CLIENT_SETTINGS).addConfigurationProvider(this);
+		WarlockConfiguration.getWarlockConfiguration("clientSettings.xml").addConfigurationProvider(this);
 	}
 	
 	@Override
 	public boolean supportsElement(Element element) {
 		if (element.getName().equals("client-settings")
-				&& client.getClientId() != null && client.getClientId().get() != null)
+				&& client.getClientId() != null)
 		{
 			String clientId = element.attributeValue("client-id");
-			if (clientId.equals(client.getClientId().get())) {
+			if (clientId.equals(client.getClientId())) {
 				return true;
 			}
 		}
@@ -143,7 +123,7 @@ public class ClientSettings extends TreeConfigurationProvider implements IClient
 	protected void saveTo(List<Element> elements) {
 		Element element = DocumentHelper.createElement("client-settings");
 		element.addAttribute("version", version + "");
-		element.addAttribute("client-id", client.getClientId().get());
+		element.addAttribute("client-id", client.getClientId());
 		
 		elements.add(element);
 		

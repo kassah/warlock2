@@ -49,11 +49,14 @@ import org.eclipse.ui.PlatformUI;
 import org.eclipse.ui.part.PageBook;
 
 import cc.warlock.core.client.IWarlockClient;
+import cc.warlock.core.client.IWarlockClientListener;
 import cc.warlock.core.client.IWarlockClientViewer;
+import cc.warlock.core.client.WarlockClientRegistry;
 import cc.warlock.rcp.configuration.GameViewConfiguration;
 import cc.warlock.rcp.ui.StreamText;
 import cc.warlock.rcp.ui.WarlockEntry;
 import cc.warlock.rcp.ui.WarlockPopupAction;
+import cc.warlock.rcp.ui.client.SWTWarlockClientListener;
 import cc.warlock.rcp.ui.client.SWTWarlockClientViewer;
 import cc.warlock.rcp.util.ColorUtil;
 import cc.warlock.rcp.util.SoundPlayer;
@@ -61,7 +64,7 @@ import cc.warlock.rcp.util.SoundPlayer;
 /**
  * @author marshall
  */
-public abstract class GameView extends WarlockView implements IWarlockClientViewer {
+public abstract class GameView extends WarlockView implements IWarlockClientViewer, IWarlockClientListener {
 	public static final String VIEW_ID = "cc.warlock.rcp.ui.views.GameView";
 	
 	protected static GameView firstInstance;
@@ -93,6 +96,8 @@ public abstract class GameView extends WarlockView implements IWarlockClientView
 		wrapper = new SWTWarlockClientViewer(this);
 		
 		streamName = IWarlockClient.DEFAULT_STREAM_NAME;
+		
+		WarlockClientRegistry.addWarlockClientListener(new SWTWarlockClientListener(this));
 	}
 	
 	public static void addGameViewFocusListener (IGameViewFocusListener listener)

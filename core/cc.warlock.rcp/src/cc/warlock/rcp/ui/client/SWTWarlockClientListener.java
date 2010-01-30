@@ -71,6 +71,18 @@ public class SWTWarlockClientListener implements IWarlockClientListener {
 		}
 	}
 	
+	private class SettingsLoadedListener implements Runnable {
+		private IWarlockClient client;
+		
+		public SettingsLoadedListener(IWarlockClient client) {
+			this.client = client;
+		}
+		
+		public void run () {
+			listener.clientSettingsLoaded(client);
+		}
+	}
+	
 	private class RemovedListener implements Runnable {
 		private IWarlockClient client;
 		
@@ -93,6 +105,10 @@ public class SWTWarlockClientListener implements IWarlockClientListener {
 
 	public void clientDisconnected(IWarlockClient client) {
 		Display.getDefault().asyncExec(new DisconnectedListener(client));
+	}
+	
+	public void clientSettingsLoaded(IWarlockClient client) {
+		Display.getDefault().asyncExec(new SettingsLoadedListener(client));
 	}
 
 	public void clientRemoved(IWarlockClient client) {

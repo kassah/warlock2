@@ -164,8 +164,9 @@ public class StormFrontServerSettings extends ClientConfigurationProvider {
 	
 	public void importServerSettings (InputStream stream, StormFrontClientSettings settings)
 	{
-		ServerSettings serverSettings = new ServerSettings(settings.getStormFrontClient());
-		serverSettings.load(settings.getStormFrontClient().getPlayerId().get(), stream);
+		IStormFrontClient client = settings.getStormFrontClient();
+		ServerSettings serverSettings = new ServerSettings(client);
+		serverSettings.load(settings.getStormFrontClient().getPlayerId(), stream);
 		
 		settings.addChildProvider(this);
 		settings.addClientSettingProvider(this);
@@ -211,9 +212,10 @@ public class StormFrontServerSettings extends ClientConfigurationProvider {
 			importMacro(macro, settings);
 		}
 		
-		WarlockConfiguration.getWarlockConfiguration(ClientSettings.CLIENT_SETTINGS).save();
+		WarlockConfiguration.getWarlockConfiguration(client.getClientId()).save();
 		
-		settings.getStormFrontClient().loadClientSettings(settings);
+		// FIXME: we should probably notify people when this happens
+		//settings.getStormFrontClient().loadClientSettings(settings);
 	}
 	
 	protected WarlockColor stormfrontColorToWarlockColor (StormFrontColor color)

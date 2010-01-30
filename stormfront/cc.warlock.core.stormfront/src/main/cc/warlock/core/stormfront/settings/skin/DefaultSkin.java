@@ -115,7 +115,7 @@ public class DefaultSkin implements IStormFrontSkin {
 	}
 
 	public String getFontFace(FontFaceType type) {
-		if (System.getProperties().getProperty("os.name").indexOf("Windows") != -1)
+		if (System.getProperties().getProperty("os.name").contains("Windows"))
 		{
 			return "Verdana";
 		}

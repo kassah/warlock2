@@ -36,13 +36,9 @@ import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.widgets.Canvas;
 import org.eclipse.swt.widgets.Composite;
-import org.eclipse.swt.widgets.Display;
 import org.eclipse.ui.part.ViewPart;
 
 import cc.warlock.core.client.IPropertyListener;
-import cc.warlock.core.client.IWarlockClient;
-import cc.warlock.core.client.WarlockClientAdapter;
-import cc.warlock.core.client.WarlockClientRegistry;
 import cc.warlock.core.client.settings.IWindowSettings;
 import cc.warlock.core.stormfront.client.IStormFrontClient;
 import cc.warlock.core.stormfront.settings.IStormFrontClientSettings;
@@ -65,18 +61,6 @@ public class HandsView extends ViewPart
 	{
 		_instance = this;
 		
-		WarlockClientRegistry.addWarlockClientListener(new WarlockClientAdapter() {
-			public void clientConnected(final IWarlockClient client) {
-				if (client instanceof IStormFrontClient)
-				{
-					Display.getDefault().asyncExec(new Runnable() {
-						public void run () {
-							setActiveClient((IStormFrontClient)client);
-						}
-					});
-				}
-			}
-		});
 		GameView.addGameViewFocusListener(new IGameViewFocusListener() {
 			public void gameViewFocused(GameView gameView) {
 				if (gameView instanceof StormFrontGameView)

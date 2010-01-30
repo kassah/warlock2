@@ -39,13 +39,11 @@ import cc.warlock.core.client.IRoomListener;
 import cc.warlock.core.client.IStream;
 import cc.warlock.core.client.IWarlockClient;
 import cc.warlock.core.client.IWarlockClientViewer;
-import cc.warlock.core.client.WarlockClientAdapter;
 import cc.warlock.core.client.WarlockClientRegistry;
 import cc.warlock.core.client.logging.IClientLogger;
 import cc.warlock.core.client.logging.LoggingConfiguration;
 import cc.warlock.core.client.logging.SimpleLogger;
 import cc.warlock.core.client.settings.IClientSettings;
-import cc.warlock.core.client.settings.internal.ClientSettings;
 import cc.warlock.core.network.IConnection;
 
 
@@ -60,7 +58,6 @@ public abstract class WarlockClient implements IWarlockClient {
 	protected String streamPrefix;
 	private Collection<IRoomListener> roomListeners = Collections.synchronizedCollection(new ArrayList<IRoomListener>());
 	protected Property<ICompass> compass = new Property<ICompass>("compass", null);
-	protected IClientSettings clientSettings;
 	protected IClientLogger logger;
 	protected HashMap<String, IStream> streams = new HashMap<String, IStream>();
 	
@@ -68,26 +65,31 @@ public abstract class WarlockClient implements IWarlockClient {
 		viewers = new ArrayList<IWarlockClientViewer>();
 		streamPrefix = "client:" + hashCode() + ":";
 		
-		clientSettings = createClientSettings();
-		
 		if (LoggingConfiguration.instance().getLogFormat().equals(LoggingConfiguration.LOG_FORMAT_TEXT))
 		{
 			logger = new SimpleLogger(this);
 		}
 		
-		WarlockClientRegistry.addWarlockClientListener(new WarlockClientAdapter() {
+		WarlockClientRegistry.addWarlockClientListener(new WarlockClientListener() {
 			@Override
 			public void clientDisconnected(IWarlockClient client) {
 				if (client == WarlockClient.this && logger != null) {
 					logger.flush();
 				}
 			}
+
+			@Override
+			public void clientActivated(IWarlockClient client) {}
+
+			@Override
+			public void clientConnected(IWarlockClient client) {}
+
+			@Override
+			public void clientRemoved(IWarlockClient client) {}
+
+			@Override
+			public void clientSettingsLoaded(IWarlockClient client) {}
 		});
-	}
-	
-	protected IClientSettings createClientSettings ()
-	{
-		return new ClientSettings(this);
 	}
 	
 	// IWarlockClient methods
@@ -166,9 +168,7 @@ public abstract class WarlockClient implements IWarlockClient {
 		return compass;
 	}
 	
-	public IClientSettings getClientSettings() {
-		return clientSettings;
-	}
+	public abstract IClientSettings getClientSettings();
 
 	public IClientLogger getLogger() {
 		return logger;

@@ -218,6 +218,8 @@ public class StormFrontStatus implements IPropertyListener<String> {
 			propertyChanged(client.getCharacterStatus().get());
 		}
 		
-		loadSettings(client.getStormFrontClientSettings());
+		IStormFrontClientSettings settings = client.getStormFrontClientSettings();
+		if(settings != null)
+			loadSettings(settings);
 	}
 }

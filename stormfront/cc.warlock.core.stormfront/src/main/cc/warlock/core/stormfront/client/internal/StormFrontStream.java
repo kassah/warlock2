@@ -39,7 +39,7 @@ public class StormFrontStream extends Stream {
 	
 	@Override
 	public void send(WarlockString text) {
-		if (client != null)
+		if (client != null && client.getClientSettings() != null)
 		{
 			// Ignore text containing ignores
 			for (IIgnore ignore : client.getClientSettings().getAllIgnores())

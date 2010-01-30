@@ -72,7 +72,7 @@ public class SettingsInfoTagHandler extends DefaultTagHandler {
 		}
 		*/
 		
-		String playerId = handler.getClient().getPlayerId().get();
+		String playerId = handler.getClient().getPlayerId();
 		
 		File serverSettings = ConfigurationUtil.getConfigurationFile("serverSettings_" + playerId + ".xml", false);
 		if (!serverSettings.exists())

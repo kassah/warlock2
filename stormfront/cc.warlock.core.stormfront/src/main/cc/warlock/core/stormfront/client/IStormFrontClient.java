@@ -71,12 +71,14 @@ public interface IStormFrontClient extends IWarlockClient, IRoomListener {
 	/**
 	 * @return The player ID of the current player
 	 */
-	public IProperty<String> getPlayerId();
+	public String getPlayerId();
+	
+	public void setPlayerId(String playerId);
 	
 	/**
 	 * @return The gameCode of the current player
 	 */
-	public IProperty<String> getGameCode();
+	public String getGameCode();
 	
 	/**
 	 * @return The roundtime property
@@ -233,8 +235,6 @@ public interface IStormFrontClient extends IWarlockClient, IRoomListener {
 	public void launchURL(String url);
 	
 	public void appendImage(String pictureId);
-	
-	public void loadClientSettings(IClientSettings settings);
 	
 	public void startedDownloadingServerSettings();
 	

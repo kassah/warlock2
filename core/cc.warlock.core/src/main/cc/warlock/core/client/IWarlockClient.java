@@ -130,7 +130,7 @@ public interface IWarlockClient extends IRoomListener {
 	/**
 	 * @return A unique string identifying this client (this string should be a constant that can be restored from at a later time)
 	 */
-	public IProperty<String> getClientId();
+	public String getClientId();
 	
 	/**
 	 * @return The current character's name (this is used in various places)

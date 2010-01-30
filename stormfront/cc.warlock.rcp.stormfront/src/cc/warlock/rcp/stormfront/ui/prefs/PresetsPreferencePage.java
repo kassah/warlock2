@@ -57,6 +57,7 @@ import org.eclipse.ui.dialogs.PropertyPage;
 import cc.warlock.core.client.IWarlockClient;
 import cc.warlock.core.client.IWarlockSkin;
 import cc.warlock.core.client.IWarlockStyle;
+import cc.warlock.core.client.WarlockClientRegistry;
 import cc.warlock.core.client.WarlockColor;
 import cc.warlock.core.client.WarlockFont;
 import cc.warlock.core.client.internal.WarlockStyle;
@@ -65,7 +66,6 @@ import cc.warlock.core.client.settings.internal.WindowSettings;
 import cc.warlock.core.stormfront.settings.internal.StormFrontClientSettings;
 import cc.warlock.rcp.util.ColorUtil;
 import cc.warlock.rcp.util.FontSelector;
-import cc.warlock.rcp.views.GameView;
 
 /**
  * 
@@ -538,8 +538,7 @@ public class PresetsPreferencePage extends PropertyPage implements
 		}
 		
 		if (updateView) {
-			GameView view = GameView.getGameViewForClient(settings.getClient());
-			view.loadClientSettings(settings);
+			WarlockClientRegistry.clientSettingsLoaded(settings.getClient());
 		}
 		
 		return true;

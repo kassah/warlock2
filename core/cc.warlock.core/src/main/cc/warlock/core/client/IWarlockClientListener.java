@@ -28,4 +28,6 @@ public interface IWarlockClientListener {
 	
 	public void clientDisconnected (IWarlockClient client);
 	public void clientRemoved (IWarlockClient client);
+	
+	public void clientSettingsLoaded(IWarlockClient client);
 }

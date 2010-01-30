@@ -34,7 +34,7 @@ import cc.warlock.core.client.IWarlockStyle;
 import cc.warlock.core.client.WarlockString;
 import cc.warlock.core.client.internal.WarlockStyle;
 import cc.warlock.core.network.IConnection.ErrorType;
-import cc.warlock.core.stormfront.client.IStormFrontClient;
+import cc.warlock.core.stormfront.client.internal.StormFrontClient;
 import cc.warlock.core.stormfront.network.SGEConnection;
 import cc.warlock.rcp.stormfront.ui.StormFrontPerspectiveFactory;
 import cc.warlock.rcp.stormfront.ui.views.BarsView;
@@ -51,10 +51,8 @@ public class LoginUtil {
 		int port = Integer.parseInt (loginProperties.get("GAMEPORT"));
 		String key = loginProperties.get("KEY");
 		
-		// TODO: Somehow make sure this is a StormFrontClient rather than getting a random client/GameView.
-		IStormFrontClient client = StormFrontClientFactory.createStormFrontClient();
-		IStormFrontClient sfclient = (IStormFrontClient) client;
-		sfclient.getGameCode().set(loginProperties.get("GAMECODE"));
+		StormFrontClient client = new StormFrontClient(loginProperties.get("GAMECODE"));
+		//client.getServerSettings().setMacroImporter(new StormFrontSWTSettings());
 		gameView.setClient(client);
 		
 		IWorkbenchPage page = PlatformUI.getWorkbench().getActiveWorkbenchWindow().getActivePage();

@@ -38,12 +38,13 @@ import org.eclipse.swt.widgets.Text;
 import org.eclipse.ui.part.PageBook;
 
 import cc.warlock.core.client.IWarlockClient;
-import cc.warlock.core.client.WarlockClientAdapter;
 import cc.warlock.core.client.WarlockClientRegistry;
+import cc.warlock.core.client.internal.WarlockClientListener;
 import cc.warlock.core.network.IConnection;
 import cc.warlock.core.network.IConnectionListener;
 import cc.warlock.core.network.IConnection.ErrorType;
 import cc.warlock.rcp.ui.WarlockText;
+import cc.warlock.rcp.ui.client.SWTWarlockClientListener;
 import cc.warlock.rcp.ui.network.SWTConnectionListenerAdapter;
 import cc.warlock.rcp.ui.style.DefaultStyleProvider;
 
@@ -67,7 +68,8 @@ public class DebugView extends WarlockView implements IConnectionListener, IGame
 		}
 		
 		// Add listeners to future clients
-		WarlockClientRegistry.addWarlockClientListener(new WarlockClientAdapter() {
+		WarlockClientRegistry.addWarlockClientListener(new SWTWarlockClientListener(new WarlockClientListener() {
+			@Override
 			public void clientConnected(final IWarlockClient client) {
 				Display.getDefault().asyncExec(new Runnable() {
 					public void run () {
@@ -77,7 +79,19 @@ public class DebugView extends WarlockView implements IConnectionListener, IGame
 					}
 				});
 			}
-		});
+
+			@Override
+			public void clientActivated(IWarlockClient client) {}
+
+			@Override
+			public void clientDisconnected(IWarlockClient client) {}
+
+			@Override
+			public void clientRemoved(IWarlockClient client) {}
+
+			@Override
+			public void clientSettingsLoaded(IWarlockClient client) {}
+		}));
 		
 		GameView.addGameViewFocusListener(this);
 	}
