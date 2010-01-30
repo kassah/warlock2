@@ -1,7 +1,6 @@
 package cc.warlock.rcp.application;
 
 import java.util.Timer;
-import java.util.TimerTask;
 
 import org.eclipse.core.runtime.IAdaptable;
 import org.eclipse.core.runtime.NullProgressMonitor;

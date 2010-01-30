@@ -3,20 +3,14 @@
  */
 package cc.warlock.rcp.stormfront.ui.menu;
 
-import java.lang.reflect.InvocationTargetException;
 import java.util.HashMap;
 import java.util.Map;
 
 import org.eclipse.core.commands.ExecutionEvent;
 import org.eclipse.core.commands.ExecutionException;
-import org.eclipse.core.runtime.IProgressMonitor;
-import org.eclipse.jface.operation.IRunnableWithProgress;
-import org.eclipse.swt.widgets.Display;
 
 import cc.warlock.rcp.menu.SimpleCommandHandler;
 import cc.warlock.rcp.stormfront.ui.util.LoginUtil;
-import cc.warlock.rcp.stormfront.ui.wizards.SGEConnectWizard;
-import cc.warlock.rcp.ui.WarlockWizardDialog;
 
 /**
  * @author kassah

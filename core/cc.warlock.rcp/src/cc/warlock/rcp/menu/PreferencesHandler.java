@@ -28,7 +28,6 @@ import org.eclipse.swt.widgets.Display;
 import org.eclipse.ui.dialogs.PreferencesUtil;
 
 import cc.warlock.core.client.IWarlockClient;
-import cc.warlock.rcp.plugin.Warlock2Plugin;
 import cc.warlock.rcp.ui.client.WarlockClientAdaptable;
 import cc.warlock.rcp.views.GameView;
 

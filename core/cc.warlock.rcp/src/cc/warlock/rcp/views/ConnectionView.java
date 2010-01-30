@@ -29,20 +29,15 @@ import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IConfigurationElement;
 import org.eclipse.core.runtime.IExtension;
 import org.eclipse.core.runtime.InvalidRegistryObjectException;
-import org.eclipse.jface.resource.ImageDescriptor;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.graphics.Color;
 import org.eclipse.swt.graphics.Font;
-import org.eclipse.swt.graphics.Image;
 import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.widgets.Button;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.Label;
-import org.eclipse.ui.PlatformUI;
-import org.eclipse.ui.commands.ICommandImageService;
-import org.eclipse.ui.commands.ICommandService;
 import org.eclipse.ui.forms.FormColors;
 import org.eclipse.ui.forms.IFormColors;
 import org.eclipse.ui.forms.events.ExpansionAdapter;
@@ -135,47 +130,50 @@ public class ConnectionView extends ViewPart {
 	{
 		IExtension extensions[] = Warlock2Plugin.getDefault().getExtensions("cc.warlock.rcp.connectionCommands"); //$NON-NLS-1$
 		
-		ICommandService commandService = (ICommandService) PlatformUI.getWorkbench().getService(ICommandService.class);
-		ICommandImageService imageService = (ICommandImageService) PlatformUI.getWorkbench().getService(ICommandImageService.class);
+		//ICommandService commandService = (ICommandService) PlatformUI.getWorkbench().getService(ICommandService.class);
+		//ICommandImageService imageService = (ICommandImageService) PlatformUI.getWorkbench().getService(ICommandImageService.class);
 		
 		for (IExtension extension : extensions)
 		{
 			for (IConfigurationElement element : extension.getConfigurationElements())
 			{
-				if (element.getName().equals("connectionCommand")) //$NON-NLS-1$
-				{
-					String commandId = element.getAttribute("commandId"); //$NON-NLS-1$
-					ImageDescriptor descriptor = imageService.getImageDescriptor(commandId);
-					Image image = descriptor == null ? null : descriptor.createImage();
-					
-					CommandDescription command = new CommandDescription();
-					command.command = new ConnectionCommand(commandId);
-					command.groupName = element.getAttribute("groupName"); //$NON-NLS-1$
-					command.weight = Integer.parseInt(element.getAttribute("weight")); //$NON-NLS-1$
-					
-					getGroupCommands(command.groupName).add(command);
-				}
-				else if (element.getName().equals("dynamic")) //$NON-NLS-1$
-				{
-					try {
+				try {
+					String groupName = element.getAttribute("groupName"); //$NON-NLS-1$
+
+					if (element.getName().equals("connectionCommand")) //$NON-NLS-1$
+					{
+						String commandId = element.getAttribute("commandId"); //$NON-NLS-1$
+						//ImageDescriptor descriptor = imageService.getImageDescriptor(commandId);
+						//Image image = descriptor == null ? null : descriptor.createImage();
+
+						CommandDescription command = new CommandDescription();
+						command.command = new ConnectionCommand(commandId);
+						command.groupName = groupName;
+						command.weight = Integer.parseInt(element.getAttribute("weight")); //$NON-NLS-1$
+
+						getGroupCommands(command.groupName).add(command);
+					}
+					else if (element.getName().equals("dynamic")) //$NON-NLS-1$
+					{
+
 						IConnectionCommandProvider item = (IConnectionCommandProvider) element.createExecutableExtension("classname"); //$NON-NLS-1$
-						String groupName = element.getAttribute("groupName"); //$NON-NLS-1$
-						
+
 						for (IConnectionCommand connectionCommand : item.getConnectionCommands())
 						{
 							CommandDescription command = new CommandDescription();
 							command.command = connectionCommand;
-							command.groupName = element.getAttribute("groupName"); //$NON-NLS-1$
-							
+							command.groupName = groupName; //$NON-NLS-1$
+
 							getGroupCommands(command.groupName).add(command);
+
 						}
-					} catch (InvalidRegistryObjectException e) {
-						// TODO Auto-generated catch block
-						e.printStackTrace();
-					} catch (CoreException e) {
-						// TODO Auto-generated catch block
-						e.printStackTrace();
 					}
+				} catch (InvalidRegistryObjectException e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+				} catch (CoreException e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
 				}
 			}
 		}

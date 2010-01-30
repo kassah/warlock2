@@ -26,8 +26,6 @@ package cc.warlock.core.client;
 
 import java.io.InputStream;
 
-import cc.warlock.core.client.settings.IClientSettings;
-
 
 
 /**

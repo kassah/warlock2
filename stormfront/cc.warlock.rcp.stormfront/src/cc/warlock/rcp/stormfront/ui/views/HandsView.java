@@ -23,12 +23,10 @@ package cc.warlock.rcp.stormfront.ui.views;
 
 import java.util.ArrayList;
 
-import org.eclipse.jface.resource.JFaceResources;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.PaintEvent;
 import org.eclipse.swt.events.PaintListener;
 import org.eclipse.swt.graphics.Color;
-import org.eclipse.swt.graphics.Font;
 import org.eclipse.swt.graphics.Image;
 import org.eclipse.swt.graphics.Rectangle;
 import org.eclipse.swt.layout.FillLayout;
@@ -75,8 +73,7 @@ public class HandsView extends ViewPart
 	{
 		protected String text;
 		protected Image image;
-		protected Color background, foreground, gradientColor, tabColor;
-		protected Font textFont;
+		protected Color background, foreground, gradientColor;
 		
 		public GradientInfo (Composite parent, Image image)
 		{
@@ -85,7 +82,6 @@ public class HandsView extends ViewPart
 			this.image = image;
 			
 			addPaintListener(this);
-			this.textFont = new Font(getDisplay(), JFaceResources.getHeaderFont().getFontData()[0].getName(), 10, SWT.NONE);
 			this.foreground = new Color(getDisplay(), 255, 255, 255);
 			this.background = new Color(getDisplay(), 0, 0, 0);
 			this.gradientColor = getGradientColor(50, true);

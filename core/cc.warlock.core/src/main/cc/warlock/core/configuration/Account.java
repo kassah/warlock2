@@ -166,7 +166,7 @@ public class Account {
 		
 		for (Profile profile : other.getProfiles())
 		{
-			Profile copy = new Profile(this, profile);
+			new Profile(this, profile);
 		}
 	}
 	
