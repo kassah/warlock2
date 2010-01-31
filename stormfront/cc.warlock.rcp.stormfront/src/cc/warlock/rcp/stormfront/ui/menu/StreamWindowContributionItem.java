@@ -30,12 +30,10 @@ import org.eclipse.ui.IWorkbenchPage;
 import org.eclipse.ui.PlatformUI;
 import org.eclipse.ui.actions.CompoundContributionItem;
 
-import cc.warlock.core.stormfront.client.IStormFrontClient;
 import cc.warlock.rcp.actions.OpenStreamWindowAction;
 import cc.warlock.rcp.views.DebugView;
 import cc.warlock.rcp.views.GameView;
 import cc.warlock.rcp.views.ScriptManager;
-import cc.warlock.rcp.views.StreamView;
 
 
 public class StreamWindowContributionItem extends CompoundContributionItem {
