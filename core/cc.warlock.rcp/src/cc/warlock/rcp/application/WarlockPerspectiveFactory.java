@@ -61,18 +61,18 @@ public class WarlockPerspectiveFactory implements IPerspectiveFactory {
 		
 		IPlaceholderFolderLayout topFolder =
 			layout.createPlaceholderFolder(TOP_FOLDER_ID, IPageLayout.TOP, 0.15f, MAIN_FOLDER_ID);
-		topFolder.addPlaceholder("*topStream:top*");
+		topFolder.addPlaceholder("*topStream:*");
 		
 //		topFolder.addPlaceholder(StreamView.DEATH_VIEW_ID);
 //		topFolder.addPlaceholder(StreamView.THOUGHTS_VIEW_ID);
 		
 		IPlaceholderFolderLayout rightFolder =
 			layout.createPlaceholderFolder(RIGHT_FOLDER_ID, IPageLayout.RIGHT, 0.75f, MAIN_FOLDER_ID);
-		rightFolder.addPlaceholder("*rightStream:right*");
+		rightFolder.addPlaceholder("*rightStream:*");
 		
 		IPlaceholderFolderLayout leftFolder =
 			layout.createPlaceholderFolder(LEFT_FOLDER_ID, IPageLayout.LEFT, 0.75f, MAIN_FOLDER_ID);
-		leftFolder.addPlaceholder("*leftStream:left*");
+		leftFolder.addPlaceholder("*leftStream:*");
 		
 //		rightFolder.addPlaceholder(StreamView.INVENTORY_VIEW_ID);
 		rightFolder.addPlaceholder("*DebugView:*");
