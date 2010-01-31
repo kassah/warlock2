@@ -176,7 +176,7 @@ public class Stream implements IStream {
 	}
 	
 	public String getFullTitle() {
-		return title + subtitle;
+		return subtitle == null ? title : title + subtitle;
 	}
 	
 	public void setClosed(boolean isClosed) {
