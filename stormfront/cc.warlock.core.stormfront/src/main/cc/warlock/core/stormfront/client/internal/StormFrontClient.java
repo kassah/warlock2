@@ -79,10 +79,15 @@ import com.martiansoftware.jsap.CommandLineTokenizer;
 public class StormFrontClient extends WarlockClient implements IStormFrontClient, IScriptListener, IRoomListener {
 
 	protected ICharacterStatus status;
-	protected Property<Integer> roundtime, casttime, monsterCount;
-	protected Property<String> leftHand, rightHand, currentSpell;
+	protected Property<Integer> roundtime = new Property<Integer>();
+	protected Property<Integer> casttime = new Property<Integer>();
+	protected Property<Integer> monsterCount = new Property<Integer>();
+	protected Property<String> leftHand = new Property<String>();
+	protected Property<String> rightHand = new Property<String>();
+	protected Property<String> currentSpell = new Property<String>();
 	protected StringBuffer buffer = new StringBuffer();
-	protected Property<String> characterName, roomDescription;
+	protected Property<String> characterName = new Property<String>();
+	protected Property<String> roomDescription = new Property<String>();
 	protected String gameCode, playerId;
 	protected StormFrontClientSettings clientSettings;
 	protected StormFrontServerSettings serverSettings;
@@ -108,15 +113,6 @@ public class StormFrontClient extends WarlockClient implements IStormFrontClient
 		this.gameCode = gameCode;
 		
 		status = new CharacterStatus(this);
-		leftHand = new Property<String>("leftHand", null);
-		rightHand = new Property<String>("rightHand", null);
-		currentSpell = new Property<String>("currentSpell", null);
-		
-		roundtime = new Property<Integer>("roundtime", 0);
-		casttime = new Property<Integer>("casttime", 0);
-		characterName = new Property<String>("characterName", null);
-		roomDescription = new Property<String>("roomDescription", null);
-		monsterCount = new Property<Integer>("monsterCount", null);
 
 		roundtimeEnd = null;
 		casttimeEnd = null;
@@ -195,7 +191,7 @@ public class StormFrontClient extends WarlockClient implements IStormFrontClient
 		Property<IStormFrontDialogMessage> dialog = dialogs.get(id);
 		
 		if(dialog == null) {
-			dialog = new Property<IStormFrontDialogMessage>(id, null);
+			dialog = new Property<IStormFrontDialogMessage>();
 			dialogs.put(id, dialog);
 		}
 		
@@ -482,50 +478,20 @@ public class StormFrontClient extends WarlockClient implements IStormFrontClient
 		}
 	}
 	
-	public IStream getThoughtsStream() {
-		return getStream(THOUGHTS_STREAM_NAME);
-	}
-	
-	public IStream getInventoryStream() {
-		return getStream(INVENTORY_STREAM_NAME);
-	}
-	
-	public IStream getDeathsStream() {
-		return getStream(DEATH_STREAM_NAME);
-	}
-	
-	public IStream getRoomStream() {
-		return getStream(ROOM_STREAM_NAME);
-	}
-	
 	@Override
 	public IStream getDefaultStream() {
 		return getStream(DEFAULT_STREAM_NAME);
 	}
-
-	public IStream getFamiliarStream() {
-		return getStream(FAMILIAR_STREAM_NAME);
-	}
-	
-	public IStream getAssessStream() {
-		return getStream(ASSESS_STREAM_NAME);
-	}
-	
-	public IStream getExperienceStream() {
-		return getStream(EXPERIENCE_STREAM_NAME);
-	}
-	
-	public IStream getLogonsStream() {
-		return getStream(LOGONS_STREAM_NAME);
-	}
 	
 	public void setComponent (String name, String value, IStream stream)
 	{
-		if (!components.containsKey(name)) {
-			components.put(name, new Property<String>(name, value));
-		} else {
-			components.get(name).set(value);
-		}
+		Property<String> component = components.get(name);
+		
+		if(component == null)
+			components.put(name, new Property<String>(value));
+		else
+			component.set(value);
+		
 		componentStreams.put(name, stream);
 		//stream.addComponent(name);
 	}
@@ -535,7 +501,7 @@ public class StormFrontClient extends WarlockClient implements IStormFrontClient
 		if(component != null) {
 			component.set(value.toString());
 		} else {
-			component = new Property<String>(name, value.toString());
+			component = new Property<String>(value.toString());
 			components.put(name, component);
 		}
 		

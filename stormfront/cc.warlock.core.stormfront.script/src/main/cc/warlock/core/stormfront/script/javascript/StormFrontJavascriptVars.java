@@ -73,7 +73,7 @@ public class StormFrontJavascriptVars implements IJavascriptVariableProvider {
 			scope.put("roomObjects", scope, new JavascriptComponent(scope, sfClient, IStormFrontClient.COMPONENT_ROOM_OBJECTS));
 			scope.put("roomDescription", scope, new JavascriptComponent(scope, sfClient, IStormFrontClient.COMPONENT_ROOM_DESCRIPTION));
 			scope.put("roomPlayers", scope, new JavascriptComponent(scope, sfClient, IStormFrontClient.COMPONENT_ROOM_PLAYERS));
-			scope.put("roomTitle", scope, new JavascriptProperty<String>(scope, sfClient.getRoomStream().getTitle()));
+			//scope.put("roomTitle", scope, new JavascriptProperty<String>(scope, sfClient.getRoomStream().getTitle()));
 			
 		}
 	}

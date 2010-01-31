@@ -332,4 +332,9 @@ public class ScriptCommands implements IScriptCommands, IStreamListener, IRoomLi
 	public void playSound(InputStream stream) {
 		getClient().playSound(stream);
 	}
+
+	public void streamTitleChanged(IStream stream, String title) {
+		// TODO Auto-generated method stub
+		
+	}
 }

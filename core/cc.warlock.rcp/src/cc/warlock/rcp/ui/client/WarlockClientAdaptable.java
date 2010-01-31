@@ -55,7 +55,7 @@ public class WarlockClientAdaptable implements IAdaptable, IWorkbenchAdapter {
 	}
 	
 	public String getLabel(Object o) {
-		return client.getDefaultStream().getTitle().get();
+		return client.getDefaultStream().getFullTitle();
 	}
 	
 	public Object getParent(Object o) {

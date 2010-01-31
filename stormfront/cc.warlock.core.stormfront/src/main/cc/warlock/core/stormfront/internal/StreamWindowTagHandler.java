@@ -46,9 +46,17 @@ public class StreamWindowTagHandler extends DefaultTagHandler {
 		if (id != null && title != null)
 		{
 			if (subtitle != null)
-				title += subtitle;
+				handler.getClient().getStream(id).setSubtitle(subtitle);
 			
-			handler.getClient().getStream(id).getTitle().set(title);
+			handler.getClient().getStream(id).setTitle(title);
 		}
+		
+		String ifClosed = attributes.getValue("ifClosed");
+		if(ifClosed != null)
+			handler.getClient().getStream(id).setClosedTarget(ifClosed);
+		
+		String closedStyle = attributes.getValue("styleIfClosed");
+		if(closedStyle != null)
+			handler.getClient().getStream(id).setClosedStyle(closedStyle);
 	}
 }

@@ -57,7 +57,7 @@ public abstract class WarlockClient implements IWarlockClient {
 	protected ICommandHistory commandHistory = new CommandHistory();
 	protected String streamPrefix;
 	private Collection<IRoomListener> roomListeners = Collections.synchronizedCollection(new ArrayList<IRoomListener>());
-	protected Property<ICompass> compass = new Property<ICompass>("compass", null);
+	protected Property<ICompass> compass = new Property<ICompass>(null);
 	protected IClientLogger logger;
 	protected HashMap<String, IStream> streams = new HashMap<String, IStream>();
 	

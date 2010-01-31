@@ -96,6 +96,7 @@ public class StreamWindowContributionItem extends CompoundContributionItem {
 	@Override
 	protected IContributionItem[] getContributionItems() {	
 		ArrayList<IContributionItem> items = new ArrayList<IContributionItem>();
+		/* TODO dynamically add streams here
 		items.add(streamContribution("Thoughts", IStormFrontClient.THOUGHTS_STREAM_NAME, StreamView.TOP_STREAM_PREFIX));
 		items.add(streamContribution("Inventory", IStormFrontClient.INVENTORY_STREAM_NAME, StreamView.RIGHT_STREAM_PREFIX));
 		items.add(streamContribution("Deaths", IStormFrontClient.DEATH_STREAM_NAME, StreamView.TOP_STREAM_PREFIX));
@@ -105,6 +106,7 @@ public class StreamWindowContributionItem extends CompoundContributionItem {
 		items.add(streamContribution("Field Experience", IStormFrontClient.EXPERIENCE_STREAM_NAME, StreamView.RIGHT_STREAM_PREFIX));
 		items.add(streamContribution("Arrivals & Departures", IStormFrontClient.LOGONS_STREAM_NAME, StreamView.RIGHT_STREAM_PREFIX));
 		items.add(streamContribution("My Bag", IStormFrontClient.STOW_STREAM_NAME, StreamView.RIGHT_STREAM_PREFIX));
+		*/
 		items.add(new ActionContributionItem(new DebugAction()));
 		//items.add(new ActionContributionItem(new ScriptManagerAction()));
 		return items.toArray(new IContributionItem[items.size()]);

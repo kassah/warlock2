@@ -59,9 +59,9 @@ public class ScriptConfiguration implements IConfigurationProvider {
 	
 	protected ScriptConfiguration ()
 	{
-		autoScan = new Property<Boolean>("autoScan", true);
-		suppressExceptions = new Property<Boolean>("suppressExceptions", true);
-		scanTimeout = new Property<Long>("scanTimeout", (long)500);
+		autoScan = new Property<Boolean>(true);
+		suppressExceptions = new Property<Boolean>(true);
+		scanTimeout = new Property<Long>(500L);
 		scriptPrefix = ".";
 		
 		addEngineExtension(JavascriptEngine.ENGINE_ID, "js");

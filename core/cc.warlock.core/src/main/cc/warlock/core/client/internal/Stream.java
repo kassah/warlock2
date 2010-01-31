@@ -27,7 +27,6 @@ package cc.warlock.core.client.internal;
 import java.util.ArrayList;
 
 import cc.warlock.core.client.ICommand;
-import cc.warlock.core.client.IProperty;
 import cc.warlock.core.client.IStream;
 import cc.warlock.core.client.IStreamListener;
 import cc.warlock.core.client.IWarlockClient;
@@ -43,17 +42,19 @@ public class Stream implements IStream {
 	
 	protected IWarlockClient client;
 	
-	protected IProperty<String> streamName, streamTitle;
+	protected String title;
+	protected String subtitle;
 	private ArrayList<IStreamListener> listeners = new ArrayList<IStreamListener>();
 	protected boolean isPrompting = false;
-	private boolean hasView = false;
+	private boolean isClosed = true;
+	private String closedStyle;
+	private String closedTarget = "main";
+	private String streamName;
 	protected boolean isLogging = false;
 	
 	protected Stream (IWarlockClient client, String streamName) {
 		this.client = client;
-		this.streamName = new Property<String>("streamName", null);
-		this.streamName.set(streamName);
-		this.streamTitle = new Property<String>("streamTitle", null);
+		this.streamName = streamName;
 	}
 
 	public synchronized void addStreamListener(IStreamListener listener) {
@@ -77,11 +78,7 @@ public class Stream implements IStream {
 		}
 	}
 	
-	public void send(String text) {
-		send(new WarlockString(text));
-	}
-	
-	public synchronized void send(WarlockString text) {
+	public synchronized void put(WarlockString text) {
 		if (isLogging && client.getLogger() != null) {
 			client.getLogger().logText(text);
 		}
@@ -94,6 +91,12 @@ public class Stream implements IStream {
 				t.printStackTrace();
 			}
 		}
+		
+		if(isClosed && !closedTarget.equals("") && !streamName.equals(closedTarget)) {
+			WarlockString closedText = new WarlockString(text.toString(), new WarlockStyle(closedStyle));
+			client.getStream(closedTarget).put(closedText);
+		}
+		
 		isPrompting = false;
 	}
 	
@@ -146,7 +149,7 @@ public class Stream implements IStream {
 		}
 	}
 	
-	public IProperty<String> getName() {
+	public String getName() {
 		return streamName;
 	}
 	
@@ -155,16 +158,36 @@ public class Stream implements IStream {
 		return client;
 	}
 
-	public IProperty<String> getTitle() {
-		return streamTitle;
+	public void setTitle(String title) {
+		this.title = title;
+		
+		for(IStreamListener listener : listeners) {
+			listener.streamTitleChanged(this, title);
+		}
 	}
 	
-	public boolean hasView() {
-		return hasView;
+	public void setSubtitle(String subtitle) {
+		this.subtitle = subtitle;
 	}
 	
-	public void setView(boolean view) {
-		hasView = view;
+	public String getTitle() {
+		return title;
+	}
+	
+	public String getFullTitle() {
+		return title + subtitle;
+	}
+	
+	public void setClosed(boolean isClosed) {
+		this.isClosed = isClosed;
+	}
+	
+	public void setClosedTarget(String target) {
+		this.closedTarget = target;
+	}
+	
+	public void setClosedStyle(String style) {
+		this.closedStyle = style;
 	}
 	
 	public synchronized void updateComponent(String id, WarlockString text) {

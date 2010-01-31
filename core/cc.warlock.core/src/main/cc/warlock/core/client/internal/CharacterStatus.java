@@ -34,7 +34,7 @@ public class CharacterStatus extends Property<String> implements ICharacterStatu
 	
 	public CharacterStatus (IWarlockClient client)
 	{
-		super("characterStatus", null);
+		super(null);
 		
 		for (StatusType type : StatusType.values())
 		{

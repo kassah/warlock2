@@ -289,8 +289,11 @@ public class StormFrontGameView extends GameView implements IStormFrontClientVie
 			
 			SWTStreamListener streamListener = new SWTStreamListener(streamText);
 			client.getDefaultStream().addStreamListener(streamListener);
+			client.getDefaultStream().setClosed(false);
+			/* TODO set us as a listener sometimes here.
 			client.getStream(IStormFrontClient.DEATH_STREAM_NAME).addStreamListener(streamListener);
 			client.getStream(IStormFrontClient.ATMOSPHERICS_STREAM_NAME).addStreamListener(streamListener);
+			*/
 			
 			
 			if (status != null) {

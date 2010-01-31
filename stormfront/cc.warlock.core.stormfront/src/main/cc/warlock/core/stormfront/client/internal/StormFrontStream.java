@@ -38,7 +38,7 @@ public class StormFrontStream extends Stream {
 	}
 	
 	@Override
-	public void send(WarlockString text) {
+	public void put(WarlockString text) {
 		if (client != null && client.getClientSettings() != null)
 		{
 			// Ignore text containing ignores
@@ -90,6 +90,6 @@ public class StormFrontStream extends Stream {
 			}
 		}
 		
-		super.send(text);
+		super.put(text);
 	}
 }

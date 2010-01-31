@@ -41,7 +41,7 @@ import cc.warlock.core.network.IConnection;
  */
 public interface IWarlockClient extends IRoomListener {
 	
-	public static final String DEFAULT_STREAM_NAME = "defaultView";
+	public static final String DEFAULT_STREAM_NAME = "main";
 	
 	/**
 	 * Connect and handshake with the Simutronics server

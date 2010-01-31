@@ -65,6 +65,21 @@ public class SWTStreamListener implements IStreamListener {
 		}
 	}
 	
+	private class TitleChangedWrapper implements Runnable
+	{
+		private IStream stream;
+		private String title;
+		
+		public TitleChangedWrapper(IStream stream, String title) {
+			this.stream = stream;
+			this.title = title;
+		}
+		
+		public void run() {
+			listener.streamTitleChanged(stream, title);
+		}
+	}
+	
 	private class EchoedWrapper implements Runnable
 	{
 		private IStream stream;
@@ -151,6 +166,10 @@ public class SWTStreamListener implements IStreamListener {
 
 	public void streamReceivedText(IStream stream, WarlockString text) {
 		run(new ReceivedTextWrapper(stream, text));
+	}
+	
+	public void streamTitleChanged(IStream stream, String title) {
+		run(new TitleChangedWrapper(stream, title));
 	}
 	
 	public void streamEchoed(IStream stream, String text) {

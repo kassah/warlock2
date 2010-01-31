@@ -34,19 +34,23 @@ public interface IStream {
 	
 	public void clear();
 	
-	public IProperty<String> getName();
+	public String getName();
+	public String getTitle();
+	public String getFullTitle();
 	
-	public IProperty<String> getTitle();
+	public void setTitle(String title);
+	public void setSubtitle(String subtitle);
 	
-	public void send (String text);
-	public void send (WarlockString text);
+	public void put (WarlockString text);
 	
 	public void prompt(String prompt);
 	public void sendCommand(ICommand command);
 	public boolean isPrompting();
 	public void flush();
-	public boolean hasView();
-	public void setView(boolean view);
+	
+	public void setClosed(boolean isClosed);
+	public void setClosedTarget(String target);
+	public void setClosedStyle(String style);
 	
 	public void echo(String text);
 	

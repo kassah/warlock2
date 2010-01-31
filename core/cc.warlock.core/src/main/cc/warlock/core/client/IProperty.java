@@ -24,11 +24,6 @@ package cc.warlock.core.client;
 public interface IProperty<T> {
 	
 	/**
-	 * @return The name of this property
-	 */
-	public String getName();
-	
-	/**
 	 * For properties with a simple string interface, this will suffice
 	 * @param data The property may do whatever it likes with this data
 	 */

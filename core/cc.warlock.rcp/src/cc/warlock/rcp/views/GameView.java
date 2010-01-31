@@ -51,6 +51,7 @@ import org.eclipse.ui.part.PageBook;
 import cc.warlock.core.client.IWarlockClient;
 import cc.warlock.core.client.IWarlockClientListener;
 import cc.warlock.core.client.IWarlockClientViewer;
+import cc.warlock.core.client.PropertyListener;
 import cc.warlock.core.client.WarlockClientRegistry;
 import cc.warlock.rcp.configuration.GameViewConfiguration;
 import cc.warlock.rcp.ui.StreamText;
@@ -404,6 +405,12 @@ public abstract class GameView extends WarlockView implements IWarlockClientView
 	
 	public void setClient(IWarlockClient client) {
 		this.client = client;
+		client.getDefaultStream().setClosed(false);
+		streamText.getTitle().addListener(new PropertyListener<String>() {
+			public void propertyChanged(String value) {
+				setPartName(value);
+			}
+		});
 		streamText.setClient(client);
 	}
 }

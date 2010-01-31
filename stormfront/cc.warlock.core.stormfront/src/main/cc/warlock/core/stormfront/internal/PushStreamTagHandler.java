@@ -49,11 +49,10 @@ public class PushStreamTagHandler extends DefaultTagHandler {
 		String id = attributes.getValue("id");
 		
 		String closedStyle = attributes.getValue("ifClosedStyle");
-		boolean watch = false;
-		if(closedStyle != null && closedStyle.equals("watching"))
-			watch = true;
+		if(closedStyle != null)
+			handler.getClient().getStream(id).setClosedStyle(closedStyle);
 		
-		handler.pushStream(id, watch);
+		handler.pushStream(id);
 	}
 	
 	@Override

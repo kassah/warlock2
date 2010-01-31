@@ -20,6 +20,7 @@ import cc.warlock.core.client.IWarlockSkin;
 import cc.warlock.core.client.IWarlockStyle;
 import cc.warlock.core.client.WarlockFont;
 import cc.warlock.core.client.WarlockString;
+import cc.warlock.core.client.internal.Property;
 import cc.warlock.core.client.settings.IClientSettings;
 import cc.warlock.core.client.settings.IHighlightString;
 import cc.warlock.core.client.settings.IWindowSettings;
@@ -37,6 +38,7 @@ public class StreamText extends WarlockText implements IStreamListener {
 	protected IStream stream;
 	protected boolean isPrompting = false;
 	protected String prompt = null;
+	protected Property<String> title = new Property<String>();
 	
 	private WarlockString textBuffer;
 	
@@ -98,6 +100,10 @@ public class StreamText extends WarlockText implements IStreamListener {
 		}
 
 		textBuffer.append(string);
+	}
+	
+	public Property<String> getTitle() {
+		return title;
 	}
 	
 	public void componentUpdated(IStream stream, String id, WarlockString value) {
@@ -189,6 +195,10 @@ public class StreamText extends WarlockText implements IStreamListener {
 			
 		bufferText(string);
 	}
+	
+	public void streamTitleChanged(IStream steam, String title) {
+		this.title.set(stream.getFullTitle());
+	}
 
 	public void setClient(IWarlockClient client) {
 		this.client = client;
@@ -201,6 +211,9 @@ public class StreamText extends WarlockText implements IStreamListener {
 			PlatformUI.getWorkbench().getActiveWorkbenchWindow().getShell().addKeyListener(game.getWarlockEntry().new KeyEventListener());
 		}
 
+		stream = client.getStream(streamName);
+		this.title.set(stream.getFullTitle());
+		
 		IStyleProvider styleProvider = StyleProviders.getStyleProvider(client);
 		if(styleProvider != null)
 			setStyleProvider(styleProvider);

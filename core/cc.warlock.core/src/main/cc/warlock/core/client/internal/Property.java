@@ -28,12 +28,12 @@ import cc.warlock.core.client.IPropertyListener;
 
 public class Property<T> implements IProperty<T> {
 
-	protected String name;
 	protected T data;
 	protected ArrayList<IPropertyListener<T>> listeners = new ArrayList<IPropertyListener<T>>();
 	
-	public Property(String name, T value) {
-		this.name = name;
+	public Property() {}
+	
+	public Property(T value) {
 		this.data = value;
 	}
 	
@@ -42,10 +42,6 @@ public class Property<T> implements IProperty<T> {
 		for(IPropertyListener<T> listener : listeners) {
 			listener.propertyChanged(data);
 		}
-	}
-	
-	public String getName() {
-		return name;
 	}
 	
 	public T get() {
@@ -58,10 +54,5 @@ public class Property<T> implements IProperty<T> {
 	
 	public boolean removeListener(IPropertyListener<T> listener) {
 		return listeners.remove(listener);
-	}
-	
-	@Override
-	public String toString() {
-		return getName() + "=" + get();
 	}
 }

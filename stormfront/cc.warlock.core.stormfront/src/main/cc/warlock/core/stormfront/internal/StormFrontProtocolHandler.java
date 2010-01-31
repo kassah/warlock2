@@ -52,7 +52,7 @@ public class StormFrontProtocolHandler implements IStormFrontProtocolHandler {
 	
 	protected IStormFrontClient client;
 	protected HashMap<String, IStormFrontTagHandler> defaultTagHandlers = new HashMap<String, IStormFrontTagHandler>();
-	protected Stack<StreamMarker> streamStack = new Stack<StreamMarker>();
+	protected Stack<IStream> streamStack = new Stack<IStream>();
 	protected Stack<String> tagStack = new Stack<String>();
 	protected HashMap<IWarlockStyle, Boolean> styles = new HashMap<IWarlockStyle, Boolean>();
 	protected int currentSpacing = 0;
@@ -129,31 +129,21 @@ public class StormFrontProtocolHandler implements IStormFrontProtocolHandler {
 		return client;
 	}
 	
-	private class StreamMarker {
-		public IStream stream;
-		public boolean watch;
-		
-		public StreamMarker(IStream stream, boolean watch) {
-			this.stream = stream;
-			this.watch = watch;
-		}
-	}
-	
 	/*
 	 *  push a stream onto the stack
 	 */
-	public void pushStream(String streamId, boolean watch) {
+	public void pushStream(String streamId) {
 		IStream stream = client.getStream(streamId);
 		if(stream != null) {
 			// remove the stream if we already have the same one on the stack
-			for(Iterator<StreamMarker> iter = streamStack.iterator(); iter.hasNext(); ) {
-				StreamMarker curMarker = iter.next();
-				if(curMarker.stream.equals(stream)) {
+			for(Iterator<IStream> iter = streamStack.iterator(); iter.hasNext(); ) {
+				IStream curStream = iter.next();
+				if(curStream.equals(stream)) {
 					iter.remove();
 					break;
 				}
 			}
-			streamStack.push(new StreamMarker(stream, watch));
+			streamStack.push(stream);
 		}
 	}
 	
@@ -172,13 +162,13 @@ public class StormFrontProtocolHandler implements IStormFrontProtocolHandler {
 	
 	public void appendStream(String streamId, WarlockString str) {
 		IStream stream = client.getStream(streamId);
-		stream.send(str);
+		stream.put(str);
 	}
 
 	public IStream getCurrentStream ()
 	{
 		try {
-			return streamStack.peek().stream;
+			return streamStack.peek();
 		} catch(EmptyStackException e) {
 			return client.getDefaultStream();
 		}
@@ -197,20 +187,9 @@ public class StormFrontProtocolHandler implements IStormFrontProtocolHandler {
 				style.setValue(true);
 			}
 			
-			IStream stream;
-			try {
-				StreamMarker marker = streamStack.peek();
-				stream = marker.stream;
-				if(!stream.hasView() && marker.watch) {
-					stream = client.getDefaultStream();
-					// TODO use a different style here
-					str.addStyle(client.getCommandStyle());
-				}
-			} catch(EmptyStackException e) {
-				stream = client.getDefaultStream();
-			}
+			IStream stream = getCurrentStream();
 			
-			stream.send(str);
+			stream.put(str);
 		}
 	}
 	
@@ -317,15 +296,9 @@ public class StormFrontProtocolHandler implements IStormFrontProtocolHandler {
 			WarlockString str = new WarlockString();
 			str.addStyle(style);
 
-			IStream stream;
-			try {
-				StreamMarker marker = streamStack.peek();
-				stream = marker.stream;
-			} catch(EmptyStackException e) {
-				stream = client.getDefaultStream();
-			}
+			IStream stream = getCurrentStream();
 			
-			stream.send(str);
+			stream.put(str);
 		}
 	}
 	

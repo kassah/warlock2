@@ -126,7 +126,7 @@ public class StormFrontConnection implements IConnection
 		
 		message.addStyle(new WarlockStyle(new IWarlockStyle.StyleType[] { IWarlockStyle.StyleType.MONOSPACE }));
 		
-		client.getDefaultStream().send(message);
+		client.getDefaultStream().put(message);
 		client.getDefaultStream().flush();
 		connected = false;
 		

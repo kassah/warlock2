@@ -146,7 +146,7 @@ public class WSLScript extends AbstractScript {
 		setSpecialVariable("roomexits", new WSLComponent(IStormFrontClient.COMPONENT_ROOM_EXITS));
 		setSpecialVariable("roomplayers", new WSLComponent(IStormFrontClient.COMPONENT_ROOM_PLAYERS));
 		setSpecialVariable("roomobjects", new WSLComponent(IStormFrontClient.COMPONENT_ROOM_OBJECTS));
-		setSpecialVariable("roomtitle", new WSLRoomTitle());
+		//setSpecialVariable("roomtitle", new WSLRoomTitle());
 		setSpecialVariable("lastcommand", new WSLLastCommand());
 	}
 
@@ -228,11 +228,13 @@ public class WSLScript extends AbstractScript {
 		}
 	}
 	
-	private class WSLRoomTitle extends WSLAbstractString {
+	/* TODO these need to be retrievable dynamically
+	 private class WSLRoomTitle extends WSLAbstractString {
 		public String toString() {
 			return sfClient.getStream(IStormFrontClient.ROOM_STREAM_NAME).getTitle().get();
 		}
 	}
+	*/
 	
 	private class WSLComponent extends WSLAbstractString {
 		protected String componentName;

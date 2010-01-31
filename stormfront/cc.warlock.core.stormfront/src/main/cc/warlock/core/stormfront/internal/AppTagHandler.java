@@ -45,9 +45,10 @@ public class AppTagHandler extends DefaultTagHandler {
 	@Override
 	public void handleStart(StormFrontAttributeList attributes, String rawXML) {
 		String characterName = attributes.getValue("char");
-		String gameName = attributes.getValue("game");
+		//String gameName = attributes.getValue("game");
 		
-		handler.getClient().getDefaultStream().getTitle().set("[" + gameName + "] " + characterName);
+		// this should set the program name
+		//handler.getClient().getDefaultStream().getTitle().set("[" + gameName + "] " + characterName);
 		handler.getClient().getCharacterName().set(characterName);
 	}
 }

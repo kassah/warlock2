@@ -44,7 +44,6 @@ import cc.warlock.core.client.WarlockClientRegistry;
 import cc.warlock.core.client.WarlockColor;
 import cc.warlock.rcp.ui.IStyleProvider;
 import cc.warlock.rcp.ui.StreamText;
-import cc.warlock.rcp.ui.client.SWTPropertyListener;
 import cc.warlock.rcp.ui.client.SWTStreamListener;
 import cc.warlock.rcp.ui.client.SWTWarlockClientListener;
 import cc.warlock.rcp.ui.style.StyleProviders;
@@ -151,12 +150,11 @@ public class StreamView extends WarlockView implements IGameViewFocusListener, I
 		streamText.setClient(client);
 		IStream stream = client.getStream(streamName);
 		stream.addStreamListener(new SWTStreamListener(streamText));
-		if (streamTitled) {
-			// TODO: Make sure this listener gets destroyed on dispose.
-			stream.getTitle().addListener(new SWTPropertyListener<String>(
-					new NameListener(client)));
-		}
-		stream.setView(true);
+		
+		// TODO: Make sure this listener gets destroyed on dispose.
+		streamText.getTitle().addListener(new NameListener(client));
+		
+		stream.setClosed(false);
 	}
 	
 	private class NameListener extends PropertyListener<String> {
@@ -167,7 +165,7 @@ public class StreamView extends WarlockView implements IGameViewFocusListener, I
 		}
 		
 		public void propertyChanged(String value) {
-			if(activeClient == client)
+			if(streamTitled && activeClient == client)
 				setViewTitle(value);
 		}
 	}
@@ -197,6 +195,10 @@ public class StreamView extends WarlockView implements IGameViewFocusListener, I
 	
 	@Override
 	public void dispose() {
+		
+		for(IWarlockClient client : streams.keySet()) {
+			client.getStream(streamName).setClosed(true);
+		}
 		
 		GameView.removeGameViewFocusListener(this);
 		

@@ -40,12 +40,12 @@ public class InvTagHandler extends DefaultTagHandler {
 	
 	@Override
 	public void handleStart(StormFrontAttributeList attributes, String rawXML) {
-		streamId = attributes.getValue("id") + "Container";
+		//streamId = attributes.getValue("id") + "Container";
 	}
 
 	@Override
 	public boolean handleCharacters(String characters) {
-		handler.appendStream(streamId, new WarlockString(characters + "\n"));
+		//handler.appendStream(streamId, new WarlockString(characters + "\n"));
 		return true;
 	}
 }

@@ -26,7 +26,7 @@ public class ClearContainerTagHandler extends DefaultTagHandler {
 	
 	@Override
 	public void handleStart(StormFrontAttributeList attributes, String rawXML) {
-		String id = attributes.getValue("id") + "Container";
-		handler.getClient().getStream(id).clear();
+		//String id = attributes.getValue("id") + "Container";
+		//handler.getClient().getStream(id).clear();
 	}
 }

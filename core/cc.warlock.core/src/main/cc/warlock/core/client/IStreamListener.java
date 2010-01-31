@@ -42,5 +42,7 @@ public interface IStreamListener {
 	
 	public void streamFlush (IStream stream);
 	
+	public void streamTitleChanged(IStream stream, String title);
+	
 	public void componentUpdated(IStream stream, String id, WarlockString value);
 }

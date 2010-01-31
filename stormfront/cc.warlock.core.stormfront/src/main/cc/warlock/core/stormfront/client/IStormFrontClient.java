@@ -32,7 +32,6 @@ import java.util.Collection;
 import cc.warlock.core.client.ICharacterStatus;
 import cc.warlock.core.client.IProperty;
 import cc.warlock.core.client.IRoomListener;
-import cc.warlock.core.client.IStream;
 import cc.warlock.core.client.IWarlockClient;
 import cc.warlock.core.client.WarlockString;
 import cc.warlock.core.script.IScript;
@@ -44,17 +43,6 @@ import cc.warlock.core.stormfront.settings.skin.IStormFrontSkin;
  * @author Marshall
  */
 public interface IStormFrontClient extends IWarlockClient, IRoomListener {
-	
-	public static final String ATMOSPHERICS_STREAM_NAME = "atmospherics";
-	public static final String DEATH_STREAM_NAME = "death";
-	public static final String INVENTORY_STREAM_NAME = "inv";
-	public static final String THOUGHTS_STREAM_NAME = "thoughts";
-	public static final String ROOM_STREAM_NAME = "room";
-	public static final String FAMILIAR_STREAM_NAME = "familiar";
-	public static final String STOW_STREAM_NAME = "stowContainer";
-	public static final String ASSESS_STREAM_NAME = "assess";
-	public static final String EXPERIENCE_STREAM_NAME = "experience";
-	public static final String LOGONS_STREAM_NAME = "logons";
 	
 	public static final String COMPONENT_ROOM_PLAYERS = "room players";
 	public static final String COMPONENT_ROOM_OBJECTS = "room objs";
@@ -175,47 +163,6 @@ public interface IStormFrontClient extends IWarlockClient, IRoomListener {
 	 * @return The stormfront skin
 	 */
 	public IStormFrontSkin getStormFrontSkin();
-	
-	/**
-	 * @return The stream for thoughts
-	 */
-	public IStream getThoughtsStream();
-	
-	/**
-	 * @return The stream for deaths
-	 */
-	public IStream getDeathsStream();
-	
-	/**
-	 * @return The stream for inventory
-	 */
-	public IStream getInventoryStream();
-	
-	/**
-	 * @return The stream for room description/exits/etc.
-	 */
-	public IStream getRoomStream();
-	
-	/**
-	 * @return The stream for familiars / wounds
-	 */
-	public IStream getFamiliarStream();
-	
-	/**
-	 * @return The stream for combat assess
-	 */
-	public IStream getAssessStream();
-	
-	/**
-	 * @return The stream for experience
-	 */
-	public IStream getExperienceStream();
-	
-	
-	/**
-	 * @return The stream for Arrivals and Departures
-	 */
-	public IStream getLogonsStream();
 	
 	/**
 	 * @param componentName

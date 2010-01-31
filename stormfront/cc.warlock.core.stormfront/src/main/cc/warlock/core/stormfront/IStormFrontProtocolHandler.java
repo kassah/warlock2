@@ -46,7 +46,7 @@ public interface IStormFrontProtocolHandler extends IStormFrontXMLHandler {
 	public void registerHandler(IStormFrontTagHandler tagHandler);
 	
 	public IStormFrontClient getClient();
-	public void pushStream(String name, boolean watch);
+	public void pushStream(String name);
 	public void popStream();
 	public void appendStream(String streamId, WarlockString characters);
 	public IStream getCurrentStream();

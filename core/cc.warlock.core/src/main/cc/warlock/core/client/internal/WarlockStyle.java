@@ -31,7 +31,7 @@ import cc.warlock.core.client.WarlockColor;
 
 public class WarlockStyle implements IWarlockStyle {
 
-	private Collection<StyleType> styleTypes;
+	private Collection<StyleType> styleTypes = new ArrayList<StyleType>();
 	private WarlockColor foregroundColor = new WarlockColor(WarlockColor.DEFAULT_COLOR);
 	private WarlockColor backgroundColor = new WarlockColor(WarlockColor.DEFAULT_COLOR);
 	private boolean fullLine;
@@ -43,12 +43,14 @@ public class WarlockStyle implements IWarlockStyle {
 	
 	public WarlockStyle (StyleType[] styleTypes)
 	{
-		this.styleTypes = new ArrayList<StyleType>();
 		this.styleTypes.addAll(Arrays.asList(styleTypes));
 	}
 	
+	public WarlockStyle(String name) {
+		this.name = name;
+	}
+	
 	public WarlockStyle () {
-		this.styleTypes = new ArrayList<StyleType>();
 	}
 	
 	public WarlockStyle (IWarlockStyle other)
@@ -59,8 +61,8 @@ public class WarlockStyle implements IWarlockStyle {
 		this.name = other.getName() == null ? null : new String(other.getName());
 		this.action = other.getAction();
 		
-		this.styleTypes  = new ArrayList<StyleType>();
-		if (other.getStyleTypes() != null) styleTypes.addAll(other.getStyleTypes());
+		if (other.getStyleTypes() != null)
+			styleTypes.addAll(other.getStyleTypes());
 		
 		this.originalStyle = other;
 		this.fullLine = other.isFullLine();
