@@ -85,12 +85,13 @@ public class StreamView extends WarlockView implements IGameViewFocusListener, I
 		streamTitled = enabled;
 	}
 
-	public static StreamView getViewForStream (String prefix, String streamName, String secondaryId) {
+	public static StreamView getViewForStream (String prefix, String streamName) {
 		IWorkbenchPage page = PlatformUI.getWorkbench().getActiveWorkbenchWindow().getActivePage();
 		
 		for (StreamView view : openViews)
 		{
-			if (view.getStreamName().equals(streamName))
+			String curName = view.getStreamName();
+			if (curName != null && curName.equals(streamName))
 			{
 				page.activate(view);
 				return view;
@@ -99,8 +100,8 @@ public class StreamView extends WarlockView implements IGameViewFocusListener, I
 		
 		// none of the already created views match, create a new one
 		try {
-			StreamView nextInstance = (StreamView) page.showView(STREAM_VIEW_PREFIX + prefix, secondaryId, IWorkbenchPage.VIEW_ACTIVATE);
-			nextInstance.setStreamName(streamName);
+			StreamView nextInstance = (StreamView) page.showView(STREAM_VIEW_PREFIX + prefix, streamName, IWorkbenchPage.VIEW_ACTIVATE);
+			//nextInstance.setStreamName(streamName);
 			
 			return nextInstance;
 		} catch (PartInitException e) {
@@ -133,7 +134,7 @@ public class StreamView extends WarlockView implements IGameViewFocusListener, I
 		nullTextWidget.setIndent(1);
 		book.showPage(nullTextWidget);
 		
-		streamName = getViewSite().getId().substring(getViewSite().getId().lastIndexOf('.')+1);
+		streamName = getViewSite().getSecondaryId();
 		for (IWarlockClient client : WarlockClientRegistry.getActiveClients()) {
 			addClient(client);
 		}

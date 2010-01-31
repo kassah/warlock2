@@ -98,25 +98,13 @@ public class StreamWindowContributionItem extends CompoundContributionItem {
 	@Override
 	protected IContributionItem[] getContributionItems() {	
 		ArrayList<IContributionItem> items = new ArrayList<IContributionItem>();
-		/* TODO dynamically add streams here
-		items.add(streamContribution("Thoughts", IStormFrontClient.THOUGHTS_STREAM_NAME, StreamView.TOP_STREAM_PREFIX));
-		items.add(streamContribution("Inventory", IStormFrontClient.INVENTORY_STREAM_NAME, StreamView.RIGHT_STREAM_PREFIX));
-		items.add(streamContribution("Deaths", IStormFrontClient.DEATH_STREAM_NAME, StreamView.TOP_STREAM_PREFIX));
-		items.add(streamContribution("Current Room", IStormFrontClient.ROOM_STREAM_NAME, StreamView.RIGHT_STREAM_PREFIX));
-		items.add(streamContribution("Familiar", IStormFrontClient.FAMILIAR_STREAM_NAME, StreamView.RIGHT_STREAM_PREFIX));
-		items.add(streamContribution("Assess", IStormFrontClient.ASSESS_STREAM_NAME, StreamView.RIGHT_STREAM_PREFIX));
-		items.add(streamContribution("Field Experience", IStormFrontClient.EXPERIENCE_STREAM_NAME, StreamView.RIGHT_STREAM_PREFIX));
-		items.add(streamContribution("Arrivals & Departures", IStormFrontClient.LOGONS_STREAM_NAME, StreamView.RIGHT_STREAM_PREFIX));
-		items.add(streamContribution("My Bag", IStormFrontClient.STOW_STREAM_NAME, StreamView.RIGHT_STREAM_PREFIX));
-		*/
 		try {
 			GameView gameView = GameView.getGameViewInFocus();
 			IWarlockClient client = gameView.getWarlockClient();
 			Collection<IStream> streams = client.getStreams();
 			for (IStream stream: streams) {
 				items.add(streamContribution(stream.getTitle(),
-						stream.getName(), StreamView.RIGHT_STREAM_PREFIX,
-						"right" + stream.getName()));
+						stream.getName(), StreamView.RIGHT_STREAM_PREFIX));
 			}
 		} catch (NullPointerException e) {
 			// Do nothing, GameViews and Clients are often not setup.
@@ -126,9 +114,9 @@ public class StreamWindowContributionItem extends CompoundContributionItem {
 		return items.toArray(new IContributionItem[items.size()]);
 	}
 	
-	protected IContributionItem streamContribution(String label, String streamName, String prefix, String secondaryId)
+	protected IContributionItem streamContribution(String label, String streamName, String prefix)
 	{
-		return new ActionContributionItem(new OpenStreamWindowAction(label, streamName, prefix, secondaryId));
+		return new ActionContributionItem(new OpenStreamWindowAction(label, streamName, prefix));
 	}
 
 }
