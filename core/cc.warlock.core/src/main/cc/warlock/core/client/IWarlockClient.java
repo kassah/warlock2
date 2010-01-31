@@ -26,6 +26,7 @@ package cc.warlock.core.client;
 
 import java.io.IOException;
 import java.io.InputStream;
+import java.util.Collection;
 
 import cc.warlock.core.client.logging.IClientLogger;
 import cc.warlock.core.client.settings.IClientSettings;
@@ -143,4 +144,9 @@ public interface IWarlockClient extends IRoomListener {
 	public IClientLogger getLogger();
 	
 	public void playSound(InputStream stream);
+
+	/**
+	 * @return The collection of current streams output by the client.
+	 */
+	public Collection<IStream> getStreams();
 }

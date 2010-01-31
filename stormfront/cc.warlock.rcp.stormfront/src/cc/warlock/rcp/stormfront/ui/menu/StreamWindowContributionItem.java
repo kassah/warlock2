@@ -22,6 +22,7 @@
 package cc.warlock.rcp.stormfront.ui.menu;
 
 import java.util.ArrayList;
+import java.util.Collection;
 
 import org.eclipse.jface.action.Action;
 import org.eclipse.jface.action.ActionContributionItem;
@@ -30,10 +31,13 @@ import org.eclipse.ui.IWorkbenchPage;
 import org.eclipse.ui.PlatformUI;
 import org.eclipse.ui.actions.CompoundContributionItem;
 
+import cc.warlock.core.client.IStream;
+import cc.warlock.core.client.IWarlockClient;
 import cc.warlock.rcp.actions.OpenStreamWindowAction;
 import cc.warlock.rcp.views.DebugView;
 import cc.warlock.rcp.views.GameView;
 import cc.warlock.rcp.views.ScriptManager;
+import cc.warlock.rcp.views.StreamView;
 
 
 public class StreamWindowContributionItem extends CompoundContributionItem {
@@ -105,6 +109,16 @@ public class StreamWindowContributionItem extends CompoundContributionItem {
 		items.add(streamContribution("Arrivals & Departures", IStormFrontClient.LOGONS_STREAM_NAME, StreamView.RIGHT_STREAM_PREFIX));
 		items.add(streamContribution("My Bag", IStormFrontClient.STOW_STREAM_NAME, StreamView.RIGHT_STREAM_PREFIX));
 		*/
+		try {
+			GameView gameView = GameView.getGameViewInFocus();
+			IWarlockClient client = gameView.getWarlockClient();
+			Collection<IStream> streams = client.getStreams();
+			for (IStream s: streams) {
+				items.add(streamContribution(s.getTitle(), s.getName(), StreamView.RIGHT_STREAM_PREFIX));
+			}
+		} catch (NullPointerException e) {
+			// Do nothing, GameViews and Clients are often not setup.
+		}
 		items.add(new ActionContributionItem(new DebugAction()));
 		//items.add(new ActionContributionItem(new ScriptManagerAction()));
 		return items.toArray(new IContributionItem[items.size()]);

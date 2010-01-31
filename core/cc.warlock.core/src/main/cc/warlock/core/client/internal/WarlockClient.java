@@ -133,6 +133,10 @@ public abstract class WarlockClient implements IWarlockClient {
 		}
 	}
 	
+	public Collection<IStream> getStreams() {
+		return streams.values();
+	}
+	
 	public IConnection getConnection() {
 		return connection;
 	}
