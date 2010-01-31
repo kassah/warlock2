@@ -54,6 +54,7 @@ public class StreamView extends WarlockView implements IGameViewFocusListener, I
 	public static final String STREAM_VIEW_PREFIX = "cc.warlock.rcp.views.stream.";
 	
 	public static final String RIGHT_STREAM_PREFIX = "rightStream.";
+	public static final String LEFT_STREAM_PREFIX = "leftStream.";
 	public static final String TOP_STREAM_PREFIX = "topStream.";
 	
 	protected static ArrayList<StreamView> openViews = new ArrayList<StreamView>();
