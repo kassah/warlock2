@@ -462,27 +462,11 @@ public class StormFrontGameView extends GameView implements IStormFrontClientVie
 		return sfClient;
 	}
 
-	@Override
-	public void clientActivated(IWarlockClient client) {
-		// TODO Auto-generated method stub
-		
-	}
+	public void clientActivated(IWarlockClient client) {}
 
-	@Override
-	public void clientConnected(IWarlockClient client) {
-		// TODO Auto-generated method stub
-		
-	}
+	public void clientConnected(IWarlockClient client) {}
 
-	@Override
-	public void clientDisconnected(IWarlockClient client) {
-		// TODO Auto-generated method stub
-		
-	}
+	public void clientDisconnected(IWarlockClient client) {}
 
-	@Override
-	public void clientRemoved(IWarlockClient client) {
-		// TODO Auto-generated method stub
-		
-	}
+	public void clientRemoved(IWarlockClient client) {}
 }
