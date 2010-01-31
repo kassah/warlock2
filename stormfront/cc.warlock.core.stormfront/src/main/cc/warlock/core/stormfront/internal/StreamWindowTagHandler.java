@@ -21,6 +21,7 @@
  */
 package cc.warlock.core.stormfront.internal;
 
+import cc.warlock.core.client.IStream;
 import cc.warlock.core.stormfront.IStormFrontProtocolHandler;
 import cc.warlock.core.stormfront.xml.StormFrontAttributeList;
 
@@ -39,24 +40,35 @@ public class StreamWindowTagHandler extends DefaultTagHandler {
 
 	@Override
 	public void handleStart(StormFrontAttributeList attributes, String rawXML) {
-		String subtitle = attributes.getValue("subtitle");
-		String title = attributes.getValue("title");
 		String id = attributes.getValue("id");
 		
-		if (id != null && title != null)
-		{
-			if (subtitle != null)
-				handler.getClient().getStream(id).setSubtitle(subtitle);
-			
-			handler.getClient().getStream(id).setTitle(title);
-		}
+		if(id == null)
+			return;
 		
+		IStream stream = handler.getClient().getStream(id);
+		
+		if(stream == null)
+			return;
+			
+
+		String subtitle = attributes.getValue("subtitle");
+		if (subtitle != null)
+			stream.setSubtitle(subtitle);
+
+		String title = attributes.getValue("title");
+		if (title != null)
+			stream.setTitle(title);
+
 		String ifClosed = attributes.getValue("ifClosed");
 		if(ifClosed != null)
-			handler.getClient().getStream(id).setClosedTarget(ifClosed);
+			stream.setClosedTarget(ifClosed);
 		
 		String closedStyle = attributes.getValue("styleIfClosed");
 		if(closedStyle != null)
-			handler.getClient().getStream(id).setClosedStyle(closedStyle);
+			stream.setClosedStyle(closedStyle);
+		
+		String location = attributes.getValue("location");
+		if(location != null)
+			stream.setLocation(location);
 	}
 }

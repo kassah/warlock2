@@ -60,4 +60,7 @@ public interface IStream {
 	public IWarlockClient getClient();
 	
 	public void updateComponent(String id, WarlockString text);
+	
+	public void setLocation(String location);
+	public String getLocation();
 }
