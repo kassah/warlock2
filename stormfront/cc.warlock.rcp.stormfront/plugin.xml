@@ -18,61 +18,10 @@
       </view>
       <view
             allowMultiple="false"
-            class="cc.warlock.rcp.views.StreamView"
-            id="cc.warlock.rcp.views.stream.topStream.death"
-            name="Deaths">
-      </view>
-      <view
-            allowMultiple="false"
-            class="cc.warlock.rcp.views.StreamView"
-            id="cc.warlock.rcp.views.stream.rightStream.inv"
-            name="Inventory">
-      </view>
-      <view
-            allowMultiple="false"
-            class="cc.warlock.rcp.views.StreamView"
-            id="cc.warlock.rcp.views.stream.rightStream.assess"
-            name="Assess">
-      </view>
-      <view
-            allowMultiple="false"
-            class="cc.warlock.rcp.views.StreamView"
-            id="cc.warlock.rcp.views.stream.rightStream.experience"
-            name="Exp">
-      </view>
-      <view
-            allowMultiple="false"
-            class="cc.warlock.rcp.views.StreamView"
-            id="cc.warlock.rcp.views.stream.rightStream.logons"
-            name="Arrivals &amp; Departures">
-      </view>
-      <view
-            allowMultiple="false"
-            class="cc.warlock.rcp.views.StreamView"
-            id="cc.warlock.rcp.views.stream.topStream.thoughts"
-            name="Thoughts">
-      </view>
-      <view
-            allowMultiple="false"
             class="cc.warlock.rcp.stormfront.ui.views.HandsView"
             icon="images/handview.gif"
             id="cc.warlock.rcp.stormfront.ui.views.HandsView"
             name="Hands">
-      </view>
-      <view
-            class="cc.warlock.rcp.views.StreamView"
-            id="cc.warlock.rcp.views.stream.rightStream.room"
-            name="Current Room">
-      </view>
-      <view
-            class="cc.warlock.rcp.views.StreamView"
-            id="cc.warlock.rcp.views.stream.rightStream.familiar"
-            name="Familiar">
-      </view>
-      <view
-            class="cc.warlock.rcp.views.StreamView"
-            id="cc.warlock.rcp.views.stream.rightStream.stowContainer"
-            name="My Bag">
       </view>
    </extension>
    <extension
