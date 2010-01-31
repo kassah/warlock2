@@ -21,19 +21,20 @@
  */
 package cc.warlock.core.stormfront.network;
 
+import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.nio.CharBuffer;
 
-public class StormFrontReader extends InputStreamReader {
+public class StormFrontReader extends BufferedReader {
 
 	private StormFrontConnection connection;
 	private StringBuffer recentText = new StringBuffer();
 	
 	public StormFrontReader (StormFrontConnection connection, InputStream stream)
 	{
-		super(stream);
+		super(new InputStreamReader(stream));
 		this.connection = connection;
 	}
 
