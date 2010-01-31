@@ -23,6 +23,24 @@
             id="cc.warlock.rcp.stormfront.ui.views.HandsView"
             name="Hands">
       </view>
+      <view
+            allowMultiple="true"
+            class="cc.warlock.rcp.views.StreamView"
+            id="cc.warlock.rcp.views.stream.rightStream"
+            name="Right View">
+      </view>
+      <view
+            allowMultiple="true"
+            class="cc.warlock.rcp.views.StreamView"
+            id="cc.warlock.rcp.views.stream.leftStream"
+            name="Familiar">
+      </view>
+      <view
+            allowMultiple="true"
+            class="cc.warlock.rcp.views.StreamView"
+            id="cc.warlock.rcp.views.stream.topStream"
+            name="My Bag">
+      </view>
    </extension>
    <extension
          point="org.eclipse.ui.commands">

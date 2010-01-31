@@ -61,21 +61,18 @@ public class WarlockPerspectiveFactory implements IPerspectiveFactory {
 		
 		IPlaceholderFolderLayout topFolder =
 			layout.createPlaceholderFolder(TOP_FOLDER_ID, IPageLayout.TOP, 0.15f, MAIN_FOLDER_ID);
-		topFolder.addPlaceholder("*topStream*");
-		topFolder.addPlaceholder("*topView*");
+		topFolder.addPlaceholder("*topStream:top*");
 		
 //		topFolder.addPlaceholder(StreamView.DEATH_VIEW_ID);
 //		topFolder.addPlaceholder(StreamView.THOUGHTS_VIEW_ID);
 		
 		IPlaceholderFolderLayout rightFolder =
 			layout.createPlaceholderFolder(RIGHT_FOLDER_ID, IPageLayout.RIGHT, 0.75f, MAIN_FOLDER_ID);
-		rightFolder.addPlaceholder("*rightStream*");
-		rightFolder.addPlaceholder("*rightView*");
+		rightFolder.addPlaceholder("*rightStream:right*");
 		
 		IPlaceholderFolderLayout leftFolder =
 			layout.createPlaceholderFolder(LEFT_FOLDER_ID, IPageLayout.LEFT, 0.75f, MAIN_FOLDER_ID);
-		leftFolder.addPlaceholder("*leftStream*");
-		leftFolder.addPlaceholder("*leftView*");
+		leftFolder.addPlaceholder("*leftStream:left*");
 		
 //		rightFolder.addPlaceholder(StreamView.INVENTORY_VIEW_ID);
 		rightFolder.addPlaceholder("*DebugView:*");
@@ -83,7 +80,6 @@ public class WarlockPerspectiveFactory implements IPerspectiveFactory {
 		IPlaceholderFolderLayout bottomFolder =
 			layout.createPlaceholderFolder(BOTTOM_FOLDER_ID, IPageLayout.BOTTOM, 0.95f, MAIN_FOLDER_ID);
 		bottomFolder.addPlaceholder("*bottomStream*");
-		bottomFolder.addPlaceholder("*bottomView*");
 		
 //		IFolderLayout folder = layout.createFolder(BOTTOM_FOLDER_ID, IPageLayout.BOTTOM, 0.90f, GameView.VIEW_ID);
 //		layout.addStandaloneView(BarsView.VIEW_ID, false, IPageLayout.BOTTOM, 0.95f, GameView.VIEW_ID);

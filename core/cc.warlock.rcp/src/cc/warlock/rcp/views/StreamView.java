@@ -53,9 +53,9 @@ public class StreamView extends WarlockView implements IGameViewFocusListener, I
 	
 	public static final String STREAM_VIEW_PREFIX = "cc.warlock.rcp.views.stream.";
 	
-	public static final String RIGHT_STREAM_PREFIX = "rightStream.";
-	public static final String LEFT_STREAM_PREFIX = "leftStream.";
-	public static final String TOP_STREAM_PREFIX = "topStream.";
+	public static final String RIGHT_STREAM_PREFIX = "rightStream";
+	public static final String LEFT_STREAM_PREFIX = "leftStream";
+	public static final String TOP_STREAM_PREFIX = "topStream";
 	
 	protected static ArrayList<StreamView> openViews = new ArrayList<StreamView>();
 	
@@ -85,7 +85,7 @@ public class StreamView extends WarlockView implements IGameViewFocusListener, I
 		streamTitled = enabled;
 	}
 
-	public static StreamView getViewForStream (String prefix, String streamName) {
+	public static StreamView getViewForStream (String prefix, String streamName, String secondaryId) {
 		IWorkbenchPage page = PlatformUI.getWorkbench().getActiveWorkbenchWindow().getActivePage();
 		
 		for (StreamView view : openViews)
@@ -99,7 +99,7 @@ public class StreamView extends WarlockView implements IGameViewFocusListener, I
 		
 		// none of the already created views match, create a new one
 		try {
-			StreamView nextInstance = (StreamView) page.showView(STREAM_VIEW_PREFIX + prefix + streamName);
+			StreamView nextInstance = (StreamView) page.showView(STREAM_VIEW_PREFIX + prefix, secondaryId, IWorkbenchPage.VIEW_ACTIVATE);
 			nextInstance.setStreamName(streamName);
 			
 			return nextInstance;

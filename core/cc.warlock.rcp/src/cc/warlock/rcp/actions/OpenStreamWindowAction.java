@@ -29,9 +29,9 @@ import cc.warlock.rcp.views.StreamView;
 
 public class OpenStreamWindowAction extends Action {
 
-	private String title, streamName, viewPrefix;
+	private String title, streamName, viewPrefix, secondaryId;
 	
-	public OpenStreamWindowAction (String title, String streamName, String viewPrefix)
+	public OpenStreamWindowAction (String title, String streamName, String viewPrefix, String secondaryId)
 	{
 		super(title, Action.AS_CHECK_BOX);
 		this.setImageDescriptor(WarlockSharedImages.getImageDescriptor(WarlockSharedImages.IMG_WINDOW));
@@ -39,12 +39,13 @@ public class OpenStreamWindowAction extends Action {
 		this.title = title;
 		this.streamName = streamName;
 		this.viewPrefix = viewPrefix;
+		this.secondaryId = secondaryId;
 	}
 	
 	@Override
 	public void run() {
 		
-		StreamView streamView = StreamView.getViewForStream(viewPrefix, streamName);
+		StreamView streamView = StreamView.getViewForStream(viewPrefix, streamName, secondaryId);
 		streamView.setViewTitle(title);
 		
 		GameView inFocus = GameView.getGameViewInFocus();

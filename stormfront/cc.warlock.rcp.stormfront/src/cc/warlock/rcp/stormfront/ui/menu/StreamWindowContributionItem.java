@@ -113,8 +113,10 @@ public class StreamWindowContributionItem extends CompoundContributionItem {
 			GameView gameView = GameView.getGameViewInFocus();
 			IWarlockClient client = gameView.getWarlockClient();
 			Collection<IStream> streams = client.getStreams();
-			for (IStream s: streams) {
-				items.add(streamContribution(s.getTitle(), s.getName(), StreamView.RIGHT_STREAM_PREFIX));
+			for (IStream stream: streams) {
+				items.add(streamContribution(stream.getTitle(),
+						stream.getName(), StreamView.RIGHT_STREAM_PREFIX,
+						"right" + stream.getName()));
 			}
 		} catch (NullPointerException e) {
 			// Do nothing, GameViews and Clients are often not setup.
@@ -124,9 +126,9 @@ public class StreamWindowContributionItem extends CompoundContributionItem {
 		return items.toArray(new IContributionItem[items.size()]);
 	}
 	
-	protected IContributionItem streamContribution(String label, String streamName, String prefix)
+	protected IContributionItem streamContribution(String label, String streamName, String prefix, String secondaryId)
 	{
-		return new ActionContributionItem(new OpenStreamWindowAction(label, streamName, prefix));
+		return new ActionContributionItem(new OpenStreamWindowAction(label, streamName, prefix, secondaryId));
 	}
 
 }
