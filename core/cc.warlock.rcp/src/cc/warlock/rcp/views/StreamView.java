@@ -157,6 +157,9 @@ public class StreamView extends WarlockView implements IGameViewFocusListener, I
 		streamText.getTitle().addListener(new NameListener(client));
 		
 		stream.setClosed(false);
+		
+		if(activeClient == null || activeClient == client)
+			setClient(client);
 	}
 	
 	private class NameListener extends PropertyListener<String> {
@@ -188,6 +191,7 @@ public class StreamView extends WarlockView implements IGameViewFocusListener, I
 		
 		activeClient = client;
 		activeStream = streams.get(client);
+		setViewTitle(client.getStream(streamName).getFullTitle());
 		
 		if(activeStream != null)
 			book.showPage(activeStream.getTextWidget());
