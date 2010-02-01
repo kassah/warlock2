@@ -103,8 +103,14 @@ public class StreamWindowContributionItem extends CompoundContributionItem {
 			IWarlockClient client = gameView.getWarlockClient();
 			Collection<IStream> streams = client.getStreams();
 			for (IStream stream: streams) {
+				String location = StreamView.RIGHT_STREAM_PREFIX;
+				if (stream.getLocation().equals("center")) {
+					location = StreamView.TOP_STREAM_PREFIX;
+				} else if (stream.getLocation().equals("left")) {
+					location = StreamView.LEFT_STREAM_PREFIX;
+				}
 				items.add(streamContribution(stream.getTitle(),
-						stream.getName(), StreamView.RIGHT_STREAM_PREFIX));
+						stream.getName(), location));
 			}
 		} catch (NullPointerException e) {
 			// Do nothing, GameViews and Clients are often not setup.

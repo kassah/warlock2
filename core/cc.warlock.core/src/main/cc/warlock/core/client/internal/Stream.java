@@ -51,7 +51,7 @@ public class Stream implements IStream {
 	private String closedTarget = "main";
 	private String streamName;
 	protected boolean isLogging = false;
-	private String location;
+	private String location = "right";
 	
 	protected Stream (IWarlockClient client, String streamName) {
 		this.client = client;
