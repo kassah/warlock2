@@ -408,9 +408,11 @@ public abstract class GameView extends WarlockView implements IWarlockClientView
 		client.getDefaultStream().setClosed(false);
 		streamText.getTitle().addListener(new PropertyListener<String>() {
 			public void propertyChanged(String value) {
-				setPartName(value);
+				setViewTitle(value);
 			}
 		});
 		streamText.setClient(client);
 	}
+	
+	protected abstract void setViewTitle(String title);
 }

@@ -472,4 +472,15 @@ public class StormFrontGameView extends GameView implements IStormFrontClientVie
 	public void clientDisconnected(IWarlockClient client) {}
 
 	public void clientRemoved(IWarlockClient client) {}
+	
+	protected void setViewTitle(String title) {
+		String prefix = "";
+		String game = sfClient.getGameCode();
+		if(game != null)
+			prefix += "[" + game + "] ";
+		String name = client.getCharacterName().get();
+		if(name != null)
+			prefix += name + " - ";
+		this.setPartName(prefix + title);
+	}
 }
