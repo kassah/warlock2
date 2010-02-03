@@ -135,6 +135,8 @@ public class StreamView extends WarlockView implements IGameViewFocusListener, I
 		book.showPage(nullTextWidget);
 		
 		streamName = getViewSite().getSecondaryId();
+		setViewTitle("(" + streamName + ")");
+		
 		for (IWarlockClient client : WarlockClientRegistry.getActiveClients()) {
 			addClient(client);
 		}
@@ -192,6 +194,8 @@ public class StreamView extends WarlockView implements IGameViewFocusListener, I
 		IStream stream = client.getStream(streamName);
 		if(stream != null)
 			setViewTitle(stream.getFullTitle());
+		else
+			setViewTitle("(" + streamName + ")");
 		
 		if(activeStream != null)
 			book.showPage(activeStream.getTextWidget());
