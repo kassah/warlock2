@@ -120,18 +120,18 @@ public class StreamText extends WarlockText implements IStreamListener {
 	}
 
 	public void streamEchoed(IStream stream, String text) {
-			IWarlockClient client = stream.getClient();
-			WarlockString string = new WarlockString();
-			if(isPrompting) {
-				string.append("\n");
-				isPrompting = false;
-			}
-			int styleStart = string.length();
-			string.append(text);
-			// TODO: make a different style for client messages
-			string.addStyle(styleStart, text.length(), client.getCommandStyle());
-			
-			appendText(string);
+		IWarlockClient client = stream.getClient();
+		WarlockString string = new WarlockString();
+		if(isPrompting) {
+			string.append("\n");
+			isPrompting = false;
+		}
+		int styleStart = string.length();
+		string.append(text);
+		// TODO: make a different style for client messages
+		string.addStyle(styleStart, text.length(), client.getCommandStyle());
+
+		appendText(string);
 	}
 
 	public void streamFlush(IStream stream) {
