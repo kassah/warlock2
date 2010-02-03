@@ -62,4 +62,6 @@ public interface IWarlockClientViewer {
 	public void paste();
 	
 	public void playSound(InputStream soundStream);
+	
+	public boolean isStreamOpen(String streamName);
 }

@@ -37,6 +37,7 @@ import cc.warlock.core.client.ICompass;
 import cc.warlock.core.client.IProperty;
 import cc.warlock.core.client.IRoomListener;
 import cc.warlock.core.client.IStream;
+import cc.warlock.core.client.IStreamListener;
 import cc.warlock.core.client.IWarlockClient;
 import cc.warlock.core.client.IWarlockClientViewer;
 import cc.warlock.core.client.WarlockClientRegistry;
@@ -45,6 +46,7 @@ import cc.warlock.core.client.logging.LoggingConfiguration;
 import cc.warlock.core.client.logging.SimpleLogger;
 import cc.warlock.core.client.settings.IClientSettings;
 import cc.warlock.core.network.IConnection;
+import cc.warlock.core.util.Pair;
 
 
 /**
@@ -53,16 +55,16 @@ import cc.warlock.core.network.IConnection;
 public abstract class WarlockClient implements IWarlockClient {
 
 	protected IConnection connection;
-	protected ArrayList<IWarlockClientViewer> viewers;
+	protected IWarlockClientViewer viewer;
 	protected ICommandHistory commandHistory = new CommandHistory();
 	protected String streamPrefix;
 	private Collection<IRoomListener> roomListeners = Collections.synchronizedCollection(new ArrayList<IRoomListener>());
 	protected Property<ICompass> compass = new Property<ICompass>(null);
 	protected IClientLogger logger;
 	protected HashMap<String, IStream> streams = new HashMap<String, IStream>();
+	protected ArrayList<Pair<String, IStreamListener>> potentialListeners = new ArrayList<Pair<String, IStreamListener>>();
 	
 	public WarlockClient () {
-		viewers = new ArrayList<IWarlockClientViewer>();
 		streamPrefix = "client:" + hashCode() + ":";
 		
 		if (LoggingConfiguration.instance().getLogFormat().equals(LoggingConfiguration.LOG_FORMAT_TEXT))
@@ -115,12 +117,12 @@ public abstract class WarlockClient implements IWarlockClient {
 		}
 	}
 	
-	public void addViewer(IWarlockClientViewer viewer) {
-		viewers.add(viewer);
+	public void setViewer(IWarlockClientViewer viewer) {
+		this.viewer = viewer;
 	}
 	
-	public void removeViewer(IWarlockClientViewer viewer) {
-		viewers.remove(viewer);
+	public IWarlockClientViewer getViewer() {
+		return viewer;
 	}
 	
 	public IStream getDefaultStream() {
@@ -179,8 +181,16 @@ public abstract class WarlockClient implements IWarlockClient {
 	}
 	
 	public void playSound(InputStream stream) {
-		for (IWarlockClientViewer viewer : viewers) {
-			viewer.playSound(stream);
-		}
+		viewer.playSound(stream);
+	}
+	
+	public abstract IStream createStream(String streamName);
+	
+	public void addStreamListener(String streamName, IStreamListener listener) {
+		IStream stream = streams.get(streamName);
+		if(stream != null)
+			stream.addStreamListener(listener);
+		else
+			potentialListeners.add(new Pair<String, IStreamListener>(streamName, listener));
 	}
 }

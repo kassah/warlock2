@@ -31,6 +31,8 @@ package cc.warlock.core.client;
  * IStreamListener implementations will subscribe to an IStream and receive an event when the Stream receives new data.
  */
 public interface IStreamListener {
+	public void streamCreated(IStream stream);
+	
 	public void streamReceivedText (IStream stream, WarlockString text);
 	
 	public void streamPrompted (IStream stream, String prompt);

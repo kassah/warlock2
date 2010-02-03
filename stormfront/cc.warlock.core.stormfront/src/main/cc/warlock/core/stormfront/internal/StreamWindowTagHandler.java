@@ -45,12 +45,11 @@ public class StreamWindowTagHandler extends DefaultTagHandler {
 		if(id == null)
 			return;
 		
-		IStream stream = handler.getClient().getStream(id);
+		IStream stream = handler.getClient().createStream(id);
 		
 		if(stream == null)
 			return;
 			
-
 		String subtitle = attributes.getValue("subtitle");
 		if (subtitle != null)
 			stream.setSubtitle(subtitle);

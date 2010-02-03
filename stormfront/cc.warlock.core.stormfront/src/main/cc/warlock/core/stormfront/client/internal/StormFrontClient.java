@@ -34,14 +34,14 @@ import java.net.URL;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
+import java.util.Iterator;
 
 import cc.warlock.core.client.ICharacterStatus;
 import cc.warlock.core.client.ICommand;
 import cc.warlock.core.client.IProperty;
 import cc.warlock.core.client.IRoomListener;
 import cc.warlock.core.client.IStream;
-import cc.warlock.core.client.IWarlockClient;
-import cc.warlock.core.client.IWarlockClientViewer;
+import cc.warlock.core.client.IStreamListener;
 import cc.warlock.core.client.IWarlockSkin;
 import cc.warlock.core.client.IWarlockStyle;
 import cc.warlock.core.client.WarlockClientRegistry;
@@ -67,6 +67,7 @@ import cc.warlock.core.stormfront.settings.skin.DefaultSkin;
 import cc.warlock.core.stormfront.settings.skin.IStormFrontSkin;
 import cc.warlock.core.stormfront.xml.StormFrontDocument;
 import cc.warlock.core.stormfront.xml.StormFrontElement;
+import cc.warlock.core.util.Pair;
 
 import com.martiansoftware.jsap.CommandLineTokenizer;
 
@@ -463,24 +464,14 @@ public class StormFrontClient extends WarlockClient implements IStormFrontClient
 	}
 	
 	@Override
-	public IStream getStream(String streamName) {
-		synchronized(streams) {
-			IStream stream = super.getStream(streamName);
-			if(stream == null) {
-				StormFrontStream sfStream = new StormFrontStream(this, streamName);
-				if (streamName.contains(IWarlockClient.DEFAULT_STREAM_NAME)) {
-					sfStream.setLogging(true);
-				}
-				stream = sfStream;
-				streams.put(streamName, stream);
-			}
-			return stream;
-		}
-	}
-	
-	@Override
 	public IStream getDefaultStream() {
-		return getStream(DEFAULT_STREAM_NAME);
+		IStream stream = this.getStream(DEFAULT_STREAM_NAME);
+		if(stream != null)
+			return stream;
+		
+		StormFrontStream sfStream = (StormFrontStream)createStream(DEFAULT_STREAM_NAME);
+		sfStream.setLogging(true);
+		return sfStream;
 	}
 	
 	public void setComponent (String name, String value, IStream stream)
@@ -565,15 +556,12 @@ public class StormFrontClient extends WarlockClient implements IStormFrontClient
 	}
 	
 	public void launchURL(String url) {
-		for (IWarlockClientViewer viewer : viewers)
+		if (viewer instanceof IStormFrontClientViewer)
 		{
-			if (viewer instanceof IStormFrontClientViewer)
-			{
-				try {
-					((IStormFrontClientViewer)viewer).launchURL(new URL(url));
-				} catch (MalformedURLException e) {
-					e.printStackTrace();
-				}
+			try {
+				((IStormFrontClientViewer)viewer).launchURL(new URL(url));
+			} catch (MalformedURLException e) {
+				e.printStackTrace();
 			}
 		}
 	}
@@ -582,10 +570,8 @@ public class StormFrontClient extends WarlockClient implements IStormFrontClient
 		try {
 			URL url = new URL("http://www.play.net/bfe/DR-art/" + pictureId + "_t.jpg");
 			
-			for (IWarlockClientViewer viewer : viewers) {
-				if (viewer instanceof IStormFrontClientViewer)
-					((IStormFrontClientViewer) viewer).appendImage(url);
-			}
+			if (viewer instanceof IStormFrontClientViewer)
+				((IStormFrontClientViewer) viewer).appendImage(url);
 		} catch (MalformedURLException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
@@ -593,10 +579,8 @@ public class StormFrontClient extends WarlockClient implements IStormFrontClient
 	}
 	
 	public void startedDownloadingServerSettings() {
-		for (IWarlockClientViewer viewer : viewers) {
-			if (viewer instanceof IStormFrontClientViewer)
-				((IStormFrontClientViewer)viewer).startedDownloadingServerSettings();
-		}
+		if (viewer instanceof IStormFrontClientViewer)
+			((IStormFrontClientViewer)viewer).startedDownloadingServerSettings();
 	}
 	
 	public void finishedDownloadingServerSettings(String str) {
@@ -629,16 +613,34 @@ public class StormFrontClient extends WarlockClient implements IStormFrontClient
 			e.printStackTrace();
 		}
 		
-		for(IWarlockClientViewer viewer : viewers) {
-			if (viewer instanceof IStormFrontClientViewer)
-				((IStormFrontClientViewer)viewer).finishedDownloadingServerSettings();
-		}
+		if (viewer instanceof IStormFrontClientViewer)
+			((IStormFrontClientViewer)viewer).finishedDownloadingServerSettings();
 	}
 	
 	public void receivedServerSetting(String setting) {
-		for (IWarlockClientViewer viewer : viewers) {
-			if (viewer instanceof IStormFrontClientViewer)
-				((IStormFrontClientViewer)viewer).receivedServerSetting(setting);
+		if (viewer instanceof IStormFrontClientViewer)
+			((IStormFrontClientViewer)viewer).receivedServerSetting(setting);
+	}
+	
+	@Override
+	public IStream createStream(String streamName) {
+		synchronized(streams) {
+			IStream stream = getStream(streamName);
+			if(stream == null) {
+				stream = new StormFrontStream(this, streamName);
+				streams.put(streamName, stream);
+				for(Iterator<Pair<String, IStreamListener>> iter =
+						potentialListeners.iterator(); iter.hasNext(); ) {
+					Pair<String, IStreamListener> pair = iter.next();
+					if(pair.first().equals(streamName)) {
+						stream.addStreamListener(pair.second());
+						iter.remove();
+					}
+				}
+				// TODO: or should this always be called?
+				stream.create();
+			}
+			return stream;
 		}
 	}
 }

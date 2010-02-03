@@ -47,8 +47,8 @@ public interface IStream {
 	public void sendCommand(ICommand command);
 	public boolean isPrompting();
 	public void flush();
+	public void create();
 	
-	public void setClosed(boolean isClosed);
 	public void setClosedTarget(String target);
 	public void setClosedStyle(String style);
 	

@@ -37,6 +37,19 @@ public class SWTStreamListener implements IStreamListener {
 		this.listener = listener;
 	}
 	
+	private class CreatedWrapper implements Runnable
+	{
+		private IStream stream;
+		
+		public CreatedWrapper(IStream stream) {
+			this.stream = stream;
+		}
+		
+		public void run() {
+			listener.streamCreated(stream);
+		}
+	}
+	
 	private class ClearedWrapper implements Runnable
 	{
 		private IStream stream;
@@ -158,6 +171,10 @@ public class SWTStreamListener implements IStreamListener {
 	protected void run(Runnable runnable)
 	{
 		Display.getDefault().asyncExec(runnable);
+	}
+	
+	public void streamCreated(IStream stream) {
+		run(new CreatedWrapper(stream));
 	}
 	
 	public void streamCleared(IStream stream) {

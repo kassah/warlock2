@@ -71,7 +71,6 @@ import cc.warlock.rcp.ui.WarlockPopupAction;
 import cc.warlock.rcp.ui.WarlockSharedImages;
 import cc.warlock.rcp.ui.WarlockWizardDialog;
 import cc.warlock.rcp.ui.client.SWTPropertyListener;
-import cc.warlock.rcp.ui.client.SWTStreamListener;
 import cc.warlock.rcp.ui.client.SWTWarlockClientListener;
 import cc.warlock.rcp.ui.style.CompassThemes;
 import cc.warlock.rcp.ui.style.StyleProviders;
@@ -282,19 +281,6 @@ public class StormFrontGameView extends GameView implements IStormFrontClientVie
 		if (client instanceof IStormFrontClient)
 		{
 			sfClient = (IStormFrontClient) client;
-
-			// The style provider needs to be set before the client is set on
-			//   the text widget, or the text widget won't get the style provider.
-			
-			
-			SWTStreamListener streamListener = new SWTStreamListener(streamText);
-			client.getDefaultStream().addStreamListener(streamListener);
-			client.getDefaultStream().setClosed(false);
-			/* TODO set us as a listener sometimes here.
-			client.getStream(IStormFrontClient.DEATH_STREAM_NAME).addStreamListener(streamListener);
-			client.getStream(IStormFrontClient.ATMOSPHERICS_STREAM_NAME).addStreamListener(streamListener);
-			*/
-			
 			
 			if (status != null) {
 				status.setActiveClient(sfClient);
@@ -334,9 +320,7 @@ public class StormFrontGameView extends GameView implements IStormFrontClientVie
 	}
 	
 	protected void disconnected ()
-	{
-		super.disconnected();
-		
+	{	
 		showPopup(reconnectPopup);
 //		reconnectPopup.setVisible(true);
 	}

@@ -46,7 +46,6 @@ public class Stream implements IStream {
 	protected String subtitle;
 	private ArrayList<IStreamListener> listeners = new ArrayList<IStreamListener>();
 	protected boolean isPrompting = false;
-	private boolean isClosed = true;
 	private String closedStyle;
 	private String closedTarget = "main";
 	private String streamName;
@@ -67,6 +66,16 @@ public class Stream implements IStream {
 		listeners.remove(listener);
 	}
 
+	/*
+	 * this function should be called when the stream is first created, after
+	 * the initial listeners are added.
+	 */
+	public synchronized void create() {
+		for(IStreamListener listener : listeners) {
+			listener.streamCreated(this);
+		}
+	}
+	
 	public synchronized void clear() {
 		for(IStreamListener listener : listeners) {
 			listener.streamCleared(this);
@@ -93,7 +102,7 @@ public class Stream implements IStream {
 			}
 		}
 		
-		if(isClosed && !closedTarget.equals("") && !streamName.equals(closedTarget)) {
+		if(!client.getViewer().isStreamOpen(streamName) && !closedTarget.equals("") && !streamName.equals(closedTarget)) {
 			WarlockString closedText = new WarlockString(text.toString(), new WarlockStyle(closedStyle));
 			client.getStream(closedTarget).put(closedText);
 		}
@@ -177,10 +186,6 @@ public class Stream implements IStream {
 	
 	public String getFullTitle() {
 		return subtitle == null ? title : title + subtitle;
-	}
-	
-	public void setClosed(boolean isClosed) {
-		this.isClosed = isClosed;
 	}
 	
 	public void setClosedTarget(String target) {

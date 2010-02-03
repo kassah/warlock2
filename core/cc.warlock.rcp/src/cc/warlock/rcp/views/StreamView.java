@@ -36,7 +36,6 @@ import org.eclipse.ui.PartInitException;
 import org.eclipse.ui.PlatformUI;
 import org.eclipse.ui.part.PageBook;
 
-import cc.warlock.core.client.IStream;
 import cc.warlock.core.client.IWarlockClient;
 import cc.warlock.core.client.IWarlockClientListener;
 import cc.warlock.core.client.PropertyListener;
@@ -150,13 +149,10 @@ public class StreamView extends WarlockView implements IGameViewFocusListener, I
 		streamText.getTextWidget().setLayout(new GridLayout(1, false));
 		streams.put(client, streamText);
 		streamText.setClient(client);
-		IStream stream = client.getStream(streamName);
-		stream.addStreamListener(new SWTStreamListener(streamText));
+		client.addStreamListener(streamName, new SWTStreamListener(streamText));
 		
 		// TODO: Make sure this listener gets destroyed on dispose.
 		streamText.getTitle().addListener(new NameListener(client));
-		
-		stream.setClosed(false);
 		
 		if(activeClient == null || activeClient == client)
 			setClient(client);
@@ -201,16 +197,9 @@ public class StreamView extends WarlockView implements IGameViewFocusListener, I
 	
 	@Override
 	public void dispose() {
-		
-		for(IWarlockClient client : streams.keySet()) {
-			client.getStream(streamName).setClosed(true);
-		}
-		
 		GameView.removeGameViewFocusListener(this);
 		
-		if (openViews.contains(this)) {
-			openViews.remove(this);
-		}
+		openViews.remove(this);
 		
 		super.dispose();
 	}

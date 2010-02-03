@@ -57,6 +57,7 @@ import cc.warlock.rcp.configuration.GameViewConfiguration;
 import cc.warlock.rcp.ui.StreamText;
 import cc.warlock.rcp.ui.WarlockEntry;
 import cc.warlock.rcp.ui.WarlockPopupAction;
+import cc.warlock.rcp.ui.client.SWTStreamListener;
 import cc.warlock.rcp.ui.client.SWTWarlockClientListener;
 import cc.warlock.rcp.ui.client.SWTWarlockClientViewer;
 import cc.warlock.rcp.util.ColorUtil;
@@ -81,7 +82,6 @@ public abstract class GameView extends WarlockView implements IWarlockClientView
 	protected SWTWarlockClientViewer wrapper;
 	protected Composite entryComposite;
 	protected IWarlockClient client;
-	protected String streamName;
 	protected Composite mainComposite;
 	
 	public GameView () {
@@ -95,8 +95,6 @@ public abstract class GameView extends WarlockView implements IWarlockClientView
 		// currentCommand = "";
 		openViews.add(this);
 		wrapper = new SWTWarlockClientViewer(this);
-		
-		streamName = IWarlockClient.DEFAULT_STREAM_NAME;
 		
 		WarlockClientRegistry.addWarlockClientListener(new SWTWarlockClientListener(this));
 	}
@@ -183,7 +181,7 @@ public abstract class GameView extends WarlockView implements IWarlockClientView
 		popupPageBook.showPage(emptyPopup);
 		popupPageBook.setVisible(false);
 		
-		streamText = new StreamText(mainComposite, streamName);
+		streamText = new StreamText(mainComposite, IWarlockClient.DEFAULT_STREAM_NAME);
 		streamText.setLineLimit(GameViewConfiguration.instance().getBufferLines());
 		streamText.getTextWidget().setLayout(new GridLayout(1, false));
 		
@@ -317,11 +315,6 @@ public abstract class GameView extends WarlockView implements IWarlockClientView
 		entry.getWidget().paste();
 	}
 	
-	protected void disconnected ()
-	{
-		client.removeViewer(wrapper);
-	}
-	
 	public IWarlockClient getWarlockClient() {
 		return client;
 	}
@@ -405,7 +398,9 @@ public abstract class GameView extends WarlockView implements IWarlockClientView
 	
 	public void setClient(IWarlockClient client) {
 		this.client = client;
-		client.getDefaultStream().setClosed(false);
+		client.setViewer(wrapper);
+		SWTStreamListener streamListener = new SWTStreamListener(streamText);
+		client.getDefaultStream().addStreamListener(streamListener);
 		streamText.getTitle().addListener(new PropertyListener<String>() {
 			public void propertyChanged(String value) {
 				setViewTitle(value);
@@ -415,4 +410,15 @@ public abstract class GameView extends WarlockView implements IWarlockClientView
 	}
 	
 	protected abstract void setViewTitle(String title);
+	
+	public boolean isStreamOpen(String streamName) {
+		if(streamName == IWarlockClient.DEFAULT_STREAM_NAME)
+			return true;
+		
+		for(StreamView streamView : StreamView.getOpenViews()) {
+			if(streamView.getStreamName().equals(streamName))
+				return true;
+		}
+		return false;
+	}
 }

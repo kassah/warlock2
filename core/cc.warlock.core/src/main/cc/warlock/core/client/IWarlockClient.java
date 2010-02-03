@@ -62,16 +62,12 @@ public interface IWarlockClient extends IRoomListener {
 	public ICommandHistory getCommandHistory();
 	
 	/**
-	 * Add a viewer to this client
-	 * @param viewer The viewer to add
+	 * Sets a viewer for the client
+	 * @param viewer The viewer to set
 	 */
-	public void addViewer (IWarlockClientViewer viewer);
+	public void setViewer (IWarlockClientViewer viewer);
 	
-	/**
-	 * Remove a viewer from this client
-	 * @param viewer The viewer to remove
-	 */
-	public void removeViewer (IWarlockClientViewer viewer);
+	public IWarlockClientViewer getViewer();
 
 	/**
 	 * Functionally equivalent to getStream(DEFAULT_STREAM_NAME)
@@ -149,4 +145,17 @@ public interface IWarlockClient extends IRoomListener {
 	 * @return The collection of current streams output by the client.
 	 */
 	public Collection<IStream> getStreams();
+	
+	/**
+	 * @return the stream associated with streamName
+	 */
+	public IStream createStream(String streamName);
+	
+	/**
+	 * Adds a StreamListener to the stream associated with streamName immediately
+	 *   if it exists, or delays until streamName is created
+	 * @param streamName
+	 * @param listener
+	 */
+	public void addStreamListener(String streamName, IStreamListener listener);
 }

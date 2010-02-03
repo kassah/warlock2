@@ -337,4 +337,9 @@ public class ScriptCommands implements IScriptCommands, IStreamListener, IRoomLi
 		// TODO Auto-generated method stub
 		
 	}
+
+	public void streamCreated(IStream stream) {
+		// TODO Auto-generated method stub
+		
+	}
 }
