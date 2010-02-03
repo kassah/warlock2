@@ -108,9 +108,7 @@ public class StreamText extends WarlockText implements IStreamListener {
 	
 	public void streamCreated(IStream stream) {
 		this.stream = stream;
-		// TODO: untangle the stuff that should only happen if there was no
-		//		stream previously set
-		initialize();
+		this.title.set(stream.getFullTitle());
 	}
 	
 	public void componentUpdated(IStream stream, String id, WarlockString value) {
@@ -122,18 +120,18 @@ public class StreamText extends WarlockText implements IStreamListener {
 	}
 
 	public void streamEchoed(IStream stream, String text) {
-		IWarlockClient client = stream.getClient();
-		WarlockString string = new WarlockString();
-		if(isPrompting) {
-			string.append("\n");
-			isPrompting = false;
-		}
-		int styleStart = string.length();
-		string.append(text);
-		// TODO: make a different style for client messages
-		string.addStyle(styleStart, text.length(), client.getCommandStyle());
-
-		appendText(string);
+			IWarlockClient client = stream.getClient();
+			WarlockString string = new WarlockString();
+			if(isPrompting) {
+				string.append("\n");
+				isPrompting = false;
+			}
+			int styleStart = string.length();
+			string.append(text);
+			// TODO: make a different style for client messages
+			string.addStyle(styleStart, text.length(), client.getCommandStyle());
+			
+			appendText(string);
 	}
 
 	public void streamFlush(IStream stream) {
@@ -220,15 +218,8 @@ public class StreamText extends WarlockText implements IStreamListener {
 
 		stream = client.getStream(streamName);
 		
-		if(stream == null)
-			return;
-		
-		initialize();
-	}
-	
-	private void initialize() {
-		//FIXME: make sure this stuff is done eventually
-		this.title.set(stream.getFullTitle());
+		if(stream != null)
+			this.title.set(stream.getFullTitle());
 		
 		IStyleProvider styleProvider = StyleProviders.getStyleProvider(client);
 		if(styleProvider != null)

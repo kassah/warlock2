@@ -36,6 +36,7 @@ import org.eclipse.ui.PartInitException;
 import org.eclipse.ui.PlatformUI;
 import org.eclipse.ui.part.PageBook;
 
+import cc.warlock.core.client.IStream;
 import cc.warlock.core.client.IWarlockClient;
 import cc.warlock.core.client.IWarlockClientListener;
 import cc.warlock.core.client.PropertyListener;
@@ -187,7 +188,10 @@ public class StreamView extends WarlockView implements IGameViewFocusListener, I
 		
 		activeClient = client;
 		activeStream = streams.get(client);
-		setViewTitle(client.getStream(streamName).getFullTitle());
+		
+		IStream stream = client.getStream(streamName);
+		if(stream != null)
+			setViewTitle(stream.getFullTitle());
 		
 		if(activeStream != null)
 			book.showPage(activeStream.getTextWidget());
