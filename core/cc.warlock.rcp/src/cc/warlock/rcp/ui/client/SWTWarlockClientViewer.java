@@ -134,7 +134,7 @@ public class SWTWarlockClientViewer implements IWarlockClientViewer  {
 	
 	protected void run(Runnable runnable)
 	{
-		Display.getDefault().asyncExec(runnable);
+		Display.getDefault().asyncExec(new CatchingRunnable(runnable));
 	}
 	
 	public String getCurrentCommand() {

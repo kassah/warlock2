@@ -32,6 +32,7 @@ import org.eclipse.swt.widgets.Display;
 import cc.warlock.core.stormfront.network.ISGEConnectionListener;
 import cc.warlock.core.stormfront.network.ISGEGame;
 import cc.warlock.core.stormfront.network.SGEConnection;
+import cc.warlock.rcp.ui.client.CatchingRunnable;
 
 /**
  * @author Marshall
@@ -39,27 +40,22 @@ import cc.warlock.core.stormfront.network.SGEConnection;
 public class SWTSGEConnectionListenerAdapter implements ISGEConnectionListener {
 
 	private ISGEConnectionListener listener;
-	private LoginReadyRunnable loginReadyRunnable;
-	private LoginFinishedRunnable loginFinishedRunnable;
-	private GamesReadyRunnable gamesReadyRunnable;
-	private CharactersReadyRunnable charactersReadyRunnable;
-	private ReadyToPlayRunnable readyToPlayRunnable;
-	private SgeErrorRunnable sgeErrorRunnable;
 	
 	public SWTSGEConnectionListenerAdapter (ISGEConnectionListener listener)
 	{
 		this.listener = listener;
-
-		loginReadyRunnable = new LoginReadyRunnable();
-		loginFinishedRunnable = new LoginFinishedRunnable();
-		gamesReadyRunnable = new GamesReadyRunnable();
-		charactersReadyRunnable = new CharactersReadyRunnable();
-		readyToPlayRunnable = new ReadyToPlayRunnable();
-		sgeErrorRunnable = new SgeErrorRunnable();
+	}
+	
+	protected void run(Runnable runnable) {
+		Display.getDefault().asyncExec(new CatchingRunnable(runnable));
 	}
 	
 	private class LoginReadyRunnable implements Runnable {
-		public SGEConnection connection;
+		private SGEConnection connection;
+		
+		public LoginReadyRunnable(SGEConnection connection) {
+			this.connection = connection;
+		}
 		
 		public void run () {
 			listener.loginReady(connection);
@@ -67,12 +63,15 @@ public class SWTSGEConnectionListenerAdapter implements ISGEConnectionListener {
 	}
 	
 	public void loginReady(SGEConnection connection) {
-		loginReadyRunnable.connection = connection;
-		Display.getDefault().asyncExec(loginReadyRunnable);
+		run(new LoginReadyRunnable(connection));
 	}
 
 	private class LoginFinishedRunnable implements Runnable {
-		public SGEConnection connection;
+		private SGEConnection connection;
+		
+		public LoginFinishedRunnable(SGEConnection connection) {
+			this.connection = connection;
+		}
 		
 		public void run () {
 			listener.loginFinished(connection);
@@ -80,13 +79,17 @@ public class SWTSGEConnectionListenerAdapter implements ISGEConnectionListener {
 	}
 	
 	public void loginFinished(SGEConnection connection) {
-		loginFinishedRunnable.connection = connection;
-		Display.getDefault().asyncExec(loginFinishedRunnable);
+		run(new LoginFinishedRunnable(connection));
 	}
 
 	private class GamesReadyRunnable implements Runnable {
-		public SGEConnection connection;
-		public List<? extends ISGEGame> games;
+		private SGEConnection connection;
+		private List<? extends ISGEGame> games;
+		
+		public GamesReadyRunnable(SGEConnection connection, List<? extends ISGEGame> games) {
+			this.connection = connection;
+			this.games = games;
+		}
 		
 		public void run () {
 			listener.gamesReady(connection, games);
@@ -94,14 +97,17 @@ public class SWTSGEConnectionListenerAdapter implements ISGEConnectionListener {
 	}
 	
 	public void gamesReady(SGEConnection connection, List<? extends ISGEGame> games) {
-		gamesReadyRunnable.connection = connection;
-		gamesReadyRunnable.games = games;
-		Display.getDefault().asyncExec(gamesReadyRunnable);
+		run(new GamesReadyRunnable(connection, games));
 	}
 
 	private class CharactersReadyRunnable implements Runnable {
-		public SGEConnection connection;
-		public Map<String, String> characters;
+		private SGEConnection connection;
+		private Map<String, String> characters;
+		
+		public CharactersReadyRunnable(SGEConnection connection, Map<String, String> characters) {
+			this.connection = connection;
+			this.characters = characters;
+		}
 		
 		public void run () {
 			listener.charactersReady(connection, characters);
@@ -109,14 +115,17 @@ public class SWTSGEConnectionListenerAdapter implements ISGEConnectionListener {
 	}
 	
 	public void charactersReady(SGEConnection connection, Map<String, String> characters) {
-		charactersReadyRunnable.connection = connection;
-		charactersReadyRunnable.characters = characters;
-		Display.getDefault().asyncExec(charactersReadyRunnable);
+		run(new CharactersReadyRunnable(connection, characters));
 	}
 
 	private class ReadyToPlayRunnable implements Runnable {
-		public SGEConnection connection;
-		public Map<String,String> loginProperties;
+		private SGEConnection connection;
+		private Map<String,String> loginProperties;
+		
+		public ReadyToPlayRunnable(SGEConnection connection, Map<String, String> loginProperties) {
+			this.connection = connection;
+			this.loginProperties = loginProperties;
+		}
 		
 		public void run () {
 			listener.readyToPlay(connection, loginProperties);
@@ -124,14 +133,17 @@ public class SWTSGEConnectionListenerAdapter implements ISGEConnectionListener {
 	}
 	
 	public void readyToPlay(SGEConnection connection, Map<String,String> loginProperties) {
-		readyToPlayRunnable.connection = connection;
-		readyToPlayRunnable.loginProperties = loginProperties;
-		Display.getDefault().asyncExec(readyToPlayRunnable);
+		run(new ReadyToPlayRunnable(connection, loginProperties));
 	}
 	
 	private class SgeErrorRunnable implements Runnable {
-		public SGEConnection connection;
-		public int errorCode;
+		private SGEConnection connection;
+		private int errorCode;
+		
+		public SgeErrorRunnable(SGEConnection connection, int errorCode) {
+			this.connection = connection;
+			this.errorCode = errorCode;
+		}
 		
 		public void run () {
 			listener.sgeError(connection, errorCode);
@@ -139,9 +151,6 @@ public class SWTSGEConnectionListenerAdapter implements ISGEConnectionListener {
 	}
 	
 	public void sgeError(SGEConnection connection, int errorCode) {
-		sgeErrorRunnable.connection = connection;
-		sgeErrorRunnable.errorCode = errorCode;
-		Display.getDefault().asyncExec(sgeErrorRunnable);
+		run(new SgeErrorRunnable(connection, errorCode));
 	}
-
 }

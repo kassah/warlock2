@@ -48,6 +48,7 @@ import cc.warlock.core.client.WarlockClientRegistry;
 import cc.warlock.core.client.WarlockString;
 import cc.warlock.core.client.internal.CharacterStatus;
 import cc.warlock.core.client.internal.Property;
+import cc.warlock.core.client.internal.Stream;
 import cc.warlock.core.client.internal.WarlockClient;
 import cc.warlock.core.client.internal.WarlockStyle;
 import cc.warlock.core.client.settings.IClientSettings;
@@ -469,9 +470,9 @@ public class StormFrontClient extends WarlockClient implements IStormFrontClient
 		if(stream != null)
 			return stream;
 		
-		StormFrontStream sfStream = (StormFrontStream)createStream(DEFAULT_STREAM_NAME);
-		sfStream.setLogging(true);
-		return sfStream;
+		stream = createStream(DEFAULT_STREAM_NAME);
+		stream.setLogging(true);
+		return stream;
 	}
 	
 	public void setComponent (String name, String value, IStream stream)
@@ -627,7 +628,7 @@ public class StormFrontClient extends WarlockClient implements IStormFrontClient
 		synchronized(streams) {
 			IStream stream = getStream(streamName);
 			if(stream == null) {
-				stream = new StormFrontStream(this, streamName);
+				stream = new Stream(this, streamName);
 				streams.put(streamName, stream);
 				for(Iterator<Pair<String, IStreamListener>> iter =
 						potentialListeners.iterator(); iter.hasNext(); ) {

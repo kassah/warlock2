@@ -52,7 +52,7 @@ public class Stream implements IStream {
 	protected boolean isLogging = false;
 	private String location = "right";
 	
-	protected Stream (IWarlockClient client, String streamName) {
+	public Stream (IWarlockClient client, String streamName) {
 		this.client = client;
 		this.streamName = streamName;
 	}

@@ -232,7 +232,7 @@ public class BarsView extends ViewPart {
 			if (client != activeClient)
 				return;
 			
-			if (value == 0) {
+			if (value == null || value == 0) {
 				roundtimeLength = -1;
 				roundtime.setSelection(0);
 				roundtime2.setSelection(0);
@@ -267,7 +267,7 @@ public class BarsView extends ViewPart {
 			if (client != activeClient)
 				return;
 				
-			if (value == 0) {
+			if (value == null || value == 0) {
 				casttimeLength = -1;
 				casttime.setSelection(0);
 				casttime.setLabel("no casttime");

@@ -170,7 +170,7 @@ public class SWTStreamListener implements IStreamListener {
 	
 	protected void run(Runnable runnable)
 	{
-		Display.getDefault().asyncExec(runnable);
+		Display.getDefault().asyncExec(new CatchingRunnable(runnable));
 	}
 	
 	public void streamCreated(IStream stream) {

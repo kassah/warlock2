@@ -73,11 +73,10 @@ public class StreamText extends WarlockText implements IStreamListener {
 			while (matcher.find())
 			{
 				MatchResult result = matcher.toMatchResult();
-				int start = result.start();
-				int length = result.end() - start;
 				
 				IWarlockStyle style = highlight.getStyle();
-				text.addStyle(start, length, style);
+				text.startStyle(result.start(), style);
+				text.endStyle(result.end(), style);
 				
 				try{
 					if (style.getSound() != null && !style.getSound().equals("")){
@@ -126,10 +125,11 @@ public class StreamText extends WarlockText implements IStreamListener {
 			string.append("\n");
 			isPrompting = false;
 		}
-		int styleStart = string.length();
+		IWarlockStyle style = client.getCommandStyle();
+		string.startStyle(style);
 		string.append(text);
 		// TODO: make a different style for client messages
-		string.addStyle(styleStart, text.length(), client.getCommandStyle());
+		string.endStyle(style);
 
 		appendText(string);
 	}
@@ -180,7 +180,7 @@ public class StreamText extends WarlockText implements IStreamListener {
 		IWarlockClient client = stream.getClient();
 		WarlockString string = new WarlockString(command.getText());
 		
-		string.addStyle(0, string.length(), client.getCommandStyle());
+		string.addStyle(client.getCommandStyle());
 		
 		if(!isPrompting && prompt != null)
 			appendText(new WarlockString(prompt));

@@ -22,76 +22,16 @@
 package cc.warlock.core.client;
 
 import java.util.ArrayList;
+import java.util.LinkedList;
 import java.util.List;
+import java.util.ListIterator;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 public class WarlockString {
 
 	private StringBuffer text = new StringBuffer();
-	private ArrayList<WarlockStringStyleRange> styles = new ArrayList<WarlockStringStyleRange>();
-	final static private Pattern eolPattern = Pattern.compile("\r?\n");
-	
-	public class WarlockStringStyleRange {
-		public IWarlockStyle style;
-		
-		private int givenStart;
-		private int givenLength;
-		
-		private int computedStart = -1;
-		private int computedLength = -1;
-		
-		public WarlockStringStyleRange(int start, int length, IWarlockStyle style) {
-			this.givenStart = start;
-			this.givenLength = length;
-			this.style = style;
-		}
-		
-		public int getStart() {
-			if(this.computedStart < 0) {
-				if(style.isFullLine()) {
-					int start = 0;
-					int end = WarlockString.this.text.length();
-					Matcher m = eolPattern.matcher(WarlockString.this.text.toString());
-					while(m.find()) {
-						end = m.end();
-						if(end > this.givenStart) {
-							break;
-						} else {
-							start = end;
-						}
-					}
-					this.computedStart = start;
-				} else {
-					this.computedStart = this.givenStart;
-				}
-			}
-			
-			return this.computedStart;
-		}
-		
-		public int getLength() {
-			if(this.computedLength < 0) {
-				if(style.isFullLine()) {
-					int start = 0;
-					int end = WarlockString.this.text.length();
-					Matcher m = eolPattern.matcher(WarlockString.this.text.toString());
-					while(m.find()) {
-						end = m.end();
-						if(end > this.givenStart) {
-							break;
-						} else {
-							start = end;
-						}
-					}
-					this.computedLength = end - start;
-				} else {
-					this.computedLength = this.givenLength;
-				}
-			}
-			return this.computedLength;
-		}
-	}
+	private LinkedList<WarlockStringMarker> styles = new LinkedList<WarlockStringMarker>();
 	
 	public WarlockString() {
 	}
@@ -124,20 +64,52 @@ public class WarlockString {
 	public void append(WarlockString string) {
 		int charCount = text.length();
 		text.append(string.toString());
-		for(WarlockStringStyleRange range : string.getStyles()) {
-			addStyle(charCount + range.getStart(), range.getLength(), range.style);
+		for(WarlockStringMarker marker : string.getStyles()) {
+			if(marker.start)
+				startStyle(charCount + marker.offset, marker.style);
+			else
+				endStyle(charCount + marker.offset, marker.style);
 		}
 	}
 	
 	public void addStyle(IWarlockStyle style) {
-		addStyle(0, text.length(), style);
+		styles.addFirst(new WarlockStringMarker(true, style, 0));
+		styles.addLast(new WarlockStringMarker(false, style, text.length()));
 	}
 	
-	public void addStyle(int start, int length, IWarlockStyle style) {
-		styles.add(new WarlockStringStyleRange(start, length, style));
+	public void startStyle(int offset, IWarlockStyle style) {
+		addTowardEnd(new WarlockStringMarker(true, style, offset));
 	}
 	
-	public List<WarlockStringStyleRange> getStyles() {
+	public void endStyle(int offset, IWarlockStyle style) {
+		addTowardEnd(new WarlockStringMarker(false, style, offset));
+	}
+	
+	public void startStyle(IWarlockStyle style) {
+		styles.addLast(new WarlockStringMarker(true, style, text.length()));
+	}
+	
+	public void endStyle(IWarlockStyle style) {
+		styles.addLast(new WarlockStringMarker(false, style, text.length()));
+	}
+	
+	private void addTowardEnd(WarlockStringMarker marker) {
+		ListIterator<WarlockStringMarker> iter = styles.listIterator();
+		while(true) {
+			if(!iter.hasNext()) {
+				iter.add(marker);
+				break;
+			}
+			WarlockStringMarker cur = iter.next();
+			if(cur.offset > marker.offset) {
+				iter.previous();
+				iter.add(marker);
+				break;
+			}
+		}
+	}
+	
+	public List<WarlockStringMarker> getStyles() {
 		return styles;
 	}
 	
@@ -156,15 +128,51 @@ public class WarlockString {
 	
 	public WarlockString substring(int start, int end) {
 		WarlockString substring = new WarlockString(text.substring(start, end));
-		for(WarlockStringStyleRange style : styles) {
-			if(style.getStart() + style.getLength() > start && style.getStart() < end) {
-				int styleLength = Math.min(style.getLength()
-						- Math.max(0, start - style.getStart()),
-						end - Math.max(style.getStart(), start));
-				int styleStart = Math.max(0, style.getStart() - start);
-				substring.addStyle(styleStart, styleLength, style.style);
+		
+		// Find all of the markers before the substring that don't end before
+		// the substring starts
+		LinkedList<WarlockStringMarker> startMarkers =
+			new LinkedList<WarlockStringMarker>();
+		for(WarlockStringMarker marker : styles) {
+			if(marker.offset >= start)
+				break;
+			if(marker.start) {
+				startMarkers.addLast(marker);
+			} else {
+				// Remove the start marker for this end marker
+				WarlockStringMarker.removeStyle(startMarkers, marker.style);
 			}
 		}
+		
+		for(WarlockStringMarker marker : startMarkers) {
+			substring.startStyle(0, marker.style);
+		}
+		
+		LinkedList<WarlockStringMarker> unfinishedMarkers =
+			new LinkedList<WarlockStringMarker>();
+		
+		// add the styles, keeping track of unfinished ones
+		for(WarlockStringMarker marker : styles) {
+			if(marker.offset < start)
+				continue;
+			
+			if(marker.offset > end)
+				break;
+			
+			if(marker.start) {
+				substring.startStyle(marker.offset - start, marker.style);
+				unfinishedMarkers.addLast(marker);
+			} else {
+				substring.endStyle(marker.offset, marker.style);
+				WarlockStringMarker.removeStyle(unfinishedMarkers, marker.style);
+			}
+		}
+		
+		// close the unfinished styles
+		for(WarlockStringMarker marker : unfinishedMarkers) {
+			substring.endStyle(end - start, marker.style);
+		}
+		
 		return substring;
 	}
 	

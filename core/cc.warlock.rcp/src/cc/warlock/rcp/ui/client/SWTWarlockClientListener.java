@@ -95,24 +95,28 @@ public class SWTWarlockClientListener implements IWarlockClientListener {
 		}
 	}
 	
+	protected void run(Runnable runnable) {
+		Display.getDefault().asyncExec(new CatchingRunnable(runnable));
+	}
+	
 	public void clientActivated(IWarlockClient client) {
-		Display.getDefault().asyncExec(new ActivatedListener(client));
+		run(new ActivatedListener(client));
 	}
 
 	public void clientConnected(IWarlockClient client) {
-		Display.getDefault().asyncExec(new ConnectedListener(client));
+		run(new ConnectedListener(client));
 	}
 
 	public void clientDisconnected(IWarlockClient client) {
-		Display.getDefault().asyncExec(new DisconnectedListener(client));
+		run(new DisconnectedListener(client));
 	}
 	
 	public void clientSettingsLoaded(IWarlockClient client) {
-		Display.getDefault().asyncExec(new SettingsLoadedListener(client));
+		run(new SettingsLoadedListener(client));
 	}
 
 	public void clientRemoved(IWarlockClient client) {
-		Display.getDefault().asyncExec(new RemovedListener(client));
+		run(new RemovedListener(client));
 	}
 
 }

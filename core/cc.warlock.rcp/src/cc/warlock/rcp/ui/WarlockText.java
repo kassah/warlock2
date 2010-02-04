@@ -22,10 +22,10 @@
 package cc.warlock.rcp.ui;
 
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.Iterator;
+import java.util.LinkedList;
 import java.util.List;
-import java.util.Map;
+import java.util.ListIterator;
 
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.custom.ST;
@@ -48,8 +48,9 @@ import org.eclipse.swt.widgets.MenuItem;
 import org.eclipse.ui.ISharedImages;
 import org.eclipse.ui.PlatformUI;
 
+import cc.warlock.core.client.IWarlockStyle;
 import cc.warlock.core.client.WarlockString;
-import cc.warlock.core.client.WarlockString.WarlockStringStyleRange;
+import cc.warlock.core.client.WarlockStringMarker;
 
 /**
  * This is an extension of the StyledText widget which has special support for embedding of arbitrary Controls/Links
@@ -69,17 +70,7 @@ public class WarlockText {
 	private int doScrollDirection = SWT.DOWN;
 	private IStyleProvider styleProvider;
 	private Menu contextMenu;
-	private HashMap<String, WarlockTextMarker> markers = new HashMap<String, WarlockTextMarker>();
-	
-	private class WarlockTextMarker {
-		public int offset;
-		public int length;
-		
-		public WarlockTextMarker(int offset, int length) {
-			this.offset = offset;
-			this.length = length;
-		}
-	}
+	private LinkedList<WarlockStringMarker> markers = new LinkedList<WarlockStringMarker>();
 	
 	public WarlockText(Composite parent) {
 		textWidget = new StyledText(parent, SWT.V_SCROLL);
@@ -215,69 +206,57 @@ public class WarlockText {
 		postTextChange(atBottom);
 	}
 	
-	private void addStyles(List<WarlockStringStyleRange> styles, int offset, int length) {
+	private void addStyles(List<WarlockStringMarker> styles, int offset) {
 		// add a marker for each style with a name
-		for(WarlockStringStyleRange style : styles) {
-			String name = style.style.getName();
+		for(WarlockStringMarker marker : styles) {
+			String name = marker.style.getName();
 			if(name != null) {
-				WarlockTextMarker marker = markers.get(name);
-				if(marker != null && marker.offset + marker.length == offset + style.getStart()) {
-					marker.length += style.getLength();
-					continue;
-				}
-				this.addMarker(name, offset + style.getStart(), style.getLength());
+				this.addMarker(new WarlockStringMarker(marker.start, marker.style, offset + marker.offset));
 			}
 		}
 		
 		/* Break up the ranges and merge overlapping styles because SWT only
 		 * allows 1 style per section
 		 */
-		ArrayList<WarlockStringStyleRange> currentStyles = new ArrayList<WarlockStringStyleRange>();
+		ArrayList<WarlockStringMarker> currentStyles = new ArrayList<WarlockStringMarker>();
 		ArrayList<StyleRangeWithData> finishedStyles = new ArrayList<StyleRangeWithData>();
 		int pos = 0;
-		while(pos >= 0) {
-			// update current styles
-			for(WarlockStringStyleRange style : styles) {
-				if(style.getStart() == pos) {
-					currentStyles.add(style);
-				} else if(style.getStart() + style.getLength() == pos) {
-					currentStyles.remove(style);
-				}
-			}
+		for(WarlockStringMarker style : styles) {
 			
-			// create style segment for pos to next pos
-			int foundPos = findNextEvent(styles, pos + 1);
-			int nextPos = foundPos < 0 ? length : foundPos;
+			int nextPos = style.offset;
 
-			if(currentStyles.size() > 0) {
+			if(nextPos > pos && currentStyles.size() > 0) {
 				// merge all of the styles
-				StyleRangeWithData style = warlockStringStyleRangeToStyleRange(
-						currentStyles.get(0), offset);
+				StyleRangeWithData styleRange = warlockStyleToStyleRange(currentStyles.get(0).style, offset + pos, nextPos - pos);
 				for(int i = 1; i < currentStyles.size(); i++) {
-					StyleRangeWithData nextStyle = warlockStringStyleRangeToStyleRange(
-							currentStyles.get(i), offset);
+					StyleRangeWithData nextStyle = warlockStyleToStyleRange(currentStyles.get(i).style, offset + pos, nextPos - pos);
 					if(nextStyle.font != null)
-						style.font = nextStyle.font;
+						styleRange.font = nextStyle.font;
 					if(nextStyle.background != null)
-						style.background = nextStyle.background;
+						styleRange.background = nextStyle.background;
 					if(nextStyle.foreground != null)
-						style.foreground = nextStyle.foreground;
+						styleRange.foreground = nextStyle.foreground;
 					if(nextStyle.fontStyle != SWT.NORMAL)
-						style.fontStyle = nextStyle.fontStyle;
-					if(nextStyle.strikeout) style.strikeout = true;
-					if(nextStyle.underline) style.underline = true;
-					style.data.putAll(nextStyle.data);
+						styleRange.fontStyle = nextStyle.fontStyle;
+					if(nextStyle.strikeout) styleRange.strikeout = true;
+					if(nextStyle.underline) styleRange.underline = true;
+					styleRange.data.putAll(nextStyle.data);
 					if(nextStyle.action != null)
-						style.action = nextStyle.action;
+						styleRange.action = nextStyle.action;
 					if(nextStyle.tooltip != null)
-						style.tooltip = nextStyle.tooltip;
+						styleRange.tooltip = nextStyle.tooltip;
 				}
-				style.start = offset + pos;
-				style.length = nextPos - pos;
-				finishedStyles.add(style);
+				finishedStyles.add(styleRange);
 			}
 			
-			pos = foundPos;
+			// update current styles
+			if(style.start) {
+				currentStyles.add(style);
+			} else {
+				WarlockStringMarker.removeStyle(currentStyles, style.style);
+			}
+
+			pos = nextPos;
 		}
 		
 		for(StyleRangeWithData style : finishedStyles) {
@@ -291,47 +270,30 @@ public class WarlockText {
 		int charCount = textWidget.getCharCount();
 		String string = wstring.toString();
 		textWidget.append(string);
-		addStyles(wstring.getStyles(), charCount, string.length());
+		addStyles(wstring.getStyles(), charCount);
 		
 		constrainLineLimit(atBottom);
 
 		postTextChange(atBottom);
 	}
 	
-	/* find an element in styles that intersects with the first element of styles, starting at pos */
-	private int findNextEvent(List<WarlockStringStyleRange> styles, int pos) {
-		int nextPos = -1;
-		for(WarlockStringStyleRange style : styles) {
-			int start = style.getStart();
-			int end = start + style.getLength();
-			if(start >= pos) {
-				if(nextPos < 0 || start < nextPos)
-					nextPos = start;
-			} else if(end >= pos) {
-				if(nextPos < 0 || end < nextPos)
-					nextPos = end;
-			}
-		}
-		return nextPos;
-	}
-	
-	private StyleRangeWithData warlockStringStyleRangeToStyleRange(WarlockStringStyleRange range, int offset) {
+	private StyleRangeWithData warlockStyleToStyleRange(IWarlockStyle style, int start, int length) {
 		if(styleProvider == null)
 			return null;
 		
-		StyleRangeWithData styleRange = styleProvider.getStyleRange(range.style);
+		StyleRangeWithData styleRange = styleProvider.getStyleRange(style);
 		if(styleRange == null)
 			return null;
 
-		styleRange.start = offset + range.getStart();
-		styleRange.length = range.getLength();
+		styleRange.start = start;
+		styleRange.length = length;
 		
-		if(range.style.isFullLine())
+		if(style.isFullLine())
 			textWidget.setLineBackground(textWidget.getLineAtOffset(styleRange.start), 1, styleRange.background);
-		if(range.style.getAction() != null)
-			styleRange.action = range.style.getAction();
-		if(range.style.getName() != null)
-			styleRange.data.put("name", range.style.getName());
+		if(style.getAction() != null)
+			styleRange.action = style.getAction();
+		if(style.getName() != null)
+			styleRange.data.put("name", style.getName());
 		
 		return styleRange;
 	}
@@ -355,30 +317,67 @@ public class WarlockText {
 		}
 	}
 	
-	// Don't not call this function on append, only replace/remove/insert
-	private void updateMarkers(int offset, int delta) {
-		for(Iterator<Map.Entry<String, WarlockTextMarker>> iter = markers.entrySet().iterator();
+	// this function removes the first "delta" amount of characters
+	private void updateMarkers(int delta) {
+		// FIXME: if only half of a style is removed, we break
+		for(Iterator<WarlockStringMarker> iter = markers.iterator();
 		iter.hasNext(); )
 		{
-			Map.Entry<String, WarlockTextMarker> entry = iter.next();
-			WarlockTextMarker marker = entry.getValue();
+			WarlockStringMarker marker = iter.next();
 			// If the replaced text contains us, remove us (replaced text must
 			// remove a character before and after (can't get rid of markers on
 			// borders, unfortunately) this shouldn't happen much, if ever.
-			if(offset < marker.offset && marker.offset - offset + delta < 0) {
+			if(marker.offset + delta < 0) {
 				iter.remove();
 				continue;
 			}
 			// move us accordingly
-			if(marker.offset > offset)
-				marker.offset += delta;
-			else if(marker.offset == offset)
-				marker.length += delta;
+			marker.offset += delta;
 		}
 	}
 	
-	public void addMarker(String name, int offset, int length) {
-		markers.put(name, new WarlockTextMarker(offset, length));
+	// this function removes the first "delta" amount of characters
+	private void updateMarkers(WarlockStringMarker startMarker,
+			WarlockStringMarker endMarker, int delta) {
+		// remove markers between start and end.
+		// all markers after start need to be adjusted by offset.
+		boolean started = false;
+		boolean ended = false;
+		for(Iterator<WarlockStringMarker> iter = markers.iterator();
+		iter.hasNext(); )
+		{
+			WarlockStringMarker marker = iter.next();
+			if(marker == startMarker) {
+				started = true;
+				continue;
+			}
+			if(marker == endMarker) {
+				ended = true;
+			}
+			if(started) {
+				if(!ended) {
+					iter.remove();
+					continue;
+				}
+				marker.offset += delta;
+			}
+		}
+	}
+	
+	public void addMarker(WarlockStringMarker marker) {
+		ListIterator<WarlockStringMarker> iter = markers.listIterator();
+		while(true) {
+			if(!iter.hasNext()) {
+				iter.add(marker);
+				break;
+			}
+			WarlockStringMarker cur = iter.next();
+			if(cur.offset > marker.offset) {
+				iter.previous();
+				iter.add(marker);
+				break;
+			}
+		}
 	}
 	
 	public void clearMarkers() {
@@ -386,17 +385,34 @@ public class WarlockText {
 	}
 	
 	public void replaceMarker(String name, WarlockString text) {
-		WarlockTextMarker marker = markers.get(name);
-		if(marker == null)
+		WarlockStringMarker startMarker = getStartMarker(name);
+		WarlockStringMarker endMarker = getEndMarker(name);
+		if(startMarker == null || endMarker == null)
 			return;
 		
-		int start = marker.offset;
-		int length = marker.length;
+		int start = startMarker.offset;
+		int length = endMarker.offset - startMarker.offset;
 		boolean atBottom = isAtBottom();
 		textWidget.replaceTextRange(start, length, text.toString());
-		updateMarkers(start, text.length() - length);
-		addStyles(text.getStyles(), start, text.length());
+		updateMarkers(startMarker, endMarker, text.length() - length);
+		addStyles(text.getStyles(), start);
 		postTextChange(atBottom);
+	}
+	
+	private WarlockStringMarker getStartMarker(String name) {
+		for(WarlockStringMarker marker : markers) {
+			if(marker.start && marker.style.getName().equals(name))
+				return marker;
+		}
+		return null;
+	}
+	
+	private WarlockStringMarker getEndMarker(String name) {
+		for(WarlockStringMarker marker : markers) {
+			if(!marker.start && marker.style.getName().equals(name))
+				return marker;
+		}
+		return null;
 	}
 	
 	private void constrainLineLimit(boolean atBottom) {
@@ -409,11 +425,11 @@ public class WarlockText {
 				int charsToRemove = textWidget.getOffsetAtLine(linesToRemove);
 				if(atBottom) {
 					textWidget.replaceTextRange(0, charsToRemove, "");
-					updateMarkers(0, -charsToRemove);
+					updateMarkers(-charsToRemove);
 				} else {
 					int pixelsToRemove = textWidget.getLinePixel(linesToRemove);
 					textWidget.replaceTextRange(0, charsToRemove, "");
-					updateMarkers(0, -charsToRemove);
+					updateMarkers(-charsToRemove);
 					if(pixelsToRemove < 0)
 						textWidget.setTopPixel(-pixelsToRemove);
 				}

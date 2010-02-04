@@ -41,6 +41,7 @@ import cc.warlock.core.client.IWarlockClient;
 import cc.warlock.core.client.WarlockClientRegistry;
 import cc.warlock.core.client.internal.WarlockClientListener;
 import cc.warlock.core.client.settings.IClientSetting;
+import cc.warlock.core.client.settings.IClientSettings;
 import cc.warlock.core.client.settings.macro.CommandMacroHandler;
 import cc.warlock.core.client.settings.macro.IMacro;
 import cc.warlock.core.client.settings.macro.IMacroCommand;
@@ -92,7 +93,13 @@ public class MacroRegistry implements IMacroProvider {
 				public void clientDisconnected(IWarlockClient client) {}
 				public void clientRemoved(IWarlockClient client) {}
 				public void clientSettingsLoaded(IWarlockClient client) {
-					client.getClientSettings().addClientSettingProvider(instance);
+					// FIXME: make sure this is a good idea
+					if(client == null)
+						return;
+					
+					IClientSettings settings = client.getClientSettings();
+					if(settings != null)
+						settings.addClientSettingProvider(instance);
 				}
 			}));
 		}

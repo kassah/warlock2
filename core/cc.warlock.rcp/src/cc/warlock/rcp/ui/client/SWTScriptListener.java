@@ -91,7 +91,7 @@ public class SWTScriptListener implements IScriptListener {
 	
 	protected void run(Runnable runnable)
 	{
-		Display.getDefault().asyncExec(runnable);
+		Display.getDefault().asyncExec(new CatchingRunnable(runnable));
 	}
 	
 	public void scriptPaused(IScript script) {

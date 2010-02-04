@@ -35,7 +35,7 @@ import org.eclipse.ui.PlatformUI;
 import cc.warlock.core.client.IStreamFilter;
 import cc.warlock.core.client.IWarlockClient;
 import cc.warlock.core.client.WarlockString;
-import cc.warlock.core.client.WarlockString.WarlockStringStyleRange;
+import cc.warlock.core.client.WarlockStringMarker;
 import cc.warlock.core.client.internal.StreamFilter;
 import cc.warlock.rcp.ui.StreamText;
 import cc.warlock.rcp.ui.client.SWTStreamListener;
@@ -69,7 +69,7 @@ public class UserStream extends StreamView {
 			WarlockString ret = new WarlockString();
 			bufferLoop: for (WarlockString buffer : string.split("\\r?\\n")) {
 				if(styles != null)
-					for(WarlockStringStyleRange style : buffer.getStyles()) {
+					for(WarlockStringMarker style : buffer.getStyles()) {
 						String name = style.style.getName();
 						if(name != null && styles.contains(name)) {
 							ret.append(buffer);

@@ -44,7 +44,11 @@ public class SWTPropertyListener<T> implements IPropertyListener<T> {
 		
 		public void run ()
 		{
-			listener.propertyChanged(value);
+			try {
+				listener.propertyChanged(value);
+			} catch(Exception e) {
+				e.printStackTrace();
+			}
 		}
 	}
 
