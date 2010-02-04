@@ -132,19 +132,6 @@ public class SWTWarlockClientViewer implements IWarlockClientViewer  {
 		}
 	}
 	
-	private class IsStreamOpenWrapper implements Runnable {
-		public boolean result;
-		public String streamName;
-		
-		public IsStreamOpenWrapper(String streamName) {
-			this.streamName = streamName;
-		}
-		
-		public void run () {
-			result = viewer.isStreamOpen(streamName);
-		}
-	}
-	
 	protected void run(Runnable runnable)
 	{
 		Display.getDefault().asyncExec(runnable);
@@ -203,9 +190,7 @@ public class SWTWarlockClientViewer implements IWarlockClientViewer  {
 	}
 	
 	public boolean isStreamOpen(String streamName) {
-		IsStreamOpenWrapper wrapper = new IsStreamOpenWrapper(streamName);
-		run(wrapper);
-		
-		return wrapper.result;
+		// This method is not allowed to use any SWT methods
+		return viewer.isStreamOpen(streamName);
 	}
 }
