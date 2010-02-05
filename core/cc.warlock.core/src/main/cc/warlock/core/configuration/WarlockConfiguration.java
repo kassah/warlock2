@@ -53,12 +53,13 @@ public class WarlockConfiguration {
 	
 	public static WarlockConfiguration getWarlockConfiguration(String configFilename)
 	{
-		if (!configurations.containsKey(configFilename))
+		/*if (!configurations.containsKey(configFilename))
 		{
 			WarlockConfiguration config = new WarlockConfiguration(configFilename);
 			configurations.put(configFilename, config);
 		}
-		return configurations.get(configFilename);
+		return configurations.get(configFilename);*/
+		return new WarlockConfiguration(configFilename);
 	}
 	
 	public static WarlockConfiguration getMainConfiguration ()
