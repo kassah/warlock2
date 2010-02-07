@@ -262,13 +262,7 @@ public class SoundPlayer
 		}
 		catch (Exception e)
 		{
-			/*
-			  In case of an exception, we dump the exception
-			  including the stack trace to the console output.
-			  Then, we exit the program.
-			*/
 			e.printStackTrace();
-			return;
 		}
 	}
 		
@@ -282,7 +276,7 @@ public class SoundPlayer
 				System.err.println("Sound queue full, not playing sound.");
 			}
 			if(!runner.running) {
-				runner.run();
+				runner.start();
 			}
 		}
 	}
