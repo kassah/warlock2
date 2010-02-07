@@ -213,7 +213,7 @@ public class SoundPlayer
 	}
 	
 	class QueueRunner extends Thread {
-		public boolean running = true;
+		public boolean running = false;
 		
 		public void run() {
 			
@@ -224,7 +224,10 @@ public class SoundPlayer
 				try {
 					Runnable entry = queue.poll(60, TimeUnit.SECONDS);
 					if (entry == null) {
-						running = false;
+						synchronized(runner) {
+							if(queue.isEmpty())
+								running = false;
+						}
 					} else {
 						entry.run();
 					}
@@ -233,7 +236,6 @@ public class SoundPlayer
 				}
 			}
 		}
-		
 	}
 	
 	protected static SoundPlayer instance = null;
@@ -275,11 +277,13 @@ public class SoundPlayer
 	}
 	
 	synchronized protected void playSound(Runnable entry) {
-		if (!queue.offer(entry)) {
-			System.err.println("Sound queue full, not playing sound.");
-		}
-		if(!runner.running) {
-			runner.run();
+		synchronized(runner) {
+			if (!queue.offer(entry)) {
+				System.err.println("Sound queue full, not playing sound.");
+			}
+			if(!runner.running) {
+				runner.run();
+			}
 		}
 	}
 	
