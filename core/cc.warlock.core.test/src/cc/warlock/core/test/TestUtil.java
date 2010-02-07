@@ -55,7 +55,7 @@ public class TestUtil {
 		{
 			Map<String,String> loginProperties = autoLogin(profile, null);
 		
-			StormFrontClient client = new StormFrontClient();
+			StormFrontClient client = new StormFrontClient("TS");
 			
 			int port = Integer.parseInt(loginProperties.get(SGEConnection.PROPERTY_GAMEPORT));
 			
