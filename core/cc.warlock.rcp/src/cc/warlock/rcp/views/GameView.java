@@ -223,8 +223,7 @@ public abstract class GameView extends WarlockView implements IWarlockClientView
 	}
 	
 	public void playSound(InputStream soundStream) {
-		SoundPlayer sp = SoundPlayer.getInstance();
-		sp.play(soundStream);
+		SoundPlayer.play(soundStream);
 	}
 	
 	protected Image createCaretImage (int width, Color foreground)

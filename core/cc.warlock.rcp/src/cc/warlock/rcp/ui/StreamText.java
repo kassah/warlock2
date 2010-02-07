@@ -81,7 +81,7 @@ public class StreamText extends WarlockText implements IStreamListener {
 				try{
 					if (style.getSound() != null && !style.getSound().equals("")){
 						//System.out.println("Playing sound " + style.getSound());
-						SoundPlayer.getInstance().play(style.getSound(), false);
+						SoundPlayer.play(style.getSound());
 						//InputStream soundStream = new FileInputStream(style.getSound());
 						//RCPUtil.playSound(soundStream);
 					}
