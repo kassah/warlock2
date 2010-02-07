@@ -235,6 +235,8 @@ public class SoundPlayer
 					running = false;
 				}
 			}
+			/* We're done running, dereference the SoundPlayer class so it can be garbage collected. */
+			instance = null;
 		}
 	}
 	
