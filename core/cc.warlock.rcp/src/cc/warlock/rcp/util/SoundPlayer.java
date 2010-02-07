@@ -213,36 +213,31 @@ public class SoundPlayer
 	}
 	
 	class QueueRunner extends Thread {
-		public boolean running = false;
-		
 		public void run() {
 			
 			setName("SoundPlayer: QueueRunner");
-			running = true;
 			
-			while (running) {
+			while (runner != null) {
 				try {
 					Runnable entry = queue.poll(60, TimeUnit.SECONDS);
 					if (entry == null) {
-						synchronized(runner) {
+						synchronized(SoundPlayer.this) {
 							if(queue.isEmpty())
-								running = false;
+								runner = null;
 						}
 					} else {
 						entry.run();
 					}
 				} catch (InterruptedException e) {
-					running = false;
+					runner = null;
 				}
 			}
-			/* We're done running, dereference the SoundPlayer class so it can be garbage collected. */
-			instance = null;
 		}
 	}
 	
 	protected static SoundPlayer instance = null;
 	private BlockingQueue<Runnable> queue = new ArrayBlockingQueue<Runnable>(20);;
-	private QueueRunner runner = new QueueRunner();
+	private QueueRunner runner;
 	
 	synchronized private static SoundPlayer getInstance(){
 		if (instance == null) {
@@ -272,12 +267,13 @@ public class SoundPlayer
 		getInstance().playFile(strFilename);
 	}
 	
-	synchronized protected void playSound(Runnable entry) {
-		synchronized(runner) {
+	protected void playSound(Runnable entry) {
+		synchronized(this) {
 			if (!queue.offer(entry)) {
 				System.err.println("Sound queue full, not playing sound.");
 			}
-			if(!runner.running) {
+			if(runner == null) {
+				runner = new QueueRunner();
 				runner.start();
 			}
 		}
