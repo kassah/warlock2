@@ -26,6 +26,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.util.concurrent.ArrayBlockingQueue;
 import java.util.concurrent.BlockingQueue;
+import java.util.concurrent.TimeUnit;
 
 import javax.sound.sampled.AudioFormat;
 import javax.sound.sampled.AudioInputStream;
@@ -37,7 +38,20 @@ import javax.sound.sampled.SourceDataLine;
 
 public class SoundPlayer
 {
-	class PlayFile implements Runnable {
+	abstract class QueueEntry {
+		public void insert() {
+			if (!queue.offer(this)) {
+				// If we can't add the player, consume the first one off the front of the queue, and try again.
+				System.err.println("Dropping oldest non-playing sound, queue was full.");
+				queue.poll();
+				insert();
+			}
+		}
+		
+		/* Runs Entry */
+		public abstract void run();
+	}
+	class PlayFile extends QueueEntry {
 		private String strFilename;
 		
 		public void run()
@@ -89,7 +103,7 @@ public class SoundPlayer
 			stream.run();
 		}
 	}
-	class PlayStream implements Runnable {
+	class PlayStream extends QueueEntry {
 		private static final int	EXTERNAL_BUFFER_SIZE = 128000;
 		private AudioInputStream audioInputStream;
 			
@@ -212,27 +226,64 @@ public class SoundPlayer
 	class QueueRunner extends Thread {
 
 		public void run() {
-			Runnable entry;
+			QueueEntry entry;
 			Boolean running = true;
 			
 			setName("SoundPlayer: QueueRunner");
 			
 			while (running) {
 				try {
-					entry = queue.take();
-					entry.run();
+					entry = queue.poll(20,TimeUnit.SECONDS);
+					if (entry == null) {
+						QueueEntry stopper = new QueueShutdown();
+						stopper.insert();
+					} else {
+						entry.run();
+					}
 				} catch (InterruptedException e) {
 					// TODO Auto-generated catch block
+					instance = null;
+					running = false;
+				} catch (ShutdownException e) {
+					/* We've reached the end of this queue, goodnight */
 					running = false;
 				}
 				// TODO Auto-generated method stub
 			}
+			/* Shutting down consumer, this instance of SoundPlayer ceases to be useful */
 		}
 		
 	}
 	
+	class QueueShutdown extends QueueEntry {
+
+		public void run() {
+			/* Lets the queue know to shut down */
+			throw new ShutdownException();
+		}
+		
+		public void insert() {
+			instance = null;
+			/* We're just going to offer this once, it really doesn't matter if it doesn't get in there
+			 * If it fails, another one will be tried after timeout anyway.
+			 */
+			Thread.currentThread().setName("SoundPlayer: QueueRunner: Shutting Down");
+			try {
+				Thread.sleep(20000);
+			} catch (InterruptedException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
+			queue.offer(this);
+		}	
+	}
+	
+	class ShutdownException extends Error {
+		private static final long serialVersionUID = 1L;
+	}
+	
 	protected static SoundPlayer instance = null;
-	private BlockingQueue<Runnable> queue = null;
+	private BlockingQueue<QueueEntry> queue = null;
 	private QueueRunner runner = null;
 	
 	synchronized private static SoundPlayer getInstance(){
@@ -270,7 +321,7 @@ public class SoundPlayer
 	}
 	
 	private SoundPlayer() {
-		queue = new ArrayBlockingQueue<Runnable>(20);
+		queue = new ArrayBlockingQueue<QueueEntry>(20);
 		runner = new QueueRunner();
 		runner.start();
 	}
@@ -278,21 +329,12 @@ public class SoundPlayer
 	public void playInternal(String strFilename) {
 		PlayFile player = new PlayFile();
 		player.strFilename = strFilename;
-		addPlayer(player);
+		player.insert();
 	}
 	
 	public void playStream(AudioInputStream audioStream) {
 		PlayStream player = new PlayStream();
 		player.audioInputStream = audioStream;
-		addPlayer(player);
-	}
-	
-	private void addPlayer(Runnable player) {
-		if (!queue.offer(player)) {
-			// If we can't add the player, consume the first one off the front of the queue, and try again.
-			System.err.println("Dropping oldest non-playing sound, queue was full.");
-			queue.poll();
-			addPlayer(player);
-		}
+		player.insert();
 	}
 }
