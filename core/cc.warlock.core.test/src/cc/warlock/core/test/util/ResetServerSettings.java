@@ -45,7 +45,7 @@ public class ResetServerSettings {
 		if (profile != null)
 		{
 			Map<String,String> loginProperties = TestUtil.autoLogin(profile, null);
-			StormFrontClient client = new StormFrontClient();
+			StormFrontClient client = new StormFrontClient(loginProperties.get("GAMECODE"));
 			int port = Integer.parseInt(loginProperties.get(SGEConnection.PROPERTY_GAMEPORT));			
 			
 			try {
@@ -56,12 +56,13 @@ public class ResetServerSettings {
 						SettingsInfoTagHandler handler = 
 							(SettingsInfoTagHandler) connection.getProtocolHandler().getTagHandler(SettingsInfoTagHandler.class);
 						
-						handler.setNewSettings(true);
+						//handler.setNewSettings(true);
 					}
 					
 					public void clientActivated(IWarlockClient client) {}
 					public void clientDisconnected(IWarlockClient client) {}
 					public void clientRemoved(IWarlockClient client) {}
+					public void clientSettingsLoaded(IWarlockClient client) {}
 				});
 				
 				client.connect(loginProperties.get(SGEConnection.PROPERTY_GAMEHOST), port, loginProperties.get(SGEConnection.PROPERTY_KEY));

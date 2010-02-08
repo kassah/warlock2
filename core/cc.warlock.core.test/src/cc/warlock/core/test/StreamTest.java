@@ -38,7 +38,7 @@ public class StreamTest {
 
 	protected static class StreamExt extends Stream {
 		public StreamExt() { super(null,null); }
-		public static Stream createStream (String name) { return Stream.fromName(null, name); } 
+		public static Stream createStream (String name) { return new Stream(null, name); } 
 	}
 	
 	protected static class Listener implements IStreamListener {
@@ -95,6 +95,16 @@ public class StreamTest {
 			this.receivedCommand = true;
 			this.command = command.getText();
 		}
+
+		public void streamCreated(IStream stream) {
+			// TODO Auto-generated method stub
+			
+		}
+
+		public void streamTitleChanged(IStream stream, String title) {
+			// TODO Auto-generated method stub
+			
+		}
 	}
 	
 	protected static Stream stream;
@@ -124,7 +134,7 @@ public class StreamTest {
 
 	@Test
 	public void testSendString() {
-		stream.send(TEST_STRING);
+		stream.put(new WarlockString(TEST_STRING));
 		Assert.assertTrue(listener.receivedText);
 		Assert.assertEquals(listener.text.toString(), TEST_STRING);
 		Assert.assertEquals(listener.text.getStyles().size(), 0);
@@ -136,7 +146,7 @@ public class StreamTest {
 		string.addStyle(TEST_STYLE);
 		string.append(TEST_STRING);
 		
-		stream.send(string);
+		stream.put(string);
 		Assert.assertTrue(listener.receivedText);
 		Assert.assertEquals(listener.text.toString(), string.toString());
 		Assert.assertEquals(listener.text.toString(), TEST_STRING);
@@ -168,7 +178,7 @@ public class StreamTest {
 
 	@Test
 	public void testGetName() {
-		Assert.assertEquals(stream.getName().get(), STREAM_NAME);
+		Assert.assertEquals(stream.getName(), STREAM_NAME);
 	}
 	
 	@Test
