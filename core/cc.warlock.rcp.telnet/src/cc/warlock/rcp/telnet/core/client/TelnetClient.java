@@ -24,13 +24,17 @@ package cc.warlock.rcp.telnet.core.client;
 import java.io.IOException;
 
 import cc.warlock.core.client.IProperty;
+import cc.warlock.core.client.IStream;
 import cc.warlock.core.client.IWarlockSkin;
 import cc.warlock.core.client.IWarlockStyle;
 import cc.warlock.core.client.WarlockClientRegistry;
 import cc.warlock.core.client.WarlockColor;
+import cc.warlock.core.client.WarlockString;
+import cc.warlock.core.client.IWarlockStyle.StyleType;
 import cc.warlock.core.client.internal.Property;
 import cc.warlock.core.client.internal.WarlockClient;
 import cc.warlock.core.client.internal.WarlockStyle;
+import cc.warlock.core.client.settings.IClientSettings;
 import cc.warlock.core.network.Connection;
 import cc.warlock.core.network.IConnection;
 import cc.warlock.core.network.IConnectionListener;
@@ -52,8 +56,8 @@ public class TelnetClient extends WarlockClient {
 	{
 		super();
 		
-		characterName = new Property<String>("characterName", "<telnet>");
-		clientId = new Property<String>("clientId", null);
+		characterName = new Property<String>("<telnet>");
+		clientId = new Property<String>(null);
 		skin = new DefaultSkin();
 		commandStyle = new WarlockStyle();
 		commandStyle.setBackgroundColor(new WarlockColor("#000033"));
@@ -77,12 +81,10 @@ public class TelnetClient extends WarlockClient {
 					ErrorType errorType) {
 			}
 			public void dataReady(IConnection connection, char[] data, int start, int length) {
-				
-//				WarlockString string = new WarlockString();
-//				string.append(new String(data, start, length));
-//				string.addStyle(0, string.length(), new WarlockStyle(new StyleType[] { StyleType.MONOSPACE }));
-				
-				getDefaultStream().send(new String(data, start, length));
+				// Push the raw input into the Stream
+				WarlockString string = new WarlockString(new String(data, start, length));
+				string.addStyle(new WarlockStyle(new StyleType[] { StyleType.MONOSPACE }));
+				getDefaultStream().put(string);
 			}
 			public void disconnected(IConnection connection) {
 				WarlockClientRegistry.clientDisconnected(TelnetClient.this);
@@ -104,8 +106,8 @@ public class TelnetClient extends WarlockClient {
 	/* (non-Javadoc)
 	 * @see cc.warlock.core.client.IWarlockClient#getClientId()
 	 */
-	public IProperty<String> getClientId() {
-		return clientId;
+	public String getClientId() {
+		return clientId.toString();
 	}
 
 	/* (non-Javadoc)
@@ -120,6 +122,18 @@ public class TelnetClient extends WarlockClient {
 	 */
 	public IWarlockSkin getSkin() {
 		return skin;
+	}
+
+	@Override
+	public IStream createStream(String streamName) {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	@Override
+	public IClientSettings getClientSettings() {
+		// TODO Auto-generated method stub
+		return null;
 	}
 
 }

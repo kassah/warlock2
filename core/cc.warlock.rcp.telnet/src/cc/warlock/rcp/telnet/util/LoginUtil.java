@@ -34,7 +34,6 @@ import cc.warlock.core.client.WarlockString;
 import cc.warlock.core.client.internal.WarlockStyle;
 import cc.warlock.core.network.IConnection.ErrorType;
 import cc.warlock.rcp.application.WarlockPerspectiveFactory;
-import cc.warlock.rcp.plugin.Warlock2Plugin;
 import cc.warlock.rcp.telnet.core.client.TelnetClientFactory;
 import cc.warlock.rcp.telnet.ui.views.TelnetGameView;
 import cc.warlock.rcp.util.RCPUtil;
@@ -51,14 +50,13 @@ public class LoginUtil {
 		String server = gameHost;
 		int port = Integer.parseInt (gamePort);
 
-		IWarlockClient client = Warlock2Plugin.getDefault().getCurrentClient();
-//		
+		IWarlockClient client = TelnetClientFactory.createTelnetClient(); //Warlock2Plugin.getDefault().getCurrentClient();
 		gameView.setClient(client);
 		
 		try {
+			System.out.println("Connecting!");
 			client.connect(server, port, null);
 			gameView.setFocus();
-			
 		} catch (IOException e) {
 			String errorConnectMessage =
 			"******************************************************************\n" +
@@ -69,7 +67,7 @@ public class LoginUtil {
 			IWarlockStyle style = new WarlockStyle();
 			style.addStyleType(IWarlockStyle.StyleType.MONOSPACE);
 			
-			client.getDefaultStream().send(new WarlockString(errorConnectMessage, style));
+			client.getDefaultStream().put(new WarlockString(errorConnectMessage, style));
 		}
 	}
 	
@@ -81,10 +79,17 @@ public class LoginUtil {
 			RCPUtil.openPerspective(WarlockPerspectiveFactory.WARLOCK_PERSPECTIVE_ID);
 		}
 		
-		GameView firstEmptyView = null;
+		TelnetGameView firstEmptyView = null;
 		for (GameView view : GameView.getOpenGameViews()) {
-			if (view.getWarlockClient().getConnection() == null || !view.getWarlockClient().getConnection().isConnected()) {
-				firstEmptyView = view; break;
+			if (!(view instanceof TelnetGameView))
+				continue;
+
+			if (view.getWarlockClient() == null
+					|| view.getWarlockClient().getConnection() == null
+					|| !view.getWarlockClient().getConnection().isConnected()) {
+				firstEmptyView = (TelnetGameView) view;
+				System.out.println("Found inactive TelnetGameView");
+				break;
 			}
 		}
 		
@@ -97,61 +102,9 @@ public class LoginUtil {
 		}
 		else 
 		{
-			Warlock2Plugin.getDefault().addNextClient(TelnetClientFactory.createTelnetClient());
-			connect(GameView.createNext(TelnetGameView.VIEW_ID, characterName), gameHost, gamePort);
+			connect((TelnetGameView) TelnetGameView.createNext(TelnetGameView.VIEW_ID, characterName), gameHost, gamePort);
 		}
 	}
-	
-	/*
-	public static void showAuthenticationError (int status)
-	{
-		String message = "Warlock was unable to log your account in due to the following error: ";
-		message += getAuthenticationError(status);
-		
-		String title = "Login Error: ";
-		
-		switch (status)
-		{
-			case SGEConnection.ACCOUNT_REJECTED:
-			{
-				title += "Account Rejected";
-			} break;
-			case SGEConnection.INVALID_ACCOUNT:
-			{
-				title += "Invalid Account";
-			} break;
-			case SGEConnection.INVALID_PASSWORD:
-			{
-				title += "Wrong Password";
-			} break;
-			case SGEConnection.ACCOUNT_EXPIRED:
-			{
-				title += "Account Expired";
-			} break;
-		}
-		
-		if (title != null && message != null)
-			MessageDialog.openError(Display.getDefault().getActiveShell(), title, message);
-	}
-	
-	
-	public static String getAuthenticationError (int status)
-	{
-		switch (status)
-		{
-			case SGEConnection.ACCOUNT_REJECTED:
-				return "The account was rejected by the server.";
-			case SGEConnection.INVALID_ACCOUNT:
-				return "The account was not recognized by the server.";
-			case SGEConnection.INVALID_PASSWORD:
-				return "The password you entered was incorrect.";
-			case SGEConnection.ACCOUNT_EXPIRED:
-				return "This account or subscription has expired.";
-		}
-		
-		return null;
-	}
-	*/
 	
 	public static void showConnectionError (ErrorType errorType)
 	{

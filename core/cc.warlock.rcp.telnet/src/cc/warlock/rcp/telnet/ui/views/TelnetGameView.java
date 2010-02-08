@@ -17,8 +17,8 @@ public class TelnetGameView extends GameView {
 		super();
 		
 		wrapper = new SWTWarlockClientViewer(this);
-		setBufferOnPrompt(false);
-		setAppendNewlines(false);
+		//setBufferOnPrompt(false);
+		//setAppendNewlines(false);
 	}
 	
 	@Override
@@ -45,5 +45,41 @@ public class TelnetGameView extends GameView {
 			return telnetClient;
 		}
 		return super.getAdapter(adapter);
+	}
+
+	@Override
+	protected void setViewTitle(String title) {
+		// TODO Auto-generated method stub
+		
+	}
+
+	@Override
+	public void clientActivated(IWarlockClient client) {
+		// TODO Auto-generated method stub
+		
+	}
+
+	@Override
+	public void clientConnected(IWarlockClient client) {
+		// TODO Auto-generated method stub
+		
+	}
+
+	@Override
+	public void clientDisconnected(IWarlockClient client) {
+		// TODO Auto-generated method stub
+		
+	}
+
+	@Override
+	public void clientRemoved(IWarlockClient client) {
+		// TODO Auto-generated method stub
+		
+	}
+
+	@Override
+	public void clientSettingsLoaded(IWarlockClient client) {
+		// TODO Auto-generated method stub
+		
 	}
 }
