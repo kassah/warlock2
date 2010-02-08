@@ -89,6 +89,7 @@ public class ScriptControlView extends ViewPart implements IScriptListener {
 				public void clientConnected(IWarlockClient client) {}
 				public void clientDisconnected(IWarlockClient client) {}
 				public void clientRemoved(IWarlockClient client) {}
+				public void clientSettingsLoaded(IWarlockClient client) {}
 			}));
 		}
 	}
