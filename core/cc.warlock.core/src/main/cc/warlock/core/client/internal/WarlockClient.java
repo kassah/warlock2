@@ -103,15 +103,11 @@ public abstract class WarlockClient implements IWarlockClient {
 	public abstract void connect(String server, int port, String key) throws IOException;
 	
 	public void send(ICommand command) {
-		if(connection == null) {
-			// Not yet connected to server
-			return;
-		}
-		
 		getDefaultStream().sendCommand(command);
 		
 		try {
-			connection.send(command.getCommand());
+			if(connection != null)
+				connection.send(command.getCommand());
 		} catch(IOException e) {
 			e.printStackTrace();
 		}
