@@ -40,6 +40,7 @@ import org.antlr.runtime.CharStream;
 import org.antlr.runtime.CommonTokenStream;
 import org.antlr.runtime.RecognitionException;
 
+import cc.warlock.core.client.IStream;
 import cc.warlock.core.client.internal.WarlockStyle;
 import cc.warlock.core.client.settings.IVariable;
 import cc.warlock.core.client.settings.internal.ClientSettings;
@@ -104,6 +105,7 @@ public class WSLScript extends AbstractScript {
 		addCommandDefinition("else", new WSLElse());
 		addCommandDefinition("exit", new WSLExit());
 		addCommandDefinition("getvital", new WSLGetVital());
+		addCommandDefinition("gettitle", new WSLGetTitle());
 		addCommandDefinition("gosub", new WSLGosub());
 		addCommandDefinition("goto", new WSLGoto());
 		for(int i = 0; i <= 9; i++) {
@@ -1109,6 +1111,28 @@ public class WSLScript extends AbstractScript {
 		}
 	}
 	
+	private class WSLGetTitle implements IWSLCommandDefinition {
+		
+		private Pattern format = Pattern.compile("^(\\w+)\\s+(\\w+)");
+		
+		public void execute(String arguments) {
+			Matcher m = format.matcher(arguments);
+			
+			if(m.find()) {
+				String streamName = m.group(1);
+				String var = m.group(2);
+				
+				IStream stream = sfClient.getStream(streamName);
+				if(stream == null)
+					scriptWarning("Stream \"" + streamName + "\" does not exist.");
+				else
+					setGlobalVariable(var, stream.getTitle());
+			} else {
+				scriptError("Invalid arguments to random");
+			}
+		}
+	}
+
 	private class WSLRandom implements IWSLCommandDefinition {
 		
 		private Pattern format = Pattern.compile("^(\\d+)\\s+(\\d+)");
