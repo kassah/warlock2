@@ -43,7 +43,7 @@ public interface IScriptCommands extends IRoomListener {
 	public void waitNextRoom () throws InterruptedException;
 	
 	public BlockingQueue<String> createLineQueue();
-	public void removeLineQueue(BlockingQueue<String> queue);
+	public boolean removeLineQueue(BlockingQueue<String> queue);
 	
 	public IMatch matchWait (Collection<IMatch> matches, BlockingQueue<String> matchQueue, double timeout) throws InterruptedException;
 	

@@ -21,18 +21,14 @@
  */
 package cc.warlock.core.stormfront.script.wsl;
 
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.Reader;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
-import java.util.Map;
-import java.util.Random;
 import java.util.Stack;
 import java.util.concurrent.BlockingQueue;
+import java.util.concurrent.TimeUnit;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -40,8 +36,6 @@ import org.antlr.runtime.CharStream;
 import org.antlr.runtime.CommonTokenStream;
 import org.antlr.runtime.RecognitionException;
 
-import cc.warlock.core.client.IStream;
-import cc.warlock.core.client.internal.WarlockStyle;
 import cc.warlock.core.client.settings.IVariable;
 import cc.warlock.core.client.settings.internal.ClientSettings;
 import cc.warlock.core.script.AbstractScript;
@@ -51,7 +45,6 @@ import cc.warlock.core.script.IScriptEngine;
 import cc.warlock.core.script.IScriptInfo;
 import cc.warlock.core.script.configuration.ScriptConfiguration;
 import cc.warlock.core.script.internal.RegexMatch;
-import cc.warlock.core.script.internal.TextMatch;
 import cc.warlock.core.stormfront.client.IStormFrontClient;
 import cc.warlock.core.stormfront.script.IStormFrontScriptCommands;
 import cc.warlock.core.stormfront.script.internal.StormFrontScriptCommands;
@@ -68,21 +61,19 @@ public class WSLScript extends AbstractScript {
 	private HashMap<String, IWSLValue> specialVariables = new HashMap<String, IWSLValue>();
 	private HashMap<String, IWSLValue> localVariables = new HashMap<String, IWSLValue>();
 	private Stack<WSLFrame> callstack = new Stack<WSLFrame>();
-	private HashMap<String, IWSLCommandDefinition> wslCommands = new HashMap<String, IWSLCommandDefinition>();
+	
 	private Thread scriptThread;
 	private Pattern commandPattern = Pattern.compile("^([\\w]+)(\\s+(.*))?");
+	private static final String argSeparator = "\\s+";
 
 	private boolean lastCondition = false;
 	private ArrayList<WSLAbstractCommand> commands = new ArrayList<WSLAbstractCommand>();
-	private ArrayList<IMatch> matches = new ArrayList<IMatch>();
-	private HashMap<IMatch, Runnable> matchData = new HashMap<IMatch, Runnable>();
+	private ArrayList<WSLMatch> matches = new ArrayList<WSLMatch>();
 	private BlockingQueue<String> matchQueue;
 	
 	protected WSLEngine engine;
 	protected IStormFrontScriptCommands scriptCommands;
 	protected IStormFrontClient sfClient;
-	
-	private static final String argSeparator = "\\s+";
 	
 	public WSLScript (WSLEngine engine, IScriptInfo info, IStormFrontClient client)
 	{
@@ -93,51 +84,6 @@ public class WSLScript extends AbstractScript {
 		this.debugging = !ScriptConfiguration.instance().getSupressExceptions().get();
 		
 		scriptCommands = new StormFrontScriptCommands(client, this);
-		
-		// add command handlers
-		addCommandDefinition("counter", new WSLCounter());
-		addCommandDefinition("deletevariable", new WSLDeleteVariable());
-		addCommandDefinition("deletelocalvariable", new WSLDeleteLocalVariable());
-		addCommandDefinition("debug", new WSLDebug());
-		addCommandDefinition("debuglevel", new WSLDebugLevel());
-		addCommandDefinition("delay", new WSLDelay());
-		addCommandDefinition("echo", new WSLEcho());
-		addCommandDefinition("else", new WSLElse());
-		addCommandDefinition("exit", new WSLExit());
-		addCommandDefinition("getvital", new WSLGetVital());
-		addCommandDefinition("gettitle", new WSLGetTitle());
-		addCommandDefinition("gosub", new WSLGosub());
-		addCommandDefinition("goto", new WSLGoto());
-		for(int i = 0; i <= 9; i++) {
-			addCommandDefinition("if_" + i, new WSLIf_(String.valueOf(i)));
-		}
-		addCommandDefinition("match", new WSLMatch());
-		addCommandDefinition("matchre", new WSLMatchRe());
-		addCommandDefinition("matchwait", new WSLMatchWait());
-		addCommandDefinition("math", new WSLMath());
-		addCommandDefinition("move", new WSLMove());
-		addCommandDefinition("nextroom", new WSLNextRoom());
-		addCommandDefinition("pause", new WSLPause());
-		addCommandDefinition("put", new WSLPut());
-		addCommandDefinition("playsound", new WSLPlaySound());
-		addCommandDefinition("random", new WSLRandom());
-		addCommandDefinition("return", new WSLReturn());
-		addCommandDefinition("run", new WSLRun());
-		addCommandDefinition("save", new WSLSave());
-		addCommandDefinition("setlocalvariable", new WSLSetLocalVariable());
-		addCommandDefinition("setvariable", new WSLSetVariable());
-		addCommandDefinition("shift", new WSLShift());
-		addCommandDefinition("timer", new WSLTimer());
-		addCommandDefinition("wait", new WSLWait());
-		addCommandDefinition("waitfor", new WSLWaitFor());
-		addCommandDefinition("waitforre", new WSLWaitForRe());
-		
-		for (IWSLCommandDefinitionProvider provider : engine.getCommandProviders())
-		{
-			for (Map.Entry<String, IWSLCommandDefinition> entry : provider.getCommands().entrySet()) {
-				addCommandDefinition(entry.getKey(), entry.getValue());
-			}
-		}
 		
 		setSpecialVariable("rt", new WSLRoundTime());
 		setSpecialVariable("monstercount", new WSLMonsterCount());
@@ -232,7 +178,7 @@ public class WSLScript extends AbstractScript {
 	
 	private class WSLRoomTitle extends WSLAbstractString {
 		public String toString() {
-			return sfClient.getStream("room").getTitle();
+			return sfClient.getStream("room").getFullTitle();
 		}
 	}
 	
@@ -380,18 +326,14 @@ public class WSLScript extends AbstractScript {
 		String arguments = m.group(3);
 		if(arguments == null) arguments = "";
 		
-		IWSLCommandDefinition command = wslCommands.get(commandName);
+		IWSLCommandDefinition command = WSLScriptCommands.getCommand(commandName);
 		if(command != null) {
 			scriptDebug(2, "Debug: " + line);
-			command.execute(arguments);
+			command.execute(this, arguments);
 		} else {
 			//TODO output the line number here
 			scriptCommands.echo("Invalid command \"" + line + "\"");
 		}
-	}
-	
-	private void addCommandDefinition (String name, IWSLCommandDefinition command) {
-		wslCommands.put(name, command);
 	}
 	
 	protected void scriptError(String message) {
@@ -399,7 +341,7 @@ public class WSLScript extends AbstractScript {
 		stop();
 	}
 	
-	private void scriptWarning(String message) {
+	protected void scriptWarning(String message) {
 		echo("Script warning on line " + curCommand.getLineNumber() + " (" + curLine + "): " + message);
 	}
 	
@@ -410,154 +352,31 @@ public class WSLScript extends AbstractScript {
 		}
 	}
 	
-	private class ScriptTimer extends WSLAbstractNumber {
-		private long timerStart = -1L;
-		private long timePast = 0L;
-		
-		public double toDouble() {
-			if(timerStart < 0) return timePast / 1000;
-			return (System.currentTimeMillis() - timerStart) / 1000;
-		}
-		
-		public void start() {
-			if(timerStart < 0)
-				timerStart = System.currentTimeMillis() - timePast;
-		}
-		
-		public void stop() {
-			if(timerStart >= 0) {
-				timePast = timerStart - System.currentTimeMillis();
-				timerStart = -1L;
-			}
-		}
-		
-		public void clear() {
-			timerStart = -1L;
-			timePast = 0L;
-		}
-	}
 	
-	protected class WSLSave implements IWSLCommandDefinition {
-		
-		public void execute(String arguments) {
-			setSpecialVariable("s", arguments);
-		}
-	}
-
-	protected class WSLDebug implements IWSLCommandDefinition {
-		public void execute(String arguments) {
-			if (arguments == null || arguments.length() == 0)
-			{
-				debugging = true;
-			}
-			else {
-				String onoff = arguments.split(argSeparator)[0];
-				
-				debugging = (onoff.equalsIgnoreCase("on") || onoff.equalsIgnoreCase("true") || onoff.equalsIgnoreCase("yes"));
-			}
-		}
-	}
-	
-	protected class WSLDebugLevel implements IWSLCommandDefinition {
-		private Pattern format = Pattern.compile("^(\\d+)$");
-		
-		public void execute(String arguments) {
-			Matcher m = format.matcher(arguments);
-			if (m.find()) {
-				debugLevel = Integer.parseInt(m.group(1));
-			}
-		}
-	}
-	
-	protected class WSLDelay implements IWSLCommandDefinition {
-		
-		public void execute(String arguments) {
-			try {
-				delay = Double.parseDouble(arguments);
-			} catch(NumberFormatException e) {
-				scriptWarning("Invalid arguments to delay");
-			}
-		}
-	}
-	
-	protected class WSLShift implements IWSLCommandDefinition {
-		
-		public void execute (String arguments) {
-			boolean local = arguments.equalsIgnoreCase("local");
-			
-			StringBuffer allArgs = new StringBuffer();
-			for (int i = 1; ; i++) {
-				String nextVar = Integer.toString(i + 1);
-				boolean exists = local ? localVariableExists(nextVar) : variableExists(nextVar);
-				if (!exists)
-				{
-					if (local) {
-						setLocalVariable("0", allArgs.toString());
-						deleteLocalVariable(Integer.toString(i));
-					} else {
-						setSpecialVariable("0", allArgs.toString());
-						setSpecialVariable(Integer.toString(i), "");
-					}
-					break;
-				}
-				else
-				{
-					String arg = local ? getLocalVariable(nextVar).toString() : getVariable(nextVar).toString();
-					if (arg == null)
-						scriptError("String error in arguments.");
-					if(allArgs.length() > 0)
-						allArgs.append(" ");
-					allArgs.append(arg);
-					if (local) {
-						setLocalVariable(Integer.toString(i), arg);
-					} else {
-						setSpecialVariable(Integer.toString(i), arg);
-					}
-				}
-			}
-		}
-	}
-
-	protected class WSLDeleteVariable implements IWSLCommandDefinition {
-		
-		public void execute (String arguments) {
-			String name = arguments.split(argSeparator)[0];
-			deleteVariable(name);
-		}
-	}
-	
-	protected class WSLDeleteLocalVariable implements IWSLCommandDefinition {
-		
-		public void execute (String arguments) {
-			String name = arguments.split(argSeparator)[0];
-			deleteLocalVariable(name);
-		}
-	}
-
-	private void setGlobalVariable(String name, IWSLValue value) {
+	protected void setGlobalVariable(String name, IWSLValue value) {
 		setGlobalVariable(name, value.toString());
 	}
 	
-	private void setGlobalVariable(String name, String value) {
+	protected void setGlobalVariable(String name, String value) {
 		if(specialVariables.containsValue(name))
 			scriptError("Cannot overwrite special variable \"" + name + "\"");
 		((ClientSettings)sfClient.getClientSettings()).getVariableConfigurationProvider().addVariable(name, value);
 	}
 	
-	private void setSpecialVariable(String name, String value) {
+	protected void setSpecialVariable(String name, String value) {
 		setSpecialVariable(name, new WSLString(value));
 	}
 	
-	private void setSpecialVariable(String name, IWSLValue value) {
+	protected void setSpecialVariable(String name, IWSLValue value) {
 		deleteVariable(name);
 		specialVariables.put(name, value);
 	}
 	
-	private void deleteVariable(String name) {
+	protected void deleteVariable(String name) {
 		((ClientSettings)sfClient.getClientSettings()).getVariableConfigurationProvider().removeVariable(name);
 	}
 	
-	private void deleteLocalVariable(String name) {
+	protected void deleteLocalVariable(String name) {
 		localVariables.remove(name);
 	}
 	
@@ -569,45 +388,57 @@ public class WSLScript extends AbstractScript {
 		localVariables.put(name, value);
 	}
 	
-	protected class WSLSetVariable implements IWSLCommandDefinition {
-		
-		private Pattern format = Pattern.compile("^([^\\s]+)(\\s+(.+)?)?$");
-		
-		public void execute (String arguments) {
-			Matcher m = format.matcher(arguments);
-			if (m.find())
-			{
-				String name = m.group(1);
-				String value = m.group(3);
-				if(value == null)
-					value = " ";
-				
-				scriptDebug(1, "setVariable: " + name + "=" + value);
-				setGlobalVariable(name, value);
-			} else {
-				scriptWarning("Invalid arguments to setvariable");
-			}
-		}
+	protected void setDebug(boolean onoff) {
+		this.debugging = onoff;
 	}
 	
-	protected class WSLSetLocalVariable implements IWSLCommandDefinition {
+	protected void setDebugLevel(int level) {
+		this.debugLevel = level;
+	}
+	
+	protected void setDelay(double delay) {
+		this.delay = delay;
+	}
+	
+	protected void matchWait(double timeout) throws InterruptedException {
+		/*
+		 * Remove matchQueue before going into the wait rather than
+		 * after coming out so we don't end up trashing another's queue
+		 * as we come out.
+		 */
+		BlockingQueue<String> myQueue = matchQueue;
+		matchQueue = null;
 		
-		private Pattern format = Pattern.compile("^([^\\s]+)(\\s+(.+)?)?$");
-		
-		public void execute (String arguments) {
-			Matcher m = format.matcher(arguments);
-			if (m.find())
-			{
-				String name = m.group(1);
-				String value = m.group(3);
-				if(value == null)
-					value = " ";
-				
-				scriptDebug(1, "setLocalVariable: " + name + "=" + value);
-				setLocalVariable(name, value);
-			} else {
-				scriptError("Invalid arguments to setLocalVariable");
+		try {
+			boolean haveTimeout = timeout > 0.0;
+			long timeoutEnd = 0L;
+			if(haveTimeout)
+				timeoutEnd = System.currentTimeMillis() + (long)(timeout * 1000.0);
+			
+			// run until we get a match or are told to stop
+			while(true) {
+				String text = null;
+				// wait for some text
+				if(haveTimeout) {
+					long now = System.currentTimeMillis();
+					if(timeoutEnd >= now)
+						text = myQueue.poll(timeoutEnd - now, TimeUnit.MILLISECONDS);
+					if(text == null)
+						return;
+				} else {
+					text = myQueue.take();
+				}
+				// try all of our matches
+				for(WSLMatch match : matches) {
+					if(match.getMatch().matches(text)) {
+						match.run();
+						return;
+					}
+				}
 			}
+		} finally {
+			matches.clear();
+			scriptCommands.removeLineQueue(myQueue);
 		}
 	}
 	
@@ -652,55 +483,27 @@ public class WSLScript extends AbstractScript {
 		}
 	}
 	
-	protected class WSLGoto implements IWSLCommandDefinition {
-		
-		public void execute (String arguments) {
-			if(arguments.length() > 0) {
-				String[] args = arguments.split(argSeparator);
-				String label = args[0];
-				gotoLabel(label);
-			} else {
-				scriptError("Invalid arguments to goto");
-			}
-		}
-	}
-	
 	protected void gosub (String label, String arguments)
 	{
 		String[] args = arguments.split(argSeparator);
-		
+
 		WSLFrame frame = new WSLFrame(nextLine, localVariables);
 		callstack.push(frame);
-		
+
 		// TODO perhaps abstract this
 		localVariables = (HashMap<String, IWSLValue>)localVariables.clone();
 		setLocalVariable("0", arguments);
 		for(int i = 0; i < args.length; i++) {
 			setLocalVariable(String.valueOf(i + 1), args[i]);
 		}
-		
+
 		Integer command = labels.get(label.toLowerCase());
-		
+
 		if (command != null)
 		{
 			gotoCommand(command);
 		} else {
 			scriptError("Invalid gosub statement, label \"" + label + "\" does not exist");
-		}
-	}
-	
-	protected class WSLGosub implements IWSLCommandDefinition {
-		
-		private Pattern format = Pattern.compile("^([^\\s]+)\\s*(.*)?$");
-		
-		public void execute (String arguments) {
-			Matcher m = format.matcher(arguments);
-			
-			if (m.find()) {
-				gosub(m.group(1), m.group(2));
-			} else {
-				scriptError("Invalid arguments to gosub");
-			}
 		}
 	}
 	
@@ -713,53 +516,40 @@ public class WSLScript extends AbstractScript {
 		}
 	}
 	
-	protected class WSLReturn implements IWSLCommandDefinition {
+	protected void addMatch(String label, IMatch match) {
+		if(matchQueue == null)
+			matchQueue = scriptCommands.createLineQueue();
 		
-		public void execute (String arguments) {
-			gosubReturn();
-		}
+		matches.add(new WSLTextMatch(label, match));
 	}
 	
-	protected class WSLMatchWait implements IWSLCommandDefinition {
+	protected void addMatchRe(String label, RegexMatch match) {
+		if(matchQueue == null)
+			matchQueue = scriptCommands.createLineQueue();
+	
+		matches.add(new WSLRegexMatch(label, match));
+	}
+	
+	private abstract class WSLMatch {
+		private IMatch match;
 		
-		public void execute (String arguments) throws InterruptedException {
-			double time;
-			
-			if(arguments.length() > 0) {
-				String[] args = arguments.split(argSeparator);
-			
-				try {
-					time = Double.parseDouble(args[0]);
-				} catch(NumberFormatException e) {
-					scriptError("Non-numeral \"" + args[0] + "\" passed to matchwait");
-					return;
-				}
-			} else {
-				time = 0;
-			}
-			
-			try {
-				// Remove matchQueue before going into the wait so we don't end up trashing another wait's queue.
-				BlockingQueue<String> myQueue = matchQueue;
-				matchQueue = null;
-				IMatch match = scriptCommands.matchWait(matches, myQueue, time);
-
-				if (match != null)
-				{
-					matchData.get(match).run();
-				}
-			} finally {
-				matches.clear();
-				matchData.clear();
-			}
+		public WSLMatch(IMatch match) {
+			this.match = match;
 		}
+		
+		public IMatch getMatch() {
+			return match;
+		}
+		
+		public abstract void run();
 	}
 
-	private class WSLTextMatchData implements Runnable {
+	private class WSLTextMatch extends WSLMatch {
 		
 		private String label;
 		
-		public WSLTextMatchData(String label) {
+		public WSLTextMatch(String label, IMatch match) {
+			super(match);
 			this.label = label;
 		}
 		
@@ -768,12 +558,13 @@ public class WSLScript extends AbstractScript {
 		}
 	}
 	
-	private class WSLRegexMatchData implements Runnable {
+	private class WSLRegexMatch extends WSLMatch {
 		
 		private String label;
 		private RegexMatch match;
 		
-		public WSLRegexMatchData(String label, RegexMatch match) {
+		public WSLRegexMatch(String label, RegexMatch match) {
+			super(match);
 			this.label = label;
 			this.match = match;
 		}
@@ -784,32 +575,7 @@ public class WSLScript extends AbstractScript {
 		}
 	}
 	
-	protected class WSLMatchRe implements IWSLCommandDefinition {
-		
-		private Pattern format = Pattern.compile("^([^\\s]+)\\s+/(.*)/(\\w*)");
-		
-		public void execute (String arguments) {
-			Matcher m = format.matcher(arguments);
-			
-			if (m.find())
-			{
-				String regex = m.group(2);
-				boolean caseInsensitive = m.group(3).contains("i");
-				RegexMatch match = new RegexMatch(regex, caseInsensitive);
-				
-				matches.add(match);
-				matchData.put(match, new WSLRegexMatchData(m.group(1), match));
-				if(matchQueue == null) {
-					matchQueue = scriptCommands.createLineQueue();
-				}
-			} else {
-				scriptError("Invalid arguments to matchre");
-			}
-		}
-
-	}
-	
-	public void setVariablesFromMatch(RegexMatch match) {
+	protected void setVariablesFromMatch(RegexMatch match) {
 		int i = 0;
 		for(String var : match.groups()) {
 			setLocalVariable(String.valueOf(i), var);
@@ -817,425 +583,12 @@ public class WSLScript extends AbstractScript {
 		}
 	}
 
-	protected class WSLMatch implements IWSLCommandDefinition {
-		
-		private Pattern format = Pattern.compile("^([^\\s]+)\\s+(.*)$");
-		
-		public void execute (String arguments) {
-			Matcher m = format.matcher(arguments);
-			
-			if (m.find())
-			{
-				IMatch match = new TextMatch(m.group(2));
-				matches.add(match);
-				matchData.put(match, new WSLTextMatchData(m.group(1)));
-				if(matchQueue == null) {
-					matchQueue = scriptCommands.createLineQueue();
-				}
-			} else {
-				scriptError("Invalid arguments to match");
-			}
-		}
-	}
-	
-	protected class WSLCounter implements IWSLCommandDefinition {
-		
-		public void execute (String arguments) {
-			if (arguments.length() == 0) {
-				scriptError("You must provide an argument to counter");
-				return;
-			}
-			
-			doMath("c", arguments);
-			
-		}
-	}
-	
-	protected class WSLMath implements IWSLCommandDefinition {
-
-		public void execute (String arguments) {
-			String[] args = arguments.split(argSeparator, 2);
-			if (args.length < 2) {
-				scriptError("Not enough arguments to math");
-				return;
-			}
-
-			doMath(args[0], args[1]);
-
-		}
-	}
-	
-	private void doMath(String targetVar, String arguments) {
-		String[] args = arguments.split(argSeparator);
-		if (args.length < 1) {
-			scriptError("No operator for math");
-			return;
-		}
-
-		String operator = args[0].trim().toLowerCase();
-		
-		double operand;
-		if (args.length > 1) {
-			try {
-				operand = Double.parseDouble(args[1].trim());
-			} catch (NumberFormatException e) {
-				scriptError("Operand must be a number");
-				return;
-			}
-		} else
-				operand = 1;
-
-		if ("set".equalsIgnoreCase(operator))
-		{
-			setGlobalVariable(targetVar, new WSLNumber(operand));
-			return;
-		}
-		
-		double value;
-		if(variableExists(targetVar)) {
-			try {
-				value = getVariable(targetVar).toDouble();
-			} catch(NumberFormatException e) {
-				scriptError("The variable \"" + targetVar + "\" must be a number to do math with it");
-				return;
-			}
-		} else
-				value = 0;
-
-
-		if ("add".equalsIgnoreCase(operator))
-		{	
-			double newValue = value + operand;
-			setGlobalVariable(targetVar, new WSLNumber(newValue));
-		}
-		else if ("subtract".equalsIgnoreCase(operator))
-		{
-			double newValue = value - operand;
-			setGlobalVariable(targetVar, new WSLNumber(newValue));
-		}
-		else if ("multiply".equalsIgnoreCase(operator))
-		{
-			double newValue = value * operand;
-			setGlobalVariable(targetVar, new WSLNumber(newValue));
-		}
-		else if ("divide".equalsIgnoreCase(operator))
-		{
-			if (operand == 0) {
-				scriptError("Cannot divide by zero");
-				return;
-			}
-			double newValue = value / operand;
-			setGlobalVariable(targetVar, new WSLNumber(newValue));
-		}
-		else if ("modulus".equalsIgnoreCase(operator))
-		{
-			double newValue = value % operand;
-			setGlobalVariable(targetVar, new WSLNumber(newValue));
-		}
-		else
-		{
-			scriptError("Unrecognized math command \"" + operator + "\"");
-		}
-	}
-
-	protected class WSLWaitForRe implements IWSLCommandDefinition {
-
-		private Pattern format = Pattern.compile("^/([^/]*)/(\\w*)");
-
-		public void execute (String arguments) throws InterruptedException {
-			Matcher m = format.matcher(arguments);
-			
-			if (m.find())
-			{
-				String flags = m.group(2);
-				boolean ignoreCase = false;
-				
-				if (flags != null && flags.contains("i"))
-				{
-					ignoreCase = true;
-				}
-				
-				RegexMatch match = new RegexMatch(m.group(1), ignoreCase);
-				
-				scriptCommands.waitFor(match);
-				setVariablesFromMatch(match);
-			} else {
-				scriptError("Invalid arguments to waitforre");
-			}
-		}
-	}
-	
-	protected class WSLWaitFor implements IWSLCommandDefinition {
-		
-		public void execute (String arguments) throws InterruptedException {
-			if (arguments.length() >= 1)
-			{
-				IMatch match = new TextMatch(arguments);
-				scriptCommands.waitFor(match);
-				
-			} else {
-				scriptError("Invalid arguments to waitfor");
-			}
-		}
-	}
-
-	protected class WSLWait implements IWSLCommandDefinition {
-		
-		public void execute (String arguments) throws InterruptedException {
-			scriptCommands.waitForPrompt();
-		}
-	}
-	
-	protected class WSLPut implements IWSLCommandDefinition {
-		
-		public void execute(String arguments) throws InterruptedException {
-			scriptCommands.put(arguments);
-			// Quit this script if we're starting another one
-			if(arguments.startsWith(ScriptConfiguration.instance().getScriptPrefix())) {
-				stop();
-			}
-		}
-	}
-	
-	protected class WSLPlaySound implements IWSLCommandDefinition {
-		public void execute(String arguments) throws InterruptedException {
-			
-			File file = new File(arguments);
-			if (file.exists()) {
-				try {
-					scriptCommands.playSound(new FileInputStream(file));
-				} catch (FileNotFoundException e) {
-					// TODO Auto-generated catch block
-					e.printStackTrace();
-				}
-			} else {
-				scriptError("Sound file \"" + file + "\" not found.");
-				return;
-			}
-		}
-	}
-	
-	protected class WSLRun implements IWSLCommandDefinition {
-		
-		public void execute(String arguments) throws InterruptedException {
-			sfClient.runScript(arguments);
-		}
-	}
-	
-	protected class WSLEcho implements IWSLCommandDefinition {
-		
-		public void execute (String arguments)
-		{
-			scriptCommands.echo(arguments);
-		}
-	}
-	
-	protected class WSLPause implements IWSLCommandDefinition {
-		
-		public void execute (String arguments) throws InterruptedException
-		{
-			double time;
-			
-			if(arguments.length() > 0) {
-				String[] args = arguments.split(argSeparator);
-			
-				try {
-					time = Double.parseDouble(args[0]);
-				} catch(NumberFormatException e) {
-					scriptError("Non-numeral \"" + args[0] + "\" passed to pause");
-					return;
-				}
-			} else {
-				time = 1;
-			}
-			scriptCommands.pause(time);
-		}
-	}
-	
-	protected class WSLMove implements IWSLCommandDefinition {
-		
-		public void execute (String arguments) throws InterruptedException
-		{
-			scriptCommands.move(arguments);
-		}
-	}
-	
-	protected class WSLNextRoom implements IWSLCommandDefinition {
-		
-		public void execute (String arguments) throws InterruptedException
-		{
-			scriptCommands.waitNextRoom();
-		}
-	}
-	
-	protected class WSLExit implements IWSLCommandDefinition {
-		
-		public void execute (String arguments) {
-			// TODO figure out if we should make this call here or elsewhere
-			stop();
-		}
-	}
-	
-	protected class WSLIf_ implements IWSLCommandDefinition {
-		private String variableName;
-		public WSLIf_ (String variableName)
-		{
-			this.variableName = variableName;
-		}
-		
-		public void execute (String arguments) throws InterruptedException {
-			if (variableExists(variableName) && getVariable(variableName).toString().length() > 0)
-			{
-				WSLScript.this.execute(arguments);
-			}
-		}
-	}
-	
-	private class WSLGetVital implements IWSLCommandDefinition {
-		
-		private Pattern format = Pattern.compile("^(\\w+)\\s+(\\w+)");
-		
-		public void execute(String arguments) {
-			Matcher m = format.matcher(arguments);
-			
-			if(m.find()) {
-				String vital = m.group(1);
-				String var = m.group(2);
-				
-				setGlobalVariable(var, sfClient.getVital(vital));
-			} else {
-				scriptError("Invalid arguments to random");
-			}
-		}
-	}
-	
-	private class WSLGetTitle implements IWSLCommandDefinition {
-		
-		private Pattern format = Pattern.compile("^(\\w+)\\s+(\\w+)");
-		
-		public void execute(String arguments) {
-			Matcher m = format.matcher(arguments);
-			
-			if(m.find()) {
-				String streamName = m.group(1);
-				String var = m.group(2);
-				
-				IStream stream = sfClient.getStream(streamName);
-				if(stream == null)
-					scriptWarning("Stream \"" + streamName + "\" does not exist.");
-				else
-					setGlobalVariable(var, stream.getTitle());
-			} else {
-				scriptError("Invalid arguments to random");
-			}
-		}
-	}
-
-	private class WSLRandom implements IWSLCommandDefinition {
-		
-		private Pattern format = Pattern.compile("^(\\d+)\\s+(\\d+)");
-		
-		public void execute(String arguments) {
-			Matcher m = format.matcher(arguments);
-			
-			if(m.find()) {
-				int min = Integer.parseInt(m.group(1));
-				int max = Integer.parseInt(m.group(2));
-				int r = min + new Random().nextInt(max - min + 1);
-				
-				setSpecialVariable("r", Integer.toString(r));
-			} else {
-				scriptError("Invalid arguments to random");
-			}
-		}
-	}
-	
-	private class WSLTimer implements IWSLCommandDefinition {
-		
-		private Pattern format = Pattern.compile("^(\\w+)(\\s+([^\\s]+))?");
-		
-		public void execute(String arguments) {
-			Matcher m = format.matcher(arguments);
-			
-			if(m.find()) {
-				String command = m.group(1);
-				String timerName = m.group(3);
-				if(timerName == null)
-					timerName = "t";
-				IWSLValue var = getVariable(timerName);
-				if(var instanceof ScriptTimer || var == null) {
-					ScriptTimer timer = (ScriptTimer)var;
-					if(command.equals("start")) {
-						if(timer == null) {
-							timer = new ScriptTimer();
-							setSpecialVariable(timerName, timer);
-						}
-						timer.start();
-					} else if(command.equals("stop")) {
-						if(timer == null) {
-							scriptWarning("Timer \"" + timerName + "\" undefined.");
-						} else {
-							timer.stop();
-						}
-					} else if(command.equals("clear")) {
-						if(timer == null) {
-							scriptWarning("Timer \"" + timerName + "\" undefined.");
-						} else {
-							timer.clear();
-						}
-					} else {
-						scriptError("Invalid command \"" + command + "\" given to timer");
-					}
-				} else {
-					scriptError("Variable \"" + timerName + "\" is not a timer.");
-				}
-			} else {
-				scriptError("Invalid arguments to timer");
-			}
-		}
-	}
-	
-	protected class WSLAddHighlightString implements IWSLCommandDefinition {
-		
-		private Pattern format = Pattern.compile("^\"([^\"])\"(\\s*(.*))?");
-		private Pattern optionFormat = Pattern.compile("(\\w+)=(.*)");
-		
-		public void execute (String arguments)
-		{
-			Matcher m = format.matcher(arguments);
-			if(m.find()) {
-				String text = m.group(1);
-				String optionString = m.group(3);
-				String[] options = optionString.split(argSeparator);
-				
-				WarlockStyle style = new WarlockStyle();
-				for(String option : options) {
-					Matcher optionMatcher = optionFormat.matcher(option);
-					if(optionMatcher.find()) {
-						String key = optionMatcher.group(1);
-						String value = optionMatcher.group(2);
-						
-						if(key.equalsIgnoreCase("forecolor")) {
-							
-						}
-					}
-				}
-			}
-		}
-	}
-	
 	public void setLastCondition(boolean condition) {
 		this.lastCondition = condition;
 	}
 	
-	private class WSLElse implements IWSLCommandDefinition {
-		
-		public void execute (String arguments) throws InterruptedException {
-			if (!lastCondition)
-			{
-				WSLScript.this.execute(arguments);
-			}
-		}
+	public boolean getLastCondition() {
+		return lastCondition;
 	}
 	
 	public IScriptEngine getScriptEngine() {

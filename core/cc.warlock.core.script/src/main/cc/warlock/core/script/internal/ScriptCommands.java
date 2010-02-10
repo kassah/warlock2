@@ -90,16 +90,13 @@ public class ScriptCommands implements IScriptCommands, IStreamListener, IRoomLi
 	public BlockingQueue<String> createLineQueue() {
 		LinkedBlockingQueue<String> queue = new LinkedBlockingQueue<String>();
 		synchronized(textWaiters) {
-			if(!textWaiters.contains(queue)) {
-				textWaiters.add(queue);
-			}
+			textWaiters.add(queue);
 		}
 		return queue;
 	}
 	
-
-	public void removeLineQueue(BlockingQueue<String> queue) {
-		textWaiters.remove(queue);
+	public boolean removeLineQueue(BlockingQueue<String> queue) {
+		return textWaiters.remove(queue);
 	}
 	
 	public IMatch matchWait(Collection<IMatch> matches, BlockingQueue<String> matchQueue, double timeout) throws InterruptedException {
