@@ -205,23 +205,51 @@ public class WarlockText {
 	
 	private void removeEmptyLines(int offset) {
 		int line = textWidget.getLineAtOffset(offset);
-		String str = textWidget.getText(textWidget.getOffsetAtLine(line),
-				textWidget.getCharCount() - 1);
+		int start = textWidget.getOffsetAtLine(line);
+		int end = textWidget.getCharCount() - 1;
+		if(start >= end)
+			return;
+		String str = textWidget.getText(start, end);
 		
-		int startOffset = 0;
+		int lineStart = 0;
 		while(true) {
-			int endOffset = str.indexOf("\n", startOffset);
-			if(endOffset < 0)
+			int lineEnd = str.indexOf("\n", lineStart);
+			if(lineEnd < 0)
 				break;
-			if(startOffset == endOffset) {
-				textWidget.replaceTextRange(offset + endOffset, 1, "");
-				this.addMarker(new WarlockStringMarker(WarlockStringMarker.Type.EMPTY,
-						new WarlockStyle("newline"), endOffset));
-				updateMarkers(endOffset + 1, -1);
-				str = str.substring(0, endOffset) + str.substring(endOffset + 1);
+			if(lineStart == lineEnd) {
+				textWidget.replaceTextRange(offset + lineEnd, 1, "");
+				WarlockStringMarker marker = new WarlockStringMarker(WarlockStringMarker.Type.EMPTY,
+						new WarlockStyle("newline"), lineEnd);
+				this.addMarker(marker);
+				updateMarkers(marker, marker, -1);
+				// Recursive call. if the could be a tail call, that would be awesome.
+				removeEmptyLines(lineEnd);
+				break;
 			} else {
-				startOffset = endOffset + 1;
+				lineStart = lineEnd + 1;
 			}
+		}
+	}
+	
+	private void restoreNewlines(int offset) {
+		for(Iterator<WarlockStringMarker> iter = markers.iterator();
+		iter.hasNext(); )
+		{
+			WarlockStringMarker marker = iter.next();
+		
+			// check to make sure we're a newline in the appropriate area
+			if(marker.offset < offset || !marker.style.getName().equals("newline"))
+				continue;
+			
+			// check if we're an empty line
+			if(marker.offset == 0 || textWidget.getTextRange(marker.offset - 1, 1).equals("\n"))
+				continue;
+			
+			// we're not an empty line, put us back into action
+			textWidget.replaceTextRange(marker.offset, 0, "\n");
+			// TODO: this should actually just affect markers after us... oh well.
+			updateMarkers(marker, marker, 1);
+			iter.remove();
 		}
 	}
 	
@@ -338,14 +366,12 @@ public class WarlockText {
 	}
 	
 	// this function removes the first "delta" amount of characters
-	private void updateMarkers(int offset, int delta) {
+	private void updateMarkers(int delta) {
 		// FIXME: if only half of a style is removed, we break
 		for(Iterator<WarlockStringMarker> iter = markers.iterator();
 		iter.hasNext(); )
 		{
 			WarlockStringMarker marker = iter.next();
-			if(marker.offset < offset)
-				continue;
 			
 			// If the replaced text contains us, remove us (replaced text must
 			// remove a character before and after (can't get rid of markers on
@@ -370,10 +396,7 @@ public class WarlockText {
 		iter.hasNext(); )
 		{
 			WarlockStringMarker marker = iter.next();
-			if(marker == startMarker) {
-				started = true;
-				continue;
-			}
+		
 			if(marker == endMarker) {
 				ended = true;
 			}
@@ -383,6 +406,9 @@ public class WarlockText {
 					continue;
 				}
 				marker.offset += delta;
+			}
+			if(marker == startMarker) {
+				started = true;
 			}
 		}
 	}
@@ -419,6 +445,8 @@ public class WarlockText {
 		textWidget.replaceTextRange(start, length, text.toString());
 		updateMarkers(startMarker, endMarker, text.length() - length);
 		addStyles(text.getStyles(), start);
+		removeEmptyLines(start);
+		restoreNewlines(start);
 		postTextChange(atBottom);
 	}
 	
@@ -450,11 +478,11 @@ public class WarlockText {
 				int charsToRemove = textWidget.getOffsetAtLine(linesToRemove);
 				if(atBottom) {
 					textWidget.replaceTextRange(0, charsToRemove, "");
-					updateMarkers(0, -charsToRemove);
+					updateMarkers(-charsToRemove);
 				} else {
 					int pixelsToRemove = textWidget.getLinePixel(linesToRemove);
 					textWidget.replaceTextRange(0, charsToRemove, "");
-					updateMarkers(0, -charsToRemove);
+					updateMarkers(-charsToRemove);
 					if(pixelsToRemove < 0)
 						textWidget.setTopPixel(-pixelsToRemove);
 				}
