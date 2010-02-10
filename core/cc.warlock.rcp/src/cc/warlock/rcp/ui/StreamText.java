@@ -20,6 +20,7 @@ import cc.warlock.core.client.IWarlockSkin;
 import cc.warlock.core.client.IWarlockStyle;
 import cc.warlock.core.client.WarlockFont;
 import cc.warlock.core.client.WarlockString;
+import cc.warlock.core.client.WarlockStringMarker;
 import cc.warlock.core.client.internal.Property;
 import cc.warlock.core.client.settings.IClientSettings;
 import cc.warlock.core.client.settings.IHighlightString;
@@ -75,8 +76,8 @@ public class StreamText extends WarlockText implements IStreamListener {
 				MatchResult result = matcher.toMatchResult();
 				
 				IWarlockStyle style = highlight.getStyle();
-				text.startStyle(result.start(), style);
-				text.endStyle(result.end(), style);
+				text.addStyle(WarlockStringMarker.Type.BEGIN, style, result.start());
+				text.addStyle(WarlockStringMarker.Type.END, style, result.end());
 				
 				try{
 					if (style.getSound() != null && !style.getSound().equals("")){
@@ -126,10 +127,10 @@ public class StreamText extends WarlockText implements IStreamListener {
 			isPrompting = false;
 		}
 		IWarlockStyle style = client.getCommandStyle();
-		string.startStyle(style);
+		string.addStyle(WarlockStringMarker.Type.BEGIN, style);
 		string.append(text);
 		// TODO: make a different style for client messages
-		string.endStyle(style);
+		string.addStyle(WarlockStringMarker.Type.END, style);
 
 		appendText(string);
 	}

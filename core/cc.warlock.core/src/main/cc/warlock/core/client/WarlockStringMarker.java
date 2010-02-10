@@ -5,12 +5,18 @@ import java.util.Iterator;
 
 
 public class WarlockStringMarker {
-	public boolean start;
+	public enum Type {
+		BEGIN,
+		END,
+		EMPTY
+	}
+	
+	public Type type;
 	public IWarlockStyle style;
 	public int offset;
 	
-	public WarlockStringMarker(boolean start, IWarlockStyle style, int offset) {
-		this.start = start;
+	public WarlockStringMarker(Type type, IWarlockStyle style, int offset) {
+		this.type = type;
 		this.style = style;
 		this.offset = offset;
 	}

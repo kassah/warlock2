@@ -65,32 +65,21 @@ public class WarlockString {
 		int charCount = text.length();
 		text.append(string.toString());
 		for(WarlockStringMarker marker : string.getStyles()) {
-			if(marker.start)
-				startStyle(charCount + marker.offset, marker.style);
-			else
-				endStyle(charCount + marker.offset, marker.style);
+			addStyle(marker.type, marker.style, charCount + marker.offset);
 		}
 	}
 	
 	public void addStyle(IWarlockStyle style) {
-		styles.addFirst(new WarlockStringMarker(true, style, 0));
-		styles.addLast(new WarlockStringMarker(false, style, text.length()));
+		styles.addFirst(new WarlockStringMarker(WarlockStringMarker.Type.BEGIN, style, 0));
+		styles.addLast(new WarlockStringMarker(WarlockStringMarker.Type.END, style, text.length()));
 	}
 	
-	public void startStyle(int offset, IWarlockStyle style) {
-		addTowardEnd(new WarlockStringMarker(true, style, offset));
+	public void addStyle(WarlockStringMarker.Type type, IWarlockStyle style, int offset) {
+		addTowardEnd(new WarlockStringMarker(type, style, offset));
 	}
 	
-	public void endStyle(int offset, IWarlockStyle style) {
-		addTowardEnd(new WarlockStringMarker(false, style, offset));
-	}
-	
-	public void startStyle(IWarlockStyle style) {
-		styles.addLast(new WarlockStringMarker(true, style, text.length()));
-	}
-	
-	public void endStyle(IWarlockStyle style) {
-		styles.addLast(new WarlockStringMarker(false, style, text.length()));
+	public void addStyle(WarlockStringMarker.Type type, IWarlockStyle style) {
+		addStyle(type, style, text.length());
 	}
 	
 	private void addTowardEnd(WarlockStringMarker marker) {
@@ -136,16 +125,16 @@ public class WarlockString {
 		for(WarlockStringMarker marker : styles) {
 			if(marker.offset >= start)
 				break;
-			if(marker.start) {
+			if(marker.type == WarlockStringMarker.Type.BEGIN) {
 				startMarkers.addLast(marker);
-			} else {
+			} else if(marker.type == WarlockStringMarker.Type.END) {
 				// Remove the start marker for this end marker
 				WarlockStringMarker.removeStyle(startMarkers, marker.style);
 			}
 		}
 		
 		for(WarlockStringMarker marker : startMarkers) {
-			substring.startStyle(0, marker.style);
+			substring.addStyle(marker.type, marker.style, 0);
 		}
 		
 		LinkedList<WarlockStringMarker> unfinishedMarkers =
@@ -159,18 +148,18 @@ public class WarlockString {
 			if(marker.offset > end)
 				break;
 			
-			if(marker.start) {
-				substring.startStyle(marker.offset - start, marker.style);
+			if(marker.type == WarlockStringMarker.Type.BEGIN) {
+				substring.addStyle(marker.type, marker.style, marker.offset - start);
 				unfinishedMarkers.addLast(marker);
 			} else {
-				substring.endStyle(marker.offset, marker.style);
+				substring.addStyle(marker.type, marker.style, marker.offset);
 				WarlockStringMarker.removeStyle(unfinishedMarkers, marker.style);
 			}
 		}
 		
 		// close the unfinished styles
 		for(WarlockStringMarker marker : unfinishedMarkers) {
-			substring.endStyle(end - start, marker.style);
+			substring.addStyle(marker.type, marker.style, end - start);
 		}
 		
 		return substring;
