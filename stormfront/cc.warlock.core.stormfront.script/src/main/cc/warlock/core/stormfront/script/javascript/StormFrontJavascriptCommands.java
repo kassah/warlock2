@@ -29,12 +29,14 @@ import java.util.Collection;
 import org.mozilla.javascript.Context;
 import org.mozilla.javascript.Function;
 
+import cc.warlock.core.client.IStream;
 import cc.warlock.core.client.settings.IVariable;
 import cc.warlock.core.client.settings.internal.ClientSettings;
 import cc.warlock.core.script.IMatch;
 import cc.warlock.core.script.internal.RegexMatch;
 import cc.warlock.core.script.javascript.JavascriptCommands;
 import cc.warlock.core.script.javascript.JavascriptScript;
+import cc.warlock.core.stormfront.client.IStormFrontClient;
 import cc.warlock.core.stormfront.script.IStormFrontScriptCommands;
 
 public class StormFrontJavascriptCommands extends JavascriptCommands
@@ -128,6 +130,10 @@ public class StormFrontJavascriptCommands extends JavascriptCommands
 		} catch(InterruptedException e) {
 			script.checkStop();
 		}
+	}
+	
+	public String getComponent(String component) {
+		return sfCommands.getStormFrontClient().getComponent(component).toString();
 	}
 	
 	public String getVariable(String name) {
