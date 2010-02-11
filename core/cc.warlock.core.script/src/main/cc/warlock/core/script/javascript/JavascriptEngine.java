@@ -69,7 +69,7 @@ public class JavascriptEngine implements IScriptEngine {
 	private class WarlockContextFactory extends ContextFactory {
 		
 		protected Context makeContext() {
-			Context cx = new Context();
+			Context cx = super.makeContext();
 			// Can't optimize if we want the instruction counter
 			cx.setOptimizationLevel(-1);
 			// Allow the user to break infinite loops or waits that don't use
