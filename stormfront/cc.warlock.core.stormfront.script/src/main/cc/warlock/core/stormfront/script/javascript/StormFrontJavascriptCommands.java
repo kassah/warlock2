@@ -133,7 +133,7 @@ public class StormFrontJavascriptCommands extends JavascriptCommands
 	}
 	
 	public String getComponent(String component) {
-		return sfCommands.getStormFrontClient().getComponent(component).toString();
+		return sfCommands.getStormFrontClient().getComponent(component).get();
 	}
 	
 	public String getVariable(String name) {
