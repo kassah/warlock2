@@ -36,8 +36,7 @@ import org.antlr.runtime.CharStream;
 import org.antlr.runtime.CommonTokenStream;
 import org.antlr.runtime.RecognitionException;
 
-import cc.warlock.core.client.settings.IVariable;
-import cc.warlock.core.client.settings.internal.ClientSettings;
+import cc.warlock.core.client.settings.internal.WarlockVariablePreference;
 import cc.warlock.core.script.AbstractScript;
 import cc.warlock.core.script.IMatch;
 import cc.warlock.core.script.IScriptCommands;
@@ -90,10 +89,10 @@ public class WSLScript extends AbstractScript {
 		setSpecialVariable("lhand", new WSLLeftHand());
 		setSpecialVariable("rhand", new WSLRightHand());
 		setSpecialVariable("spell", new WSLSpell());
-		setSpecialVariable("roomdesc", new WSLComponent(IStormFrontClient.COMPONENT_ROOM_DESCRIPTION));
-		setSpecialVariable("roomexits", new WSLComponent(IStormFrontClient.COMPONENT_ROOM_EXITS));
-		setSpecialVariable("roomplayers", new WSLComponent(IStormFrontClient.COMPONENT_ROOM_PLAYERS));
-		setSpecialVariable("roomobjects", new WSLComponent(IStormFrontClient.COMPONENT_ROOM_OBJECTS));
+		setSpecialVariable("roomdesc", new WSLComponent("room desc"));
+		setSpecialVariable("roomexits", new WSLComponent("room exits"));
+		setSpecialVariable("roomplayers", new WSLComponent("room players"));
+		setSpecialVariable("roomobjects", new WSLComponent("room objs"));
 		setSpecialVariable("roomtitle", new WSLRoomTitle());
 		setSpecialVariable("lastcommand", new WSLLastCommand());
 	}
@@ -105,15 +104,16 @@ public class WSLScript extends AbstractScript {
 			return val;
 		
 		// return value from settings. All user global variables are stored here
-		IVariable var = sfClient.getClientSettings().getVariable(name);
+		String var = WarlockVariablePreference.get(sfClient.getClientPreferences(), name).get();
 		if (var != null)
-			return new WSLString(var.getValue());
+			return new WSLString(var);
 		
 		return null;
 	}
 	
 	public boolean variableExists(String name) {
-		return specialVariables.containsKey(name) || sfClient.getClientSettings().getVariable(name) != null;
+		return specialVariables.containsKey(name) ||
+			WarlockVariablePreference.get(sfClient.getClientPreferences(), name).get() != null;
 	}
 	
 	public boolean localVariableExists(String name) {
@@ -360,7 +360,7 @@ public class WSLScript extends AbstractScript {
 	protected void setGlobalVariable(String name, String value) {
 		if(specialVariables.containsValue(name))
 			scriptError("Cannot overwrite special variable \"" + name + "\"");
-		((ClientSettings)sfClient.getClientSettings()).getVariableConfigurationProvider().addVariable(name, value);
+		WarlockVariablePreference.set(sfClient.getClientPreferences(), name, value);
 	}
 	
 	protected void setSpecialVariable(String name, String value) {
@@ -373,7 +373,7 @@ public class WSLScript extends AbstractScript {
 	}
 	
 	protected void deleteVariable(String name) {
-		((ClientSettings)sfClient.getClientSettings()).getVariableConfigurationProvider().removeVariable(name);
+		WarlockVariablePreference.remove(sfClient.getClientPreferences(), name);
 	}
 	
 	protected void deleteLocalVariable(String name) {

@@ -16,15 +16,15 @@ import cc.warlock.core.client.ICommand;
 import cc.warlock.core.client.IStream;
 import cc.warlock.core.client.IStreamListener;
 import cc.warlock.core.client.IWarlockClient;
-import cc.warlock.core.client.IWarlockSkin;
+import cc.warlock.core.client.IWarlockHighlight;
 import cc.warlock.core.client.IWarlockStyle;
 import cc.warlock.core.client.WarlockFont;
 import cc.warlock.core.client.WarlockString;
 import cc.warlock.core.client.WarlockStringMarker;
 import cc.warlock.core.client.internal.Property;
 import cc.warlock.core.client.settings.IClientSettings;
-import cc.warlock.core.client.settings.IHighlightString;
 import cc.warlock.core.client.settings.IWindowSettings;
+import cc.warlock.core.client.settings.internal.WarlockHighlightPreference;
 import cc.warlock.rcp.configuration.GameViewConfiguration;
 import cc.warlock.rcp.ui.style.StyleProviders;
 import cc.warlock.rcp.util.ColorUtil;
@@ -58,8 +58,9 @@ public class StreamText extends WarlockText implements IStreamListener {
 	}
 	
 	protected void highlightText (WarlockString text)
-	{	
-		for (IHighlightString highlight : client.getClientSettings().getAllHighlightStrings())
+	{
+		// TODO: Highlights should be cached
+		for (IWarlockHighlight highlight : WarlockHighlightPreference.getAll(client.getClientPreferences()).get())
 		{
 			Pattern p;
 			try {

@@ -44,7 +44,7 @@ import cc.warlock.core.client.WarlockClientRegistry;
 import cc.warlock.core.client.logging.IClientLogger;
 import cc.warlock.core.client.logging.LoggingConfiguration;
 import cc.warlock.core.client.logging.SimpleLogger;
-import cc.warlock.core.client.settings.IClientSettings;
+import cc.warlock.core.client.settings.internal.WarlockClientPreferences;
 import cc.warlock.core.network.IConnection;
 import cc.warlock.core.util.Pair;
 
@@ -170,7 +170,7 @@ public abstract class WarlockClient implements IWarlockClient {
 		return compass;
 	}
 	
-	public abstract IClientSettings getClientSettings();
+	public abstract WarlockClientPreferences getClientPreferences();
 
 	public IClientLogger getLogger() {
 		return logger;

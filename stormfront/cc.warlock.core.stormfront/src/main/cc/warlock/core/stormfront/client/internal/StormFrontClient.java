@@ -42,7 +42,6 @@ import cc.warlock.core.client.IProperty;
 import cc.warlock.core.client.IRoomListener;
 import cc.warlock.core.client.IStream;
 import cc.warlock.core.client.IStreamListener;
-import cc.warlock.core.client.IWarlockSkin;
 import cc.warlock.core.client.IWarlockStyle;
 import cc.warlock.core.client.WarlockClientRegistry;
 import cc.warlock.core.client.WarlockString;
@@ -51,7 +50,7 @@ import cc.warlock.core.client.internal.Property;
 import cc.warlock.core.client.internal.Stream;
 import cc.warlock.core.client.internal.WarlockClient;
 import cc.warlock.core.client.internal.WarlockStyle;
-import cc.warlock.core.client.settings.IClientSettings;
+import cc.warlock.core.client.settings.internal.WarlockClientPreferences;
 import cc.warlock.core.configuration.ConfigurationUtil;
 import cc.warlock.core.script.IScript;
 import cc.warlock.core.script.IScriptListener;
@@ -62,10 +61,7 @@ import cc.warlock.core.stormfront.client.IStormFrontClientViewer;
 import cc.warlock.core.stormfront.client.IStormFrontDialogMessage;
 import cc.warlock.core.stormfront.network.StormFrontConnection;
 import cc.warlock.core.stormfront.settings.IStormFrontClientSettings;
-import cc.warlock.core.stormfront.settings.StormFrontServerSettings;
 import cc.warlock.core.stormfront.settings.internal.StormFrontClientSettings;
-import cc.warlock.core.stormfront.settings.skin.DefaultSkin;
-import cc.warlock.core.stormfront.settings.skin.IStormFrontSkin;
 import cc.warlock.core.stormfront.xml.StormFrontDocument;
 import cc.warlock.core.stormfront.xml.StormFrontElement;
 import cc.warlock.core.util.Pair;
@@ -91,8 +87,7 @@ public class StormFrontClient extends WarlockClient implements IStormFrontClient
 	protected Property<String> characterName = new Property<String>();
 	protected Property<String> roomDescription = new Property<String>();
 	protected String gameCode, playerId;
-	protected StormFrontClientSettings clientSettings;
-	protected StormFrontServerSettings serverSettings;
+	protected WarlockClientPreferences prefs;
 	protected long timeDelta;
 	protected Long roundtimeEnd, casttimeEnd;
 	protected int roundtimeLength, casttimeLength;
@@ -100,7 +95,6 @@ public class StormFrontClient extends WarlockClient implements IStormFrontClient
 	protected Thread casttimeThread = null;
 	protected ArrayList<IScript> runningScripts;
 	protected ArrayList<IScriptListener> scriptListeners;
-	protected DefaultSkin skin;
 	protected HashMap<String, Property<String>> components =
 		new HashMap<String, Property<String>>();
 	protected HashMap<String, IStream> componentStreams = new HashMap<String, IStream>();
@@ -395,22 +389,13 @@ public class StormFrontClient extends WarlockClient implements IStormFrontClient
 	public void setPlayerId(String playerId) {
 		this.playerId = playerId;
 		
-		clientSettings = new StormFrontClientSettings(this, getClientId());
-		skin = new DefaultSkin(clientSettings);
-		skin.loadDefaultStyles(clientSettings.getHighlightConfigurationProvider());
-		
-		serverSettings = new StormFrontServerSettings();
-		clientSettings.addChildProvider(serverSettings);
+		prefs = new WarlockClientPreferences(this.getClientId());
 		
 		WarlockClientRegistry.clientSettingsLoaded(this);
 	}
 	
-	public IClientSettings getClientSettings() {
-		return clientSettings;
-	}
-	
-	public IStormFrontClientSettings getStormFrontClientSettings() {
-		return clientSettings;
+	public WarlockClientPreferences getClientPreferences() {
+		return prefs;
 	}
 	
 	public IProperty<String> getCharacterName() {
@@ -454,14 +439,6 @@ public class StormFrontClient extends WarlockClient implements IStormFrontClient
 	public void removeScriptListener (IScriptListener listener)
 	{
 		scriptListeners.remove(listener);
-	}
-	
-	public IWarlockSkin getSkin() {
-		return skin;
-	}
-	
-	public IStormFrontSkin getStormFrontSkin() {
-		return skin;
 	}
 	
 	@Override
@@ -551,10 +528,6 @@ public class StormFrontClient extends WarlockClient implements IStormFrontClient
 		if(commands == null) return null;
 		return commands.get(coord);
 	}
-	/* Internal only.. meant for importing/exporting stormfront's savings */
-	public StormFrontServerSettings getServerSettings() {
-		return serverSettings;
-	}
 	
 	public void launchURL(String url) {
 		if (viewer instanceof IStormFrontClientViewer)
@@ -605,7 +578,7 @@ public class StormFrontClient extends WarlockClient implements IStormFrontClient
 		try {
 			InputStream stream = new FileInputStream(settingsFile);
 			
-			serverSettings.importServerSettings(stream, clientSettings);
+			//serverSettings.importServerSettings(stream, clientSettings);
 			stream.close();
 		} catch (FileNotFoundException e) {
 			// TODO Auto-generated catch block

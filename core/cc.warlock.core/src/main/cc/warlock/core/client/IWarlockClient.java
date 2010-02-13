@@ -29,7 +29,7 @@ import java.io.InputStream;
 import java.util.Collection;
 
 import cc.warlock.core.client.logging.IClientLogger;
-import cc.warlock.core.client.settings.IClientSettings;
+import cc.warlock.core.client.settings.internal.WarlockClientPreferences;
 import cc.warlock.core.network.IConnection;
 
 /**
@@ -90,11 +90,6 @@ public interface IWarlockClient extends IRoomListener {
 	public IConnection getConnection ();
 	
 	/**
-	 * @return The skin for this client
-	 */
-	public IWarlockSkin getSkin();
-	
-	/**
 	 * @return The style for commands output by this client
 	 */
 	public IWarlockStyle getCommandStyle();
@@ -122,7 +117,7 @@ public interface IWarlockClient extends IRoomListener {
 	 * see IClientSettings 
 	 * @return the settings for this client 
 	 */
-	public IClientSettings getClientSettings();
+	public WarlockClientPreferences getClientPreferences();
 	
 	/**
 	 * @return A unique string identifying this client (this string should be a constant that can be restored from at a later time)

@@ -88,7 +88,6 @@ public class HighlightStringsPreferencePage extends PreferencePageUtils implemen
 	protected Text filterText;
 	protected Text soundText; 
 	protected IWarlockClient client;
-	protected IWarlockSkin skin;
 	protected ClientSettings settings;
 	protected HighlightString selectedString;
 	protected ArrayList<HighlightString> addedStrings = new ArrayList<HighlightString>();

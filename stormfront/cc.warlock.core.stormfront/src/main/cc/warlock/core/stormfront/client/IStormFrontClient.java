@@ -37,17 +37,11 @@ import cc.warlock.core.client.WarlockString;
 import cc.warlock.core.script.IScript;
 import cc.warlock.core.script.IScriptListener;
 import cc.warlock.core.stormfront.settings.IStormFrontClientSettings;
-import cc.warlock.core.stormfront.settings.skin.IStormFrontSkin;
 
 /**
  * @author Marshall
  */
 public interface IStormFrontClient extends IWarlockClient, IRoomListener {
-	
-	public static final String COMPONENT_ROOM_PLAYERS = "room players";
-	public static final String COMPONENT_ROOM_OBJECTS = "room objs";
-	public static final String COMPONENT_ROOM_EXITS = "room exits";
-	public static final String COMPONENT_ROOM_DESCRIPTION = "room desc";
 	
 	/**
 	 * The server settings for this client
@@ -158,11 +152,6 @@ public interface IStormFrontClient extends IWarlockClient, IRoomListener {
 	public void addScriptListener (IScriptListener listener);
 	
 	public void removeScriptListener (IScriptListener listener);
-	
-	/**
-	 * @return The stormfront skin
-	 */
-	public IStormFrontSkin getStormFrontSkin();
 	
 	/**
 	 * @param componentName
