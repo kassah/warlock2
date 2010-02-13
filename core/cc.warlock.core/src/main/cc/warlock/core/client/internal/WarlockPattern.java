@@ -6,7 +6,7 @@ import cc.warlock.core.client.IWarlockPattern;
 
 public class WarlockPattern implements IWarlockPattern {
 
-	protected Pattern pattern = null;
+	private Pattern pattern = null;
 	
 	private String text;
 	private boolean literal;

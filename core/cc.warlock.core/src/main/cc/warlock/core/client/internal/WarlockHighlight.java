@@ -18,7 +18,6 @@ public class WarlockHighlight extends WarlockPattern implements IWarlockHighligh
 	}
 
 	public void setStyle(IWarlockStyle style) {
-		this.pattern = null;
 		this.style = style;
 	}
 }
