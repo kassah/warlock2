@@ -11,4 +11,9 @@ public class WarlockStylePreference {
 		style.setFullLine(node.getBoolean("full-line", false));
 		return style;
 	}
+	
+	protected static void saveStyle(Preferences node, IWarlockStyle style) {
+		node.put("name", style.getName());
+		node.putBoolean("full-line", style.isFullLine());
+	}
 }
