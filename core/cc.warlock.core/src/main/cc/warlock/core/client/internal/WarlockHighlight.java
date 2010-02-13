@@ -13,9 +13,12 @@ public class WarlockHighlight extends WarlockPattern implements IWarlockHighligh
 		this.style = style;
 	}
 
-	@Override
 	public IWarlockStyle getStyle() {
 		return style;
 	}
 
+	public void setStyle(IWarlockStyle style) {
+		this.pattern = null;
+		this.style = style;
+	}
 }

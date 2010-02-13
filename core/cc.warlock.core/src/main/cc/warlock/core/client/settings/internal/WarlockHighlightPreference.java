@@ -2,6 +2,8 @@ package cc.warlock.core.client.settings.internal;
 
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.HashMap;
+import java.util.Map;
 
 import org.osgi.service.prefs.BackingStoreException;
 import org.osgi.service.prefs.Preferences;
@@ -25,6 +27,21 @@ public class WarlockHighlightPreference {
 		}
 
 		return new WarlockPreference<Collection<IWarlockHighlight>>(prefs, hnode.absolutePath(), results);
+	}
+	
+	public static WarlockPreference<Map<String, IWarlockHighlight>> getMap(WarlockClientPreferences prefs) {
+		HashMap<String, IWarlockHighlight> results = new HashMap<String, IWarlockHighlight>();
+
+		Preferences hnode = prefs.getClientPreferences().node("highlight");
+		try {
+			for (String name : hnode.childrenNames()) {
+				results.put(name, getHighlight(hnode.node(name)));
+			}
+		} catch(BackingStoreException e) {
+			e.printStackTrace();
+		}
+
+		return new WarlockPreference<Map<String, IWarlockHighlight>>(prefs, hnode.absolutePath(), results);
 	}
 	
 	protected static IWarlockHighlight getHighlight(Preferences node) {

@@ -6,7 +6,7 @@ import cc.warlock.core.client.IWarlockPattern;
 
 public class WarlockPattern implements IWarlockPattern {
 
-	private Pattern pattern = null;
+	protected Pattern pattern = null;
 	
 	private String text;
 	private boolean literal;
@@ -21,7 +21,6 @@ public class WarlockPattern implements IWarlockPattern {
 		this.caseInsensitive = caseInsensitive;
 	}
 	
-	@Override
 	public Pattern getPattern() {
 		if(pattern == null && text != null) {
 			String str = text;
@@ -36,24 +35,39 @@ public class WarlockPattern implements IWarlockPattern {
 		return pattern;
 	}
 
-	@Override
 	public String getText() {
 		return text;
 	}
 
-	@Override
 	public boolean isCaseInsensitive() {
 		return caseInsensitive;
 	}
 
-	@Override
 	public boolean isWholeWord() {
 		return wholeWord;
 	}
 
-	@Override
 	public boolean isLiteral() {
 		return literal;
 	}
 
+	public void setText(String text) {
+		this.pattern = null;
+		this.text = text;
+	}
+	
+	public void setCaseInsensitive(boolean caseInsensitive) {
+		this.pattern = null;
+		this.caseInsensitive = caseInsensitive;
+	}
+	
+	public void setWholeWord(boolean wholeWord) {
+		this.pattern = null;
+		this.wholeWord = wholeWord;
+	}
+	
+	public void setListeral(boolean literal) {
+		this.pattern = null;
+		this.literal = literal;
+	}
 }
