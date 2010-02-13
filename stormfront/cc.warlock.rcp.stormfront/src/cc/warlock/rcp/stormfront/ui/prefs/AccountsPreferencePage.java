@@ -49,8 +49,8 @@ import org.eclipse.swt.widgets.Group;
 import org.eclipse.ui.IWorkbenchPropertyPage;
 import org.eclipse.ui.dialogs.PropertyPage;
 
-import cc.warlock.core.configuration.Account;
-import cc.warlock.core.configuration.Profile;
+import cc.warlock.core.profile.Account;
+import cc.warlock.core.profile.Profile;
 import cc.warlock.core.stormfront.ProfileConfiguration;
 import cc.warlock.rcp.ui.WarlockSharedImages;
 

@@ -29,7 +29,7 @@ import java.util.Collection;
 import org.mozilla.javascript.Context;
 import org.mozilla.javascript.Function;
 
-import cc.warlock.core.client.settings.internal.WarlockVariablePreference;
+import cc.warlock.core.client.settings.WarlockVariableProvider;
 import cc.warlock.core.script.IMatch;
 import cc.warlock.core.script.internal.RegexMatch;
 import cc.warlock.core.script.javascript.JavascriptCommands;
@@ -134,7 +134,7 @@ public class StormFrontJavascriptCommands extends JavascriptCommands
 	}
 	
 	public String getVariable(String name) {
-		return WarlockVariablePreference.get(sfCommands.getStormFrontClient().getClientPreferences(), name).get();
+		return WarlockVariableProvider.get(sfCommands.getStormFrontClient().getClientPreferences(), name).get();
 	}
 	
 	public String getVital(String name) {
@@ -142,6 +142,6 @@ public class StormFrontJavascriptCommands extends JavascriptCommands
 	}
 	
 	public void setVariable(String name, String value) {
-		WarlockVariablePreference.set(sfCommands.getClient().getClientPreferences(), name, value);
+		WarlockVariableProvider.set(sfCommands.getClient().getClientPreferences(), name, value);
 	}
 }

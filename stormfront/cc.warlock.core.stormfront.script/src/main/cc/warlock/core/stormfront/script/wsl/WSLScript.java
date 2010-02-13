@@ -36,7 +36,7 @@ import org.antlr.runtime.CharStream;
 import org.antlr.runtime.CommonTokenStream;
 import org.antlr.runtime.RecognitionException;
 
-import cc.warlock.core.client.settings.internal.WarlockVariablePreference;
+import cc.warlock.core.client.settings.WarlockVariableProvider;
 import cc.warlock.core.script.AbstractScript;
 import cc.warlock.core.script.IMatch;
 import cc.warlock.core.script.IScriptCommands;
@@ -104,7 +104,7 @@ public class WSLScript extends AbstractScript {
 			return val;
 		
 		// return value from settings. All user global variables are stored here
-		String var = WarlockVariablePreference.get(sfClient.getClientPreferences(), name).get();
+		String var = WarlockVariableProvider.get(sfClient.getClientPreferences(), name).get();
 		if (var != null)
 			return new WSLString(var);
 		
@@ -113,7 +113,7 @@ public class WSLScript extends AbstractScript {
 	
 	public boolean variableExists(String name) {
 		return specialVariables.containsKey(name) ||
-			WarlockVariablePreference.get(sfClient.getClientPreferences(), name).get() != null;
+			WarlockVariableProvider.get(sfClient.getClientPreferences(), name).get() != null;
 	}
 	
 	public boolean localVariableExists(String name) {
@@ -360,7 +360,7 @@ public class WSLScript extends AbstractScript {
 	protected void setGlobalVariable(String name, String value) {
 		if(specialVariables.containsValue(name))
 			scriptError("Cannot overwrite special variable \"" + name + "\"");
-		WarlockVariablePreference.set(sfClient.getClientPreferences(), name, value);
+		WarlockVariableProvider.set(sfClient.getClientPreferences(), name, value);
 	}
 	
 	protected void setSpecialVariable(String name, String value) {
@@ -373,7 +373,7 @@ public class WSLScript extends AbstractScript {
 	}
 	
 	protected void deleteVariable(String name) {
-		WarlockVariablePreference.remove(sfClient.getClientPreferences(), name);
+		WarlockVariableProvider.remove(sfClient.getClientPreferences(), name);
 	}
 	
 	protected void deleteLocalVariable(String name) {

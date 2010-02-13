@@ -24,7 +24,7 @@ import cc.warlock.core.client.WarlockStringMarker;
 import cc.warlock.core.client.internal.Property;
 import cc.warlock.core.client.settings.IClientSettings;
 import cc.warlock.core.client.settings.IWindowSettings;
-import cc.warlock.core.client.settings.internal.WarlockHighlightPreference;
+import cc.warlock.core.client.settings.WarlockHighlightProvider;
 import cc.warlock.rcp.configuration.GameViewConfiguration;
 import cc.warlock.rcp.ui.style.StyleProviders;
 import cc.warlock.rcp.util.ColorUtil;
@@ -60,7 +60,7 @@ public class StreamText extends WarlockText implements IStreamListener {
 	protected void highlightText (WarlockString text)
 	{
 		// TODO: Highlights should be cached
-		for (IWarlockHighlight highlight : WarlockHighlightPreference.getAll(client.getClientPreferences()).get())
+		for (IWarlockHighlight highlight : WarlockHighlightProvider.getAll(client.getClientPreferences()).get())
 		{
 			Pattern p;
 			try {

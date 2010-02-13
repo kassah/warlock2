@@ -19,7 +19,7 @@
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
-package cc.warlock.core.configuration;
+package cc.warlock.core.profile;
 
 import java.io.UnsupportedEncodingException;
 import java.security.InvalidAlgorithmParameterException;
@@ -40,6 +40,7 @@ import javax.crypto.spec.PBEKeySpec;
 import javax.crypto.spec.PBEParameterSpec;
 
 import org.apache.commons.codec.binary.Base64;
+
 
 public class Account {
 
@@ -150,6 +151,7 @@ public class Account {
 	}
 	
 	public Account () { }
+	
 	public Account (String name, String password)
 	{
 		this.accountName = name;

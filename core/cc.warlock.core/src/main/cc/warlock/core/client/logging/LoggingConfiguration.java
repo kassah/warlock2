@@ -28,9 +28,9 @@ import java.util.List;
 import org.dom4j.DocumentHelper;
 import org.dom4j.Element;
 
-import cc.warlock.core.configuration.ConfigurationUtil;
 import cc.warlock.core.configuration.IConfigurationProvider;
 import cc.warlock.core.configuration.WarlockConfiguration;
+import cc.warlock.core.util.ConfigurationUtil;
 
 
 public class LoggingConfiguration implements IConfigurationProvider {

@@ -31,7 +31,7 @@ import org.eclipse.jface.action.IContributionItem;
 import org.eclipse.swt.graphics.Image;
 import org.eclipse.ui.actions.CompoundContributionItem;
 
-import cc.warlock.core.configuration.Profile;
+import cc.warlock.core.profile.Profile;
 import cc.warlock.core.stormfront.ProfileConfiguration;
 import cc.warlock.rcp.stormfront.ui.StormFrontSharedImages;
 import cc.warlock.rcp.stormfront.ui.actions.ProfileConnectAction;

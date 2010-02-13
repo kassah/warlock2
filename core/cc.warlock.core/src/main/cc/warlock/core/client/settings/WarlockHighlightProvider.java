@@ -1,0 +1,113 @@
+package cc.warlock.core.client.settings;
+
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.HashMap;
+import java.util.Map;
+
+import org.osgi.service.prefs.BackingStoreException;
+import org.osgi.service.prefs.Preferences;
+
+import cc.warlock.core.client.IWarlockHighlight;
+import cc.warlock.core.client.IWarlockStyle;
+import cc.warlock.core.client.internal.WarlockHighlight;
+
+public class WarlockHighlightProvider implements WarlockPreferenceProvider<IWarlockHighlight> {
+	private static WarlockHighlightProvider instance;
+	
+	private WarlockHighlightProvider() { }
+	
+	protected static synchronized WarlockHighlightProvider getInstance() {
+		if(instance == null)
+			instance = new WarlockHighlightProvider();
+		return instance;
+	}
+	
+	public static Collection<WarlockPreference<IWarlockHighlight>> getAll(WarlockClientPreferences prefs) {
+		ArrayList<WarlockPreference<IWarlockHighlight>> results =
+			new ArrayList<WarlockPreference<IWarlockHighlight>>();
+
+		Preferences hnode = prefs.getNode().node("highlight");
+		try {
+			for (String name : hnode.childrenNames()) {
+				Preferences node = hnode.node(name);
+				results.add(new WarlockPreference<IWarlockHighlight>(getInstance(),
+						node.absolutePath(), getHighlight(node)));
+			}
+		} catch(BackingStoreException e) {
+			e.printStackTrace();
+		}
+
+		return results;
+	}
+	
+	public static Map<String, WarlockPreference<IWarlockHighlight>> getMap(WarlockClientPreferences prefs) {
+		HashMap<String, WarlockPreference<IWarlockHighlight>> results =
+			new HashMap<String, WarlockPreference<IWarlockHighlight>>();
+
+		Preferences hnode = prefs.getNode().node("highlight");
+		try {
+			for (String name : hnode.childrenNames()) {
+				Preferences node = hnode.node(name);
+				results.put(name, new WarlockPreference<IWarlockHighlight>(getInstance(),
+						node.absolutePath(), getHighlight(node)));
+			}
+		} catch(BackingStoreException e) {
+			e.printStackTrace();
+		}
+
+		return results;
+	}
+	
+	protected static IWarlockHighlight getHighlight(Preferences node) {
+		String text = node.get("text", null);
+		boolean literal = node.getBoolean("literal", true);
+		boolean caseInsensitive = node.getBoolean("case-insensitive", false);
+		boolean wholeWord = node.getBoolean("whole-word", false);
+		IWarlockStyle style = WarlockStylePreference.getStyle(node.node("style"));
+		
+		return new WarlockHighlight(text, literal, caseInsensitive, wholeWord, style);
+	}
+	
+	public static String addHighlight(WarlockClientPreferences prefs, IWarlockHighlight highlight) {
+		Preferences hnode = prefs.getNode().node("highlight");
+		
+		int max = 0;
+		try {
+			for (String name : hnode.childrenNames()) {
+				int cur = Integer.parseInt(name);
+				if(cur > max)
+					max = cur;
+			}
+		} catch(BackingStoreException e) {
+			e.printStackTrace();
+		}
+		String name = Integer.toString(max + 1);
+		saveHighlight(hnode.node(name), highlight);
+		return name;
+	}
+	
+	public static void putHighlight(WarlockClientPreferences prefs, String id, IWarlockHighlight highlight) {
+		saveHighlight(prefs.getNode().node("highlight").node(id), highlight);
+	}
+	
+	protected static void saveHighlight(Preferences node, IWarlockHighlight highlight) {
+		node.put("text", highlight.getText());
+		node.putBoolean("literal", highlight.isLiteral());
+		node.putBoolean("case-insensitive", highlight.isCaseInsensitive());
+		node.putBoolean("whole-word", highlight.isWholeWord());
+		WarlockStylePreference.saveStyle(node.node("style"), highlight.getStyle());
+	}
+	
+	public static void removeHighlight(WarlockClientPreferences prefs, String id) {
+		try {
+			prefs.getNode().node("highlight").node(id).removeNode();
+		} catch(BackingStoreException e) {
+			e.printStackTrace();
+		}
+	}
+	
+	public void save(String path, IWarlockHighlight value) {
+		saveHighlight(WarlockPreferences.getScope().getNode(path), value);
+	}
+}

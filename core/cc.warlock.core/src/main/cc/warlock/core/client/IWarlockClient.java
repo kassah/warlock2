@@ -29,7 +29,7 @@ import java.io.InputStream;
 import java.util.Collection;
 
 import cc.warlock.core.client.logging.IClientLogger;
-import cc.warlock.core.client.settings.internal.WarlockClientPreferences;
+import cc.warlock.core.client.settings.WarlockClientPreferences;
 import cc.warlock.core.network.IConnection;
 
 /**

@@ -35,9 +35,9 @@ import org.dom4j.Element;
 
 import cc.warlock.core.client.IProperty;
 import cc.warlock.core.client.internal.Property;
-import cc.warlock.core.configuration.ConfigurationUtil;
 import cc.warlock.core.configuration.IConfigurationProvider;
 import cc.warlock.core.script.javascript.JavascriptEngine;
+import cc.warlock.core.util.ConfigurationUtil;
 
 public class ScriptConfiguration implements IConfigurationProvider {
 

@@ -36,13 +36,13 @@ import java.util.Map;
 
 import cc.warlock.core.client.IWarlockStyle;
 import cc.warlock.core.client.settings.IHighlightString;
-import cc.warlock.core.configuration.ConfigurationUtil;
 import cc.warlock.core.script.ScriptEngineRegistry;
 import cc.warlock.core.stormfront.client.IStormFrontClient;
 import cc.warlock.core.stormfront.settings.StormFrontServerSettings;
 import cc.warlock.core.stormfront.settings.skin.IStormFrontSkin;
 import cc.warlock.core.stormfront.xml.StormFrontDocument;
 import cc.warlock.core.stormfront.xml.StormFrontElement;
+import cc.warlock.core.util.ConfigurationUtil;
 
 @Deprecated
 public class ServerSettings implements Comparable<ServerSettings>

@@ -1,17 +1,16 @@
-package cc.warlock.core.client.internal;
+package cc.warlock.core.client.settings;
 
 import org.eclipse.core.runtime.preferences.IEclipsePreferences.INodeChangeListener;
 import org.eclipse.core.runtime.preferences.IEclipsePreferences.IPreferenceChangeListener;
 
-import cc.warlock.core.client.settings.internal.WarlockClientPreferences;
 
 public class WarlockPreference<T> {
+	private WarlockPreferenceProvider<T> provider;
 	private T value;
-	private WarlockClientPreferences prefs;
 	private String path;
 	
-	public WarlockPreference(WarlockClientPreferences prefs, String path, T value) {
-		this.prefs = prefs;
+	public WarlockPreference(WarlockPreferenceProvider<T> provider, String path, T value) {
+		this.provider = provider;
 		this.path = path;
 		this.value = value;
 	}
@@ -20,11 +19,19 @@ public class WarlockPreference<T> {
 		return value;
 	}
 	
+	public String getPath() {
+		return path;
+	}
+	
+	public void save() {
+		provider.save(path, value);
+	}
+	
 	public void addNodeChangeListener(INodeChangeListener listener) {
-		prefs.addNodeChangeListener(path, listener);
+		WarlockPreferences.addNodeChangeListener(path, listener);
 	}
 	
 	public void addPrefenceChangeListener(IPreferenceChangeListener listener) {
-		prefs.addPreferenceChangeListener(path, listener);
+		WarlockPreferences.addPreferenceChangeListener(path, listener);
 	}
 }

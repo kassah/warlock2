@@ -44,7 +44,7 @@ import cc.warlock.core.client.WarlockClientRegistry;
 import cc.warlock.core.client.logging.IClientLogger;
 import cc.warlock.core.client.logging.LoggingConfiguration;
 import cc.warlock.core.client.logging.SimpleLogger;
-import cc.warlock.core.client.settings.internal.WarlockClientPreferences;
+import cc.warlock.core.client.settings.WarlockClientPreferences;
 import cc.warlock.core.network.IConnection;
 import cc.warlock.core.util.Pair;
 

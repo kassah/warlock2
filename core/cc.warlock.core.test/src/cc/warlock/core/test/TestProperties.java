@@ -30,7 +30,7 @@ import java.util.Properties;
 
 import org.junit.Assert;
 
-import cc.warlock.core.configuration.ConfigurationUtil;
+import cc.warlock.core.util.ConfigurationUtil;
 
 public class TestProperties {
 

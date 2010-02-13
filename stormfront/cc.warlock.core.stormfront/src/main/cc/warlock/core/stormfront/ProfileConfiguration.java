@@ -29,10 +29,10 @@ import java.util.List;
 import org.dom4j.DocumentHelper;
 import org.dom4j.Element;
 
-import cc.warlock.core.configuration.Account;
 import cc.warlock.core.configuration.IConfigurationProvider;
-import cc.warlock.core.configuration.Profile;
 import cc.warlock.core.configuration.WarlockConfiguration;
+import cc.warlock.core.profile.Account;
+import cc.warlock.core.profile.Profile;
 
 public class ProfileConfiguration implements IConfigurationProvider {
 	

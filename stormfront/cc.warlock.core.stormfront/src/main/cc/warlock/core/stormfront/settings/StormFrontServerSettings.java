@@ -46,7 +46,6 @@ import cc.warlock.core.client.settings.internal.HighlightString;
 import cc.warlock.core.client.settings.internal.Ignore;
 import cc.warlock.core.client.settings.internal.Variable;
 import cc.warlock.core.client.settings.internal.WindowSettings;
-import cc.warlock.core.configuration.ConfigurationUtil;
 import cc.warlock.core.configuration.WarlockConfiguration;
 import cc.warlock.core.script.configuration.ScriptConfiguration;
 import cc.warlock.core.stormfront.client.IStormFrontClient;
@@ -60,6 +59,7 @@ import cc.warlock.core.stormfront.settings.server.ServerScript;
 import cc.warlock.core.stormfront.settings.server.ServerSettings;
 import cc.warlock.core.stormfront.xml.StormFrontDocument;
 import cc.warlock.core.stormfront.xml.StormFrontElement;
+import cc.warlock.core.util.ConfigurationUtil;
 
 
 /**

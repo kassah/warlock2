@@ -19,14 +19,12 @@
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
-package cc.warlock.core.configuration;
+package cc.warlock.core.util;
 
 import java.io.File;
 import java.io.IOException;
 
 public class ConfigurationUtil {
-
-	public static final String MAIN_CONFIGURATION_FILE = "config.xml";
 	
 	public static File getAppConfigDirectory ()
 	{

@@ -27,7 +27,7 @@ import java.util.Map;
 
 import org.junit.Assert;
 
-import cc.warlock.core.configuration.Profile;
+import cc.warlock.core.profile.Profile;
 import cc.warlock.core.stormfront.client.internal.StormFrontClient;
 import cc.warlock.core.stormfront.network.ISGEConnectionListener;
 import cc.warlock.core.stormfront.network.SGEConnection;

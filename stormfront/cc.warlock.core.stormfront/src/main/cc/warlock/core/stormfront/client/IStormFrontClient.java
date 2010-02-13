@@ -36,18 +36,11 @@ import cc.warlock.core.client.IWarlockClient;
 import cc.warlock.core.client.WarlockString;
 import cc.warlock.core.script.IScript;
 import cc.warlock.core.script.IScriptListener;
-import cc.warlock.core.stormfront.settings.IStormFrontClientSettings;
 
 /**
  * @author Marshall
  */
 public interface IStormFrontClient extends IWarlockClient, IRoomListener {
-	
-	/**
-	 * The server settings for this client
-	 * @return
-	 */
-	public IStormFrontClientSettings getStormFrontClientSettings();
 	
 	/**
 	 * @return The player ID of the current player

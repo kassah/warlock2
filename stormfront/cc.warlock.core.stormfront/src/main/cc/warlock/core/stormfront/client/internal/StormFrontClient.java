@@ -50,8 +50,7 @@ import cc.warlock.core.client.internal.Property;
 import cc.warlock.core.client.internal.Stream;
 import cc.warlock.core.client.internal.WarlockClient;
 import cc.warlock.core.client.internal.WarlockStyle;
-import cc.warlock.core.client.settings.internal.WarlockClientPreferences;
-import cc.warlock.core.configuration.ConfigurationUtil;
+import cc.warlock.core.client.settings.WarlockClientPreferences;
 import cc.warlock.core.script.IScript;
 import cc.warlock.core.script.IScriptListener;
 import cc.warlock.core.script.ScriptEngineRegistry;
@@ -64,6 +63,7 @@ import cc.warlock.core.stormfront.settings.IStormFrontClientSettings;
 import cc.warlock.core.stormfront.settings.internal.StormFrontClientSettings;
 import cc.warlock.core.stormfront.xml.StormFrontDocument;
 import cc.warlock.core.stormfront.xml.StormFrontElement;
+import cc.warlock.core.util.ConfigurationUtil;
 import cc.warlock.core.util.Pair;
 
 import com.martiansoftware.jsap.CommandLineTokenizer;

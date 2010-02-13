@@ -22,7 +22,8 @@
 /*
  * Created on Dec 31, 2004
  */
-package cc.warlock.core.configuration;
+package cc.warlock.core.profile;
+
 
 /**
  * @author Marshall

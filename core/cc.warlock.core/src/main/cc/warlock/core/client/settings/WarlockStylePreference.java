@@ -1,4 +1,4 @@
-package cc.warlock.core.client.settings.internal;
+package cc.warlock.core.client.settings;
 
 import org.osgi.service.prefs.Preferences;
 

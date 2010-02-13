@@ -35,7 +35,7 @@ import java.util.Properties;
 import org.eclipse.swt.graphics.Color;
 import org.eclipse.swt.widgets.Display;
 
-import cc.warlock.core.configuration.ConfigurationUtil;
+import cc.warlock.core.util.ConfigurationUtil;
 
 public class SavedStyles {
 

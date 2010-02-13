@@ -27,9 +27,9 @@ import java.io.FileWriter;
 import java.io.IOException;
 import java.io.InputStream;
 
-import cc.warlock.core.configuration.ConfigurationUtil;
 import cc.warlock.core.stormfront.IStormFrontProtocolHandler;
 import cc.warlock.core.stormfront.xml.StormFrontDocument;
+import cc.warlock.core.util.ConfigurationUtil;
 
 
 public class CmdlistTagHandler extends DefaultTagHandler {
