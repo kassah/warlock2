@@ -63,7 +63,7 @@ public class StyleTagHandler extends DefaultTagHandler {
 		
 		if (styleId != null && styleId.length() > 0)
 		{
-			IWarlockStyle style = handler.getClient().getClientSettings().getNamedStyle(styleId);
+			IWarlockStyle style = handler.getClient().getNamedStyle(styleId);
 			if(style != null) {
 				currentStyle = style;
 				handler.addStyle(currentStyle);

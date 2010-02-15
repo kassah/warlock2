@@ -39,6 +39,7 @@ public interface IWarlockStyle {
 	
 	public WarlockColor getForegroundColor();
 	public WarlockColor getBackgroundColor();
+	public WarlockFont getFont();
 	public boolean isFullLine();
 	public String getName();
 	
@@ -47,6 +48,7 @@ public interface IWarlockStyle {
 	public void setAction(Runnable action);
 	public void setForegroundColor(WarlockColor color);
 	public void setBackgroundColor(WarlockColor color);
+	public void setFont(WarlockFont font);
 	public void setFullLine(boolean fullLine);
 	public void setName(String name);
 	public String getSound();

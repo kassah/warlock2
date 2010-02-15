@@ -27,6 +27,7 @@ import java.util.Collection;
 
 import cc.warlock.core.client.IWarlockStyle;
 import cc.warlock.core.client.WarlockColor;
+import cc.warlock.core.client.WarlockFont;
 
 
 public class WarlockStyle implements IWarlockStyle {
@@ -34,6 +35,7 @@ public class WarlockStyle implements IWarlockStyle {
 	private Collection<StyleType> styleTypes = new ArrayList<StyleType>();
 	private WarlockColor foregroundColor = new WarlockColor(WarlockColor.DEFAULT_COLOR);
 	private WarlockColor backgroundColor = new WarlockColor(WarlockColor.DEFAULT_COLOR);
+	private WarlockFont font;
 	private boolean fullLine;
 	private String name;
 	private Runnable action;
@@ -58,6 +60,8 @@ public class WarlockStyle implements IWarlockStyle {
 		
 		this.backgroundColor = new WarlockColor(other.getBackgroundColor());
 		this.foregroundColor = new WarlockColor(other.getForegroundColor());
+		if(other.getFont() != null)
+			this.font = new WarlockFont(other.getFont());
 		this.name = other.getName() == null ? null : new String(other.getName());
 		this.action = other.getAction();
 		
@@ -93,17 +97,6 @@ public class WarlockStyle implements IWarlockStyle {
 		needsUpdate = true;
 		
 		styleTypes.add(styleType);
-	}
-	
-	public void inheritFrom(IWarlockStyle style) {
-		// Right now this just deals with inheriting monospace, eventually we should figure out a way to inherit other properties as well
-		if (style.getStyleTypes().contains(StyleType.MONOSPACE)
-			&& !styleTypes.contains(StyleType.MONOSPACE))
-		{
-			needsUpdate = true;
-			
-			styleTypes.add(StyleType.MONOSPACE);
-		}
 	}
 	
 	public void setFullLine(boolean fullLine) {
@@ -144,6 +137,14 @@ public class WarlockStyle implements IWarlockStyle {
 			needsUpdate = true;
 		
 		this.backgroundColor = backgroundColor;
+	}
+	
+	public WarlockFont getFont() {
+		return font;
+	}
+	
+	public void setFont(WarlockFont font) {
+		this.font = font;
 	}
 	
 	public boolean needsUpdate ()

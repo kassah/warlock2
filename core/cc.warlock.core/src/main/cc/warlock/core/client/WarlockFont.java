@@ -23,19 +23,25 @@ package cc.warlock.core.client;
 
 public class WarlockFont {
 
-	public static final WarlockFont DEFAULT_FONT = new WarlockFont();
-	static {
-		DEFAULT_FONT.setFamilyName("default");
-		DEFAULT_FONT.setSize(-1);
-	}
+	public static final WarlockFont DEFAULT_FONT = new WarlockFont("default", -1);
 	
 	protected String familyName;
 	protected int size;
 	
 	public WarlockFont () { }
+	
+	public WarlockFont(String familyName, int size) {
+		this.familyName = familyName;
+		this.size = size;
+	}
+	
+	public WarlockFont(String familyName) {
+		this.familyName = familyName;
+	}
+	
 	public WarlockFont (WarlockFont other)
 	{
-		this.familyName = new String(other.familyName);
+		this.familyName = other.familyName;
 		this.size = other.size;
 	}
 	

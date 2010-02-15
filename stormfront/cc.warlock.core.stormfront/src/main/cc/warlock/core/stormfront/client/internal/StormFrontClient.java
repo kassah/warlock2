@@ -51,6 +51,7 @@ import cc.warlock.core.client.internal.Stream;
 import cc.warlock.core.client.internal.WarlockClient;
 import cc.warlock.core.client.internal.WarlockStyle;
 import cc.warlock.core.client.settings.WarlockClientPreferences;
+import cc.warlock.core.client.settings.WarlockStyleProvider;
 import cc.warlock.core.script.IScript;
 import cc.warlock.core.script.IScriptListener;
 import cc.warlock.core.script.ScriptEngineRegistry;
@@ -490,14 +491,6 @@ public class StormFrontClient extends WarlockClient implements IStormFrontClient
 		super.finalize();
 	}
 	
-	public IWarlockStyle getCommandStyle() {
-		IWarlockStyle style = clientSettings.getNamedStyle(StormFrontClientSettings.PRESET_COMMAND);
-		if (style == null) {
-			return new WarlockStyle();
-		}
-		return style;
-	}
-	
 	public void loadCmdlist()
 	{
 		try {
@@ -616,5 +609,9 @@ public class StormFrontClient extends WarlockClient implements IStormFrontClient
 			}
 			return stream;
 		}
+	}
+	
+	public IWarlockStyle getNamedStyle(String name) {
+		return WarlockStyleProvider.get(prefs, name).get();
 	}
 }

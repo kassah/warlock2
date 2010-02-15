@@ -89,11 +89,6 @@ public interface IWarlockClient extends IRoomListener {
 	 */
 	public IConnection getConnection ();
 	
-	/**
-	 * @return The style for commands output by this client
-	 */
-	public IWarlockStyle getCommandStyle();
-	
 	public void flushStreams();
 	
 	/**

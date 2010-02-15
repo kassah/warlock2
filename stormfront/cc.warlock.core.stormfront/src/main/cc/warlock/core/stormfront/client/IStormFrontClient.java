@@ -33,6 +33,7 @@ import cc.warlock.core.client.ICharacterStatus;
 import cc.warlock.core.client.IProperty;
 import cc.warlock.core.client.IRoomListener;
 import cc.warlock.core.client.IWarlockClient;
+import cc.warlock.core.client.IWarlockStyle;
 import cc.warlock.core.client.WarlockString;
 import cc.warlock.core.script.IScript;
 import cc.warlock.core.script.IScriptListener;
@@ -170,4 +171,5 @@ public interface IStormFrontClient extends IWarlockClient, IRoomListener {
 	
 	public void receivedServerSetting(String setting);
 
+	public IWarlockStyle getNamedStyle(String name);
 }

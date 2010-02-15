@@ -64,7 +64,7 @@ public class WarlockHighlightProvider implements WarlockPreferenceProvider<IWarl
 		boolean literal = node.getBoolean("literal", true);
 		boolean caseInsensitive = node.getBoolean("case-insensitive", false);
 		boolean wholeWord = node.getBoolean("whole-word", false);
-		IWarlockStyle style = WarlockStylePreference.getStyle(node.node("style"));
+		IWarlockStyle style = WarlockStyleProvider.getStyle(node.node("style"));
 		
 		return new WarlockHighlight(text, literal, caseInsensitive, wholeWord, style);
 	}
@@ -96,7 +96,7 @@ public class WarlockHighlightProvider implements WarlockPreferenceProvider<IWarl
 		node.putBoolean("literal", highlight.isLiteral());
 		node.putBoolean("case-insensitive", highlight.isCaseInsensitive());
 		node.putBoolean("whole-word", highlight.isWholeWord());
-		WarlockStylePreference.saveStyle(node.node("style"), highlight.getStyle());
+		WarlockStyleProvider.saveStyle(node.node("style"), highlight.getStyle());
 	}
 	
 	public static void removeHighlight(WarlockClientPreferences prefs, String id) {

@@ -10,8 +10,6 @@ import org.eclipse.ui.application.IWorkbenchWindowConfigurer;
 import org.eclipse.ui.application.WorkbenchAdvisor;
 import org.eclipse.ui.application.WorkbenchWindowAdvisor;
 
-import cc.warlock.core.configuration.WarlockConfiguration;
-
 public class WarlockWorkbenchAdvisor extends WorkbenchAdvisor {
 	private Timer timer = new Timer();
 
@@ -47,20 +45,9 @@ public class WarlockWorkbenchAdvisor extends WorkbenchAdvisor {
 	}
 	
 	@Override
-	public void preStartup() {
-		WarlockConfiguration.getMainConfiguration().addConfigurationProvider(WarlockPerspectiveLayout.instance());
-	}
-	
-	@Override
-	public void postStartup() {
-		WarlockPerspectiveLayout.instance().loadBounds();
-	}
-	
-	@Override
 	public boolean preShutdown() {
 		timer.cancel();
 		
-		WarlockPerspectiveLayout.instance().saveLayout();
 		return true;
 	}
 
