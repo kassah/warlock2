@@ -31,6 +31,7 @@ import java.util.Calendar;
 
 import cc.warlock.core.client.IWarlockClient;
 import cc.warlock.core.client.WarlockString;
+import cc.warlock.core.util.ConfigurationUtil;
 
 /**
  * A simple text-based logger that rotates daily
@@ -91,7 +92,7 @@ public class SimpleLogger implements IClientLogger {
 			characterName = client.getCharacterName().get();
 		}
 		
-		return new File(LoggingConfiguration.instance().getLogDirectory(),
+		return new File(ConfigurationUtil.getConfigurationDirectory("logs", true),
 			characterName + "-" + dateFormat.format(Calendar.getInstance().getTime()) + ".txt");
 	}
 	

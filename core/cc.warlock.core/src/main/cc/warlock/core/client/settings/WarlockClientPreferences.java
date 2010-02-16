@@ -1,5 +1,7 @@
 package cc.warlock.core.client.settings;
 
+import org.eclipse.core.runtime.preferences.IEclipsePreferences.INodeChangeListener;
+import org.eclipse.core.runtime.preferences.IEclipsePreferences.IPreferenceChangeListener;
 import org.osgi.service.prefs.Preferences;
 
 public class WarlockClientPreferences extends WarlockPreferences {
@@ -11,5 +13,13 @@ public class WarlockClientPreferences extends WarlockPreferences {
 	
 	public Preferences getNode() {
 		return clientPrefs;
+	}
+	
+	public void addNodeChangeListener(INodeChangeListener listener) {
+		WarlockPreferences.addNodeChangeListener(clientPrefs.absolutePath(), listener);
+	}
+	
+	public void addPreferenceChangeListener(IPreferenceChangeListener listener) {
+		WarlockPreferences.addPreferenceChangeListener(clientPrefs.absolutePath(), listener);
 	}
 }

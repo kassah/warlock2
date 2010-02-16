@@ -31,7 +31,7 @@ public class WarlockPreference<T> {
 		WarlockPreferences.addNodeChangeListener(path, listener);
 	}
 	
-	public void addPrefenceChangeListener(IPreferenceChangeListener listener) {
+	public void addPreferenceChangeListener(IPreferenceChangeListener listener) {
 		WarlockPreferences.addPreferenceChangeListener(path, listener);
 	}
 }

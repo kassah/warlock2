@@ -38,7 +38,7 @@ import org.eclipse.ui.IWorkbenchPropertyPage;
 
 import cc.warlock.core.client.IWarlockClient;
 import cc.warlock.core.client.logging.LoggingConfiguration;
-import cc.warlock.core.client.settings.internal.ClientSettings;
+import cc.warlock.core.util.ConfigurationUtil;
 
 /**
  * @author Will Robertson
@@ -49,7 +49,6 @@ public class LoggingPreferencePage extends PreferencePageUtils implements
 
 	public static final String PAGE_ID = "cc.warlock.rcp.prefs.logging";
 	
-	protected ClientSettings settings;
 	protected IWarlockClient client;
 	protected Combo loggingType;
 	protected Text logDir;
@@ -77,7 +76,7 @@ public class LoggingPreferencePage extends PreferencePageUtils implements
 		Composite logDirComposite = new Composite(main, SWT.NONE);
 		logDirComposite.setLayout(new GridLayout(2, false));
 		logDir = new Text(logDirComposite, SWT.BORDER | SWT.SINGLE);
-		logDir.setText(LoggingConfiguration.instance().getLogDirectory().getAbsolutePath());
+		logDir.setText(ConfigurationUtil.getConfigurationDirectory("logs", true).getAbsolutePath());
 		Button logDirButton = new Button(logDirComposite, SWT.PUSH);
 		logDirButton.setText("Browse");
 		logDirButton.addSelectionListener(new SelectionAdapter() {

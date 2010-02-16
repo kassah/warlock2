@@ -49,7 +49,6 @@ import cc.warlock.core.client.IWarlockHighlight;
 import cc.warlock.core.client.IWarlockStyle;
 import cc.warlock.core.client.WarlockClientRegistry;
 import cc.warlock.core.client.logging.IClientLogger;
-import cc.warlock.core.client.logging.LoggingConfiguration;
 import cc.warlock.core.client.logging.SimpleLogger;
 import cc.warlock.core.client.settings.WarlockClientPreferences;
 import cc.warlock.core.client.settings.WarlockHighlightProvider;
@@ -83,6 +82,8 @@ public abstract class WarlockClient implements IWarlockClient {
 	protected HashMap<String, WarlockMacro> macros;
 	protected INodeChangeListener macroNodeListener;
 	protected IPreferenceChangeListener macroPrefListener;
+	protected String scriptPrefix;
+	protected IPreferenceChangeListener scriptPrefixChangeListener;
 	
 	protected class HighlightNodeChangeListener implements INodeChangeListener {
 		public void added(NodeChangeEvent event) {
@@ -118,13 +119,15 @@ public abstract class WarlockClient implements IWarlockClient {
 		}
 	}
 	
+	protected class ScriptPrfixChangeListener implements IPreferenceChangeListener {
+		public void preferenceChange(PreferenceChangeEvent event) {
+			scriptPrefix = prefs.getNode().get("script-prefix", ".");
+		}
+	}
+	
 	public WarlockClient () {
 		streamPrefix = "client:" + hashCode() + ":";
-		
-		if (LoggingConfiguration.instance().getLogFormat().equals(LoggingConfiguration.LOG_FORMAT_TEXT))
-		{
-			logger = new SimpleLogger(this);
-		}
+		logger = new SimpleLogger(this);
 		
 		WarlockClientRegistry.addWarlockClientListener(new WarlockClientListener() {
 			@Override
@@ -165,6 +168,10 @@ public abstract class WarlockClient implements IWarlockClient {
 				macroPrefListener = new MacroPreferenceChangeListener();
 				WarlockMacroProvider.addPreferenceChangeListener(prefs,
 						macroPrefListener);
+				
+				scriptPrefix = prefs.getNode().get("script-prefix", ".");
+				scriptPrefixChangeListener = new ScriptPrfixChangeListener();
+				prefs.addPreferenceChangeListener(scriptPrefixChangeListener);
 			}
 		});
 	}
