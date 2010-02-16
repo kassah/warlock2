@@ -49,7 +49,6 @@ import cc.warlock.core.client.internal.CharacterStatus;
 import cc.warlock.core.client.internal.Property;
 import cc.warlock.core.client.internal.Stream;
 import cc.warlock.core.client.internal.WarlockClient;
-import cc.warlock.core.client.internal.WarlockStyle;
 import cc.warlock.core.client.settings.WarlockClientPreferences;
 import cc.warlock.core.client.settings.WarlockStyleProvider;
 import cc.warlock.core.script.IScript;
@@ -60,8 +59,6 @@ import cc.warlock.core.stormfront.client.IStormFrontClient;
 import cc.warlock.core.stormfront.client.IStormFrontClientViewer;
 import cc.warlock.core.stormfront.client.IStormFrontDialogMessage;
 import cc.warlock.core.stormfront.network.StormFrontConnection;
-import cc.warlock.core.stormfront.settings.IStormFrontClientSettings;
-import cc.warlock.core.stormfront.settings.internal.StormFrontClientSettings;
 import cc.warlock.core.stormfront.xml.StormFrontDocument;
 import cc.warlock.core.stormfront.xml.StormFrontElement;
 import cc.warlock.core.util.ConfigurationUtil;
@@ -88,7 +85,6 @@ public class StormFrontClient extends WarlockClient implements IStormFrontClient
 	protected Property<String> characterName = new Property<String>();
 	protected Property<String> roomDescription = new Property<String>();
 	protected String gameCode, playerId;
-	protected WarlockClientPreferences prefs;
 	protected long timeDelta;
 	protected Long roundtimeEnd, casttimeEnd;
 	protected int roundtimeLength, casttimeLength;
@@ -377,11 +373,6 @@ public class StormFrontClient extends WarlockClient implements IStormFrontClient
 		
 		WarlockClientRegistry.clientConnected(this);
 	}
-	
-	public void streamCleared() {
-		// TODO Auto-generated method stub
-		
-	}
 
 	public String getPlayerId() {
 		return playerId;
@@ -463,7 +454,6 @@ public class StormFrontClient extends WarlockClient implements IStormFrontClient
 			component.set(value);
 		
 		componentStreams.put(name, stream);
-		//stream.addComponent(name);
 	}
 	
 	public void updateComponent(String name, WarlockString value) {
@@ -478,7 +468,6 @@ public class StormFrontClient extends WarlockClient implements IStormFrontClient
 		IStream stream = componentStreams.get(name);
 		if(stream != null)
 			stream.updateComponent(name, value);
-		// FIXME: else should we create the stream? -Sean
 	}
 	
 	public IProperty<String> getComponent(String componentName) {
@@ -540,7 +529,6 @@ public class StormFrontClient extends WarlockClient implements IStormFrontClient
 			if (viewer instanceof IStormFrontClientViewer)
 				((IStormFrontClientViewer) viewer).appendImage(url);
 		} catch (MalformedURLException e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
 	}

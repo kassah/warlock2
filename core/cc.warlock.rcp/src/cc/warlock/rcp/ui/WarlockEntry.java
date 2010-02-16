@@ -22,6 +22,8 @@
 package cc.warlock.rcp.ui;
 
 import java.util.ArrayList;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 import org.eclipse.core.runtime.Platform;
 import org.eclipse.swt.SWT;
@@ -37,7 +39,11 @@ import org.eclipse.swt.widgets.Composite;
 import cc.warlock.core.client.ICommand;
 import cc.warlock.core.client.IWarlockClientViewer;
 import cc.warlock.core.client.internal.Command;
-import cc.warlock.core.client.settings.macro.IMacro;
+import cc.warlock.core.client.internal.WarlockMacro;
+import cc.warlock.core.client.settings.WarlockVariableProvider;
+import cc.warlock.rcp.macro.IMacroCommand;
+import cc.warlock.rcp.macro.MacroCommandRegistry;
+import cc.warlock.rcp.macro.MacroVariableRegistry;
 import cc.warlock.rcp.views.GameView;
 
 public class WarlockEntry {
@@ -47,6 +53,7 @@ public class WarlockEntry {
 	private boolean searchMode = false;
 	private StringBuffer searchText = new StringBuffer();
 	private String searchCommand = "";
+	protected static final Pattern varPattern = Pattern.compile("^\\w+");
 	
 	public WarlockEntry(Composite parent, IWarlockClientViewer viewer) {
 		this.viewer = viewer;
@@ -86,33 +93,11 @@ public class WarlockEntry {
 		return widget;
 	}
 	
-	protected boolean checkAndExecuteMacro (IMacro macro, int keyCode, int stateMask)
-	{
-		if (macro.getKeyCode() == keyCode && macro.getModifiers() == stateMask)
-		{
-			try {
-				leaveSearchMode();
-				macro.execute(viewer);
-				//keyHandled = true;
-			} catch (Exception ex) {
-				// TODO Auto-generated catch block
-				ex.printStackTrace();
-			}
-
-			return true;
-		}
-		return false;
-	}
-	
 	// returns whether we processed the key or not.
 	protected boolean processKey(int keyCode, int stateMask, char character) {
 		//System.out.println("got char \"" + e.character + "\"");
-		for (IMacro macro : viewer.getWarlockClient().getClientSettings().getAllMacros())
-		{
-			if (checkAndExecuteMacro(macro, keyCode, stateMask)) {
-				return true;
-			}
-		}
+		WarlockMacro macro = viewer.getWarlockClient().getMacro(keyCode, stateMask);
+		parseCommand(macro.getCommand());
 
 		if (!widget.isFocusControl() || searchMode) {
 			if(entryCharacters.contains(character))
@@ -134,6 +119,94 @@ public class WarlockEntry {
 			}
 		}
 		return false;
+	}
+	
+	protected boolean parseCommand(String command) {
+		String savedCommand = null;
+		StringBuffer buffer = new StringBuffer();
+		for (int pos = 0; pos < command.length(); pos++) {
+			char curChar = command.charAt(pos);
+			if(curChar == '\\' && command.length() > pos + 1) {
+				viewer.append(buffer.toString());
+				buffer.setLength(0);
+				
+				pos++;
+				curChar = command.charAt(pos);
+				switch(curChar) {
+				
+				// submit current text in entry
+				case 'n':
+				case 'r':
+					viewer.submit();
+					break;
+					
+				// pause 1 second
+				case 'p':
+					// not sure how to implement pause
+					break;
+					
+				// clear the entry
+				case 'x':
+					viewer.setCurrentCommand("");
+					break;
+					
+				// display a dialog to get the value
+				case '?':
+					// unimplemented
+					break;
+					
+				// save current text in entry
+				case 'S':
+					savedCommand = viewer.getCurrentCommand();
+					break;
+					
+				// restore saved command
+				case 'R':
+					if(savedCommand != null)
+						viewer.setCurrentCommand(savedCommand);
+					break;
+					
+				default:
+					buffer.append(curChar);
+				}
+			} else if(curChar == '{') {
+				int endPos = command.indexOf('}', pos);
+				if(endPos == -1) {
+					buffer.append(curChar);
+				} else {
+					String commandText = command.substring(pos + 1, endPos);
+					pos = endPos + 1;
+					IMacroCommand macroCommand = MacroCommandRegistry.getMacroCommand(commandText);
+					if(macroCommand != null) {
+						viewer.append(buffer.toString());
+						buffer.setLength(0);
+						macroCommand.execute(viewer);
+					}
+				}
+			} else if(curChar == '@') {
+				// Stub... Move cursor to this char position
+			} else if(curChar == '$') {
+				Matcher match = varPattern.matcher(command.substring(pos + 1));
+				if(match.matches()) {
+					String name = match.group();
+					String val = MacroVariableRegistry.getMacroVariable(name, viewer);
+					if(val == null)
+						val = WarlockVariableProvider.get(viewer.getWarlockClient().getClientPreferences(), name).get();
+					if(val != null) {
+						buffer.append(val);
+						pos += name.length() + 1;
+					} else {
+						buffer.append(curChar);
+					}
+				} else {
+					buffer.append(curChar);
+				}
+			} else {
+				buffer.append(curChar);
+			}
+		}
+		viewer.append(buffer.toString());
+		return true;
 	}
 	
 	public class KeyVerifier implements VerifyKeyListener {

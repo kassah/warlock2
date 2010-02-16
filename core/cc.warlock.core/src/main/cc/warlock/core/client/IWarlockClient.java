@@ -28,6 +28,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.util.Collection;
 
+import cc.warlock.core.client.internal.WarlockMacro;
 import cc.warlock.core.client.logging.IClientLogger;
 import cc.warlock.core.client.settings.WarlockClientPreferences;
 import cc.warlock.core.network.IConnection;
@@ -148,4 +149,10 @@ public interface IWarlockClient extends IRoomListener {
 	 * @param listener
 	 */
 	public void addStreamListener(String streamName, IStreamListener listener);
+	
+	public Collection<IWarlockHighlight> getHighlights();
+	
+	public WarlockMacro getMacro(int keycode, int modifiers);
+	
+	public IWarlockStyle getCommandStyle();
 }

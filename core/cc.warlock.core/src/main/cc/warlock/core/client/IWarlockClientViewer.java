@@ -44,6 +44,7 @@ public interface IWarlockClientViewer {
 	public void setCurrentCommand (String command);
 	
 	public void append(char c);
+	public void append(String str);
 	
 	public void submit();
 	

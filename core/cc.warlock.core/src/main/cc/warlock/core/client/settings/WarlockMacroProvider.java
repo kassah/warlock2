@@ -3,12 +3,16 @@ package cc.warlock.core.client.settings;
 import java.util.ArrayList;
 import java.util.Collection;
 
+import org.eclipse.core.runtime.preferences.IEclipsePreferences.INodeChangeListener;
+import org.eclipse.core.runtime.preferences.IEclipsePreferences.IPreferenceChangeListener;
 import org.osgi.service.prefs.BackingStoreException;
 import org.osgi.service.prefs.Preferences;
 
 import cc.warlock.core.client.internal.WarlockMacro;
 
 public class WarlockMacroProvider implements WarlockPreferenceProvider<WarlockMacro> {
+	private static final String NODE_NAME = "macro";
+	
 	private static WarlockMacroProvider instance;
 	
 	private WarlockMacroProvider() { }
@@ -24,7 +28,7 @@ public class WarlockMacroProvider implements WarlockPreferenceProvider<WarlockMa
 		ArrayList<WarlockPreference<WarlockMacro>> results =
 			new ArrayList<WarlockPreference<WarlockMacro>>();
 
-		Preferences inode = prefs.getNode().node("macro");
+		Preferences inode = prefs.getNode().node(NODE_NAME);
 		try {
 			for (String name : inode.childrenNames()) {
 				Preferences node = inode.node(name);
@@ -54,5 +58,29 @@ public class WarlockMacroProvider implements WarlockPreferenceProvider<WarlockMa
 	
 	public void save(String path, WarlockMacro value) {
 		saveMacro(WarlockPreferences.getScope().getNode(path), value);
+	}
+	
+	public static void addNodeChangeListener(WarlockClientPreferences prefs,
+			INodeChangeListener listener) {
+		String path = prefs.getNode().node(NODE_NAME).absolutePath();
+		WarlockPreferences.getScope().getNode(path).addNodeChangeListener(listener);
+	}
+	
+	public static void addPreferenceChangeListener(WarlockClientPreferences prefs,
+			IPreferenceChangeListener listener) {
+		String path = prefs.getNode().node(NODE_NAME).absolutePath();
+		WarlockPreferences.getScope().getNode(path).addPreferenceChangeListener(listener);
+	}
+	
+	public static void removeNodeChangeListener(WarlockClientPreferences prefs,
+			INodeChangeListener listener) {
+		String path = prefs.getNode().node(NODE_NAME).absolutePath();
+		WarlockPreferences.getScope().getNode(path).removeNodeChangeListener(listener);
+	}
+	
+	public static void removePreferenceChangeListener(WarlockClientPreferences prefs,
+			IPreferenceChangeListener listener) {
+		String path = prefs.getNode().node(NODE_NAME).absolutePath();
+		WarlockPreferences.getScope().getNode(path).removePreferenceChangeListener(listener);
 	}
 }

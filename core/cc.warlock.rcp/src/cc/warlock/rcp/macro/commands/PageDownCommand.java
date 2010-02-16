@@ -19,22 +19,35 @@
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
-package cc.warlock.rcp.ui.macros.internal.commands;
+package cc.warlock.rcp.macro.commands;
 
 import cc.warlock.core.client.IWarlockClientViewer;
-import cc.warlock.core.client.settings.macro.IMacroCommand;
+import cc.warlock.rcp.macro.IMacroCommand;
+import cc.warlock.rcp.views.WarlockView;
 
-public class RepeatLastMacroCommand implements IMacroCommand {
-	
+/**
+ * @author Will Robertson
+ *
+ * Handles PageDown Macro (normally assigned to the PageDown Key)
+ */
+public class PageDownCommand implements IMacroCommand {
+
+	/* (non-Javadoc)
+	 * @see cc.warlock.rcp.ui.macros.IMacroCommand#execute(cc.warlock.core.client.IWarlockClientViewer)
+	 */
+	public void execute(IWarlockClientViewer context) {
+		if (WarlockView.getViewInFocus() != null)
+			WarlockView.getViewInFocus().pageDown();
+	}
+
+	/* (non-Javadoc)
+	 * @see cc.warlock.rcp.ui.macros.IMacroCommand#getIdentifier()
+	 */
 	public String getIdentifier() {
-		return "RepeatLast";
+		return "PageDown";
 	}
-	
-	public void execute(IWarlockClientViewer viewer) {
-		viewer.repeatLastCommand();
-	}
-	
+
 	public String getDescription() {
-		return "Repeat the last command in the command history";
+		return "Scroll a page down in the current game view";
 	}
 }

@@ -22,9 +22,10 @@
 package cc.warlock.core.client.settings.macro;
 
 import java.util.List;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 import cc.warlock.core.client.IWarlockClientViewer;
-import cc.warlock.core.client.settings.IClientSettings;
 /**
  * This is the default macro handler for a command being sent to the connection.
  * Embedded macro variables and special-commands are supported, to allow for additional functionality.
@@ -34,6 +35,7 @@ import cc.warlock.core.client.settings.IClientSettings;
 public class CommandMacroHandler implements IMacroHandler {
 
 	protected String command;
+	
 	
 	public CommandMacroHandler (String command)
 	{
@@ -46,7 +48,7 @@ public class CommandMacroHandler implements IMacroHandler {
 		List<? extends IMacroVariable> variables = settings.getAllMacroVariables();
 		
 		String newCommand = new String(command);
-		String savedCommand = null;
+		
 		
 		for (IMacroVariable var : variables)
 		{
@@ -62,69 +64,7 @@ public class CommandMacroHandler implements IMacroHandler {
 			}
 		}
 		
-		for (int pos = 0; pos < newCommand.length(); pos++) {
-			char curChar = newCommand.charAt(pos);
-			if(curChar == '\\' && newCommand.length() > pos + 1) {
-				pos++;
-				curChar = newCommand.charAt(pos);
-				switch(curChar) {
-				
-				// submit current text in entry
-				case 'n':
-				case 'r':
-					viewer.submit();
-					break;
-					
-				// pause 1 second
-				case 'p':
-					// not sure how to implement pause
-					break;
-					
-				// clear the entry
-				case 'x':
-					viewer.setCurrentCommand("");
-					break;
-					
-				// display a dialog to get the value
-				case '?':
-					// unimplemented
-					break;
-					
-				// save current text in entry
-				case 'S':
-					savedCommand = viewer.getCurrentCommand();
-					break;
-					
-				// restore saved command
-				case 'R':
-					if(savedCommand != null)
-						viewer.setCurrentCommand(savedCommand);
-					break;
-				default:
-					viewer.append(curChar);
-				}
-			} else if(curChar == '{') {
-				int endPos = newCommand.indexOf('}', pos);
-				if(endPos == -1) {
-					viewer.append(curChar);
-				} else {
-					String commandText = newCommand.substring(pos + 1, endPos);
-					pos = endPos + 1;
-					for(IMacroCommand macroCommand : settings.getAllMacroCommands()) {
-						if(commandText.equals(macroCommand.getIdentifier())) {
-							macroCommand.execute(viewer);
-						}
-					}
-				}
-			} else if(curChar == '@') {
-				// Stub... Move cursor to this char position
-			} else {
-				viewer.append(curChar);
-			}
-		}
-		return true;
-	}
-	
+		
 	public String getCommand () {
 		return this.command;
 	}

@@ -22,9 +22,7 @@ import cc.warlock.core.client.WarlockFont;
 import cc.warlock.core.client.WarlockString;
 import cc.warlock.core.client.WarlockStringMarker;
 import cc.warlock.core.client.internal.Property;
-import cc.warlock.core.client.settings.IClientSettings;
-import cc.warlock.core.client.settings.IWindowSettings;
-import cc.warlock.core.client.settings.WarlockHighlightProvider;
+import cc.warlock.core.client.settings.WarlockWindowProvider;
 import cc.warlock.rcp.configuration.GameViewConfiguration;
 import cc.warlock.rcp.ui.style.StyleProviders;
 import cc.warlock.rcp.util.ColorUtil;
@@ -60,7 +58,7 @@ public class StreamText extends WarlockText implements IStreamListener {
 	protected void highlightText (WarlockString text)
 	{
 		// TODO: Highlights should be cached
-		for (IWarlockHighlight highlight : WarlockHighlightProvider.getAll(client.getClientPreferences()).get())
+		for (IWarlockHighlight highlight : client.getHighlights())
 		{
 			Pattern p;
 			try {
@@ -226,36 +224,32 @@ public class StreamText extends WarlockText implements IStreamListener {
 		IStyleProvider styleProvider = StyleProviders.getStyleProvider(client);
 		if(styleProvider != null)
 			setStyleProvider(styleProvider);
-		
-		IWarlockSkin skin = client.getSkin();
-		IClientSettings settings = client.getClientSettings();
-		
-		if(skin != null && settings != null) {
-			Color background = ColorUtil.warlockColorToColor(client.getSkin().getMainBackground());
-			Color foreground = ColorUtil.warlockColorToColor(client.getSkin().getMainForeground());
-			WarlockFont font = client.getClientSettings().getMainWindowSettings().getFont();
-			if (!streamName.equals(IWarlockClient.DEFAULT_STREAM_NAME)) {
-				IWindowSettings wsettings = settings.getWindowSettings(streamName);
-				if (wsettings != null) {
-					if (!wsettings.getBackgroundColor().isDefault())
-						background = ColorUtil.warlockColorToColor(wsettings.getBackgroundColor());
-					if (!wsettings.getForegroundColor().isDefault())
-						foreground = ColorUtil.warlockColorToColor(wsettings.getForegroundColor());
-					if (!wsettings.getFont().isDefaultFont())
-						font = wsettings.getFont();
-				}
-			}
-			this.setBackground(background);
-			this.setForeground(foreground);
 
-			String defaultFontFace = GameViewConfiguration.instance().getDefaultFontFace();
-			int defaultFontSize = GameViewConfiguration.instance().getDefaultFontSize();
+		Color background = ColorUtil.warlockColorToColor(getDefaultColor());
+		Color foreground = ColorUtil.warlockColorToColor(getDefaultColor());
+		WarlockFont font = getDefaultFont();
+		
+		// TODO: add a preference change listener here
+		IWarlockStyle wsettings = WarlockWindowProvider.get(client.getClientPreferences(), streamName).get();
+		if (wsettings != null) {
+			if (!wsettings.getBackgroundColor().isDefault())
+				background = ColorUtil.warlockColorToColor(wsettings.getBackgroundColor());
+			if (!wsettings.getForegroundColor().isDefault())
+				foreground = ColorUtil.warlockColorToColor(wsettings.getForegroundColor());
+			if (!wsettings.getFont().isDefaultFont())
+				font = wsettings.getFont();
+		}
+		
+		this.setBackground(background);
+		this.setForeground(foreground);
 
-			if (font.isDefaultFont()) {
-				this.setFont(new Font(Display.getDefault(), defaultFontFace, defaultFontSize, SWT.NORMAL));
-			} else {
-				this.setFont(FontUtil.warlockFontToFont(font));
-			}
+		String defaultFontFace = GameViewConfiguration.instance().getDefaultFontFace();
+		int defaultFontSize = GameViewConfiguration.instance().getDefaultFontSize();
+
+		if (font.isDefaultFont()) {
+			this.setFont(new Font(Display.getDefault(), defaultFontFace, defaultFontSize, SWT.NORMAL));
+		} else {
+			this.setFont(FontUtil.warlockFontToFont(font));
 		}
 	}
 }

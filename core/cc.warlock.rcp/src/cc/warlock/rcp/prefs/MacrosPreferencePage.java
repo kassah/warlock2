@@ -22,7 +22,6 @@
 package cc.warlock.rcp.prefs;
 
 import java.util.ArrayList;
-import java.util.Collection;
 
 import org.eclipse.core.runtime.IAdaptable;
 import org.eclipse.jface.bindings.keys.KeyStroke;
@@ -63,13 +62,14 @@ import org.eclipse.ui.IWorkbenchPropertyPage;
 import org.eclipse.ui.part.PageBook;
 
 import cc.warlock.core.client.IWarlockClient;
-import cc.warlock.core.client.settings.internal.ClientSettings;
+import cc.warlock.core.client.internal.WarlockMacro;
+import cc.warlock.core.client.settings.WarlockMacroProvider;
+import cc.warlock.core.client.settings.WarlockPreference;
 import cc.warlock.core.client.settings.macro.CommandMacroHandler;
 import cc.warlock.core.client.settings.macro.IMacro;
-import cc.warlock.core.client.settings.macro.IMacroCommand;
-import cc.warlock.core.client.settings.macro.IMacroHandler;
 import cc.warlock.core.client.settings.macro.IMacroProvider;
 import cc.warlock.core.client.settings.macro.internal.Macro;
+import cc.warlock.rcp.macro.IMacroCommand;
 import cc.warlock.rcp.ui.ContentAssistCellEditor;
 import cc.warlock.rcp.ui.KeyStrokeCellEditor;
 import cc.warlock.rcp.ui.KeyStrokeText;
@@ -90,14 +90,14 @@ public class MacrosPreferencePage extends PreferencePageUtils implements
 	
 	protected TableViewer macroTable;
 	protected IWarlockClient client;
-	protected ClientSettings settings;
 	
-	protected ArrayList<Macro> macros = new ArrayList<Macro>();
+	protected ArrayList<WarlockPreference<WarlockMacro>> macros =
+		new ArrayList<WarlockPreference<WarlockMacro>>();
 
 	protected Button addMacroButton;
 	protected Button removeMacroButton;
 	
-	protected Macro selectedMacro;
+	protected WarlockMacro selectedMacro;
 	protected PageBook filterBook;
 
 	protected Text commandText;
@@ -188,9 +188,10 @@ public class MacrosPreferencePage extends PreferencePageUtils implements
 		macroTable.setColumnProperties(new String[] {COLUMN_COMMAND, COLUMN_KEY});
 		macroTable.setContentProvider(new ArrayContentProvider());
 		macroTable.setLabelProvider(new LabelProvider());
+		/* FIXME: I don't know what this does -Sean
 		macroTable.addFilter(new ViewerFilter() {
 			public boolean select(Viewer viewer, Object parentElement, Object element) {
-				IMacro macro = (IMacro) element;
+				WarlockMacro macro = (WarlockMacro) element;
 				Collection<IMacroHandler> handlers = macro.getHandlers();
 				
 				if (handlers.size() == 1) {
@@ -202,6 +203,7 @@ public class MacrosPreferencePage extends PreferencePageUtils implements
 				return false;
 			}	
 		});
+		*/
 		macroTable.addFilter(new MacroFilter());
 		
 		macroTable.addSelectionChangedListener(new ISelectionChangedListener() {
@@ -209,16 +211,15 @@ public class MacrosPreferencePage extends PreferencePageUtils implements
 				if (macroTable.getSelection().isEmpty()) {
 					removeMacroButton.setEnabled(false);
 				} else {
-					selectedMacro = (Macro) ((IStructuredSelection)macroTable.getSelection()).getFirstElement();
+					selectedMacro = (WarlockMacro) ((IStructuredSelection)macroTable.getSelection()).getFirstElement();
 					removeMacroButton.setEnabled(true);
 				}
 			}
 		});
 		
-		for (IMacro macro : settings.getAllMacros()) {
-			if (macro instanceof Macro) {
-				macros.add(new Macro((Macro)macro));
-			}
+		for (WarlockPreference<WarlockMacro> macro : WarlockMacroProvider
+				.getAll(client.getClientPreferences())) {
+			macros.add(macro);
 		}
 		
 		macroTable.setInput(macros);
@@ -260,10 +261,10 @@ public class MacrosPreferencePage extends PreferencePageUtils implements
 	
 	protected class MacroFilter extends ViewerFilter {
 		public boolean select(Viewer viewer, Object parentElement, Object element) {
-			IMacro macro = (IMacro)element;
+			WarlockMacro macro = (WarlockMacro)element;
 			
 			if (filterByCommand) {
-				String command = getCommandMacroHandler(macro).getCommand();
+				String command = macro.getCommand();
 				
 				if (command.equals("")) {
 					return true;
@@ -273,7 +274,7 @@ public class MacrosPreferencePage extends PreferencePageUtils implements
 			} else {
 				KeyStroke stroke = keyComboText.getKeyStroke();
 				if (stroke != null && stroke.getNaturalKey() != KeyStroke.NO_KEY) {
-					return (stroke.getModifierKeys() == macro.getModifiers() && stroke.getNaturalKey() == macro.getKeyCode());
+					return (stroke.getModifierKeys() == macro.getModifiers() && stroke.getNaturalKey() == macro.getKeycode());
 				}
 				return true;
 			}

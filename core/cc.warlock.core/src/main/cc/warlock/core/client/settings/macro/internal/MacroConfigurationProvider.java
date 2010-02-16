@@ -32,10 +32,10 @@ import org.dom4j.Element;
 import cc.warlock.core.client.settings.internal.ClientConfigurationProvider;
 import cc.warlock.core.client.settings.macro.CommandMacroHandler;
 import cc.warlock.core.client.settings.macro.IMacro;
-import cc.warlock.core.client.settings.macro.IMacroCommand;
 import cc.warlock.core.client.settings.macro.IMacroHandler;
 import cc.warlock.core.client.settings.macro.IMacroProvider;
-import cc.warlock.core.client.settings.macro.IMacroVariable;
+import cc.warlock.core.stormfront.IMacroCommand;
+import cc.warlock.rcp.macro.IMacroVariable;
 
 /**
  * Macros defined by this provider are command-based only. 

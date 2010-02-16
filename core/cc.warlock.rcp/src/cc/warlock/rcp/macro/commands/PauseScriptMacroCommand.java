@@ -19,29 +19,36 @@
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
-package cc.warlock.rcp.ui.macros.internal.commands;
+package cc.warlock.rcp.macro.commands;
+
+import java.util.List;
+
 import cc.warlock.core.client.IWarlockClientViewer;
-import cc.warlock.core.client.settings.macro.IMacroCommand;
-import cc.warlock.rcp.prefs.HighlightStringsPreferencePage;
-import cc.warlock.rcp.util.RCPUtil;
+import cc.warlock.core.script.IScript;
+import cc.warlock.core.script.ScriptEngineRegistry;
+import cc.warlock.rcp.macro.IMacroCommand;
 
-/**
- * 
- * @author Marshall Culpepper
- *
- */
-public class HighlightsDialogMacroCommand implements IMacroCommand {
-
-	public void execute(IWarlockClientViewer context) {
-		RCPUtil.openPreferences(HighlightStringsPreferencePage.PAGE_ID);
-	}
-
+public class PauseScriptMacroCommand implements IMacroCommand {
+	
+	boolean paused = false;
+	
 	public String getIdentifier() {
-		return "HighlightsDialog";
-	}
-
-	public String getDescription() {
-		return "Open the Highlights preference page";
+		return "PauseScript";
 	}
 	
+	public void execute(IWarlockClientViewer viewer) {
+		List<IScript> runningScripts = ScriptEngineRegistry.getRunningScripts(viewer.getWarlockClient());
+		for(IScript currentScript : runningScripts)
+		{
+			if(paused)
+				currentScript.resume();
+			else
+				currentScript.suspend();
+		}
+		paused = !paused;
+	}
+	
+	public String getDescription() {
+		return "Suspend/resume running scripts";
+	}
 }

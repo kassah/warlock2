@@ -19,17 +19,29 @@
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
-package cc.warlock.core.client.settings.macro;
+package cc.warlock.rcp.macro.commands;
 
 import cc.warlock.core.client.IWarlockClientViewer;
-import cc.warlock.core.client.settings.IClientSetting;
+import cc.warlock.rcp.macro.IMacroCommand;
+import cc.warlock.rcp.prefs.VariablesPreferencePage;
+import cc.warlock.rcp.util.RCPUtil;
 
 /**
- * @author Marshall
+ * 
+ * @author Marshall Culpepper
+ *
  */
-public interface IMacroVariable extends IClientSetting {
+public class VariablesDialogMacroCommand implements IMacroCommand {
 
-	public String getIdentifier();
+	public void execute(IWarlockClientViewer context) {
+		RCPUtil.openPreferences(VariablesPreferencePage.PAGE_ID);
+	}
 	
-	public String getValue(IWarlockClientViewer context);
+	public String getIdentifier() {
+		return "VariablesDialog";
+	}
+	
+	public String getDescription() {
+		return "Open the Variables preference page";
+	}
 }

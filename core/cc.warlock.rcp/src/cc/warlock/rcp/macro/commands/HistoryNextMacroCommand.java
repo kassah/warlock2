@@ -19,42 +19,22 @@
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
-/*
- * Created on Mar 27, 2005
- */
-package cc.warlock.rcp.ui.macros.internal.variables;
+package cc.warlock.rcp.macro.commands;
 
-import cc.warlock.core.client.ICommand;
-import cc.warlock.core.client.IWarlockClient;
 import cc.warlock.core.client.IWarlockClientViewer;
-import cc.warlock.core.client.settings.IClientSettingProvider;
-import cc.warlock.core.client.settings.macro.IMacroVariable;
-import cc.warlock.rcp.ui.macros.MacroRegistry;
+import cc.warlock.rcp.macro.IMacroCommand;
 
-
-/**
- * @author Marshall
- */
-public class LastCommandMacroVariable implements IMacroVariable {
-
+public class HistoryNextMacroCommand implements IMacroCommand {
+	
 	public String getIdentifier() {
-		return "$lastCommand";
+		return "HistoryNext";
 	}
-
-	public String getValue(IWarlockClientViewer context) {
-		
-		IWarlockClient client = context.getWarlockClient();
-		
-		ICommand command = client.getCommandHistory().getLastCommand();
-			
-		if(command != null) {
-			return command.getCommand();
-		}
-		
-		return null;
+	
+	public void execute(IWarlockClientViewer viewer) {
+		viewer.nextCommand();
 	}
-
-	public IClientSettingProvider getProvider() {
-		return MacroRegistry.instance();
+	
+	public String getDescription() {
+		return "Show the next command from the command history";
 	}
 }

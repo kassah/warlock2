@@ -19,16 +19,36 @@
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
-package cc.warlock.rcp.ui.macros.internal.commands;
+/*
+ * Created on Mar 27, 2005
+ */
+package cc.warlock.rcp.macro.variables;
 
+import cc.warlock.core.client.ICommand;
+import cc.warlock.core.client.IWarlockClient;
 import cc.warlock.core.client.IWarlockClientViewer;
+import cc.warlock.rcp.macro.IMacroVariable;
 
-public class PasteMacroCommand {
-	public void execute(IWarlockClientViewer context) {
-		context.paste();
-	}
+
+/**
+ * @author Marshall
+ */
+public class LastCommandMacroVariable implements IMacroVariable {
 
 	public String getIdentifier() {
-		return "Paste";
+		return "$lastCommand";
+	}
+
+	public String getValue(IWarlockClientViewer context) {
+		
+		IWarlockClient client = context.getWarlockClient();
+		
+		ICommand command = client.getCommandHistory().getLastCommand();
+			
+		if(command != null) {
+			return command.getCommand();
+		}
+		
+		return null;
 	}
 }

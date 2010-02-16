@@ -19,22 +19,17 @@
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
-package cc.warlock.rcp.ui.macros.internal.commands;
+package cc.warlock.rcp.macro;
 
 import cc.warlock.core.client.IWarlockClientViewer;
-import cc.warlock.core.client.settings.macro.IMacroCommand;
 
-public class HistorySearchMacroCommand implements IMacroCommand {
-	
-	public String getIdentifier() {
-		return "HistorySearch";
-	}
-	
-	public void execute(IWarlockClientViewer viewer) {
-		viewer.searchHistory();
-	}
-	
-	public String getDescription() {
-		return "Search the command history for a command";
-	}
+/**
+ * @author Marshall
+ */
+public interface IMacroCommand {
+
+	public String getIdentifier ();
+	public String getDescription();
+	public void execute (IWarlockClientViewer context);
+
 }

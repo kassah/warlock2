@@ -31,6 +31,11 @@ import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
 
+import org.eclipse.core.runtime.preferences.IEclipsePreferences.INodeChangeListener;
+import org.eclipse.core.runtime.preferences.IEclipsePreferences.IPreferenceChangeListener;
+import org.eclipse.core.runtime.preferences.IEclipsePreferences.NodeChangeEvent;
+import org.eclipse.core.runtime.preferences.IEclipsePreferences.PreferenceChangeEvent;
+
 import cc.warlock.core.client.ICommand;
 import cc.warlock.core.client.ICommandHistory;
 import cc.warlock.core.client.ICompass;
@@ -40,11 +45,17 @@ import cc.warlock.core.client.IStream;
 import cc.warlock.core.client.IStreamListener;
 import cc.warlock.core.client.IWarlockClient;
 import cc.warlock.core.client.IWarlockClientViewer;
+import cc.warlock.core.client.IWarlockHighlight;
+import cc.warlock.core.client.IWarlockStyle;
 import cc.warlock.core.client.WarlockClientRegistry;
 import cc.warlock.core.client.logging.IClientLogger;
 import cc.warlock.core.client.logging.LoggingConfiguration;
 import cc.warlock.core.client.logging.SimpleLogger;
 import cc.warlock.core.client.settings.WarlockClientPreferences;
+import cc.warlock.core.client.settings.WarlockHighlightProvider;
+import cc.warlock.core.client.settings.WarlockMacroProvider;
+import cc.warlock.core.client.settings.WarlockPreference;
+import cc.warlock.core.client.settings.WarlockStyleProvider;
 import cc.warlock.core.network.IConnection;
 import cc.warlock.core.util.Pair;
 
@@ -58,11 +69,54 @@ public abstract class WarlockClient implements IWarlockClient {
 	protected IWarlockClientViewer viewer;
 	protected ICommandHistory commandHistory = new CommandHistory();
 	protected String streamPrefix;
-	private Collection<IRoomListener> roomListeners = Collections.synchronizedCollection(new ArrayList<IRoomListener>());
+	private Collection<IRoomListener> roomListeners =
+		Collections.synchronizedCollection(new ArrayList<IRoomListener>());
 	protected Property<ICompass> compass = new Property<ICompass>(null);
 	protected IClientLogger logger;
 	protected HashMap<String, IStream> streams = new HashMap<String, IStream>();
-	protected ArrayList<Pair<String, IStreamListener>> potentialListeners = new ArrayList<Pair<String, IStreamListener>>();
+	protected ArrayList<Pair<String, IStreamListener>> potentialListeners =
+		new ArrayList<Pair<String, IStreamListener>>();
+	protected ArrayList<IWarlockHighlight> highlights;
+	protected WarlockClientPreferences prefs;
+	protected INodeChangeListener highlightNodeListener;
+	protected IPreferenceChangeListener highlightPrefListener;
+	protected HashMap<String, WarlockMacro> macros;
+	protected INodeChangeListener macroNodeListener;
+	protected IPreferenceChangeListener macroPrefListener;
+	
+	protected class HighlightNodeChangeListener implements INodeChangeListener {
+		public void added(NodeChangeEvent event) {
+			loadHighlights();
+		}
+
+		public void removed(NodeChangeEvent event) {
+			loadHighlights();
+		}
+		
+	}
+	
+	protected class HighlightPreferenceChangeListener implements IPreferenceChangeListener {
+		public void preferenceChange(PreferenceChangeEvent event) {
+			loadHighlights();
+		}
+	}
+	
+	protected class MacroNodeChangeListener implements INodeChangeListener {
+		public void added(NodeChangeEvent event) {
+			loadMacros();
+		}
+
+		public void removed(NodeChangeEvent event) {
+			loadMacros();
+		}
+		
+	}
+	
+	protected class MacroPreferenceChangeListener implements IPreferenceChangeListener {
+		public void preferenceChange(PreferenceChangeEvent event) {
+			loadMacros();
+		}
+	}
 	
 	public WarlockClient () {
 		streamPrefix = "client:" + hashCode() + ":";
@@ -87,10 +141,31 @@ public abstract class WarlockClient implements IWarlockClient {
 			public void clientConnected(IWarlockClient client) {}
 
 			@Override
-			public void clientRemoved(IWarlockClient client) {}
+			public void clientRemoved(IWarlockClient client) {
+				WarlockHighlightProvider.removeNodeChangeListener(prefs, highlightNodeListener);
+				WarlockHighlightProvider.removePreferenceChangeListener(prefs, highlightPrefListener);
+				
+				WarlockMacroProvider.removeNodeChangeListener(prefs, macroNodeListener);
+				WarlockMacroProvider.removePreferenceChangeListener(prefs, macroPrefListener);
+			}
 
 			@Override
-			public void clientSettingsLoaded(IWarlockClient client) {}
+			public void clientSettingsLoaded(IWarlockClient client) {
+				loadHighlights();
+				highlightNodeListener = new HighlightNodeChangeListener();
+				WarlockHighlightProvider.addNodeChangeListener(prefs,
+						highlightNodeListener);
+				highlightPrefListener = new HighlightPreferenceChangeListener();
+				WarlockHighlightProvider.addPreferenceChangeListener(prefs,
+						highlightPrefListener);
+				
+				loadMacros();
+				macroNodeListener = new MacroNodeChangeListener();
+				WarlockMacroProvider.addNodeChangeListener(prefs, macroNodeListener);
+				macroPrefListener = new MacroPreferenceChangeListener();
+				WarlockMacroProvider.addPreferenceChangeListener(prefs,
+						macroPrefListener);
+			}
 		});
 	}
 	
@@ -188,5 +263,35 @@ public abstract class WarlockClient implements IWarlockClient {
 			stream.addStreamListener(listener);
 		else
 			potentialListeners.add(new Pair<String, IStreamListener>(streamName, listener));
+	}
+	
+	public Collection<IWarlockHighlight> getHighlights() {
+		return highlights;
+	}
+	
+	protected void loadHighlights() {
+		highlights = new ArrayList<IWarlockHighlight>();
+		
+		for(WarlockPreference<IWarlockHighlight> highlight : WarlockHighlightProvider.getAll(prefs)) {
+			highlights.add(highlight.get());
+		}
+	}
+	
+	public WarlockMacro getMacro(int keycode, int modifiers) {
+		return macros.get(Integer.toString(keycode) + "+" + Integer.toString(modifiers));
+	}
+	
+	protected void loadMacros() {
+		macros = new HashMap<String, WarlockMacro>();
+		
+		for(WarlockPreference<WarlockMacro> macroPref : WarlockMacroProvider.getAll(prefs)) {
+			WarlockMacro macro = macroPref.get();
+			macros.put(Integer.toString(macro.getModifiers()) + "+"
+					+ Integer.toString(macro.getKeycode()), macro);
+		}
+	}
+	
+	public IWarlockStyle getCommandStyle() {
+		return WarlockStyleProvider.get(prefs, "command").get();
 	}
 }

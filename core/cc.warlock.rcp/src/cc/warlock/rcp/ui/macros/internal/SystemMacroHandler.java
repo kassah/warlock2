@@ -30,7 +30,7 @@ import cc.warlock.core.client.settings.macro.IMacro;
 import cc.warlock.core.client.settings.macro.IMacroHandler;
 import cc.warlock.core.script.IScript;
 import cc.warlock.core.script.ScriptEngineRegistry;
-import cc.warlock.rcp.ui.macros.MacroRegistry;
+import cc.warlock.rcp.macro.MacroCommandRegistry;
 
 public class SystemMacroHandler implements IMacroHandler {
 
@@ -38,8 +38,8 @@ public class SystemMacroHandler implements IMacroHandler {
 	
 	public SystemMacroHandler ()
 	{
-		sendMacro = MacroRegistry.createMacro(SWT.CR, this);
-		stopScript = MacroRegistry.createMacro(SWT.ESC, this);
+		sendMacro = MacroCommandRegistry.createMacro(SWT.CR, this);
+		stopScript = MacroCommandRegistry.createMacro(SWT.ESC, this);
 	}
 	
 	public IMacro[] getMacros ()

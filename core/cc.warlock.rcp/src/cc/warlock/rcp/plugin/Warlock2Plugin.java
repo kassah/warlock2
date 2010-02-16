@@ -31,9 +31,9 @@ import org.eclipse.core.runtime.Platform;
 import org.eclipse.ui.plugin.AbstractUIPlugin;
 import org.osgi.framework.BundleContext;
 
+import cc.warlock.rcp.macro.MacroCommandRegistry;
 import cc.warlock.rcp.ui.client.WarlockClientAdaptable;
 import cc.warlock.rcp.ui.client.WarlockClientAdapterFactory;
-import cc.warlock.rcp.ui.macros.MacroRegistry;
 
 /**
  * The main plugin class to be used in the desktop.
@@ -67,7 +67,7 @@ public class Warlock2Plugin extends AbstractUIPlugin {
 		super.start(context);
 		
 		// force load of the Macro registry
-		MacroRegistry.instance();
+		MacroCommandRegistry.instance();
 		
 		Platform.getAdapterManager().registerAdapters(new WarlockClientAdapterFactory(), WarlockClientAdaptable.class);
 	}

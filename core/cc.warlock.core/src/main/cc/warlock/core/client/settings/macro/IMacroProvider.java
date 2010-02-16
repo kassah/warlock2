@@ -25,6 +25,8 @@ import java.util.Collection;
 import java.util.List;
 
 import cc.warlock.core.client.settings.IClientSettingProvider;
+import cc.warlock.core.stormfront.IMacroCommand;
+import cc.warlock.rcp.macro.IMacroVariable;
 
 
 public interface IMacroProvider extends IClientSettingProvider {

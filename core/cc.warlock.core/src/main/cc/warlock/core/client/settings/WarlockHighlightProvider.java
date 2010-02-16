@@ -5,6 +5,8 @@ import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
 
+import org.eclipse.core.runtime.preferences.IEclipsePreferences.INodeChangeListener;
+import org.eclipse.core.runtime.preferences.IEclipsePreferences.IPreferenceChangeListener;
 import org.osgi.service.prefs.BackingStoreException;
 import org.osgi.service.prefs.Preferences;
 
@@ -13,6 +15,8 @@ import cc.warlock.core.client.IWarlockStyle;
 import cc.warlock.core.client.internal.WarlockHighlight;
 
 public class WarlockHighlightProvider implements WarlockPreferenceProvider<IWarlockHighlight> {
+	private static final String NODE_NAME = "highlight";
+	
 	private static WarlockHighlightProvider instance;
 	
 	private WarlockHighlightProvider() { }
@@ -27,7 +31,7 @@ public class WarlockHighlightProvider implements WarlockPreferenceProvider<IWarl
 		ArrayList<WarlockPreference<IWarlockHighlight>> results =
 			new ArrayList<WarlockPreference<IWarlockHighlight>>();
 
-		Preferences hnode = prefs.getNode().node("highlight");
+		Preferences hnode = prefs.getNode().node(NODE_NAME);
 		try {
 			for (String name : hnode.childrenNames()) {
 				Preferences node = hnode.node(name);
@@ -45,7 +49,7 @@ public class WarlockHighlightProvider implements WarlockPreferenceProvider<IWarl
 		HashMap<String, WarlockPreference<IWarlockHighlight>> results =
 			new HashMap<String, WarlockPreference<IWarlockHighlight>>();
 
-		Preferences hnode = prefs.getNode().node("highlight");
+		Preferences hnode = prefs.getNode().node(NODE_NAME);
 		try {
 			for (String name : hnode.childrenNames()) {
 				Preferences node = hnode.node(name);
@@ -70,7 +74,7 @@ public class WarlockHighlightProvider implements WarlockPreferenceProvider<IWarl
 	}
 	
 	public static String addHighlight(WarlockClientPreferences prefs, IWarlockHighlight highlight) {
-		Preferences hnode = prefs.getNode().node("highlight");
+		Preferences hnode = prefs.getNode().node(NODE_NAME);
 		
 		int max = 0;
 		try {
@@ -88,7 +92,7 @@ public class WarlockHighlightProvider implements WarlockPreferenceProvider<IWarl
 	}
 	
 	public static void putHighlight(WarlockClientPreferences prefs, String id, IWarlockHighlight highlight) {
-		saveHighlight(prefs.getNode().node("highlight").node(id), highlight);
+		saveHighlight(prefs.getNode().node(NODE_NAME).node(id), highlight);
 	}
 	
 	protected static void saveHighlight(Preferences node, IWarlockHighlight highlight) {
@@ -101,7 +105,7 @@ public class WarlockHighlightProvider implements WarlockPreferenceProvider<IWarl
 	
 	public static void removeHighlight(WarlockClientPreferences prefs, String id) {
 		try {
-			prefs.getNode().node("highlight").node(id).removeNode();
+			prefs.getNode().node(NODE_NAME).node(id).removeNode();
 		} catch(BackingStoreException e) {
 			e.printStackTrace();
 		}
@@ -109,5 +113,29 @@ public class WarlockHighlightProvider implements WarlockPreferenceProvider<IWarl
 	
 	public void save(String path, IWarlockHighlight value) {
 		saveHighlight(WarlockPreferences.getScope().getNode(path), value);
+	}
+	
+	public static void addNodeChangeListener(WarlockClientPreferences prefs,
+			INodeChangeListener listener) {
+		String path = prefs.getNode().node(NODE_NAME).absolutePath();
+		WarlockPreferences.getScope().getNode(path).addNodeChangeListener(listener);
+	}
+	
+	public static void addPreferenceChangeListener(WarlockClientPreferences prefs,
+			IPreferenceChangeListener listener) {
+		String path = prefs.getNode().node(NODE_NAME).absolutePath();
+		WarlockPreferences.getScope().getNode(path).addPreferenceChangeListener(listener);
+	}
+	
+	public static void removeNodeChangeListener(WarlockClientPreferences prefs,
+			INodeChangeListener listener) {
+		String path = prefs.getNode().node(NODE_NAME).absolutePath();
+		WarlockPreferences.getScope().getNode(path).removeNodeChangeListener(listener);
+	}
+	
+	public static void removePreferenceChangeListener(WarlockClientPreferences prefs,
+			IPreferenceChangeListener listener) {
+		String path = prefs.getNode().node(NODE_NAME).absolutePath();
+		WarlockPreferences.getScope().getNode(path).removePreferenceChangeListener(listener);
 	}
 }

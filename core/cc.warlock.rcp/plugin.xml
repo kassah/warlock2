@@ -68,36 +68,26 @@
    </extension>
    <extension
          point="cc.warlock.rcp.macroVariables">
-      <macroVariable classname="cc.warlock.rcp.ui.macros.internal.variables.CurrentCommandMacroVariable"/>
-      <macroVariable classname="cc.warlock.rcp.ui.macros.internal.variables.LastCommandMacroVariable"/>
-      <macroVariable classname="cc.warlock.rcp.ui.macros.internal.variables.NextCommandMacroVariable"/>
+      <macroVariable classname="cc.warlock.rcp.macro.variables.CurrentCommandMacroVariable"/>
+      <macroVariable classname="cc.warlock.rcp.macro.variables.LastCommandMacroVariable"/>
+      <macroVariable classname="cc.warlock.rcp.macro.variables.NextCommandMacroVariable"/>
    </extension>
    <extension
          point="cc.warlock.rcp.macroCommands">
-      <macroCommand classname="cc.warlock.rcp.ui.macros.internal.commands.HistoryPrevMacroCommand"/>
-      <macroCommand classname="cc.warlock.rcp.ui.macros.internal.commands.HistorySearchMacroCommand"/>
-      <macroCommand classname="cc.warlock.rcp.ui.macros.internal.commands.HistoryNextMacroCommand"/>
-      <macroCommand classname="cc.warlock.rcp.ui.macros.internal.commands.PauseScriptMacroCommand"/>
-      <macroCommand classname="cc.warlock.rcp.ui.macros.internal.commands.ReturnOrRepeatLastMacroCommand"/>
-      <macroCommand classname="cc.warlock.rcp.ui.macros.internal.commands.RepeatLastMacroCommand"/>
-      <macroCommand classname="cc.warlock.rcp.ui.macros.internal.commands.RepeatSecondToLastMacroCommand"/>
-      <macroCommand classname="cc.warlock.rcp.ui.macros.internal.commands.CopyMacroCommand"/>
-      <macroCommand classname="cc.warlock.rcp.ui.macros.internal.commands.PasteMacroCommand"/>
-      <macroCommand
-            classname="cc.warlock.rcp.ui.macros.internal.commands.PageUpCommand">
-      </macroCommand>
-      <macroCommand
-            classname="cc.warlock.rcp.ui.macros.internal.commands.PageDownCommand">
-      </macroCommand>
-      <macroCommand
-            classname="cc.warlock.rcp.ui.macros.internal.commands.HighlightsDialogMacroCommand">
-      </macroCommand>
-      <macroCommand
-            classname="cc.warlock.rcp.ui.macros.internal.commands.MacrosDialogMacroCommand">
-      </macroCommand>
-      <macroCommand
-            classname="cc.warlock.rcp.ui.macros.internal.commands.VariablesDialogMacroCommand">
-      </macroCommand>
+      <macroCommand classname="cc.warlock.rcp.macro.commands.CopyMacroCommand"/>
+      <macroCommand classname="cc.warlock.rcp.macro.commands.HighlightsDialogMacroCommand"/>
+      <macroCommand classname="cc.warlock.rcp.macro.commands.HistoryNextMacroCommand"/>
+      <macroCommand classname="cc.warlock.rcp.macro.commands.HistoryPrevMacroCommand"/>
+      <macroCommand classname="cc.warlock.rcp.macro.commands.HistorySearchMacroCommand"/>
+      <macroCommand classname="cc.warlock.rcp.macro.commands.MacrosDialogMacroCommand"/>
+      <macroCommand classname="cc.warlock.rcp.macro.commands.PageDownCommand"/>
+      <macroCommand classname="cc.warlock.rcp.macro.commands.PageUpCommand"/>
+      <macroCommand classname="cc.warlock.rcp.macro.commands.PauseScriptMacroCommand"/>
+      <macroCommand classname="cc.warlock.rcp.macro.commands.PasteMacroCommand"/>
+      <macroCommand classname="cc.warlock.rcp.macro.commands.RepeatLastMacroCommand"/>
+      <macroCommand classname="cc.warlock.rcp.macro.commands.RepeatSecondToLastMacroCommand"/>
+      <macroCommand classname="cc.warlock.rcp.macro.commands.ReturnOrRepeatLastMacroCommand"/>
+      <macroCommand classname="cc.warlock.rcp.macro.commands.VariablesDialogMacroCommand"/>
    </extension>
    <extension
          id="product"

@@ -39,8 +39,8 @@ import cc.warlock.core.network.Connection;
 import cc.warlock.core.network.IConnection;
 import cc.warlock.core.network.IConnectionListener;
 import cc.warlock.core.network.IConnection.ErrorType;
+import cc.warlock.rcp.macro.MacroCommandRegistry;
 import cc.warlock.rcp.telnet.ui.DefaultSkin;
-import cc.warlock.rcp.ui.macros.MacroRegistry;
 
 /**
  * @author Will Robertson
@@ -62,7 +62,7 @@ public class TelnetClient extends WarlockClient {
 		commandStyle = new WarlockStyle();
 		commandStyle.setBackgroundColor(new WarlockColor("#000033"));
 		
-		getClientSettings().addClientSettingProvider(MacroRegistry.instance());
+		getClientSettings().addClientSettingProvider(MacroCommandRegistry.instance());
 	}
 	
 	/* (non-Javadoc)
