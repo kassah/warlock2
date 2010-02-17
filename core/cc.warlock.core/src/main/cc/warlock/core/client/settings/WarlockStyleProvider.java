@@ -8,13 +8,11 @@ import cc.warlock.core.client.WarlockFont;
 import cc.warlock.core.client.internal.WarlockStyle;
 
 public class WarlockStyleProvider implements WarlockPreferenceProvider<IWarlockStyle> {
-	private static WarlockStyleProvider instance;
+	private static final WarlockStyleProvider instance = new WarlockStyleProvider();
 	
 	private WarlockStyleProvider() { }
 	
-	protected static synchronized WarlockStyleProvider getInstance() {
-		if(instance == null)
-			instance = new WarlockStyleProvider();
+	public static WarlockStyleProvider getInstance() {
 		return instance;
 	}
 	

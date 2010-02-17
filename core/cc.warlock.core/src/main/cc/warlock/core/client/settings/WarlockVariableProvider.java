@@ -4,13 +4,11 @@ import org.osgi.service.prefs.Preferences;
 
 
 public class WarlockVariableProvider implements WarlockPreferenceProvider<String> {
-	private static WarlockVariableProvider instance;
+	private static WarlockVariableProvider instance = new WarlockVariableProvider();
 	
 	private WarlockVariableProvider() { }
 	
-	protected static synchronized WarlockVariableProvider getInstance() {
-		if(instance == null)
-			instance = new WarlockVariableProvider();
+	public static WarlockVariableProvider getInstance() {
 		return instance;
 	}
 	

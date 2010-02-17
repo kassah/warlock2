@@ -10,13 +10,11 @@ import cc.warlock.core.client.IWarlockPattern;
 import cc.warlock.core.client.internal.WarlockPattern;
 
 public class WarlockTriggerProvider implements WarlockPreferenceProvider<IWarlockPattern> {
-	private static WarlockTriggerProvider instance;
+	private static final WarlockTriggerProvider instance = new WarlockTriggerProvider();
 	
 	private WarlockTriggerProvider() { }
 	
-	protected static synchronized WarlockTriggerProvider getInstance() {
-		if(instance == null)
-			instance = new WarlockTriggerProvider();
+	public static WarlockTriggerProvider getInstance() {
 		return instance;
 	}
 	

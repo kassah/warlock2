@@ -13,13 +13,11 @@ import cc.warlock.core.client.internal.WarlockMacro;
 public class WarlockMacroProvider implements WarlockPreferenceProvider<WarlockMacro> {
 	private static final String NODE_NAME = "macro";
 	
-	private static WarlockMacroProvider instance;
+	private static final WarlockMacroProvider instance = new WarlockMacroProvider();
 	
 	private WarlockMacroProvider() { }
 	
-	protected static synchronized WarlockMacroProvider getInstance() {
-		if(instance == null)
-			instance = new WarlockMacroProvider();
+	protected static WarlockMacroProvider getInstance() {
 		return instance;
 	}
 	

@@ -10,13 +10,11 @@ import cc.warlock.core.client.IWarlockPattern;
 import cc.warlock.core.client.internal.WarlockPattern;
 
 public class WarlockIgnoreProvider implements WarlockPreferenceProvider<IWarlockPattern> {
-	private static WarlockIgnoreProvider instance;
+	private static final WarlockIgnoreProvider instance = new WarlockIgnoreProvider();
 	
 	private WarlockIgnoreProvider() { }
 	
-	protected static synchronized WarlockIgnoreProvider getInstance() {
-		if(instance == null)
-			instance = new WarlockIgnoreProvider();
+	public static WarlockIgnoreProvider getInstance() {
 		return instance;
 	}
 	

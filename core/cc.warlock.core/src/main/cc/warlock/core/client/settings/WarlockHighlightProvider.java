@@ -17,13 +17,11 @@ import cc.warlock.core.client.internal.WarlockHighlight;
 public class WarlockHighlightProvider implements WarlockPreferenceProvider<IWarlockHighlight> {
 	private static final String NODE_NAME = "highlight";
 	
-	private static WarlockHighlightProvider instance;
+	private static final WarlockHighlightProvider instance = new WarlockHighlightProvider();
 	
 	private WarlockHighlightProvider() { }
 	
-	protected static synchronized WarlockHighlightProvider getInstance() {
-		if(instance == null)
-			instance = new WarlockHighlightProvider();
+	private static WarlockHighlightProvider getInstance() {
 		return instance;
 	}
 	

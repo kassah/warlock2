@@ -5,13 +5,11 @@ import org.osgi.service.prefs.Preferences;
 import cc.warlock.core.client.WarlockColor;
 
 public class WarlockColorProvider implements WarlockPreferenceProvider<WarlockColor> {
-	private static WarlockColorProvider instance;
+	private static final WarlockColorProvider instance = new WarlockColorProvider();
 	
 	private WarlockColorProvider() { }
 	
-	protected static synchronized WarlockColorProvider getInstance() {
-		if(instance == null)
-			instance = new WarlockColorProvider();
+	public static WarlockColorProvider getInstance() {
 		return instance;
 	}
 	

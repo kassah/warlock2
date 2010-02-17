@@ -5,13 +5,11 @@ import org.osgi.service.prefs.Preferences;
 import cc.warlock.core.client.WarlockFont;
 
 public class WarlockFontProvider implements WarlockPreferenceProvider<WarlockFont> {
-	private static WarlockFontProvider instance;
+	private static final WarlockFontProvider instance = new WarlockFontProvider();
 	
 	private WarlockFontProvider() { }
 	
-	protected static synchronized WarlockFontProvider getInstance() {
-		if(instance == null)
-			instance = new WarlockFontProvider();
+	public static WarlockFontProvider getInstance() {
 		return instance;
 	}
 	
