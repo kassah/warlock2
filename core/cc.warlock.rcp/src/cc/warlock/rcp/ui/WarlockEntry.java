@@ -191,7 +191,7 @@ public class WarlockEntry {
 					String name = match.group();
 					String val = MacroVariableRegistry.getMacroVariable(name, viewer);
 					if(val == null)
-						val = WarlockVariableProvider.get(viewer.getWarlockClient().getClientPreferences(), name).get();
+						val = WarlockVariableProvider.getInstance().get(viewer.getWarlockClient().getClientPreferences(), name);
 					if(val != null) {
 						buffer.append(val);
 						pos += name.length() + 1;

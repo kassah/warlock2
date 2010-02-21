@@ -134,7 +134,7 @@ public class StormFrontJavascriptCommands extends JavascriptCommands
 	}
 	
 	public String getVariable(String name) {
-		return WarlockVariableProvider.get(sfCommands.getStormFrontClient().getClientPreferences(), name).get();
+		return WarlockVariableProvider.getInstance().get(sfCommands.getStormFrontClient().getClientPreferences(), name);
 	}
 	
 	public String getVital(String name) {
@@ -142,6 +142,6 @@ public class StormFrontJavascriptCommands extends JavascriptCommands
 	}
 	
 	public void setVariable(String name, String value) {
-		WarlockVariableProvider.set(sfCommands.getClient().getClientPreferences(), name, value);
+		WarlockVariableProvider.getInstance().set(sfCommands.getClient().getClientPreferences(), name, value);
 	}
 }

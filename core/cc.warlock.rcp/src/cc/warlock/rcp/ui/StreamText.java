@@ -230,7 +230,7 @@ public class StreamText extends WarlockText implements IStreamListener {
 		WarlockFont font = getDefaultFont();
 		
 		// TODO: add a preference change listener here
-		IWarlockStyle wsettings = WarlockWindowProvider.get(client.getClientPreferences(), streamName).get();
+		IWarlockStyle wsettings = WarlockWindowProvider.getInstance().get(client.getClientPreferences(), streamName);
 		if (wsettings != null) {
 			if (!wsettings.getBackgroundColor().isDefault())
 				background = ColorUtil.warlockColorToColor(wsettings.getBackgroundColor());

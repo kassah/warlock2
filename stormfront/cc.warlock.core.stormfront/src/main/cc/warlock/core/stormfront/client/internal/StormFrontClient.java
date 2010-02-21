@@ -600,6 +600,6 @@ public class StormFrontClient extends WarlockClient implements IStormFrontClient
 	}
 	
 	public IWarlockStyle getNamedStyle(String name) {
-		return WarlockStyleProvider.get(prefs, name).get();
+		return WarlockStyleProvider.getInstance().get(prefs, name);
 	}
 }
