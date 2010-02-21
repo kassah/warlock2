@@ -4,7 +4,10 @@ import org.osgi.service.prefs.Preferences;
 
 import cc.warlock.core.client.WarlockFont;
 
-public class WarlockFontProvider implements WarlockPreferenceProvider<WarlockFont> {
+/*
+ * This class should not be used directly
+ */
+public class WarlockFontProvider extends WarlockPreferenceProvider<WarlockFont> {
 	private static final WarlockFontProvider instance = new WarlockFontProvider();
 	
 	private WarlockFontProvider() { }
@@ -13,7 +16,11 @@ public class WarlockFontProvider implements WarlockPreferenceProvider<WarlockFon
 		return instance;
 	}
 	
-	public static WarlockFont getFont(Preferences node) {
+	protected String getNodeName() {
+		return null;
+	}
+	
+	protected WarlockFont get(Preferences node) {
 		WarlockFont font = new WarlockFont();
 		String family = node.get("family", null);
 		if(family != null)
@@ -24,17 +31,8 @@ public class WarlockFontProvider implements WarlockPreferenceProvider<WarlockFon
 		return font;
 	}
 	
-	public static WarlockPreference<WarlockFont> get(Preferences node) {
-		return new WarlockPreference<WarlockFont>(getInstance(),
-				node.absolutePath(), getFont(node));
-	}
-	
-	protected static void saveFont(Preferences node, WarlockFont value) {
+	protected void set(Preferences node, WarlockFont value) {
 		node.put("family", value.getFamilyName());
 		node.putInt("size", value.getSize());
-	}
-	
-	public void save(String path, WarlockFont value) {
-		saveFont(WarlockPreferences.getScope().getNode(path), value);
 	}
 }

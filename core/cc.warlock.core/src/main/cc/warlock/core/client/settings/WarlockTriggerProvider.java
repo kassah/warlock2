@@ -1,42 +1,24 @@
 package cc.warlock.core.client.settings;
 
-import java.util.ArrayList;
-import java.util.Collection;
-
-import org.osgi.service.prefs.BackingStoreException;
 import org.osgi.service.prefs.Preferences;
 
 import cc.warlock.core.client.IWarlockPattern;
 import cc.warlock.core.client.internal.WarlockPattern;
 
-public class WarlockTriggerProvider implements WarlockPreferenceProvider<IWarlockPattern> {
+public class WarlockTriggerProvider extends WarlockPreferenceArrayProvider<IWarlockPattern> {
 	private static final WarlockTriggerProvider instance = new WarlockTriggerProvider();
 	
-	private WarlockTriggerProvider() { }
+	protected WarlockTriggerProvider() { }
 	
 	public static WarlockTriggerProvider getInstance() {
 		return instance;
 	}
 	
-	public static Collection<WarlockPreference<IWarlockPattern>> getAll(WarlockClientPreferences prefs) {
-		ArrayList<WarlockPreference<IWarlockPattern>> results =
-			new ArrayList<WarlockPreference<IWarlockPattern>>();
-
-		Preferences inode = prefs.getNode().node("trigger");
-		try {
-			for (String name : inode.childrenNames()) {
-				Preferences node = inode.node(name);
-				results.add(new WarlockPreference<IWarlockPattern>(getInstance(),
-						node.absolutePath(), getPattern(node)));
-			}
-		} catch(BackingStoreException e) {
-			e.printStackTrace();
-		}
-
-		return results;
+	protected String getNodeName() {
+		return "trigger";
 	}
 	
-	protected static IWarlockPattern getPattern(Preferences node) {
+	protected IWarlockPattern get(Preferences node) {
 		String text = node.get("text", null);
 		boolean literal = node.getBoolean("literal", true);
 		boolean caseInsensitive = node.getBoolean("case-insensitive", false);
@@ -45,14 +27,10 @@ public class WarlockTriggerProvider implements WarlockPreferenceProvider<IWarloc
 		return new WarlockPattern(text, literal, caseInsensitive, wholeWord);
 	}
 	
-	protected static void saveTrigger(Preferences node, IWarlockPattern pattern) {
+	protected void set(Preferences node, IWarlockPattern pattern) {
 		node.put("text", pattern.getText());
 		node.putBoolean("literal", pattern.isLiteral());
 		node.putBoolean("case-insensitive", pattern.isCaseInsensitive());
 		node.putBoolean("whole-word", pattern.isWholeWord());
-	}
-	
-	public void save(String path, IWarlockPattern value) {
-		saveTrigger(WarlockPreferences.getScope().getNode(path), value);
 	}
 }

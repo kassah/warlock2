@@ -4,7 +4,10 @@ import org.osgi.service.prefs.Preferences;
 
 import cc.warlock.core.client.WarlockColor;
 
-public class WarlockColorProvider implements WarlockPreferenceProvider<WarlockColor> {
+/*
+ * This class is meant for internal use only.
+ */
+public class WarlockColorProvider extends WarlockPreferenceProvider<WarlockColor> {
 	private static final WarlockColorProvider instance = new WarlockColorProvider();
 	
 	private WarlockColorProvider() { }
@@ -13,20 +16,15 @@ public class WarlockColorProvider implements WarlockPreferenceProvider<WarlockCo
 		return instance;
 	}
 	
-	public static WarlockColor getColor(Preferences node) {
+	protected String getNodeName() {
+		return null;
+	}
+	
+	public WarlockColor get(Preferences node) {
 		return new WarlockColor(node.get("value", null));
 	}
 	
-	public static WarlockPreference<WarlockColor> get(Preferences node) {
-		return new WarlockPreference<WarlockColor>(getInstance(),
-				node.absolutePath(), getColor(node));
-	}
-	
-	protected static void saveColor(Preferences node, WarlockColor value) {
+	protected void set(Preferences node, WarlockColor value) {
 		node.put("value", value.toString());
-	}
-	
-	public void save(String path, WarlockColor value) {
-		saveColor(WarlockPreferences.getScope().getNode(path), value);
 	}
 }

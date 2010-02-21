@@ -24,7 +24,7 @@ public class WarlockPreference<T> {
 	}
 	
 	public void save() {
-		provider.save(path, value);
+		provider.set(path, value);
 	}
 	
 	public void addNodeChangeListener(INodeChangeListener listener) {

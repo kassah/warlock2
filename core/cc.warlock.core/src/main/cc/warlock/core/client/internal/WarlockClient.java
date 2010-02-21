@@ -53,7 +53,6 @@ import cc.warlock.core.client.logging.SimpleLogger;
 import cc.warlock.core.client.settings.WarlockClientPreferences;
 import cc.warlock.core.client.settings.WarlockHighlightProvider;
 import cc.warlock.core.client.settings.WarlockMacroProvider;
-import cc.warlock.core.client.settings.WarlockPreference;
 import cc.warlock.core.client.settings.WarlockStyleProvider;
 import cc.warlock.core.network.IConnection;
 import cc.warlock.core.util.Pair;
@@ -145,28 +144,28 @@ public abstract class WarlockClient implements IWarlockClient {
 
 			@Override
 			public void clientRemoved(IWarlockClient client) {
-				WarlockHighlightProvider.removeNodeChangeListener(prefs, highlightNodeListener);
-				WarlockHighlightProvider.removePreferenceChangeListener(prefs, highlightPrefListener);
+				WarlockHighlightProvider.getInstance().removeNodeChangeListener(prefs, highlightNodeListener);
+				WarlockHighlightProvider.getInstance().removePreferenceChangeListener(prefs, highlightPrefListener);
 				
-				WarlockMacroProvider.removeNodeChangeListener(prefs, macroNodeListener);
-				WarlockMacroProvider.removePreferenceChangeListener(prefs, macroPrefListener);
+				WarlockMacroProvider.getInstance().removeNodeChangeListener(prefs, macroNodeListener);
+				WarlockMacroProvider.getInstance().removePreferenceChangeListener(prefs, macroPrefListener);
 			}
 
 			@Override
 			public void clientSettingsLoaded(IWarlockClient client) {
 				loadHighlights();
 				highlightNodeListener = new HighlightNodeChangeListener();
-				WarlockHighlightProvider.addNodeChangeListener(prefs,
+				WarlockHighlightProvider.getInstance().addNodeChangeListener(prefs,
 						highlightNodeListener);
 				highlightPrefListener = new HighlightPreferenceChangeListener();
-				WarlockHighlightProvider.addPreferenceChangeListener(prefs,
+				WarlockHighlightProvider.getInstance().addPreferenceChangeListener(prefs,
 						highlightPrefListener);
 				
 				loadMacros();
 				macroNodeListener = new MacroNodeChangeListener();
-				WarlockMacroProvider.addNodeChangeListener(prefs, macroNodeListener);
+				WarlockMacroProvider.getInstance().addNodeChangeListener(prefs, macroNodeListener);
 				macroPrefListener = new MacroPreferenceChangeListener();
-				WarlockMacroProvider.addPreferenceChangeListener(prefs,
+				WarlockMacroProvider.getInstance().addPreferenceChangeListener(prefs,
 						macroPrefListener);
 				
 				scriptPrefix = prefs.getNode().get("script-prefix", ".");
@@ -279,8 +278,8 @@ public abstract class WarlockClient implements IWarlockClient {
 	protected void loadHighlights() {
 		highlights = new ArrayList<IWarlockHighlight>();
 		
-		for(WarlockPreference<IWarlockHighlight> highlight : WarlockHighlightProvider.getAll(prefs)) {
-			highlights.add(highlight.get());
+		for(IWarlockHighlight highlight : WarlockHighlightProvider.getInstance().getAll(prefs)) {
+			highlights.add(highlight);
 		}
 	}
 	
@@ -291,14 +290,14 @@ public abstract class WarlockClient implements IWarlockClient {
 	protected void loadMacros() {
 		macros = new HashMap<String, WarlockMacro>();
 		
-		for(WarlockPreference<WarlockMacro> macroPref : WarlockMacroProvider.getAll(prefs)) {
-			WarlockMacro macro = macroPref.get();
+		for(WarlockMacro macroPref : WarlockMacroProvider.getInstance().getAll(prefs)) {
+			WarlockMacro macro = macroPref;
 			macros.put(Integer.toString(macro.getModifiers()) + "+"
 					+ Integer.toString(macro.getKeycode()), macro);
 		}
 	}
 	
 	public IWarlockStyle getCommandStyle() {
-		return WarlockStyleProvider.get(prefs, "command").get();
+		return WarlockStyleProvider.getInstance().get(prefs, "command");
 	}
 }
