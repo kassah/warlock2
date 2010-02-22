@@ -54,7 +54,6 @@ import cc.warlock.core.client.settings.WarlockStyleProvider;
 import cc.warlock.core.script.IScript;
 import cc.warlock.core.script.IScriptListener;
 import cc.warlock.core.script.ScriptEngineRegistry;
-import cc.warlock.core.script.configuration.ScriptConfiguration;
 import cc.warlock.core.stormfront.client.IStormFrontClient;
 import cc.warlock.core.stormfront.client.IStormFrontClientViewer;
 import cc.warlock.core.stormfront.client.IStormFrontDialogMessage;
@@ -119,8 +118,6 @@ public class StormFrontClient extends WarlockClient implements IStormFrontClient
 	
 	@Override
 	public void send(ICommand command) {
-		String scriptPrefix = ScriptConfiguration.instance().getScriptPrefix();
-		
 		if (command.getCommand().startsWith(scriptPrefix)){
 			runScript(command.getCommand().substring(scriptPrefix.length()));
 		} else {

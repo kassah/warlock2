@@ -29,32 +29,21 @@ import java.util.List;
 import org.dom4j.DocumentHelper;
 import org.dom4j.Element;
 
-import cc.warlock.core.configuration.IConfigurationProvider;
-import cc.warlock.core.configuration.WarlockConfiguration;
 import cc.warlock.core.profile.Account;
 import cc.warlock.core.profile.Profile;
 
-public class ProfileConfiguration implements IConfigurationProvider {
+public class ProfileConfiguration {
 	
-	public static final String PROFILE_CONFIGURATION_FILE = "profiles.xml";
-	
-	protected static ProfileConfiguration _instance;
+	protected static ProfileConfiguration instance  = new ProfileConfiguration();
 	
 	public static ProfileConfiguration instance() {
-		if (_instance == null) _instance = new ProfileConfiguration();
-		return _instance;
-	}
-	
-	public static WarlockConfiguration getProfileConfiguration ()
-	{
-		return WarlockConfiguration.getWarlockConfiguration(PROFILE_CONFIGURATION_FILE);
+		return instance;
 	}
 	
 	// TODO - determine if accounts should be synchronized
 	protected HashMap<String, Account> accounts = new HashMap<String, Account>();
 	
 	protected ProfileConfiguration () {
-		WarlockConfiguration.getWarlockConfiguration(PROFILE_CONFIGURATION_FILE).addConfigurationProvider(this);
 	}
 	
 	public List<Element> getTopLevelElements() {
@@ -105,14 +94,6 @@ public class ProfileConfiguration implements IConfigurationProvider {
 				account.getProfiles().add(profile);
 			}
 		}
-	}
-
-	public boolean supportsElement(Element element) {
-		if (element.getName().equals("account") || element.getName().equals("profile"))
-		{
-			return true;
-		}
-		return false;
 	}
 	
 	public void addAccount (Account account)

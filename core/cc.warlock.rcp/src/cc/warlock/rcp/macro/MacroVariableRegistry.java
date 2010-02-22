@@ -52,6 +52,6 @@ public class MacroVariableRegistry {
 		if(var != null)
 			return var.getValue(context);
 		
-		return WarlockVariableProvider.get(context.getWarlockClient().getClientPreferences(), id).get();
+		return WarlockVariableProvider.getInstance().get(context.getWarlockClient().getClientPreferences(), id);
 	}
 }
