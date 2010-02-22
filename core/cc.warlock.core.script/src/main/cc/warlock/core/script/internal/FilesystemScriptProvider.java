@@ -36,7 +36,7 @@ import cc.warlock.core.script.IScriptFileInfo;
 import cc.warlock.core.script.IScriptInfo;
 import cc.warlock.core.script.IScriptProvider;
 import cc.warlock.core.script.ScriptEngineRegistry;
-import cc.warlock.core.script.settings.WarlockScriptPreference;
+import cc.warlock.core.script.settings.ScriptDirectoryProvider;
 
 public class FilesystemScriptProvider implements IScriptProvider {
 	protected static FilesystemScriptProvider _instance;
@@ -93,7 +93,7 @@ public class FilesystemScriptProvider implements IScriptProvider {
 	public Collection<? extends IScriptInfo> getScriptInfos(WarlockClientPreferences prefs)
 	{
 		ArrayList<ScriptFileInfo> infos = new ArrayList<ScriptFileInfo>();
-		for(String path : WarlockScriptPreference.getInstance().getAll(prefs)) {
+		for(String path : ScriptDirectoryProvider.getInstance().getAll(prefs)) {
 			File dir = new File(path);
 			if (dir != null)
 			{

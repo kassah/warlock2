@@ -4,13 +4,13 @@ import org.osgi.service.prefs.Preferences;
 
 import cc.warlock.core.client.settings.WarlockPreferenceArrayProvider;
 
-public class WarlockScriptPreference extends WarlockPreferenceArrayProvider<String> {
+public class ScriptDirectoryProvider extends WarlockPreferenceArrayProvider<String> {
 	
-	private static final WarlockScriptPreference instance = new WarlockScriptPreference();
+	private static final ScriptDirectoryProvider instance = new ScriptDirectoryProvider();
 	
-	protected WarlockScriptPreference() { }
+	protected ScriptDirectoryProvider() { }
 	
-	public static WarlockScriptPreference getInstance() {
+	public static ScriptDirectoryProvider getInstance() {
 		return instance;
 	}
 	
