@@ -93,7 +93,7 @@ public class ScriptEngineRegistry {
 	{
 		for (IScriptProvider provider : providers)
 		{
-			for (IScriptInfo scriptInfo : provider.getScriptInfos())
+			for (IScriptInfo scriptInfo : provider.getScriptInfos(client.getClientPreferences()))
 			{
 				if (scriptInfo.getScriptName().equalsIgnoreCase(scriptName)) {
 					IScript script = provider.startScript(scriptInfo, client, arguments);

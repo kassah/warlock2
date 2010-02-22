@@ -25,36 +25,24 @@ import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.FileReader;
 import java.io.Reader;
-import java.util.Arrays;
-import java.util.HashMap;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Set;
+import java.util.ArrayList;
+import java.util.Collection;
 
 import cc.warlock.core.client.IWarlockClient;
-import cc.warlock.core.configuration.WarlockConfiguration;
-import cc.warlock.core.script.IFilesystemScriptProvider;
+import cc.warlock.core.client.settings.WarlockClientPreferences;
 import cc.warlock.core.script.IScript;
 import cc.warlock.core.script.IScriptEngine;
 import cc.warlock.core.script.IScriptFileInfo;
 import cc.warlock.core.script.IScriptInfo;
+import cc.warlock.core.script.IScriptProvider;
 import cc.warlock.core.script.ScriptEngineRegistry;
-import cc.warlock.core.script.configuration.ScriptConfiguration;
+import cc.warlock.core.script.settings.WarlockScriptPreference;
 
-public class FilesystemScriptProvider implements IFilesystemScriptProvider, Runnable {
-
-	// TODO - determine if infos needs to be synchronized
-	protected HashMap<ScriptFileInfo, Long> infos = new HashMap<ScriptFileInfo, Long>();
-	
-	protected boolean scanning = false, scanFinished = false;
+public class FilesystemScriptProvider implements IScriptProvider {
 	protected static FilesystemScriptProvider _instance;
-	protected boolean forcedScan = false;
-	protected Thread scanningThread;
 	
 	static {
 		ScriptEngineRegistry.addScriptProvider(instance());
-		WarlockConfiguration.getMainConfiguration().addConfigurationProvider(ScriptConfiguration.instance());
-		instance().scan();
 	}
 	
 	public static FilesystemScriptProvider instance()
@@ -65,7 +53,7 @@ public class FilesystemScriptProvider implements IFilesystemScriptProvider, Runn
 		return _instance;
 	}
 	
-	protected class ScriptFileInfo implements IScriptFileInfo, Comparable<ScriptFileInfo>
+	public class ScriptFileInfo implements IScriptFileInfo, Comparable<ScriptFileInfo>
 	{
 		public String scriptName;
 		public File scriptFile;
@@ -100,43 +88,24 @@ public class FilesystemScriptProvider implements IFilesystemScriptProvider, Runn
 		}
 	}
 	
-	FilesystemScriptProvider () { }
+	protected FilesystemScriptProvider () { }
 	
-	protected void start () {
-		scanning = true;
-		
-		scanningThread = new Thread(this);
-		scanningThread.start();
-	}
-	
-	public void addScriptDirectory (File directory)
+	public Collection<? extends IScriptInfo> getScriptInfos(WarlockClientPreferences prefs)
 	{
-		Set<File> scriptDirs =
-			ScriptConfiguration.instance().getScriptDirectories();
-		
-		if (!scriptDirs.contains(directory))
-			scriptDirs.add(directory);
-	}
-	
-	public void removeScriptDirectory (File directory)
-	{
-		Set<File> scriptDirs =
-			ScriptConfiguration.instance().getScriptDirectories();
-		
-		scriptDirs.remove(directory);
-	}
-	
-	public List<IScriptInfo> getScriptInfos() {
-		if (!scanning && ScriptConfiguration.instance().getAutoScan().get()) {
-			start();
+		ArrayList<ScriptFileInfo> infos = new ArrayList<ScriptFileInfo>();
+		for(String path : WarlockScriptPreference.getInstance().getAll(prefs)) {
+			File dir = new File(path);
+			if (dir != null)
+			{
+				scanDirectory(infos, dir);
+			}
 		}
-		
-		return Arrays.asList(infos.keySet().toArray(new IScriptInfo[infos.keySet().size()]));
+		return infos;
 	}
 	
-	protected ScriptFileInfo getScriptInfo (File file)
+	protected ScriptFileInfo getScriptInfo (Collection<ScriptFileInfo> infos, File file)
 	{
-		for (ScriptFileInfo info : infos.keySet())
+		for (ScriptFileInfo info : infos)
 		{
 			if (info.scriptFile.getAbsolutePath().equals(file.getAbsolutePath()))
 			{
@@ -157,93 +126,27 @@ public class FilesystemScriptProvider implements IFilesystemScriptProvider, Runn
 		return null;
 	}
 	
-	protected void scanDirectory (File directory)
+	protected void scanDirectory (Collection<ScriptFileInfo> infos, File directory)
 	{
 		if (!directory.exists()) return;
 		
 		for (File file : directory.listFiles())
 		{
-			if (file.isFile())
+			if (file.isFile() && file.exists())
 			{
-				ScriptFileInfo info = getScriptInfo(file);
+				ScriptFileInfo info = getScriptInfo(infos, file);
 				if (info == null) {
 					info = new ScriptFileInfo();
 					info.scriptFile = file;
 					info.scriptName = file.getName();
-					if (info.scriptName.indexOf('.') > 0)
+					if (info.scriptName.lastIndexOf('.') > 0)
 					{
-						info.scriptName = info.scriptName.substring(0, info.scriptName.indexOf('.'));
+						info.scriptName = info.scriptName.substring(0, info.scriptName.lastIndexOf('.'));
 					}
 					
-					infos.put(info, (long) 0);
+					infos.add(info);
 				}
 			}
 		}
-		
-		for (Iterator<ScriptFileInfo> iter = infos.keySet().iterator(); iter.hasNext(); )
-		{
-			ScriptFileInfo info = iter.next();
-			
-			if (!info.scriptFile.exists())
-				iter.remove();
-		}
-	}
-	
-	protected void scan ()
-	{
-		for (File dir : ScriptConfiguration.instance().getScriptDirectories())
-		{
-			if (dir.exists())
-			{
-				scanDirectory(dir);
-			}
-		}
-		scanFinished = true;
-	}
-	
-	public void run ()
-	{
-		while (scanning)
-		{
-			scan();
-			
-			try {
-				Thread.sleep(ScriptConfiguration.instance().getScanTimeout().get());
-			} catch (InterruptedException e) {
-				if (!forcedScan)
-				{
-					e.printStackTrace();
-				}
-				forcedScan = false;
-			}
-		}
-	}
-	
-	public List<File> getScriptDirectories() {
-		Set<File> scriptDirs = ScriptConfiguration.instance().getScriptDirectories();
-		
-		return Arrays.asList(scriptDirs.toArray(new File[scriptDirs.size()]));
-	}
-	
-	public void forceScan() {
-		forcedScan = true;
-		scanFinished = false;
-		
-		scanningThread.interrupt();
-		while (!scanFinished) {
-			try {
-				Thread.sleep((long)200);
-			} catch (InterruptedException e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
-			}
-		}
-	}
-	
-	@Override
-	protected void finalize() throws Throwable {
-		scanning = false;
-		
-		super.finalize();
 	}
 }

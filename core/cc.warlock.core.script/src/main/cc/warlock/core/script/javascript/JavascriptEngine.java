@@ -30,7 +30,6 @@ package cc.warlock.core.script.javascript;
 import java.io.Reader;
 import java.util.ArrayList;
 import java.util.Collection;
-import java.util.List;
 
 import org.mozilla.javascript.Context;
 import org.mozilla.javascript.ContextFactory;
@@ -48,7 +47,6 @@ import cc.warlock.core.script.IScriptEngine;
 import cc.warlock.core.script.IScriptFileInfo;
 import cc.warlock.core.script.IScriptInfo;
 import cc.warlock.core.script.ScriptCommandsFactory;
-import cc.warlock.core.script.configuration.ScriptConfiguration;
 import cc.warlock.core.script.javascript.JavascriptScript.StopException;
 
 
@@ -63,6 +61,7 @@ public class JavascriptEngine implements IScriptEngine {
 	public static final String ENGINE_ID = "cc.warlock.script.javascript.JavascriptEngine";
 	protected ArrayList<IJavascriptVariableProvider> varProviders = new ArrayList<IJavascriptVariableProvider>();
 	protected ArrayList<JavascriptScript> runningScripts = new ArrayList<JavascriptScript>();
+	protected ArrayList<String> fileExtensions = new ArrayList<String>();
 	
 	public Scriptable scope;
 	
@@ -105,6 +104,7 @@ public class JavascriptEngine implements IScriptEngine {
 	}
 	
 	public JavascriptEngine() {
+		fileExtensions.add(".js");
 		ContextFactory.initGlobal(new WarlockContextFactory());
 	}
 	
@@ -113,7 +113,7 @@ public class JavascriptEngine implements IScriptEngine {
 	}
 	
 	public String getScriptEngineName() {
-		return "Standard Javascript Engine (c) 2002-2007 Warlock Team";
+		return "Standard Javascript Engine (c) 2002-2010 Warlock Team";
 	}
 	
 	
@@ -131,13 +131,9 @@ public class JavascriptEngine implements IScriptEngine {
 		if (scriptInfo instanceof IScriptFileInfo)
 		{
 			IScriptFileInfo info = (IScriptFileInfo) scriptInfo;
-			if (info.getExtension() != null)
-			{
-				List<String> extensions = ScriptConfiguration.instance().getEngineExtensions(ENGINE_ID);
-				if (extensions != null && extensions.contains(info.getExtension().toLowerCase())) {
-					return true;
-				}
-			}
+			if (info.getExtension() != null
+					&& fileExtensions.contains(info.getExtension().toLowerCase()))
+				return true;
 		}
 		
 		return false;
