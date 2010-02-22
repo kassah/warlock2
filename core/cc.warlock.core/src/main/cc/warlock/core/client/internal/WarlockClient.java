@@ -118,7 +118,7 @@ public abstract class WarlockClient implements IWarlockClient {
 		}
 	}
 	
-	protected class ScriptPrfixChangeListener implements IPreferenceChangeListener {
+	protected class ScriptPrefixChangeListener implements IPreferenceChangeListener {
 		public void preferenceChange(PreferenceChangeEvent event) {
 			scriptPrefix = prefs.getNode().get("script-prefix", ".");
 		}
@@ -169,7 +169,7 @@ public abstract class WarlockClient implements IWarlockClient {
 						macroPrefListener);
 				
 				scriptPrefix = prefs.getNode().get("script-prefix", ".");
-				scriptPrefixChangeListener = new ScriptPrfixChangeListener();
+				scriptPrefixChangeListener = new ScriptPrefixChangeListener();
 				prefs.addPreferenceChangeListener(scriptPrefixChangeListener);
 			}
 		});

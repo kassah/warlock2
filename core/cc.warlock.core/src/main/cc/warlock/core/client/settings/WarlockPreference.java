@@ -28,10 +28,10 @@ public class WarlockPreference<T> {
 	}
 	
 	public void addNodeChangeListener(INodeChangeListener listener) {
-		WarlockPreferences.addNodeChangeListener(path, listener);
+		WarlockPreferences.getInstance().addNodeChangeListener(path, listener);
 	}
 	
 	public void addPreferenceChangeListener(IPreferenceChangeListener listener) {
-		WarlockPreferences.addPreferenceChangeListener(path, listener);
+		WarlockPreferences.getInstance().addPreferenceChangeListener(path, listener);
 	}
 }

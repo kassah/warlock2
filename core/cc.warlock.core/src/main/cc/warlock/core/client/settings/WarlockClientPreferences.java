@@ -16,10 +16,10 @@ public class WarlockClientPreferences extends WarlockPreferences {
 	}
 	
 	public void addNodeChangeListener(INodeChangeListener listener) {
-		WarlockPreferences.addNodeChangeListener(clientPrefs.absolutePath(), listener);
+		WarlockPreferences.getInstance().addNodeChangeListener(clientPrefs.absolutePath(), listener);
 	}
 	
 	public void addPreferenceChangeListener(IPreferenceChangeListener listener) {
-		WarlockPreferences.addPreferenceChangeListener(clientPrefs.absolutePath(), listener);
+		WarlockPreferences.getInstance().addPreferenceChangeListener(clientPrefs.absolutePath(), listener);
 	}
 }

@@ -7,22 +7,29 @@ import org.eclipse.core.runtime.preferences.IEclipsePreferences.IPreferenceChang
 import org.osgi.service.prefs.Preferences;
 
 public class WarlockPreferences {
-	private static ConfigurationScope scope;
-	private static IEclipsePreferences topLevel;
+	private static WarlockPreferences instance = new WarlockPreferences();
+	private static ConfigurationScope scope = new ConfigurationScope();
+	private static IEclipsePreferences topLevel = scope.getNode("cc.warlock");
 	
-	public static synchronized ConfigurationScope getScope() {
-		if(scope == null)
-			scope = new ConfigurationScope();
+	protected WarlockPreferences() { }
+	
+	public static WarlockPreferences getInstance() {
+		return instance;
+	}
+	
+	public static ConfigurationScope getScope() {
 		return scope;
 	}
 	
-	public static synchronized Preferences getRootNode() {
-		if(topLevel == null)
-			topLevel = scope.getNode("cc.warlock");
+	public static Preferences getRootNode() {
 		return topLevel;
 	}
 	
-	public static void addNodeChangeListener(String path, INodeChangeListener listener) {
+	public Preferences getNode() {
+		return topLevel;
+	}
+	
+	public void addNodeChangeListener(String path, INodeChangeListener listener) {
 		try {
 			getScope().getNode(path).addNodeChangeListener(listener);
 		} catch(Exception e) {
@@ -30,7 +37,7 @@ public class WarlockPreferences {
 		}
 	}
 	
-	public static void addPreferenceChangeListener(String path, IPreferenceChangeListener listener) {
+	public void addPreferenceChangeListener(String path, IPreferenceChangeListener listener) {
 		try {
 			getScope().getNode(path).addPreferenceChangeListener(listener);
 		} catch(Exception e) {

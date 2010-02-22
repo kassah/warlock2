@@ -17,15 +17,15 @@ public abstract class WarlockPreferenceProvider<T> {
 	
 	protected abstract T get(Preferences node);
 	
-	public T get(WarlockClientPreferences prefs, String id) {
+	public T get(WarlockPreferences prefs, String id) {
 		return get(getNode(prefs, id));
 	}
 	
-	protected Preferences getNode(WarlockClientPreferences prefs, String id) {
+	protected Preferences getNode(WarlockPreferences prefs, String id) {
 		return prefs.getNode().node(getNodeName()).node(id);
 	}
 	
-	public WarlockPreference<T> getPreference(WarlockClientPreferences prefs,
+	public WarlockPreference<T> getPreference(WarlockPreferences prefs,
 			String id) {
 		return getPreference(getNode(prefs, id));
 	}
@@ -42,7 +42,7 @@ public abstract class WarlockPreferenceProvider<T> {
 	
 	protected abstract void set(Preferences node, T value);
 	
-	public void remove(WarlockClientPreferences prefs, String id) {
+	public void remove(WarlockPreferences prefs, String id) {
 		try {
 			prefs.getNode().node(getNodeName()).node(id).removeNode();
 		} catch(Exception e) {
@@ -50,7 +50,7 @@ public abstract class WarlockPreferenceProvider<T> {
 		}
 	}
 	
-	public Collection<T> getAll(WarlockClientPreferences prefs) {
+	public Collection<T> getAll(WarlockPreferences prefs) {
 		ArrayList<T> results =
 			new ArrayList<T>();
 
@@ -68,7 +68,7 @@ public abstract class WarlockPreferenceProvider<T> {
 	}
 	
 	public Collection<WarlockPreference<T>> getAllPreferences(
-			WarlockClientPreferences prefs) {
+			WarlockPreferences prefs) {
 		ArrayList<WarlockPreference<T>> results =
 			new ArrayList<WarlockPreference<T>>();
 
@@ -85,7 +85,7 @@ public abstract class WarlockPreferenceProvider<T> {
 		return results;
 	}
 	
-	public Map<String, T> getMap(WarlockClientPreferences prefs) {
+	public Map<String, T> getMap(WarlockPreferences prefs) {
 		HashMap<String, T> results = new HashMap<String, T>();
 
 		Preferences hnode = prefs.getNode().node(getNodeName());
@@ -101,7 +101,7 @@ public abstract class WarlockPreferenceProvider<T> {
 		return results;
 	}
 	
-	public Map<String, WarlockPreference<T>> getPreferenceMap(WarlockClientPreferences prefs) {
+	public Map<String, WarlockPreference<T>> getPreferenceMap(WarlockPreferences prefs) {
 		HashMap<String, WarlockPreference<T>> results =
 			new HashMap<String, WarlockPreference<T>>();
 
@@ -118,25 +118,25 @@ public abstract class WarlockPreferenceProvider<T> {
 		return results;
 	}
 	
-	public void addNodeChangeListener(WarlockClientPreferences prefs,
+	public void addNodeChangeListener(WarlockPreferences prefs,
 			INodeChangeListener listener) {
 		String path = prefs.getNode().node(getNodeName()).absolutePath();
 		WarlockPreferences.getScope().getNode(path).addNodeChangeListener(listener);
 	}
 	
-	public void addPreferenceChangeListener(WarlockClientPreferences prefs,
+	public void addPreferenceChangeListener(WarlockPreferences prefs,
 			IPreferenceChangeListener listener) {
 		String path = prefs.getNode().node(getNodeName()).absolutePath();
 		WarlockPreferences.getScope().getNode(path).addPreferenceChangeListener(listener);
 	}
 	
-	public void removeNodeChangeListener(WarlockClientPreferences prefs,
+	public void removeNodeChangeListener(WarlockPreferences prefs,
 			INodeChangeListener listener) {
 		String path = prefs.getNode().node(getNodeName()).absolutePath();
 		WarlockPreferences.getScope().getNode(path).removeNodeChangeListener(listener);
 	}
 	
-	public void removePreferenceChangeListener(WarlockClientPreferences prefs,
+	public void removePreferenceChangeListener(WarlockPreferences prefs,
 			IPreferenceChangeListener listener) {
 		String path = prefs.getNode().node(getNodeName()).absolutePath();
 		WarlockPreferences.getScope().getNode(path).removePreferenceChangeListener(listener);
