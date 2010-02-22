@@ -44,9 +44,11 @@ import org.eclipse.swt.widgets.Shell;
 import org.eclipse.swt.widgets.TableColumn;
 import org.eclipse.ui.part.ViewPart;
 
+import cc.warlock.core.client.IWarlockClient;
 import cc.warlock.core.script.IScriptInfo;
 import cc.warlock.core.script.IScriptProvider;
 import cc.warlock.core.script.ScriptEngineRegistry;
+import cc.warlock.rcp.views.GameView;
 import cc.warlock.scribe.ui.ScribeSharedImages;
 
 public class ScriptsView extends ViewPart {
@@ -120,7 +122,9 @@ public class ScriptsView extends ViewPart {
 				ArrayList<IScriptInfo> scripts = new ArrayList<IScriptInfo>();
 				for (IScriptProvider provider : ScriptEngineRegistry.getScriptProviders())
 				{
-					scripts.addAll(provider.getScriptInfos());
+					for (GameView gv: GameView.getOpenGameViews()) {
+						scripts.addAll(provider.getScriptInfos(gv.getWarlockClient().getClientPreferences()));
+					}
 				}
 				scriptList.setInput(scripts);
 			}
