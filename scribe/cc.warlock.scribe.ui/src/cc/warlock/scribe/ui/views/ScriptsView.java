@@ -45,6 +45,7 @@ import org.eclipse.swt.widgets.TableColumn;
 import org.eclipse.ui.part.ViewPart;
 
 import cc.warlock.core.client.IWarlockClient;
+import cc.warlock.core.script.IScript;
 import cc.warlock.core.script.IScriptInfo;
 import cc.warlock.core.script.IScriptProvider;
 import cc.warlock.core.script.ScriptEngineRegistry;
@@ -120,11 +121,8 @@ public class ScriptsView extends ViewPart {
 		Display.getDefault().syncExec(new Runnable() {
 			public void run() {
 				ArrayList<IScriptInfo> scripts = new ArrayList<IScriptInfo>();
-				for (IScriptProvider provider : ScriptEngineRegistry.getScriptProviders())
-				{
-					for (GameView gv: GameView.getOpenGameViews()) {
-						scripts.addAll(provider.getScriptInfos(gv.getWarlockClient().getClientPreferences()));
-					}
+				for (IScript s: ScriptEngineRegistry.getRunningScripts()) {
+					scripts.add(s.getScriptInfo());
 				}
 				scriptList.setInput(scripts);
 			}
