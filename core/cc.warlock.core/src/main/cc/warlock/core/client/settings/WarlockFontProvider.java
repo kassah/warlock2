@@ -17,7 +17,7 @@ public class WarlockFontProvider extends WarlockPreferenceProvider<WarlockFont> 
 	}
 	
 	protected String getNodeName() {
-		return null;
+		return "font";
 	}
 	
 	protected WarlockFont get(Preferences node) {

@@ -157,4 +157,6 @@ public interface IWarlockClient extends IRoomListener {
 	public IWarlockStyle getCommandStyle();
 	
 	public String getScriptPrefix();
+	
+	public boolean hasSuppressPrompt();
 }

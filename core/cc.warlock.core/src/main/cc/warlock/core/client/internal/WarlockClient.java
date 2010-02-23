@@ -83,6 +83,8 @@ public abstract class WarlockClient implements IWarlockClient {
 	protected IPreferenceChangeListener macroPrefListener;
 	protected String scriptPrefix;
 	protected IPreferenceChangeListener scriptPrefixChangeListener;
+	protected boolean suppressPrompt = false;
+	protected IPreferenceChangeListener suppressPromptChangeListener;
 	
 	protected class HighlightNodeChangeListener implements INodeChangeListener {
 		public void added(NodeChangeEvent event) {
@@ -124,6 +126,12 @@ public abstract class WarlockClient implements IWarlockClient {
 		}
 	}
 	
+	protected class SuppressPromptChangeListener implements IPreferenceChangeListener {
+		public void preferenceChange(PreferenceChangeEvent event) {
+			suppressPrompt = prefs.getNode().getBoolean("suppress-prompt", false);
+		}
+	}
+	
 	public WarlockClient () {
 		streamPrefix = "client:" + hashCode() + ":";
 		logger = new SimpleLogger(this);
@@ -149,6 +157,9 @@ public abstract class WarlockClient implements IWarlockClient {
 				
 				WarlockMacroProvider.getInstance().removeNodeChangeListener(prefs, macroNodeListener);
 				WarlockMacroProvider.getInstance().removePreferenceChangeListener(prefs, macroPrefListener);
+				
+				WarlockMacroProvider.getInstance().removePreferenceChangeListener(prefs, scriptPrefixChangeListener);
+				WarlockMacroProvider.getInstance().removePreferenceChangeListener(prefs, suppressPromptChangeListener);
 			}
 
 			@Override
@@ -171,6 +182,10 @@ public abstract class WarlockClient implements IWarlockClient {
 				scriptPrefix = prefs.getNode().get("script-prefix", ".");
 				scriptPrefixChangeListener = new ScriptPrefixChangeListener();
 				prefs.addPreferenceChangeListener(scriptPrefixChangeListener);
+				
+				suppressPrompt = prefs.getNode().getBoolean("suppress-prompt", false);
+				suppressPromptChangeListener = new SuppressPromptChangeListener();
+				prefs.addPreferenceChangeListener(suppressPromptChangeListener);
 			}
 		});
 	}
@@ -303,5 +318,9 @@ public abstract class WarlockClient implements IWarlockClient {
 	
 	public String getScriptPrefix() {
 		return scriptPrefix;
+	}
+	
+	public boolean hasSuppressPrompt() {
+		return suppressPrompt;
 	}
 }
