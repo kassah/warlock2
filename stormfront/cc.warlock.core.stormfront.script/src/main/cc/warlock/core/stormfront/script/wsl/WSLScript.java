@@ -42,7 +42,6 @@ import cc.warlock.core.script.IMatch;
 import cc.warlock.core.script.IScriptCommands;
 import cc.warlock.core.script.IScriptEngine;
 import cc.warlock.core.script.IScriptInfo;
-import cc.warlock.core.script.configuration.ScriptConfiguration;
 import cc.warlock.core.script.internal.RegexMatch;
 import cc.warlock.core.stormfront.client.IStormFrontClient;
 import cc.warlock.core.stormfront.script.IStormFrontScriptCommands;
@@ -80,7 +79,7 @@ public class WSLScript extends AbstractScript {
 		this.engine = engine;
 		this.sfClient = client;
 		
-		this.debugging = !ScriptConfiguration.instance().getSupressExceptions().get();
+		this.debugging = sfClient.getClientPreferences().getNode().getBoolean("script-debug", false);
 		
 		scriptCommands = new StormFrontScriptCommands(client, this);
 		

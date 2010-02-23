@@ -300,4 +300,8 @@ public abstract class WarlockClient implements IWarlockClient {
 	public IWarlockStyle getCommandStyle() {
 		return WarlockStyleProvider.getInstance().get(prefs, "command");
 	}
+	
+	public String getScriptPrefix() {
+		return scriptPrefix;
+	}
 }

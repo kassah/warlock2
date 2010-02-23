@@ -10,7 +10,6 @@ import java.util.regex.Pattern;
 
 import cc.warlock.core.client.IStream;
 import cc.warlock.core.script.IMatch;
-import cc.warlock.core.script.configuration.ScriptConfiguration;
 import cc.warlock.core.script.internal.RegexMatch;
 import cc.warlock.core.script.internal.TextMatch;
 
@@ -379,7 +378,7 @@ public class WSLScriptCommands {
 		public void execute(WSLScript script, String arguments) throws InterruptedException {
 			script.scriptCommands.put(arguments);
 			// Quit this script if we're starting another one
-			if(arguments.startsWith(ScriptConfiguration.instance().getScriptPrefix())) {
+			if(arguments.startsWith(script.getClient().getScriptPrefix())) {
 				script.stop();
 			}
 		}

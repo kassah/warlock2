@@ -155,4 +155,6 @@ public interface IWarlockClient extends IRoomListener {
 	public WarlockMacro getMacro(int keycode, int modifiers);
 	
 	public IWarlockStyle getCommandStyle();
+	
+	public String getScriptPrefix();
 }
