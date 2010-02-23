@@ -29,6 +29,7 @@ import cc.warlock.core.client.IWarlockClient;
 import cc.warlock.core.client.IWarlockStyle;
 import cc.warlock.core.client.WarlockColor;
 import cc.warlock.core.client.WarlockFont;
+import cc.warlock.core.client.settings.WarlockFontProvider;
 import cc.warlock.rcp.ui.IStyleProvider;
 import cc.warlock.rcp.ui.StyleRangeWithData;
 import cc.warlock.rcp.util.ColorUtil;
@@ -57,7 +58,8 @@ public class DefaultStyleProvider implements IStyleProvider {
 				range.underline = true;
 			else if (styleType.equals(IWarlockStyle.StyleType.MONOSPACE))
 			{
-				WarlockFont font = client.getClientSettings().getMainWindowSettings().getColumnFont();
+				// FIXME: cache this
+				WarlockFont font = WarlockFontProvider.getInstance().get(client.getClientPreferences(), "mono");
 				if (!font.isDefaultFont() && Display.getDefault().getFontList(font.getFamilyName(), true).length > 0)
 				{
 					range.font = FontUtil.warlockFontToFont(font);

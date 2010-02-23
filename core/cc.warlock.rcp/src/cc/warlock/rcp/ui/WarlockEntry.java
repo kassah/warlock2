@@ -22,6 +22,7 @@
 package cc.warlock.rcp.ui;
 
 import java.util.ArrayList;
+import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -41,6 +42,8 @@ import cc.warlock.core.client.IWarlockClientViewer;
 import cc.warlock.core.client.internal.Command;
 import cc.warlock.core.client.internal.WarlockMacro;
 import cc.warlock.core.client.settings.WarlockVariableProvider;
+import cc.warlock.core.script.IScript;
+import cc.warlock.core.script.ScriptEngineRegistry;
 import cc.warlock.rcp.macro.IMacroCommand;
 import cc.warlock.rcp.macro.MacroCommandRegistry;
 import cc.warlock.rcp.macro.MacroVariableRegistry;
@@ -97,8 +100,24 @@ public class WarlockEntry {
 	protected boolean processKey(int keyCode, int stateMask, char character) {
 		//System.out.println("got char \"" + e.character + "\"");
 		WarlockMacro macro = viewer.getWarlockClient().getMacro(keyCode, stateMask);
-		parseCommand(macro.getCommand());
+		if(macro != null)
+			if(parseCommand(macro.getCommand()))
+				return true;
 
+		if(character == SWT.CR) {
+			viewer.submit();
+			return true;
+		}
+		
+		if(character == SWT.ESC) {
+			// TODO: this loop should probably be implemented elsewhere
+			List<IScript> runningScripts = ScriptEngineRegistry.getRunningScripts(viewer.getWarlockClient());
+			for(IScript script : runningScripts) {
+				script.stop();
+			}
+			return true;
+		}
+			
 		if (!widget.isFocusControl() || searchMode) {
 			if(entryCharacters.contains(character))
 			{

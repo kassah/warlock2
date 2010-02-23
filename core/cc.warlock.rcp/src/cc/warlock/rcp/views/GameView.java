@@ -51,9 +51,10 @@ import org.eclipse.ui.part.PageBook;
 import cc.warlock.core.client.IWarlockClient;
 import cc.warlock.core.client.IWarlockClientListener;
 import cc.warlock.core.client.IWarlockClientViewer;
+import cc.warlock.core.client.IWarlockStyle;
 import cc.warlock.core.client.PropertyListener;
 import cc.warlock.core.client.WarlockClientRegistry;
-import cc.warlock.rcp.configuration.GameViewConfiguration;
+import cc.warlock.core.client.settings.WarlockWindowProvider;
 import cc.warlock.rcp.ui.StreamText;
 import cc.warlock.rcp.ui.WarlockEntry;
 import cc.warlock.rcp.ui.WarlockPopupAction;
@@ -182,7 +183,8 @@ public abstract class GameView extends WarlockView implements IWarlockClientView
 		popupPageBook.setVisible(false);
 		
 		streamText = new StreamText(mainComposite, IWarlockClient.DEFAULT_STREAM_NAME);
-		streamText.setLineLimit(GameViewConfiguration.instance().getBufferLines());
+		// FIXME: update this when it changes
+		streamText.setLineLimit(client.getClientPreferences().getNode().getInt("buffer-lines", 5000));
 		streamText.getTextWidget().setLayout(new GridLayout(1, false));
 		
 		// create the entry
@@ -203,8 +205,9 @@ public abstract class GameView extends WarlockView implements IWarlockClientView
 	
 	protected void initColors()
 	{
-		Color background = ColorUtil.warlockColorToColor(GameViewConfiguration.instance().getDefaultBackground());
-		Color foreground = ColorUtil.warlockColorToColor(GameViewConfiguration.instance().getDefaultForeground());
+		IWarlockStyle style = WarlockWindowProvider.getInstance().get(client.getClientPreferences(), "main");
+		Color background = ColorUtil.warlockColorToColor(style.getBackgroundColor());
+		Color foreground = ColorUtil.warlockColorToColor(style.getForegroundColor());
 		
 		entry.getWidget().setBackground(background);
 		entry.getWidget().setForeground(foreground);

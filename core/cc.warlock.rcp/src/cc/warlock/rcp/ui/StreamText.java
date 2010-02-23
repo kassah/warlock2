@@ -5,9 +5,7 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import java.util.regex.PatternSyntaxException;
 
-import org.eclipse.swt.SWT;
 import org.eclipse.swt.graphics.Color;
-import org.eclipse.swt.graphics.Font;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Display;
 import org.eclipse.ui.PlatformUI;
@@ -22,8 +20,8 @@ import cc.warlock.core.client.WarlockFont;
 import cc.warlock.core.client.WarlockString;
 import cc.warlock.core.client.WarlockStringMarker;
 import cc.warlock.core.client.internal.Property;
+import cc.warlock.core.client.settings.WarlockFontProvider;
 import cc.warlock.core.client.settings.WarlockWindowProvider;
-import cc.warlock.rcp.configuration.GameViewConfiguration;
 import cc.warlock.rcp.ui.style.StyleProviders;
 import cc.warlock.rcp.util.ColorUtil;
 import cc.warlock.rcp.util.FontUtil;
@@ -147,7 +145,8 @@ public class StreamText extends WarlockText implements IStreamListener {
 	}
 	
 	private void showPrompt(String prompt) {
-		if(!GameViewConfiguration.instance().getSuppressPrompt()) {
+		if(prompt != null
+				&& client.hasSuppressPrompt()) {
 			WarlockString text = new WarlockString();
 			text.append(prompt);
 			appendText(text);
@@ -161,8 +160,7 @@ public class StreamText extends WarlockText implements IStreamListener {
 			
 			flushBuffer();
 			
-			if(prompt != null)
-				showPrompt(prompt);
+			showPrompt(prompt);
 		} else {
 			// if the new prompt is the same as the old one, do nothing.
 			// if the new prompt is null, just print the newline.
@@ -225,9 +223,11 @@ public class StreamText extends WarlockText implements IStreamListener {
 		if(styleProvider != null)
 			setStyleProvider(styleProvider);
 
-		Color background = ColorUtil.warlockColorToColor(getDefaultColor());
-		Color foreground = ColorUtil.warlockColorToColor(getDefaultColor());
-		WarlockFont font = getDefaultFont();
+		// FIXME: make the following lines read from a default config
+		Color background = new Color(Display.getDefault(), 0, 0, 0);
+		Color foreground = new Color(Display.getDefault(), 192, 192, 192);
+		
+		WarlockFont font = WarlockFontProvider.getInstance().get(client.getClientPreferences(), "default");
 		
 		// TODO: add a preference change listener here
 		IWarlockStyle wsettings = WarlockWindowProvider.getInstance().get(client.getClientPreferences(), streamName);
@@ -243,13 +243,6 @@ public class StreamText extends WarlockText implements IStreamListener {
 		this.setBackground(background);
 		this.setForeground(foreground);
 
-		String defaultFontFace = GameViewConfiguration.instance().getDefaultFontFace();
-		int defaultFontSize = GameViewConfiguration.instance().getDefaultFontSize();
-
-		if (font.isDefaultFont()) {
-			this.setFont(new Font(Display.getDefault(), defaultFontFace, defaultFontSize, SWT.NORMAL));
-		} else {
-			this.setFont(FontUtil.warlockFontToFont(font));
-		}
+		this.setFont(FontUtil.warlockFontToFont(font));
 	}
 }

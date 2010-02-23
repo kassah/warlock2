@@ -39,9 +39,10 @@ import org.eclipse.ui.part.PageBook;
 import cc.warlock.core.client.IStream;
 import cc.warlock.core.client.IWarlockClient;
 import cc.warlock.core.client.IWarlockClientListener;
+import cc.warlock.core.client.IWarlockStyle;
 import cc.warlock.core.client.PropertyListener;
 import cc.warlock.core.client.WarlockClientRegistry;
-import cc.warlock.core.client.WarlockColor;
+import cc.warlock.core.client.settings.WarlockWindowProvider;
 import cc.warlock.rcp.ui.IStyleProvider;
 import cc.warlock.rcp.ui.StreamText;
 import cc.warlock.rcp.ui.client.SWTStreamListener;
@@ -273,12 +274,14 @@ public class StreamView extends WarlockView implements IGameViewFocusListener, I
 		if(stream == null)
 			return;
 		
-		WarlockColor bg = client.getSkin().getMainBackground();
-		WarlockColor fg = client.getSkin().getMainForeground();
+		IWarlockStyle window = WarlockWindowProvider.getInstance().get(client.getClientPreferences(), streamName);
+		if(window == null)
+			return;
+		
 		IStyleProvider styleProvider = StyleProviders.getStyleProvider(client);
 		if(styleProvider != null)
 			stream.setStyleProvider(styleProvider);
-		this.setBackground(client, ColorUtil.warlockColorToColor(bg));
-		this.setForeground(client, ColorUtil.warlockColorToColor(fg));
+		this.setBackground(client, ColorUtil.warlockColorToColor(window.getBackgroundColor()));
+		this.setForeground(client, ColorUtil.warlockColorToColor(window.getForegroundColor()));
 	}
 }
