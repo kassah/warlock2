@@ -21,11 +21,11 @@
  */
 package cc.warlock.rcp.macro.commands;
 
-import cc.warlock.core.client.IWarlockClientViewer;
+import cc.warlock.rcp.views.GameView;
 
 public class PasteMacroCommand {
-	public void execute(IWarlockClientViewer context) {
-		context.paste();
+	public void execute(GameView gameView) {
+		gameView.paste();
 	}
 
 	public String getIdentifier() {

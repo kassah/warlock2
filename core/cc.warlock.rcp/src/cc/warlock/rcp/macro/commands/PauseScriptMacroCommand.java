@@ -23,10 +23,10 @@ package cc.warlock.rcp.macro.commands;
 
 import java.util.List;
 
-import cc.warlock.core.client.IWarlockClientViewer;
 import cc.warlock.core.script.IScript;
 import cc.warlock.core.script.ScriptEngineRegistry;
 import cc.warlock.rcp.macro.IMacroCommand;
+import cc.warlock.rcp.views.GameView;
 
 public class PauseScriptMacroCommand implements IMacroCommand {
 	
@@ -36,8 +36,8 @@ public class PauseScriptMacroCommand implements IMacroCommand {
 		return "PauseScript";
 	}
 	
-	public void execute(IWarlockClientViewer viewer) {
-		List<IScript> runningScripts = ScriptEngineRegistry.getRunningScripts(viewer.getWarlockClient());
+	public void execute(GameView gameView) {
+		List<IScript> runningScripts = ScriptEngineRegistry.getRunningScripts(gameView.getWarlockClient());
 		for(IScript currentScript : runningScripts)
 		{
 			if(paused)

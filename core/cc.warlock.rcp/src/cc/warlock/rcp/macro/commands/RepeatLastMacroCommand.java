@@ -21,8 +21,8 @@
  */
 package cc.warlock.rcp.macro.commands;
 
-import cc.warlock.core.client.IWarlockClientViewer;
 import cc.warlock.rcp.macro.IMacroCommand;
+import cc.warlock.rcp.views.GameView;
 
 public class RepeatLastMacroCommand implements IMacroCommand {
 	
@@ -30,8 +30,8 @@ public class RepeatLastMacroCommand implements IMacroCommand {
 		return "RepeatLast";
 	}
 	
-	public void execute(IWarlockClientViewer viewer) {
-		viewer.repeatLastCommand();
+	public void execute(GameView gameView) {
+		gameView.repeatLastCommand();
 	}
 	
 	public String getDescription() {

@@ -21,10 +21,10 @@
  */
 package cc.warlock.rcp.macro.commands;
 
-import cc.warlock.core.client.IWarlockClientViewer;
 import cc.warlock.rcp.macro.IMacroCommand;
 import cc.warlock.rcp.prefs.VariablesPreferencePage;
 import cc.warlock.rcp.util.RCPUtil;
+import cc.warlock.rcp.views.GameView;
 
 /**
  * 
@@ -33,7 +33,7 @@ import cc.warlock.rcp.util.RCPUtil;
  */
 public class VariablesDialogMacroCommand implements IMacroCommand {
 
-	public void execute(IWarlockClientViewer context) {
+	public void execute(GameView gameView) {
 		RCPUtil.openPreferences(VariablesPreferencePage.PAGE_ID);
 	}
 	

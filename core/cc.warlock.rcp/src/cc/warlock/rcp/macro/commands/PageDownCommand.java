@@ -21,8 +21,8 @@
  */
 package cc.warlock.rcp.macro.commands;
 
-import cc.warlock.core.client.IWarlockClientViewer;
 import cc.warlock.rcp.macro.IMacroCommand;
+import cc.warlock.rcp.views.GameView;
 import cc.warlock.rcp.views.WarlockView;
 
 /**
@@ -35,7 +35,7 @@ public class PageDownCommand implements IMacroCommand {
 	/* (non-Javadoc)
 	 * @see cc.warlock.rcp.ui.macros.IMacroCommand#execute(cc.warlock.core.client.IWarlockClientViewer)
 	 */
-	public void execute(IWarlockClientViewer context) {
+	public void execute(GameView gameView) {
 		if (WarlockView.getViewInFocus() != null)
 			WarlockView.getViewInFocus().pageDown();
 	}

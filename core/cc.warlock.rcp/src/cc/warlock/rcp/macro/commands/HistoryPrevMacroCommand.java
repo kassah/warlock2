@@ -21,8 +21,8 @@
  */
 package cc.warlock.rcp.macro.commands;
 
-import cc.warlock.core.client.IWarlockClientViewer;
 import cc.warlock.rcp.macro.IMacroCommand;
+import cc.warlock.rcp.views.GameView;
 
 public class HistoryPrevMacroCommand implements IMacroCommand {
 	
@@ -30,8 +30,8 @@ public class HistoryPrevMacroCommand implements IMacroCommand {
 		return "HistoryPrev";
 	}
 	
-	public void execute(IWarlockClientViewer viewer) {
-		viewer.prevCommand();
+	public void execute(GameView gameView) {
+		gameView.prevCommand();
 	}
 	
 	public String getDescription() {
