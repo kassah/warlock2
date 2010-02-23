@@ -22,7 +22,6 @@
 package cc.warlock.rcp.prefs;
 
 import java.util.ArrayList;
-import java.util.regex.PatternSyntaxException;
 
 import org.eclipse.core.runtime.IAdaptable;
 import org.eclipse.jface.preference.ColorSelector;
@@ -67,13 +66,11 @@ import cc.warlock.core.client.IWarlockClient;
 import cc.warlock.core.client.IWarlockHighlight;
 import cc.warlock.core.client.IWarlockStyle;
 import cc.warlock.core.client.WarlockColor;
-import cc.warlock.core.client.internal.WarlockClient;
 import cc.warlock.core.client.internal.WarlockHighlight;
 import cc.warlock.core.client.internal.WarlockStyle;
-import cc.warlock.rcp.prefs.BackupHighlightStringsPreferencePageBak.StringsLabelProvider;
+import cc.warlock.core.client.settings.WarlockWindowProvider;
 import cc.warlock.rcp.ui.WarlockSharedImages;
 import cc.warlock.rcp.util.ColorUtil;
-import cc.warlock.rcp.views.GameView;
 
 
 public class HighlightStringsPreferencePage extends PreferencePageUtils implements
@@ -113,14 +110,14 @@ public class HighlightStringsPreferencePage extends PreferencePageUtils implemen
 		public Color getBackground(Object element, int columnIndex) {
 			HighlightItem string = (HighlightItem)element;
 			Color c = new Color(HighlightStringsPreferencePage.this.getShell().getDisplay(),
-					ColorUtil.warlockColorToRGB(skin.getBackgroundColor(string)));
+					ColorUtil.warlockColorToRGB(string.item.getStyle().getBackgroundColor()));
 			return c;
 		}
 
 		public Color getForeground(Object element, int columnIndex) {
 			HighlightItem string = (HighlightItem)element;
 			Color c = new Color(HighlightStringsPreferencePage.this.getShell().getDisplay(), 
-					ColorUtil.warlockColorToRGB(skin.getForegroundColor(string)));
+					ColorUtil.warlockColorToRGB(string.item.getStyle().getForegroundColor()));
 			return c;
 		}
 	}
@@ -133,7 +130,7 @@ public class HighlightStringsPreferencePage extends PreferencePageUtils implemen
 	private Button defaultFG, customFG, defaultBG, customBG, fillLineButton;
 	private Button caseInsensitiveButton, regexButton, fullWordMatchButton, soundButton;
 	private Button addHighlight, removeHighlight;
-	private WarlockClient client;
+	private IWarlockClient client;
 	
 	private Text soundText;
 	protected ArrayList<HighlightItem> highlightArray = new ArrayList<HighlightItem>();
@@ -169,9 +166,9 @@ public class HighlightStringsPreferencePage extends PreferencePageUtils implemen
 	
 	@Override
 	protected void buttonPressed(Button button) {
-		if (button == removeString) {
+		if (button == removeHighlight) {
 			removeStringSelected();
-		} else if (button == addString) {
+		} else if (button == addHighlight) {
 			addStringSelected();
 		} else if (button == defaultBG) {
 			defaultBackgroundSelected();
@@ -206,7 +203,8 @@ public class HighlightStringsPreferencePage extends PreferencePageUtils implemen
 	
 	private void defaultForegroundSelected ()
 	{
-		selectedHighlight.item.getStyle().setForegroundColor(skin.getMainForeground());
+		IWarlockStyle window = WarlockWindowProvider.getInstance().get(client.getClientPreferences(), "main");
+		selectedHighlight.item.getStyle().setForegroundColor(window.getForegroundColor());
 		customFGSelector.setEnabled(false);
 		customFGSelector.setColorValue(ColorUtil.warlockColorToRGB(selectedHighlight.item.getStyle().getForegroundColor()));
 		highlightTable.update(selectedHighlight, null);
@@ -224,7 +222,8 @@ public class HighlightStringsPreferencePage extends PreferencePageUtils implemen
 	
 	private void defaultBackgroundSelected ()
 	{
-		selectedHighlight.item.getStyle().setBackgroundColor(skin.getMainBackground());
+		IWarlockStyle window = WarlockWindowProvider.getInstance().get(client.getClientPreferences(), "main");
+		selectedHighlight.item.getStyle().setBackgroundColor(window.getBackgroundColor());
 		customBGSelector.setEnabled(false);
 		customBGSelector.setColorValue(ColorUtil.warlockColorToRGB(selectedHighlight.item.getStyle().getBackgroundColor()));
 		highlightTable.update(selectedHighlight, null);	
@@ -519,14 +518,15 @@ public class HighlightStringsPreferencePage extends PreferencePageUtils implemen
 		customBG.setEnabled(true);
 		customBGSelector.setEnabled(!bgIsDefault);
 		
+		IWarlockStyle window = WarlockWindowProvider.getInstance().get(client.getClientPreferences(), "main");
 		if (fgIsDefault) {
-			customFGSelector.setColorValue(ColorUtil.warlockColorToRGB(skin.getMainForeground()));
+			customFGSelector.setColorValue(ColorUtil.warlockColorToRGB(window.getForegroundColor()));
 		} else {
 			customFGSelector.setColorValue(ColorUtil.warlockColorToRGB(fgColor));
 		}
 		
 		if (bgIsDefault) {
-			customBGSelector.setColorValue(ColorUtil.warlockColorToRGB(skin.getMainBackground()));
+			customBGSelector.setColorValue(ColorUtil.warlockColorToRGB(window.getBackgroundColor()));
 		} else {
 			customBGSelector.setColorValue(ColorUtil.warlockColorToRGB(bgColor));
 		}
@@ -556,14 +556,8 @@ public class HighlightStringsPreferencePage extends PreferencePageUtils implemen
 	
 	@Override
 	public void setElement(IAdaptable element) {
-		client = GameView.getGameViewInFocus().getWarlockClient();
-		
 		client = (IWarlockClient)element.getAdapter(IWarlockClient.class);
-		settings = (ClientSettings) client.getClientSettings();
-		skin = settings.getClient().getSkin();
-		
-		if (highlightStrings.isEmpty())
-			copyHighlightStrings();
+		// TODO Do the rest
 	}
 	
 	@Override
