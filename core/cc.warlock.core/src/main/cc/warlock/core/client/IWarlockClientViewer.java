@@ -36,31 +36,6 @@ import java.io.InputStream;
  * and appending text to the view of this client.  
  */
 public interface IWarlockClientViewer {
-
-	public IWarlockClient getWarlockClient ();
-	
-	public String getCurrentCommand ();
-	
-	public void setCurrentCommand (String command);
-	
-	public void append(char c);
-	public void append(String str);
-	
-	public void submit();
-	
-	public void prevCommand();
-	
-	public void nextCommand();
-	
-	public void searchHistory();
-	
-	public void repeatLastCommand();
-	
-	public void repeatSecondToLastCommand();
-	
-	public void copy();
-	
-	public void paste();
 	
 	public void playSound(InputStream soundStream);
 	

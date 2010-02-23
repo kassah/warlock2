@@ -38,7 +38,6 @@ import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.widgets.Composite;
 
 import cc.warlock.core.client.ICommand;
-import cc.warlock.core.client.IWarlockClientViewer;
 import cc.warlock.core.client.internal.Command;
 import cc.warlock.core.client.internal.WarlockMacro;
 import cc.warlock.core.client.settings.WarlockVariableProvider;
@@ -52,14 +51,14 @@ import cc.warlock.rcp.views.GameView;
 public class WarlockEntry {
 
 	private StyledText widget;
-	private IWarlockClientViewer viewer;
+	private GameView gameView;
 	private boolean searchMode = false;
 	private StringBuffer searchText = new StringBuffer();
 	private String searchCommand = "";
 	protected static final Pattern varPattern = Pattern.compile("^\\w+");
 	
-	public WarlockEntry(Composite parent, IWarlockClientViewer viewer) {
-		this.viewer = viewer;
+	public WarlockEntry(Composite parent, GameView view) {
+		this.gameView = view;
 		
 		widget = new StyledText(parent, SWT.SINGLE); 
 		widget.setLayoutData(new GridData(GridData.FILL, GridData.FILL, true, true, 1, 1));
@@ -99,19 +98,19 @@ public class WarlockEntry {
 	// returns whether we processed the key or not.
 	protected boolean processKey(int keyCode, int stateMask, char character) {
 		//System.out.println("got char \"" + e.character + "\"");
-		WarlockMacro macro = viewer.getWarlockClient().getMacro(keyCode, stateMask);
+		WarlockMacro macro = gameView.getWarlockClient().getMacro(keyCode, stateMask);
 		if(macro != null)
 			if(parseCommand(macro.getCommand()))
 				return true;
 
 		if(character == SWT.CR) {
-			viewer.submit();
+			gameView.submit();
 			return true;
 		}
 		
 		if(character == SWT.ESC) {
 			// TODO: this loop should probably be implemented elsewhere
-			List<IScript> runningScripts = ScriptEngineRegistry.getRunningScripts(viewer.getWarlockClient());
+			List<IScript> runningScripts = ScriptEngineRegistry.getRunningScripts(gameView.getWarlockClient());
 			for(IScript script : runningScripts) {
 				script.stop();
 			}
@@ -146,7 +145,7 @@ public class WarlockEntry {
 		for (int pos = 0; pos < command.length(); pos++) {
 			char curChar = command.charAt(pos);
 			if(curChar == '\\' && command.length() > pos + 1) {
-				viewer.append(buffer.toString());
+				gameView.append(buffer.toString());
 				buffer.setLength(0);
 				
 				pos++;
@@ -156,7 +155,7 @@ public class WarlockEntry {
 				// submit current text in entry
 				case 'n':
 				case 'r':
-					viewer.submit();
+					gameView.submit();
 					break;
 					
 				// pause 1 second
@@ -166,7 +165,7 @@ public class WarlockEntry {
 					
 				// clear the entry
 				case 'x':
-					viewer.setCurrentCommand("");
+					gameView.setCurrentCommand("");
 					break;
 					
 				// display a dialog to get the value
@@ -176,13 +175,13 @@ public class WarlockEntry {
 					
 				// save current text in entry
 				case 'S':
-					savedCommand = viewer.getCurrentCommand();
+					savedCommand = gameView.getCurrentCommand();
 					break;
 					
 				// restore saved command
 				case 'R':
 					if(savedCommand != null)
-						viewer.setCurrentCommand(savedCommand);
+						gameView.setCurrentCommand(savedCommand);
 					break;
 					
 				default:
@@ -197,9 +196,9 @@ public class WarlockEntry {
 					pos = endPos + 1;
 					IMacroCommand macroCommand = MacroCommandRegistry.getMacroCommand(commandText);
 					if(macroCommand != null) {
-						viewer.append(buffer.toString());
+						gameView.append(buffer.toString());
 						buffer.setLength(0);
-						macroCommand.execute(viewer);
+						macroCommand.execute(gameView);
 					}
 				}
 			} else if(curChar == '@') {
@@ -208,9 +207,9 @@ public class WarlockEntry {
 				Matcher match = varPattern.matcher(command.substring(pos + 1));
 				if(match.matches()) {
 					String name = match.group();
-					String val = MacroVariableRegistry.getMacroVariable(name, viewer);
+					String val = MacroVariableRegistry.getMacroVariable(name, gameView);
 					if(val == null)
-						val = WarlockVariableProvider.getInstance().get(viewer.getWarlockClient().getClientPreferences(), name);
+						val = WarlockVariableProvider.getInstance().get(gameView.getWarlockClient().getClientPreferences(), name);
 					if(val != null) {
 						buffer.append(val);
 						pos += name.length() + 1;
@@ -224,7 +223,7 @@ public class WarlockEntry {
 				buffer.append(curChar);
 			}
 		}
-		viewer.append(buffer.toString());
+		gameView.append(buffer.toString());
 		return true;
 	}
 	
@@ -239,7 +238,7 @@ public class WarlockEntry {
 	
 	public class KeyEventListener implements KeyListener {
 		public void keyPressed(KeyEvent e) {
-			if(!e.doit || viewer.getWarlockClient() != GameView.getGameViewInFocus().getWarlockClient())
+			if(!e.doit || gameView.getWarlockClient() != GameView.getGameViewInFocus().getWarlockClient())
 				return;
 			if(processKey(e.keyCode, e.stateMask, e.character))
 				e.doit = false;
@@ -270,8 +269,19 @@ public class WarlockEntry {
 		}
 	}
 	
+	public void append(String str) {
+		if(searchMode) {
+			searchText.append(str);
+			search();
+		} else {
+			int offset = widget.getCaretOffset();
+			widget.insert(str);
+			widget.setCaretOffset(offset + str.length());
+		}
+	}
+	
 	private void search() {
-		ICommand foundCommand = viewer.getWarlockClient().getCommandHistory().search(searchText.toString());
+		ICommand foundCommand = gameView.getWarlockClient().getCommandHistory().search(searchText.toString());
 		if(foundCommand != null) {
 			searchCommand = foundCommand.getCommand();
 		}
@@ -294,7 +304,7 @@ public class WarlockEntry {
 	}
 	
 	public void prevCommand() {
-		ICommand prevCommand = viewer.getWarlockClient().getCommandHistory().prev();
+		ICommand prevCommand = gameView.getWarlockClient().getCommandHistory().prev();
 		
 		if(prevCommand != null)
 			setText(prevCommand.getCommand());
@@ -303,7 +313,7 @@ public class WarlockEntry {
 	}
 	
 	public void nextCommand() {
-		ICommand nextCommand = viewer.getWarlockClient().getCommandHistory().next();
+		ICommand nextCommand = gameView.getWarlockClient().getCommandHistory().next();
 		if(nextCommand != null) {
 			setText(nextCommand.getCommand());
 		} else {
@@ -313,7 +323,7 @@ public class WarlockEntry {
 	
 	public void searchHistory() {
 		if(searchMode) {
-			ICommand foundCommand = viewer.getWarlockClient().getCommandHistory().searchBefore(searchText.toString());
+			ICommand foundCommand = gameView.getWarlockClient().getCommandHistory().searchBefore(searchText.toString());
 			if(foundCommand != null) {
 				searchCommand = foundCommand.getCommand();
 			}
@@ -337,24 +347,24 @@ public class WarlockEntry {
 			text = widget.getText();
 		}
 		ICommand command = new Command(text);
-		viewer.getWarlockClient().send(command);
-		viewer.getWarlockClient().getCommandHistory().addCommand(command);
-		viewer.getWarlockClient().getCommandHistory().resetPosition();
+		gameView.getWarlockClient().send(command);
+		gameView.getWarlockClient().getCommandHistory().addCommand(command);
+		gameView.getWarlockClient().getCommandHistory().resetPosition();
 		setText("");
 	}
 	
 	public void repeatLastCommand() {
-		if (viewer.getWarlockClient().getCommandHistory().size() >= 1) {
-			ICommand command = viewer.getWarlockClient().getCommandHistory().getLastCommand();
-			viewer.getWarlockClient().send(command);
+		if (gameView.getWarlockClient().getCommandHistory().size() >= 1) {
+			ICommand command = gameView.getWarlockClient().getCommandHistory().getLastCommand();
+			gameView.getWarlockClient().send(command);
 		}
 	}
 	
 	public void repeatSecondToLastCommand() {
-		if (viewer.getWarlockClient().getCommandHistory().size() >= 2)
+		if (gameView.getWarlockClient().getCommandHistory().size() >= 2)
 		{
-			ICommand command = viewer.getWarlockClient().getCommandHistory().getCommandAt(1);
-			viewer.getWarlockClient().send(command);
+			ICommand command = gameView.getWarlockClient().getCommandHistory().getCommandAt(1);
+			gameView.getWarlockClient().send(command);
 		}
 	}
 }

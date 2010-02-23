@@ -197,7 +197,7 @@ public abstract class GameView extends WarlockView implements IWarlockClientView
 		entryComposite.setLayout(entryLayout);
 		entryComposite.setLayoutData(new GridData(GridData.FILL, GridData.VERTICAL_ALIGN_END, true, false));
 		
-		this.entry = new WarlockEntry(entryComposite, wrapper); // Do this BEFORE getTextForClient!
+		this.entry = new WarlockEntry(entryComposite, this); // Do this BEFORE getTextForClient!
 		
 		initColors();
 	}
@@ -283,6 +283,10 @@ public abstract class GameView extends WarlockView implements IWarlockClientView
 	
 	public void append(char c) {
 		entry.append(c);
+	}
+	
+	public void append(String str) {
+		entry.append(str);
 	}
 	
 	public void nextCommand() {

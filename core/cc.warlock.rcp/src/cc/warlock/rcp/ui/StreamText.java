@@ -222,6 +222,12 @@ public class StreamText extends WarlockText implements IStreamListener {
 		IStyleProvider styleProvider = StyleProviders.getStyleProvider(client);
 		if(styleProvider != null)
 			setStyleProvider(styleProvider);
+		
+		if(client.getClientPreferences() != null)
+			settingsLoaded();
+	}
+	
+	public void settingsLoaded() {
 
 		// FIXME: make the following lines read from a default config
 		Color background = new Color(Display.getDefault(), 0, 0, 0);
@@ -240,9 +246,9 @@ public class StreamText extends WarlockText implements IStreamListener {
 				font = wsettings.getFont();
 		}
 		
-		this.setBackground(background);
-		this.setForeground(foreground);
-
-		this.setFont(FontUtil.warlockFontToFont(font));
+		textWidget.setBackground(background);
+		textWidget.setForeground(foreground);
+		
+		textWidget.setFont(FontUtil.warlockFontToFont(font));
 	}
 }

@@ -36,9 +36,7 @@ import org.eclipse.swt.events.MouseListener;
 import org.eclipse.swt.events.MouseMoveListener;
 import org.eclipse.swt.events.SelectionAdapter;
 import org.eclipse.swt.events.SelectionEvent;
-import org.eclipse.swt.graphics.Color;
 import org.eclipse.swt.graphics.Cursor;
-import org.eclipse.swt.graphics.Font;
 import org.eclipse.swt.graphics.Point;
 import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.widgets.Composite;
@@ -60,7 +58,7 @@ import cc.warlock.core.client.internal.WarlockStyle;
  */
 public class WarlockText {
 	
-	private StyledText textWidget;
+	protected StyledText textWidget;
 	private Cursor handCursor, defaultCursor;
 	private int lineLimit = 5000;
 	private int doScrollDirection = SWT.DOWN;
@@ -170,18 +168,6 @@ public class WarlockText {
 	
 	public void pageDown() {
 		textWidget.invokeAction(ST.PAGE_DOWN);
-	}
-	
-	public void setBackground(Color color) {
-		textWidget.setBackground(color);
-	}
-	
-	public void setForeground(Color color) {
-		textWidget.setForeground(color);
-	}
-	
-	public void setFont(Font font) {
-		textWidget.setFont(font);
 	}
 	
 	public void clearText() {

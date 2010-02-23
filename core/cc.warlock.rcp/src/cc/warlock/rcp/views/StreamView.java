@@ -27,7 +27,6 @@ import java.util.HashMap;
 
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.custom.StyledText;
-import org.eclipse.swt.graphics.Color;
 import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.widgets.Composite;
@@ -39,16 +38,11 @@ import org.eclipse.ui.part.PageBook;
 import cc.warlock.core.client.IStream;
 import cc.warlock.core.client.IWarlockClient;
 import cc.warlock.core.client.IWarlockClientListener;
-import cc.warlock.core.client.IWarlockStyle;
 import cc.warlock.core.client.PropertyListener;
 import cc.warlock.core.client.WarlockClientRegistry;
-import cc.warlock.core.client.settings.WarlockWindowProvider;
-import cc.warlock.rcp.ui.IStyleProvider;
 import cc.warlock.rcp.ui.StreamText;
 import cc.warlock.rcp.ui.client.SWTStreamListener;
 import cc.warlock.rcp.ui.client.SWTWarlockClientListener;
-import cc.warlock.rcp.ui.style.StyleProviders;
-import cc.warlock.rcp.util.ColorUtil;
 
 public class StreamView extends WarlockView implements IGameViewFocusListener, IWarlockClientListener {
 	
@@ -226,20 +220,6 @@ public class StreamView extends WarlockView implements IGameViewFocusListener, I
 		setPartName(title);
 	}
 	
-	public void setForeground (IWarlockClient client, Color foreground)
-	{
-		StreamText stream = streams.get(client);
-		if(stream != null)
-			stream.setForeground(foreground);
-	}
-	
-	public void setBackground (IWarlockClient client, Color background)
-	{
-		StreamText stream = streams.get(client);
-		if(stream != null)
-			stream.setBackground(background);
-	}
-	
 	public void pageUp() {
 		activeStream.pageUp();
 	}
@@ -274,14 +254,6 @@ public class StreamView extends WarlockView implements IGameViewFocusListener, I
 		if(stream == null)
 			return;
 		
-		IWarlockStyle window = WarlockWindowProvider.getInstance().get(client.getClientPreferences(), streamName);
-		if(window == null)
-			return;
-		
-		IStyleProvider styleProvider = StyleProviders.getStyleProvider(client);
-		if(styleProvider != null)
-			stream.setStyleProvider(styleProvider);
-		this.setBackground(client, ColorUtil.warlockColorToColor(window.getBackgroundColor()));
-		this.setForeground(client, ColorUtil.warlockColorToColor(window.getForegroundColor()));
+		stream.settingsLoaded();
 	}
 }

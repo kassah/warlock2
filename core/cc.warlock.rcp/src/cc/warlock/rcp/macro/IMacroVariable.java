@@ -21,7 +21,7 @@
  */
 package cc.warlock.rcp.macro;
 
-import cc.warlock.core.client.IWarlockClientViewer;
+import cc.warlock.rcp.views.GameView;
 
 /**
  * @author Marshall
@@ -30,5 +30,5 @@ public interface IMacroVariable {
 
 	public String getIdentifier();
 	
-	public String getValue(IWarlockClientViewer context);
+	public String getValue(GameView gameView);
 }

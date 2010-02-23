@@ -24,8 +24,8 @@
  */
 package cc.warlock.rcp.macro.variables;
 
-import cc.warlock.core.client.IWarlockClientViewer;
 import cc.warlock.rcp.macro.IMacroVariable;
+import cc.warlock.rcp.views.GameView;
 
 
 /**
@@ -37,7 +37,7 @@ public class CurrentCommandMacroVariable implements IMacroVariable {
 		return "$currentCommand";
 	}
 	
-	public String getValue(IWarlockClientViewer context) {
-		return context.getCurrentCommand();
+	public String getValue(GameView gameView) {
+		return gameView.getCurrentCommand();
 	}
 }

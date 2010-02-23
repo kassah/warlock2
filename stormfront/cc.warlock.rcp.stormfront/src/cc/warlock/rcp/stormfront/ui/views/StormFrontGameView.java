@@ -25,19 +25,16 @@ import java.net.URL;
 
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.jface.dialogs.ProgressMonitorDialog;
-import org.eclipse.jface.resource.JFaceResources;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.MenuAdapter;
 import org.eclipse.swt.events.MenuEvent;
 import org.eclipse.swt.events.SelectionAdapter;
 import org.eclipse.swt.events.SelectionEvent;
 import org.eclipse.swt.events.SelectionListener;
-import org.eclipse.swt.graphics.Font;
 import org.eclipse.swt.graphics.Point;
 import org.eclipse.swt.graphics.Rectangle;
 import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.widgets.Button;
-import org.eclipse.swt.widgets.Caret;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.Label;
@@ -49,15 +46,16 @@ import org.eclipse.ui.PlatformUI;
 import cc.warlock.core.client.ICompass;
 import cc.warlock.core.client.IPropertyListener;
 import cc.warlock.core.client.IWarlockClient;
+import cc.warlock.core.client.IWarlockStyle;
 import cc.warlock.core.client.WarlockClientRegistry;
 import cc.warlock.core.client.WarlockColor;
-import cc.warlock.core.client.WarlockFont;
 import cc.warlock.core.client.internal.WarlockClientListener;
+import cc.warlock.core.client.settings.WarlockClientPreferences;
+import cc.warlock.core.client.settings.WarlockWindowProvider;
 import cc.warlock.core.profile.Profile;
 import cc.warlock.core.stormfront.ProfileConfiguration;
 import cc.warlock.core.stormfront.client.IStormFrontClient;
 import cc.warlock.core.stormfront.client.IStormFrontClientViewer;
-import cc.warlock.core.stormfront.settings.IStormFrontClientSettings;
 import cc.warlock.rcp.stormfront.StormFrontGameViewConfiguration;
 import cc.warlock.rcp.stormfront.adapters.SWTStormFrontClientViewer;
 import cc.warlock.rcp.stormfront.ui.StormFrontSharedImages;
@@ -287,9 +285,7 @@ public class StormFrontGameView extends GameView implements IStormFrontClientVie
 				// textBorder.setActiveClient(sfClient);
 			}
 			
-			IStormFrontClientSettings settings = sfClient.getStormFrontClientSettings();
-			if(settings != null)
-				loadClientSettings(settings);
+			loadClientSettings(client.getClientPreferences());
 			
 			WarlockClientRegistry.addWarlockClientListener(new SWTWarlockClientListener(new WarlockClientListener() {
 				@Override
@@ -325,19 +321,19 @@ public class StormFrontGameView extends GameView implements IStormFrontClientVie
 //		reconnectPopup.setVisible(true);
 	}
 	
-	protected Font normalFont;
-
 	private Button reconnect;
 	
 	public void clientSettingsLoaded(IWarlockClient client) {
 		if(client == sfClient) {
-			loadClientSettings(sfClient.getStormFrontClientSettings());
+			loadClientSettings(sfClient.getClientPreferences());
 		}
 	}
 	
-	public void loadClientSettings(IStormFrontClientSettings settings)
-	{	
-		IStyleProvider styleProvider = new StormFrontStyleProvider(settings);
+	public void loadClientSettings(WarlockClientPreferences prefs)
+	{
+		if(prefs == null)
+			return;
+		IStyleProvider styleProvider = new StormFrontStyleProvider(sfClient);
 		
 		StyleProviders.setStyleProvider(client, styleProvider);
 		
@@ -368,42 +364,36 @@ public class StormFrontGameView extends GameView implements IStormFrontClientVie
 		
 		streamText.setStyleProvider(styleProvider);
 		
-		WarlockColor bg = sfClient.getStormFrontSkin().getMainBackground();
-		WarlockColor fg = sfClient.getStormFrontSkin().getMainForeground();
+		IWarlockStyle defaultStyle = WarlockWindowProvider.getInstance().get(prefs, "main");
+		IWarlockStyle entryStyle = WarlockWindowProvider.getInstance().get(prefs, "entry");
+		if(entryStyle == null)
+			entryStyle = defaultStyle;
 		
-		WarlockFont mainFont = settings.getMainWindowSettings().getFont();
-		String fontFace = mainFont.getFamilyName();
-		int fontSize = mainFont.getSize();
-//		if (Platform.getOS().equals(Platform.OS_MACOSX)) {
-//			fontSize = settings.getMainWindowSettings().getFontSizeInPixels();
-//		}
+		WarlockColor entryBG = entryStyle.getBackgroundColor();
+		WarlockColor entryFG = entryStyle.getForegroundColor();
+		// FIXME: re-enable this... maybe?
+		//WarlockColor entryBarColor = settings.getCommandLineSettings().getBarColor();
 		
-		normalFont = mainFont.isDefaultFont() ? JFaceResources.getDefaultFont() : new Font(getSite().getShell().getDisplay(), fontFace, fontSize, SWT.NONE);
-		streamText.setFont(normalFont);
-		
-		WarlockColor entryBG = settings.getCommandLineSettings().getBackgroundColor();
-		WarlockColor entryFG = settings.getCommandLineSettings().getForegroundColor();
-		WarlockColor entryBarColor = settings.getCommandLineSettings().getBarColor();
-		
-		entry.getWidget().setForeground(ColorUtil.warlockColorToColor(entryFG.isDefault() ? fg  : entryFG));
-		entry.getWidget().setBackground(ColorUtil.warlockColorToColor(entryBG.isDefault() ? bg : entryBG));
+		entry.getWidget().setForeground(ColorUtil.warlockColorToColor(
+				entryFG.isDefault() ? defaultStyle.getForegroundColor()
+						: entryFG));
+		entry.getWidget().setBackground(ColorUtil.warlockColorToColor(
+				entryBG.isDefault() ? defaultStyle.getBackgroundColor()
+						: entryBG));
 		entry.getWidget().redraw();
 		
-		Caret newCaret = createCaret(1, ColorUtil.warlockColorToColor(entryBarColor.isDefault() ? fg : entryBarColor));
-		entry.getWidget().setCaret(newCaret);
+		//Caret newCaret = createCaret(1, ColorUtil.warlockColorToColor(entryBarColor.isDefault() ? fg : entryBarColor));
+		//entry.getWidget().setCaret(newCaret);
 		
 		streamText.setClient(sfClient);
-		streamText.setBackground(ColorUtil.warlockColorToColor(bg));
-		streamText.setForeground(ColorUtil.warlockColorToColor(fg));
-		streamText.getTextWidget().redraw();
 		
 		if (HandsView.getDefault() != null)
 		{
-			HandsView.getDefault().loadSettings(settings);
+			HandsView.getDefault().loadSettings(prefs);
 		}
 		
 		if (status != null) {
-			status.loadSettings(settings);
+			status.loadSettings(prefs);
 		}
 	}
 	

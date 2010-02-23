@@ -26,23 +26,22 @@ import org.eclipse.swt.SWT;
 import org.eclipse.swt.graphics.Font;
 import org.eclipse.swt.widgets.Display;
 
+import cc.warlock.core.client.IWarlockClient;
 import cc.warlock.core.client.IWarlockStyle;
-import cc.warlock.core.client.WarlockColor;
 import cc.warlock.core.client.WarlockFont;
-import cc.warlock.core.stormfront.client.IStormFrontClient;
-import cc.warlock.core.stormfront.settings.IStormFrontClientSettings;
+import cc.warlock.core.client.settings.WarlockClientPreferences;
+import cc.warlock.core.client.settings.WarlockFontProvider;
 import cc.warlock.rcp.ui.StyleRangeWithData;
 import cc.warlock.rcp.ui.style.DefaultStyleProvider;
-import cc.warlock.rcp.util.ColorUtil;
 
 public class StormFrontStyleProvider extends DefaultStyleProvider {
 
-	protected IStormFrontClientSettings settings;
+	protected WarlockClientPreferences prefs;
 	
-	public StormFrontStyleProvider (IStormFrontClientSettings settings)
+	public StormFrontStyleProvider (IWarlockClient client)
 	{
-		super(settings.getClient());
-		this.settings = settings;
+		super(client);
+		this.prefs = client.getClientPreferences();
 	}
 	
 	public StyleRangeWithData getStyleRange (IWarlockStyle style)
@@ -50,8 +49,9 @@ public class StormFrontStyleProvider extends DefaultStyleProvider {
 		Display display = Display.getDefault();
 		StyleRangeWithData range = super.getStyleRange(style);
 		
-		IStormFrontClient sfClient = (IStormFrontClient)client;
+		//IStormFrontClient sfClient = (IStormFrontClient)client;
 		
+		/* FIXME: audit the following section
 		if (style.getName() != null)
 		{
 			if (style.getBackgroundColor().isDefault()) {
@@ -65,10 +65,11 @@ public class StormFrontStyleProvider extends DefaultStyleProvider {
 					range.foreground = ColorUtil.warlockColorToColor(color);
 			}
 		}
+		*/
 		
 		if (style.getStyleTypes().contains(IWarlockStyle.StyleType.MONOSPACE))
 		{
-			WarlockFont columnFont = settings.getMainWindowSettings().getColumnFont();
+			WarlockFont columnFont = WarlockFontProvider.getInstance().get(prefs, "mono");
 //			if (Platform.getOS().equals(Platform.OS_MACOSX)) {
 //				monoFontSize = settings.getMainWindowSettings().getColumnFontSizeInPixels();
 //			}
