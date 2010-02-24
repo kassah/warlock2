@@ -21,8 +21,6 @@
  */
 package cc.warlock.rcp.ui.script;
 
-import java.io.File;
-
 import org.eclipse.jface.wizard.WizardPage;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.layout.GridData;
@@ -32,10 +30,11 @@ import org.eclipse.swt.widgets.Label;
 
 import cc.warlock.core.script.IScriptEngine;
 import cc.warlock.core.script.ScriptEngineRegistry;
-import cc.warlock.core.script.configuration.ScriptConfiguration;
+import cc.warlock.core.script.settings.ScriptDirectoryProvider;
 import cc.warlock.rcp.ui.ComboField;
 import cc.warlock.rcp.ui.TextField;
 import cc.warlock.rcp.ui.WarlockSharedImages;
+import cc.warlock.rcp.views.GameView;
 
 public class NewScriptWizardPage extends WizardPage {
 
@@ -61,9 +60,9 @@ public class NewScriptWizardPage extends WizardPage {
 		
 		scriptDirCombo = new ComboField(main, SWT.BORDER | SWT.DROP_DOWN);
 		boolean selected = false;
-		for (File dir : ScriptConfiguration.instance().getScriptDirectories())
+		for (String path : ScriptDirectoryProvider.getInstance().getAll(GameView.getGameViewInFocus().getWarlockClient().getClientPreferences()))
 		{
-			scriptDirCombo.getCombo().add(dir.getAbsolutePath());
+			scriptDirCombo.getCombo().add(path);
 
 			if (!selected) {
 				scriptDirCombo.getCombo().select(0);
@@ -92,7 +91,7 @@ public class NewScriptWizardPage extends WizardPage {
 		selected = false;
 		for (IScriptEngine engine : ScriptEngineRegistry.getScriptEngines())
 		{
-			for (String extension : ScriptConfiguration.instance().getEngineExtensions(engine.getScriptEngineId()))
+			for (String extension : engine.getFileExtensions())
 			{
 				scriptExtCombo.getCombo().add("."+extension);
 				if (!selected) {

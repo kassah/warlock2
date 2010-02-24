@@ -235,4 +235,8 @@ public class JavascriptEngine implements IScriptEngine {
 	public Collection<? extends IScript> getRunningScripts() {
 		return runningScripts;
 	}
+	
+	public Collection<String> getFileExtensions() {
+		return fileExtensions;
+	}
 }

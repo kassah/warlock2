@@ -66,4 +66,6 @@ public interface IScriptEngine {
 	 */
 	public Collection<? extends IScript> getRunningScripts();
 	
+	public Collection<String> getFileExtensions();
+	
 }

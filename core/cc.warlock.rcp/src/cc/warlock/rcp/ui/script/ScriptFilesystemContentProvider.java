@@ -21,29 +21,28 @@
  */
 package cc.warlock.rcp.ui.script;
 
-import java.util.List;
-
 import org.eclipse.jface.viewers.ITreeContentProvider;
 import org.eclipse.jface.viewers.Viewer;
 
-import cc.warlock.core.script.IFilesystemScriptProvider;
 import cc.warlock.core.script.IScriptInfo;
 import cc.warlock.core.script.IScriptProvider;
 import cc.warlock.core.script.ScriptEngineRegistry;
+import cc.warlock.core.script.internal.FilesystemScriptProvider;
 import cc.warlock.rcp.application.WarlockApplication;
+import cc.warlock.rcp.views.GameView;
 
 public class ScriptFilesystemContentProvider implements ITreeContentProvider
 {
 	public static final String LOCAL_SCRIPTS = "localScripts";
 	
-	protected IFilesystemScriptProvider getFilesystemScriptProvider ()
+	protected FilesystemScriptProvider getFilesystemScriptProvider ()
 	{
-		IFilesystemScriptProvider provider = null;
+		FilesystemScriptProvider provider = null;
 		for (IScriptProvider p : ScriptEngineRegistry.getScriptProviders())
 		{
-			if (p instanceof IFilesystemScriptProvider)
+			if (p instanceof FilesystemScriptProvider)
 			{
-				provider = (IFilesystemScriptProvider) p;
+				provider = (FilesystemScriptProvider) p;
 			}
 		}
 		
@@ -57,11 +56,9 @@ public class ScriptFilesystemContentProvider implements ITreeContentProvider
 		}
 		else if (parentElement.equals(LOCAL_SCRIPTS))
 		{
-			IFilesystemScriptProvider provider = getFilesystemScriptProvider();
+			FilesystemScriptProvider provider = getFilesystemScriptProvider();
 			
-			List<IScriptInfo> scriptInfos = provider.getScriptInfos();
-			
-			return scriptInfos.toArray(new IScriptInfo[scriptInfos.size()]);
+			return provider.getScriptInfos(GameView.getGameViewInFocus().getWarlockClient().getClientPreferences());
 		}
 		
 		return new Object[0];

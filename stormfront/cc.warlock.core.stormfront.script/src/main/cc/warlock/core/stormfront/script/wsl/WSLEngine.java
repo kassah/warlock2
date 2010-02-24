@@ -100,4 +100,8 @@ public class WSLEngine implements IScriptEngine, IScriptListener {
 	public Collection<? extends IScript> getRunningScripts() {
 		return runningScripts;
 	}
+	
+	public Collection<String> getFileExtensions() {
+		return fileExtensions;
+	}
 }

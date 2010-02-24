@@ -21,14 +21,12 @@
  */
 package cc.warlock.core.script;
 
-import java.util.Collection;
-
 import cc.warlock.core.client.IWarlockClient;
 import cc.warlock.core.client.settings.WarlockClientPreferences;
 
 public interface IScriptProvider {
 
-	public Collection<? extends IScriptInfo> getScriptInfos(WarlockClientPreferences prefs);
+	public IScriptInfo[] getScriptInfos(WarlockClientPreferences prefs);
 	
 	public IScript startScript (IScriptInfo scriptInfo, IWarlockClient client, String[] arguments);
 	

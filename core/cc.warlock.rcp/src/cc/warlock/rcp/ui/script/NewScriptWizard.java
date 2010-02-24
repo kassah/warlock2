@@ -31,9 +31,6 @@ import org.eclipse.ui.IWorkbenchPage;
 import org.eclipse.ui.PartInitException;
 import org.eclipse.ui.ide.FileStoreEditorInput;
 
-import cc.warlock.core.script.IFilesystemScriptProvider;
-import cc.warlock.core.script.ScriptEngineRegistry;
-
 public class NewScriptWizard extends Wizard {
 	
 	protected NewScriptWizardPage page1;
@@ -66,16 +63,6 @@ public class NewScriptWizard extends Wizard {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
-		
-		IFilesystemScriptProvider provider = (IFilesystemScriptProvider)
-			ScriptEngineRegistry.getScriptProvider(IFilesystemScriptProvider.class);
-		
-		if (provider != null)
-		{
-			provider.forceScan();
-		}
-		
-		
 		
 		IFileStore fileStore = EFS.getLocalFileSystem().fromLocalFile(scriptFile);
 		try {

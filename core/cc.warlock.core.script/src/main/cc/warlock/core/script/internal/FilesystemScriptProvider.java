@@ -90,7 +90,7 @@ public class FilesystemScriptProvider implements IScriptProvider {
 	
 	protected FilesystemScriptProvider () { }
 	
-	public Collection<? extends IScriptInfo> getScriptInfos(WarlockClientPreferences prefs)
+	public IScriptInfo[] getScriptInfos(WarlockClientPreferences prefs)
 	{
 		ArrayList<ScriptFileInfo> infos = new ArrayList<ScriptFileInfo>();
 		for(String path : ScriptDirectoryProvider.getInstance().getAll(prefs)) {
@@ -100,7 +100,7 @@ public class FilesystemScriptProvider implements IScriptProvider {
 				scanDirectory(infos, dir);
 			}
 		}
-		return infos;
+		return infos.toArray(new IScriptInfo[infos.size()]);
 	}
 	
 	protected ScriptFileInfo getScriptInfo (Collection<ScriptFileInfo> infos, File file)
