@@ -8,7 +8,7 @@ import org.osgi.service.prefs.Preferences;
 
 public class WarlockPreferences {
 	private static WarlockPreferences instance = new WarlockPreferences();
-	private static ConfigurationScope scope = new ConfigurationScope();
+	protected static ConfigurationScope scope = new ConfigurationScope();
 	private static IEclipsePreferences topLevel = scope.getNode("cc.warlock");
 	
 	protected WarlockPreferences() { }
