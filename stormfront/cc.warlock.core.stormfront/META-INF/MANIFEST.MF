@@ -15,4 +15,5 @@ Export-Package: cc.warlock.core.stormfront,
  cc.warlock.core.stormfront.client.internal,
  cc.warlock.core.stormfront.internal,
  cc.warlock.core.stormfront.network,
+ cc.warlock.core.stormfront.profile,
  cc.warlock.core.stormfront.xml
