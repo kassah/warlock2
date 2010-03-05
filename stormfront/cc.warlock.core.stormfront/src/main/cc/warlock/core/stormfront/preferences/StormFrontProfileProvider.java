@@ -3,17 +3,15 @@ package cc.warlock.core.stormfront.preferences;
 import org.osgi.service.prefs.Preferences;
 
 import cc.warlock.core.client.settings.WarlockPreferenceArrayProvider;
-import cc.warlock.core.stormfront.StormFrontCharacterProfile;
+import cc.warlock.core.stormfront.profile.StormFrontProfile;
 
-public class StormFrontCharacterProfileProvider extends
-		WarlockPreferenceArrayProvider<StormFrontCharacterProfile> {
+public class StormFrontProfileProvider extends
+		WarlockPreferenceArrayProvider<StormFrontProfile> {
 
 	@Override
-	protected StormFrontCharacterProfile get(Preferences node) {
+	protected StormFrontProfile get(Preferences node) {
 		// TODO Auto-generated method stub
-		StormFrontCharacterProfile profile = new StormFrontCharacterProfile();
-		profile.setUsername(node.get("username", null));
-		profile.setPassword(node.get("password", null));
+		StormFrontProfile profile = new StormFrontProfile();
 		profile.setId(node.get("id", null));
 		profile.setName(node.get("name", null));
 		profile.setGameCode(node.get("gameCode", null));
@@ -23,13 +21,11 @@ public class StormFrontCharacterProfileProvider extends
 
 	@Override
 	protected String getNodeName() {
-		return "sfCharacterProfile";
+		return "profile";
 	}
 
 	@Override
-	protected void set(Preferences node, StormFrontCharacterProfile value) {
-		node.put("username", value.getUsername());
-		node.put("password", value.getPassword());
+	protected void set(Preferences node, StormFrontProfile value) {
 		node.put("id", value.getId());
 		node.put("name", value.getName());
 		node.put("gameCode", value.getGameCode());
