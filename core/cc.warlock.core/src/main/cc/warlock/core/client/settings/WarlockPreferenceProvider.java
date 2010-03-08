@@ -36,7 +36,7 @@ public abstract class WarlockPreferenceProvider<T> {
 		set(WarlockPreferences.getScope().getNode(path), value);
 	}
 	
-	public void set(WarlockClientPreferences prefs, String id, T value) {
+	public void set(WarlockPreferences prefs, String id, T value) {
 		set(getNode(prefs, id), value);
 	}
 	
