@@ -6,6 +6,7 @@ public class StormFrontProfile extends Profile {
 	private String id = "";
 	private String gameCode = "";
 	private String gameName = "";
+	private String gameViewId = null;
 	private StormFrontAccount account = null;
 	
 	public StormFrontProfile() {
@@ -81,5 +82,13 @@ public class StormFrontProfile extends Profile {
 	 */
 	public StormFrontAccount getAccount() {
 		return account;
+	}
+	
+	public void setGameViewId(String gameViewId) {
+		this.gameViewId = gameViewId;
+	}
+	
+	public String getGameViewId() {
+		return gameViewId;
 	}
 }

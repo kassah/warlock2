@@ -51,12 +51,13 @@ import cc.warlock.core.client.WarlockClientRegistry;
 import cc.warlock.core.client.WarlockColor;
 import cc.warlock.core.client.internal.WarlockClientListener;
 import cc.warlock.core.client.settings.WarlockClientPreferences;
+import cc.warlock.core.client.settings.WarlockPreferences;
 import cc.warlock.core.client.settings.WarlockWindowProvider;
 import cc.warlock.core.profile.Profile;
-import cc.warlock.core.stormfront.ProfileConfiguration;
 import cc.warlock.core.stormfront.client.IStormFrontClient;
 import cc.warlock.core.stormfront.client.IStormFrontClientViewer;
-import cc.warlock.rcp.stormfront.StormFrontGameViewConfiguration;
+import cc.warlock.core.stormfront.preferences.StormFrontProfileProvider;
+import cc.warlock.core.stormfront.profile.StormFrontProfile;
 import cc.warlock.rcp.stormfront.adapters.SWTStormFrontClientViewer;
 import cc.warlock.rcp.stormfront.ui.StormFrontSharedImages;
 import cc.warlock.rcp.stormfront.ui.StormFrontStatus;
@@ -105,17 +106,20 @@ public class StormFrontGameView extends GameView implements IStormFrontClientVie
 		status = new StormFrontStatus(entryComposite);
 		
 		String fullId = getViewSite().getId() + ":" + getViewSite().getSecondaryId();
-		String characterName = StormFrontGameViewConfiguration.instance().getProfileId(fullId);
 		
-		final Profile profile = ProfileConfiguration.instance().getProfileByCharacterName(characterName);
 		createReconnectPopup();
 		
+		StormFrontProfile profile = StormFrontProfileProvider.getInstance().getByGameViewId(fullId);
+			
 		if (profile != null) {
 			setReconnectProfile(profile);
 			showPopup(reconnectPopup);
 		}
-		else {			
-			setNoReconnectProfile(characterName);
+		else {
+			if(sfClient != null)
+				setNoReconnectProfile(sfClient.getCharacterName().get());
+			else
+				setNoReconnectProfile("");
 		}
 	}
 	
@@ -211,7 +215,7 @@ public class StormFrontGameView extends GameView implements IStormFrontClientVie
 			}
 		});
 		
-		for (final Profile profile : ProfileConfiguration.instance().getAllProfiles())
+		for (final StormFrontProfile profile : StormFrontProfileProvider.getInstance().getAll(WarlockPreferences.getInstance()))
 		{
 			MenuItem item = new MenuItem (menu, SWT.PUSH);
 			item.setText(profile.getName());
@@ -329,6 +333,19 @@ public class StormFrontGameView extends GameView implements IStormFrontClientVie
 		}
 	}
 	
+	private class CharacterNameListener implements IPropertyListener<String> {
+		public void propertyChanged(String value) {
+			String viewId = getViewSite().getId() + ":" + getViewSite().getSecondaryId();
+			
+			StormFrontProfile profile = StormFrontProfileProvider.getInstance().getByGameViewId(viewId);
+			if (profile != null) {
+				setReconnectProfile(profile);
+			} else {
+				setNoReconnectProfile(value);
+			}	
+		}
+	}
+	
 	public void loadClientSettings(WarlockClientPreferences prefs)
 	{
 		if(prefs == null)
@@ -337,30 +354,7 @@ public class StormFrontGameView extends GameView implements IStormFrontClientVie
 		
 		StyleProviders.setStyleProvider(client, styleProvider);
 		
-		sfClient.getCharacterName().addListener(new IPropertyListener<String>() {
-			public void propertyChanged(String value) {
-				String viewId = getViewSite().getId() + ":" + getViewSite().getSecondaryId();
-				
-				/* FIXME: Marshall, can you look the following. I _think_
-				 * sfClient.getCharacterName().get() should just be replaced
-				 * by value (the parameter to this method).
-				 */
-				StormFrontGameViewConfiguration.instance().addProfileMapping(viewId,
-						sfClient.getCharacterName().get());
-				
-				Display.getDefault().asyncExec(new Runnable() {
-					public void run() {
-						Profile profile = ProfileConfiguration.instance()
-								.getProfileByCharacterName(sfClient.getCharacterName().get());
-						if (profile != null) {
-							setReconnectProfile(profile);
-						} else {
-							setNoReconnectProfile(sfClient.getCharacterName().get());
-						}	
-					}
-				});
-			}
-		});
+		sfClient.getCharacterName().addListener(new SWTPropertyListener<String>(new CharacterNameListener()));
 		
 		streamText.setStyleProvider(styleProvider);
 		
