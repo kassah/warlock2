@@ -49,29 +49,31 @@ import org.eclipse.swt.widgets.Group;
 import org.eclipse.ui.IWorkbenchPropertyPage;
 import org.eclipse.ui.dialogs.PropertyPage;
 
-import cc.warlock.core.profile.Account;
+import cc.warlock.core.client.settings.WarlockPreferences;
 import cc.warlock.core.profile.Profile;
-import cc.warlock.core.stormfront.ProfileConfiguration;
+import cc.warlock.core.stormfront.preferences.StormFrontAccountProvider;
+import cc.warlock.core.stormfront.profile.StormFrontAccount;
+import cc.warlock.core.stormfront.profile.StormFrontProfile;
 import cc.warlock.rcp.ui.WarlockSharedImages;
 
 public class AccountsPreferencePage extends PropertyPage implements
 		IWorkbenchPropertyPage {
 
 	public static final String PAGE_ID = "cc.warlock.rcp.stormfront.ui.prefs.accountsAndProfiles";
-	protected ArrayList<Account> accounts = new ArrayList<Account>();
-	protected ArrayList<Account> addedAccounts = new ArrayList<Account>();
-	protected ArrayList<Account> removedAccounts = new ArrayList<Account>();
-	protected HashMap<Account, ArrayList<Profile>> addedProfiles = new HashMap<Account, ArrayList<Profile>>();
-	protected HashMap<Account, ArrayList<Profile>> removedProfiles = new HashMap<Account, ArrayList<Profile>>();
+	protected ArrayList<StormFrontAccount> accounts = new ArrayList<StormFrontAccount>();
+	protected ArrayList<StormFrontAccount> addedAccounts = new ArrayList<StormFrontAccount>();
+	protected ArrayList<StormFrontAccount> removedAccounts = new ArrayList<StormFrontAccount>();
+	protected HashMap<StormFrontAccount, ArrayList<Profile>> addedProfiles = new HashMap<StormFrontAccount, ArrayList<Profile>>();
+	protected HashMap<StormFrontAccount, ArrayList<Profile>> removedProfiles = new HashMap<StormFrontAccount, ArrayList<Profile>>();
 	
 	protected TreeViewer accountViewer;
 	protected Button addAccount, removeAccount, editAccount, addProfile, removeProfile;
 	
 	public AccountsPreferencePage ()
 	{
-		for (Account account : ProfileConfiguration.instance().getAllAccounts())
+		for (StormFrontAccount account : StormFrontAccountProvider.getInstance().getAll(WarlockPreferences.getInstance()))
 		{
-			Account copy = new Account(account);
+			StormFrontAccount copy = new StormFrontAccount(account);
 			accounts.add(copy);
 		}
 	}
@@ -152,9 +154,9 @@ public class AccountsPreferencePage extends PropertyPage implements
 		viewer.setContentProvider(new ITreeContentProvider() {
 			public void dispose() {	}
 			public Object[] getChildren(Object parentElement) {
-				if (parentElement instanceof Account)
+				if (parentElement instanceof StormFrontAccount)
 				{
-					return ((Account)parentElement).getProfiles().toArray();
+					return ((StormFrontAccount)parentElement).getProfiles().toArray();
 				}
 				return new Object[0];
 			}
@@ -171,16 +173,16 @@ public class AccountsPreferencePage extends PropertyPage implements
 			}
 			
 			public Object getParent(Object element) {
-				if (element instanceof Profile) {
-					return ((Profile)element).getAccount();
+				if (element instanceof StormFrontProfile) {
+					return ((StormFrontProfile)element).getAccount();
 				}
 				return null;
 			}
 			
 			public boolean hasChildren(Object element) {
-				if (element instanceof Account)
+				if (element instanceof StormFrontAccount)
 				{
-					return ((Account)element).getProfiles().size() > 0;
+					return ((StormFrontAccount)element).getProfiles().size() > 0;
 				}
 				return false;
 			}
@@ -196,8 +198,8 @@ public class AccountsPreferencePage extends PropertyPage implements
 				return null;
 			}
 			public String getText(Object element) {
-				if (element instanceof Account) {
-					return ((Account)element).getAccountName();
+				if (element instanceof StormFrontAccount) {
+					return ((StormFrontAccount)element).getAccountName();
 				} else if (element instanceof Profile) {
 					return ((Profile)element).getName();
 				}
@@ -209,9 +211,9 @@ public class AccountsPreferencePage extends PropertyPage implements
 		
 		viewer.addFilter(new ViewerFilter() {
 			public boolean select(Viewer viewer, Object parentElement, Object element) {
-				if (element instanceof Account)
+				if (element instanceof StormFrontAccount)
 				{
-					Account account = (Account) element;
+					StormFrontAccount account = (StormFrontAccount) element;
 					if (removedAccounts.contains(account)) {
 						return false;
 					}
@@ -235,10 +237,10 @@ public class AccountsPreferencePage extends PropertyPage implements
 		viewer.addSelectionChangedListener(new ISelectionChangedListener() {
 			public void selectionChanged(SelectionChangedEvent event) {
 				IStructuredSelection selection = (IStructuredSelection)event.getSelection();
-				if (selection.getFirstElement() instanceof Account) {
-					accountSelected((Account)selection.getFirstElement());
+				if (selection.getFirstElement() instanceof StormFrontAccount) {
+					accountSelected((StormFrontAccount)selection.getFirstElement());
 				} else if (selection.getFirstElement() instanceof Profile) {
-					profileSelected((Profile)selection.getFirstElement());
+					profileSelected((StormFrontProfile)selection.getFirstElement());
 				}
 			}
 		});
@@ -251,8 +253,8 @@ public class AccountsPreferencePage extends PropertyPage implements
 		accountViewer.expandAll();
 	}
 	
-	protected Account currentAccount;
-	protected void accountSelected (Account account)
+	protected StormFrontAccount currentAccount;
+	protected void accountSelected (StormFrontAccount account)
 	{
 		removeAccount.setEnabled(true);
 		editAccount.setEnabled(true);
@@ -262,8 +264,8 @@ public class AccountsPreferencePage extends PropertyPage implements
 		currentAccount = account;
 	}
 	
-	protected Profile currentProfile;
-	protected void profileSelected (Profile profile)
+	protected StormFrontProfile currentProfile;
+	protected void profileSelected (StormFrontProfile profile)
 	{
 		removeProfile.setEnabled(true);
 		
@@ -323,7 +325,7 @@ public class AccountsPreferencePage extends PropertyPage implements
 			String username = dialog.getUsername();
 			String password = dialog.getPassword();
 			
-			Account account = new Account(username, password);
+			StormFrontAccount account = new StormFrontAccount(username, password);
 			accountViewer.add(account, new Object[0]);
 			addedAccounts.add(account);
 		}
@@ -331,7 +333,7 @@ public class AccountsPreferencePage extends PropertyPage implements
 
 	@Override
 	public boolean performOk() {
-		for (Account account : accounts)
+		for (StormFrontAccount account : accounts)
 		{
 			if (account.needsUpdate())
 			{
@@ -340,12 +342,12 @@ public class AccountsPreferencePage extends PropertyPage implements
 			}
 		}
 		
-		for (Account account : removedAccounts)
+		for (StormFrontAccount account : removedAccounts)
 		{
 			ProfileConfiguration.instance().removeAccount(account.getOriginalAccount());
 		}
 		
-		for (Account account : addedAccounts)
+		for (StormFrontAccount account : addedAccounts)
 		{
 			ProfileConfiguration.instance().addAccount(account);
 		}

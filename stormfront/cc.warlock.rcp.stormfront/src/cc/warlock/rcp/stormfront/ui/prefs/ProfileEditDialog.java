@@ -38,30 +38,30 @@ import org.eclipse.swt.widgets.Control;
 import org.eclipse.swt.widgets.Label;
 import org.eclipse.swt.widgets.Shell;
 
-import cc.warlock.core.profile.Account;
-import cc.warlock.core.profile.Profile;
 import cc.warlock.core.stormfront.network.ISGEGame;
 import cc.warlock.core.stormfront.network.SGEConnection;
 import cc.warlock.core.stormfront.network.SGEConnectionListener;
+import cc.warlock.core.stormfront.profile.StormFrontAccount;
+import cc.warlock.core.stormfront.profile.StormFrontProfile;
 import cc.warlock.rcp.ui.ComboField;
 
 public class ProfileEditDialog extends Dialog {
 
-	protected Account account;
-	protected Profile profile;
+	protected StormFrontAccount account;
+	protected StormFrontProfile profile;
 	
 	protected ComboField gameField;
 	protected ComboField characterField;
 	protected Label statusLabel;
 	
-	public ProfileEditDialog (Shell parentShell, Account account)
+	public ProfileEditDialog (Shell parentShell, StormFrontAccount account)
 	{
 		super(parentShell);
 		
 		this.account = account;
 	}
 	
-	public ProfileEditDialog (Shell parentShell, Account account, Profile profile)
+	public ProfileEditDialog (Shell parentShell, StormFrontAccount account, StormFrontProfile profile)
 	{
 		this(parentShell, account);
 		
@@ -146,14 +146,14 @@ public class ProfileEditDialog extends Dialog {
 	
 	protected static class ProfileRetriever extends SGEConnectionListener
 	{
-		protected Account account;
+		protected StormFrontAccount account;
 		protected boolean loggedIn, gettingCharacters;
 		protected int errorCode = -1;
 		protected List<? extends ISGEGame> games;
 		protected Map<String, String> characters;
 		protected SGEConnection connection;
 		
-		public ProfileRetriever (Account account)
+		public ProfileRetriever (StormFrontAccount account)
 		{
 			this.account = account;
 			loggedIn = false;

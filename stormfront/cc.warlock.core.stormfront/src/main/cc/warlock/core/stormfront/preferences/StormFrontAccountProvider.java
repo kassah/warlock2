@@ -6,8 +6,17 @@ import cc.warlock.core.client.settings.WarlockPreferenceArrayProvider;
 import cc.warlock.core.stormfront.profile.StormFrontAccount;
 
 public class StormFrontAccountProvider
-	extends WarlockPreferenceArrayProvider<StormFrontAccount>{
+	extends WarlockPreferenceArrayProvider<StormFrontAccount> {
 
+	private static final StormFrontAccountProvider instance =
+		new StormFrontAccountProvider();
+	
+	private StormFrontAccountProvider() { }
+	
+	public static StormFrontAccountProvider getInstance() {
+		return instance;
+	}
+	
 	@Override
 	protected StormFrontAccount get(Preferences node) {
 		// TODO Auto-generated method stub
