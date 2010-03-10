@@ -55,11 +55,11 @@ public class ScriptsWindowHandler extends SimpleCommandHandler implements
 		}
 		
 		try {
-			window = PlatformUI.getWorkbench().openWorkbenchWindow(ScriptsPerspectiveFactory.PERSPECTIVE_ID, WarlockApplication.instance());
+			window = PlatformUI.getWorkbench().openWorkbenchWindow(ScriptsPerspectiveFactory.PERSPECTIVE_ID, WarlockApplication.getInstance());
 		} catch (WorkbenchException e) {
 			throw new ExecutionException("Unable to create script editor window", e);
 		}
-		IWorkbenchWindowConfigurer c = WarlockApplication.instance().getWindowConfigurer(window);
+		IWorkbenchWindowConfigurer c = WarlockApplication.getInstance().getWindowConfigurer(window);
 		c.setShowMenuBar(false);
 		c.setTitle("Warlock Scripts");
 		c.setInitialSize(new Point(600, 400));

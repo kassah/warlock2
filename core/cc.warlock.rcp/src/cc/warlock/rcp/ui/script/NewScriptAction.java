@@ -48,7 +48,7 @@ public class NewScriptAction extends Action {
 		int response = dialog.open();
 		if (response == WizardDialog.OK)
 		{
-			site.getStructuredViewer().refresh(WarlockApplication.instance());
+			site.getStructuredViewer().refresh(WarlockApplication.getInstance());
 		}
 	}
 }

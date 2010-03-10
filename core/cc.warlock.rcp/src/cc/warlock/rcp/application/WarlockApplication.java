@@ -44,17 +44,17 @@ import com.martiansoftware.jsap.JSAPResult;
  */
 public class WarlockApplication implements IApplication, IAdaptable {
 	private String startWithProfile = null;
-	private static WarlockApplication _instance;
+	private static WarlockApplication instance = new WarlockApplication();
 	private WarlockWorkbenchAdvisor advisor;
 	
-	public WarlockApplication ()
+	private WarlockApplication ()
 	{
-		_instance = this;
+		// Singleton
 	}
 	
-	public static WarlockApplication instance()
+	public static WarlockApplication getInstance()
 	{
-		return _instance;
+		return instance;
 	}
 	
 	private void parseArguments (String[] arguments)

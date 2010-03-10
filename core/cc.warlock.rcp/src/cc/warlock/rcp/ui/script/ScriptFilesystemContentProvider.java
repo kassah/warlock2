@@ -71,7 +71,7 @@ public class ScriptFilesystemContentProvider implements ITreeContentProvider
 		}
 		else if (element.equals(LOCAL_SCRIPTS))
 		{
-			return WarlockApplication.instance();
+			return WarlockApplication.getInstance();
 		}
 		
 		return null;

@@ -53,7 +53,6 @@ import cc.warlock.core.client.internal.WarlockClientListener;
 import cc.warlock.core.client.settings.WarlockClientPreferences;
 import cc.warlock.core.client.settings.WarlockPreferences;
 import cc.warlock.core.client.settings.WarlockWindowProvider;
-import cc.warlock.core.profile.Profile;
 import cc.warlock.core.stormfront.client.IStormFrontClient;
 import cc.warlock.core.stormfront.client.IStormFrontClientViewer;
 import cc.warlock.core.stormfront.preferences.StormFrontProfileProvider;
@@ -159,7 +158,7 @@ public class StormFrontGameView extends GameView implements IStormFrontClientVie
 	}
 	
 	protected SelectionListener currentListener;
-	protected void setReconnectProfile (final Profile profile)
+	protected void setReconnectProfile (final StormFrontProfile profile)
 	{
 		String characterName = profile.getName();
 		reconnectLabel.setText("The character \"" + characterName + "\" is currently disconnected.");

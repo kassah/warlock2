@@ -25,9 +25,7 @@ import java.util.HashMap;
 
 import org.mozilla.javascript.Scriptable;
 
-import cc.warlock.core.script.ScriptEngineRegistry;
 import cc.warlock.core.script.javascript.IJavascriptVariableProvider;
-import cc.warlock.core.script.javascript.JavascriptEngine;
 import cc.warlock.core.script.javascript.JavascriptScript;
 import cc.warlock.core.stormfront.client.IStormFrontClient;
 import cc.warlock.core.stormfront.script.IStormFrontScriptCommands;
@@ -36,14 +34,6 @@ public class StormFrontJavascriptVars implements IJavascriptVariableProvider {
 
 	protected HashMap<JavascriptScript, StormFrontJavascriptCommands> scriptCommands =
 		new HashMap<JavascriptScript, StormFrontJavascriptCommands>();
-	
-	public StormFrontJavascriptVars ()
-	{
-		JavascriptEngine engine = (JavascriptEngine)
-			ScriptEngineRegistry.getScriptEngine(JavascriptEngine.ENGINE_ID);
-		
-		engine.addVariableProvider(this);
-	}
 	
 	public void loadVariables(JavascriptScript script, Scriptable scope) {
 		if (script.getClient() instanceof IStormFrontClient)

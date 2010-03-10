@@ -38,6 +38,7 @@ import cc.warlock.core.profile.Profile;
 import cc.warlock.core.stormfront.network.ISGEConnectionListener;
 import cc.warlock.core.stormfront.network.ISGEGame;
 import cc.warlock.core.stormfront.network.SGEConnection;
+import cc.warlock.core.stormfront.profile.StormFrontProfile;
 import cc.warlock.rcp.plugin.Warlock2Plugin;
 import cc.warlock.rcp.stormfront.adapters.SWTSGEConnectionListenerAdapter;
 import cc.warlock.rcp.stormfront.ui.StormFrontSharedImages;
@@ -47,13 +48,13 @@ import cc.warlock.rcp.ui.network.SWTConnectionListenerAdapter;
 import cc.warlock.rcp.views.GameView;
 
 public class ProfileConnectAction extends Action implements ISGEConnectionListener, ILineConnectionListener {
-	private Profile profile;
+	private StormFrontProfile profile;
 	private IProgressMonitor monitor;
 	private boolean finished;
 	private IStatus status;
 	private GameView gameView;
 	
-	public ProfileConnectAction (Profile profile) {
+	public ProfileConnectAction (StormFrontProfile profile) {
 		super(profile.getName(), StormFrontSharedImages.getImageDescriptor(StormFrontSharedImages.IMG_CHARACTER));
 		setDescription(profile.getGameName() + " character \"" + profile.getName() + "\"");
 		
@@ -153,7 +154,7 @@ public class ProfileConnectAction extends Action implements ISGEConnectionListen
 		this.gameView = gameView;
 	}
 
-	public Profile getProfile() {
+	public StormFrontProfile getProfile() {
 		return profile;
 	}
 

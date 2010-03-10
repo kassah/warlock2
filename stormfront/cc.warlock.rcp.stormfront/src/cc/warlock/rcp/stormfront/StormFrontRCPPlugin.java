@@ -26,7 +26,9 @@ import org.eclipse.ui.plugin.AbstractUIPlugin;
 import org.osgi.framework.BundleContext;
 
 import cc.warlock.core.profile.Profile;
-import cc.warlock.core.stormfront.ProfileConfiguration;
+import cc.warlock.core.script.ScriptEngineRegistry;
+import cc.warlock.core.script.javascript.JavascriptEngine;
+import cc.warlock.core.stormfront.preferences.StormFrontProfileProvider;
 import cc.warlock.core.stormfront.script.javascript.StormFrontJavascriptVars;
 import cc.warlock.rcp.application.WarlockApplication;
 import cc.warlock.rcp.stormfront.adapters.StormFrontClientAdapterFactory;
@@ -58,23 +60,19 @@ public class StormFrontRCPPlugin extends AbstractUIPlugin {
 		super.start(context);
 		plugin = this;
 		
-		// i think this is the best place for this to go?
-		new StormFrontJavascriptVars();
+		JavascriptEngine engine = (JavascriptEngine)ScriptEngineRegistry.getScriptEngine(JavascriptEngine.ENGINE_ID);
+		engine.addVariableProvider(new StormFrontJavascriptVars());
 		
 		Platform.getAdapterManager().registerAdapters(new StormFrontClientAdapterFactory(), WarlockClientAdaptable.class);
 		
-		if (WarlockApplication.instance().getStartWithProfile() != null) {
-			Profile connectToProfile = null;
+		String startWithProfile = WarlockApplication.getInstance().getStartWithProfile();
+		if (startWithProfile != null) {
+			Profile connectToProfile = StormFrontProfileProvider.getInstance().getByName(startWithProfile);
 			
-			for (Profile profile : ProfileConfiguration.instance().getAllProfiles())
-			{
-				if (WarlockApplication.instance().getStartWithProfile().equals(profile.getName()))
-				{
-					connectToProfile = profile;
-				}
+			if (connectToProfile == null) {
+				/* TODO show a warning */
+				return;
 			}
-			
-			if (connectToProfile == null) /* TODO show a warning */ return;
 			
 			ProfileConnectAction action = new ProfileConnectAction(connectToProfile);
 			action.run();

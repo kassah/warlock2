@@ -50,4 +50,12 @@ public class StormFrontProfileProvider extends
 		}
 		return null;
 	}
+	
+	public StormFrontProfile getByName(String name) {
+		for(StormFrontProfile profile : getAll(WarlockPreferences.getInstance())) {
+			if(profile.getName() == name)
+				return profile;
+		}
+		return null;
+	}
 }
