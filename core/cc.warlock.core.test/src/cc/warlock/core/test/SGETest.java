@@ -27,10 +27,11 @@ import java.util.List;
 import org.junit.Assert;
 import org.junit.Test;
 
-import cc.warlock.core.profile.Profile;
-import cc.warlock.core.stormfront.ProfileConfiguration;
 import cc.warlock.core.stormfront.network.SGEConnection;
 import cc.warlock.core.stormfront.network.SGEConnectionListener;
+import cc.warlock.core.stormfront.preferences.StormFrontPreferences;
+import cc.warlock.core.stormfront.preferences.StormFrontProfileProvider;
+import cc.warlock.core.stormfront.profile.StormFrontProfile;
 
 public class SGETest {
 	protected Hashtable<String,Boolean> success = new Hashtable<String,Boolean>();
@@ -42,9 +43,8 @@ public class SGETest {
 			TestProperties.failProperty(TestProperties.PROFILE_NAMES);
 		}
 		
-		for (final String profileName : profileNames)
-		{
-			Profile profile = ProfileConfiguration.instance().getProfileByCharacterName(profileName);
+		for (final String profileName : profileNames) {
+			StormFrontProfile profile = StormFrontProfileProvider.getInstance().getByName(profileName);
 			Assert.assertNotNull("Profile described by \"" + profileName + "\" was null!", profile);
 			
 			success.put(profileName, false);

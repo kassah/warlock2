@@ -8,12 +8,12 @@ import org.junit.Assert;
 import cc.warlock.core.client.IWarlockClient;
 import cc.warlock.core.client.IWarlockClientListener;
 import cc.warlock.core.client.WarlockClientRegistry;
-import cc.warlock.core.profile.Profile;
-import cc.warlock.core.stormfront.ProfileConfiguration;
 import cc.warlock.core.stormfront.client.internal.StormFrontClient;
 import cc.warlock.core.stormfront.internal.SettingsInfoTagHandler;
 import cc.warlock.core.stormfront.network.SGEConnection;
 import cc.warlock.core.stormfront.network.StormFrontConnection;
+import cc.warlock.core.stormfront.preferences.StormFrontProfileProvider;
+import cc.warlock.core.stormfront.profile.StormFrontProfile;
 import cc.warlock.core.test.TestUtil;
 
 public class ResetServerSettings {
@@ -34,12 +34,11 @@ public class ResetServerSettings {
 			return;
 		}
 		
-		Profile profile = null;
+		StormFrontProfile profile = null;
 		
 		if (args.length == 1)
 		{
-			profile = 
-				ProfileConfiguration.instance().getProfileByCharacterName(args[0]);
+			profile = StormFrontProfileProvider.getInstance().getByName(args[0]);
 		}
 				
 		if (profile != null)
