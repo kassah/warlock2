@@ -31,7 +31,7 @@ import org.eclipse.jface.action.IContributionItem;
 import org.eclipse.swt.graphics.Image;
 import org.eclipse.ui.actions.CompoundContributionItem;
 
-import cc.warlock.core.client.settings.WarlockPreferences;
+import cc.warlock.core.stormfront.preferences.StormFrontPreferences;
 import cc.warlock.core.stormfront.preferences.StormFrontProfileProvider;
 import cc.warlock.core.stormfront.profile.StormFrontProfile;
 import cc.warlock.rcp.stormfront.ui.StormFrontSharedImages;
@@ -53,7 +53,7 @@ public class ProfileConnectContributionItem extends CompoundContributionItem imp
 
 	@Override
 	protected IContributionItem[] getContributionItems() {
-		Collection<StormFrontProfile> profiles = StormFrontProfileProvider.getInstance().getAll(WarlockPreferences.getInstance());
+		Collection<StormFrontProfile> profiles = StormFrontProfileProvider.getInstance().getAll(StormFrontPreferences.getInstance());
 		IContributionItem[] items = new IContributionItem[profiles.size()];
 		int i = 0;
 		
@@ -69,7 +69,7 @@ public class ProfileConnectContributionItem extends CompoundContributionItem imp
 	public List<IConnectionCommand> getConnectionCommands () {
 		ArrayList<IConnectionCommand> commands = new ArrayList<IConnectionCommand>();
 		
-		for (StormFrontProfile profile : StormFrontProfileProvider.getInstance().getAll(WarlockPreferences.getInstance()))
+		for (StormFrontProfile profile : StormFrontProfileProvider.getInstance().getAll(StormFrontPreferences.getInstance()))
 		{
 			commands.add(new ConnectionAction(new ProfileConnectAction(profile)));
 		}

@@ -44,7 +44,7 @@ public class StormFrontProfileProvider extends
 	}
 
 	public StormFrontProfile getByGameViewId(String gameViewId) {
-		for(StormFrontProfile profile : getAll(WarlockPreferences.getInstance())) {
+		for(StormFrontProfile profile : getAll(StormFrontPreferences.getInstance())) {
 			if(profile.getGameViewId() == gameViewId)
 				return profile;
 		}
@@ -52,7 +52,7 @@ public class StormFrontProfileProvider extends
 	}
 	
 	public StormFrontProfile getByName(String name) {
-		for(StormFrontProfile profile : getAll(WarlockPreferences.getInstance())) {
+		for(StormFrontProfile profile : getAll(StormFrontPreferences.getInstance())) {
 			if(profile.getName() == name)
 				return profile;
 		}
