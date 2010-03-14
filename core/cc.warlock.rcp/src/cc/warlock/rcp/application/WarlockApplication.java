@@ -47,9 +47,13 @@ public class WarlockApplication implements IApplication, IAdaptable {
 	private static WarlockApplication instance = new WarlockApplication();
 	private WarlockWorkbenchAdvisor advisor;
 	
-	private WarlockApplication ()
+	/**
+	 * This must stay public, it is called as apart of the eclipse
+	 * loading process.
+	 */
+	public WarlockApplication ()
 	{
-		// Singleton
+		instance = this;
 	}
 	
 	public static WarlockApplication getInstance()
