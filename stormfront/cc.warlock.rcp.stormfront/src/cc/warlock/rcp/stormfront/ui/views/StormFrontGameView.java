@@ -51,10 +51,10 @@ import cc.warlock.core.client.WarlockClientRegistry;
 import cc.warlock.core.client.WarlockColor;
 import cc.warlock.core.client.internal.WarlockClientListener;
 import cc.warlock.core.client.settings.WarlockClientPreferences;
-import cc.warlock.core.client.settings.WarlockPreferences;
 import cc.warlock.core.client.settings.WarlockWindowProvider;
 import cc.warlock.core.stormfront.client.IStormFrontClient;
 import cc.warlock.core.stormfront.client.IStormFrontClientViewer;
+import cc.warlock.core.stormfront.preferences.StormFrontPreferences;
 import cc.warlock.core.stormfront.preferences.StormFrontProfileProvider;
 import cc.warlock.core.stormfront.profile.StormFrontProfile;
 import cc.warlock.rcp.stormfront.adapters.SWTStormFrontClientViewer;
@@ -214,7 +214,7 @@ public class StormFrontGameView extends GameView implements IStormFrontClientVie
 			}
 		});
 		
-		for (final StormFrontProfile profile : StormFrontProfileProvider.getInstance().getAll(WarlockPreferences.getInstance()))
+		for (final StormFrontProfile profile : StormFrontProfileProvider.getInstance().getAll(StormFrontPreferences.getInstance()))
 		{
 			MenuItem item = new MenuItem (menu, SWT.PUSH);
 			item.setText(profile.getName());
