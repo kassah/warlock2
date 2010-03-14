@@ -29,6 +29,7 @@ import cc.warlock.core.profile.Profile;
 import cc.warlock.core.script.ScriptEngineRegistry;
 import cc.warlock.core.script.javascript.JavascriptEngine;
 import cc.warlock.core.stormfront.preferences.StormFrontProfileProvider;
+import cc.warlock.core.stormfront.profile.StormFrontProfile;
 import cc.warlock.core.stormfront.script.javascript.StormFrontJavascriptVars;
 import cc.warlock.rcp.application.WarlockApplication;
 import cc.warlock.rcp.stormfront.adapters.StormFrontClientAdapterFactory;
@@ -74,7 +75,11 @@ public class StormFrontRCPPlugin extends AbstractUIPlugin {
 				return;
 			}
 			
-			ProfileConnectAction action = new ProfileConnectAction(connectToProfile);
+			if (!(connectToProfile instanceof StormFrontProfile)) {
+				return;
+			}
+			
+			ProfileConnectAction action = new ProfileConnectAction((StormFrontProfile) connectToProfile);
 			action.run();
 		}
 	}
