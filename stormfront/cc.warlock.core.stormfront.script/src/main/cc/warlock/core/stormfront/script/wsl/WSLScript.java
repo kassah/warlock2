@@ -62,7 +62,6 @@ public class WSLScript extends AbstractScript {
 	
 	private Thread scriptThread;
 	private Pattern commandPattern = Pattern.compile("^([\\w]+)(\\s+(.*))?");
-	private static final String argSeparator = "\\s+";
 
 	private boolean lastCondition = false;
 	private ArrayList<WSLAbstractCommand> commands = new ArrayList<WSLAbstractCommand>();
@@ -482,18 +481,38 @@ public class WSLScript extends AbstractScript {
 		}
 	}
 	
+	private static final Pattern gosubArgRegex =
+		Pattern.compile("(?:(['\"])(.*?)(?<!\\\\)(?>\\\\\\\\)*\\1|([^\\s]+))");
 	protected void gosub (String label, String arguments)
 	{
-		String[] args = arguments.split(argSeparator);
-
 		WSLFrame frame = new WSLFrame(nextLine, localVariables);
 		callstack.push(frame);
 
 		// TODO perhaps abstract this
 		localVariables = (HashMap<String, IWSLValue>)localVariables.clone();
 		setLocalVariable("0", arguments);
-		for(int i = 0; i < args.length; i++) {
-			setLocalVariable(String.valueOf(i + 1), args[i]);
+
+		// parse the args, splitting on " and ', and leaving in \-escaped quotes
+		Matcher m = gosubArgRegex.matcher(arguments);
+		ArrayList<String> matchList = new ArrayList<String>();
+		while (m.find()) {
+			String phrase;
+			if (m.group(2) != null) {
+				// Add quoted string without the quotes
+				phrase = m.group(2);
+			} else {
+				// Add unquoted word
+				phrase = m.group();
+			}
+			
+			phrase = phrase.replaceAll("\\(['\"])", "\\1");
+			matchList.add(phrase);
+		}
+		
+		int i = 1;
+		for(String arg : matchList) {
+			setLocalVariable(String.valueOf(i + 1), arg);
+			i++;
 		}
 
 		Integer command = labels.get(label.toLowerCase());
