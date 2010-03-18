@@ -4,11 +4,13 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.util.HashMap;
+import java.util.Map;
 import java.util.Random;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 import cc.warlock.core.client.IStream;
+import cc.warlock.core.client.ICharacterStatus.StatusType;
 import cc.warlock.core.script.IMatch;
 import cc.warlock.core.script.internal.RegexMatch;
 import cc.warlock.core.script.internal.TextMatch;
@@ -41,6 +43,7 @@ public class WSLScriptCommands {
 		addCommandDefinition("echo", new WSLCommandEcho());
 		addCommandDefinition("else", new WSLCommandElse());
 		addCommandDefinition("exit", new WSLCommandExit());
+		addCommandDefinition("getstatus", new WSLCommandGetStatus());
 		addCommandDefinition("gettime", new WSLCommandGetTime());
 		addCommandDefinition("gettitle", new WSLCommandGetTitle());
 		addCommandDefinition("getvital", new WSLCommandGetVital());
@@ -534,6 +537,32 @@ public class WSLScriptCommands {
 		}
 	}
 
+	private class WSLCommandGetStatus implements IWSLCommandDefinition {
+		
+		private Pattern format = Pattern.compile("^(\\w+)\\s+(\\w+)");
+
+		public void execute(WSLScript script, String arguments) {
+			Matcher m = format.matcher(arguments);
+
+			if(m.find()) {
+				String statusName = m.group(1);
+				String var = m.group(2);
+
+				boolean status = false;
+				for(Map.Entry<StatusType, Boolean> statusEntry
+						: script.sfClient.getCharacterStatus().getStatus().entrySet()) {
+					if(statusEntry.getKey().name().equals(statusName)) {
+						status = statusEntry.getValue();
+						break;
+					}
+				}
+				script.setGlobalVariable(var, new WSLBoolean(status));
+			} else {
+				script.scriptError("Invalid arguments to random");
+			}
+		}
+	}
+	
 	private class WSLCommandRandom implements IWSLCommandDefinition {
 
 		private Pattern format = Pattern.compile("^(\\d+)\\s+(\\d+)");
