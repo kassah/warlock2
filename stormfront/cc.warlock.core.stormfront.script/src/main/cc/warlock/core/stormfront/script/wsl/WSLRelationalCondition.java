@@ -22,6 +22,7 @@
 package cc.warlock.core.stormfront.script.wsl;
 
 import java.util.List;
+import java.util.regex.PatternSyntaxException;
 
 public class WSLRelationalCondition extends WSLAbstractBoolean {
 
@@ -38,10 +39,13 @@ public class WSLRelationalCondition extends WSLAbstractBoolean {
 	
 	private List<IWSLValue> args;
 	private List<RelationalOperator> ops;
+	private WSLScript script;
 	
-	public WSLRelationalCondition(List<IWSLValue> args, List<RelationalOperator> ops) {
+	public WSLRelationalCondition(WSLScript script, List<IWSLValue> args,
+			List<RelationalOperator> ops) {
 		this.args = args;
 		this.ops = ops;
+		this.script = script;
 	}
 	
 	@Override
@@ -49,8 +53,17 @@ public class WSLRelationalCondition extends WSLAbstractBoolean {
 		IWSLValue value = args.get(0);
 		for(int i = 0; i < ops.size(); i++) {
 			IWSLValue nextValue = args.get(i + 1);
-			if(!ops.get(i).compare(value, nextValue))
+			try {
+				if(!ops.get(i).compare(value, nextValue))
+					return false;
+			} catch(PatternSyntaxException e) {
+				script.scriptWarning("Pattern syntax error at pattern index ("
+						+ e.getIndex() + "): " + e.getDescription());
 				return false;
+			} catch(Exception e) {
+				script.scriptWarning(e.getMessage());
+				return false;
+			}
 			value = nextValue;
 		}
 		return true;
