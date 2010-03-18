@@ -41,8 +41,9 @@ public class WSLScriptCommands {
 		addCommandDefinition("echo", new WSLCommandEcho());
 		addCommandDefinition("else", new WSLCommandElse());
 		addCommandDefinition("exit", new WSLCommandExit());
-		addCommandDefinition("getvital", new WSLCommandGetVital());
+		addCommandDefinition("gettime", new WSLCommandGetTime());
 		addCommandDefinition("gettitle", new WSLCommandGetTitle());
+		addCommandDefinition("getvital", new WSLCommandGetVital());
 		addCommandDefinition("gosub", new WSLCommandGosub());
 		addCommandDefinition("goto", new WSLCommandGoto());
 		for(int i = 0; i <= 9; i++) {
@@ -510,6 +511,23 @@ public class WSLScriptCommands {
 					script.scriptWarning("Stream \"" + streamName + "\" does not exist.");
 				else
 					script.setGlobalVariable(var, stream.getFullTitle());
+			} else {
+				script.scriptError("Invalid arguments to random");
+			}
+		}
+	}
+	
+	private class WSLCommandGetTime implements IWSLCommandDefinition {
+		
+		private Pattern format = Pattern.compile("^(\\w+)");
+		
+		public void execute(WSLScript script, String arguments) {
+			Matcher m = format.matcher(arguments);
+
+			if(m.find()) {
+				String varName = m.group(1);
+
+				script.setGlobalVariable(varName, new WSLNumber(System.currentTimeMillis() / 100));
 			} else {
 				script.scriptError("Invalid arguments to random");
 			}
