@@ -180,7 +180,7 @@ relationalExpression returns [IWSLValue cond]
 				if(args == null)
 					cond = arg;
 				else
-					cond = new WSLRelationalCondition(args, ops);
+					cond = new WSLRelationalCondition(script, args, ops);
 			}
 	;
 
