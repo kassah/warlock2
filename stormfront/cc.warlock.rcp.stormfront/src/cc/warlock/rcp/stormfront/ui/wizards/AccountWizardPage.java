@@ -47,11 +47,10 @@ import org.eclipse.swt.widgets.Text;
 import cc.warlock.core.network.IConnection;
 import cc.warlock.core.network.ILineConnectionListener;
 import cc.warlock.core.network.IConnection.ErrorType;
-import cc.warlock.core.profile.Account;
-import cc.warlock.core.stormfront.ProfileConfiguration;
 import cc.warlock.core.stormfront.network.ISGEGame;
 import cc.warlock.core.stormfront.network.SGEConnection;
 import cc.warlock.core.stormfront.network.SGEConnectionListener;
+import cc.warlock.core.stormfront.profile.StormFrontAccount;
 import cc.warlock.rcp.stormfront.adapters.SWTSGEConnectionListenerAdapter;
 import cc.warlock.rcp.stormfront.ui.util.LoginUtil;
 import cc.warlock.rcp.ui.ComboField;
@@ -73,7 +72,7 @@ public class AccountWizardPage extends WizardPageWithNotification implements ILi
 	private TextField password;
 	private Listener listener;
 	private SWTConnectionListenerAdapter connectionListener;
-	private Account savedAccount; 
+	private StormFrontAccount savedAccount; 
 	
 	public AccountWizardPage (SGEConnection connection)
 	{
@@ -104,8 +103,8 @@ public class AccountWizardPage extends WizardPageWithNotification implements ILi
 		
 		setControl(controls);
 		
-		final Collection<Account> accounts = ProfileConfiguration.instance().getAllAccounts();
-		for (Account account : accounts) {
+		final Collection<StormFrontAccount> accounts = ProfileConfiguration.instance().getAllAccounts();
+		for (StormFrontAccount account : accounts) {
 			this.account.getCombo().add(account.getAccountName());
 		}
 		if (accounts.size() > 0)
@@ -140,7 +139,7 @@ public class AccountWizardPage extends WizardPageWithNotification implements ILi
 				
 				if (save)
 				{
-					savedAccount = new Account(account.getText(), password.getText());
+					savedAccount = new StormFrontAccount(account.getText(), password.getText());
 					
 					ProfileConfiguration.instance().addAccount(savedAccount);
 				}
@@ -211,7 +210,7 @@ public class AccountWizardPage extends WizardPageWithNotification implements ILi
 		return  new Text(parent, SWT.BORDER);
 	}
 	
-	public Account getSavedAccount ()
+	public StormFrontAccount getSavedAccount ()
 	{
 		return savedAccount;
 	}
