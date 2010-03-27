@@ -506,7 +506,7 @@ public class WSLScript extends AbstractScript {
 				phrase = m.group();
 			}
 			
-			phrase = phrase.replaceAll("\\(['\"])", "\\1");
+			phrase = phrase.replaceAll("\\\\(['\"])", "\\1");
 			matchList.add(phrase);
 		}
 		
