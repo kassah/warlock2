@@ -512,7 +512,7 @@ public class WSLScript extends AbstractScript {
 		
 		int i = 1;
 		for(String arg : matchList) {
-			setLocalVariable(String.valueOf(i + 1), arg);
+			setLocalVariable(String.valueOf(i), arg);
 			i++;
 		}
 
