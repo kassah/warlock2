@@ -50,6 +50,8 @@ import cc.warlock.core.network.IConnection.ErrorType;
 import cc.warlock.core.stormfront.network.ISGEGame;
 import cc.warlock.core.stormfront.network.SGEConnection;
 import cc.warlock.core.stormfront.network.SGEConnectionListener;
+import cc.warlock.core.stormfront.preferences.StormFrontAccountProvider;
+import cc.warlock.core.stormfront.preferences.StormFrontPreferences;
 import cc.warlock.core.stormfront.profile.StormFrontAccount;
 import cc.warlock.rcp.stormfront.adapters.SWTSGEConnectionListenerAdapter;
 import cc.warlock.rcp.stormfront.ui.util.LoginUtil;
@@ -103,14 +105,16 @@ public class AccountWizardPage extends WizardPageWithNotification implements ILi
 		
 		setControl(controls);
 		
-		final Collection<StormFrontAccount> accounts = ProfileConfiguration.instance().getAllAccounts();
+		final StormFrontPreferences prefs = StormFrontPreferences.getInstance();
+		final StormFrontAccountProvider acctProvider = StormFrontAccountProvider.getInstance();
+		final Collection<StormFrontAccount> accounts = acctProvider.getAll(prefs);
 		for (StormFrontAccount account : accounts) {
 			this.account.getCombo().add(account.getAccountName());
 		}
 		if (accounts.size() > 0)
 		{
 			account.getCombo().select(0);
-			password.getTextControl().setText(ProfileConfiguration.instance().getAccount(account.getCombo().getText()).getPassword());
+			password.getTextControl().setText(acctProvider.getAccount(prefs, account.getCombo().getText()).getPassword());
 			
 			account.getCombo().addSelectionListener(new SelectionListener() {
 				public void widgetDefaultSelected(SelectionEvent e) {
@@ -118,7 +122,7 @@ public class AccountWizardPage extends WizardPageWithNotification implements ILi
 				}
 				public void widgetSelected(SelectionEvent e) {
 					String accountName = account.getCombo().getText();
-					password.getTextControl().setText(ProfileConfiguration.instance().getAccount(accountName).getPassword());
+					password.getTextControl().setText(acctProvider.getAccount(prefs,accountName).getPassword());
 				}
 			});
 		}
@@ -130,8 +134,10 @@ public class AccountWizardPage extends WizardPageWithNotification implements ILi
 	public void pageExited(int button) {
 //		if (button == WizardWithNotification.NEXT)
 //		{	
+			final StormFrontPreferences prefs = StormFrontPreferences.getInstance();
+			final StormFrontAccountProvider acctProvider = StormFrontAccountProvider.getInstance();
 			accountName = account.getText();
-			savedAccount = ProfileConfiguration.instance().getAccount(account.getText());
+			savedAccount = acctProvider.getAccount(prefs, account.getText());
 			if (savedAccount == null)
 			{
 				boolean save = MessageDialog.openQuestion(Display.getDefault().getActiveShell(),
@@ -141,7 +147,7 @@ public class AccountWizardPage extends WizardPageWithNotification implements ILi
 				{
 					savedAccount = new StormFrontAccount(account.getText(), password.getText());
 					
-					ProfileConfiguration.instance().addAccount(savedAccount);
+					acctProvider.add(prefs, savedAccount);
 				}
 			}
 			
