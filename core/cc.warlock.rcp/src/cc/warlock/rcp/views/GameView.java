@@ -54,6 +54,8 @@ import cc.warlock.core.client.IWarlockClientViewer;
 import cc.warlock.core.client.IWarlockStyle;
 import cc.warlock.core.client.PropertyListener;
 import cc.warlock.core.client.WarlockClientRegistry;
+import cc.warlock.core.client.WarlockColor;
+import cc.warlock.core.client.internal.WarlockStyle;
 import cc.warlock.core.client.settings.WarlockWindowProvider;
 import cc.warlock.rcp.ui.StreamText;
 import cc.warlock.rcp.ui.WarlockEntry;
@@ -184,7 +186,11 @@ public abstract class GameView extends WarlockView implements IWarlockClientView
 		
 		streamText = new StreamText(mainComposite, IWarlockClient.DEFAULT_STREAM_NAME);
 		// FIXME: update this when it changes
-		streamText.setLineLimit(client.getClientPreferences().getNode().getInt("buffer-lines", 5000));
+		// FIXME: find a better way to deal with null client
+		if (client != null)
+			streamText.setLineLimit(client.getClientPreferences().getNode().getInt("buffer-lines", 5000));
+		else
+			streamText.setLineLimit(5000);
 		streamText.getTextWidget().setLayout(new GridLayout(1, false));
 		
 		// create the entry
@@ -205,7 +211,16 @@ public abstract class GameView extends WarlockView implements IWarlockClientView
 	
 	protected void initColors()
 	{
-		IWarlockStyle style = WarlockWindowProvider.getInstance().get(client.getClientPreferences(), "main");
+		IWarlockStyle style;
+		// FIXME: find a better way to deal with null client
+		if (client != null) {
+			style = WarlockWindowProvider.getInstance().get(client.getClientPreferences(), "main");
+		} else {
+			// FIXME: These settings should actually come from somewhere.
+			style = new WarlockStyle();
+			style.setBackgroundColor(new WarlockColor("#191932"));
+			style.setForegroundColor(new WarlockColor("#F0F0FF"));
+		}
 		Color background = ColorUtil.warlockColorToColor(style.getBackgroundColor());
 		Color foreground = ColorUtil.warlockColorToColor(style.getForegroundColor());
 		
