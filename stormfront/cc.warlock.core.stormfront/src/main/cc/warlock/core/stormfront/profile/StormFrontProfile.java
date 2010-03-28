@@ -13,8 +13,9 @@ public class StormFrontProfile extends Profile {
 		// Defaults
 	}
 	
-	public StormFrontProfile(String username, String password, String id, String name, String gameCode, String gameName) {
+	public StormFrontProfile(StormFrontAccount account, String id, String name, String gameCode, String gameName) {
 		super(name);
+		this.account = account;
 		this.id = id;
 		this.gameCode = gameCode;
 		this.gameName = gameName;
