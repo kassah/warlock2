@@ -250,5 +250,7 @@ public class StreamText extends WarlockText implements IStreamListener {
 		textWidget.setForeground(foreground);
 		
 		textWidget.setFont(FontUtil.warlockFontToFont(font));
+		
+		setLineLimit(client.getClientPreferences().getNode().getInt("buffer-lines", 5000));
 	}
 }
