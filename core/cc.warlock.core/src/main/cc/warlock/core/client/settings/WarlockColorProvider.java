@@ -19,9 +19,13 @@ public class WarlockColorProvider extends WarlockPreferenceProvider<WarlockColor
 	protected String getNodeName() {
 		return null;
 	}
-	
+
 	public WarlockColor get(Preferences node) {
-		return new WarlockColor(node.get("value", null));
+		String val = node.get("value", null);
+		if (val == null)
+			return new WarlockColor(); // Blank
+		else
+			return new WarlockColor(node.get("value", null));
 	}
 	
 	protected void set(Preferences node, WarlockColor value) {
