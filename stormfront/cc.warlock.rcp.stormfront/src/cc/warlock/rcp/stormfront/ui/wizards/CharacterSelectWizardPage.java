@@ -27,6 +27,7 @@
  */
 package cc.warlock.rcp.stormfront.ui.wizards;
 
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
@@ -49,12 +50,13 @@ import org.eclipse.swt.graphics.Image;
 import org.eclipse.swt.layout.FillLayout;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Table;
-
-import cc.warlock.core.profile.Account;
 import cc.warlock.core.profile.Profile;
-import cc.warlock.core.stormfront.ProfileConfiguration;
 import cc.warlock.core.stormfront.network.SGEConnection;
 import cc.warlock.core.stormfront.network.SGEConnectionListener;
+import cc.warlock.core.stormfront.preferences.StormFrontPreferences;
+import cc.warlock.core.stormfront.preferences.StormFrontProfileProvider;
+import cc.warlock.core.stormfront.profile.StormFrontAccount;
+import cc.warlock.core.stormfront.profile.StormFrontProfile;
 import cc.warlock.rcp.stormfront.adapters.SWTSGEConnectionListenerAdapter;
 import cc.warlock.rcp.stormfront.ui.util.LoginUtil;
 import cc.warlock.rcp.ui.WarlockSharedImages;
@@ -214,10 +216,10 @@ public class CharacterSelectWizardPage extends WizardPage {
 			GameSelectWizardPage gameSelectPage = (GameSelectWizardPage) getPreviousPage();
 			AccountWizardPage accountPage = (AccountWizardPage) getPreviousPage().getPreviousPage();
 			
-			Account account = accountPage.getSavedAccount();
+			StormFrontAccount account = accountPage.getSavedAccount();
 			if (account != null && !getSelectedCharacterCode().equals(SGEConnection.NEW_CHARACTER_CODE))
 			{
-				Collection<Profile> savedProfiles = account.getProfiles();
+				Collection<StormFrontProfile> savedProfiles = account.getProfiles();
 
 				boolean exists = false;
 				if (savedProfiles != null && savedProfiles.size() > 0)
@@ -237,10 +239,10 @@ public class CharacterSelectWizardPage extends WizardPage {
 					
 					if (response)
 					{
-						Profile profile = new Profile(account, getSelectedCharacterCode(), getSelectedCharacterName(),
+						StormFrontProfile profile = new StormFrontProfile(account, getSelectedCharacterCode(), getSelectedCharacterName(),
 								gameSelectPage.getSelectedGameCode(), gameSelectPage.getSelectedGameName());
 						
-						ProfileConfiguration.getProfileConfiguration().save();
+						StormFrontProfileProvider.getInstance().set(StormFrontPreferences.getInstance(), profile.getId(), profile);
 						
 						// should be auto-added to the account list by ctor
 					}
