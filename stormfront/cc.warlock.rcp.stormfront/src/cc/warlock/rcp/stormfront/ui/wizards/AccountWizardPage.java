@@ -114,7 +114,7 @@ public class AccountWizardPage extends WizardPageWithNotification implements ILi
 		if (accounts.size() > 0)
 		{
 			account.getCombo().select(0);
-			password.getTextControl().setText(acctProvider.getAccount(prefs, account.getCombo().getText()).getPassword());
+			password.getTextControl().setText(acctProvider.get(prefs, account.getCombo().getText()).getPassword());
 			
 			account.getCombo().addSelectionListener(new SelectionListener() {
 				public void widgetDefaultSelected(SelectionEvent e) {
@@ -122,7 +122,7 @@ public class AccountWizardPage extends WizardPageWithNotification implements ILi
 				}
 				public void widgetSelected(SelectionEvent e) {
 					String accountName = account.getCombo().getText();
-					password.getTextControl().setText(acctProvider.getAccount(prefs,accountName).getPassword());
+					password.getTextControl().setText(acctProvider.get(prefs,accountName).getPassword());
 				}
 			});
 		}
@@ -137,7 +137,7 @@ public class AccountWizardPage extends WizardPageWithNotification implements ILi
 			final StormFrontPreferences prefs = StormFrontPreferences.getInstance();
 			final StormFrontAccountProvider acctProvider = StormFrontAccountProvider.getInstance();
 			accountName = account.getText();
-			savedAccount = acctProvider.getAccount(prefs, account.getText());
+			savedAccount = acctProvider.get(prefs, account.getText());
 			if (savedAccount == null)
 			{
 				boolean save = MessageDialog.openQuestion(Display.getDefault().getActiveShell(),
@@ -147,7 +147,7 @@ public class AccountWizardPage extends WizardPageWithNotification implements ILi
 				{
 					savedAccount = new StormFrontAccount(account.getText(), password.getText());
 					
-					acctProvider.add(prefs, savedAccount);
+					acctProvider.set(prefs,savedAccount.getAccountName(), savedAccount);
 				}
 			}
 			
