@@ -552,7 +552,7 @@ public class WSLScriptCommands {
 				boolean status = false;
 				for(Map.Entry<StatusType, Boolean> statusEntry
 						: script.sfClient.getCharacterStatus().getStatus().entrySet()) {
-					if(statusEntry.getKey().name().equals(statusName)) {
+					if(statusEntry.getKey().name().equalsIgnoreCase(statusName)) {
 						status = statusEntry.getValue();
 						break;
 					}
