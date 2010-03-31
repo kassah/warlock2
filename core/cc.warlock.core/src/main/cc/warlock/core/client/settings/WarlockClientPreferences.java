@@ -8,7 +8,7 @@ public class WarlockClientPreferences extends WarlockPreferences {
 	protected Preferences clientPrefs;
 	
 	public WarlockClientPreferences(String clientID) {
-		clientPrefs = getRootNode().node("client/" + clientID);
+		clientPrefs = super.getNode().node("client/" + clientID);
 	}
 	
 	public Preferences getNode() {

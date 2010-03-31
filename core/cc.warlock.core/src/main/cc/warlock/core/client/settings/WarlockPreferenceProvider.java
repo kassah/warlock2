@@ -33,7 +33,7 @@ public abstract class WarlockPreferenceProvider<T> {
 	protected abstract String getNodeName();
 	
 	public void set(String path, T value) {
-		set(WarlockPreferences.getScope().getNode(path), value);
+		set(WarlockPreferences.getInstance().getScope().getNode(path), value);
 	}
 	
 	public void set(WarlockPreferences prefs, String id, T value) {
@@ -121,24 +121,24 @@ public abstract class WarlockPreferenceProvider<T> {
 	public void addNodeChangeListener(WarlockPreferences prefs,
 			INodeChangeListener listener) {
 		String path = prefs.getNode().node(getNodeName()).absolutePath();
-		WarlockPreferences.getScope().getNode(path).addNodeChangeListener(listener);
+		WarlockPreferences.getInstance().getScope().getNode(path).addNodeChangeListener(listener);
 	}
 	
 	public void addPreferenceChangeListener(WarlockPreferences prefs,
 			IPreferenceChangeListener listener) {
 		String path = prefs.getNode().node(getNodeName()).absolutePath();
-		WarlockPreferences.getScope().getNode(path).addPreferenceChangeListener(listener);
+		WarlockPreferences.getInstance().getScope().getNode(path).addPreferenceChangeListener(listener);
 	}
 	
 	public void removeNodeChangeListener(WarlockPreferences prefs,
 			INodeChangeListener listener) {
 		String path = prefs.getNode().node(getNodeName()).absolutePath();
-		WarlockPreferences.getScope().getNode(path).removeNodeChangeListener(listener);
+		WarlockPreferences.getInstance().getScope().getNode(path).removeNodeChangeListener(listener);
 	}
 	
 	public void removePreferenceChangeListener(WarlockPreferences prefs,
 			IPreferenceChangeListener listener) {
 		String path = prefs.getNode().node(getNodeName()).absolutePath();
-		WarlockPreferences.getScope().getNode(path).removePreferenceChangeListener(listener);
+		WarlockPreferences.getInstance().getScope().getNode(path).removePreferenceChangeListener(listener);
 	}
 }

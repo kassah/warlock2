@@ -2,14 +2,15 @@ package cc.warlock.core.client.settings;
 
 import org.eclipse.core.runtime.preferences.ConfigurationScope;
 import org.eclipse.core.runtime.preferences.IEclipsePreferences;
+import org.eclipse.core.runtime.preferences.IScopeContext;
 import org.eclipse.core.runtime.preferences.IEclipsePreferences.INodeChangeListener;
 import org.eclipse.core.runtime.preferences.IEclipsePreferences.IPreferenceChangeListener;
 import org.osgi.service.prefs.Preferences;
 
 public class WarlockPreferences {
 	private static WarlockPreferences instance = new WarlockPreferences();
-	protected static ConfigurationScope scope = new ConfigurationScope();
-	private static IEclipsePreferences topLevel = scope.getNode("cc.warlock");
+	private ConfigurationScope scope = new ConfigurationScope();
+	private IEclipsePreferences topLevel = scope.getNode("cc.warlock");
 	
 	protected WarlockPreferences() { }
 	
@@ -17,12 +18,8 @@ public class WarlockPreferences {
 		return instance;
 	}
 	
-	public static ConfigurationScope getScope() {
+	public IScopeContext getScope() {
 		return scope;
-	}
-	
-	public static Preferences getRootNode() {
-		return topLevel;
 	}
 	
 	public Preferences getNode() {

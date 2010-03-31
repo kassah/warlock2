@@ -39,8 +39,6 @@ public class WarlockStyle implements IWarlockStyle {
 	private boolean fullLine;
 	private String name;
 	private Runnable action;
-	private IWarlockStyle originalStyle;
-	private boolean needsUpdate;
 	private String sound = new String();
 	
 	public WarlockStyle (StyleType[] styleTypes)
@@ -68,7 +66,6 @@ public class WarlockStyle implements IWarlockStyle {
 		if (other.getStyleTypes() != null)
 			styleTypes.addAll(other.getStyleTypes());
 		
-		this.originalStyle = other;
 		this.fullLine = other.isFullLine();
 		this.setSound(other.getSound());
 	}
@@ -78,9 +75,6 @@ public class WarlockStyle implements IWarlockStyle {
 	}
 	
 	public void setAction(Runnable action) {
-		if (action != this.action)
-			needsUpdate = true;
-			
 		this.action = action;
 	}
 	
@@ -94,22 +88,14 @@ public class WarlockStyle implements IWarlockStyle {
 	
 	public void addStyleType (StyleType styleType)
 	{
-		needsUpdate = true;
-		
 		styleTypes.add(styleType);
 	}
 	
 	public void setFullLine(boolean fullLine) {
-		if (fullLine != this.fullLine)
-			needsUpdate = true;
-		
 		this.fullLine = fullLine;
 	}
 	
 	public void setName(String name) {
-		if (!name.equals(this.name))
-			needsUpdate = true;
-		
 		this.name = name;
 	}
 	
@@ -122,9 +108,6 @@ public class WarlockStyle implements IWarlockStyle {
 	}
 
 	public void setForegroundColor(WarlockColor foregroundColor) {
-		if (!foregroundColor.equals(this.foregroundColor))
-			needsUpdate = true;
-		
 		this.foregroundColor = foregroundColor;
 	}
 
@@ -133,9 +116,6 @@ public class WarlockStyle implements IWarlockStyle {
 	}
 
 	public void setBackgroundColor(WarlockColor backgroundColor) {
-		if (!backgroundColor.equals(this.backgroundColor))
-			needsUpdate = true;
-		
 		this.backgroundColor = backgroundColor;
 	}
 	
@@ -147,25 +127,11 @@ public class WarlockStyle implements IWarlockStyle {
 		this.font = font;
 	}
 	
-	public boolean needsUpdate ()
-	{
-		return needsUpdate;
-	}
-	
-	public IWarlockStyle getOriginalStyle ()
-	{
-		return originalStyle;
-	}
-	
 	public String getSound(){
 		return sound;
 	}
 	
 	public void setSound(String sound){
-		if ((this.sound == null) || (sound != null && !this.sound.equals(sound))){
-
-			needsUpdate = true;
-		}
 		this.sound = sound;
 	}
 	

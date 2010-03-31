@@ -25,6 +25,7 @@ import org.eclipse.core.runtime.Platform;
 import org.eclipse.ui.plugin.AbstractUIPlugin;
 import org.osgi.framework.BundleContext;
 
+import cc.warlock.core.client.settings.WarlockDefaultPreferencesRegistry;
 import cc.warlock.core.profile.Profile;
 import cc.warlock.core.script.ScriptEngineRegistry;
 import cc.warlock.core.script.javascript.JavascriptEngine;
@@ -34,6 +35,7 @@ import cc.warlock.core.stormfront.script.javascript.StormFrontJavascriptVars;
 import cc.warlock.rcp.application.WarlockApplication;
 import cc.warlock.rcp.stormfront.adapters.StormFrontClientAdapterFactory;
 import cc.warlock.rcp.stormfront.ui.actions.ProfileConnectAction;
+import cc.warlock.rcp.stormfront.ui.prefs.WarlockDefaultPreferences;
 import cc.warlock.rcp.ui.client.WarlockClientAdaptable;
 
 /**
@@ -60,6 +62,8 @@ public class StormFrontRCPPlugin extends AbstractUIPlugin {
 	public void start(BundleContext context) throws Exception {
 		super.start(context);
 		plugin = this;
+		
+		WarlockDefaultPreferencesRegistry.getInstance().set(WarlockDefaultPreferences.getInstance());
 		
 		JavascriptEngine engine = (JavascriptEngine)ScriptEngineRegistry.getScriptEngine(JavascriptEngine.ENGINE_ID);
 		engine.addVariableProvider(new StormFrontJavascriptVars());
