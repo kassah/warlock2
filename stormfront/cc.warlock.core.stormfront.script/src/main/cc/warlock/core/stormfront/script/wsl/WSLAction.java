@@ -42,7 +42,7 @@ public class WSLAction extends WSLAbstractCommand {
 	private class WSLActionAdapter implements Runnable {
 		
 		public void run() {
-			script.setVariablesFromMatch((RegexMatch)match);
+			script.setVariablesFromMatch(match);
 			try {
 				if(!command.isInstant())
 					script.scriptCommands.waitForRoundtime(script.delay);

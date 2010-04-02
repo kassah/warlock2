@@ -49,7 +49,7 @@ public class RegexMatch implements IMatch {
 	public boolean matches(String text) {
 		groups.clear();
 		Matcher m = regex.matcher(text);
-		if(m.find()) {
+		if(m.find(0)) {
 			groups.add(m.group());
 			for(int i = 1; i <= m.groupCount(); i++) {
 				groups.add(m.group(i));
