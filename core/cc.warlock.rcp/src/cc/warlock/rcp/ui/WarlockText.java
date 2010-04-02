@@ -223,7 +223,7 @@ public class WarlockText {
 				this.addMarker(marker);
 				updateMarkers(marker, marker, -1);
 				// Recursive call. if the could be a tail call, that would be awesome.
-				removeEmptyLines(lineEnd);
+				removeEmptyLines(offset + lineEnd);
 				break;
 			} else {
 				lineStart = lineEnd + 1;
