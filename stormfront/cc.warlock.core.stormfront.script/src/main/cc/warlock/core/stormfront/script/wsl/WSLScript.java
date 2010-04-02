@@ -51,8 +51,7 @@ import cc.warlock.core.stormfront.script.internal.StormFrontScriptCommands;
 
 public class WSLScript extends AbstractScript {
 	
-	private boolean debugging = false;
-	private int debugLevel = 1;
+	private int debugLevel = 0;
 	protected double delay = 0.0;
 	private HashMap<String, Integer> labels = new HashMap<String, Integer>();
 	private int nextLine = 0;
@@ -80,7 +79,8 @@ public class WSLScript extends AbstractScript {
 		this.engine = engine;
 		this.sfClient = client;
 		
-		this.debugging = !ScriptConfiguration.instance().getSupressExceptions().get();
+		if(!ScriptConfiguration.instance().getSupressExceptions().get())
+			debugLevel = 1;
 		
 		scriptCommands = new StormFrontScriptCommands(client, this);
 		
@@ -346,7 +346,7 @@ public class WSLScript extends AbstractScript {
 	
 	protected void scriptDebug (int level, String message)
 	{
-		if (level <= debugLevel && debugging) {
+		if (level <= debugLevel) {
 			echo(message);
 		}
 	}
@@ -387,12 +387,12 @@ public class WSLScript extends AbstractScript {
 		localVariables.put(name, value);
 	}
 	
-	protected void setDebug(boolean onoff) {
-		this.debugging = onoff;
-	}
-	
 	protected void setDebugLevel(int level) {
 		this.debugLevel = level;
+	}
+	
+	protected int getDebugLevel() {
+		return this.debugLevel;
 	}
 	
 	protected void setDelay(double delay) {

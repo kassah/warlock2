@@ -39,7 +39,6 @@ public class WSLScriptCommands {
 		addCommandDefinition("deletevariable", new WSLCommandDeleteVariable());
 		addCommandDefinition("deletelocalvariable", new WSLCommandDeleteLocalVariable());
 		addCommandDefinition("debug", new WSLCommandDebug());
-		addCommandDefinition("debuglevel", new WSLCommandDebugLevel());
 		addCommandDefinition("delay", new WSLCommandDelay());
 		addCommandDefinition("echo", new WSLCommandEcho());
 		addCommandDefinition("else", new WSLCommandElse());
@@ -87,26 +86,36 @@ public class WSLScriptCommands {
 	}
 
 	protected class WSLCommandDebug implements IWSLCommandDefinition {
-		public void execute(WSLScript script, String arguments) {
-			if (arguments == null || arguments.length() == 0) {
-				script.setDebug(true);
-			} else {
-				String onoff = arguments.split(argSeparator)[0];
-				
-				script.setDebug(onoff.equalsIgnoreCase("on")
-						|| onoff.equalsIgnoreCase("true")
-						|| onoff.equalsIgnoreCase("yes"));
-			}
-		}
-	}
-	
-	protected class WSLCommandDebugLevel implements IWSLCommandDefinition {
-		private Pattern format = Pattern.compile("^(\\d+)$");
+		private Pattern format = Pattern.compile("(\\w+)");
 		
 		public void execute(WSLScript script, String arguments) {
+			
+			if (arguments == null || arguments.length() == 0) {
+				if(script.getDebugLevel() < 1)
+					script.setDebugLevel(1);
+				return;
+			}
+			
 			Matcher m = format.matcher(arguments);
-			if (m.find()) {
-				script.setDebugLevel(Integer.parseInt(m.group(1)));
+			if (!m.matches()) {
+				script.scriptWarning("Invalid arguments to command \"debug\"");
+				return;
+			}
+
+			String arg = m.group(1);
+			
+			if(arg.equalsIgnoreCase("on") || arg.equalsIgnoreCase("true")) {
+				if(script.getDebugLevel() < 1)
+					script.setDebugLevel(1);
+			} else if(arg.equalsIgnoreCase("off") || arg.equalsIgnoreCase("false")) {
+				script.setDebugLevel(0);
+			} else {
+				try {
+					int level = Integer.parseInt(arg);
+					script.setDebugLevel(level);
+				} catch(NumberFormatException e) {
+					script.scriptWarning("Invalid argument to command \"debug\": " + arg);
+				}
 			}
 		}
 	}
