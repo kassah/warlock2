@@ -22,19 +22,32 @@
 package cc.warlock.core.stormfront.script.wsl;
 
 import java.util.List;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 import java.util.regex.PatternSyntaxException;
 
 public class WSLRelationalCondition extends WSLAbstractBoolean {
 
 	public enum RelationalOperator {
-		GreaterThan			{ boolean compare(IWSLValue arg1, IWSLValue arg2) { return arg1.toDouble() > arg2.toDouble(); } },
-		GreaterThanEqualTo	{ boolean compare(IWSLValue arg1, IWSLValue arg2) { return arg1.toDouble() >= arg2.toDouble(); } },
-		LessThan			{ boolean compare(IWSLValue arg1, IWSLValue arg2) { return arg1.toDouble() < arg2.toDouble(); } },
-		LessThanEqualTo		{ boolean compare(IWSLValue arg1, IWSLValue arg2) { return arg1.toDouble() <= arg2.toDouble(); } },
-		Contains			{ boolean compare(IWSLValue arg1, IWSLValue arg2) { return arg1.toString().contains(arg2.toString()); } },
-		ContainsRe			{ boolean compare(IWSLValue arg1, IWSLValue arg2) { return arg1.toString().matches(arg2.toString()); } };
+		GreaterThan			{ boolean compare(WSLScript script, IWSLValue arg1, IWSLValue arg2) { return arg1.toDouble() > arg2.toDouble(); } },
+		GreaterThanEqualTo	{ boolean compare(WSLScript script, IWSLValue arg1, IWSLValue arg2) { return arg1.toDouble() >= arg2.toDouble(); } },
+		LessThan			{ boolean compare(WSLScript script, IWSLValue arg1, IWSLValue arg2) { return arg1.toDouble() < arg2.toDouble(); } },
+		LessThanEqualTo		{ boolean compare(WSLScript script, IWSLValue arg1, IWSLValue arg2) { return arg1.toDouble() <= arg2.toDouble(); } },
+		Contains			{ boolean compare(WSLScript script, IWSLValue arg1, IWSLValue arg2) { return arg1.toString().contains(arg2.toString()); } },
+		ContainsRe			{ boolean compare(WSLScript script, IWSLValue arg1, IWSLValue arg2) {
+			String regex = arg2.toString();
+			String text = arg1.toString();
+			Matcher m = Pattern.compile(regex).matcher(text);
+			if(m.find(0)) {
+				for(int i = 0; i <= m.groupCount(); i++) {
+					script.setLocalVariable(String.valueOf(i), m.group(i));
+				}
+				return true;
+			}
+			return false;
+		} };
 	
-		abstract boolean compare(IWSLValue arg1, IWSLValue arg2);
+		abstract boolean compare(WSLScript script, IWSLValue arg1, IWSLValue arg2);
 	}
 	
 	private List<IWSLValue> args;
@@ -54,7 +67,7 @@ public class WSLRelationalCondition extends WSLAbstractBoolean {
 		for(int i = 0; i < ops.size(); i++) {
 			IWSLValue nextValue = args.get(i + 1);
 			try {
-				if(!ops.get(i).compare(value, nextValue))
+				if(!ops.get(i).compare(script, value, nextValue))
 					return false;
 			} catch(PatternSyntaxException e) {
 				script.scriptWarning("Pattern syntax error at pattern index ("
