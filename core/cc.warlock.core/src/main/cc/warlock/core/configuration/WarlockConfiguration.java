@@ -53,13 +53,16 @@ public class WarlockConfiguration {
 	
 	public static WarlockConfiguration getWarlockConfiguration(String configFilename)
 	{
-		/*if (!configurations.containsKey(configFilename))
+		/*
+		 * Without this, settings WILL NOT SAVE between Warlock Instances.
+		 * Please test before removing again.
+		 */
+		if (!configurations.containsKey(configFilename))
 		{
 			WarlockConfiguration config = new WarlockConfiguration(configFilename);
 			configurations.put(configFilename, config);
 		}
-		return configurations.get(configFilename);*/
-		return new WarlockConfiguration(configFilename);
+		return configurations.get(configFilename);
 	}
 	
 	public static WarlockConfiguration getMainConfiguration ()
