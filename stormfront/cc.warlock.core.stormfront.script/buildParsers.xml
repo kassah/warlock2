@@ -1,10 +1,10 @@
 <project default="build-parsers">
 	
 	<target name="build-parsers">
-		<mkdir dir="src/antlr/cc/warlock/core/stormfront/script/wsl"/>
+		<mkdir dir="${basedir}/src/antlr/cc/warlock/core/stormfront/script/wsl"/>
 		
 		<antcall target="build-grammar">
-			<param name="grammar-file" value="cc/warlock/core/stormfront/script/wsl/WSL.g"/>
+			<param name="grammar-file" value="${basedir}/src/main/cc/warlock/core/stormfront/script/wsl/WSL.g"/>
 			<param name="lib-dir" value="cc/warlock/core/stormfront/script/wsl"/>
 		</antcall>
 	</target>
