@@ -73,7 +73,7 @@
 		<tstamp/>
 		<stopwatch name="build-timer"/>
 		<progress set="0" message="" bar="copy"/>
-		<progress message="Getting Subversion Revision..."/>
+		<progress message="Getting Build Number..."/>
 		
 		<getWarlockVersion property="warlock-version"/>
 		<progress add="1" message="Replacing versions in plugins and manifests..."/>
