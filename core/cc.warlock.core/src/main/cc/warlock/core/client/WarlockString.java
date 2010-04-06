@@ -119,7 +119,8 @@ public class WarlockString {
 	
 	public boolean hasStyleNamed(String styleName) {
 		for(WarlockStringMarker marker : styles) {
-			if(marker.style.getName().equals(styleName))
+			String curName = marker.style.getName();
+			if(curName != null && curName.equals(styleName))
 				return true;
 		}
 		return false;
