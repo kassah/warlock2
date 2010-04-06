@@ -64,14 +64,6 @@ public interface IStreamListener {
 	public void streamReceivedCommand (IStream stream, ICommand command);
 	
 	/**
-	 * A local echo (i.e. from scripts) has been pushed into the stream.
-	 * 
-	 * @param stream
-	 * @param text
-	 */
-	public void streamEchoed (IStream stream, String text);
-	
-	/**
 	 * Stream has been asked to clear. i.e. an updated copy of the streams content is coming through.
 	 * 
 	 * @param stream

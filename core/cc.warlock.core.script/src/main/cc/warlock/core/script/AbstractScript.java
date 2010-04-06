@@ -105,6 +105,10 @@ public abstract class AbstractScript implements IScript {
 		client.getDefaultStream().echo(message + "\n");
 	}
 	
+	protected void debug(String message) {
+		client.getDefaultStream().debug(message + "\n");
+	}
+	
 	public IWarlockClient getClient() {
 		return client;
 	}

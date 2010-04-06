@@ -117,6 +117,14 @@ public class WarlockString {
 		return styles;
 	}
 	
+	public boolean hasStyleNamed(String styleName) {
+		for(WarlockStringMarker marker : styles) {
+			if(marker.style.getName().equals(styleName))
+				return true;
+		}
+		return false;
+	}
+	
 	public int length() {
 		return text.length();
 	}

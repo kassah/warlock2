@@ -148,11 +148,32 @@ public class Stream implements IStream {
 		if (isLogging && client.getLogger() != null) {
 			client.getLogger().logEcho(text);
 		}
+		
+		WarlockString string = new WarlockString(text);
+		string.addStyle(new WarlockStyle("echo"));
 
 		for (IStreamListener listener : listeners)
 		{
 			try {
-				listener.streamEchoed(this, text);
+				listener.streamReceivedText(this, string);
+			} catch (Throwable t) {
+				t.printStackTrace();
+			}
+		}
+	}
+	
+	public synchronized void debug(String text) {
+		WarlockString string = new WarlockString(text);
+		string.addStyle(new WarlockStyle("debug"));
+
+		if (isLogging && client.getLogger() != null) {
+			client.getLogger().logText(string);
+		}
+		
+		for (IStreamListener listener : listeners)
+		{
+			try {
+				listener.streamReceivedText(this, string);
 			} catch (Throwable t) {
 				t.printStackTrace();
 			}

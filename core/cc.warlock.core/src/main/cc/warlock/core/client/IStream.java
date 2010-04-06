@@ -53,6 +53,7 @@ public interface IStream {
 	public void setClosedStyle(String style);
 	
 	public void echo(String text);
+	public void debug(String text);
 	
 	public void addStreamListener(IStreamListener listener);
 	public void removeStreamListener(IStreamListener listener);
