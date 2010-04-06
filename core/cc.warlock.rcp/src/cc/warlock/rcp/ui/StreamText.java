@@ -119,22 +119,6 @@ public class StreamText extends WarlockText implements IStreamListener {
 		clearText();
 	}
 
-	public void streamEchoed(IStream stream, String text) {
-		IWarlockClient client = stream.getClient();
-		WarlockString string = new WarlockString();
-		if(isPrompting) {
-			string.append("\n");
-			isPrompting = false;
-		}
-		IWarlockStyle style = client.getCommandStyle();
-		string.addStyle(WarlockStringMarker.Type.BEGIN, style);
-		string.append(text);
-		// TODO: make a different style for client messages
-		string.addStyle(WarlockStringMarker.Type.END, style);
-
-		appendText(string);
-	}
-
 	public void streamFlush(IStream stream) {
 		flushBuffer();
 	}
@@ -196,10 +180,13 @@ public class StreamText extends WarlockText implements IStreamListener {
 			string.append("\n");
 			isPrompting = false;
 		}
-			
+		
 		string.append(text);
-			
-		bufferText(string);
+		
+		if(string.hasStyleNamed("echo") || string.hasStyleNamed("debug"))
+			appendText(string);
+		else
+			bufferText(string);
 	}
 	
 	public void streamTitleChanged(IStream stream, String title) {
