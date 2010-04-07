@@ -75,6 +75,21 @@ public class WarlockString {
 	}
 	
 	public void addStyle(WarlockStringMarker.Type type, IWarlockStyle style, int offset) {
+		if(style.isFullLine()) {
+			if(type == WarlockStringMarker.Type.BEGIN) {
+				int lastLineEnd = text.substring(0, offset).lastIndexOf("\n");
+				if(lastLineEnd < 0)
+					offset = 0;
+				else
+					offset = lastLineEnd + 1;
+			} else {
+				int lineEnd = text.indexOf("\n", offset);
+				if(lineEnd < 0)
+					offset = text.length();
+				else
+					offset = lineEnd;
+			}
+		}
 		addTowardEnd(new WarlockStringMarker(type, style, offset));
 	}
 	
@@ -100,6 +115,15 @@ public class WarlockString {
 	
 	public List<WarlockStringMarker> getStyles() {
 		return styles;
+	}
+	
+	public boolean hasStyleNamed(String styleName) {
+		for(WarlockStringMarker marker : styles) {
+			String curName = marker.style.getName();
+			if(curName != null && curName.equals(styleName))
+				return true;
+		}
+		return false;
 	}
 	
 	public int length() {

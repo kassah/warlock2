@@ -47,8 +47,7 @@ public class SoundPlayer
 			if (System.getProperty("os.name").equals("Linux")) {
 				Boolean extPlay = true;
 				try {
-					Process aplay = Runtime.getRuntime().exec("aplay "+strFilename);
-					aplay.waitFor();
+					Runtime.getRuntime().exec("aplay "+strFilename);
 				} catch (Exception e) {
 					e.printStackTrace();
 					extPlay = false;
@@ -61,7 +60,7 @@ public class SoundPlayer
 				}
 			}
 			/*
-			  Now, that we're shure there is an argument, we
+			  Now, that we're sure there is an argument, we
 			  take it as the filename of the soundfile
 			  we want to play.
 			*/

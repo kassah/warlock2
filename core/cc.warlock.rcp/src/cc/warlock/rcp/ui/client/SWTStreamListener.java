@@ -93,21 +93,6 @@ public class SWTStreamListener implements IStreamListener {
 		}
 	}
 	
-	private class EchoedWrapper implements Runnable
-	{
-		private IStream stream;
-		private String text;
-		
-		public EchoedWrapper(IStream stream, String text) {
-			this.stream = stream;
-			this.text = text;
-		}
-		
-		public void run() {
-			listener.streamEchoed(stream, text);
-		}
-	}
-	
 	private class CommandWrapper implements Runnable
 	{
 		private IStream stream;
@@ -187,10 +172,6 @@ public class SWTStreamListener implements IStreamListener {
 	
 	public void streamTitleChanged(IStream stream, String title) {
 		run(new TitleChangedWrapper(stream, title));
-	}
-	
-	public void streamEchoed(IStream stream, String text) {
-		run(new EchoedWrapper(stream, text));
 	}
 	
 	public void streamPrompted(IStream stream, String prompt) {

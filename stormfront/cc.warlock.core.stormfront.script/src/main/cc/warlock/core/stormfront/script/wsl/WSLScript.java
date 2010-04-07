@@ -330,27 +330,25 @@ public class WSLScript extends AbstractScript {
 			scriptDebug(2, "Debug: " + line);
 			command.execute(this, arguments);
 		} else {
-			//TODO output the line number here
-			scriptCommands.echo("Invalid command \"" + line + "\"");
+			debug("Invalid command on line (" + curCommand.getLineNumber() + "): " + line);
 		}
 	}
 	
 	protected void scriptError(String message) {
-		echo("Script error on line " + curCommand.getLineNumber() + " (" + curLine + "): " + message);
+		debug("Script error on line " + curCommand.getLineNumber() + " (" + curLine + "): " + message);
 		stop();
 	}
 	
 	protected void scriptWarning(String message) {
-		echo("Script warning on line " + curCommand.getLineNumber() + " (" + curLine + "): " + message);
+		debug("Script warning on line " + curCommand.getLineNumber() + " (" + curLine + "): " + message);
 	}
 	
 	protected void scriptDebug (int level, String message)
 	{
 		if (level <= debugLevel) {
-			echo(message);
+			debug(message);
 		}
 	}
-	
 	
 	protected void setGlobalVariable(String name, IWSLValue value) {
 		setGlobalVariable(name, value.toString());
@@ -616,9 +614,5 @@ public class WSLScript extends AbstractScript {
 	
 	public IScriptCommands getCommands() {
 		return scriptCommands;
-	}
-	
-	protected void echo(String message) {
-		super.echo(message);
 	}
 }

@@ -142,7 +142,7 @@ public class StormFrontConnection implements IConnection
 		public void run() {
 			try {
 				sendLine(key);
-				sendLine("/FE:WARLOCK /VERSION:1.0.1.22 /XML\n");
+				sendLine("/FE:STORMFRONT /XML");
 				
 				reader = new StormFrontReader(StormFrontConnection.this, socket.getInputStream());
 				parser = new StormFrontProtocolParser(reader);
