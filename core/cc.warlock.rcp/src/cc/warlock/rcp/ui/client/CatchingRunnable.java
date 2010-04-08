@@ -11,7 +11,7 @@ public class CatchingRunnable implements Runnable {
 	public void run() {
 		try {
 			runner.run();
-		} catch(Exception e) {
+		} catch(Throwable e) {
 			e.printStackTrace();
 		}
 	}
