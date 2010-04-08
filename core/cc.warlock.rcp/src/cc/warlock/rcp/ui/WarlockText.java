@@ -225,13 +225,13 @@ public class WarlockText {
 			if(lineEnd < 0)
 				break;
 			if(lineStart == lineEnd) {
-				textWidget.replaceTextRange(offset + lineEnd, 1, "");
+				textWidget.replaceTextRange(start + lineEnd, 1, "");
 				WarlockStringMarker marker = new WarlockStringMarker(
-						new WarlockStyle("newline"), offset + lineEnd, offset + lineEnd);
+						new WarlockStyle("newline"), start + lineEnd, start + lineEnd);
 				this.addInternalMarker(marker, markers);
 				updateMarkers(-1, marker);
 				// Recursive call. if the could be a tail call, that would be awesome.
-				removeEmptyLines(offset + lineEnd);
+				removeEmptyLines(start + lineEnd);
 				break;
 			} else {
 				lineStart = lineEnd + 1;
