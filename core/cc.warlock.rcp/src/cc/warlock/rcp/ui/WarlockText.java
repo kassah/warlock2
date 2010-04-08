@@ -214,10 +214,10 @@ public class WarlockText {
 	private void removeEmptyLines(int offset) {
 		int line = textWidget.getLineAtOffset(offset);
 		int start = textWidget.getOffsetAtLine(line);
-		int end = textWidget.getCharCount() - 1;
+		int end = textWidget.getCharCount();
 		if(start >= end)
 			return;
-		String str = textWidget.getText(start, end);
+		String str = textWidget.getTextRange(start, end - start);
 		
 		int lineStart = 0;
 		while(true) {
