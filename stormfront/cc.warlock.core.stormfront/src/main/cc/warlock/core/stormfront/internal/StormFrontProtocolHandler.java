@@ -30,12 +30,12 @@ package cc.warlock.core.stormfront.internal;
 import java.util.EmptyStackException;
 import java.util.HashMap;
 import java.util.Iterator;
-import java.util.Map;
 import java.util.Stack;
 
 import cc.warlock.core.client.IStream;
 import cc.warlock.core.client.IWarlockStyle;
 import cc.warlock.core.client.WarlockString;
+import cc.warlock.core.client.WarlockStringMarker;
 import cc.warlock.core.stormfront.IStormFrontProtocolHandler;
 import cc.warlock.core.stormfront.IStormFrontTagHandler;
 import cc.warlock.core.stormfront.client.IStormFrontClient;
@@ -54,7 +54,8 @@ public class StormFrontProtocolHandler implements IStormFrontProtocolHandler {
 	protected HashMap<String, IStormFrontTagHandler> defaultTagHandlers = new HashMap<String, IStormFrontTagHandler>();
 	protected Stack<IStream> streamStack = new Stack<IStream>();
 	protected Stack<String> tagStack = new Stack<String>();
-	protected HashMap<IWarlockStyle, Boolean> styles = new HashMap<IWarlockStyle, Boolean>();
+	protected Stack<WarlockStringMarker> styleStack = new Stack<WarlockStringMarker>();
+	private WarlockString buffer = null;
 	protected int currentSpacing = 0;
 	protected int monsterCount = 0;
 	protected IWarlockStyle boldStyle = null;
@@ -133,6 +134,7 @@ public class StormFrontProtocolHandler implements IStormFrontProtocolHandler {
 	 *  push a stream onto the stack
 	 */
 	public void pushStream(String streamId) {
+		clearStyles();
 		IStream stream = client.getStream(streamId);
 		if(stream != null) {
 			// remove the stream if we already have the same one on the stack
@@ -152,17 +154,14 @@ public class StormFrontProtocolHandler implements IStormFrontProtocolHandler {
 	 */
 	public void popStream()
 	throws EmptyStackException {
+		clearStyles();
 		if (streamStack.size() > 0)
 			streamStack.pop();
 	}
 	
 	public void clearStreams() {
+		clearStyles();
 		streamStack.clear();
-	}
-	
-	public void appendStream(String streamId, WarlockString str) {
-		IStream stream = client.getStream(streamId);
-		stream.put(str);
 	}
 
 	public IStream getCurrentStream ()
@@ -181,15 +180,12 @@ public class StormFrontProtocolHandler implements IStormFrontProtocolHandler {
 		// if there was no handler or it couldn't handle the characters,
 		// take a default action
 		if(!handleCharacters(characters)) {
-			WarlockString str = new WarlockString(characters);
-			for(Map.Entry<IWarlockStyle, Boolean> style : styles.entrySet()) {
-				str.addStyle(style.getKey());
-				style.setValue(true);
+			if(styleStack.isEmpty()) {
+				IStream stream = getCurrentStream();
+				stream.put(new WarlockString(characters));
+			} else {
+				buffer.append(characters);
 			}
-			
-			IStream stream = getCurrentStream();
-			
-			stream.put(str);
 		}
 	}
 	
@@ -285,30 +281,54 @@ public class StormFrontProtocolHandler implements IStormFrontProtocolHandler {
 	}
 	
 	public void addStyle(IWarlockStyle style) {
-		styles.put(style, false);
+		if(buffer == null)
+			buffer = new WarlockString();
+		
+		WarlockStringMarker marker = new WarlockStringMarker(style,
+				buffer.length(), buffer.length());
+		
+		if(!styleStack.isEmpty()) {
+			WarlockStringMarker lastStyle = styleStack.peek();
+			lastStyle.addMarker(marker);
+		} else {
+			buffer.addMarker(marker);
+		}
+		
+		styleStack.push(marker);
 	}
 	
 	public void removeStyle(IWarlockStyle style) {
-		Boolean wasSent = styles.remove(style);
+		if(styleStack.isEmpty() || styleStack.peek().getStyle() != style)
+			return;
 		
-		// If the style was never output, put it in the string anyway
-		if(wasSent != null && !wasSent.booleanValue()) {
-			WarlockString str = new WarlockString();
-			str.addStyle(style);
-
-			IStream stream = getCurrentStream();
-			
-			stream.put(str);
+		WarlockStringMarker marker = styleStack.pop();
+		marker.setEnd(buffer.length());
+		
+		if(styleStack.isEmpty()) {
+			flushBuffer();
 		}
+	}
+	
+	private void flushBuffer() {
+		if(buffer == null)
+			return;
+		
+		IStream stream = getCurrentStream();
+		stream.put(buffer);
+		buffer = null;
 	}
 	
 	public void clearStyles() {
 		boldStyle = null;
-		styles.clear();
-	}
-	
-	public Map<IWarlockStyle, Boolean> getStyles() {
-		return styles;
+		if(buffer == null) {
+			styleStack.clear();
+		} else {
+			while(!styleStack.isEmpty()) {
+				WarlockStringMarker marker = styleStack.pop();
+				marker.setEnd(buffer.length());
+			}
+			flushBuffer();
+		}
 	}
 	
 	public void startBold() {

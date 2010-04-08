@@ -24,7 +24,6 @@ package cc.warlock.core.client;
 import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.List;
-import java.util.ListIterator;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -65,52 +64,20 @@ public class WarlockString {
 		int charCount = text.length();
 		text.append(string.toString());
 		for(WarlockStringMarker marker : string.getStyles()) {
-			addStyle(marker.type, marker.style, charCount + marker.offset);
+			styles.add(marker.copy(charCount));
 		}
 	}
 	
 	public void addStyle(IWarlockStyle style) {
-		styles.addFirst(new WarlockStringMarker(WarlockStringMarker.Type.BEGIN, style, 0));
-		styles.addLast(new WarlockStringMarker(WarlockStringMarker.Type.END, style, text.length()));
-	}
-	
-	public void addStyle(WarlockStringMarker.Type type, IWarlockStyle style, int offset) {
-		if(style.isFullLine()) {
-			if(type == WarlockStringMarker.Type.BEGIN) {
-				int lastLineEnd = text.substring(0, offset).lastIndexOf("\n");
-				if(lastLineEnd < 0)
-					offset = 0;
-				else
-					offset = lastLineEnd + 1;
-			} else {
-				int lineEnd = text.indexOf("\n", offset);
-				if(lineEnd < 0)
-					offset = text.length();
-				else
-					offset = lineEnd;
-			}
+		WarlockStringMarker newMarker = new WarlockStringMarker(style, 0, text.length());
+		
+		for(WarlockStringMarker curMarker : styles) {
+			newMarker.addMarker(curMarker);
 		}
-		addTowardEnd(new WarlockStringMarker(type, style, offset));
-	}
-	
-	public void addStyle(WarlockStringMarker.Type type, IWarlockStyle style) {
-		addStyle(type, style, text.length());
-	}
-	
-	private void addTowardEnd(WarlockStringMarker marker) {
-		ListIterator<WarlockStringMarker> iter = styles.listIterator();
-		while(true) {
-			if(!iter.hasNext()) {
-				iter.add(marker);
-				break;
-			}
-			WarlockStringMarker cur = iter.next();
-			if(cur.offset > marker.offset) {
-				iter.previous();
-				iter.add(marker);
-				break;
-			}
-		}
+		
+		styles.clear();
+		
+		styles.add(newMarker);
 	}
 	
 	public List<WarlockStringMarker> getStyles() {
@@ -119,8 +86,7 @@ public class WarlockString {
 	
 	public boolean hasStyleNamed(String styleName) {
 		for(WarlockStringMarker marker : styles) {
-			String curName = marker.style.getName();
-			if(curName != null && curName.equals(styleName))
+			if(marker.hasStyleNamed(styleName))
 				return true;
 		}
 		return false;
@@ -139,51 +105,18 @@ public class WarlockString {
 		return substring(start, text.length());
 	}
 	
+	public void addMarker(WarlockStringMarker marker) {
+		styles.add(marker);
+	}
+	
 	public WarlockString substring(int start, int end) {
 		WarlockString substring = new WarlockString(text.substring(start, end));
 		
-		// Find all of the markers before the substring that don't end before
-		// the substring starts
-		LinkedList<WarlockStringMarker> startMarkers =
-			new LinkedList<WarlockStringMarker>();
 		for(WarlockStringMarker marker : styles) {
-			if(marker.offset >= start)
-				break;
-			if(marker.type == WarlockStringMarker.Type.BEGIN) {
-				startMarkers.addLast(marker);
-			} else if(marker.type == WarlockStringMarker.Type.END) {
-				// Remove the start marker for this end marker
-				WarlockStringMarker.removeStyle(startMarkers, marker.style);
-			}
-		}
-		
-		for(WarlockStringMarker marker : startMarkers) {
-			substring.addStyle(marker.type, marker.style, 0);
-		}
-		
-		LinkedList<WarlockStringMarker> unfinishedMarkers =
-			new LinkedList<WarlockStringMarker>();
-		
-		// add the styles, keeping track of unfinished ones
-		for(WarlockStringMarker marker : styles) {
-			if(marker.offset < start)
+			if(marker.getEnd() >= start)
 				continue;
 			
-			if(marker.offset > end)
-				break;
-			
-			if(marker.type == WarlockStringMarker.Type.BEGIN) {
-				substring.addStyle(marker.type, marker.style, marker.offset - start);
-				unfinishedMarkers.addLast(marker);
-			} else {
-				substring.addStyle(marker.type, marker.style, marker.offset);
-				WarlockStringMarker.removeStyle(unfinishedMarkers, marker.style);
-			}
-		}
-		
-		// close the unfinished styles
-		for(WarlockStringMarker marker : unfinishedMarkers) {
-			substring.addStyle(marker.type, marker.style, end - start);
+			substring.addMarker(marker.copy(-start, end - start));
 		}
 		
 		return substring;

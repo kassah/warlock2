@@ -1,10 +1,5 @@
 package cc.warlock.rcp.ui;
 
-import java.util.regex.MatchResult;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
-import java.util.regex.PatternSyntaxException;
-
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.graphics.Color;
 import org.eclipse.swt.graphics.Font;
@@ -17,24 +12,19 @@ import cc.warlock.core.client.IStream;
 import cc.warlock.core.client.IStreamListener;
 import cc.warlock.core.client.IWarlockClient;
 import cc.warlock.core.client.IWarlockSkin;
-import cc.warlock.core.client.IWarlockStyle;
 import cc.warlock.core.client.WarlockFont;
 import cc.warlock.core.client.WarlockString;
-import cc.warlock.core.client.WarlockStringMarker;
 import cc.warlock.core.client.internal.Property;
 import cc.warlock.core.client.settings.IClientSettings;
-import cc.warlock.core.client.settings.IHighlightString;
 import cc.warlock.core.client.settings.IWindowSettings;
 import cc.warlock.rcp.configuration.GameViewConfiguration;
 import cc.warlock.rcp.ui.style.StyleProviders;
 import cc.warlock.rcp.util.ColorUtil;
 import cc.warlock.rcp.util.FontUtil;
-import cc.warlock.rcp.util.SoundPlayer;
 import cc.warlock.rcp.views.GameView;
 
 public class StreamText extends WarlockText implements IStreamListener {
 
-	protected IWarlockClient client;
 	protected String streamName;
 	protected IStream stream;
 	protected boolean isPrompting = false;
@@ -50,47 +40,6 @@ public class StreamText extends WarlockText implements IStreamListener {
 	
 	public void setFocus() {
 		// Nothing to do
-	}
-	
-	protected synchronized void appendText(WarlockString string) {
-		highlightText(string);
-		append(string);
-	}
-	
-	protected void highlightText (WarlockString text)
-	{	
-		for (IHighlightString highlight : client.getClientSettings().getAllHighlightStrings())
-		{
-			Pattern p;
-			try {
-				p = highlight.getPattern();
-			} catch(PatternSyntaxException e) {
-				continue;
-			}
-			if(p == null)
-				continue;
-			Matcher matcher = p.matcher(text.toString());
-			
-			while (matcher.find())
-			{
-				MatchResult result = matcher.toMatchResult();
-				
-				IWarlockStyle style = highlight.getStyle();
-				text.addStyle(WarlockStringMarker.Type.BEGIN, style, result.start());
-				text.addStyle(WarlockStringMarker.Type.END, style, result.end());
-				
-				try{
-					if (style.getSound() != null && !style.getSound().equals("")){
-						//System.out.println("Playing sound " + style.getSound());
-						SoundPlayer.play(style.getSound());
-						//InputStream soundStream = new FileInputStream(style.getSound());
-						//RCPUtil.playSound(soundStream);
-					}
-				}catch(Exception e){
-					e.printStackTrace();
-				}
-			}
-		}
 	}
 	
 	protected synchronized void bufferText (WarlockString string)
@@ -125,7 +74,7 @@ public class StreamText extends WarlockText implements IStreamListener {
 
 	private void flushBuffer() {
 		if(textBuffer != null) {
-			appendText(textBuffer);
+			append(textBuffer);
 			textBuffer.clear();
 			textBuffer = null;
 		}
@@ -135,7 +84,7 @@ public class StreamText extends WarlockText implements IStreamListener {
 		if(!GameViewConfiguration.instance().getSuppressPrompt()) {
 			WarlockString text = new WarlockString();
 			text.append(prompt);
-			appendText(text);
+			append(text);
 		}
 	}
 	
@@ -153,9 +102,9 @@ public class StreamText extends WarlockText implements IStreamListener {
 			// if the new prompt is null, just print the newline.
 			if(prompt == null) {
 				if(this.prompt != null)
-					appendText(new WarlockString("\n"));
+					append(new WarlockString("\n"));
 			} else if(this.prompt == null || !this.prompt.equals(prompt)) {
-				appendText(new WarlockString("\n" + prompt));
+				append(new WarlockString("\n" + prompt));
 			}	
 		}
 		this.prompt = prompt;
@@ -168,9 +117,9 @@ public class StreamText extends WarlockText implements IStreamListener {
 		string.addStyle(client.getCommandStyle());
 		
 		if(!isPrompting && prompt != null)
-			appendText(new WarlockString(prompt));
+			append(new WarlockString(prompt));
 		
-		appendText(string);
+		append(string);
 	}
 
 	public void streamReceivedText(IStream stream, WarlockString text) {
@@ -184,7 +133,7 @@ public class StreamText extends WarlockText implements IStreamListener {
 		string.append(text);
 		
 		if(string.hasStyleNamed("echo") || string.hasStyleNamed("debug"))
-			appendText(string);
+			append(string);
 		else
 			bufferText(string);
 	}

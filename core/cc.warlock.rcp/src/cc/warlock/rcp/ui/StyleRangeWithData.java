@@ -97,7 +97,7 @@ public class StyleRangeWithData extends StyleRange
 	}
 	
 	@Override
-	public Object clone() {
+	public StyleRangeWithData clone() {
 		StyleRangeWithData style = (StyleRangeWithData)super.clone();
 		style.data = this.data;
 		style.tooltip = this.tooltip;

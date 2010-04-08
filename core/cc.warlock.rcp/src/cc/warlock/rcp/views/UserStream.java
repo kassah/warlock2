@@ -63,14 +63,14 @@ public class UserStream extends StreamView {
 		}
 		
 		@Override
-		protected synchronized void appendText (WarlockString string)
+		public void append (WarlockString string)
 		{
 			// Process filters on the complete lines
 			WarlockString ret = new WarlockString();
 			bufferLoop: for (WarlockString buffer : string.split("\\r?\\n")) {
 				if(styles != null)
 					for(WarlockStringMarker style : buffer.getStyles()) {
-						String name = style.style.getName();
+						String name = style.getStyle().getName();
 						if(name != null && styles.contains(name)) {
 							ret.append(buffer);
 							ret.append("\n");
@@ -88,7 +88,7 @@ public class UserStream extends StreamView {
 				}
 			}
 			if (ret.length() > 0) {
-				super.appendText(ret);
+				super.append(ret);
 			}
 		}
 	}
