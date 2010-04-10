@@ -22,6 +22,7 @@
 package cc.warlock.rcp.ui;
 
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
@@ -225,12 +226,13 @@ public class WarlockText {
 			if(lineEnd < 0)
 				break;
 			if(lineStart == lineEnd) {
-				textWidget.replaceTextRange(start + lineEnd, 1, "");
 				WarlockStringMarker marker = new WarlockStringMarker(
-						new WarlockStyle("newline"), start + lineEnd, start + lineEnd);
+						new WarlockStyle("newline"), start + lineEnd, start + lineEnd + 1);
 				this.addInternalMarker(marker, markers);
-				updateMarkers(-1, marker);
-				// Recursive call. if the could be a tail call, that would be awesome.
+				textWidget.replaceTextRange(start + lineEnd, 1, "");
+				marker.setEnd(start + lineEnd);
+				updateMarkers(-1, marker, markers);
+				// Recursive call. if this could be a tail call, that would be awesome.
 				removeEmptyLines(start + lineEnd);
 				break;
 			} else {
@@ -239,14 +241,21 @@ public class WarlockText {
 		}
 	}
 	
-	private void restoreNewlines(int offset) {
-		for(Iterator<WarlockStringMarker> iter = markers.iterator();
+	private void restoreNewlines(int offset, Collection<WarlockStringMarker> markerList) {
+		for(Iterator<WarlockStringMarker> iter = markerList.iterator();
 		iter.hasNext(); )
 		{
 			WarlockStringMarker marker = iter.next();
 		
+			Collection<WarlockStringMarker> subList = marker.getSubMarkers();
+			if(subList != null)
+				restoreNewlines(offset, subList);
+			
 			// check to make sure we're a newline in the appropriate area
-			if(marker.getStart() < offset || !marker.getStyle().getName().equals("newline"))
+			if(marker.getStart() < offset)
+				continue;
+			String name = marker.getStyle().getName();
+			if(name == null || !name.equals("newline"))
 				continue;
 			
 			// check if we're an empty line
@@ -256,7 +265,7 @@ public class WarlockText {
 			// we're not an empty line, put us back into action
 			textWidget.replaceTextRange(marker.getStart(), 0, "\n");
 			// TODO: this should actually just affect markers after us... oh well.
-			updateMarkers(1, marker);
+			updateMarkers(1, marker, markers);
 			iter.remove();
 		}
 	}
@@ -395,6 +404,11 @@ public class WarlockText {
 	
 	private StyleRangeWithData mergeStyleRanges(StyleRangeWithData style1,
 			StyleRangeWithData style2) {
+		if(style1 == null)
+			return style2;
+		if(style2 == null)
+			return style1;
+		
 		StyleRangeWithData newStyle = style1.clone();
 		
 		newStyle.start = style2.start;
@@ -455,11 +469,12 @@ public class WarlockText {
 	}
 	
 	// this function removes the first "delta" amount of characters
-	private void updateMarkers(int delta, WarlockStringMarker afterMarker) {
+	private boolean updateMarkers(int delta, WarlockStringMarker afterMarker, Collection<WarlockStringMarker> markerList) {
 		// remove markers between start and end.
 		// all markers after start need to be adjusted by offset.
+		// returns whether or not the afterMarker was found
 		boolean started = false;
-		for(Iterator<WarlockStringMarker> iter = markers.iterator();
+		for(Iterator<WarlockStringMarker> iter = markerList.iterator();
 		iter.hasNext(); )
 		{
 			WarlockStringMarker marker = iter.next();
@@ -470,10 +485,11 @@ public class WarlockText {
 			}
 			
 			if(!started)
-				continue;
-			
-			marker.move(delta);
+				started = updateMarkers(delta, afterMarker, marker.getSubMarkers());
+			else
+				marker.move(delta);
 		}
+		return started;
 	}
 	
 	public void addInternalMarker(WarlockStringMarker marker,
@@ -489,6 +505,7 @@ public class WarlockText {
 				if(cur.getEnd() > marker.getStart()) {
 					if(marker.getEnd() > cur.getStart()) {
 						addInternalMarker(marker, cur.getSubMarkers());
+						return;
 					}
 
 					iter.previous();
@@ -532,18 +549,22 @@ public class WarlockText {
 	}
 	
 	public void replaceMarker(String name, WarlockString text) {
-		WarlockStringMarker marker = getMarker(name);
+		WarlockStringMarker marker = getMarker(name, markers);
 		if(marker == null)
 			return;
 		
 		int start = marker.getStart();
 		int length = marker.getEnd() - start;
 		boolean atBottom = isAtBottom();
+		String beforeText = textWidget.getText();
 		textWidget.replaceTextRange(start, length, text.toString());
+		String afterText = textWidget.getText();
+		if(beforeText.equals(afterText))
+			System.out.println("No Change");
 		marker.clear();
 		int newLength = text.length();
 		marker.setEnd(start + newLength);
-		updateMarkers(newLength - length, marker);
+		updateMarkers(newLength - length, marker, markers);
 		
 		// Add the new styles to the existing marker
 		for(WarlockStringMarker newMarker : text.getStyles()) {
@@ -554,14 +575,21 @@ public class WarlockText {
 		showHighlights(marker.getStart(), marker.getEnd());
 		
 		removeEmptyLines(start);
-		restoreNewlines(start);
+		restoreNewlines(start, markers);
 		postTextChange(atBottom);
 	}
 	
-	private WarlockStringMarker getMarker(String name) {
-		for(WarlockStringMarker marker : markers) {
+	private WarlockStringMarker getMarker(String name,
+			Collection<WarlockStringMarker> markerList) {
+		for(WarlockStringMarker marker : markerList) {
 			if(marker.getStyle().getName().equals(name))
 				return marker;
+			Collection<WarlockStringMarker> subList = marker.getSubMarkers();
+			if(subList != null) {
+				WarlockStringMarker result = getMarker(name, marker.getSubMarkers());
+				if(result != null)
+					return result;
+			}
 		}
 		return null;
 	}
