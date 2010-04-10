@@ -330,8 +330,18 @@ public class WarlockText {
 				MatchResult result = matcher.toMatchResult();
 				
 				IWarlockStyle style = highlight.getStyle();
+				int highlightStart = result.start() + start;
+				int highlightLength = result.end() - result.start();
+				if(style.isFullLine()) {
+					int lineNum = textWidget.getLineAtOffset(highlightStart);
+					highlightStart = textWidget.getOffsetAtLine(lineNum);
+					if(lineNum == textWidget.getLineCount())
+						highlightLength = textWidget.getCharCount() - highlightStart;
+					else
+						highlightLength = textWidget.getOffsetAtLine(lineNum + 1) - highlightStart;
+				}
 				textWidget.setStyleRange(this.warlockStyleToStyleRange(style,
-						result.start() + start, result.end() - result.start()));
+						highlightStart, highlightLength));
 				
 				try{
 					if (style.getSound() != null && !style.getSound().equals("")){
