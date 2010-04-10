@@ -212,6 +212,7 @@ public class WarlockText {
 		postTextChange(atBottom);
 	}
 	
+	private Pattern newlinePattern = Pattern.compile("\r?\n");
 	private void removeEmptyLines(int offset) {
 		int line = textWidget.getLineAtOffset(offset);
 		int start = textWidget.getOffsetAtLine(line);
@@ -219,29 +220,29 @@ public class WarlockText {
 		if(start >= end)
 			return;
 		String str = textWidget.getTextRange(start, end - start);
+		Matcher m = newlinePattern.matcher(str);
 		
 		int lineStart = 0;
-		while(true) {
-			int lineEnd = str.indexOf("\n", lineStart);
-			if(lineEnd < 0)
-				break;
-			if(lineStart == lineEnd) {
+		while(m.find(lineStart)) {
+			if(lineStart == m.start()) {
+				int matchPos = start + m.start();
+				int matchLen = m.end() - m.start();
 				// Add the newline marker. We give it an initial length of 1
 				//   so it gets added correctly into the tree of markers
 				WarlockStringMarker marker = new WarlockStringMarker(
-						new WarlockStyle("newline"), start + lineEnd, start + lineEnd + 1);
+						new WarlockStyle("newline"), matchPos, matchPos + matchLen);
 				this.addInternalMarker(marker, markers);
 				
 				// then remove the newline from the text
-				textWidget.replaceTextRange(start + lineEnd, 1, "");
+				textWidget.replaceTextRange(matchPos, matchLen, "");
 				// and shrink down the newline marker because the actual newline is no longer there.
-				marker.setEnd(start + lineEnd);
-				updateMarkers(-1, marker, markers);
+				marker.setEnd(matchPos);
+				updateMarkers(-matchLen, marker, markers);
 				// Recursive call. if this could be a tail call, that would be awesome.
-				removeEmptyLines(start + lineEnd);
+				removeEmptyLines(start);
 				break;
 			} else {
-				lineStart = lineEnd + 1;
+				lineStart = m.end();
 			}
 		}
 	}
