@@ -334,8 +334,8 @@ public class WarlockText {
 				if(style.isFullLine()) {
 					int lineNum = textWidget.getLineAtOffset(highlightStart);
 					highlightStart = textWidget.getOffsetAtLine(lineNum);
-					if(lineNum == textWidget.getLineCount())
-						highlightLength = textWidget.getCharCount() - highlightStart;
+					if(lineNum + 1 >= textWidget.getLineCount())
+						highlightLength = end - highlightStart;
 					else
 						highlightLength = textWidget.getOffsetAtLine(lineNum + 1) - highlightStart;
 				}
