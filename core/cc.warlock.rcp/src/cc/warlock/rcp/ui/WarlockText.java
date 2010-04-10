@@ -287,8 +287,6 @@ public class WarlockText {
 			
 			this.showStyle(marker);
 		}
-		
-		showHighlights(offset, textWidget.getCharCount());
 	}
 	
 	private void showStyle(WarlockStringMarker marker) {
@@ -390,6 +388,7 @@ public class WarlockText {
 		String string = wstring.toString();
 		textWidget.append(string);
 		appendStyles(wstring.getStyles(), charCount);
+		showHighlights(charCount, textWidget.getCharCount());
 		removeEmptyLines(charCount);
 		
 		constrainLineLimit(atBottom);
