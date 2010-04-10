@@ -158,4 +158,6 @@ public interface IWarlockClient extends IRoomListener {
 	 * @param listener
 	 */
 	public void addStreamListener(String streamName, IStreamListener listener);
+	
+	public void removeStreamListener(String streamName, IStreamListener listener);
 }

@@ -30,6 +30,7 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
+import java.util.Iterator;
 
 import cc.warlock.core.client.ICommand;
 import cc.warlock.core.client.ICommandHistory;
@@ -188,5 +189,22 @@ public abstract class WarlockClient implements IWarlockClient {
 			stream.addStreamListener(listener);
 		else
 			potentialListeners.add(new Pair<String, IStreamListener>(streamName, listener));
+	}
+	
+	public void removeStreamListener(String streamName, IStreamListener listener) {
+		IStream stream = streams.get(streamName);
+		if(stream != null) {
+			stream.removeStreamListener(listener);
+		} else {
+			for(Iterator<Pair<String, IStreamListener>> iter = potentialListeners.iterator();
+			iter.hasNext(); ) {
+				Pair<String, IStreamListener> pair = iter.next();
+				
+				if(pair.first().equals(streamName) && pair.second() == listener) {
+					iter.remove();
+					break;
+				}
+			}
+		}
 	}
 }
