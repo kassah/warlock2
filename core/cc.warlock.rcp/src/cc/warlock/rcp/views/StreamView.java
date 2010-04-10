@@ -44,7 +44,6 @@ import cc.warlock.core.client.WarlockClientRegistry;
 import cc.warlock.core.client.WarlockColor;
 import cc.warlock.rcp.ui.IStyleProvider;
 import cc.warlock.rcp.ui.StreamText;
-import cc.warlock.rcp.ui.client.SWTStreamListener;
 import cc.warlock.rcp.ui.client.SWTWarlockClientListener;
 import cc.warlock.rcp.ui.style.StyleProviders;
 import cc.warlock.rcp.util.ColorUtil;
@@ -152,7 +151,6 @@ public class StreamView extends WarlockView implements IGameViewFocusListener, I
 		streamText.getTextWidget().setLayout(new GridLayout(1, false));
 		streams.put(client, streamText);
 		streamText.setClient(client);
-		client.addStreamListener(streamName, new SWTStreamListener(streamText));
 		
 		// TODO: Make sure this listener gets destroyed on dispose.
 		streamText.getTitle().addListener(new NameListener(client));
@@ -209,6 +207,9 @@ public class StreamView extends WarlockView implements IGameViewFocusListener, I
 		
 		openViews.remove(this);
 		
+		for(StreamText stream : streams.values()) {
+			stream.dispose();
+		}
 		super.dispose();
 	}
 	

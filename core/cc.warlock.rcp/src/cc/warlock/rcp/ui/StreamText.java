@@ -18,6 +18,7 @@ import cc.warlock.core.client.internal.Property;
 import cc.warlock.core.client.settings.IClientSettings;
 import cc.warlock.core.client.settings.IWindowSettings;
 import cc.warlock.rcp.configuration.GameViewConfiguration;
+import cc.warlock.rcp.ui.client.SWTStreamListener;
 import cc.warlock.rcp.ui.style.StyleProviders;
 import cc.warlock.rcp.util.ColorUtil;
 import cc.warlock.rcp.util.FontUtil;
@@ -30,6 +31,7 @@ public class StreamText extends WarlockText implements IStreamListener {
 	protected boolean isPrompting = false;
 	protected String prompt = null;
 	protected Property<String> title = new Property<String>();
+	private IStreamListener listener = new SWTStreamListener(this);
 	
 	private WarlockString textBuffer;
 	
@@ -143,6 +145,9 @@ public class StreamText extends WarlockText implements IStreamListener {
 	}
 
 	public void setClient(IWarlockClient client) {
+		if(this.client != null)
+			return;
+		
 		this.client = client;
 		
 		GameView game = GameView.getGameViewForClient(client);
@@ -191,6 +196,14 @@ public class StreamText extends WarlockText implements IStreamListener {
 			} else {
 				this.setFont(FontUtil.warlockFontToFont(font));
 			}
+		}
+		
+		client.addStreamListener(streamName, listener);
+	}
+	
+	public void dispose() {
+		if(client != null) {
+			client.removeStreamListener(streamName, listener);
 		}
 	}
 }

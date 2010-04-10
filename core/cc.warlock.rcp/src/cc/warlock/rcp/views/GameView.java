@@ -57,7 +57,6 @@ import cc.warlock.rcp.configuration.GameViewConfiguration;
 import cc.warlock.rcp.ui.StreamText;
 import cc.warlock.rcp.ui.WarlockEntry;
 import cc.warlock.rcp.ui.WarlockPopupAction;
-import cc.warlock.rcp.ui.client.SWTStreamListener;
 import cc.warlock.rcp.ui.client.SWTWarlockClientListener;
 import cc.warlock.rcp.ui.client.SWTWarlockClientViewer;
 import cc.warlock.rcp.util.ColorUtil;
@@ -384,6 +383,7 @@ public abstract class GameView extends WarlockView implements IWarlockClientView
 			} else
 				firstInstance = openViews.get(0);
 		}
+		streamText.dispose();
 		super.dispose();
 	}
 	
@@ -398,8 +398,7 @@ public abstract class GameView extends WarlockView implements IWarlockClientView
 	public void setClient(IWarlockClient client) {
 		this.client = client;
 		client.setViewer(wrapper);
-		SWTStreamListener streamListener = new SWTStreamListener(streamText);
-		client.getDefaultStream().addStreamListener(streamListener);
+		
 		streamText.getTitle().addListener(new PropertyListener<String>() {
 			public void propertyChanged(String value) {
 				setViewTitle(value);
