@@ -1,5 +1,6 @@
 package cc.warlock.core.stormfront.internal;
 
+import java.util.HashMap;
 import java.util.Stack;
 
 import cc.warlock.core.client.IWarlockStyle;
@@ -12,11 +13,16 @@ import cc.warlock.core.stormfront.xml.StormFrontAttributeList;
 
 public abstract class StyledSubTagHandler extends DefaultTagHandler {
 
+	private HashMap<String, IStormFrontTagHandler> tagHandlers =
+		new HashMap<String, IStormFrontTagHandler>();
 	protected WarlockString buffer;
 	private Stack<WarlockStringMarker> styleStack = new Stack<WarlockStringMarker>();
 	
 	public StyledSubTagHandler(IStormFrontProtocolHandler handler) {
 		super(handler);
+		
+		tagHandlers.put("b", new StyleBTagHandler());
+		tagHandlers.put("preset", new StylePresetTagHandler());
 	}
 	
 	@Override
@@ -41,12 +47,7 @@ public abstract class StyledSubTagHandler extends DefaultTagHandler {
 	
 	@Override
 	public IStormFrontTagHandler getTagHandler(String tagName) {
-		if(tagName.equals("b"))
-			return new StyleBTagHandler();
-		if(tagName.equals("preset"))
-			return new StylePresetTagHandler();
-		
-		return null;
+		return tagHandlers.get(tagName);
 	}
 	
 	private void addStyle(WarlockStringMarker marker) {
@@ -90,6 +91,7 @@ public abstract class StyledSubTagHandler extends DefaultTagHandler {
 		@Override
 		public void handleEnd(String rawXML) {
 			removeStyle(marker);
+			marker = null;
 		}
 		
 		@Override
@@ -113,8 +115,7 @@ public abstract class StyledSubTagHandler extends DefaultTagHandler {
 			IWarlockStyle style = handler.getClient().getClientSettings().getNamedStyle(id);
 			if (style == null)
 				style = new WarlockStyle();
-
-			style.setName(id);
+			
 			marker = new WarlockStringMarker(style, buffer.length(), buffer.length());
 			addStyle(marker);
 		}
@@ -122,6 +123,7 @@ public abstract class StyledSubTagHandler extends DefaultTagHandler {
 		@Override
 		public void handleEnd(String rawXML) {
 			removeStyle(marker);
+			marker = null;
 		}
 		
 		@Override
