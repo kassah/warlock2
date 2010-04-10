@@ -499,9 +499,11 @@ public class WarlockText {
 				continue;
 			}
 			
-			if(!started)
+			if(!started) {
 				started = updateMarkers(delta, afterMarker, marker.getSubMarkers());
-			else
+				if(started)
+					marker.setEnd(marker.getEnd() + delta);
+			} else
 				marker.move(delta);
 		}
 		return started;
