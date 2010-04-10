@@ -113,10 +113,8 @@ public class WarlockString {
 		WarlockString substring = new WarlockString(text.substring(start, end));
 		
 		for(WarlockStringMarker marker : styles) {
-			if(marker.getEnd() >= start)
-				continue;
-			
-			substring.addMarker(marker.copy(-start, end - start));
+			if(marker.getEnd() >= start && marker.getStart() <= end)
+				substring.addMarker(marker.copy(-start, end - start));
 		}
 		
 		return substring;
