@@ -226,10 +226,15 @@ public class WarlockText {
 			if(lineEnd < 0)
 				break;
 			if(lineStart == lineEnd) {
+				// Add the newline marker. We give it an initial length of 1
+				//   so it gets added correctly into the tree of markers
 				WarlockStringMarker marker = new WarlockStringMarker(
 						new WarlockStyle("newline"), start + lineEnd, start + lineEnd + 1);
 				this.addInternalMarker(marker, markers);
+				
+				// then remove the newline from the text
 				textWidget.replaceTextRange(start + lineEnd, 1, "");
+				// and shrink down the newline marker because the actual newline is no longer there.
 				marker.setEnd(start + lineEnd);
 				updateMarkers(-1, marker, markers);
 				// Recursive call. if this could be a tail call, that would be awesome.
@@ -556,11 +561,7 @@ public class WarlockText {
 		int start = marker.getStart();
 		int length = marker.getEnd() - start;
 		boolean atBottom = isAtBottom();
-		String beforeText = textWidget.getText();
 		textWidget.replaceTextRange(start, length, text.toString());
-		String afterText = textWidget.getText();
-		if(beforeText.equals(afterText))
-			System.out.println("No Change");
 		marker.clear();
 		int newLength = text.length();
 		marker.setEnd(start + newLength);
