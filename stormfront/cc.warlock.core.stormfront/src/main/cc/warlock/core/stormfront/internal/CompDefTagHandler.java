@@ -24,10 +24,8 @@
  */
 package cc.warlock.core.stormfront.internal;
 
-import cc.warlock.core.client.IWarlockClient;
 import cc.warlock.core.client.internal.WarlockStyle;
 import cc.warlock.core.stormfront.IStormFrontProtocolHandler;
-import cc.warlock.core.stormfront.client.internal.StormFrontClient;
 import cc.warlock.core.stormfront.xml.StormFrontAttributeList;
 
 
@@ -94,10 +92,7 @@ public class CompDefTagHandler extends DefaultTagHandler {
 			handler.getClient().getMonsterCount().set(count);
 		}
 		
-		
-		IWarlockClient client = handler.getClient();
-		if(client instanceof StormFrontClient)
-			((StormFrontClient)client).setComponent(id, buffer.toString(), handler.getCurrentStream());
+		handler.getClient().setComponent(id, buffer.toString(), handler.getCurrentStream());
 	}
 	
 	@Override
