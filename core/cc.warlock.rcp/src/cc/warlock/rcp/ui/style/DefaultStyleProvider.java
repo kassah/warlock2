@@ -45,7 +45,7 @@ public class DefaultStyleProvider implements IStyleProvider {
 	public StyleRangeWithData getStyleRange (IWarlockStyle style)
 	{	
 		StyleRangeWithData range = new StyleRangeWithData();
-		range.fontStyle = 0;
+		range.fontStyle = SWT.NORMAL;
 		
 		for (IWarlockStyle.StyleType styleType : style.getStyleTypes())
 		{
