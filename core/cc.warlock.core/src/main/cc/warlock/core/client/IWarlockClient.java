@@ -160,4 +160,10 @@ public interface IWarlockClient extends IRoomListener {
 	public void addStreamListener(String streamName, IStreamListener listener);
 	
 	public void removeStreamListener(String streamName, IStreamListener listener);
+	
+	public String getVariable(String id);
+	
+	public void setVariable(String id, String value);
+	
+	public void removeVariable(String id);
 }

@@ -52,6 +52,8 @@ import cc.warlock.core.client.internal.Stream;
 import cc.warlock.core.client.internal.WarlockClient;
 import cc.warlock.core.client.internal.WarlockStyle;
 import cc.warlock.core.client.settings.IClientSettings;
+import cc.warlock.core.client.settings.IVariable;
+import cc.warlock.core.client.settings.internal.VariableConfigurationProvider;
 import cc.warlock.core.configuration.ConfigurationUtil;
 import cc.warlock.core.script.IScript;
 import cc.warlock.core.script.IScriptListener;
@@ -643,5 +645,32 @@ public class StormFrontClient extends WarlockClient implements IStormFrontClient
 			}
 			return stream;
 		}
+	}
+	
+	public String getVariable(String id) {
+		if(clientSettings == null)
+			return null;
+		IVariable var = clientSettings.getVariable(id);
+		if(var == null)
+			return null;
+		return var.getValue();
+	}
+	
+	public void setVariable(String id, String value) {
+		if(clientSettings == null)
+			return;
+		VariableConfigurationProvider varProvider = clientSettings.getVariableConfigurationProvider();
+		if(varProvider == null)
+			return;
+		varProvider.addVariable(id, value);
+	}
+	
+	public void removeVariable(String id) {
+		if(clientSettings == null)
+			return;
+		VariableConfigurationProvider varProvider = clientSettings.getVariableConfigurationProvider();
+		if(varProvider == null)
+			return;
+		varProvider.removeVariable(id);
 	}
 }
