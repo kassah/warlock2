@@ -477,8 +477,9 @@ public class StormFrontClient extends WarlockClient implements IStormFrontClient
 		return stream;
 	}
 	
-	public void setComponent (String name, String value, IStream stream)
+	public void setComponent (String componentName, String value, IStream stream)
 	{
+		String name = componentName.toLowerCase();
 		Property<String> component = components.get(name);
 		
 		if(component == null)
@@ -490,7 +491,8 @@ public class StormFrontClient extends WarlockClient implements IStormFrontClient
 		//stream.addComponent(name);
 	}
 	
-	public void updateComponent(String name, WarlockString value) {
+	public void updateComponent(String componentName, WarlockString value) {
+		String name = componentName.toLowerCase();
 		Property<String> component = components.get(name);
 		if(component != null) {
 			component.set(value.toString());
@@ -500,13 +502,13 @@ public class StormFrontClient extends WarlockClient implements IStormFrontClient
 		}
 		
 		IStream stream = componentStreams.get(name);
+		// FIXME: The streams store them in a case-senstive fashion.
 		if(stream != null)
-			stream.updateComponent(name, value);
-		// FIXME: else should we create the stream? -Sean
+			stream.updateComponent(componentName, value);
 	}
 	
 	public IProperty<String> getComponent(String componentName) {
-		return components.get(componentName);
+		return components.get(componentName.toLowerCase());
 	}
 	
 	@Override
