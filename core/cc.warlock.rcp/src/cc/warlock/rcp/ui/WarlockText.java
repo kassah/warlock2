@@ -309,6 +309,7 @@ public class WarlockText {
 					subStart = style.start;
 					StyleRangeWithData newStyle = highlight.clone();
 					newStyle.length = style.start - highlight.start;
+					iter.add(newStyle);
 				} else {
 					subStart = style.start;
 				}
