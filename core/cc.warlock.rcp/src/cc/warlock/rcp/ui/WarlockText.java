@@ -339,8 +339,10 @@ public class WarlockText {
 				// else both styles end at the same time
 				
 				// We matched a style and inserted the highlight, so we're done
-				break;
+				continue highlightLoop;
 			}
+			
+			styles.add(highlight);
 		}
 		
 		try {
