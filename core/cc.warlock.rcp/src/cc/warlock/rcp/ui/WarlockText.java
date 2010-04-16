@@ -237,7 +237,7 @@ public class WarlockText {
 				textWidget.replaceTextRange(matchPos, matchLen, "");
 				// and shrink down the newline marker because the actual newline is no longer there.
 				marker.setEnd(matchPos);
-				updateMarkers(-matchLen, marker, markers);
+				WarlockStringMarker.updateMarkers(-matchLen, marker, markers);
 				// Recursive call. if this could be a tail call, that would be awesome.
 				removeEmptyLines(start);
 				break;
@@ -271,7 +271,7 @@ public class WarlockText {
 			// we're not an empty line, put us back into action
 			textWidget.replaceTextRange(marker.getStart(), 0, "\n");
 			// TODO: this should actually just affect markers after us... oh well.
-			updateMarkers(1, marker, markers);
+			WarlockStringMarker.updateMarkers(1, marker, markers);
 			iter.remove();
 		}
 	}
@@ -545,32 +545,6 @@ public class WarlockText {
 		}
 	}
 	
-	// this function removes the first "delta" amount of characters
-	private boolean updateMarkers(int delta, WarlockStringMarker afterMarker, Collection<WarlockStringMarker> markerList) {
-		// remove markers between start and end.
-		// all markers after start need to be adjusted by offset.
-		// returns whether or not the afterMarker was found
-		boolean started = false;
-		for(Iterator<WarlockStringMarker> iter = markerList.iterator();
-		iter.hasNext(); )
-		{
-			WarlockStringMarker marker = iter.next();
-			
-			if(marker == afterMarker) {
-				started = true;
-				continue;
-			}
-			
-			if(!started) {
-				started = updateMarkers(delta, afterMarker, marker.getSubMarkers());
-				if(started)
-					marker.setEnd(marker.getEnd() + delta);
-			} else
-				marker.move(delta);
-		}
-		return started;
-	}
-	
 	public void addInternalMarker(WarlockStringMarker marker,
 			LinkedList<WarlockStringMarker> markerList) {
 		ListIterator<WarlockStringMarker> iter = markerList.listIterator();
@@ -639,7 +613,7 @@ public class WarlockText {
 		marker.clear();
 		int newLength = text.length();
 		marker.setEnd(start + newLength);
-		updateMarkers(newLength - length, marker, markers);
+		WarlockStringMarker.updateMarkers(newLength - length, marker, markers);
 		
 		// Add the new styles to the existing marker
 		for(WarlockStringMarker newMarker : text.getStyles()) {

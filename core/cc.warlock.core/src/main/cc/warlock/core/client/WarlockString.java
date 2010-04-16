@@ -152,4 +152,17 @@ public class WarlockString {
 		
 		return parts.toArray(new WarlockString[parts.size()]);
 	}
+	
+	public WarlockStringMarker getMarker(String id) {
+		for(WarlockStringMarker marker : styles) {
+			WarlockStringMarker subMarker = marker.getMarker(id);
+			if(subMarker != null)
+				return subMarker;
+		}
+		return null;
+	}
+	
+	public void replace(int start, int end, String str) {
+		text.replace(start, end, str);
+	}
 }

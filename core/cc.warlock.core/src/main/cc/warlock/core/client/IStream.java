@@ -66,4 +66,6 @@ public interface IStream {
 	
 	public void setLocation(String location);
 	public String getLocation();
+	
+	public WarlockString getHistory();
 }
