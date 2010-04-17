@@ -22,6 +22,10 @@ public class WarlockStringMarker {
 		return style;
 	}
 	
+	public void setStyle(IWarlockStyle style) {
+		this.style = style;
+	}
+	
 	public int getStart() {
 		return start;
 	}
@@ -44,6 +48,16 @@ public class WarlockStringMarker {
 	
 	public void addMarker(WarlockStringMarker marker) {
 		subMarkers.add(marker);
+	}
+	
+	public WarlockStringMarker clone() {
+		WarlockStringMarker clone = new WarlockStringMarker(style, start, end);
+		
+		for(WarlockStringMarker marker : subMarkers) {
+			clone.addMarker(marker.clone());
+		}
+		
+		return clone;
 	}
 	
 	public WarlockStringMarker copy(int offset) {
@@ -162,5 +176,16 @@ public class WarlockStringMarker {
 				marker.move(delta);
 		}
 		return started;
+	}
+	
+	public IWarlockStyle getBaseStyle(WarlockStringMarker marker) {
+		if(this == marker)
+			return style;
+		for(WarlockStringMarker subMarker : subMarkers) {
+			IWarlockStyle baseStyle = subMarker.getBaseStyle(marker);
+			if(baseStyle != null)
+				return style.mergeWith(baseStyle);
+		}
+		return null;
 	}
 }

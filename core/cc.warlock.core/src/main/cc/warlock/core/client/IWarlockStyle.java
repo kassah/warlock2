@@ -51,5 +51,6 @@ public interface IWarlockStyle {
 	public void setName(String name);
 	public String getSound();
 	public void setSound(String sound);
+	public IWarlockStyle mergeWith(IWarlockStyle style);
 
 }

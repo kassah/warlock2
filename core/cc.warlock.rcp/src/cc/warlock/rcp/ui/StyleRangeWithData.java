@@ -45,7 +45,11 @@ public class StyleRangeWithData extends StyleRange
 	}
 	
 	public StyleRangeWithData(int start, int length, Color foreground, Color background, int fontStyle) {
-		new StyleRange(start, length, foreground, background, fontStyle);
+		super(start, length, foreground, background, fontStyle);
+	}
+	
+	public StyleRangeWithData(StyleRange style) {
+		super(style.start, style.length, style.foreground, style.background, style.fontStyle);
 	}
 	
 	@Override

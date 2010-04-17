@@ -165,4 +165,13 @@ public class WarlockString {
 	public void replace(int start, int end, String str) {
 		text.replace(start, end, str);
 	}
+	
+	public IWarlockStyle getBaseStyle(WarlockStringMarker marker) {
+		for(WarlockStringMarker subMarker : styles) {
+			IWarlockStyle style = subMarker.getBaseStyle(marker);
+			if(style != null)
+				return style;
+		}
+		return null;
+	}
 }

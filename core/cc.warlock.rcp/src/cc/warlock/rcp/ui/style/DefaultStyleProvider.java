@@ -49,6 +49,9 @@ public class DefaultStyleProvider implements IStyleProvider {
 		
 		for (IWarlockStyle.StyleType styleType : style.getStyleTypes())
 		{
+			if(styleType == null)
+				continue;
+			
 			if (styleType.equals(IWarlockStyle.StyleType.BOLD))
 				range.fontStyle |= SWT.BOLD;
 			else if (styleType.equals(IWarlockStyle.StyleType.ITALIC))
