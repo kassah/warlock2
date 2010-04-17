@@ -145,8 +145,10 @@ public class StreamText extends WarlockText implements IStreamListener {
 	}
 
 	public void setClient(IWarlockClient client) {
-		if(this.client != null)
+		if(this.client != null) {
+			assert (this.client == client);
 			return;
+		}
 		
 		this.client = client;
 		
@@ -196,6 +198,11 @@ public class StreamText extends WarlockText implements IStreamListener {
 			} else {
 				this.setFont(FontUtil.warlockFontToFont(font));
 			}
+		}
+		
+		if(stream != null) {
+			this.streamReceivedText(stream, stream.getHistory());
+			this.flushBuffer();
 		}
 		
 		client.addStreamListener(streamName, listener);

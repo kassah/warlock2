@@ -25,7 +25,6 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Iterator;
 import java.util.LinkedList;
-import java.util.List;
 import java.util.ListIterator;
 import java.util.regex.MatchResult;
 import java.util.regex.Matcher;
@@ -195,7 +194,7 @@ public class WarlockText {
 	
 	public void clearText() {
 		textWidget.setText("");
-		clearMarkers();
+		markers.clear();
 	}
 	
 	public void setLineLimit(int limit) {
@@ -206,6 +205,7 @@ public class WarlockText {
 		boolean atBottom = isAtBottom();
 		int charCount = textWidget.getCharCount();
 		textWidget.append(string);
+		
 		removeEmptyLines(charCount);
 		constrainLineLimit(atBottom);
 
@@ -237,7 +237,7 @@ public class WarlockText {
 				textWidget.replaceTextRange(matchPos, matchLen, "");
 				// and shrink down the newline marker because the actual newline is no longer there.
 				marker.setEnd(matchPos);
-				updateMarkers(-matchLen, marker, markers);
+				WarlockStringMarker.updateMarkers(-matchLen, marker, markers);
 				// Recursive call. if this could be a tail call, that would be awesome.
 				removeEmptyLines(start);
 				break;
@@ -271,34 +271,94 @@ public class WarlockText {
 			// we're not an empty line, put us back into action
 			textWidget.replaceTextRange(marker.getStart(), 0, "\n");
 			// TODO: this should actually just affect markers after us... oh well.
-			updateMarkers(1, marker, markers);
+			WarlockStringMarker.updateMarkers(1, marker, markers);
 			iter.remove();
 		}
 	}
 	
-	private void appendStyles(List<WarlockStringMarker> styles, int offset) {
-		// add a marker for each style with a name
-		for(WarlockStringMarker strMarker : styles) {
-			WarlockStringMarker marker = strMarker.copy(offset);
-			String name = marker.getStyle().getName();
-			if(name != null) {
-				this.addMarker(marker);
+	private Collection<StyleRange> mergeStyleRangeLists(Collection<StyleRange> list1, Collection<StyleRange> list2) {
+		LinkedList<StyleRange> resultList = new LinkedList<StyleRange>();
+		for(StyleRange style : list1) {
+			resultList.add(style);
+		}
+		
+		mergeLoop: for(StyleRange mergingStyle : list2) {
+			for(ListIterator<StyleRange> iter = resultList.listIterator();
+			iter.hasNext(); )
+			{
+				StyleRange style = iter.next();
+				
+				// if the highlight came before the current style, add the
+				//   highlight before it and go to the next highlight
+				if(style.start >= mergingStyle.start + mergingStyle.length) {
+					iter.previous();
+					iter.add(mergingStyle);
+					continue mergeLoop;
+				}
+				
+				// If the highlight came after the current style, continue on
+				if(mergingStyle.start >= style.start + style.length)
+					continue;
+				
+				iter.remove();
+				
+				int subStart;
+				
+				if(style.start < mergingStyle.start) {
+					subStart = mergingStyle.start;
+					StyleRange newStyle = (StyleRange)style.clone();
+					newStyle.length = mergingStyle.start - style.start;
+					iter.add(newStyle);
+				} else if(mergingStyle.start < style.start) {
+					subStart = style.start;
+					StyleRange newStyle = (StyleRange)mergingStyle.clone();
+					newStyle.length = style.start - mergingStyle.start;
+					iter.add(newStyle);
+				} else {
+					subStart = style.start;
+				}
+				
+				int subEnd;
+				if(style.start + style.length < mergingStyle.start + mergingStyle.length) {
+					subEnd = style.start + style.length;
+				} else {
+					subEnd = mergingStyle.start + mergingStyle.length;
+				}
+				
+				StyleRange newStyle = this.mergeStyleRanges(style, mergingStyle);
+				newStyle.start = subStart;
+				newStyle.length = subEnd - subStart;
+				iter.add(newStyle);
+				
+				if(style.start + style.length < mergingStyle.start + mergingStyle.length) {
+					StyleRange endStyle = (StyleRange)mergingStyle.clone();
+					endStyle.start = subEnd;
+					endStyle.length = mergingStyle.start + mergingStyle.length - subEnd;
+					iter.add(endStyle);
+				} else if(mergingStyle.start + mergingStyle.length < style.start + style.length) {
+					StyleRange endStyle = (StyleRange)style.clone();
+					endStyle.start = subEnd;
+					endStyle.length = style.start + style.length - subEnd;
+					iter.add(endStyle);
+				}
+				// else both styles end at the same time
+				
+				// We matched a style and inserted the highlight, so we're done
+				continue mergeLoop;
 			}
 			
-			this.showStyle(marker);
+			resultList.add(mergingStyle);
 		}
+		
+		return resultList;
 	}
 	
-	private void showStyle(WarlockStringMarker marker) {
-		
-		/* Break up the ranges and merge overlapping styles because SWT only
-		 * allows 1 style per section
-		 */
-		ArrayList<StyleRangeWithData> finishedStyles = new ArrayList<StyleRangeWithData>();
-		getMarkerStyles(marker, new StyleRangeWithData(), finishedStyles);
-		
+	private void showStyles(Collection<StyleRange> styles, int start, int end) {
+
 		try {
-			for(StyleRangeWithData style : finishedStyles) {
+			Collection<StyleRange> finalList = mergeStyleRangeLists(styles, getHighlights(start, end));
+			
+			for(StyleRange style : finalList) {
 				textWidget.setStyleRange(style);
 			}
 		} catch(Exception e) {
@@ -306,9 +366,10 @@ public class WarlockText {
 		}
 	}
 	
-	private void showHighlights(int start, int end) {
+	private Collection<StyleRange> getHighlights(int start, int end) {
+		ArrayList<StyleRange> highlightList = new ArrayList<StyleRange>();
 		if(client == null)
-			return;
+			return highlightList;
 		
 		String text = textWidget.getTextRange(start, end - start);
 		
@@ -339,7 +400,7 @@ public class WarlockText {
 					else
 						highlightLength = textWidget.getOffsetAtLine(lineNum + 1) - highlightStart;
 				}
-				textWidget.setStyleRange(this.warlockStyleToStyleRange(style,
+				highlightList.add(this.warlockStyleToStyleRange(style,
 						highlightStart, highlightLength));
 				
 				try{
@@ -354,16 +415,18 @@ public class WarlockText {
 				}
 			}
 		}
+		
+		return highlightList;
 	}
 	
 	private void getMarkerStyles(WarlockStringMarker marker,
-			StyleRangeWithData baseStyle, ArrayList<StyleRangeWithData> resultStyles) {
+			StyleRange baseStyle, Collection<StyleRange> resultStyles) {
 		int pos = marker.getStart();
 		for(WarlockStringMarker subMarker : marker.getSubMarkers()) {
 			
 			int nextPos = subMarker.getStart();
 			
-			StyleRangeWithData styleRange = mergeStyleRanges(baseStyle,
+			StyleRange styleRange = mergeStyleRanges(baseStyle,
 					warlockStyleToStyleRange(marker.getStyle(), pos, nextPos - pos));
 			
 			if(nextPos > pos)
@@ -375,7 +438,7 @@ public class WarlockText {
 		}
 		
 		if(marker.getEnd() > pos) {
-			StyleRangeWithData styleRange = mergeStyleRanges(baseStyle,
+			StyleRange styleRange = mergeStyleRanges(baseStyle,
 					warlockStyleToStyleRange(marker.getStyle(), pos, marker.getEnd() - pos));
 			resultStyles.add(styleRange);
 		}
@@ -384,16 +447,36 @@ public class WarlockText {
 	public void append(WarlockString wstring) {
 		boolean atBottom = isAtBottom();
 		
-		int charCount = textWidget.getCharCount();
-		String string = wstring.toString();
-		textWidget.append(string);
-		appendStyles(wstring.getStyles(), charCount);
-		showHighlights(charCount, textWidget.getCharCount());
-		removeEmptyLines(charCount);
+		int offset = textWidget.getCharCount();
+		textWidget.append(wstring.toString());
+		/* Break up the ranges and merge overlapping styles because SWT only
+		 * allows 1 style per section
+		 */
+		LinkedList<StyleRange> finishedStyles = new LinkedList<StyleRange>();
+		for(WarlockStringMarker strMarker : wstring.getStyles()) {
+			WarlockStringMarker marker = strMarker.copy(offset);
+			addNamedMarkers(marker, wstring);
+			getMarkerStyles(marker, new StyleRangeWithData(), finishedStyles);
+		}
+		showStyles(finishedStyles, offset, textWidget.getCharCount());
+		removeEmptyLines(offset);
 		
 		constrainLineLimit(atBottom);
 
 		postTextChange(atBottom);
+	}
+	
+	private void addNamedMarkers(WarlockStringMarker marker, WarlockString wstring) {
+		if(marker.getName() != null) {
+			IWarlockStyle baseStyle = wstring.getBaseStyle(marker);
+			if(baseStyle != null)
+				marker.setStyle(baseStyle);
+			this.addMarker(marker);
+		} else {
+			for(WarlockStringMarker subMarker : marker.getSubMarkers()) {
+				addNamedMarkers(subMarker, wstring);
+			}
+		}
 	}
 	
 	private StyleRangeWithData warlockStyleToStyleRange(IWarlockStyle style, int start, int length) {
@@ -417,14 +500,18 @@ public class WarlockText {
 		return styleRange;
 	}
 	
-	private StyleRangeWithData mergeStyleRanges(StyleRangeWithData style1,
-			StyleRangeWithData style2) {
+	private StyleRange mergeStyleRanges(StyleRange style1, StyleRange style2) {
 		if(style1 == null)
 			return style2;
 		if(style2 == null)
 			return style1;
 		
-		StyleRangeWithData newStyle = style1.clone();
+		StyleRange newStyle;
+		// start with a cloned style1, unless style2 has data, but style1 doesn't
+		if(style2 instanceof StyleRangeWithData && !(style1 instanceof StyleRangeWithData))
+			newStyle = new StyleRangeWithData(style1);
+		else
+			newStyle = (StyleRange)style1.clone();
 		
 		newStyle.start = style2.start;
 		newStyle.length = style2.length;
@@ -438,11 +525,17 @@ public class WarlockText {
 			newStyle.fontStyle = style2.fontStyle;
 		if(style2.strikeout) newStyle.strikeout = true;
 		if(style2.underline) newStyle.underline = true;
-		newStyle.data.putAll(style2.data);
-		if(style2.action != null)
-			newStyle.action = style2.action;
-		if(style2.tooltip != null)
-			newStyle.tooltip = style2.tooltip;
+		
+		if(style2 instanceof StyleRangeWithData) {
+			StyleRangeWithData _newStyle = (StyleRangeWithData)newStyle;
+			StyleRangeWithData _style2 = (StyleRangeWithData)style2;
+			
+			_newStyle.data.putAll(_style2.data);
+			if(_style2.action != null)
+				_newStyle.action = _style2.action;
+			if(_style2.tooltip != null)
+				_newStyle.tooltip = _style2.tooltip;
+		}
 		
 		return newStyle;
 	}
@@ -481,32 +574,6 @@ public class WarlockText {
 			// move us accordingly
 			marker.move(delta);
 		}
-	}
-	
-	// this function removes the first "delta" amount of characters
-	private boolean updateMarkers(int delta, WarlockStringMarker afterMarker, Collection<WarlockStringMarker> markerList) {
-		// remove markers between start and end.
-		// all markers after start need to be adjusted by offset.
-		// returns whether or not the afterMarker was found
-		boolean started = false;
-		for(Iterator<WarlockStringMarker> iter = markerList.iterator();
-		iter.hasNext(); )
-		{
-			WarlockStringMarker marker = iter.next();
-			
-			if(marker == afterMarker) {
-				started = true;
-				continue;
-			}
-			
-			if(!started) {
-				started = updateMarkers(delta, afterMarker, marker.getSubMarkers());
-				if(started)
-					marker.setEnd(marker.getEnd() + delta);
-			} else
-				marker.move(delta);
-		}
-		return started;
 	}
 	
 	public void addInternalMarker(WarlockStringMarker marker,
@@ -561,12 +628,16 @@ public class WarlockText {
 		}
 	}
 	
-	public void clearMarkers() {
-		markers.clear();
-	}
-	
 	public void replaceMarker(String name, WarlockString text) {
-		WarlockStringMarker marker = getMarker(name, markers);
+		WarlockStringMarker marker = null;
+		IWarlockStyle baseStyle = null;
+		for(WarlockStringMarker subMarker : markers) {
+			marker = getMarker(name, subMarker);
+			if(marker != null) {
+				baseStyle = subMarker.getBaseStyle(marker);
+				break;
+			}
+		}
 		if(marker == null)
 			return;
 		
@@ -577,15 +648,21 @@ public class WarlockText {
 		marker.clear();
 		int newLength = text.length();
 		marker.setEnd(start + newLength);
-		updateMarkers(newLength - length, marker, markers);
+		WarlockStringMarker.updateMarkers(newLength - length, marker, markers);
 		
 		// Add the new styles to the existing marker
 		for(WarlockStringMarker newMarker : text.getStyles()) {
 			marker.addMarker(newMarker.copy(start));
 		}
 		
-		showStyle(marker);
-		showHighlights(marker.getStart(), marker.getEnd());
+		/* Break up the ranges and merge overlapping styles because SWT only
+		 * allows 1 style per section
+		 */
+		WarlockStringMarker markerWithStyle = marker.clone();
+		markerWithStyle.setStyle(baseStyle);
+		LinkedList<StyleRange> newStyles = new LinkedList<StyleRange>();
+		getMarkerStyles(markerWithStyle, new StyleRangeWithData(), newStyles);
+		showStyles(newStyles, marker.getStart(), marker.getEnd());
 		
 		removeEmptyLines(start);
 		restoreNewlines(start, markers);
@@ -593,16 +670,15 @@ public class WarlockText {
 	}
 	
 	private WarlockStringMarker getMarker(String name,
-			Collection<WarlockStringMarker> markerList) {
-		for(WarlockStringMarker marker : markerList) {
-			if(marker.getStyle().getName().equals(name))
-				return marker;
-			Collection<WarlockStringMarker> subList = marker.getSubMarkers();
-			if(subList != null) {
-				WarlockStringMarker result = getMarker(name, marker.getSubMarkers());
-				if(result != null)
-					return result;
-			}
+			WarlockStringMarker marker) {
+		String myName = marker.getName();
+		if(myName.equals(name))
+			return marker;
+		
+		for(WarlockStringMarker subMarker : marker.getSubMarkers()) {
+			WarlockStringMarker result = getMarker(name, subMarker);
+			if(result != null)
+				return result;
 		}
 		return null;
 	}

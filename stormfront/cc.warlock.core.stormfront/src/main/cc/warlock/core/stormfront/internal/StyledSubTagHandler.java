@@ -92,6 +92,9 @@ public abstract class StyledSubTagHandler extends DefaultTagHandler {
 		public void handleEnd(String rawXML) {
 			removeStyle(marker);
 			marker = null;
+			
+			// this will be off if we get nested b's.
+			handler.incrementMonsterCount();
 		}
 		
 		@Override

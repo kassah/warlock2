@@ -22,6 +22,10 @@ public class WarlockStringMarker {
 		return style;
 	}
 	
+	public void setStyle(IWarlockStyle style) {
+		this.style = style;
+	}
+	
 	public int getStart() {
 		return start;
 	}
@@ -44,6 +48,16 @@ public class WarlockStringMarker {
 	
 	public void addMarker(WarlockStringMarker marker) {
 		subMarkers.add(marker);
+	}
+	
+	public WarlockStringMarker clone() {
+		WarlockStringMarker clone = new WarlockStringMarker(style, start, end);
+		
+		for(WarlockStringMarker marker : subMarkers) {
+			clone.addMarker(marker.clone());
+		}
+		
+		return clone;
 	}
 	
 	public WarlockStringMarker copy(int offset) {
@@ -108,6 +122,24 @@ public class WarlockStringMarker {
 		subMarkers.clear();
 	}
 	
+	public String getName() {
+		if(style == null)
+			return null;
+		return style.getName();
+	}
+	
+	public WarlockStringMarker getMarker(String name) {
+		String myName = this.getName();
+		if(myName != null && myName.equals(name))
+			return this;
+		for(WarlockStringMarker subMarker : subMarkers) {
+			WarlockStringMarker marker = subMarker.getMarker(name);
+			if(marker != null)
+				return marker;
+		}
+		return null;
+	}
+	
 	// helper function to remove a style from a list
 	public static void removeStyle(Collection<WarlockStringMarker> list, IWarlockStyle style) {
 		Iterator<WarlockStringMarker> iter = list.iterator();
@@ -120,4 +152,40 @@ public class WarlockStringMarker {
 		}
 	}
 	
+	// this function removes the first "delta" amount of characters
+	public static boolean updateMarkers(int delta, WarlockStringMarker afterMarker, Collection<WarlockStringMarker> markerList) {
+		// remove markers between start and end.
+		// all markers after start need to be adjusted by offset.
+		// returns whether or not the afterMarker was found
+		boolean started = false;
+		for(Iterator<WarlockStringMarker> iter = markerList.iterator();
+		iter.hasNext(); )
+		{
+			WarlockStringMarker marker = iter.next();
+			
+			if(marker == afterMarker) {
+				started = true;
+				continue;
+			}
+			
+			if(!started) {
+				started = updateMarkers(delta, afterMarker, marker.getSubMarkers());
+				if(started)
+					marker.setEnd(marker.getEnd() + delta);
+			} else
+				marker.move(delta);
+		}
+		return started;
+	}
+	
+	public IWarlockStyle getBaseStyle(WarlockStringMarker marker) {
+		if(this == marker)
+			return style;
+		for(WarlockStringMarker subMarker : subMarkers) {
+			IWarlockStyle baseStyle = subMarker.getBaseStyle(marker);
+			if(baseStyle != null)
+				return style.mergeWith(baseStyle);
+		}
+		return null;
+	}
 }

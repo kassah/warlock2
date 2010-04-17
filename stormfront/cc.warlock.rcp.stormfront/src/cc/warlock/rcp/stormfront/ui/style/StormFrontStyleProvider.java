@@ -21,14 +21,8 @@
  */
 package cc.warlock.rcp.stormfront.ui.style;
 
-import org.eclipse.jface.resource.JFaceResources;
-import org.eclipse.swt.SWT;
-import org.eclipse.swt.graphics.Font;
-import org.eclipse.swt.widgets.Display;
-
 import cc.warlock.core.client.IWarlockStyle;
 import cc.warlock.core.client.WarlockColor;
-import cc.warlock.core.client.WarlockFont;
 import cc.warlock.core.stormfront.client.IStormFrontClient;
 import cc.warlock.core.stormfront.settings.IStormFrontClientSettings;
 import cc.warlock.rcp.ui.StyleRangeWithData;
@@ -47,7 +41,6 @@ public class StormFrontStyleProvider extends DefaultStyleProvider {
 	
 	public StyleRangeWithData getStyleRange (IWarlockStyle style)
 	{
-		Display display = Display.getDefault();
 		StyleRangeWithData range = super.getStyleRange(style);
 		
 		IStormFrontClient sfClient = (IStormFrontClient)client;
@@ -63,24 +56,6 @@ public class StormFrontStyleProvider extends DefaultStyleProvider {
 				WarlockColor color = sfClient.getStormFrontSkin().getDefaultForegroundColor(style.getName());
 				if (!color.isDefault())
 					range.foreground = ColorUtil.warlockColorToColor(color);
-			}
-		}
-		
-		if (style.getStyleTypes().contains(IWarlockStyle.StyleType.MONOSPACE))
-		{
-			WarlockFont columnFont = settings.getMainWindowSettings().getColumnFont();
-//			if (Platform.getOS().equals(Platform.OS_MACOSX)) {
-//				monoFontSize = settings.getMainWindowSettings().getColumnFontSizeInPixels();
-//			}
-			if (columnFont != null)
-			{
-				String monoFontFace = columnFont.getFamilyName();
-				int monoFontSize = columnFont.getSize();
-				
-				if (!columnFont.isDefaultFont() && JFaceResources.getFontRegistry().hasValueFor(monoFontFace))
-				{
-					range.font = new Font(display, monoFontFace, monoFontSize, SWT.NONE);
-				}
 			}
 		}
 		

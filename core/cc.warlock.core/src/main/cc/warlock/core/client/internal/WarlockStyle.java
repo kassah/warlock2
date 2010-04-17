@@ -21,9 +21,9 @@
  */
 package cc.warlock.core.client.internal;
 
-import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
+import java.util.HashSet;
 
 import cc.warlock.core.client.IWarlockStyle;
 import cc.warlock.core.client.WarlockColor;
@@ -31,7 +31,7 @@ import cc.warlock.core.client.WarlockColor;
 
 public class WarlockStyle implements IWarlockStyle {
 
-	private Collection<StyleType> styleTypes = new ArrayList<StyleType>();
+	private HashSet<StyleType> styleTypes = new HashSet<StyleType>();
 	private WarlockColor foregroundColor = new WarlockColor(WarlockColor.DEFAULT_COLOR);
 	private WarlockColor backgroundColor = new WarlockColor(WarlockColor.DEFAULT_COLOR);
 	private boolean fullLine;
@@ -168,4 +168,18 @@ public class WarlockStyle implements IWarlockStyle {
 		this.sound = sound;
 	}
 	
+	public IWarlockStyle mergeWith(IWarlockStyle style) {
+		WarlockStyle mergedStyle = new WarlockStyle(this);
+		WarlockColor fg = style.getForegroundColor();
+		if(fg != null && !fg.equals(WarlockColor.DEFAULT_COLOR))
+			mergedStyle.setForegroundColor(fg);
+		WarlockColor bg = style.getForegroundColor();
+		if(bg != null && !bg.equals(WarlockColor.DEFAULT_COLOR))
+			mergedStyle.setBackgroundColor(bg);
+		for(StyleType styleType : style.getStyleTypes()) {
+			mergedStyle.addStyleType(styleType);
+		}
+		
+		return mergedStyle;
+	}
 }

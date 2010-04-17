@@ -52,6 +52,8 @@ import cc.warlock.core.client.internal.Stream;
 import cc.warlock.core.client.internal.WarlockClient;
 import cc.warlock.core.client.internal.WarlockStyle;
 import cc.warlock.core.client.settings.IClientSettings;
+import cc.warlock.core.client.settings.IVariable;
+import cc.warlock.core.client.settings.internal.VariableConfigurationProvider;
 import cc.warlock.core.configuration.ConfigurationUtil;
 import cc.warlock.core.script.IScript;
 import cc.warlock.core.script.IScriptListener;
@@ -475,8 +477,9 @@ public class StormFrontClient extends WarlockClient implements IStormFrontClient
 		return stream;
 	}
 	
-	public void setComponent (String name, String value, IStream stream)
+	public void setComponent (String componentName, String value, IStream stream)
 	{
+		String name = componentName.toLowerCase();
 		Property<String> component = components.get(name);
 		
 		if(component == null)
@@ -488,7 +491,8 @@ public class StormFrontClient extends WarlockClient implements IStormFrontClient
 		//stream.addComponent(name);
 	}
 	
-	public void updateComponent(String name, WarlockString value) {
+	public void updateComponent(String componentName, WarlockString value) {
+		String name = componentName.toLowerCase();
 		Property<String> component = components.get(name);
 		if(component != null) {
 			component.set(value.toString());
@@ -498,13 +502,13 @@ public class StormFrontClient extends WarlockClient implements IStormFrontClient
 		}
 		
 		IStream stream = componentStreams.get(name);
+		// FIXME: The streams store them in a case-senstive fashion.
 		if(stream != null)
-			stream.updateComponent(name, value);
-		// FIXME: else should we create the stream? -Sean
+			stream.updateComponent(componentName, value);
 	}
 	
 	public IProperty<String> getComponent(String componentName) {
-		return components.get(componentName);
+		return components.get(componentName.toLowerCase());
 	}
 	
 	@Override
@@ -643,5 +647,32 @@ public class StormFrontClient extends WarlockClient implements IStormFrontClient
 			}
 			return stream;
 		}
+	}
+	
+	public String getVariable(String id) {
+		if(clientSettings == null)
+			return null;
+		IVariable var = clientSettings.getVariable(id);
+		if(var == null)
+			return null;
+		return var.getValue();
+	}
+	
+	public void setVariable(String id, String value) {
+		if(clientSettings == null)
+			return;
+		VariableConfigurationProvider varProvider = clientSettings.getVariableConfigurationProvider();
+		if(varProvider == null)
+			return;
+		varProvider.addVariable(id, value);
+	}
+	
+	public void removeVariable(String id) {
+		if(clientSettings == null)
+			return;
+		VariableConfigurationProvider varProvider = clientSettings.getVariableConfigurationProvider();
+		if(varProvider == null)
+			return;
+		varProvider.removeVariable(id);
 	}
 }

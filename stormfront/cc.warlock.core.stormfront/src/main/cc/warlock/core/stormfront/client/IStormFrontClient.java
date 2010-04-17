@@ -32,6 +32,7 @@ import java.util.Collection;
 import cc.warlock.core.client.ICharacterStatus;
 import cc.warlock.core.client.IProperty;
 import cc.warlock.core.client.IRoomListener;
+import cc.warlock.core.client.IStream;
 import cc.warlock.core.client.IWarlockClient;
 import cc.warlock.core.client.WarlockString;
 import cc.warlock.core.script.IScript;
@@ -169,6 +170,8 @@ public interface IStormFrontClient extends IWarlockClient, IRoomListener {
 	 * @return The component with the passed in name
 	 */
 	public IProperty<String> getComponent(String componentName);
+	
+	public void setComponent (String componentName, String value, IStream stream);
 	
 	public void updateComponent(String name, WarlockString value);
 	

@@ -9,6 +9,7 @@ import java.util.Random;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+import cc.warlock.core.client.IProperty;
 import cc.warlock.core.client.IStream;
 import cc.warlock.core.client.ICharacterStatus.StatusType;
 import cc.warlock.core.script.IMatch;
@@ -43,6 +44,7 @@ public class WSLScriptCommands {
 		addCommandDefinition("echo", new WSLCommandEcho());
 		addCommandDefinition("else", new WSLCommandElse());
 		addCommandDefinition("exit", new WSLCommandExit());
+		addCommandDefinition("getcomponent", new WSLCommandGetComponent());
 		addCommandDefinition("getstatus", new WSLCommandGetStatus());
 		addCommandDefinition("gettime", new WSLCommandGetTime());
 		addCommandDefinition("gettitle", new WSLCommandGetTitle());
@@ -490,16 +492,18 @@ public class WSLScriptCommands {
 		}
 	}
 
+	private Pattern getFormat = Pattern.compile("^(\\w+)(\\s+(\\w.*))?");
 	private class WSLCommandGetVital implements IWSLCommandDefinition {
 
-		private Pattern format = Pattern.compile("^(\\w+)\\s+(\\w+)");
-
 		public void execute(WSLScript script, String arguments) {
-			Matcher m = format.matcher(arguments);
+			Matcher m = getFormat.matcher(arguments);
 
 			if(m.find()) {
-				String vital = m.group(1);
-				String var = m.group(2);
+				String var = m.group(1);
+				// If we have more words after the variable, use that for the vital name
+				String vital = m.group(3);
+				if(vital == null)
+					vital = var;
 
 				script.setGlobalVariable(var, script.sfClient.getVital(vital));
 			} else {
@@ -510,14 +514,15 @@ public class WSLScriptCommands {
 
 	private class WSLCommandGetTitle implements IWSLCommandDefinition {
 
-		private Pattern format = Pattern.compile("^(\\w+)\\s+(\\w+)");
-
 		public void execute(WSLScript script, String arguments) {
-			Matcher m = format.matcher(arguments);
+			Matcher m = getFormat.matcher(arguments);
 
 			if(m.find()) {
-				String streamName = m.group(1);
-				String var = m.group(2);
+				String var = m.group(1);
+				// If we have more words after the variable, use that for the stream name
+				String streamName = m.group(3);
+				if(streamName == null)
+					streamName = var;
 
 				IStream stream = script.sfClient.getStream(streamName);
 				if(stream == null)
@@ -549,15 +554,16 @@ public class WSLScriptCommands {
 
 	private class WSLCommandGetStatus implements IWSLCommandDefinition {
 		
-		private Pattern format = Pattern.compile("^(\\w+)\\s+(\\w+)");
-
 		public void execute(WSLScript script, String arguments) {
-			Matcher m = format.matcher(arguments);
+			Matcher m = getFormat.matcher(arguments);
 
 			if(m.find()) {
-				String statusName = m.group(1);
-				String var = m.group(2);
-
+				String var = m.group(1);
+				// If we have more words after the variable, use that for the status name
+				String statusName = m.group(3);
+				if(statusName == null)
+					statusName = var;
+				
 				boolean status = false;
 				for(Map.Entry<StatusType, Boolean> statusEntry
 						: script.sfClient.getCharacterStatus().getStatus().entrySet()) {
@@ -567,6 +573,29 @@ public class WSLScriptCommands {
 					}
 				}
 				script.setGlobalVariable(var, new WSLBoolean(status));
+			} else {
+				script.scriptError("Invalid arguments to random");
+			}
+		}
+	}
+	
+	private class WSLCommandGetComponent implements IWSLCommandDefinition {
+
+		public void execute(WSLScript script, String arguments) {
+			Matcher m = getFormat.matcher(arguments);
+
+			if(m.find()) {
+				String var = m.group(1);
+				// If we have more words after the variable, use that for the vital name
+				String componentName = m.group(3);
+				if(componentName == null)
+					componentName = var;
+
+				IProperty<String> component = script.sfClient.getComponent(componentName);
+				if(component != null)
+					script.setGlobalVariable(var, component.get());
+				else
+					script.scriptDebug(0, "Component (" + componentName + ") does not exist.");
 			} else {
 				script.scriptError("Invalid arguments to random");
 			}

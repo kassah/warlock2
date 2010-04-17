@@ -51,10 +51,12 @@ public class Stream implements IStream {
 	private String streamName;
 	protected boolean isLogging = false;
 	private String location = "right";
+	private StreamHistory history = new StreamHistory();
 	
 	public Stream (IWarlockClient client, String streamName) {
 		this.client = client;
 		this.streamName = streamName;
+		this.addStreamListener(history);
 	}
 
 	public synchronized void addStreamListener(IStreamListener listener) {
@@ -238,5 +240,9 @@ public class Stream implements IStream {
 	
 	public String getLocation() {
 		return location;
+	}
+	
+	public WarlockString getHistory() {
+		return history.getHistory();
 	}
 }
