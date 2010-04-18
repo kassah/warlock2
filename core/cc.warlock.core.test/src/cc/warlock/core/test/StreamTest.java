@@ -151,7 +151,7 @@ public class StreamTest {
 		Assert.assertEquals(listener.text.toString(), string.toString());
 		Assert.assertEquals(listener.text.toString(), TEST_STRING);
 		Assert.assertEquals(listener.text.getStyles().size(), 1);
-		Assert.assertEquals(listener.text.getStyles().get(0).style, TEST_STYLE);
+		Assert.assertEquals(listener.text.getStyles().get(0).getStyle(), TEST_STYLE);
 	}
 
 	@Test
