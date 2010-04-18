@@ -10,29 +10,22 @@ public class StreamHistory implements IStreamListener {
 	
 	private WarlockString buffer = new WarlockString();
 
-	@Override
 	public void streamCleared(IStream stream) {
 		buffer.clear();
 	}
 
-	@Override
 	public void streamCreated(IStream stream) {}
 
-	@Override
 	public void streamFlush(IStream stream) {}
 
-	@Override
 	public void streamPrompted(IStream stream, String prompt) {}
 
-	@Override
 	public void streamReceivedCommand(IStream stream, ICommand command) {}
 
-	@Override
 	public void streamReceivedText(IStream stream, WarlockString text) {
 		buffer.append(text);
 	}
 
-	@Override
 	public void componentUpdated(IStream stream, String id, WarlockString value) {
 		WarlockStringMarker marker = buffer.getMarker(id);
 		if(marker == null)
@@ -51,7 +44,6 @@ public class StreamHistory implements IStreamListener {
 		}
 	}
 
-	@Override
 	public void streamTitleChanged(IStream stream, String title) {}
 	
 	public WarlockString getHistory() {
