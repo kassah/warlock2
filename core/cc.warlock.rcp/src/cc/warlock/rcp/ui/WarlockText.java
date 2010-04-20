@@ -288,15 +288,15 @@ public class WarlockText {
 			{
 				StyleRange style = iter.next();
 				
-				// if the highlight came before the current style, add the
-				//   highlight before it and go to the next highlight
+				// if the mergeStyle came before the current style, add the
+				//   mergeStyle before it and go to the next mergeStyle
 				if(style.start >= mergingStyle.start + mergingStyle.length) {
 					iter.previous();
 					iter.add(mergingStyle);
 					continue mergeLoop;
 				}
 				
-				// If the highlight came after the current style, continue on
+				// If the mergeStyle came after the current style, continue on
 				if(mergingStyle.start >= style.start + style.length)
 					continue;
 				
@@ -343,7 +343,7 @@ public class WarlockText {
 				}
 				// else both styles end at the same time
 				
-				// We matched a style and inserted the highlight, so we're done
+				// We matched a style and inserted the new style, so we're done
 				continue mergeLoop;
 			}
 			
