@@ -492,7 +492,7 @@ public class WSLScriptCommands {
 		}
 	}
 
-	private Pattern getFormat = Pattern.compile("^(\\w+)(\\s+(\\w.*))?");
+	private Pattern getFormat = Pattern.compile("^([^\\s]+)(\\s+(.*))?");
 	private class WSLCommandGetVital implements IWSLCommandDefinition {
 
 		public void execute(WSLScript script, String arguments) {
@@ -537,7 +537,7 @@ public class WSLScriptCommands {
 	
 	private class WSLCommandGetTime implements IWSLCommandDefinition {
 		
-		private Pattern format = Pattern.compile("^(\\w+)");
+		private Pattern format = Pattern.compile("^([^\\s]+)");
 		
 		public void execute(WSLScript script, String arguments) {
 			Matcher m = format.matcher(arguments);
