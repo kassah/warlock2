@@ -82,7 +82,7 @@ public class PatternSetting extends ClientSetting implements IPatternSetting {
 				flags |= Pattern.CASE_INSENSITIVE;
 			}
 			if (fullWord) {
-				s = "(^|\\s)\\p{Punct}?" + s + "\\p{Punct}?(\\s|$)";
+				s = "(^|\\b|\\s|\\p{Punct})" + s + "($|\\b|\\s|\\p{Punct})";
 			}
 			
 			pattern = Pattern.compile(s, flags);
