@@ -283,7 +283,7 @@ public class WSLScriptCommands {
 
 	protected class WSLCommandMatchRe implements IWSLCommandDefinition {
 
-		private Pattern format = Pattern.compile("^([^\\s]+)\\s+/(.*)/(\\w*)");
+		private Pattern format = Pattern.compile("^([^\\s]+)\\s+/([^/]*)/(\\w*)");
 
 		public void execute (WSLScript script, String arguments) {
 			Matcher m = format.matcher(arguments);
