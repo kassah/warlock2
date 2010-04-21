@@ -47,7 +47,6 @@ public class JavascriptCommands {
 	private JavascriptScript script;
 	private HashMap<Integer, TimerTask> timeTasks = new HashMap<Integer, TimerTask>();
 	private int nextTimerID = 1;
-	private Timer timer = new Timer();
 	
 	public JavascriptCommands(IScriptCommands commands, JavascriptScript script) {
 		this.commands = commands;
@@ -226,6 +225,7 @@ public class JavascriptCommands {
 		script.checkStop();
 		
 		int id = nextTimerID++;
+		Timer timer = new Timer();
 		
 		CommandCallback c = new CommandCallback(command);
 		timeTasks.put(id, c);
@@ -238,6 +238,7 @@ public class JavascriptCommands {
 		script.checkStop();
 		
 		int id = nextTimerID++;
+		Timer timer = new Timer();
 		
 		CommandCallback c = new CommandCallback(command);
 		timeTasks.put(id, c);
