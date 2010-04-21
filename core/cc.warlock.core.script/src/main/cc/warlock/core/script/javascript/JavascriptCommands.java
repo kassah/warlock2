@@ -200,11 +200,20 @@ public class JavascriptCommands {
 		public void run() {
 			Context.enter();
 			try {
+				script.checkStop();
+				
 				Script jsCommand = script.getContext().compileString(command, "callback", 0, null);
 
 				jsCommand.exec(script.getContext(), script.getScope());
+			} catch(EcmaError e) {
+				commands.echo(e.getMessage());
+				this.cancel();
+			} catch(StopException e) {
+				this.cancel();
 			} catch(Exception e) {
+				commands.echo(e.getMessage());
 				e.printStackTrace();
+				this.cancel();
 			} finally {
 				Context.exit();
 			}
