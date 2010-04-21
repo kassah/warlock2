@@ -29,14 +29,12 @@ import java.util.Collection;
 import org.mozilla.javascript.Context;
 import org.mozilla.javascript.Function;
 
-import cc.warlock.core.client.IStream;
 import cc.warlock.core.client.settings.IVariable;
 import cc.warlock.core.client.settings.internal.ClientSettings;
 import cc.warlock.core.script.IMatch;
 import cc.warlock.core.script.internal.RegexMatch;
 import cc.warlock.core.script.javascript.JavascriptCommands;
 import cc.warlock.core.script.javascript.JavascriptScript;
-import cc.warlock.core.stormfront.client.IStormFrontClient;
 import cc.warlock.core.stormfront.script.IStormFrontScriptCommands;
 
 public class StormFrontJavascriptCommands extends JavascriptCommands
@@ -67,7 +65,7 @@ public class StormFrontJavascriptCommands extends JavascriptCommands
 				Collection<String> matchGroups = match.groups();
 				arguments = matchGroups.toArray(new String[matchGroups.size()]);
 				
-				function.call(script.getContext(), script.getScope(), null, arguments);
+				function.call(getScript().getContext(), getScript().getScope(), null, arguments);
 			} finally {
 				Context.exit();
 			}
@@ -76,7 +74,7 @@ public class StormFrontJavascriptCommands extends JavascriptCommands
 	
 	// IStormFrontScriptCommands delegated methods
 	public void addAction(Function action, String text) {
-		script.checkStop();
+		checkStop();
 		
 		RegexMatch match = new RegexMatch(text);
 		JSActionHandler command = new JSActionHandler(action, match);
@@ -84,41 +82,41 @@ public class StormFrontJavascriptCommands extends JavascriptCommands
 	}
 
 	public void removeAction(String text) {
-		script.checkStop();
+		checkStop();
 		
 		sfCommands.removeAction(text);
 	}
 	
 	public void removeAction(IMatch action)
 	{
-		script.checkStop();
+		checkStop();
 		
 		sfCommands.removeAction(action);
 	}
 
 	public void clearActions() {
-		script.checkStop();
+		checkStop();
 		
 		sfCommands.clearActions();
 	}
 
 	public void waitForRoundtime() {
-		script.checkStop();
+		checkStop();
 		
 		try {
 			sfCommands.waitForRoundtime(0.0);
 		} catch(InterruptedException e) {
-			script.checkStop();
+			checkStop();
 		}
 	}
 
 	public void waitNextRoom() {
-		script.checkStop();
+		checkStop();
 		
 		try {
 			sfCommands.waitNextRoom();
 		} catch(InterruptedException e) {
-			script.checkStop();
+			checkStop();
 		}
 	}
 
@@ -128,7 +126,7 @@ public class StormFrontJavascriptCommands extends JavascriptCommands
 		try {
 			sfCommands.waitForRoundtime(0.0);
 		} catch(InterruptedException e) {
-			script.checkStop();
+			checkStop();
 		}
 	}
 	

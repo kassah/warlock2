@@ -43,9 +43,9 @@ import cc.warlock.core.script.javascript.JavascriptScript.StopException;
 
 public class JavascriptCommands {
 
-	protected IScriptCommands commands;
-	protected JavascriptScript script;
-	protected HashMap<Integer, TimerTask> timeTasks = new HashMap<Integer, TimerTask>();
+	private IScriptCommands commands;
+	private JavascriptScript script;
+	private HashMap<Integer, TimerTask> timeTasks = new HashMap<Integer, TimerTask>();
 	private int nextTimerID = 1;
 	private Timer timer = new Timer();
 	
@@ -256,5 +256,9 @@ public class JavascriptCommands {
 				e.printStackTrace();
 			}
 		}
+	}
+	
+	protected void checkStop() {
+		script.checkStop();
 	}
 }
