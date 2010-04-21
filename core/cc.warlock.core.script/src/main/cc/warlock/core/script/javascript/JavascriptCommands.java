@@ -31,6 +31,7 @@ import java.util.Timer;
 import java.util.TimerTask;
 
 import org.mozilla.javascript.Context;
+import org.mozilla.javascript.EcmaError;
 import org.mozilla.javascript.Script;
 
 import cc.warlock.core.script.IMatch;
@@ -38,6 +39,7 @@ import cc.warlock.core.script.IScriptCommands;
 import cc.warlock.core.script.IScriptFileInfo;
 import cc.warlock.core.script.internal.RegexMatch;
 import cc.warlock.core.script.internal.TextMatch;
+import cc.warlock.core.script.javascript.JavascriptScript.StopException;
 
 public class JavascriptCommands {
 
