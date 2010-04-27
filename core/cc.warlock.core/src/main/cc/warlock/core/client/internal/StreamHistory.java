@@ -54,6 +54,9 @@ public class StreamHistory implements IStreamListener {
 	}
 	
 	private void constrainLines() {
+		// if we have fewer characters, we certainly have fewer newlines
+		if(buffer.length() <= lineLimit)
+			return;
 		int lines = buffer.getLineCount();
 		if(lines <= lineLimit)
 			return;
