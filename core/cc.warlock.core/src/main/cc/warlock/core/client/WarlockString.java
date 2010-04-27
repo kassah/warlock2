@@ -52,6 +52,14 @@ public class WarlockString {
 		return text.toString();
 	}
 	
+	public int indexOf(String str) {
+		return text.indexOf(str);
+	}
+	
+	public int indexOf(String str, int fromIndex) {
+		return text.indexOf(str, fromIndex);
+	}
+	
 	public int lastIndexOf(String str) {
 		return this.text.lastIndexOf(str);
 	}
@@ -173,5 +181,16 @@ public class WarlockString {
 				return style;
 		}
 		return null;
+	}
+	
+	public int getLineCount() {
+		int i = 0;
+		int count = 0;
+		while((i = text.indexOf("\n", i)) > 0) {
+			// start the next search after the previous index.
+			i++;
+			count++;
+		}
+		return count;
 	}
 }
