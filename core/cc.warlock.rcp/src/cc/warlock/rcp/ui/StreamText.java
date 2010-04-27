@@ -201,7 +201,9 @@ public class StreamText extends WarlockText implements IStreamListener {
 		}
 		
 		if(stream != null) {
-			this.streamReceivedText(stream, stream.getHistory());
+			WarlockString history = stream.getHistory();
+			if(history != null)
+				this.streamReceivedText(stream, stream.getHistory());
 			this.flushBuffer();
 		}
 		
