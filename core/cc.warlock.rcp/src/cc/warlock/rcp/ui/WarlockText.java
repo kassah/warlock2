@@ -58,6 +58,7 @@ import cc.warlock.core.client.WarlockString;
 import cc.warlock.core.client.WarlockStringMarker;
 import cc.warlock.core.client.internal.WarlockStyle;
 import cc.warlock.core.client.settings.IHighlightString;
+import cc.warlock.rcp.ui.style.StyleProviders;
 import cc.warlock.rcp.util.SoundPlayer;
 
 /**
@@ -72,7 +73,6 @@ public class WarlockText {
 	private Cursor handCursor, defaultCursor;
 	private int lineLimit = 5000;
 	private int doScrollDirection = SWT.DOWN;
-	private IStyleProvider styleProvider;
 	private Menu contextMenu;
 	private LinkedList<WarlockStringMarker> markers = new LinkedList<WarlockStringMarker>();
 	
@@ -288,6 +288,9 @@ public class WarlockText {
 			{
 				StyleRange style = iter.next();
 				
+				if(style == null || mergingStyle == null)
+					continue;
+				
 				// if the mergeStyle came before the current style, add the
 				//   mergeStyle before it and go to the next mergeStyle
 				if(style.start >= mergingStyle.start + mergingStyle.length) {
@@ -400,8 +403,12 @@ public class WarlockText {
 					else
 						highlightLength = textWidget.getOffsetAtLine(lineNum + 1) - highlightStart;
 				}
-				highlightList.add(this.warlockStyleToStyleRange(style,
-						highlightStart, highlightLength));
+				
+				StyleRangeWithData styleRange = warlockStyleToStyleRange(style,
+						highlightStart, highlightLength);
+				if(styleRange == null)
+					continue;
+				highlightList.add(styleRange);
 				
 				try{
 					if (style.getSound() != null && !style.getSound().equals("")){
@@ -480,6 +487,7 @@ public class WarlockText {
 	}
 	
 	private StyleRangeWithData warlockStyleToStyleRange(IWarlockStyle style, int start, int length) {
+		IStyleProvider styleProvider = StyleProviders.getStyleProvider(client);
 		if(styleProvider == null)
 			return null;
 		
@@ -713,9 +721,5 @@ public class WarlockText {
 	
 	public StyledText getTextWidget() {
 		return textWidget;
-	}
-	
-	public void setStyleProvider(IStyleProvider styleProvider) {
-		this.styleProvider = styleProvider;
 	}
 }

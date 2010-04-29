@@ -366,8 +366,6 @@ public class StormFrontGameView extends GameView implements IStormFrontClientVie
 			}
 		});
 		
-		streamText.setStyleProvider(styleProvider);
-		
 		WarlockColor bg = sfClient.getStormFrontSkin().getMainBackground();
 		WarlockColor fg = sfClient.getStormFrontSkin().getMainForeground();
 		

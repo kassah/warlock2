@@ -46,7 +46,6 @@ import cc.warlock.core.network.IConnection.ErrorType;
 import cc.warlock.rcp.ui.WarlockText;
 import cc.warlock.rcp.ui.client.SWTWarlockClientListener;
 import cc.warlock.rcp.ui.network.SWTConnectionListenerAdapter;
-import cc.warlock.rcp.ui.style.DefaultStyleProvider;
 
 public class DebugView extends WarlockView implements IConnectionListener, IGameViewFocusListener {
 
@@ -180,7 +179,6 @@ public class DebugView extends WarlockView implements IConnectionListener, IGame
 		
 		if (text == null) {
 			text = new WarlockText(book);
-			text.setStyleProvider(new DefaultStyleProvider(client));
 			
 			clientStreams.put(client, text);
 			return text;

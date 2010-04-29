@@ -42,10 +42,8 @@ import cc.warlock.core.client.IWarlockClientListener;
 import cc.warlock.core.client.PropertyListener;
 import cc.warlock.core.client.WarlockClientRegistry;
 import cc.warlock.core.client.WarlockColor;
-import cc.warlock.rcp.ui.IStyleProvider;
 import cc.warlock.rcp.ui.StreamText;
 import cc.warlock.rcp.ui.client.SWTWarlockClientListener;
-import cc.warlock.rcp.ui.style.StyleProviders;
 import cc.warlock.rcp.util.ColorUtil;
 
 public class StreamView extends WarlockView implements IGameViewFocusListener, IWarlockClientListener {
@@ -276,9 +274,6 @@ public class StreamView extends WarlockView implements IGameViewFocusListener, I
 		
 		WarlockColor bg = client.getSkin().getMainBackground();
 		WarlockColor fg = client.getSkin().getMainForeground();
-		IStyleProvider styleProvider = StyleProviders.getStyleProvider(client);
-		if(styleProvider != null)
-			stream.setStyleProvider(styleProvider);
 		this.setBackground(client, ColorUtil.warlockColorToColor(bg));
 		this.setForeground(client, ColorUtil.warlockColorToColor(fg));
 	}

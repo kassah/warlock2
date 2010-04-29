@@ -19,7 +19,6 @@ import cc.warlock.core.client.settings.IClientSettings;
 import cc.warlock.core.client.settings.IWindowSettings;
 import cc.warlock.rcp.configuration.GameViewConfiguration;
 import cc.warlock.rcp.ui.client.SWTStreamListener;
-import cc.warlock.rcp.ui.style.StyleProviders;
 import cc.warlock.rcp.util.ColorUtil;
 import cc.warlock.rcp.util.FontUtil;
 import cc.warlock.rcp.views.GameView;
@@ -164,10 +163,6 @@ public class StreamText extends WarlockText implements IStreamListener {
 		
 		if(stream != null)
 			this.title.set(stream.getFullTitle());
-		
-		IStyleProvider styleProvider = StyleProviders.getStyleProvider(client);
-		if(styleProvider != null)
-			setStyleProvider(styleProvider);
 		
 		IWarlockSkin skin = client.getSkin();
 		IClientSettings settings = client.getClientSettings();
