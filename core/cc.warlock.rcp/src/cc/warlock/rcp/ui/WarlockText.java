@@ -283,12 +283,13 @@ public class WarlockText {
 		}
 		
 		mergeLoop: for(StyleRange mergingStyle : list2) {
+			if(mergingStyle == null)
+				continue;
 			for(ListIterator<StyleRange> iter = resultList.listIterator();
 			iter.hasNext(); )
 			{
 				StyleRange style = iter.next();
-				
-				if(style == null || mergingStyle == null)
+				if(style == null)
 					continue;
 				
 				// if the mergeStyle came before the current style, add the
@@ -308,15 +309,19 @@ public class WarlockText {
 				int subStart;
 				
 				if(style.start < mergingStyle.start) {
-					subStart = mergingStyle.start;
+					// Add the style before they overlap
 					StyleRange newStyle = (StyleRange)style.clone();
 					newStyle.length = mergingStyle.start - style.start;
 					iter.add(newStyle);
+					
+					subStart = mergingStyle.start;
 				} else if(mergingStyle.start < style.start) {
-					subStart = style.start;
+					// Add the style before they overlap
 					StyleRange newStyle = (StyleRange)mergingStyle.clone();
 					newStyle.length = style.start - mergingStyle.start;
 					iter.add(newStyle);
+					
+					subStart = style.start;
 				} else {
 					subStart = style.start;
 				}
@@ -334,10 +339,10 @@ public class WarlockText {
 				iter.add(newStyle);
 				
 				if(style.start + style.length < mergingStyle.start + mergingStyle.length) {
-					StyleRange endStyle = (StyleRange)mergingStyle.clone();
-					endStyle.start = subEnd;
-					endStyle.length = mergingStyle.start + mergingStyle.length - subEnd;
-					iter.add(endStyle);
+					int length = mergingStyle.start + mergingStyle.length - subEnd;
+					mergingStyle.start = subEnd;
+					mergingStyle.length = length;
+					continue;
 				} else if(mergingStyle.start + mergingStyle.length < style.start + style.length) {
 					StyleRange endStyle = (StyleRange)style.clone();
 					endStyle.start = subEnd;
