@@ -62,10 +62,12 @@ public class StreamText extends WarlockText implements IStreamListener {
 	}
 	
 	public void componentUpdated(IStream stream, String id, WarlockString value) {
+		flushBuffer();
 		replaceMarker(id, value);
 	}
 
 	public void streamCleared(IStream stream) {
+		flushBuffer();
 		clearText();
 	}
 
@@ -73,7 +75,7 @@ public class StreamText extends WarlockText implements IStreamListener {
 		flushBuffer();
 	}
 
-	private void flushBuffer() {
+	private synchronized void flushBuffer() {
 		if(textBuffer != null) {
 			append(textBuffer);
 			textBuffer.clear();
