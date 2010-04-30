@@ -128,12 +128,18 @@ public class WarlockStringMarker {
 		return style.getName();
 	}
 	
-	public WarlockStringMarker getMarker(String name) {
-		String myName = this.getName();
-		if(myName != null && myName.equals(name))
+	public String getComponentName() {
+		if(style == null)
+			return null;
+		return style.getComponentName();
+	}
+	
+	public WarlockStringMarker getMarkerByComponent(String componentName) {
+		String myName = getComponentName();
+		if(myName != null && myName.equals(componentName))
 			return this;
 		for(WarlockStringMarker subMarker : subMarkers) {
-			WarlockStringMarker marker = subMarker.getMarker(name);
+			WarlockStringMarker marker = subMarker.getMarkerByComponent(componentName);
 			if(marker != null)
 				return marker;
 		}
@@ -153,7 +159,8 @@ public class WarlockStringMarker {
 	}
 	
 	// this function removes the first "delta" amount of characters
-	public static boolean updateMarkers(int delta, WarlockStringMarker afterMarker, Collection<WarlockStringMarker> markerList) {
+	public static boolean updateMarkers(int delta, WarlockStringMarker afterMarker,
+			Collection<WarlockStringMarker> markerList) {
 		// remove markers between start and end.
 		// all markers after start need to be adjusted by offset.
 		// returns whether or not the afterMarker was found
@@ -184,7 +191,7 @@ public class WarlockStringMarker {
 		for(WarlockStringMarker subMarker : subMarkers) {
 			IWarlockStyle baseStyle = subMarker.getBaseStyle(marker);
 			if(baseStyle != null)
-				return style.mergeWith(baseStyle);
+				return baseStyle.mergeWith(style);
 		}
 		return null;
 	}

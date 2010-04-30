@@ -59,12 +59,16 @@ public class CompDefTagHandler extends DefaultTagHandler {
 			handler.removeStyle(style);
 			style = null;
 		}
-		style = new WarlockStyle();
 		buffer.setLength(0);
-		this.id = attributes.getValue("id");
-		style.setName(this.id);
+		
+		id = attributes.getValue("id");
+		if(id == null)
+			return;
+		
+		style = new WarlockStyle();
+		style.setComponentName(id);
 		handler.addStyle(style);
-		if(id != null && id.equals("room objs"))
+		if(id.equals("room objs"))
 			handler.resetMonsterCount();
 	}
 	
@@ -100,4 +104,3 @@ public class CompDefTagHandler extends DefaultTagHandler {
 		return false;
 	}
 }
-

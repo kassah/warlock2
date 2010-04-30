@@ -29,7 +29,7 @@ public class StreamHistory implements IStreamListener {
 	}
 
 	public void componentUpdated(IStream stream, String id, WarlockString value) {
-		WarlockStringMarker marker = buffer.getMarker(id);
+		WarlockStringMarker marker = buffer.getMarkerByComponent(id);
 		if(marker == null)
 			return;
 		marker.clear();

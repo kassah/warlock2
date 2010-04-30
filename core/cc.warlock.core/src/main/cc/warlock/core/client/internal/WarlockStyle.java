@@ -36,6 +36,7 @@ public class WarlockStyle implements IWarlockStyle {
 	private WarlockColor backgroundColor = new WarlockColor(WarlockColor.DEFAULT_COLOR);
 	private boolean fullLine;
 	private String name;
+	private String componentName;
 	private Runnable action;
 	private IWarlockStyle originalStyle;
 	private boolean needsUpdate;
@@ -58,7 +59,8 @@ public class WarlockStyle implements IWarlockStyle {
 		
 		this.backgroundColor = new WarlockColor(other.getBackgroundColor());
 		this.foregroundColor = new WarlockColor(other.getForegroundColor());
-		this.name = other.getName() == null ? null : new String(other.getName());
+		this.name = other.getName();
+		this.componentName = other.getComponentName();
 		this.action = other.getAction();
 		
 		if (other.getStyleTypes() != null)
@@ -124,6 +126,14 @@ public class WarlockStyle implements IWarlockStyle {
 		return name;
 	}
 
+	public void setComponentName(String componentName) {
+		this.componentName = componentName;
+	}
+	
+	public String getComponentName() {
+		return componentName;
+	}
+	
 	public WarlockColor getForegroundColor() {
 		return foregroundColor;
 	}
@@ -156,7 +166,7 @@ public class WarlockStyle implements IWarlockStyle {
 		return originalStyle;
 	}
 	
-	public String getSound(){
+	public String getSound() {
 		return sound;
 	}
 	

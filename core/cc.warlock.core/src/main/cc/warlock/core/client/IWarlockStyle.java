@@ -41,6 +41,7 @@ public interface IWarlockStyle {
 	public WarlockColor getBackgroundColor();
 	public boolean isFullLine();
 	public String getName();
+	public String getComponentName();
 	
 	public void addStyleType (StyleType styleType);
 
@@ -49,6 +50,7 @@ public interface IWarlockStyle {
 	public void setBackgroundColor(WarlockColor color);
 	public void setFullLine(boolean fullLine);
 	public void setName(String name);
+	public void setComponentName(String componentName);
 	public String getSound();
 	public void setSound(String sound);
 	public IWarlockStyle mergeWith(IWarlockStyle style);

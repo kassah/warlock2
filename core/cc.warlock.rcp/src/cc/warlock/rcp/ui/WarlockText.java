@@ -260,7 +260,7 @@ public class WarlockText {
 			// check to make sure we're a newline in the appropriate area
 			if(marker.getStart() < offset)
 				continue;
-			String name = marker.getStyle().getName();
+			String name = marker.getName();
 			if(name == null || !name.equals("newline"))
 				continue;
 			
@@ -467,7 +467,7 @@ public class WarlockText {
 		LinkedList<StyleRange> finishedStyles = new LinkedList<StyleRange>();
 		for(WarlockStringMarker strMarker : wstring.getStyles()) {
 			WarlockStringMarker marker = strMarker.copy(offset);
-			addNamedMarkers(marker, wstring);
+			addComponentMarker(marker, marker);
 			getMarkerStyles(marker, new StyleRangeWithData(), finishedStyles);
 		}
 		showStyles(finishedStyles, offset, textWidget.getCharCount());
@@ -478,15 +478,15 @@ public class WarlockText {
 		postTextChange(atBottom);
 	}
 	
-	private void addNamedMarkers(WarlockStringMarker marker, WarlockString wstring) {
-		if(marker.getName() != null) {
-			IWarlockStyle baseStyle = wstring.getBaseStyle(marker);
+	private void addComponentMarker(WarlockStringMarker marker, WarlockStringMarker topLevel) {
+		if(marker.getComponentName() != null) {
+			this.addMarker(marker);
+			IWarlockStyle baseStyle = topLevel.getBaseStyle(marker);
 			if(baseStyle != null)
 				marker.setStyle(baseStyle);
-			this.addMarker(marker);
 		} else {
 			for(WarlockStringMarker subMarker : marker.getSubMarkers()) {
-				addNamedMarkers(subMarker, wstring);
+				addComponentMarker(subMarker, topLevel);
 			}
 		}
 	}
@@ -645,7 +645,7 @@ public class WarlockText {
 		WarlockStringMarker marker = null;
 		IWarlockStyle baseStyle = null;
 		for(WarlockStringMarker subMarker : markers) {
-			marker = getMarker(name, subMarker);
+			marker = getMarkerByComponent(name, subMarker);
 			if(marker != null) {
 				baseStyle = subMarker.getBaseStyle(marker);
 				break;
@@ -682,14 +682,14 @@ public class WarlockText {
 		postTextChange(atBottom);
 	}
 	
-	private WarlockStringMarker getMarker(String name,
+	private WarlockStringMarker getMarkerByComponent(String componentName,
 			WarlockStringMarker marker) {
-		String myName = marker.getName();
-		if(myName.equals(name))
+		String myName = marker.getComponentName();
+		if(myName != null && myName.equals(componentName))
 			return marker;
 		
 		for(WarlockStringMarker subMarker : marker.getSubMarkers()) {
-			WarlockStringMarker result = getMarker(name, subMarker);
+			WarlockStringMarker result = getMarkerByComponent(componentName, subMarker);
 			if(result != null)
 				return result;
 		}
