@@ -104,7 +104,7 @@ public class DebugView extends WarlockView implements IConnectionListener, IGame
 	private void debug (IWarlockClient client, String message)
 	{
 		WarlockText console = getTextForClient(client);
-		console.append(message);
+		console.appendRaw(message);
 	}
 	
 	@Override

@@ -202,12 +202,13 @@ public class WarlockText {
 		lineLimit = limit;
 	}
 	
-	public void append(String string) {
+	public void appendRaw(String string) {
 		boolean atBottom = isAtBottom();
-		int charCount = textWidget.getCharCount();
+		
 		textWidget.append(string);
 
-		postTextChange(atBottom, charCount);
+		if(atBottom)
+			scrollToEnd();
 	}
 	
 	private Pattern newlinePattern = Pattern.compile("\r?\n");
