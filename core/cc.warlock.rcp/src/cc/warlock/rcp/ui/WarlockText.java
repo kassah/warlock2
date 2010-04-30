@@ -74,6 +74,7 @@ public class WarlockText {
 	private int lineLimit = 5000;
 	private int doScrollDirection = SWT.DOWN;
 	private Menu contextMenu;
+	private boolean ignoreEmptyLines = true;
 	private LinkedList<WarlockStringMarker> markers = new LinkedList<WarlockStringMarker>();
 	
 	public WarlockText(Composite parent) {
@@ -205,11 +206,8 @@ public class WarlockText {
 		boolean atBottom = isAtBottom();
 		int charCount = textWidget.getCharCount();
 		textWidget.append(string);
-		
-		removeEmptyLines(charCount);
-		constrainLineLimit(atBottom);
 
-		postTextChange(atBottom);
+		postTextChange(atBottom, charCount);
 	}
 	
 	private Pattern newlinePattern = Pattern.compile("\r?\n");
@@ -471,11 +469,8 @@ public class WarlockText {
 			getMarkerStyles(marker, new StyleRangeWithData(), finishedStyles);
 		}
 		showStyles(finishedStyles, offset, textWidget.getCharCount());
-		removeEmptyLines(offset);
-		
-		constrainLineLimit(atBottom);
 
-		postTextChange(atBottom);
+		postTextChange(atBottom, offset);
 	}
 	
 	private void addComponentMarker(WarlockStringMarker marker, WarlockStringMarker topLevel) {
@@ -557,19 +552,23 @@ public class WarlockText {
 		return textWidget.getLinePixel(textWidget.getLineCount()) <= textWidget.getClientArea().height;
 	}
 	
-	public void postTextChange(boolean atBottom) {
-		// TODO: Make preTextChange private
-		// Explination: right now we can't listen for the before and after of our resize, so this must be called
-		//     after an action that will cause a resize.
-		if (atBottom && doScrollDirection == SWT.DOWN) {
+	private void postTextChange(boolean atBottom, int offset) {
+		
+		if(ignoreEmptyLines) {
+			removeEmptyLines(offset);
+			restoreNewlines(offset, markers);
+		}
+		
+		constrainLineLimit(atBottom);
+		
+		if(atBottom)
+			scrollToEnd();
+	}
+	
+	public void scrollToEnd() {
+		if(doScrollDirection == SWT.DOWN)
 			textWidget.setTopPixel(textWidget.getTopPixel()
 					+ textWidget.getLinePixel(textWidget.getLineCount()));
-			
-			// FIXME: is this still needed?
-			//if (Platform.getOS().equals(Platform.OS_MACOSX)) {
-			//	textWidget.redraw();
-			//}
-		}
 	}
 	
 	// this function removes the first "delta" amount of characters
@@ -677,9 +676,7 @@ public class WarlockText {
 		getMarkerStyles(markerWithStyle, new StyleRangeWithData(), newStyles);
 		showStyles(newStyles, marker.getStart(), marker.getEnd());
 		
-		removeEmptyLines(start);
-		restoreNewlines(start, markers);
-		postTextChange(atBottom);
+		postTextChange(atBottom, start);
 	}
 	
 	private WarlockStringMarker getMarkerByComponent(String componentName,
@@ -722,6 +719,10 @@ public class WarlockText {
 		if (dir == SWT.DOWN || dir == SWT.UP)
 			doScrollDirection = dir;
 		// TODO: Else throw an error
+	}
+	
+	public void setIgnoreEmptyLines(boolean ignoreLines) {
+		this.ignoreEmptyLines = ignoreLines;
 	}
 	
 	public StyledText getTextWidget() {

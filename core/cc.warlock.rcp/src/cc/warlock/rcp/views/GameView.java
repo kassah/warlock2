@@ -183,6 +183,7 @@ public abstract class GameView extends WarlockView implements IWarlockClientView
 		streamText = new StreamText(mainComposite, IWarlockClient.DEFAULT_STREAM_NAME);
 		streamText.setLineLimit(GameViewConfiguration.instance().getBufferLines());
 		streamText.getTextWidget().setLayout(new GridLayout(1, false));
+		streamText.setIgnoreEmptyLines(false);
 		
 		// create the entry
 		entryComposite = new Composite(mainComposite, SWT.NONE);
@@ -339,7 +340,9 @@ public abstract class GameView extends WarlockView implements IWarlockClientView
 		((GridData)popupPageBook.getLayoutData()).exclude = false;
 		
 		mainComposite.layout();
-		streamText.postTextChange(atBottom);
+		
+		if(atBottom)
+			streamText.scrollToEnd();
 	}
 	
 	public void hidePopup (WarlockPopupAction popup)
@@ -350,7 +353,9 @@ public abstract class GameView extends WarlockView implements IWarlockClientView
 		((GridData)popupPageBook.getLayoutData()).exclude = true;
 		
 		mainComposite.layout();
-		streamText.postTextChange(atBottom);
+		
+		if(atBottom)
+			streamText.scrollToEnd();
 	}
 	
 	@Override
