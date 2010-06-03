@@ -136,4 +136,22 @@ public class TelnetClient extends WarlockClient {
 		return null;
 	}
 
+	@Override
+	public String getVariable(String id) {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	@Override
+	public void removeVariable(String id) {
+		// TODO Auto-generated method stub
+		
+	}
+
+	@Override
+	public void setVariable(String id, String value) {
+		// TODO Auto-generated method stub
+		
+	}
+
 }
