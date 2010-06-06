@@ -163,6 +163,12 @@ public class WarlockConfiguration {
 		}
 		
 		try {
+			if (configFile.exists()) {
+				File backupFile = new File(configFile.getPath()+ ".bak");
+				if (backupFile.exists())
+					backupFile.renameTo(new File(backupFile.getPath()+ ".1"));
+				configFile.renameTo(backupFile);
+			}
 			OutputFormat format = OutputFormat.createPrettyPrint();
 			FileOutputStream stream = new FileOutputStream(configFile);
 			XMLWriter writer = new XMLWriter(stream, format);
