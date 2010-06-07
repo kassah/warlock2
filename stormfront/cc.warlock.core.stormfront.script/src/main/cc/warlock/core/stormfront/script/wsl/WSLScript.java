@@ -36,6 +36,7 @@ import org.antlr.runtime.CharStream;
 import org.antlr.runtime.CommonTokenStream;
 import org.antlr.runtime.RecognitionException;
 
+import cc.warlock.core.client.IStream;
 import cc.warlock.core.script.AbstractScript;
 import cc.warlock.core.script.IMatch;
 import cc.warlock.core.script.IScriptCommands;
@@ -175,7 +176,10 @@ public class WSLScript extends AbstractScript {
 	
 	private class WSLRoomTitle extends WSLAbstractString {
 		public String toString() {
-			return sfClient.getStream("room").getFullTitle();
+			IStream roomStream = sfClient.getStream("room");
+			if(roomStream == null)
+				return "";
+			return roomStream.getFullTitle();
 		}
 	}
 	

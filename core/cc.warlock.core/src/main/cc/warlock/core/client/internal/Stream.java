@@ -109,7 +109,9 @@ public class Stream implements IStream {
 		
 		if(!client.getViewer().isStreamOpen(streamName) && !closedTarget.equals("") && !streamName.equals(closedTarget)) {
 			WarlockString closedText = new WarlockString(text.toString(), new WarlockStyle(closedStyle));
-			client.getStream(closedTarget).put(closedText);
+			IStream closedStream = client.getStream(closedTarget);
+			if(closedStream != null)
+				closedStream.put(closedText);
 		}
 		
 		isPrompting = false;

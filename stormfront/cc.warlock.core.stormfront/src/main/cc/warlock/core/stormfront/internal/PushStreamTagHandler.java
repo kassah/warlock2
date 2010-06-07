@@ -24,6 +24,7 @@
  */
 package cc.warlock.core.stormfront.internal;
 
+import cc.warlock.core.client.IStream;
 import cc.warlock.core.stormfront.IStormFrontProtocolHandler;
 import cc.warlock.core.stormfront.xml.StormFrontAttributeList;
 
@@ -49,8 +50,9 @@ public class PushStreamTagHandler extends DefaultTagHandler {
 		String id = attributes.getValue("id");
 		
 		String closedStyle = attributes.getValue("ifClosedStyle");
-		if(closedStyle != null)
-			handler.getClient().getStream(id).setClosedStyle(closedStyle);
+		IStream closedStream = handler.getClient().getStream(id);
+		if(closedStyle != null && closedStream != null)
+			closedStream.setClosedStyle(closedStyle);
 		
 		handler.pushStream(id);
 	}

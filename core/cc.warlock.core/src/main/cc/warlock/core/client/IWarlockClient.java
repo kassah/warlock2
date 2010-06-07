@@ -77,7 +77,7 @@ public interface IWarlockClient extends IRoomListener {
 	
 	/**
 	 * @param streamName The stream name
-	 * @return The stream associated with the given name. If this stream does not exist, it will be lazily created.
+	 * @return The stream associated with the given name. If this stream does not exist, NULL will be returned.
 	 */
 	public IStream getStream(String streamName);
 	
