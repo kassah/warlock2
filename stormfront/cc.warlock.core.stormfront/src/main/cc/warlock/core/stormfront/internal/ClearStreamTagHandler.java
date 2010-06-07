@@ -21,6 +21,7 @@
  */
 package cc.warlock.core.stormfront.internal;
 
+import cc.warlock.core.client.IStream;
 import cc.warlock.core.stormfront.IStormFrontProtocolHandler;
 import cc.warlock.core.stormfront.xml.StormFrontAttributeList;
 
@@ -42,7 +43,9 @@ public class ClearStreamTagHandler extends DefaultTagHandler {
 	@Override
 	public void handleStart(StormFrontAttributeList attributes, String rawXML) {
 		String id = attributes.getValue("id");
-		
-		handler.getClient().getStream(id).clear();
+		IStream stream = handler.getClient().getStream(id);
+		// If stream is null, then it doesn't exist, thus is already clear.
+		if (stream != null)
+			stream.clear();
 	}
 }
