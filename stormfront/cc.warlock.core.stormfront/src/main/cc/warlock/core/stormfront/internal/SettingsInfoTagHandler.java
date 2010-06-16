@@ -22,11 +22,14 @@
 package cc.warlock.core.stormfront.internal;
 
 import java.io.File;
+import java.io.FileInputStream;
 import java.io.IOException;
 
 import cc.warlock.core.configuration.ConfigurationUtil;
 import cc.warlock.core.stormfront.IStormFrontProtocolHandler;
+import cc.warlock.core.stormfront.client.internal.StormFrontClient;
 import cc.warlock.core.stormfront.settings.StormFrontServerSettings;
+import cc.warlock.core.stormfront.settings.internal.StormFrontClientSettings;
 import cc.warlock.core.stormfront.xml.StormFrontAttributeList;
 
 
@@ -85,6 +88,17 @@ public class SettingsInfoTagHandler extends DefaultTagHandler {
 		} else {
 			try {
 				handler.getClient().getConnection().sendLine("");
+				
+				StormFrontClient client = (StormFrontClient)handler.getClient();
+				if (client.getServerSettings().getClientVersion() == null)
+				{
+					FileInputStream stream = new FileInputStream(serverSettings);
+					StormFrontClientSettings settings =
+						(StormFrontClientSettings)handler.getClient().getStormFrontClientSettings();
+					
+					client.getServerSettings().importServerSettings(stream, settings);					
+					stream.close();
+				}
 			} catch(IOException e) {
 				e.printStackTrace();
 			}
