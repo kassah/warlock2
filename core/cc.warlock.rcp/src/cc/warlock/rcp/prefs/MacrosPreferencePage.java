@@ -26,6 +26,7 @@ import java.util.Collection;
 
 import org.eclipse.core.runtime.IAdaptable;
 import org.eclipse.jface.bindings.keys.KeyStroke;
+import org.eclipse.jface.bindings.keys.ParseException;
 import org.eclipse.jface.bindings.keys.SWTKeySupport;
 import org.eclipse.jface.fieldassist.IContentProposal;
 import org.eclipse.jface.fieldassist.IContentProposalProvider;
@@ -96,6 +97,8 @@ public class MacrosPreferencePage extends PreferencePageUtils implements
 
 	protected Button addMacroButton;
 	protected Button removeMacroButton;
+	protected Button clearMacrosButton;
+	protected Button defaultMacrosButton;
 	
 	protected Macro selectedMacro;
 	protected PageBook filterBook;
@@ -255,9 +258,31 @@ public class MacrosPreferencePage extends PreferencePageUtils implements
 		});
 		removeMacroButton.setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, false));
 		
+		Label filler = new Label(macroButtons, SWT.NONE);
+		filler.setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, true));	
+		
+		clearMacrosButton = new Button(macroButtons, SWT.PUSH);
+		clearMacrosButton.setText("Clear Macros");
+		clearMacrosButton.addSelectionListener(new SelectionAdapter() {
+			public void widgetSelected(SelectionEvent e) {
+				clearMacros();
+			}
+		});
+		clearMacrosButton.setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, false));
+		
+		defaultMacrosButton = new Button(macroButtons, SWT.PUSH);
+		defaultMacrosButton.setText("Reset to Defaults");
+		defaultMacrosButton.addSelectionListener(new SelectionAdapter() {
+			public void widgetSelected(SelectionEvent e) {
+				setupDefaultMacros();
+			}
+		});
+		defaultMacrosButton.setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, false));
+		
+		
 		return main;
 	}
-	
+
 	protected class MacroFilter extends ViewerFilter {
 		public boolean select(Viewer viewer, Object parentElement, Object element) {
 			IMacro macro = (IMacro)element;
@@ -304,6 +329,133 @@ public class MacrosPreferencePage extends PreferencePageUtils implements
 		}
 		
 		macroTable.remove(selectedMacro);
+	}
+	
+	
+	protected void setupDefaultMacros() {
+		// There probably is a better place to put this.
+		clearMacros();
+		createRawMacro("\\xxml toggle containers\\r",99,65536);
+		createRawMacro("\\xxml toggle dialogs\\r",100,65536);
+		createRawMacro("{ExportDialog}",101,327680);
+		createRawMacro("{HighlightsDialog}",104,327680);
+		createRawMacro("{ImportDialog}",105,327680);
+		createRawMacro("{ToggleLinks}",108,65536);
+		createRawMacro("{ToggleMusic}",109,65536);
+		createRawMacro("{ToggleImages}",105,65536);
+		createRawMacro("{ToggleSounds}",115,65536);
+		createRawMacro("{MacrosDialog}",109,327680);
+		createRawMacro("{ChooseSkin}",115,327680);
+		createRawMacro("{VariablesDialog}",118,65536);
+		createRawMacro("{MacroSet}0",48,65536);
+		createRawMacro("{MacroSet}1",49,65536);
+		createRawMacro("{MacroSet}2",50,65536);
+		createRawMacro("{MacroSet}3",51,65536);
+		createRawMacro("{MacroSet}4",52,65536);
+		createRawMacro("{MacroSet}5",53,65536);
+		createRawMacro("{MacroSet}6",54,65536);
+		createRawMacro("{MacroSet}7",55,65536);
+		createRawMacro("{MacroSet}8",56,65536);
+		createRawMacro("{MacroSet}9",57,65536);
+		createRawMacro("{Restart}",16777230,262144);
+		createRawMacro("\\xretreat\\r",114,262144);
+		createRawMacro("\\xlook\\r",16777259,0);
+		createRawMacro("\\xhealth\\r",16777263,0);
+		createRawMacro("\\xnotoriety\\r",16777258,0);
+		createRawMacro("\\xmana\\r",16777261,0);
+		createRawMacro("\\xup\\r",16777262,0);
+		createRawMacro("\\xdown\\r",16777264,0);
+		createRawMacro("\\xsw\\r",16777265,0);
+		createRawMacro("\\xs\\r",16777266,0);
+		createRawMacro("\\xse\\r",16777267,0);
+		createRawMacro("\\xw\\r",16777268,0);
+		createRawMacro("\\xout\\r",16777269,0);
+		createRawMacro("\\xe\\r",16777270,0);
+		createRawMacro("\\xnw\\r",16777271,0);
+		createRawMacro("\\xn\\r",16777272,0);
+		createRawMacro("\\xne\\r",16777273,0);
+		createRawMacro("{PageUp}",16777221,0);
+		createRawMacro("{PageDown}",16777222,0);
+		createRawMacro("{LineUp}",16777221,131072);
+		createRawMacro("{LineDown}",16777222,131072);
+		createRawMacro("{HistoryPrev}",16777217,0);
+		createRawMacro("{HistoryNext}",16777218,0);
+		createRawMacro("{RepeatLast}",13,262144);
+		createRawMacro("{RepeatSecondToLast}",13,65536);
+		createRawMacro("{ReturnOrRepeatLast}",16777296,0);
+		createRawMacro("{RepeatLast}",16777296,262144);
+		createRawMacro("{RepeatSecondToLast}",16777296,65536);
+		createRawMacro("{CycleWindows}",9,0);
+		createRawMacro("{BufferTop}",16777221,262144);
+		createRawMacro("{BufferBottom}",16777222,262144);
+		createRawMacro("{BufferTop}",16777223,262144);
+		createRawMacro("{BufferBottom}",16777224,262144);
+		createRawMacro("{CycleWindowsReverse}",9,131072);
+		createRawMacro("\\xassess\\r",97,262144);
+		createRawMacro("{copy}",99,262144);
+		createRawMacro("{cut}",120,262144);
+		createRawMacro("{paste}",118,262144);
+		createRawMacro("{PauseScript}",27,131072);
+		createRawMacro("peer down\\r",16777264,262144);
+		createRawMacro("\\xpath focus damage\\r",16777265,131072);
+		createRawMacro("\\xaft to port\\r",16777265,65536);
+		createRawMacro("peer sw\\r",16777265,262144);
+		createRawMacro("\\xpath focus quick\\r",16777266,131072);
+		createRawMacro("\\xaft\\r",16777266,65536);
+		createRawMacro("peer s\\r",16777266,262144);
+		createRawMacro("\\xpath focus ease\\r",16777267,131072);
+		createRawMacro("\\xaft to starboard\\r",16777267,65536);
+		createRawMacro("peer se\\r",16777267,262144);
+		createRawMacro("\\xport\\r",16777268,65536);
+		createRawMacro("peer w\\r",16777268,262144);
+		createRawMacro("peer out\\r",16777269,262144);
+		createRawMacro("\\xstarboard\\r",16777270,65536);
+		createRawMacro("peer e\\r",16777270,262144);
+		createRawMacro("\\xforward to port\\r",16777271,65536);
+		createRawMacro("peer nw\\r",16777271,262144);
+		createRawMacro("\\xforward\\r",16777272,65536);
+		createRawMacro("peer n\\r",16777272,262144);
+		createRawMacro("\\xforward to starboard\\r",16777273,65536);
+		createRawMacro("peer ne\\r",16777273,262144);
+		createRawMacro("peer up\\r",16777262,262144);
+		createRawMacro("\\xpath sense\\r",16777263,131072);
+		createRawMacro("\\xpath check\\r",16777258,131072);
+		createRawMacro("\\xdemeanor neutral\\r",101,65536);
+		createRawMacro("\\xdemeanor reserved\\r",119,65536);
+		createRawMacro("\\xdemeanor cold\\r",113,65536);
+		createRawMacro("\\xget \\?\\rput \\? in my %container\\r",116,262144);
+		createRawMacro("\\xremove my %helmet\\rput my %helmet in my %container\\r\\premove my %gloves\\rput my %gloves in my %container\\r",16777235,0);
+		createRawMacro("\\xopen my \\?\\ropen my %gpouch\\r\\pfill my %gpouch with my \\?\\r\\pclose my %gpouch\\rclose my \\?\\r",16777228,0);
+		createRawMacro("\\xopen my %gpouch\\rappr my %gpouch\\r\\p\\p\\p\\p\\p\\p\\p\\p\\p\\xclose my %gpouch\\r",16777230,0);
+		createRawMacro("\\xopen my \\?\\rl in my \\?\\r\\pclose my \\?\\r",16777231,0);
+		createRawMacro("\\xget my %helmet\\rwear my %helmet\\r\\pget my %gloves\\rwear my %gloves\\r",16777234,0);
+		createRawMacro("\\xdemeanor friendly\\r",114,65536);
+		createRawMacro("\\xdemeanor warm\\r",116,65536);
+		createRawMacro("\\xpath focus power\\r",16777268,131072);
+		createRawMacro("\\xremove my %shield\\rstow my %shield\\r",16777235,262144);
+		createRawMacro("\\xget my %shield\\rwear my %shield\\r",16777234,262144);
+	}
+	
+	// Mostly just to support setupDefaultMacros
+	protected void createRawMacro(String cmd, int keycode, int keymod) {
+		Macro macro = new Macro(settings.getMacroConfigurationProvider(), 0);
+		macro.setModifiers(keymod);
+		macro.setKeyCode(keycode);
+		macro.addHandler(new CommandMacroHandler(cmd));
+		
+		addedMacros.add(macro);
+		macros.add(macro);
+		macroTable.add(macro);
+	}
+	
+	protected void clearMacros() {
+		// Clear out all exiting macros.
+		macroTable.getTable().clearAll();
+		addedMacros.clear();
+		for (Macro x: macros) {
+			macroTable.remove(x);
+			removedMacros.add(x);
+		}
 	}
 	
 	protected CommandMacroHandler getCommandMacroHandler (IMacro macro) {
