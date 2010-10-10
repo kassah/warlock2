@@ -26,7 +26,6 @@ import java.util.Collection;
 
 import org.eclipse.core.runtime.IAdaptable;
 import org.eclipse.jface.bindings.keys.KeyStroke;
-import org.eclipse.jface.bindings.keys.ParseException;
 import org.eclipse.jface.bindings.keys.SWTKeySupport;
 import org.eclipse.jface.fieldassist.IContentProposal;
 import org.eclipse.jface.fieldassist.IContentProposalProvider;
@@ -59,6 +58,7 @@ import org.eclipse.swt.widgets.Label;
 import org.eclipse.swt.widgets.Listener;
 import org.eclipse.swt.widgets.Menu;
 import org.eclipse.swt.widgets.MenuItem;
+import org.eclipse.swt.widgets.Table;
 import org.eclipse.swt.widgets.Text;
 import org.eclipse.ui.IWorkbenchPropertyPage;
 import org.eclipse.ui.part.PageBook;
@@ -89,7 +89,7 @@ public class MacrosPreferencePage extends PreferencePageUtils implements
 	protected static String COLUMN_COMMAND = "command";
 	protected static String COLUMN_KEY = "key";
 	
-	protected TableViewer macroTable;
+	protected TableViewer macroTableView;
 	protected IWarlockClient client;
 	protected ClientSettings settings;
 	
@@ -129,17 +129,17 @@ public class MacrosPreferencePage extends PreferencePageUtils implements
 		commandText = new Text(filterBook, SWT.BORDER);
 		commandText.addModifyListener(new ModifyListener() {
 			public void modifyText(ModifyEvent e) {
-				macroTable.refresh();
+				macroTableView.refresh();
 			}
 		});
 		
 		keyComboText = new KeyStrokeText(filterBook, SWT.BORDER);
 		keyComboText.addKeyStrokeLockListener(new KeyStrokeLockListener() {
 			public void keyStrokeLocked() {
-				macroTable.refresh();
+				macroTableView.refresh();
 			}
 			public void keyStrokeUnlocked() {
-				macroTable.refresh();
+				macroTableView.refresh();
 			}
 		});
 		
@@ -160,7 +160,7 @@ public class MacrosPreferencePage extends PreferencePageUtils implements
 			public void widgetSelected(SelectionEvent e) {
 				MacrosPreferencePage.this.filterByCommand = true;
 				filterBook.showPage(commandText);
-				macroTable.refresh();
+				macroTableView.refresh();
 			}
 		});
 		
@@ -170,28 +170,28 @@ public class MacrosPreferencePage extends PreferencePageUtils implements
 			public void widgetSelected(SelectionEvent e) {
 				MacrosPreferencePage.this.filterByCommand = false;
 				filterBook.showPage(keyComboText.getText());
-				macroTable.refresh();
+				macroTableView.refresh();
 			}
 		});
 		filterButton.setLayoutData(new GridData(SWT.BEGINNING, SWT.FILL, false, false));
 		
 		new Label(main, SWT.NONE);
-		macroTable = new TableViewer(main, SWT.SINGLE | SWT.BORDER | SWT.V_SCROLL);
-		TableViewerColumn commandColumn = new TableViewerColumn(macroTable, SWT.NONE, 0);
+		macroTableView = new TableViewer(main, SWT.SINGLE | SWT.BORDER | SWT.V_SCROLL);
+		TableViewerColumn commandColumn = new TableViewerColumn(macroTableView, SWT.NONE, 0);
 		commandColumn.getColumn().setText("Command");
 		commandColumn.getColumn().setWidth(225);
-		commandColumn.setEditingSupport(new CommandEditingSupport(macroTable));
+		commandColumn.setEditingSupport(new CommandEditingSupport(macroTableView));
 		
-		TableViewerColumn keyColumn = new TableViewerColumn(macroTable, SWT.NONE, 1);
+		TableViewerColumn keyColumn = new TableViewerColumn(macroTableView, SWT.NONE, 1);
 		keyColumn.getColumn().setText("Key Combination");
 		keyColumn.getColumn().setWidth(125);
-		keyColumn.setEditingSupport(new KeyStrokeEditingSupport(macroTable));
+		keyColumn.setEditingSupport(new KeyStrokeEditingSupport(macroTableView));
 		
-		macroTable.setUseHashlookup(true);
-		macroTable.setColumnProperties(new String[] {COLUMN_COMMAND, COLUMN_KEY});
-		macroTable.setContentProvider(new ArrayContentProvider());
-		macroTable.setLabelProvider(new LabelProvider());
-		macroTable.addFilter(new ViewerFilter() {
+		macroTableView.setUseHashlookup(true);
+		macroTableView.setColumnProperties(new String[] {COLUMN_COMMAND, COLUMN_KEY});
+		macroTableView.setContentProvider(new ArrayContentProvider());
+		macroTableView.setLabelProvider(new LabelProvider());
+		macroTableView.addFilter(new ViewerFilter() {
 			public boolean select(Viewer viewer, Object parentElement, Object element) {
 				IMacro macro = (IMacro) element;
 				Collection<IMacroHandler> handlers = macro.getHandlers();
@@ -205,14 +205,14 @@ public class MacrosPreferencePage extends PreferencePageUtils implements
 				return false;
 			}	
 		});
-		macroTable.addFilter(new MacroFilter());
+		macroTableView.addFilter(new MacroFilter());
 		
-		macroTable.addSelectionChangedListener(new ISelectionChangedListener() {
+		macroTableView.addSelectionChangedListener(new ISelectionChangedListener() {
 			public void selectionChanged(SelectionChangedEvent event) {
-				if (macroTable.getSelection().isEmpty()) {
+				if (macroTableView.getSelection().isEmpty()) {
 					removeMacroButton.setEnabled(false);
 				} else {
-					selectedMacro = (Macro) ((IStructuredSelection)macroTable.getSelection()).getFirstElement();
+					selectedMacro = (Macro) ((IStructuredSelection)macroTableView.getSelection()).getFirstElement();
 					removeMacroButton.setEnabled(true);
 				}
 			}
@@ -224,14 +224,14 @@ public class MacrosPreferencePage extends PreferencePageUtils implements
 			}
 		}
 		
-		macroTable.setInput(macros);
-		macroTable.getTable().setHeaderVisible(true);
-		int listHeight = macroTable.getTable().getItemHeight() * 8;
-		Rectangle trim = macroTable.getTable().computeTrim(0, 0, 0, listHeight);
+		macroTableView.setInput(macros);
+		macroTableView.getTable().setHeaderVisible(true);
+		int listHeight = macroTableView.getTable().getItemHeight() * 8;
+		Rectangle trim = macroTableView.getTable().computeTrim(0, 0, 0, listHeight);
 		data = new GridData(GridData.FILL, GridData.FILL, true, true);
 		data.heightHint = trim.height;
 		
-		macroTable.getTable().setLayoutData(data);
+		macroTableView.getTable().setLayoutData(data);
 		
 		Composite macroButtons = new Composite(main, SWT.NONE);
 		macroButtons.setLayout(new GridLayout(1, true));
@@ -313,9 +313,9 @@ public class MacrosPreferencePage extends PreferencePageUtils implements
 		
 		addedMacros.add(macro);
 		macros.add(macro);
-		macroTable.add(macro);
+		macroTableView.add(macro);
 		
-		macroTable.editElement(macro, 0);
+		macroTableView.editElement(macro, 0);
 	}
 	
 	protected ArrayList<Macro> removedMacros = new ArrayList<Macro>();
@@ -328,7 +328,7 @@ public class MacrosPreferencePage extends PreferencePageUtils implements
 			removedMacros.add(selectedMacro);
 		}
 		
-		macroTable.remove(selectedMacro);
+		macroTableView.remove(selectedMacro);
 	}
 	
 	
@@ -445,16 +445,18 @@ public class MacrosPreferencePage extends PreferencePageUtils implements
 		
 		addedMacros.add(macro);
 		macros.add(macro);
-		macroTable.add(macro);
+		macroTableView.add(macro);
 	}
 	
 	protected void clearMacros() {
 		// Clear out all exiting macros.
-		macroTable.getTable().clearAll();
+		Table macroTable = macroTableView.getTable();
+		if(macroTable != null)
+			macroTable.clearAll();
 		addedMacros.clear();
-		for (Macro x: macros) {
-			macroTable.remove(x);
-			removedMacros.add(x);
+		for (Macro currentMacro: macros) {
+			macroTableView.remove(currentMacro);
+			removedMacros.add(currentMacro);
 		}
 	}
 	
@@ -491,7 +493,7 @@ public class MacrosPreferencePage extends PreferencePageUtils implements
 		public CommandEditingSupport (TableViewer viewer) {
 			super(viewer);
 			
-			editor = new ContentAssistCellEditor(macroTable.getTable(), SWT.SINGLE, new char[] { '{', '$', '\\' }, this);
+			editor = new ContentAssistCellEditor(macroTableView.getTable(), SWT.SINGLE, new char[] { '{', '$', '\\' }, this);
 		}
 		
 		protected boolean canEdit(Object element) {
@@ -510,7 +512,7 @@ public class MacrosPreferencePage extends PreferencePageUtils implements
 			getCommandMacroHandler((IMacro)element).setCommand((String)value);
 			((Macro)element).setNeedsUpdate(true);
 			
-			macroTable.update(element, null);
+			macroTableView.update(element, null);
 		}
 		
 		protected class MacroCommandContentProposal implements IContentProposal
@@ -576,7 +578,7 @@ public class MacrosPreferencePage extends PreferencePageUtils implements
 		{
 			super(viewer);
 			
-			this.editor = new KeyStrokeCellEditor(macroTable.getTable(), SWT.SINGLE);
+			this.editor = new KeyStrokeCellEditor(macroTableView.getTable(), SWT.SINGLE);
 		}
 		
 		protected boolean canEdit(Object element) {
@@ -599,7 +601,7 @@ public class MacrosPreferencePage extends PreferencePageUtils implements
 			macro.setModifiers(stroke.getModifierKeys());
 			macro.setKeyCode(stroke.getNaturalKey());
 			
-			macroTable.update(macro, null);
+			macroTableView.update(macro, null);
 		}	
 	}
 
