@@ -18,11 +18,15 @@ public abstract class StyledSubTagHandler extends DefaultTagHandler {
 	protected WarlockString buffer;
 	private Stack<WarlockStringMarker> styleStack = new Stack<WarlockStringMarker>();
 	
+	private WarlockStringMarker boldMarker = null;
+	
 	public StyledSubTagHandler(IStormFrontProtocolHandler handler) {
 		super(handler);
 		
 		tagHandlers.put("b", new StyleBTagHandler());
 		tagHandlers.put("preset", new StylePresetTagHandler());
+		tagHandlers.put("pushBold", new StylePushBoldTagHandler());
+		tagHandlers.put("popBold", new StylePopBoldTagHandler());
 	}
 	
 	@Override
@@ -100,6 +104,38 @@ public abstract class StyledSubTagHandler extends DefaultTagHandler {
 		@Override
 		public boolean ignoreNewlines() {
 			return false;
+		}
+	}
+	
+	private class StylePushBoldTagHandler extends BaseTagHandler {
+
+		@Override
+		public String[] getTagNames() {
+			return new String[] { "pushBold" };
+		}
+		
+		@Override
+		public void handleStart(StormFrontAttributeList attributes, String rawXML) {
+			IWarlockStyle style = handler.getClient().getClientSettings().getNamedStyle("bold");
+			boldMarker = new WarlockStringMarker(style, buffer.length(), buffer.length());
+			addStyle(boldMarker);
+		}
+	}
+	
+	private class StylePopBoldTagHandler extends BaseTagHandler {
+
+		@Override
+		public String[] getTagNames() {
+			return new String[] { "popBold" };
+		}
+		
+		@Override
+		public void handleEnd(String rawXML) {
+			removeStyle(boldMarker);
+			boldMarker = null;
+			
+			// this will be off if we get nested b's.
+			handler.incrementMonsterCount();
 		}
 	}
 	
