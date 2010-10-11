@@ -63,6 +63,4 @@ public interface IStormFrontTagHandler {
 	 * @param characters
 	 */
 	public boolean handleCharacters(String characters);
-	
-	public boolean ignoreNewlines();
 }

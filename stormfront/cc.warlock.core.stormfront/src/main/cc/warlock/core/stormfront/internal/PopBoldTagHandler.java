@@ -39,9 +39,4 @@ public class PopBoldTagHandler extends DefaultTagHandler {
 	public void handleEnd(String rawXML) {
 		handler.stopBold();
 	}
-	
-	@Override
-	public boolean ignoreNewlines() {
-		return false;
-	}
 }

@@ -98,9 +98,4 @@ public class CompDefTagHandler extends DefaultTagHandler {
 		
 		handler.getClient().setComponent(id, buffer.toString(), handler.getCurrentStream());
 	}
-	
-	@Override
-	public boolean ignoreNewlines() {
-		return false;
-	}
 }

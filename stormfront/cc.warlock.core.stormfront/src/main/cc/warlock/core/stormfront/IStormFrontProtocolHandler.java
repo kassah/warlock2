@@ -27,11 +27,8 @@
  */
 package cc.warlock.core.stormfront;
 
-import java.util.Map;
-
 import cc.warlock.core.client.IStream;
 import cc.warlock.core.client.IWarlockStyle;
-import cc.warlock.core.client.WarlockString;
 import cc.warlock.core.stormfront.client.IStormFrontClient;
 import cc.warlock.core.stormfront.xml.IStormFrontXMLHandler;
 

@@ -96,11 +96,6 @@ public abstract class StyledSubTagHandler extends DefaultTagHandler {
 			// this will be off if we get nested b's.
 			handler.incrementMonsterCount();
 		}
-		
-		@Override
-		public boolean ignoreNewlines() {
-			return false;
-		}
 	}
 	
 	public class StylePresetTagHandler extends BaseTagHandler {
@@ -128,12 +123,6 @@ public abstract class StyledSubTagHandler extends DefaultTagHandler {
 			removeStyle(marker);
 			marker = null;
 		}
-		
-		@Override
-		public  boolean ignoreNewlines() {
-			return false;
-		}
-
 	}
 
 }

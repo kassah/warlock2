@@ -40,9 +40,4 @@ public class PushBoldTagHandler extends DefaultTagHandler {
 	public void handleEnd(String rawXML) {
 		handler.startBold();
 	}
-	
-	@Override
-	public boolean ignoreNewlines() {
-		return false;
-	}
 }

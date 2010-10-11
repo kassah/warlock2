@@ -70,9 +70,4 @@ public class StyleTagHandler extends DefaultTagHandler {
 			}
 		}
 	}
-	
-	@Override
-	public boolean ignoreNewlines() {
-		return false;
-	}
 }

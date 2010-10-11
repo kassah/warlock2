@@ -92,8 +92,4 @@ public class ATagHandler extends DefaultTagHandler {
 			style = null;
 		}
 	}
-	@Override
-	public boolean ignoreNewlines() {
-		return false;
-	}
 }

@@ -56,9 +56,4 @@ public class PushStreamTagHandler extends DefaultTagHandler {
 		
 		handler.pushStream(id);
 	}
-	
-	@Override
-	public boolean ignoreNewlines() {
-		return false;
-	}
 }

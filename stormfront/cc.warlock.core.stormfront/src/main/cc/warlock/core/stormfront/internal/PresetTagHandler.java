@@ -59,10 +59,4 @@ public class PresetTagHandler extends DefaultTagHandler {
 		IWarlockStyle style = styles.pop();
 		handler.removeStyle(style);
 	}
-	
-	@Override
-	public  boolean ignoreNewlines() {
-		return false;
-	}
-
 }

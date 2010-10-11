@@ -98,9 +98,4 @@ public class DTagHandler extends DefaultTagHandler {
 		}
 		
 	}
-	
-	@Override
-	public boolean ignoreNewlines() {
-		return false;
-	}
 }

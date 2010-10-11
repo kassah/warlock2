@@ -66,8 +66,4 @@ abstract public class BaseTagHandler implements IStormFrontTagHandler {
 		if(tagHandlers == null) return null;
 		return tagHandlers.get(tagName);
 	}
-	
-	public boolean ignoreNewlines() {
-		return true;
-	}
 }
