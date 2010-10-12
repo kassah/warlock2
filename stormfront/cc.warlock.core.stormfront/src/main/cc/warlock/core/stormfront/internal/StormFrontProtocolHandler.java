@@ -231,9 +231,6 @@ public class StormFrontProtocolHandler implements IStormFrontProtocolHandler {
 	 * @see org.xml.sax.ContentHandler#endElement(java.lang.String, java.lang.String, java.lang.String)
 	 */
 	public void endElement(String name, String rawXML) {
-		
-		lineHasTag = true;
-		
 		// Get the tag name off the stack
 		if(tagStack.size() == 0 || !name.equals(tagStack.peek())) {
 			System.err.println("Unexpected close tag \"" + name + "\". Probably an unsupported tag.");
@@ -251,14 +248,14 @@ public class StormFrontProtocolHandler implements IStormFrontProtocolHandler {
 			if (rawXML != null)
 				characters(rawXML);
 		} */
+		
+		lineHasTag = true;
 	}
 	
 	/* (non-Javadoc)
 	 * @see org.xml.sax.ContentHandler#startElement(java.lang.String, java.lang.String, java.lang.String, org.xml.sax.Attributes)
 	 */
 	public void startElement(String name, StormFrontAttributeList attributes, String rawXML) {
-		
-		lineHasTag = true;
 		
 		// call the method for the object
 		IStormFrontTagHandler tagHandler = getTagHandlerForElement(name, null, 0);
@@ -272,6 +269,8 @@ public class StormFrontProtocolHandler implements IStormFrontProtocolHandler {
 			if(rawXML != null)
 				characters(rawXML);
 		}*/
+		
+		lineHasTag = true;
 	}
 	
 	private IStormFrontTagHandler getTagHandlerForElement(String name,
