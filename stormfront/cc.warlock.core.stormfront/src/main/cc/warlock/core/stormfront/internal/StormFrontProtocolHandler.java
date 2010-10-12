@@ -60,7 +60,7 @@ public class StormFrontProtocolHandler implements IStormFrontProtocolHandler {
 	protected int monsterCount = 0;
 	protected IWarlockStyle boldStyle = null;
 	private boolean lineHasTag = false;
-	private boolean lineHasCharacters = false;
+	private boolean lineHasContent = false;
 	
  	public StormFrontProtocolHandler(IStormFrontClient client) {
 		
@@ -148,7 +148,7 @@ public class StormFrontProtocolHandler implements IStormFrontProtocolHandler {
 				}
 			}
 			streamStack.push(stream);
-			lineHasCharacters = false;
+			lineHasContent = false;
 		}
 	}
 	
@@ -160,13 +160,13 @@ public class StormFrontProtocolHandler implements IStormFrontProtocolHandler {
 		clearStyles();
 		if (streamStack.size() > 0)
 			streamStack.pop();
-		lineHasCharacters = false;
+		lineHasContent = false;
 	}
 	
 	public void clearStreams() {
 		clearStyles();
 		streamStack.clear();
-		lineHasCharacters = false;
+		lineHasContent = false;
 	}
 
 	public IStream getCurrentStream ()
@@ -188,7 +188,7 @@ public class StormFrontProtocolHandler implements IStormFrontProtocolHandler {
 			if(styleStack.isEmpty()) {
 				String str = characters;
 				// Suppress newlines following tags when the line is empty
-				if(lineHasTag && !lineHasCharacters) {
+				if(lineHasTag && !lineHasContent) {
 					if(str.startsWith("\n"))
 						str = str.substring(1);
 					else if(str.startsWith("\r\n"))
@@ -207,7 +207,7 @@ public class StormFrontProtocolHandler implements IStormFrontProtocolHandler {
 				lineHasTag = false;
 			
 			// I don't think we need to handle line endings with \n\r or \r
-			lineHasCharacters = !characters.endsWith("\n");
+			lineHasContent = !characters.endsWith("\n");
 		}
 	}
 	
@@ -315,6 +315,8 @@ public class StormFrontProtocolHandler implements IStormFrontProtocolHandler {
 		}
 		
 		styleStack.push(marker);
+		
+		lineHasContent = true;
 	}
 	
 	public void removeStyle(IWarlockStyle style) {
