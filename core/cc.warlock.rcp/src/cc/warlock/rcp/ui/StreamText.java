@@ -123,6 +123,7 @@ public class StreamText extends WarlockText implements IStreamListener {
 			append(new WarlockString(prompt));
 		
 		append(string);
+		isPrompting = false;
 	}
 
 	public void streamReceivedText(IStream stream, WarlockString text) {
