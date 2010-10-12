@@ -59,6 +59,8 @@ public class StormFrontProtocolHandler implements IStormFrontProtocolHandler {
 	protected int currentSpacing = 0;
 	protected int monsterCount = 0;
 	protected IWarlockStyle boldStyle = null;
+	private boolean lineHasTag = false;
+	private boolean lineHasCharacters = false;
 	
  	public StormFrontProtocolHandler(IStormFrontClient client) {
 		
@@ -181,11 +183,28 @@ public class StormFrontProtocolHandler implements IStormFrontProtocolHandler {
 		// take a default action
 		if(!handleCharacters(characters)) {
 			if(styleStack.isEmpty()) {
-				IStream stream = getCurrentStream();
-				stream.put(new WarlockString(characters));
+				String str = characters;
+				// Suppress newlines following tags when the line is empty
+				if(lineHasTag && !lineHasCharacters) {
+					if(str.startsWith("\n"))
+						str = str.substring(1);
+					else if(str.startsWith("\r\n"))
+						str = str.substring(2);
+				}
+				
+				if(str.length() > 0) {
+					IStream stream = getCurrentStream();
+					stream.put(new WarlockString(str));
+				}
 			} else {
 				buffer.append(characters);
 			}
+			
+			if(characters.contains("\n"))
+				lineHasTag = false;
+			
+			// I don't think we need to handle line endings with \n\r or \r
+			lineHasCharacters = !characters.endsWith("\n");
 		}
 	}
 	
@@ -209,6 +228,9 @@ public class StormFrontProtocolHandler implements IStormFrontProtocolHandler {
 	 * @see org.xml.sax.ContentHandler#endElement(java.lang.String, java.lang.String, java.lang.String)
 	 */
 	public void endElement(String name, String rawXML) {
+		
+		lineHasTag = true;
+		
 		// Get the tag name off the stack
 		if(tagStack.size() == 0 || !name.equals(tagStack.peek())) {
 			System.err.println("Unexpected close tag \"" + name + "\". Probably an unsupported tag.");
@@ -232,6 +254,8 @@ public class StormFrontProtocolHandler implements IStormFrontProtocolHandler {
 	 * @see org.xml.sax.ContentHandler#startElement(java.lang.String, java.lang.String, java.lang.String, org.xml.sax.Attributes)
 	 */
 	public void startElement(String name, StormFrontAttributeList attributes, String rawXML) {
+		
+		lineHasTag = true;
 		
 		// call the method for the object
 		IStormFrontTagHandler tagHandler = getTagHandlerForElement(name, null, 0);
