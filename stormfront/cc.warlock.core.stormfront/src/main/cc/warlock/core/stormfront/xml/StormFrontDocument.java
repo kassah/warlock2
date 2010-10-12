@@ -24,6 +24,7 @@ package cc.warlock.core.stormfront.xml;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.Writer;
+import java.util.EmptyStackException;
 import java.util.Stack;
 
 import cc.warlock.core.stormfront.internal.ParseException;
@@ -74,9 +75,13 @@ public class StormFrontDocument implements IStormFrontXMLHandler {
 	}
 	
 	public void characters(String characters) {
-		StormFrontElement element = elementStack.peek();
+		try {
+			StormFrontElement element = elementStack.peek();
 		
-		element.appendText(characters);
+			element.appendText(characters);
+		} catch (EmptyStackException e) {
+			e.printStackTrace();
+		}
 	}
 	
 	public void endElement(String name, String rawXML) {
