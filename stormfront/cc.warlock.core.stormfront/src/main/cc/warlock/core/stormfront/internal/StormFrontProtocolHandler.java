@@ -27,9 +27,7 @@
  */
 package cc.warlock.core.stormfront.internal;
 
-import java.util.EmptyStackException;
 import java.util.HashMap;
-import java.util.Iterator;
 import java.util.Stack;
 
 import cc.warlock.core.client.IStream;
@@ -52,7 +50,7 @@ public class StormFrontProtocolHandler implements IStormFrontProtocolHandler {
 	
 	protected IStormFrontClient client;
 	protected HashMap<String, IStormFrontTagHandler> defaultTagHandlers = new HashMap<String, IStormFrontTagHandler>();
-	protected Stack<IStream> streamStack = new Stack<IStream>();
+	protected TextDest textDest = null;
 	protected Stack<String> tagStack = new Stack<String>();
 	protected Stack<WarlockStringMarker> styleStack = new Stack<WarlockStringMarker>();
 	private WarlockString buffer = null;
@@ -61,6 +59,47 @@ public class StormFrontProtocolHandler implements IStormFrontProtocolHandler {
 	protected IWarlockStyle boldStyle = null;
 	private boolean lineHasTag = false;
 	private boolean lineHasContent = false;
+	
+	protected interface TextDest {
+		public void put(WarlockString text);
+		public void flush();
+	}
+	
+	protected class StreamTextDest implements TextDest {
+		private IStream stream;
+		
+		public StreamTextDest(IStream stream) {
+			this.stream = stream;
+		}
+		
+		public void put(WarlockString text) {
+			stream.put(text);
+		}
+		
+		public IStream getStream() {
+			return stream;
+		}
+		
+		public void flush() { }
+	}
+	
+	protected class ComponentTextDest implements TextDest {
+		private WarlockString buffer = new WarlockString();
+		private String id;
+		
+		public ComponentTextDest(String id) {
+			this.id = id;
+		}
+		
+		public void put(WarlockString text) {
+			buffer.append(text);
+		}
+		
+		public void flush() {
+			client.updateComponent(id, buffer);
+			buffer = null;
+		}
+	}
 	
  	public StormFrontProtocolHandler(IStormFrontClient client) {
 		
@@ -112,7 +151,7 @@ public class StormFrontProtocolHandler implements IStormFrontProtocolHandler {
 		new BTagHandler(this);
 		new DTagHandler(this);
 		
-		new StubTagHandler(this); // handles knows tags that don't have an implementation.
+		new StubTagHandler(this); // handles known tags that don't have an implementation.
 	}
 	
 	/*
@@ -135,47 +174,35 @@ public class StormFrontProtocolHandler implements IStormFrontProtocolHandler {
 	/*
 	 *  push a stream onto the stack
 	 */
-	public void pushStream(String streamId) {
-		clearStyles();
+	public void setDestStream(String streamId) {
+		clearDest();
 		IStream stream = client.getStream(streamId);
-		if(stream != null) {
-			// remove the stream if we already have the same one on the stack
-			for(Iterator<IStream> iter = streamStack.iterator(); iter.hasNext(); ) {
-				IStream curStream = iter.next();
-				if(curStream.equals(stream)) {
-					iter.remove();
-					break;
-				}
-			}
-			streamStack.push(stream);
-			lineHasContent = false;
-		}
-	}
-	
-	/*
-	 * pop a stream from the stack
-	 */
-	public void popStream()
-	throws EmptyStackException {
-		clearStyles();
-		if (streamStack.size() > 0)
-			streamStack.pop();
+		if(stream != null)
+			textDest = new StreamTextDest(stream);
 		lineHasContent = false;
 	}
 	
-	public void clearStreams() {
+	public void setDestComponent(String id) {
+		clearDest();
+		textDest = new ComponentTextDest(id);
+		lineHasContent = false;
+	}
+	
+	public void clearDest() {
 		clearStyles();
-		streamStack.clear();
+		if(textDest != null) {
+			textDest.flush();
+			textDest = null;
+		}
 		lineHasContent = false;
 	}
 
 	public IStream getCurrentStream ()
 	{
-		try {
-			return streamStack.peek();
-		} catch(EmptyStackException e) {
+		if(textDest == null || !(textDest instanceof StreamTextDest))
 			return client.getDefaultStream();
-		}
+		else
+			return ((StreamTextDest)textDest).getStream();
 	}
 	
 	/* (non-Javadoc)
@@ -196,8 +223,11 @@ public class StormFrontProtocolHandler implements IStormFrontProtocolHandler {
 				}
 				
 				if(str.length() > 0) {
-					IStream stream = getCurrentStream();
-					stream.put(new WarlockString(str));
+					WarlockString text = new WarlockString(str);
+					if(textDest != null)
+						textDest.put(text);
+					else
+						client.getDefaultStream().put(text);
 				}
 			} else {
 				buffer.append(characters);
@@ -335,8 +365,10 @@ public class StormFrontProtocolHandler implements IStormFrontProtocolHandler {
 		if(buffer == null)
 			return;
 		
-		IStream stream = getCurrentStream();
-		stream.put(buffer);
+		if(textDest != null)
+			textDest.put(buffer);
+		else
+			client.getDefaultStream().put(buffer);
 		buffer = null;
 	}
 	

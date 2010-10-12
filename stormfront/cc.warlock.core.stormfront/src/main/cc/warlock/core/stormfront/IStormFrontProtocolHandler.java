@@ -43,14 +43,14 @@ public interface IStormFrontProtocolHandler extends IStormFrontXMLHandler {
 	public void registerHandler(IStormFrontTagHandler tagHandler);
 	
 	public IStormFrontClient getClient();
-	public void pushStream(String name);
-	public void popStream();
+	public void setDestStream(String name);
+	public void setDestComponent(String id);
 	public IStream getCurrentStream();
 	
 	public void addStyle(IWarlockStyle style);
 	public void removeStyle(IWarlockStyle style);
 	public void clearStyles();
-	public void clearStreams();
+	public void clearDest();
 	public void startBold();
 	public void stopBold();
 	

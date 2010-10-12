@@ -45,7 +45,7 @@ public class StreamTagHandler extends DefaultTagHandler {
 		 {
 			String streamId = id;
 			
-			handler.pushStream(streamId);
+			handler.setDestStream(streamId);
 		 }
 	}
 	 
@@ -54,6 +54,6 @@ public class StreamTagHandler extends DefaultTagHandler {
 		 // TODO flush the buffer here manually
 		 // force append a new-line.. most of the use of <stream>xxx</stream> doesn't have newlines, so the buffer won't flush
 		 handler.characters("\n");
-		 handler.popStream();
+		 handler.clearDest();
 	}
 }

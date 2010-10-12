@@ -41,6 +41,6 @@ public class PopStreamTagHandler extends DefaultTagHandler {
 	
 	@Override
 	public void handleStart(StormFrontAttributeList attributes, String rawXML) {
-		handler.popStream();
+		handler.clearDest();
 	}
 }

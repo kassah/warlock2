@@ -21,13 +21,11 @@
  */
 package cc.warlock.core.stormfront.internal;
 
-import cc.warlock.core.client.WarlockString;
 import cc.warlock.core.stormfront.IStormFrontProtocolHandler;
-import cc.warlock.core.stormfront.client.IStormFrontClient;
 import cc.warlock.core.stormfront.xml.StormFrontAttributeList;
 
 
-public class ComponentTagHandler extends StyledSubTagHandler {
+public class ComponentTagHandler extends DefaultTagHandler {
 
 	private String id;
 	
@@ -42,31 +40,23 @@ public class ComponentTagHandler extends StyledSubTagHandler {
 	
 	@Override
 	public void handleStart(StormFrontAttributeList attributes, String rawXML) {
-		super.handleStart(attributes, rawXML);
-		
 		id = attributes.getValue("id");
 		
-		if(id != null && id.equals("room objs"))
+		if(id == null)
+			return;
+		
+		if(id.equals("room objs"))
 			handler.resetMonsterCount();
+		
+		handler.setDestComponent(id);
 	}
 	
 	@Override
 	public void handleEnd(String rawXML) {
-		super.handleEnd(rawXML);
-		
-		WarlockString text = buffer;
-		buffer = null;
-		
 		if (id == null)
 			return;
 		
-		IStormFrontClient client = handler.getClient();
-		client.updateComponent(id, text);
-		
-		if(id.equals("room objs")) {
-			int count = handler.getMonsterCount();
-			client.getMonsterCount().set(count);
-		}
+		handler.clearDest();
 	}
 
 }
