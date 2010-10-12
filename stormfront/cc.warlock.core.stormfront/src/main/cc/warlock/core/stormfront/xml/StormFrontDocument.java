@@ -75,12 +75,11 @@ public class StormFrontDocument implements IStormFrontXMLHandler {
 	}
 	
 	public void characters(String characters) {
-		try {
+		// Check if there is an element to apply this to, 
+		//   if not it's probably outside the root element so we ignore it.
+		if (!elementStack.isEmpty()) {
 			StormFrontElement element = elementStack.peek();
-		
 			element.appendText(characters);
-		} catch (EmptyStackException e) {
-			e.printStackTrace();
 		}
 	}
 	
