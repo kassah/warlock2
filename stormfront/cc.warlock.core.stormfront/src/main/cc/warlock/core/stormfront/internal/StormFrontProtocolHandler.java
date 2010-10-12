@@ -148,6 +148,7 @@ public class StormFrontProtocolHandler implements IStormFrontProtocolHandler {
 				}
 			}
 			streamStack.push(stream);
+			lineHasCharacters = false;
 		}
 	}
 	
@@ -159,11 +160,13 @@ public class StormFrontProtocolHandler implements IStormFrontProtocolHandler {
 		clearStyles();
 		if (streamStack.size() > 0)
 			streamStack.pop();
+		lineHasCharacters = false;
 	}
 	
 	public void clearStreams() {
 		clearStyles();
 		streamStack.clear();
+		lineHasCharacters = false;
 	}
 
 	public IStream getCurrentStream ()
