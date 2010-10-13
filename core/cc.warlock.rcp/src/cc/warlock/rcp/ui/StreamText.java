@@ -152,11 +152,9 @@ public class StreamText extends WarlockText implements IStreamListener {
 		if (this.client == client) {
 			return;
 		}
-		// Removed this to make reconnection possible.. not sure what it did so leaving it here.
-		// if(this.client != null) {
-		//	assert (this.client == client);
-		//	return;
-		// }
+		
+		if(this.client != null)
+			this.client.removeStreamListener(streamName, listener);
 		
 		this.client = client;
 		
