@@ -62,9 +62,9 @@ public class StormFrontClientSettings extends ClientSettings implements
 	protected CommandLineConfigurationProvider commandLineProvider;
 	protected IStormFrontClient sfClient;
 	
-	public StormFrontClientSettings (IStormFrontClient client, String fileName)
+	public StormFrontClientSettings (IStormFrontClient client)
 	{
-		super(client, fileName);
+		super(client);
 		this.sfClient = client;
 		
 		commandLineProvider = new CommandLineConfigurationProvider();

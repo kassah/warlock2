@@ -397,7 +397,7 @@ public class StormFrontClient extends WarlockClient implements IStormFrontClient
 	public void setPlayerId(String playerId) {
 		this.playerId = playerId;
 		
-		clientSettings = new StormFrontClientSettings(this, getClientId());
+		clientSettings = new StormFrontClientSettings(this);
 		skin = new DefaultSkin(clientSettings);
 		skin.loadDefaultStyles(clientSettings.getHighlightConfigurationProvider());
 		

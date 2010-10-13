@@ -71,7 +71,7 @@ public class ClientSettings extends TreeConfigurationProvider implements IClient
 	protected MacroConfigurationProvider macroConfigurationProvider;
 	protected WindowSettingsConfigurationProvider windowSettingsProvider;
 	
-	public ClientSettings (IWarlockClient client, String clientId) {
+	public ClientSettings (IWarlockClient client) {
 		super("client-settings");
 		this.client = client;
 		
