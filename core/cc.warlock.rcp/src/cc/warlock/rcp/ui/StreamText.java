@@ -147,10 +147,16 @@ public class StreamText extends WarlockText implements IStreamListener {
 	}
 
 	public void setClient(IWarlockClient client) {
-		if(this.client != null) {
-			assert (this.client == client);
+		
+		// No sense in updating the client if we're already using it.
+		if (this.client == client) {
 			return;
 		}
+		// Removed this to make reconnection possible.. not sure what it did so leaving it here.
+		// if(this.client != null) {
+		//	assert (this.client == client);
+		//	return;
+		// }
 		
 		this.client = client;
 		
