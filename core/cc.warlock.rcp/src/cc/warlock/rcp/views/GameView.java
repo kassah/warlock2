@@ -360,14 +360,9 @@ public abstract class GameView extends WarlockView implements IWarlockClientView
 	
 	@Override
 	public void dispose() {
-		if (client != null && client.getConnection() != null && client.getConnection().isConnected())
-		{
-			try {
-				client.getConnection().disconnect();
-			} catch (IOException e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
-			}
+		if (client != null) {
+			// All done with client, dispose of it so it can do whatever it needs to to be done.
+			client.dispose();
 		}
 		openViews.remove(this);
 		if (gameInFocus == this) {
@@ -401,6 +396,10 @@ public abstract class GameView extends WarlockView implements IWarlockClientView
 	}
 	
 	public void setClient(IWarlockClient client) {
+		if (this.client != null) {
+			// All done with client, dispose of it so it can do whatever it needs to to be done.
+			this.client.dispose();
+		}
 		this.client = client;
 		client.setViewer(wrapper);
 		

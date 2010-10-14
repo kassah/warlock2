@@ -129,6 +129,15 @@ public class StormFrontClient extends WarlockClient implements IStormFrontClient
 	}
 	
 	@Override
+	public void dispose() {
+		if (clientSettings != null) {
+			// Shut down settings.
+			clientSettings.dispose();
+		}
+		super.dispose();
+	}
+	
+	@Override
 	public void send(ICommand command) {
 		String scriptPrefix = ScriptConfiguration.instance().getScriptPrefix();
 		

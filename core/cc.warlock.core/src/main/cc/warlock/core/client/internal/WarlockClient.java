@@ -40,6 +40,7 @@ import cc.warlock.core.client.IRoomListener;
 import cc.warlock.core.client.IStream;
 import cc.warlock.core.client.IStreamListener;
 import cc.warlock.core.client.IWarlockClient;
+import cc.warlock.core.client.IWarlockClientListener;
 import cc.warlock.core.client.IWarlockClientViewer;
 import cc.warlock.core.client.WarlockClientRegistry;
 import cc.warlock.core.client.logging.IClientLogger;
@@ -57,6 +58,7 @@ public abstract class WarlockClient implements IWarlockClient {
 
 	protected IConnection connection;
 	protected IWarlockClientViewer viewer;
+	protected IWarlockClientListener listener;
 	protected ICommandHistory commandHistory = new CommandHistory();
 	protected String streamPrefix;
 	private Collection<IRoomListener> roomListeners = Collections.synchronizedCollection(new ArrayList<IRoomListener>());
@@ -72,8 +74,7 @@ public abstract class WarlockClient implements IWarlockClient {
 		{
 			logger = new SimpleLogger(this);
 		}
-		
-		WarlockClientRegistry.addWarlockClientListener(new WarlockClientListener() {
+		listener = new WarlockClientListener() {
 			@Override
 			public void clientDisconnected(IWarlockClient client) {
 				if (client == WarlockClient.this && logger != null) {
@@ -92,7 +93,25 @@ public abstract class WarlockClient implements IWarlockClient {
 
 			@Override
 			public void clientSettingsLoaded(IWarlockClient client) {}
-		});
+		};
+		WarlockClientRegistry.addWarlockClientListener(listener);
+	}
+	
+	public void dispose() {
+		// Disconnect if we havn't already.
+		if (this.getConnection() != null && this.getConnection().isConnected())
+		{
+			try {
+				this.getConnection().disconnect();
+			} catch (IOException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
+		}
+		// Flush Logger
+		logger.flush();
+		// Remove ourselves from the list of active clients.
+		WarlockClientRegistry.removeWarlockClientListener(listener);
 	}
 	
 	// IWarlockClient methods

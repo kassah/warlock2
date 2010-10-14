@@ -166,4 +166,6 @@ public interface IWarlockClient extends IRoomListener {
 	public void setVariable(String id, String value);
 	
 	public void removeVariable(String id);
+	
+	public void dispose();
 }

@@ -103,7 +103,13 @@ public class WarlockConfiguration {
 			e.printStackTrace();
 		}
 	}
-	
+	/**
+	 * Add Configuration Provider
+	 * 
+	 * This adds the configuration provider and looks up the unhandled elements to see if any match it.
+	 * 
+	 * @param provider
+	 */
 	public void addConfigurationProvider (IConfigurationProvider provider)
 	{
 		if (!providers.contains(provider))
@@ -123,7 +129,43 @@ public class WarlockConfiguration {
 		}
 	}
 	
-	public void removeConfigurationProvider (IConfigurationProvider provider)
+	/**
+	 * Remove Configuration Provider
+	 * 
+	 * This removes a configuration provider and grabs the element set, and adds it to the unhandled set.
+	 * 
+	 * @param provider
+	 */
+	public void removeConfigurationProvider (IConfigurationProvider provider) {
+		if (providers.remove(provider)) {
+			if (elementProviders.containsValue(provider)) {
+				// Grab elements and put them into unhandled (so they get saved)
+				List<Element> elements = provider.getTopLevelElements();
+				for (Element element : elements)
+				{
+					unhandledElements.add(element);
+				}
+				
+				// Remove Provider from our list of providers.
+				for (Iterator<Map.Entry<Element,IConfigurationProvider>> iter = elementProviders.entrySet().iterator();
+							iter.hasNext(); ) {
+					Map.Entry<Element, IConfigurationProvider> entry = iter.next();
+					
+					if (entry.getValue().equals(provider))
+						iter.remove();
+				}
+			}
+		}
+	}
+	
+	/**
+	 * Delete Configuration Provider and Associated Elements
+	 * 
+	 * This removes the element associated with with the provider as well as removing the listener on it.
+	 * 
+	 * @param provider
+	 */
+	public void deleteConfigurationProvider (IConfigurationProvider provider)
 	{
 		if (providers.remove(provider)) {
 			if (elementProviders.containsValue(provider)) {

@@ -66,4 +66,6 @@ public interface IClientSettings {
 	public IMacroCommand getMacroCommand(String id);
 
 	public IWindowSettings getMainWindowSettings();
+
+	void dispose();
 }

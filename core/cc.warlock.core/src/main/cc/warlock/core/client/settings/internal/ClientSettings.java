@@ -102,6 +102,12 @@ public class ClientSettings extends TreeConfigurationProvider implements IClient
 	}
 	
 	@Override
+	public void dispose() {
+		// We're no longer needed, let's get out of the Configuration Provider Business so someone else can get in.
+		WarlockConfiguration.getWarlockConfiguration("clientSettings.xml").removeConfigurationProvider(this);
+	}
+	
+	@Override
 	public boolean supportsElement(Element element) {
 		if (element.getName().equals("client-settings")
 				&& client.getClientId() != null)
