@@ -160,6 +160,7 @@ public class StormFrontGameView extends GameView implements IStormFrontClientVie
 	protected void setReconnectProfile (final Profile profile)
 	{
 		String characterName = profile.getName();
+		final GameView gView = this;
 		reconnectLabel.setText("The character \"" + characterName + "\" is currently disconnected.");
 		reconnectLabel.setBackground(reconnectPopup.getBackground());
 
@@ -170,6 +171,7 @@ public class StormFrontGameView extends GameView implements IStormFrontClientVie
 		currentListener = new SelectionAdapter () {
 			public void widgetSelected(SelectionEvent e) {
 				ProfileConnectAction action = new ProfileConnectAction(profile);
+				action.setGameView(gView);
 				action.run();
 				hidePopup(reconnectPopup);
 //				reconnectPopup.setVisible(false);
@@ -203,6 +205,7 @@ public class StormFrontGameView extends GameView implements IStormFrontClientVie
 	
 	protected Menu createProfileMenu (final Button connections)
 	{
+		final GameView gView = this;
 		Menu menu = new Menu(connections);
 		menu.addMenuListener(new MenuAdapter() {
 			public void menuShown(MenuEvent e) {
@@ -222,6 +225,7 @@ public class StormFrontGameView extends GameView implements IStormFrontClientVie
 				public void widgetSelected(SelectionEvent e) {
 					ProfileConnectAction action = new ProfileConnectAction(profile);
 					action.run();
+					action.setGameView(gView);
 					hidePopup(reconnectPopup);
 //					reconnectPopup.setVisible(false);
 				}
