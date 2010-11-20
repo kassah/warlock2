@@ -29,7 +29,7 @@ package cc.warlock.core.script;
 
 import java.util.Collection;
 
-import cc.warlock.core.client.IWarlockClient;
+import cc.warlock.core.client.IWarlockClientViewer;
 
 /**
  * @author Marshall
@@ -47,7 +47,7 @@ public interface IScriptEngine {
 	 * @param client the client to start the script on
 	 * @param argumetns The arguments passed to the script
 	 */
-	public IScript startScript(IScriptInfo info, IWarlockClient client, String[] arguments);
+	public IScript startScript(IScriptInfo info, IWarlockClientViewer viewer, String[] arguments);
 	
 	public boolean supports (IScriptInfo scriptInfo);
 	

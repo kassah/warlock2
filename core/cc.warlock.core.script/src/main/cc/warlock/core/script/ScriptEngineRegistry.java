@@ -25,6 +25,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import cc.warlock.core.client.IWarlockClient;
+import cc.warlock.core.client.IWarlockClientViewer;
 import cc.warlock.core.script.internal.FilesystemScriptProvider;
 
 
@@ -89,21 +90,21 @@ public class ScriptEngineRegistry {
 		return null;
 	}
 	
-	public static IScript startScript (String scriptName, IWarlockClient client, String[] arguments)
+	public static IScript startScript (String scriptName, IWarlockClientViewer viewer, String[] arguments)
 	{
 		for (IScriptProvider provider : providers)
 		{
 			for (IScriptInfo scriptInfo : provider.getScriptInfos())
 			{
 				if (scriptInfo.getScriptName().equalsIgnoreCase(scriptName)) {
-					IScript script = provider.startScript(scriptInfo, client, arguments);
+					IScript script = provider.startScript(scriptInfo, viewer, arguments);
 					if(script != null)
 						return script;
 				}
 			}
 		}
 		
-		client.getDefaultStream().echo("Could not find script \"" + scriptName + "\"\n");
+		viewer.getWarlockClient().getDefaultStream().echo("Could not find script \"" + scriptName + "\"\n");
 		return null;
 	}
 	
@@ -116,13 +117,13 @@ public class ScriptEngineRegistry {
 		return scripts;
 	}
 	
-	public static List<IScript> getRunningScripts (IWarlockClient client) {
+	public static List<IScript> getRunningScripts (IWarlockClientViewer viewer) {
 		ArrayList<IScript> scripts = new ArrayList<IScript>();
 		for (IScriptEngine engine : engines)
 		{
 			// Append only if script is apart of the client
 			for (IScript script: engine.getRunningScripts()) {
-				if (script.getClient() == client) {
+				if (script.getViewer() == viewer) {
 					scripts.add(script);
 				}
 			}

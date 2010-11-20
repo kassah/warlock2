@@ -41,7 +41,7 @@ import org.mozilla.javascript.ScriptableObject;
 import org.mozilla.javascript.WrapFactory;
 import org.mozilla.javascript.WrappedException;
 
-import cc.warlock.core.client.IWarlockClient;
+import cc.warlock.core.client.IWarlockClientViewer;
 import cc.warlock.core.script.IScript;
 import cc.warlock.core.script.IScriptCommands;
 import cc.warlock.core.script.IScriptEngine;
@@ -147,11 +147,11 @@ public class JavascriptEngine implements IScriptEngine {
 	protected static String includeFunctionName = "<warlock js:include>";
 	
 
-	public IScript startScript(IScriptInfo info, final IWarlockClient client, final String[] arguments) {
+	public IScript startScript(IScriptInfo info, final IWarlockClientViewer viewer, final String[] arguments) {
 		// FIXME need to somehow get dependent IScriptCommands to pass into the following constructor
 		
-		IScriptCommands commands = ScriptCommandsFactory.getFactory().createScriptCommands(client, info.getScriptName());
-		final JavascriptScript script = new JavascriptScript(this, info, client, commands);
+		IScriptCommands commands = ScriptCommandsFactory.getFactory().createScriptCommands(viewer, info.getScriptName());
+		final JavascriptScript script = new JavascriptScript(this, info, viewer, commands);
 		
 		script.start();
 		runningScripts.add(script);
@@ -185,19 +185,19 @@ public class JavascriptEngine implements IScriptEngine {
 					if (!(e.getCause() instanceof Error))
 					{
 						e.printStackTrace();
-						client.getDefaultStream().echo("[JS " + e.details() + "  Script: " + script.getName() + "  Line: " + e.lineNumber() + "]\n");
+						viewer.getWarlockClient().getDefaultStream().echo("[JS " + e.details() + "  Script: " + script.getName() + "  Line: " + e.lineNumber() + "]\n");
 					}
 				}
 				catch (RhinoException e) {
 					e.printStackTrace();
-					client.getDefaultStream().echo("[JS " + e.details() + "  Script: " + script.getName() + "  Line: " + e.lineNumber() + "]\n");
+					viewer.getWarlockClient().getDefaultStream().echo("[JS " + e.details() + "  Script: " + script.getName() + "  Line: " + e.lineNumber() + "]\n");
 				}
 				catch(StopException e) {
 					// normal exit, do nothing
 				}
 				catch (Exception e) {
 					e.printStackTrace();
-					client.getDefaultStream().echo("[unhandled exception in script: " + script.getName() + "]\n");
+					viewer.getWarlockClient().getDefaultStream().echo("[unhandled exception in script: " + script.getName() + "]\n");
 				}
 				finally {
 					script.getCommands().removeThread(Thread.currentThread());

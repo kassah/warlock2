@@ -31,7 +31,7 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Set;
 
-import cc.warlock.core.client.IWarlockClient;
+import cc.warlock.core.client.IWarlockClientViewer;
 import cc.warlock.core.configuration.WarlockConfiguration;
 import cc.warlock.core.script.IFilesystemScriptProvider;
 import cc.warlock.core.script.IScript;
@@ -146,12 +146,12 @@ public class FilesystemScriptProvider implements IFilesystemScriptProvider, Runn
 		return null;
 	}
 
-	public IScript startScript(IScriptInfo scriptInfo, IWarlockClient client, String[] arguments) {
+	public IScript startScript(IScriptInfo scriptInfo, IWarlockClientViewer viewer, String[] arguments) {
 		for (IScriptEngine engine : ScriptEngineRegistry.getScriptEngines())
 		{
 			if (engine.supports(scriptInfo))
 			{
-				return engine.startScript(scriptInfo, client, arguments);
+				return engine.startScript(scriptInfo, viewer, arguments);
 			}
 		}
 		return null;

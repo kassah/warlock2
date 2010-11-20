@@ -161,7 +161,7 @@ public class StormFrontClient extends WarlockClient implements IStormFrontClient
 			arguments = CommandLineTokenizer.tokenize(args);
 		}
 		
-		IScript script = ScriptEngineRegistry.startScript(scriptName, this, arguments);
+		IScript script = ScriptEngineRegistry.startScript(scriptName, viewer, arguments);
 		if (script != null)
 		{
 			script.addScriptListener(this);

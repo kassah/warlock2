@@ -420,7 +420,7 @@ public class WSLScriptCommands {
 	protected class WSLCommandRun implements IWSLCommandDefinition {
 
 		public void execute(WSLScript script, String arguments) throws InterruptedException {
-			script.sfClient.runScript(arguments);
+			script.getSFClient().runScript(arguments);
 		}
 	}
 
@@ -505,7 +505,7 @@ public class WSLScriptCommands {
 				if(vital == null)
 					vital = var;
 
-				script.setGlobalVariable(var, script.sfClient.getVital(vital));
+				script.setGlobalVariable(var, script.getSFClient().getVital(vital));
 			} else {
 				script.scriptError("Invalid arguments to random");
 			}
@@ -524,7 +524,7 @@ public class WSLScriptCommands {
 				if(streamName == null)
 					streamName = var;
 
-				IStream stream = script.sfClient.getStream(streamName);
+				IStream stream = script.getSFClient().getStream(streamName);
 				if(stream == null)
 					script.scriptWarning("Stream \"" + streamName + "\" does not exist.");
 				else
@@ -566,7 +566,7 @@ public class WSLScriptCommands {
 				
 				boolean status = false;
 				for(Map.Entry<StatusType, Boolean> statusEntry
-						: script.sfClient.getCharacterStatus().getStatus().entrySet()) {
+						: script.getSFClient().getCharacterStatus().getStatus().entrySet()) {
 					if(statusEntry.getKey().name().equalsIgnoreCase(statusName)) {
 						status = statusEntry.getValue();
 						break;
@@ -591,7 +591,7 @@ public class WSLScriptCommands {
 				if(componentName == null)
 					componentName = var;
 
-				IProperty<String> component = script.sfClient.getComponent(componentName);
+				IProperty<String> component = script.getSFClient().getComponent(componentName);
 				if(component != null)
 					script.setGlobalVariable(var, component.get());
 				else

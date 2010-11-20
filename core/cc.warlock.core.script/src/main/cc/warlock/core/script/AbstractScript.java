@@ -25,6 +25,7 @@ import java.io.Reader;
 import java.util.ArrayList;
 
 import cc.warlock.core.client.IWarlockClient;
+import cc.warlock.core.client.IWarlockClientViewer;
 
 public abstract class AbstractScript implements IScript {
 
@@ -32,14 +33,14 @@ public abstract class AbstractScript implements IScript {
 	private boolean stopped = true;
 	protected Reader reader;
 	protected IScriptInfo info;
-	private IWarlockClient client;
+	private IWarlockClientViewer viewer;
 	
-	public AbstractScript (IScriptInfo info, IWarlockClient client)
+	public AbstractScript (IScriptInfo info, IWarlockClientViewer viewer)
 	{
 		this.listeners = new ArrayList<IScriptListener>();
 		
 		this.info = info;
-		this.client = client;
+		this.viewer = viewer;
 	}
 	
 	public void start () {
@@ -102,15 +103,19 @@ public abstract class AbstractScript implements IScript {
 	}
 	
 	protected void echo(String message) {
-		client.getDefaultStream().echo(message + "\n");
+		getClient().getDefaultStream().echo(message + "\n");
 	}
 	
 	protected void debug(String message) {
-		client.getDefaultStream().debug(message + "\n");
+		getClient().getDefaultStream().debug(message + "\n");
 	}
 	
 	public IWarlockClient getClient() {
-		return client;
+		return viewer.getWarlockClient();
+	}
+	
+	public IWarlockClientViewer getViewer() {
+		return viewer;
 	}
 	
 	abstract public IScriptCommands getCommands();

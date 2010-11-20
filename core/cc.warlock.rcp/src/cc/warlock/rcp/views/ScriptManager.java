@@ -45,6 +45,7 @@ import org.eclipse.swt.widgets.Text;
 import org.eclipse.ui.part.ViewPart;
 
 import cc.warlock.core.client.IWarlockClient;
+import cc.warlock.core.client.IWarlockClientViewer;
 import cc.warlock.core.script.IScript;
 import cc.warlock.core.script.IScriptEngine;
 import cc.warlock.core.script.IScriptInfo;
@@ -270,6 +271,11 @@ public class ScriptManager extends ViewPart implements IGameViewFocusListener, I
 			return null;
 		}
 
+		public IWarlockClientViewer getViewer() {
+			// FIXME added to fix error, should this not be a stub?
+			return null;
+		}
+		
 		public String getName() {
 			// TODO Auto-generated method stub
 			return name;

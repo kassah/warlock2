@@ -37,7 +37,7 @@ public class PauseScriptMacroCommand implements IMacroCommand {
 	}
 	
 	public void execute(IWarlockClientViewer viewer) {
-		List<IScript> runningScripts = ScriptEngineRegistry.getRunningScripts(viewer.getWarlockClient());
+		List<IScript> runningScripts = ScriptEngineRegistry.getRunningScripts(viewer);
 		for(IScript currentScript : runningScripts)
 		{
 			if(paused)

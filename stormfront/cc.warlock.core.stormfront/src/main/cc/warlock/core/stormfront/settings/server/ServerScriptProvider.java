@@ -27,7 +27,7 @@ import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 
-import cc.warlock.core.client.IWarlockClient;
+import cc.warlock.core.client.IWarlockClientViewer;
 import cc.warlock.core.script.IScript;
 import cc.warlock.core.script.IScriptEngine;
 import cc.warlock.core.script.IScriptInfo;
@@ -85,13 +85,13 @@ public class ServerScriptProvider implements IServerScriptProvider
 		return Arrays.asList(scripts.values().toArray(new IScriptInfo[scripts.values().size()]));
 	}
 	
-	public IScript startScript (IScriptInfo scriptInfo, IWarlockClient client, String[] arguments)
+	public IScript startScript (IScriptInfo scriptInfo, IWarlockClientViewer viewer, String[] arguments)
 	{
 		for (IScriptEngine engine : ScriptEngineRegistry.getScriptEngines())
 		{
 			if (engine.supports(scriptInfo))
 			{
-				return engine.startScript(scriptInfo, client, arguments);
+				return engine.startScript(scriptInfo, viewer, arguments);
 			}
 		}
 		return null;

@@ -32,7 +32,7 @@ import java.io.Reader;
 import org.mozilla.javascript.Context;
 import org.mozilla.javascript.Scriptable;
 
-import cc.warlock.core.client.IWarlockClient;
+import cc.warlock.core.client.IWarlockClientViewer;
 import cc.warlock.core.script.AbstractScript;
 import cc.warlock.core.script.IScriptCommands;
 import cc.warlock.core.script.IScriptEngine;
@@ -54,9 +54,9 @@ public class JavascriptScript extends AbstractScript {
 		private static final long serialVersionUID = 5687999229834097094L;
 	}
 	
-	public JavascriptScript (JavascriptEngine engine, IScriptInfo info, IWarlockClient client, IScriptCommands commands)
+	public JavascriptScript (JavascriptEngine engine, IScriptInfo info, IWarlockClientViewer viewer, IScriptCommands commands)
 	{
-		super(info, client);
+		super(info, viewer);
 		
 		this.engine = engine;
 		this.commands = commands;

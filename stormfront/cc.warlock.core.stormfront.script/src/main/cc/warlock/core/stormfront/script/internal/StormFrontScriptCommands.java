@@ -27,6 +27,8 @@ import java.util.Map;
 import java.util.concurrent.LinkedBlockingQueue;
 
 import cc.warlock.core.client.IStream;
+import cc.warlock.core.client.IWarlockClient;
+import cc.warlock.core.client.IWarlockClientViewer;
 import cc.warlock.core.script.IMatch;
 import cc.warlock.core.script.IScript;
 import cc.warlock.core.script.internal.ScriptCommands;
@@ -35,7 +37,6 @@ import cc.warlock.core.stormfront.script.IStormFrontScriptCommands;
 
 public class StormFrontScriptCommands extends ScriptCommands implements IStormFrontScriptCommands {
 
-	protected IStormFrontClient sfClient;
 	protected IScript script;
 	
 	private int typeAhead = 0;
@@ -46,10 +47,9 @@ public class StormFrontScriptCommands extends ScriptCommands implements IStormFr
 	private HashMap<IMatch, Runnable> actions = new HashMap<IMatch, Runnable>();
 	private Thread actionThread = null;
 	
-	public StormFrontScriptCommands(IStormFrontClient client, String name)
+	public StormFrontScriptCommands(IWarlockClientViewer viewer, String name)
 	{
-		super(client, name);
-		this.sfClient = client;
+		super(viewer, name);
 		
 		/* TODO which streams should we listen to here?
 		client.getDeathsStream().addStreamListener(this);
@@ -59,15 +59,19 @@ public class StormFrontScriptCommands extends ScriptCommands implements IStormFr
 		*/
 	}
 	
-	public StormFrontScriptCommands(IStormFrontClient client, IScript script)
+	public StormFrontScriptCommands(IWarlockClientViewer viewer, IScript script)
 	{
-		this(client, script.getName());
+		this(viewer, script.getName());
 		
 		this.script = script;
 	}
 	
 	public IStormFrontClient getStormFrontClient() {
-		return sfClient;
+		IWarlockClient client = viewer.getWarlockClient();
+		// TODO handle this more appropriately.
+		if(!(client instanceof IStormFrontClient))
+			return null;
+		return (IStormFrontClient)client;
 	}
 	
 	@Override
@@ -91,7 +95,7 @@ public class StormFrontScriptCommands extends ScriptCommands implements IStormFr
 	
 	public void waitForRoundtime(double delay) throws InterruptedException
 	{
-		sfClient.waitForRoundtime(delay);
+		getStormFrontClient().waitForRoundtime(delay);
 	}
 	
 	private class ScriptActionThread extends Thread {

@@ -38,6 +38,7 @@ import cc.warlock.core.client.IRoomListener;
 import cc.warlock.core.client.IStream;
 import cc.warlock.core.client.IStreamListener;
 import cc.warlock.core.client.IWarlockClient;
+import cc.warlock.core.client.IWarlockClientViewer;
 import cc.warlock.core.client.WarlockString;
 import cc.warlock.core.client.internal.Command;
 import cc.warlock.core.script.IMatch;
@@ -45,7 +46,7 @@ import cc.warlock.core.script.IScriptCommands;
 
 public class ScriptCommands implements IScriptCommands, IStreamListener, IRoomListener {
 
-	protected IWarlockClient client;
+	protected IWarlockClientViewer viewer;
 	protected Collection<LinkedBlockingQueue<String>> textWaiters =
 		Collections.synchronizedCollection(new ArrayList<LinkedBlockingQueue<String>>());
 	private StringBuffer receiveBuffer = new StringBuffer();
@@ -73,18 +74,18 @@ public class ScriptCommands implements IScriptCommands, IStreamListener, IRoomLi
 	
 	private List<Thread> scriptThreads = Collections.synchronizedList(new ArrayList<Thread>());
 	
-	public ScriptCommands(IWarlockClient client, String scriptName)
+	public ScriptCommands(IWarlockClientViewer viewer, String scriptName)
 	{
-		this.client = client;
+		this.viewer = viewer;
 		this.scriptName = scriptName;
-		atPrompt = client.getDefaultStream().isPrompting();
+		atPrompt = getClient().getDefaultStream().isPrompting();
 
-		client.getDefaultStream().addStreamListener(this);
-		client.addRoomListener(this);
+		getClient().getDefaultStream().addStreamListener(this);
+		getClient().addRoomListener(this);
 	}
 	
 	public void echo(String text) {
-		client.getDefaultStream().echo("[" + scriptName + "]: " + text + "\n");
+		getClient().getDefaultStream().echo("[" + scriptName + "]: " + text + "\n");
 	}
 	
 	public BlockingQueue<String> createLineQueue() {
@@ -164,7 +165,7 @@ public class ScriptCommands implements IScriptCommands, IStreamListener, IRoomLi
 		
 		Command command = new Command(text, true);
 		command.setPrefix("[" + scriptName + "]: ");
-		client.send(command);
+		getClient().send(command);
 	}
 
 	public void waitFor(IMatch match) throws InterruptedException {
@@ -195,7 +196,7 @@ public class ScriptCommands implements IScriptCommands, IStreamListener, IRoomLi
 	}
 	
 	public IWarlockClient getClient() {
-		return this.client;
+		return viewer.getWarlockClient();
 	}
 		
 	public void streamCleared(IStream stream) {}
@@ -267,8 +268,8 @@ public class ScriptCommands implements IScriptCommands, IStreamListener, IRoomLi
 	public void stop() {
 		interrupt();
 
-		client.getDefaultStream().removeStreamListener(this);
-		client.removeRoomListener(this);
+		getClient().getDefaultStream().removeStreamListener(this);
+		getClient().removeRoomListener(this);
 	}
 	
 	public void interrupt() {

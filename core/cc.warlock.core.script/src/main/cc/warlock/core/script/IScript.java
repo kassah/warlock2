@@ -28,6 +28,7 @@
 package cc.warlock.core.script;
 
 import cc.warlock.core.client.IWarlockClient;
+import cc.warlock.core.client.IWarlockClientViewer;
 
 
 
@@ -59,5 +60,7 @@ public interface IScript {
 	public IScriptInfo getScriptInfo();
 	
 	public IWarlockClient getClient();
+	
+	public IWarlockClientViewer getViewer();
 	
 }

@@ -37,6 +37,7 @@ import org.antlr.runtime.CommonTokenStream;
 import org.antlr.runtime.RecognitionException;
 
 import cc.warlock.core.client.IStream;
+import cc.warlock.core.client.IWarlockClientViewer;
 import cc.warlock.core.script.AbstractScript;
 import cc.warlock.core.script.IMatch;
 import cc.warlock.core.script.IScriptCommands;
@@ -70,18 +71,16 @@ public class WSLScript extends AbstractScript {
 	
 	protected WSLEngine engine;
 	protected IStormFrontScriptCommands scriptCommands;
-	protected IStormFrontClient sfClient;
 	
-	public WSLScript (WSLEngine engine, IScriptInfo info, IStormFrontClient client)
+	public WSLScript (WSLEngine engine, IScriptInfo info, IWarlockClientViewer viewer)
 	{
-		super(info, client);
+		super(info, viewer);
 		this.engine = engine;
-		this.sfClient = client;
 		
 		if(!ScriptConfiguration.instance().getSupressExceptions().get())
 			debugLevel = 1;
 		
-		scriptCommands = new StormFrontScriptCommands(client, this);
+		scriptCommands = new StormFrontScriptCommands(viewer, this);
 		
 		setSpecialVariable("rt", new WSLRoundTime());
 		setSpecialVariable("monstercount", new WSLMonsterCount());
@@ -103,7 +102,7 @@ public class WSLScript extends AbstractScript {
 			return val;
 		
 		// return value from settings. All user global variables are stored here
-		String var = sfClient.getVariable(name);
+		String var = getSFClient().getVariable(name);
 		if (var != null)
 			return new WSLString(var);
 		
@@ -111,7 +110,7 @@ public class WSLScript extends AbstractScript {
 	}
 	
 	public boolean variableExists(String name) {
-		return specialVariables.containsKey(name) || sfClient.getVariable(name) != null;
+		return specialVariables.containsKey(name) || getSFClient().getVariable(name) != null;
 	}
 	
 	public boolean localVariableExists(String name) {
@@ -146,37 +145,37 @@ public class WSLScript extends AbstractScript {
 	
 	private class WSLRoundTime extends WSLAbstractNumber {
 		public double toDouble() {
-			return sfClient.getRoundtime().get();
+			return getSFClient().getRoundtime().get();
 		}
 	}
 	
 	private class WSLMonsterCount extends WSLAbstractNumber {
 		public double toDouble() {
-			return sfClient.getMonsterCount().get();
+			return getSFClient().getMonsterCount().get();
 		}
 	}
 	
 	private class WSLLeftHand extends WSLAbstractString {
 		public String toString() {
-			return sfClient.getLeftHand().get();
+			return getSFClient().getLeftHand().get();
 		}
 	}
 	
 	private class WSLRightHand extends WSLAbstractString {
 		public String toString() {
-			return sfClient.getRightHand().get();
+			return getSFClient().getRightHand().get();
 		}
 	}
 	
 	private class WSLSpell extends WSLAbstractString {
 		public String toString() {
-			return sfClient.getCurrentSpell().get();
+			return getSFClient().getCurrentSpell().get();
 		}
 	}
 	
 	private class WSLRoomTitle extends WSLAbstractString {
 		public String toString() {
-			IStream roomStream = sfClient.getStream("room");
+			IStream roomStream = getSFClient().getStream("room");
 			if(roomStream == null)
 				return "";
 			return roomStream.getFullTitle();
@@ -190,7 +189,7 @@ public class WSLScript extends AbstractScript {
 		}
 		
 		public String toString () {
-			return sfClient.getComponent(componentName).get();
+			return getSFClient().getComponent(componentName).get();
 		}
 	}
 	
@@ -359,7 +358,7 @@ public class WSLScript extends AbstractScript {
 	protected void setGlobalVariable(String name, String value) {
 		if(specialVariables.containsValue(name))
 			scriptError("Cannot overwrite special variable \"" + name + "\"");
-		sfClient.setVariable(name, value);
+		getSFClient().setVariable(name, value);
 	}
 	
 	protected void setSpecialVariable(String name, String value) {
@@ -372,7 +371,7 @@ public class WSLScript extends AbstractScript {
 	}
 	
 	protected void deleteVariable(String name) {
-		sfClient.removeVariable(name);
+		getSFClient().removeVariable(name);
 	}
 	
 	protected void deleteLocalVariable(String name) {
@@ -616,5 +615,9 @@ public class WSLScript extends AbstractScript {
 	
 	public IScriptCommands getCommands() {
 		return scriptCommands;
+	}
+	
+	protected IStormFrontClient getSFClient() {
+		return (IStormFrontClient)getClient();
 	}
 }

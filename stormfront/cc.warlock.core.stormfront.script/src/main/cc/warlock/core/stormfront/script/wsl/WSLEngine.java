@@ -26,7 +26,7 @@ import java.util.Arrays;
 import java.util.Collection;
 import java.util.List;
 
-import cc.warlock.core.client.IWarlockClient;
+import cc.warlock.core.client.IWarlockClientViewer;
 import cc.warlock.core.script.IScript;
 import cc.warlock.core.script.IScriptEngine;
 import cc.warlock.core.script.IScriptFileInfo;
@@ -87,9 +87,9 @@ public class WSLEngine implements IScriptEngine, IScriptListener {
 		return false;
 	}
 	
-	public IScript startScript(IScriptInfo info, IWarlockClient client, String[] arguments) {
+	public IScript startScript(IScriptInfo info, IWarlockClientViewer viewer, String[] arguments) {
 
-		WSLScript wslScript = new WSLScript(this, info, (IStormFrontClient)client);
+		WSLScript wslScript = new WSLScript(this, info, viewer);
 
 		runningScripts.add(wslScript);
 		wslScript.addScriptListener(this);
