@@ -31,10 +31,11 @@ import cc.warlock.core.client.IWarlockClientViewer;
 import cc.warlock.core.script.IScript;
 import cc.warlock.core.script.IScriptEngine;
 import cc.warlock.core.script.IScriptInfo;
+import cc.warlock.core.script.IScriptProvider;
 import cc.warlock.core.script.ScriptEngineRegistry;
 import cc.warlock.core.stormfront.client.IStormFrontClient;
 
-public class ServerScriptProvider implements IServerScriptProvider
+public class ServerScriptProvider implements IScriptProvider
 {
 	protected HashMap<String, ServerScriptInfo> scripts = new HashMap<String, ServerScriptInfo>();
 	protected IStormFrontClient client;
@@ -67,7 +68,7 @@ public class ServerScriptProvider implements IServerScriptProvider
 			return ServerScriptProvider.this.client;
 		}
 		
-		public IServerScriptProvider getProvider() {
+		public IScriptProvider getProvider() {
 			return ServerScriptProvider.this;
 		}
 	}

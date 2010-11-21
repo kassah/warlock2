@@ -22,6 +22,7 @@
 package cc.warlock.core.stormfront.settings.server;
 
 import cc.warlock.core.script.IScriptInfo;
+import cc.warlock.core.script.IScriptProvider;
 import cc.warlock.core.stormfront.client.IStormFrontClient;
 
 @Deprecated
@@ -33,7 +34,7 @@ public interface IServerScriptInfo extends IScriptInfo {
 	
 	public IStormFrontClient getClient();
 	
-	public IServerScriptProvider getProvider();
+	public IScriptProvider getProvider();
 	
 	public ServerScript getServerScript();
 }
