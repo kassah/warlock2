@@ -625,6 +625,8 @@ public class StormFrontClient extends WarlockClient implements IStormFrontClient
 			e.printStackTrace();
 		} catch (IOException e) {
 			e.printStackTrace();
+		} catch (NullPointerException e) {
+			e.printStackTrace();
 		}
 		
 		if (viewer instanceof IStormFrontClientViewer)
