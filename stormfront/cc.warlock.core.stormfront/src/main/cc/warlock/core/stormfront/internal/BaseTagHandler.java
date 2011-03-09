@@ -63,7 +63,9 @@ abstract public class BaseTagHandler implements IStormFrontTagHandler {
 	}
 	
 	public IStormFrontTagHandler getTagHandler(String tagName) {
-		if(tagHandlers == null) return null;
+		if(tagHandlers == null)
+			return null;
+		
 		return tagHandlers.get(tagName);
 	}
 }
