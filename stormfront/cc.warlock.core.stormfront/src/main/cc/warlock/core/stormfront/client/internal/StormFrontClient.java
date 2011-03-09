@@ -620,10 +620,7 @@ public class StormFrontClient extends WarlockClient implements IStormFrontClient
 			
 			serverSettings.importServerSettings(stream, clientSettings);
 			stream.close();
-		} catch (FileNotFoundException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		} catch (IOException e) {
+		} catch (Exception e) {
 			e.printStackTrace();
 		}
 		
