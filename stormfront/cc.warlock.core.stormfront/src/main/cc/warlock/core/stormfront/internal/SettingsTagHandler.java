@@ -29,7 +29,21 @@ import cc.warlock.core.stormfront.xml.StormFrontAttributeList;
 public class SettingsTagHandler extends DefaultTagHandler {
 
 	private StringBuffer buffer = new StringBuffer();
+	private String clientVersion = null;
 	private IStormFrontTagHandler subElements;
+	private NullTagHandler nullHandler = new NullTagHandler();
+	
+	public class NullTagHandler extends BaseTagHandler {
+		@Override
+		public String[] getTagNames() {
+			return new String[] { };
+		}
+
+		@Override
+		public boolean handleCharacters(String characters) {
+			return true;
+		}
+	}
 	
 	public SettingsTagHandler(IStormFrontProtocolHandler handler) {
 		super(handler);
@@ -44,21 +58,23 @@ public class SettingsTagHandler extends DefaultTagHandler {
 	
 	@Override
 	public void handleStart(StormFrontAttributeList attributes, String rawXML) {
-		buffer.setLength(0);
+		clientVersion = attributes.getValue("client");
 		
+		// Apparently we're expecting to be client version 1.0.1.25
+		if(clientVersion != null && !clientVersion.equals("1.0.1.25"))
+			return;
+		
+		buffer.setLength(0);
 		buffer.append(rawXML);
-		/*buffer.append("<settings");
-		String client = attributes.getValue("client");
-		if(client != null) buffer.append(" client=\"" + client + "\"");
-		String major = attributes.getValue("major");
-		if(major != null) buffer.append(" major=\"" + (Integer.parseInt(major) + 1) + "\"");
-		buffer.append(">\n");*/
 		
 		handler.getClient().startedDownloadingServerSettings();
 	}
 	
 	@Override
 	public void handleEnd(String rawXML) {
+		if(clientVersion != null && !clientVersion.equals("1.0.1.25"))
+			return;
+		
 		buffer.append(rawXML);
 		
 		handler.getClient().finishedDownloadingServerSettings(buffer.toString());
@@ -66,6 +82,9 @@ public class SettingsTagHandler extends DefaultTagHandler {
 	
 	@Override
 	public boolean handleCharacters(String characters) {
+		if(clientVersion != null && !clientVersion.equals("1.0.1.25"))
+			return true;
+		
 		buffer.append(characters);
 		return true;
 	}
@@ -76,6 +95,9 @@ public class SettingsTagHandler extends DefaultTagHandler {
 	
 	@Override
 	public IStormFrontTagHandler getTagHandler(String tagName) {
+		if(clientVersion != null && !clientVersion.equals("1.0.1.25"))
+			return nullHandler;
+		
 		return subElements;
 	}
 }

@@ -39,5 +39,6 @@ public class PushBoldTagHandler extends DefaultTagHandler {
 	@Override
 	public void handleEnd(String rawXML) {
 		handler.startBold();
+		handler.incrementMonsterCount();
 	}
 }

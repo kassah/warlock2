@@ -246,7 +246,7 @@ public class StormFrontProtocolHandler implements IStormFrontProtocolHandler {
 		for(int pos = tagStack.size() - 1; pos >= 0; pos--) {
 			String tagName = tagStack.get(pos);
 		
-			IStormFrontTagHandler tagHandler = getTagHandlerForElement(tagName, null, 0);
+			IStormFrontTagHandler tagHandler = getTagHandlerForElement(tagName);
 			if(tagHandler != null) {
 				tagHandler.setCurrentTag(tagName);
 				// if the handler handled the characters, we're done
@@ -263,21 +263,18 @@ public class StormFrontProtocolHandler implements IStormFrontProtocolHandler {
 	public void endElement(String name, String rawXML) {
 		// Get the tag name off the stack
 		if(tagStack.size() == 0 || !name.equals(tagStack.peek())) {
-			System.err.println("Unexpected close tag \"" + name + "\". Probably an unsupported tag.");
+			System.err.println("Unexpected close tag \"" + name + "\".");
 		} else {
 			tagStack.pop();
 		}
 		
 		// call the method for the object
-		IStormFrontTagHandler tagHandler = getTagHandlerForElement(name, null, 0);
+		IStormFrontTagHandler tagHandler = getTagHandlerForElement(name);
 		if(tagHandler != null) {
 			
 			tagHandler.setCurrentTag(name);
 			tagHandler.handleEnd(rawXML);
-		} /* else {
-			if (rawXML != null)
-				characters(rawXML);
-		} */
+		}
 		
 		lineHasTag = true;
 	}
@@ -288,45 +285,71 @@ public class StormFrontProtocolHandler implements IStormFrontProtocolHandler {
 	public void startElement(String name, StormFrontAttributeList attributes, String rawXML) {
 		
 		// call the method for the object
-		IStormFrontTagHandler tagHandler = getTagHandlerForElement(name, null, 0);
+		IStormFrontTagHandler tagHandler = getTagHandlerForElement(name);
+		
+		tagStack.push(name);
 		
 		if(tagHandler != null) {
-			
-			tagStack.push(name);
 			tagHandler.setCurrentTag(name);
 			tagHandler.handleStart(attributes, rawXML);
-		} /*else {
-			if(rawXML != null)
-				characters(rawXML);
-		}*/
+		} else {
+			System.err.println("Unhandled tag \"" + name + "\". Probably an unsupported tag.");
+		}
 		
 		lineHasTag = true;
 	}
 	
-	private IStormFrontTagHandler getTagHandlerForElement(String name,
-			IStormFrontTagHandler parentHandler, int stackPosition) {
+	private IStormFrontTagHandler getTagHandlerForElement(String name) {
+		if(tagStack.size() == 0)
+			return defaultTagHandlers.get(name);
+		
+		IStormFrontTagHandler rv = getTagHandlerForElementHelper(name, null, 0, false);
+		if(rv == null)
+			rv = defaultTagHandlers.get(name);
+		return rv;
+	}
+	
+	private IStormFrontTagHandler getTagHandlerForElementHelper(String name,
+			IStormFrontTagHandler parentHandler, int stackPosition, boolean origParent) {
 		if(stackPosition < tagStack.size()) {
+			// Walk down the stack until we hit the bottom, then search for our tag out the way back out
 			String tagName = tagStack.get(stackPosition);
 			
 			// next handler is the child the parent
 			IStormFrontTagHandler nextHandler;
-			if(parentHandler != null) nextHandler = parentHandler.getTagHandler(tagName);
-			else nextHandler = defaultTagHandlers.get(tagName);
-			// If there was no match, use the current parent
-			if(nextHandler == null) nextHandler = parentHandler;
+			if(parentHandler != null)
+				nextHandler = parentHandler.getTagHandler(tagName);
+			else
+				nextHandler = defaultTagHandlers.get(tagName);
+			
+			// If we just searched for the tag we're looking for, return the result.
+			if(name.equals(tagName))
+				return nextHandler;
+			
+			// If we found a handler, then it's original
+			boolean nextIsOrig = nextHandler != null;
+			
+			// If there was no match, use the current parent (not original)
+			if(nextHandler == null) {
+				nextHandler = parentHandler;
+			}
 			
 			// see if there is a valid handler further down the tree.
-			IStormFrontTagHandler tagHandler = getTagHandlerForElement(name,
-					nextHandler, stackPosition + 1);
+			IStormFrontTagHandler tagHandler = getTagHandlerForElementHelper(name,
+					nextHandler, stackPosition + 1, nextIsOrig);
 			if(tagHandler != null) {
 				return tagHandler;
 			} else {
-				if(parentHandler != null) return parentHandler.getTagHandler(name);
-				else return defaultTagHandlers.get(name);
+				if(origParent)
+					return parentHandler.getTagHandler(name);
+				else
+					return null;
 			}
 		} else {
-			if(parentHandler != null) return parentHandler.getTagHandler(name);
-			else return defaultTagHandlers.get(name);
+			if(origParent)
+				return parentHandler.getTagHandler(name);
+			else
+				return null;
 		}
 	}
 	

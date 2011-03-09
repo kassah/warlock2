@@ -35,14 +35,15 @@ public class SettingsElementsTagHandler extends DefaultTagHandler {
 	
 	@Override
 	public String[] getTagNames() {
-		return new String[] {
+		return new String[] { };
+		/*return new String[] {
 				"presets", "strings", "stream", "scripts",
 				"names", "macros", "palette", "vars", "dialog",
 				"panels", "toggles", "misc", "options", "cmdline",
 				"keys", "p", "k", "i", "w", "h", "k", "v", "s", "m", "o",
 				"font", "columnFont", "detach", "ignores", "builtin",
 				"group", "toggles", "app", "display"
-				};
+				};*/
 	}
 	
 	@Override
@@ -59,11 +60,7 @@ public class SettingsElementsTagHandler extends DefaultTagHandler {
 	@Override
 	public void handleEnd(String rawXML) {
 		handler.getClient().receivedServerSetting(getCurrentTag());
-		
-		if (rawXML != null)
-		{
-			settings.append(rawXML);
-		}
+		settings.append(rawXML);
 	}
 
 }
