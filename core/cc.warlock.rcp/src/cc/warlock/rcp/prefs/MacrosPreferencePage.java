@@ -455,8 +455,11 @@ public class MacrosPreferencePage extends PreferencePageUtils implements
 			macroTable.clearAll();
 		addedMacros.clear();
 		for (Macro currentMacro: macros) {
-			macroTableView.remove(currentMacro);
-			removedMacros.add(currentMacro);
+			// System Macros have no handlers, and shouldn't be removed.
+			if (!currentMacro.getHandlers().isEmpty()) {
+				macroTableView.remove(currentMacro);
+				removedMacros.add(currentMacro);
+			}
 		}
 	}
 	
